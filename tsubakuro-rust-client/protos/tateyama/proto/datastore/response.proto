@@ -1,0 +1,396 @@
+syntax = "proto3";
+
+package tateyama.proto.datastore.response;
+
+option java_multiple_files = false;
+option java_package = "com.tsurugidb.datastore.proto";
+option java_outer_classname = "DatastoreResponse";
+
+import "tateyama/proto/datastore/common.proto";
+
+// empty message
+message Void {}
+
+// unknown error was occurred.
+message UnknownError {
+    // the error message.
+    string message = 1;
+}
+
+// starts backup operation.
+message BackupBegin {
+    reserved 1 to 10;
+    
+    // the simple source.
+    message SimpleSource {
+        // the list of simple files to be copied.
+        repeated string files = 1;
+    }
+
+    // the detail file description.
+    message DetailFile {
+        // the source of a file to be copied.
+        string source = 1;
+        // the destination of the file.
+        string destination = 2;
+        // the file is mutable or not.
+        bool mutable = 3;
+        // the file is detached or not.
+        bool detached = 4;
+    }
+
+    // the detail source.
+    message DetailSource {
+        // the log begin
+        uint64 log_begin = 1;
+        // the log end
+        uint64 log_end = 2;
+        // the image finish
+        oneof image_finish {
+            // image finish is not set
+            uint64 image_finish_is_not_set = 3;
+            // image finish value
+            uint64 image_finish_value = 4;
+        }
+        // the list of detail files to be copied.
+        repeated DetailFile detail_files = 5;
+    }
+
+    // request is successfully completed.
+    message Success {
+        // the corresponded backup operation ID.
+        uint64 id = 11;
+
+        oneof source {
+            // the simple source.
+            SimpleSource simple_source = 12;
+
+            // the detail source.
+            DetailSource detail_source = 13;
+        }
+    }
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 11;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 12;
+    }
+}
+
+// completes backup operation.
+message BackupEnd {
+    reserved 1 to 10;
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Void success = 11;
+
+        // backup operation was expired.
+        Void expired = 12;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 13;
+    }
+}
+
+// estimates backup operation magnitude.
+message BackupEstimate {
+    reserved 1 to 10;
+
+    // request is successfully completed.
+    message Success {
+        // the number of files to be copied.
+        uint64 number_of_files = 11;
+    
+        // the approx. number of bytes to be copied.
+        uint64 number_of_bytes = 12;
+    }
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 11;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 12;
+    }
+}
+
+// retrieves the list of registered Point-in-Time recovery tags.
+message TagList {
+    reserved 1 to 10;
+
+    // request is successfully completed.
+    message Success {
+        // the tag list.
+        repeated common.Tag tags = 11;
+    }
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 11;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 12;
+    }
+}
+
+// creates a new Point-in-Time recovery tag.
+message TagAdd {
+    reserved 1 to 10;
+    
+    // request is successfully completed.
+    message Success {
+        // the added tag.
+        common.Tag tag = 1;
+    }
+
+    // the target tag is already exists.
+    message AlreadyExists {
+        // the tag name.
+        string name = 1;
+    }
+
+    // the target tag name is too long.
+    message TooLongName {
+        string name = 1;
+        uint64 max_characters = 2;
+    }
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 11;
+
+        // the target tag is already exists.
+        AlreadyExists already_exists = 12;
+
+        // the target tag name is too long.
+        TooLongName too_long_name = 13;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 14;
+    }
+}
+
+// retrieves a Point-in-Time recovery tag.
+message TagGet {
+    reserved 1 to 10;
+    
+    // request is successfully completed.
+    message Success {
+        // the got tag.
+        common.Tag tag = 1;
+    }
+
+    // target tag is not found.
+    message NotFound {
+        // the tag name.
+        string name = 1;
+    }
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 12;
+
+        // target tag is not found.
+        NotFound not_found = 13;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 11;
+    }
+}
+
+// removes a Point-in-Time recovery tag.
+message TagRemove {
+    reserved 1 to 10;
+
+    // request is successfully completed.
+    message Success {
+        // the tag name.
+        string name = 1;
+    }
+
+    // target tag is not found.
+    message NotFound {
+        // the tag name.
+        string name = 1;
+    }
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 12;
+
+        // target tag is not found.
+        NotFound not_found = 13;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 11;
+    }
+}
+
+// begins to restore datastore.
+message RestoreBegin {
+    reserved 1 to 10;
+
+    // operation was successfully started.
+    message Success {
+        // the restore job ID.
+        uint64 id = 1;
+    }
+
+    // target backup is not found.
+    message NotFound {
+        // source file path or tag name.
+        string path = 1;
+    }
+
+    // cannot access to target backup by permission error.
+    message PermissionError {
+        // source file path or tag name.
+        string path = 1;
+    }
+
+    // the backup file seems broken.
+    message BrokenData {
+        // broken file path.
+        string path = 1;
+        string detail = 2;
+    }
+
+    // the response body.
+    oneof result {
+        // operation was successfully started.
+        Success success = 12;
+
+        // target backup is not found.
+        NotFound not_found = 13;
+
+        // cannot access to target backup by permission error.
+        PermissionError permission_error = 14;
+
+        // the backup file seems broken.
+        BrokenData broken_data = 15;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 11;
+    }
+}
+
+// retrieves the restore status.
+message RestoreStatus {
+    reserved 1 to 10;
+
+    // kind of restore job status.
+    enum StatusKind {
+        // the restore status is not specified.
+        RESTORE_STATUS_KIND_UNSPECIFIED = 0;
+
+        // preparing restore operation.
+        PREPARING = 1;
+
+        // restore operation is running.
+        RUNNING = 2;
+
+        // restore operation was completed.
+        COMPLETED = 3;
+
+        // restore operation was failed.
+        FAILED = 4;
+
+        // restore operation was canceled.
+        CANCELED = 5;
+    }
+
+    // request is successfully completed.
+    message Success {
+        // the restore job ID.
+        uint64 id = 1;
+
+        // the restore status.
+        StatusKind status = 2;
+
+        // the restore job label, or empty if it is not specified.
+        string label = 3;
+
+        // the restore job owner.
+        string owner = 4;
+
+        // the restore source description.
+        string source = 5;
+
+        // the restore start time (UNIX time in milliseconds).
+        uint64 start_time = 6;
+
+        // the elapsed finish time (UNIX time in milliseconds), or 0 to N/A.
+        uint64 elapsed_finish_time = 7;
+
+        // the job progress ([0, 1]).
+        float progress = 8;
+    }
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 12;
+
+        // target restore operation is not found.
+        Void not_found = 13;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 11;
+    }
+}
+
+// revokes a restore job.
+message RestoreCancel {
+    reserved 1 to 10;
+
+    // the response body.
+    oneof result {
+        // operation was successfully disposed.
+        Void success = 12;
+
+        // the target restore operation was not found.
+        Void not_found = 13;
+
+        // cannot remove the job by permission error.
+        Void permission_error = 14;
+
+        // the cancel request was rejected (already running).
+        Void rejected = 15;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 11;
+    }
+}
+
+// disposes a restore job history.
+message RestoreDispose {
+    reserved 1 to 10;
+
+    // the response body.
+    oneof result {
+        // operation was successfully disposed.
+        Void success = 12;
+
+        // the target restore operation was not found.
+        Void not_found = 13;
+
+        // cannot remove the job by permission error.
+        Void permission_error = 14;
+
+        // the restore operation has not been finished yut.
+        Void not_finished = 15;
+
+        // unknown error was occurred.
+        UnknownError unknown_error = 11;
+    }
+}

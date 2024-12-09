@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package tateyama.proto.datastore.request;
+
+option java_multiple_files = false;
+option java_package = "com.tsurugidb.datastore.proto";
+option java_outer_classname = "DatastoreRequest";
+
+// the request message to datastore service.
+message Request {
+    // service message version (major)
+    uint64 service_message_version_major = 1;
+
+    // service message version (minor)
+    uint64 service_message_version_minor = 2;
+
+    // reserved for system use
+    reserved 3 to 10;
+
+    // the request command.
+    oneof command {
+        // starts backup operation.
+        BackupBegin backup_begin = 11;
+        // completes backup operation.
+        BackupEnd backup_end = 12;
+        // estimates backup operation magnitude.
+        BackupEstimate backup_estimate = 14;
+        // starts detail backup operation.
+        BackupDetailBegin backup_detail_begin = 15;
+        // retrieves the list of registered Point-in-Time recovery tags.
+        TagList tag_list = 17;
+        // creates a new Point-in-Time recovery tag.
+        TagAdd tag_add = 18;
+        // retrieves a Point-in-Time recovery tag.
+        TagGet tag_get = 19;
+        // removes a Point-in-Time recovery tag.
+        TagRemove tag_remove = 20;
+        // begins to restore datastore.
+        RestoreBegin restore_begin = 21;
+        // retrieves the restore status.
+        RestoreStatus restore_status = 22;
+        // removes a restore operation.
+        RestoreCancel restore_cancel = 23;
+        // disposes a restore job history.
+        RestoreDispose restore_dispose = 24;
+    }
+    reserved 16;
+    reserved 25 to 99;
+}
+
+// starts backup operation.
+message BackupBegin {
+    // the backup label.
+    string label = 1;
+}
+
+// the backup type.
+enum BackupType {
+    BACKUP_TYPE_UNSPECIFIED = 0;
+    STANDARD = 1;
+    TRANSACTION = 2;
+}
+
+// starts detail backup operation.
+message BackupDetailBegin {
+    // the backup label.
+    string label = 1;
+
+    // the backup type.
+    BackupType type = 2;
+}
+
+// completes backup operation.
+message BackupEnd {
+    // the backup ID to complete.
+    uint64 id = 1;
+}
+
+// estimates backup operation magnitude.
+message BackupEstimate {}
+
+// retrieves the list of registered Point-in-Time recovery tags.
+message TagList {}
+
+// creates a new Point-in-Time recovery tag.
+message TagAdd {
+    // the tag name.
+    string name = 1;
+
+    // the tag comment.
+    string comment = 2;
+}
+
+// retrieves a Point-in-Time recovery tag.
+message TagGet {
+    // the tag name.
+    string name = 1;
+}
+
+// removes a Point-in-Time recovery tag.
+message TagRemove {
+    // the tag name.
+    string name = 1;
+}
+
+// file entry for Entries
+message FileSetEntry {
+    // the source of a file
+    string source_path = 1;
+    // the destination of the file.
+    string destination_path = 2;
+    // the file is detached or not.
+    bool detached = 3;
+}
+
+// restores from an array of file_set_entry
+message Entries {
+    // the directory on which source files are.
+    string directory = 1;
+    // an array of file_set_entry
+    repeated FileSetEntry file_set_entry = 2;
+}
+
+// begins to restore datastore.
+message RestoreBegin {
+
+    // the restore source.
+    oneof source {
+        // restores from backup directory path.
+        string backup_directory = 1;
+
+        // restores from point-in-time recovery tag name.
+        string tag_name = 2;
+
+        // restores from an array of file_set_entry
+        Entries entries = 5;
+    }
+
+    // whether or not keeps the backup source.
+    bool keep_backup = 3;
+
+    // the restore label.
+    string label = 4;
+}
+
+// retrieves the restore status.
+message RestoreStatus {
+    // the restore job ID.
+    uint64 id = 1;
+}
+
+// removes a restore job.
+message RestoreCancel {
+    // the restore job ID.
+    uint64 id = 1;
+}
+
+// disposes a restore job history.
+message RestoreDispose {
+    // the restore job ID.
+    uint64 id = 1;
+}

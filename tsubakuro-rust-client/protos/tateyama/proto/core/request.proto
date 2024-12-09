@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package tateyama.proto.core.request;
+
+option java_multiple_files = false;
+option java_package = "com.tsurugidb.core.proto";
+option java_outer_classname = "CoreRequest";
+
+// the request message to tateyama core service.
+message Request {
+    // service message version (major)
+    uint64 service_message_version_major = 1;
+
+    // service message version (minor)
+    uint64 service_message_version_minor = 2;
+
+    // reserved for system use
+    reserved 3 to 10;
+
+    // the request command.
+    oneof command {
+        // update session expiration time operation.
+        UpdateExpirationTime update_expiration_time = 11;
+
+        // shutdown operation.
+        Shutdown shutdown = 12;
+    }
+    reserved 13 to 99;
+}
+
+// update session expiration time
+message UpdateExpirationTime {
+
+    // the extending expiration time, or empty for the default duration to extend.
+    oneof expiration_time_opt {
+        // the expiration time (milliseconds from now) to be set
+        uint64 expiration_time = 1;
+    }
+}
+
+// kind of shutdown type.
+enum ShutdownType {
+
+    // The default shutdown type.
+    SHUTDOWN_TYPE_NOT_SET = 0;
+
+    // Waits for the ongoing requests and safely shutdown the session.
+    GRACEFUL = 1;
+
+    // Cancelling the ongoing requests and safely shutdown the session.
+    FORCEFUL = 2;
+}
+
+// request shutdown to the session.
+message Shutdown {
+
+    // the shutdown type.
+    ShutdownType type = 1;
+}

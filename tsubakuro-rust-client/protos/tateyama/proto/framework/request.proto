@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package tateyama.proto.framework.request;
+
+option java_package = "com.tsurugidb.framework.proto";
+option java_outer_classname = "FrameworkRequest";
+
+// common request header for clients to set and send to tateyama.
+message Header {
+  // service message version (major)
+  uint64 service_message_version_major = 1;
+
+  // service message version (minor)
+  uint64 service_message_version_minor = 2;
+
+  // reserved for system use
+  reserved 3 to 10;
+
+  // the destination service ID.
+  uint64 service_id = 11;
+
+  // session ID.
+  uint64 session_id = 12;
+}
