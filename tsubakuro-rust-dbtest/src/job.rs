@@ -1,22 +1,17 @@
-use std::time::Duration;
-
 use tsubakuro_rust_client::prelude::*;
 
 use crate::create_connection_option;
-
-const TIMEOUT: Duration = Duration::from_secs(10);
 
 pub(super) async fn execute(endpoint: &str) -> Result<(), TgError> {
     println!("job::execute start");
 
     let connection_option = create_connection_option(endpoint)?;
 
-    let session_job = Session::connect_async(&connection_option, TIMEOUT).await?;
-    let session = session_job.take(TIMEOUT).await?;
+    let session_job = Session::connect_async(&connection_option).await?;
+    let session = session_job.take().await?;
     println!("{session:?}");
 
-    let mut client: SqlClient = session.make_client();
-    client.set_default_timeout(TIMEOUT);
+    let client: SqlClient = session.make_client();
 
     drop_table_if_exists(&client, "test").await?;
     execute_statement(
@@ -50,8 +45,7 @@ create table test (
 
         let sql = "select * from test order by foo";
         let job = client.execute_query_async(&tx, sql).await?;
-        let mut result = job.take(TIMEOUT).await?;
-        result.set_default_timeout(TIMEOUT);
+        let mut result = job.take().await?;
         while result.next_row().await? {
             assert_eq!(true, result.next_column().await?);
             let foo: i32 = result.fetch().await?;
@@ -73,7 +67,7 @@ create table test (
 
 async fn list_tables(client: &SqlClient) -> Result<(), TgError> {
     let job = client.list_tables_async().await?;
-    let table_list = job.take(TIMEOUT).await?;
+    let table_list = job.take().await?;
     println!("list_tables={:?}", table_list.get_table_names());
     Ok(())
 }
@@ -86,7 +80,7 @@ async fn start_occ(client: &SqlClient) -> Result<Transaction, TgError> {
 async fn commit(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
     let option = CommitOption::new();
     let job = client.commit_async(transaction, &option).await?;
-    job.take(TIMEOUT).await?;
+    job.take().await?;
 
     transaction.close().await?;
     Ok(())
@@ -96,9 +90,10 @@ async fn execute_statement(client: &SqlClient, sql: &str) -> Result<SqlExecuteRe
     let tx = start_occ(client).await?;
 
     let job = client.execute_statement_async(&tx, &sql).await?;
-    let result = job.take(TIMEOUT).await?;
+    let result = job.take().await?;
 
     commit(&client, &tx).await?;
+    tx.close().await?;
     Ok(result)
 }
 

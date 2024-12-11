@@ -31,6 +31,7 @@ impl TcpConnector {
         endpoint: &Endpoint,
         client_information: ClientInformation,
         timeout: Duration,
+        default_timeout: Duration,
     ) -> Result<Arc<Session>, TgError> {
         let wire = TcpConnector::create_wire(endpoint).await?;
 
@@ -41,13 +42,14 @@ impl TcpConnector {
 
         wire.set_session_id(session_id)?;
 
-        Ok(Session::new(wire))
+        Ok(Session::new(wire, default_timeout))
     }
 
     pub(crate) async fn connect_async(
         endpoint: &Endpoint,
         client_information: ClientInformation,
         timeout: Duration,
+        default_timeout: Duration,
     ) -> Result<Job<Arc<Session>>, TgError> {
         let wire = TcpConnector::create_wire(endpoint).await?;
 
@@ -57,18 +59,22 @@ impl TcpConnector {
             client_information,
             wire_information,
             timeout,
+            default_timeout,
         )
         .await?;
 
-        let job = Job::new(|timeout| {
-            Box::pin(async move {
-                let session_id = handshake_job.take(timeout).await?;
+        let job = Job::new(
+            move |timeout| {
+                Box::pin(async move {
+                    let session_id = handshake_job.take_for(timeout).await?;
 
-                wire.set_session_id(session_id)?;
+                    wire.set_session_id(session_id)?;
 
-                Ok(Session::new(wire))
-            })
-        });
+                    Ok(Session::new(wire, default_timeout))
+                })
+            },
+            timeout,
+        );
         Ok(job)
     }
 

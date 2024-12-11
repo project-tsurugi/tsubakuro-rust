@@ -1,4 +1,4 @@
-use std::{env, process};
+use std::{env, process, time::Duration};
 
 use tsubakuro_rust_client::prelude::*;
 
@@ -28,6 +28,7 @@ fn create_connection_option(endpoint: &str) -> Result<ConnectionOption, TgError>
     let mut option = ConnectionOption::new();
     option.set_application_name("tsubakuro-rust-dbtest");
     option.set_endpoint_url(endpoint)?;
+    option.set_default_timeout(Duration::from_secs(10));
 
     Ok(option)
 }

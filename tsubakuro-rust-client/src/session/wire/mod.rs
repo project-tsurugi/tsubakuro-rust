@@ -81,15 +81,19 @@ impl Wire {
         request: R,
         converter: Box<dyn FnOnce(WireResponse) -> Result<T, TgError> + Send>,
         timeout: Duration,
+        default_timeout: Duration,
     ) -> Result<Job<T>, TgError> {
         let slot_handle = self.send_internal(service_id, request, timeout).await?;
         let wire = self.clone();
-        let job = Job::new(|timeout| {
-            Box::pin(async move {
-                let response = wire.pull_internal(slot_handle, timeout).await?;
-                converter(response)
-            })
-        });
+        let job = Job::new(
+            |timeout| {
+                Box::pin(async move {
+                    let response = wire.pull_internal(slot_handle, timeout).await?;
+                    converter(response)
+                })
+            },
+            default_timeout,
+        );
         Ok(job)
     }
 

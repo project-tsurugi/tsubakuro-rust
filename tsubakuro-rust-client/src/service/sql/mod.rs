@@ -47,9 +47,10 @@ pub struct SqlClient {
 
 impl ServiceClient for SqlClient {
     fn new(session: Arc<Session>) -> Self {
+        let default_timeout = session.default_timeout();
         SqlClient {
             session,
-            default_timeout: Duration::ZERO,
+            default_timeout,
         }
     }
 }
@@ -67,10 +68,11 @@ impl SqlClient {
     }
 
     pub async fn list_tables(&self) -> Result<TableList, TgError> {
-        self.list_tables_with_timeout(self.default_timeout).await
+        let timeout = self.default_timeout;
+        self.list_tables_for(timeout).await
     }
 
-    pub async fn list_tables_with_timeout(&self, timeout: Duration) -> Result<TableList, TgError> {
+    pub async fn list_tables_for(&self, timeout: Duration) -> Result<TableList, TgError> {
         const FUNCTION_NAME: &str = "list_tables()";
         trace!("{} start", FUNCTION_NAME);
 
@@ -83,11 +85,11 @@ impl SqlClient {
     }
 
     pub async fn list_tables_async(&self) -> Result<Job<TableList>, TgError> {
-        self.list_tables_async_with_timeout(self.default_timeout)
-            .await
+        let timeout = self.default_timeout;
+        self.list_tables_async_for(timeout).await
     }
 
-    pub async fn list_tables_async_with_timeout(
+    pub async fn list_tables_async_for(
         &self,
         timeout: Duration,
     ) -> Result<Job<TableList>, TgError> {
@@ -116,11 +118,12 @@ impl SqlClient {
         &self,
         transaction_option: &TransactionOption,
     ) -> Result<Transaction, TgError> {
-        self.start_transaction_with_timeout(transaction_option, self.default_timeout)
+        let timeout = self.default_timeout;
+        self.start_transaction_for(transaction_option, timeout)
             .await
     }
 
-    pub async fn start_transaction_with_timeout(
+    pub async fn start_transaction_for(
         &self,
         transaction_option: &TransactionOption,
         timeout: Duration,
@@ -130,8 +133,10 @@ impl SqlClient {
 
         let command = Self::begin_transaction_command(transaction_option);
         let response = self.send_and_pull_response(command, timeout).await?;
+
         let session = self.session.clone();
-        let transaction = transaction_begin_processor(session, response, self.default_timeout)?;
+        let close_timeout = self.default_timeout;
+        let transaction = transaction_begin_processor(session, response, close_timeout)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(transaction)
@@ -141,11 +146,12 @@ impl SqlClient {
         &self,
         transaction_option: &TransactionOption,
     ) -> Result<Job<Transaction>, TgError> {
-        self.start_transaction_async_with_timeout(transaction_option, self.default_timeout)
+        let timeout = self.default_timeout;
+        self.start_transaction_async_for(transaction_option, timeout)
             .await
     }
 
-    pub async fn start_transaction_async_with_timeout(
+    pub async fn start_transaction_async_for(
         &self,
         transaction_option: &TransactionOption,
         timeout: Duration,
@@ -160,7 +166,7 @@ impl SqlClient {
             .send_and_pull_async(
                 command,
                 Box::new(move |response| {
-                    transaction_begin_processor(session.clone(), response, close_timeout)
+                    transaction_begin_processor(session, response, close_timeout)
                 }),
                 timeout,
             )
@@ -184,11 +190,11 @@ impl SqlClient {
         transaction: &Transaction,
         sql: &str,
     ) -> Result<SqlExecuteResult, TgError> {
-        self.execute_statement_with_timeout(transaction, sql, self.default_timeout)
-            .await
+        let timeout = self.default_timeout;
+        self.execute_statement_for(transaction, sql, timeout).await
     }
 
-    pub async fn execute_statement_with_timeout(
+    pub async fn execute_statement_for(
         &self,
         transaction: &Transaction,
         sql: &str,
@@ -212,11 +218,12 @@ impl SqlClient {
         transaction: &Transaction,
         sql: &str,
     ) -> Result<Job<SqlExecuteResult>, TgError> {
-        self.execute_statement_async_with_timeout(transaction, sql, self.default_timeout)
+        let timeout = self.default_timeout;
+        self.execute_statement_async_for(transaction, sql, timeout)
             .await
     }
 
-    pub async fn execute_statement_async_with_timeout(
+    pub async fn execute_statement_async_for(
         &self,
         transaction: &Transaction,
         sql: &str,
@@ -252,11 +259,11 @@ impl SqlClient {
         transaction: &Transaction,
         sql: &str,
     ) -> Result<SqlQueryResult, TgError> {
-        self.execute_query_with_timeout(transaction, sql, self.default_timeout)
-            .await
+        let timeout = self.default_timeout;
+        self.execute_query_for(transaction, sql, timeout).await
     }
 
-    pub async fn execute_query_with_timeout(
+    pub async fn execute_query_for(
         &self,
         transaction: &Transaction,
         sql: &str,
@@ -269,11 +276,13 @@ impl SqlClient {
 
         let command = Self::execute_query_command(tx_handle, sql);
         let response = self.send_and_pull_response(command, timeout).await?;
-        let result_set =
-            query_result_processor(self.wire().clone(), response, self.default_timeout)?;
+
+        let wire = self.wire().clone();
+        let default_timeout = self.default_timeout;
+        let query_result = query_result_processor(wire, response, default_timeout)?;
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(result_set)
+        Ok(query_result)
     }
 
     pub async fn execute_query_async(
@@ -281,11 +290,12 @@ impl SqlClient {
         transaction: &Transaction,
         sql: &str,
     ) -> Result<Job<SqlQueryResult>, TgError> {
-        self.execute_query_async_with_timeout(transaction, sql, self.default_timeout)
+        let timeout = self.default_timeout;
+        self.execute_query_async_for(transaction, sql, timeout)
             .await
     }
 
-    pub async fn execute_query_async_with_timeout(
+    pub async fn execute_query_async_for(
         &self,
         transaction: &Transaction,
         sql: &str,
@@ -327,11 +337,11 @@ impl SqlClient {
         transaction: &Transaction,
         commit_option: &CommitOption,
     ) -> Result<(), TgError> {
-        self.commit_with_timeout(transaction, commit_option, self.default_timeout)
-            .await
+        let timeout = self.default_timeout;
+        self.commit_for(transaction, commit_option, timeout).await
     }
 
-    pub async fn commit_with_timeout(
+    pub async fn commit_for(
         &self,
         transaction: &Transaction,
         commit_option: &CommitOption,
@@ -355,11 +365,12 @@ impl SqlClient {
         transaction: &Transaction,
         commit_option: &CommitOption,
     ) -> Result<Job<()>, TgError> {
-        self.commit_async_with_timeout(transaction, commit_option, self.default_timeout)
+        let timeout = self.default_timeout;
+        self.commit_async_for(transaction, commit_option, timeout)
             .await
     }
 
-    pub async fn commit_async_with_timeout(
+    pub async fn commit_async_for(
         &self,
         transaction: &Transaction,
         commit_option: &CommitOption,
@@ -402,11 +413,11 @@ impl SqlClient {
     }
 
     pub async fn rollback(&self, transaction: &Transaction) -> Result<(), TgError> {
-        self.rollback_with_timeout(transaction, self.default_timeout)
-            .await
+        let timeout = self.default_timeout;
+        self.rollback_for(transaction, timeout).await
     }
 
-    pub async fn rollback_with_timeout(
+    pub async fn rollback_for(
         &self,
         transaction: &Transaction,
         timeout: Duration,
@@ -425,11 +436,11 @@ impl SqlClient {
     }
 
     pub async fn rollback_async(&self, transaction: &Transaction) -> Result<Job<()>, TgError> {
-        self.rollback_async_with_timeout(transaction, self.default_timeout)
-            .await
+        let timeout = self.default_timeout;
+        self.rollback_async_for(transaction, timeout).await
     }
 
-    pub async fn rollback_async_with_timeout(
+    pub async fn rollback_async_for(
         &self,
         transaction: &Transaction,
         timeout: Duration,
@@ -511,7 +522,13 @@ impl SqlClient {
     ) -> Result<Job<T>, TgError> {
         let request = Self::new_request(command);
         self.wire()
-            .send_and_pull_async(SERVICE_ID_SQL, request, converter, timeout)
+            .send_and_pull_async(
+                SERVICE_ID_SQL,
+                request,
+                converter,
+                timeout,
+                self.default_timeout,
+            )
             .await
     }
 

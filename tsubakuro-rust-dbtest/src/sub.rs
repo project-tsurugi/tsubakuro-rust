@@ -1,21 +1,16 @@
-use std::time::Duration;
-
 use tsubakuro_rust_client::prelude::*;
 
 use crate::create_connection_option;
-
-const TIMEOUT: Duration = Duration::from_secs(10);
 
 pub(super) async fn execute(endpoint: &str) -> Result<(), TgError> {
     println!("sub::execute start");
 
     let connection_option = create_connection_option(endpoint)?;
 
-    let session = Session::connect(&connection_option, TIMEOUT).await?;
+    let session = Session::connect(&connection_option).await?;
     println!("{session:?}");
 
-    let mut client: SqlClient = session.make_client();
-    client.set_default_timeout(TIMEOUT);
+    let client: SqlClient = session.make_client();
 
     drop_table_if_exists(&client, "test").await?;
     execute_statement(
@@ -49,7 +44,6 @@ create table test (
 
         let sql = "select * from test order by foo";
         let mut result = client.execute_query(&tx, sql).await?;
-        result.set_default_timeout(TIMEOUT);
         while result.next_row().await? {
             assert_eq!(true, result.next_column().await?);
             let foo: i32 = result.fetch().await?;
@@ -94,6 +88,7 @@ async fn execute_statement(client: &SqlClient, sql: &str) -> Result<SqlExecuteRe
     let result = client.execute_statement(&tx, &sql).await?;
 
     commit(&client, &tx).await?;
+    tx.close().await?;
     Ok(result)
 }
 

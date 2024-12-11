@@ -59,6 +59,7 @@ impl EndpointBroker {
         client_information: ClientInformation,
         wire_information: WireInformation,
         timeout: Duration,
+        default_timeout: Duration,
     ) -> Result<Job<i64>, TgError> {
         const FUNCTION_NAME: &str = "handshake_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -75,6 +76,7 @@ impl EndpointBroker {
                     Ok(session_id)
                 }),
                 timeout,
+                default_timeout,
             )
             .await?;
 

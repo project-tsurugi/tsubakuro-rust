@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::error::TgError;
 
 use super::endpoint::Endpoint;
@@ -8,6 +10,7 @@ pub struct ConnectionOption {
     endpoint: Option<Endpoint>,
     application_name: Option<String>,
     label: Option<String>,
+    default_timeout: Duration,
 }
 
 impl ConnectionOption {
@@ -16,6 +19,7 @@ impl ConnectionOption {
             endpoint: None,
             application_name: None,
             label: None,
+            default_timeout: Duration::ZERO,
         }
     }
 
@@ -47,6 +51,14 @@ impl ConnectionOption {
 
     pub fn label(&self) -> Option<&String> {
         self.label.as_ref()
+    }
+
+    pub fn set_default_timeout(&mut self, timeout: Duration) {
+        self.default_timeout = timeout;
+    }
+
+    pub fn default_timeout(&self) -> Duration {
+        self.default_timeout
     }
 }
 

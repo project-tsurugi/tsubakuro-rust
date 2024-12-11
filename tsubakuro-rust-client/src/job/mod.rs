@@ -6,10 +6,11 @@ pub struct Job<T> {
     take: Box<
         dyn FnOnce(Duration) -> Pin<Box<dyn Future<Output = Result<T, TgError>> + Send>> + Send,
     >,
+    default_timeout: Duration,
 }
 
 impl<T> Job<T> {
-    pub(crate) fn new<F>(take: F) -> Job<T>
+    pub(crate) fn new<F>(take: F, default_timeout: Duration) -> Job<T>
     where
         F: FnOnce(Duration) -> Pin<Box<dyn Future<Output = Result<T, TgError>> + Send>>
             + Send
@@ -17,10 +18,22 @@ impl<T> Job<T> {
     {
         Job {
             take: Box::new(take),
+            default_timeout,
         }
     }
 
-    pub async fn take(self, timeout: Duration) -> Result<T, TgError> {
+    pub fn set_default_timeout(&mut self, timeout: Duration) {
+        self.default_timeout = timeout;
+    }
+
+    // TODO &self
+    pub async fn take(self) -> Result<T, TgError> {
+        let timeout = self.default_timeout;
+        self.take_for(timeout).await
+    }
+
+    // TODO &self
+    pub async fn take_for(self, timeout: Duration) -> Result<T, TgError> {
         (self.take)(timeout).await
     }
 }

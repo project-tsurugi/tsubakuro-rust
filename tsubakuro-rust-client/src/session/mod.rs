@@ -18,17 +18,25 @@ pub(crate) mod wire;
 #[derive(Debug)]
 pub struct Session {
     wire: Arc<Wire>,
+    default_timeout: Duration,
 }
 
 impl Session {
-    pub async fn connect(
+    pub async fn connect(connection_option: &ConnectionOption) -> Result<Arc<Session>, TgError> {
+        let timeout = connection_option.default_timeout();
+        Self::connect_for(connection_option, timeout).await
+    }
+
+    pub async fn connect_for(
         connection_option: &ConnectionOption,
         timeout: Duration,
     ) -> Result<Arc<Session>, TgError> {
         let (endpoint, client_information) = Self::create_information(connection_option)?;
+        let default_timeout = connection_option.default_timeout();
+
         match endpoint {
             Endpoint::Tcp(_, _) => {
-                TcpConnector::connect(endpoint, client_information, timeout).await
+                TcpConnector::connect(endpoint, client_information, timeout, default_timeout).await
             }
             _ => Err(illegal_argument_error!("unsupported endpoint")),
         }
@@ -36,13 +44,22 @@ impl Session {
 
     pub async fn connect_async(
         connection_option: &ConnectionOption,
+    ) -> Result<Job<Arc<Session>>, TgError> {
+        let timeout = connection_option.default_timeout();
+        Self::connect_async_for(connection_option, timeout).await
+    }
+
+    pub async fn connect_async_for(
+        connection_option: &ConnectionOption,
         timeout: Duration,
     ) -> Result<Job<Arc<Session>>, TgError> {
         let (endpoint, client_information) = Self::create_information(connection_option)?;
+        let default_timeout = connection_option.default_timeout();
 
         let job = match endpoint {
             Endpoint::Tcp(_, _) => {
-                TcpConnector::connect_async(endpoint, client_information, timeout).await?
+                TcpConnector::connect_async(endpoint, client_information, timeout, default_timeout)
+                    .await?
             }
             _ => return Err(illegal_argument_error!("unsupported endpoint")),
         };
@@ -65,6 +82,14 @@ impl Session {
         Ok((endpoint, client_information))
     }
 
+    pub fn set_default_timeout(&mut self, timeout: Duration) {
+        self.default_timeout = timeout;
+    }
+
+    pub fn default_timeout(&self) -> Duration {
+        self.default_timeout
+    }
+
     pub fn make_client<T: ServiceClient>(self: &Arc<Session>) -> T {
         T::new(self.clone())
     }
@@ -73,8 +98,11 @@ impl Session {
 }
 
 impl Session {
-    fn new(wire: Arc<Wire>) -> Arc<Self> {
-        Arc::new(Session { wire })
+    fn new(wire: Arc<Wire>, default_timeout: Duration) -> Arc<Self> {
+        Arc::new(Session {
+            wire,
+            default_timeout,
+        })
     }
 
     pub(crate) fn wire(&self) -> Arc<Wire> {
