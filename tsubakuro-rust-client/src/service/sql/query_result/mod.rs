@@ -74,9 +74,10 @@ pub(crate) fn query_result_processor(
     let rs_wire = wire.create_result_set_wire(&result_set_name)?;
     let byte_stream = ResultSetByteStream::new(rs_wire);
     let value_stream = ResultSetValueStream::new(byte_stream);
-    let result_set = SqlQueryResult::new(result_set_name, metadata, value_stream, default_timeout);
+    let query_result =
+        SqlQueryResult::new(result_set_name, metadata, value_stream, default_timeout);
 
-    Ok(result_set)
+    Ok(query_result)
 }
 
 fn read_result_set_metadata(

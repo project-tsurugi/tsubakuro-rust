@@ -2,52 +2,46 @@ use crate::jogasaki::proto::sql::response::Name as ProtoName;
 
 use std::fmt::{Debug, Display};
 
+#[derive(PartialEq)]
 pub struct TName {
-    identfiers: Vec<String>,
+    identifiers: Vec<String>,
 }
 
 impl TName {
+    pub fn new(identifiers: Vec<String>) -> TName {
+        TName { identifiers }
+    }
+
     pub fn from(proto_name: &ProtoName) -> TName {
         let identifiers = proto_name
             .identifiers
             .iter()
             .map(|identifier| identifier.label.to_string())
             .collect();
-        TName {
-            identfiers: identifiers,
-        }
+        TName { identifiers }
     }
 
     pub fn identifiers(&self) -> &Vec<String> {
-        &self.identfiers
+        &self.identifiers
     }
 }
 
 impl Display for TName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = self.identfiers.join(".");
+        let s = self.identifiers.join(".");
         write!(f, "{}", s)
     }
 }
 
 impl Debug for TName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let s = self.to_string();
-        write!(f, "{}", s)
+        write!(f, "{}", self)
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-
-    impl TName {
-        fn new(identifiers: Vec<String>) -> TName {
-            TName {
-                identfiers: identifiers,
-            }
-        }
-    }
 
     #[test]
     fn tname_identifiers() {

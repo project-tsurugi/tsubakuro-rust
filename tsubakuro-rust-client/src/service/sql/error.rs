@@ -93,3 +93,17 @@ fn to_sql_service_diagnostic_code_number(code: crate::jogasaki::proto::sql::erro
         crate::jogasaki::proto::sql::error::Code::Unspecified => -1,
     }
 }
+
+#[macro_export]
+macro_rules! broken_relation_error {
+    ($function_name:expr, $message:expr) => {
+        $crate::error::TgError::ClientError(format!("{}: {}", $function_name, $message), None)
+    };
+}
+
+#[macro_export]
+macro_rules! broken_encoding_error {
+    ($function_name:expr, $message:expr) => {
+        $crate::error::TgError::ClientError(format!("{}: {}", $function_name, $message), None)
+    };
+}

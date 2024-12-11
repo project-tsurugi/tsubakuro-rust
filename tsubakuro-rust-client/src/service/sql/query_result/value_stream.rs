@@ -1,6 +1,6 @@
 use std::{collections::VecDeque, time::Duration};
 
-use crate::{client_error, error::TgError};
+use crate::{broken_encoding_error, broken_relation_error, client_error, error::TgError};
 
 use super::{byte_stream::ResultSetByteStream, variant::Base128Variant};
 
@@ -265,8 +265,9 @@ impl ResultSetValueStream {
         }
     }
 
-    pub async fn next_row(&mut self, timeout: Duration) -> Result<bool, TgError> {
-        //TODO discardTopLevelRow()
+    pub(crate) async fn next_row(&mut self, timeout: Duration) -> Result<bool, TgError> {
+        self.discard_top_level_row(timeout).await?;
+
         let entry_type = self.peek_entry_type(timeout).await?;
         match entry_type {
             EntryType::EndOfContents => Ok(false),
@@ -281,13 +282,42 @@ impl ResultSetValueStream {
         }
     }
 
-    pub async fn next_column(&mut self, timeout: Duration) -> Result<bool, TgError> {
-        if self.kind_stack.is_empty() {
+    async fn discard_top_level_row(&mut self, timeout: Duration) -> Result<(), TgError> {
+        while !self.kind_stack_is_empty() {
+            self.discard_current_frame(timeout).await?;
+        }
+        Ok(())
+    }
+
+    async fn discard_current_frame(&mut self, timeout: Duration) -> Result<(), TgError> {
+        let entry = self.kind_stack_pop();
+        if let Some((_, rest)) = entry {
+            for _i in 0..rest {
+                self.force_discard_current_entry(timeout).await?;
+            }
+        }
+        self.current_column_type = EntryType::Nothing;
+        Ok(())
+    }
+
+    async fn force_discard_current_entry(&mut self, timeout: Duration) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "force_discard_current_entry";
+        if !self.skip(true, timeout).await? {
+            return Err(broken_relation_error!(
+                FUNCTION_NAME,
+                "relation is interruptibly closed"
+            ));
+        }
+        Ok(())
+    }
+
+    pub(crate) async fn next_column(&mut self, timeout: Duration) -> Result<bool, TgError> {
+        if self.kind_stack_is_empty() {
             // trace!("+++---next_column()=false kind_stack is empty");
             return Ok(false);
         }
 
-        //TODO discardCurrentColumnIfExists()
+        self.discard_current_column_if_exists(timeout).await?;
 
         let rest = self.kind_stack_get_top().unwrap().1;
         if rest == 0 {
@@ -302,6 +332,15 @@ impl ResultSetValueStream {
 
         // trace!("+++---next_column()=true");
         Ok(true)
+    }
+
+    async fn discard_current_column_if_exists(&mut self, timeout: Duration) -> Result<(), TgError> {
+        debug_assert_eq!(false, self.kind_stack_is_empty());
+        if self.current_column_type != EntryType::Nothing {
+            self.force_discard_current_entry(timeout).await?;
+            self.column_consumed();
+        }
+        Ok(())
     }
 
     pub(crate) fn is_null(&mut self) -> Result<bool, TgError> {
@@ -322,8 +361,146 @@ impl ResultSetValueStream {
         }
     }
 
-    async fn read_int(&mut self, timeout: Duration) -> Result<i64, TgError> {
+    pub(crate) async fn fetch_int8_value(&mut self, timeout: Duration) -> Result<i64, TgError> {
         self.require_column_type(EntryType::Int)?;
+        let value = self.read_int(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
+    pub(crate) async fn fetch_character_value(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<String, TgError> {
+        self.require_column_type(EntryType::Character)?;
+        let value = self.read_character(timeout).await?;
+        // trace!("+++---take_character_value=[{}]", value);
+        self.column_consumed();
+        Ok(value)
+    }
+
+    fn require_column_type(&self, expected: EntryType) -> Result<(), TgError> {
+        let found = self.current_column_type;
+        if found == EntryType::Nothing {
+            return Err(client_error!("invoke .nextColumn() before fetch value"));
+        }
+
+        if found != expected {
+            return Err(client_error!(format!("value is type is inconsistent: found '{found:?}' but expected one is ''{expected:?}''")));
+        }
+        Ok(())
+    }
+
+    fn column_consumed(&mut self) {
+        self.current_column_type = EntryType::Nothing;
+        let entry = self.kind_stack_get_top().unwrap();
+        debug_assert!(entry.1 > 0);
+        entry.1 -= 1;
+    }
+}
+
+impl ResultSetValueStream {
+    async fn peek_entry_type(&mut self, timeout: Duration) -> Result<EntryType, TgError> {
+        // trace!("+++---peek_entry_type={:?}", self.current_entry_type);
+        if self.current_entry_type == EntryType::Nothing {
+            self.fetch_header(timeout).await?;
+        }
+        Ok(self.current_entry_type)
+    }
+
+    async fn skip(&mut self, _deep: bool, timeout: Duration) -> Result<bool, TgError> {
+        const FUNCTION_NAME: &str = "ResultSetValueStream.skip()";
+        let entry_type = self.peek_entry_type(timeout).await?;
+        match entry_type {
+            EntryType::Null => {
+                self.read_null()?;
+                Ok(true)
+            }
+            EntryType::Int => {
+                self.read_int(timeout).await?;
+                Ok(true)
+            }
+            // case FLOAT4:
+            //     readFloat4();
+            //     return true;
+            // case FLOAT8:
+            //     readFloat8();
+            //     return true;
+            // case DECIMAL:
+            //     readDecimal();
+            //     return true;
+            EntryType::Character => {
+                self.read_character(timeout).await?;
+                Ok(true)
+            }
+
+            // case BIT:
+            //     readBit(bitBuilder);
+            //     return true;
+            // case OCTET:
+            //     readOctet(byteBuilder);
+            //     return true;
+
+            // case DATE:
+            //     readDate();
+            //     return true;
+            // case TIME_OF_DAY:
+            //     readTimeOfDay();
+            //     return true;
+            // case TIME_POINT:
+            //     readTimePoint();
+            //     return true;
+            // case TIME_OF_DAY_WITH_TIME_ZONE:
+            //     readTimeOfDayWithTimeZone();
+            //     return true;
+            // case TIME_POINT_WITH_TIME_ZONE:
+            //     readTimePointWithTimeZone();
+            //     return true;
+            // case DATETIME_INTERVAL:
+            //     readDateTimeInterval();
+            //     return true;
+
+            // case ROW: {
+            //     int count = readRowBegin();
+            //     if (deep) {
+            //         return skipN(count);
+            //     }
+            //     return true;
+            // }
+            // case ARRAY: {
+            //     int count = readArrayBegin();
+            //     if (deep) {
+            //         return skipN(count);
+            //     }
+            //     return true;
+            // }
+            EntryType::EndOfContents => Ok(false),
+            _ => Err(broken_encoding_error!(
+                FUNCTION_NAME,
+                format!("unsupported entry type: {entry_type:?}")
+            )),
+        }
+    }
+
+    async fn _skip_n(&mut self, count: i32, timeout: Duration) -> Result<bool, TgError> {
+        for _i in 0..count {
+            if !self.skip(true, timeout).await? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
+
+    fn read_null(&mut self) -> Result<(), TgError> {
+        self.require(EntryType::Null)?;
+        self.clear_header_info();
+        // header only
+
+        Ok(())
+    }
+
+    async fn read_int(&mut self, timeout: Duration) -> Result<i64, TgError> {
+        self.require(EntryType::Int)?;
         self.read_int_body(timeout).await
     }
 
@@ -344,25 +521,8 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
-    pub(crate) async fn fetch_int8_value(&mut self, timeout: Duration) -> Result<i64, TgError> {
-        self.require_column_type(EntryType::Int)?;
-        let value = self.read_int(timeout).await?;
-        self.column_consumed();
-        Ok(value)
-    }
-
-    pub(crate) async fn fetch_character_value(
-        &mut self,
-        timeout: Duration,
-    ) -> Result<String, TgError> {
-        self.require_column_type(EntryType::Character)?;
-        let value = self.read_character(timeout).await?;
-        // trace!("+++---take_character_value=[{}]", value);
-        self.column_consumed();
-        Ok(value)
-    }
-
     async fn read_character(&mut self, timeout: Duration) -> Result<String, TgError> {
+        self.require(EntryType::Character)?;
         let size = self.read_character_size(timeout).await?;
 
         let buffer = {
@@ -388,7 +548,7 @@ impl ResultSetValueStream {
         }
 
         debug_assert_eq!(category, HEADER_CHARACTER);
-        return self.read_size(timeout).await;
+        self.read_size(timeout).await
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: Duration) -> Result<i32, TgError> {
@@ -403,23 +563,16 @@ impl ResultSetValueStream {
         }
 
         debug_assert_eq!(category, HEADER_ROW);
-        return self.read_size(timeout).await;
-    }
-}
-
-impl ResultSetValueStream {
-    fn clear_header_info(&mut self) {
-        self.current_entry_type = EntryType::Nothing;
-        self.current_header_category = HEADER_UNGAINED;
-        self.current_header_payload = 0;
+        self.read_size(timeout).await
     }
 
-    async fn peek_entry_type(&mut self, timeout: Duration) -> Result<EntryType, TgError> {
-        // trace!("+++---peek_entry_type={:?}", self.current_entry_type);
-        if self.current_entry_type == EntryType::Nothing {
-            self.fetch_header(timeout).await?;
+    async fn read_size(&mut self, timeout: Duration) -> Result<i32, TgError> {
+        let value = Base128Variant::read_unsigned(&mut self.byte_stream, timeout).await?;
+        if value < 0 || value > (i32::MAX as i64) {
+            // TODO BrokenEncodingException
+            return Err(client_error!(format!("saw unsupported size {value}")));
         }
-        Ok(self.current_entry_type)
+        Ok(value as i32)
     }
 
     fn require(&self, expected: EntryType) -> Result<EntryType, TgError> {
@@ -431,32 +584,13 @@ impl ResultSetValueStream {
         }
         Ok(found)
     }
+}
 
-    fn require_column_type(&self, expected: EntryType) -> Result<(), TgError> {
-        let found = self.current_column_type;
-        if found == EntryType::Nothing {
-            return Err(client_error!("invoke .nextColumn() before fetch value"));
-        }
-
-        if found != expected {
-            return Err(client_error!(format!("value is type is inconsistent: found '{found:?}' but expected one is ''{expected:?}''")));
-        }
-        Ok(())
-    }
-
-    fn column_consumed(&mut self) {
-        self.current_column_type = EntryType::Nothing;
-        let entry = self.kind_stack_get_top().unwrap();
-        debug_assert!(entry.1 > 0);
-        entry.1 -= 1;
-    }
-
-    fn kind_stack_push(&mut self, kind: EntryKind, rest: i32) {
-        self.kind_stack.push_back((kind, rest));
-    }
-
-    fn kind_stack_get_top(&mut self) -> Option<&mut (EntryKind, i32)> {
-        self.kind_stack.back_mut()
+impl ResultSetValueStream {
+    fn clear_header_info(&mut self) {
+        self.current_entry_type = EntryType::Nothing;
+        self.current_header_category = HEADER_UNGAINED;
+        self.current_header_payload = 0;
     }
 
     async fn fetch_header(&mut self, timeout: Duration) -> Result<(), TgError> {
@@ -509,6 +643,7 @@ impl ResultSetValueStream {
             let index = (c + OFFSET_INDEPENDENT_ENTRY_TYPE) as usize;
             let entry_type = INDEPENDENT_ENTRY_TYPE[index];
             if entry_type == EntryType::Nothing {
+                // TODO BrokenEncodingException
                 return Err(client_error!(format!("unrecognized entry error {c}")));
             }
             self.current_entry_type = entry_type;
@@ -517,12 +652,22 @@ impl ResultSetValueStream {
         }
         Ok(())
     }
+}
 
-    async fn read_size(&mut self, timeout: Duration) -> Result<i32, TgError> {
-        let value = Base128Variant::read_unsigned(&mut self.byte_stream, timeout).await?;
-        if value < 0 || value > (i32::MAX as i64) {
-            return Err(client_error!(format!("saw unsupported size {value}")));
-        }
-        Ok(value as i32)
+impl ResultSetValueStream {
+    fn kind_stack_push(&mut self, kind: EntryKind, rest: i32) {
+        self.kind_stack.push_back((kind, rest));
+    }
+
+    fn kind_stack_get_top(&mut self) -> Option<&mut (EntryKind, i32)> {
+        self.kind_stack.back_mut()
+    }
+
+    fn kind_stack_pop(&mut self) -> Option<(EntryKind, i32)> {
+        self.kind_stack.pop_back()
+    }
+
+    fn kind_stack_is_empty(&self) -> bool {
+        self.kind_stack.is_empty()
     }
 }

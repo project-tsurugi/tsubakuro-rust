@@ -52,7 +52,7 @@ impl Wire {
         Arc::new(Wire { wire })
     }
 
-    pub(crate) fn get_delegate_wire(self: &Arc<Self>) -> &DelegateWire {
+    pub(crate) fn get_delegate_wire<'a>(self: &'a Arc<Self>) -> &'a DelegateWire {
         &self.wire
     }
 
