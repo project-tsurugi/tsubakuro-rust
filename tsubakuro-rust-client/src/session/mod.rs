@@ -95,6 +95,14 @@ impl Session {
     }
 
     // TODO Session::shutdown()
+
+    pub async fn close(&self) -> Result<(), TgError> {
+        self.wire.close().await
+    }
+
+    pub fn is_closed(&self) -> bool {
+        self.wire.is_closed()
+    }
 }
 
 impl Session {

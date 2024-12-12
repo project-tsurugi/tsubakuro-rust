@@ -110,6 +110,14 @@ impl TcpWire {
             .register_result_set_wire(result_set_name, rs_wire.clone())?;
         Ok(rs_wire)
     }
+
+    pub(crate) async fn close(&self) -> Result<(), TgError> {
+        self.link.close().await
+    }
+
+    pub(crate) fn is_closed(&self) -> bool {
+        self.link.is_closed()
+    }
 }
 
 impl TcpWire {

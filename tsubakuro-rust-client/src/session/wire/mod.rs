@@ -152,6 +152,14 @@ impl Wire {
         self.wire
             .create_result_set_wire(self.clone(), result_set_name)
     }
+
+    pub async fn close(&self) -> Result<(), TgError> {
+        self.wire.close().await
+    }
+
+    pub fn is_closed(&self) -> bool {
+        self.wire.is_closed()
+    }
 }
 
 // DelegateWireをトレイトにしたいが、downcastが難しいので、enumにしておく
@@ -218,6 +226,20 @@ impl DelegateWire {
     ) -> Result<Arc<dyn ResultSetWire>, TgError> {
         match self {
             DelegateWire::Tcp(tcp_wire) => tcp_wire.create_result_set_wire(wire, result_set_name),
+            _ => todo!("DelegateWire"),
+        }
+    }
+
+    async fn close(&self) -> Result<(), TgError> {
+        match self {
+            DelegateWire::Tcp(tcp_wire) => tcp_wire.close().await,
+            _ => todo!("DelegateWire"),
+        }
+    }
+
+    fn is_closed(&self) -> bool {
+        match self {
+            DelegateWire::Tcp(tcp_wire) => tcp_wire.is_closed(),
             _ => todo!("DelegateWire"),
         }
     }

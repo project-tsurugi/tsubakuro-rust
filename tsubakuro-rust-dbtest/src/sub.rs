@@ -59,6 +59,12 @@ create table test (
     }
     println!("select end");
 
+    assert_eq!(false, session.is_closed());
+    println!("session close start");
+    session.close().await?;
+    println!("session close end");
+    assert_eq!(true, session.is_closed());
+
     println!("sub::execute end");
     Ok(())
 }

@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{sync::atomic::AtomicBool, time::Duration};
 
 use log::trace;
 use prost::bytes::BytesMut;
@@ -9,6 +9,7 @@ use tokio::{
 };
 
 use crate::{
+    client_error,
     error::TgError,
     illegal_argument_error, io_error,
     prelude::Endpoint,
@@ -20,8 +21,9 @@ use super::r#enum::TcpResponseInfo;
 
 pub(crate) struct TcpLink {
     endpoint: Endpoint,
-    reader: Mutex<ReadHalf<TcpStream>>,
-    writer: Mutex<WriteHalf<TcpStream>>,
+    reader: Mutex<Option<ReadHalf<TcpStream>>>,
+    writer: Mutex<Option<WriteHalf<TcpStream>>>,
+    closed: AtomicBool,
 }
 
 impl std::fmt::Debug for TcpLink {
@@ -49,8 +51,9 @@ impl TcpLink {
         let (reader, writer) = tokio::io::split(stream);
         Ok(TcpLink {
             endpoint: endpoint.clone(),
-            reader: Mutex::new(reader),
-            writer: Mutex::new(writer),
+            reader: Mutex::new(Some(reader)),
+            writer: Mutex::new(Some(writer)),
+            closed: AtomicBool::new(false),
         })
     }
 
@@ -73,6 +76,9 @@ impl TcpLink {
 
         let result = tokio::time::timeout(timeout, async {
             let mut writer = self.writer.lock().await;
+            let writer = writer
+                .as_mut()
+                .ok_or(client_error!("TcpLink already closed"))?;
             writer
                 .write_all(&tcp_header)
                 .await
@@ -111,6 +117,9 @@ impl TcpLink {
 
         let result = tokio::time::timeout(timeout, async {
             let mut writer = self.writer.lock().await;
+            let writer = writer
+                .as_mut()
+                .ok_or(client_error!("TcpLink already closed"))?;
             writer
                 .write_all(&tcp_header)
                 .await
@@ -135,6 +144,9 @@ impl TcpLink {
                 Err(_) => return Ok(None),
             }
         };
+        let reader = reader
+            .as_mut()
+            .ok_or(client_error!("TcpLink already closed"))?;
         let result = tokio::time::timeout(timeout, async {
             let info = {
                 let mut buffer = [0u8; 1];
@@ -204,5 +216,28 @@ impl TcpLink {
             Ok(Err(e)) => Err(e),
             Err(_) => Err(timeout_error!("TcpLink.recv(): timeout")),
         }
+    }
+
+    pub(crate) async fn close(&self) -> Result<(), TgError> {
+        if let Ok(_) = self.closed.compare_exchange(
+            false,
+            true,
+            std::sync::atomic::Ordering::SeqCst,
+            std::sync::atomic::Ordering::SeqCst,
+        ) {
+            {
+                let mut writer = self.writer.lock().await;
+                writer.take(); // upadte to None
+            }
+            {
+                let mut reader = self.reader.lock().await;
+                reader.take(); // update to None
+            }
+        }
+        Ok(())
+    }
+
+    pub(crate) fn is_closed(&self) -> bool {
+        self.closed.load(std::sync::atomic::Ordering::SeqCst)
     }
 }
