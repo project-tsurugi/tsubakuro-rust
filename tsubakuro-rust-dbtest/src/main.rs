@@ -5,6 +5,7 @@ use tsubakuro_rust_client::prelude::*;
 mod job;
 mod service;
 mod sub;
+mod transaction;
 
 #[tokio::main]
 async fn main() -> Result<(), TgError> {

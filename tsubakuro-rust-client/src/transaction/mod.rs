@@ -21,6 +21,7 @@ use crate::{
 
 pub mod option;
 
+#[derive(Debug)]
 pub struct Transaction {
     session: Arc<Session>,
     transaction_handle: u64,
@@ -59,6 +60,10 @@ impl Transaction {
 
     pub fn set_close_timeout(&mut self, timeout: Duration) {
         self.close_timeout = timeout;
+    }
+
+    pub fn close_timeout(&self) -> Duration {
+        self.close_timeout
     }
 
     pub async fn close(&self) -> Result<(), TgError> {

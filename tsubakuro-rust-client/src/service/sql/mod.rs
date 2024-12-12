@@ -67,6 +67,12 @@ impl SqlClient {
         self.default_timeout = timeout;
     }
 
+    pub fn default_timeout(&self) -> Duration {
+        self.default_timeout
+    }
+}
+
+impl SqlClient {
     pub async fn list_tables(&self) -> Result<TableList, TgError> {
         let timeout = self.default_timeout;
         self.list_tables_for(timeout).await
@@ -135,7 +141,9 @@ impl SqlClient {
         let response = self.send_and_pull_response(command, timeout).await?;
 
         let session = self.session.clone();
-        let close_timeout = self.default_timeout;
+        let close_timeout = transaction_option
+            .close_timeout()
+            .unwrap_or(self.default_timeout);
         let transaction = transaction_begin_processor(session, response, close_timeout)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -161,7 +169,9 @@ impl SqlClient {
 
         let command = Self::begin_transaction_command(transaction_option);
         let session = self.session.clone();
-        let close_timeout = self.default_timeout;
+        let close_timeout = transaction_option
+            .close_timeout()
+            .unwrap_or(self.default_timeout);
         let job = self
             .send_and_pull_async(
                 command,
