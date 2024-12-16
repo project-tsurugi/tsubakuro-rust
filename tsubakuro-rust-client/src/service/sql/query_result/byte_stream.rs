@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use prost::bytes::{BufMut, BytesMut};
+use prost::bytes::{Buf, BufMut, BytesMut};
 
 use crate::error::TgError;
 
@@ -20,10 +20,11 @@ impl ResultSetByteStream {
         }
     }
 
+    // TODO EOFのときはOk(None)でなくErr(EOF)を返すべき？
     pub(crate) async fn read_u8(&mut self, timeout: Duration) -> Result<Option<u8>, TgError> {
-        // TODO 効率の良い方法
         if let Some(bytes) = self.get_bytes(timeout).await? {
-            let value = bytes.split_to(1)[0];
+            let value = bytes[0];
+            bytes.advance(1);
             Ok(Some(value))
         } else {
             return Ok(None);
@@ -35,6 +36,23 @@ impl ResultSetByteStream {
         size: usize,
         timeout: Duration,
     ) -> Result<Option<BytesMut>, TgError> {
+        let bytes = {
+            if let Some(bytes) = self.get_bytes(timeout).await? {
+                bytes
+            } else {
+                return Ok(None);
+            }
+        };
+        let bytes_len = bytes.len();
+        if size == bytes_len {
+            let bytes = self.current.take();
+            return Ok(bytes);
+        }
+        if size < bytes_len {
+            let bytes = bytes.split_to(size);
+            return Ok(Some(bytes));
+        }
+
         // TODO 効率の良い方法
         let mut buffer = BytesMut::with_capacity(size);
         for _ in 0..size {

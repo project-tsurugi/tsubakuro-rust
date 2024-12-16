@@ -1,5 +1,7 @@
 use std::{collections::VecDeque, time::Duration};
 
+use prost::bytes::BytesMut;
+
 use crate::{broken_encoding_error, broken_relation_error, client_error, error::TgError};
 
 use super::{byte_stream::ResultSetByteStream, variant::Base128Variant};
@@ -368,13 +370,26 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    pub(crate) async fn fetch_float4_value(&mut self, timeout: Duration) -> Result<f32, TgError> {
+        self.require_column_type(EntryType::Float4)?;
+        let value = self.read_float4(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
+    pub(crate) async fn fetch_float8_value(&mut self, timeout: Duration) -> Result<f64, TgError> {
+        self.require_column_type(EntryType::Float8)?;
+        let value = self.read_float8(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
     pub(crate) async fn fetch_character_value(
         &mut self,
         timeout: Duration,
     ) -> Result<String, TgError> {
         self.require_column_type(EntryType::Character)?;
         let value = self.read_character(timeout).await?;
-        // trace!("+++---take_character_value=[{}]", value);
         self.column_consumed();
         Ok(value)
     }
@@ -420,12 +435,14 @@ impl ResultSetValueStream {
                 self.read_int(timeout).await?;
                 Ok(true)
             }
-            // case FLOAT4:
-            //     readFloat4();
-            //     return true;
-            // case FLOAT8:
-            //     readFloat8();
-            //     return true;
+            EntryType::Float4 => {
+                self.read_float4(timeout).await?;
+                Ok(true)
+            }
+            EntryType::Float8 => {
+                self.read_float8(timeout).await?;
+                Ok(true)
+            }
             // case DECIMAL:
             //     readDecimal();
             //     return true;
@@ -521,6 +538,22 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    async fn read_float4(&mut self, timeout: Duration) -> Result<f32, TgError> {
+        self.require(EntryType::Float4)?;
+        self.clear_header_info();
+        let bits = self.read4(timeout).await?;
+        let value = f32::from_bits(bits);
+        Ok(value)
+    }
+
+    async fn read_float8(&mut self, timeout: Duration) -> Result<f64, TgError> {
+        self.require(EntryType::Float8)?;
+        self.clear_header_info();
+        let bits = self.read8(timeout).await?;
+        let value = f64::from_bits(bits);
+        Ok(value)
+    }
+
     async fn read_character(&mut self, timeout: Duration) -> Result<String, TgError> {
         self.require(EntryType::Character)?;
         let size = self.read_character_size(timeout).await?;
@@ -529,6 +562,7 @@ impl ResultSetValueStream {
             if let Some(buffer) = self.byte_stream.read_all(size as usize, timeout).await? {
                 buffer
             } else {
+                // TODO BrokenEncodingException
                 return Err(client_error!("saw unexpected eof"));
             }
         };
@@ -566,15 +600,6 @@ impl ResultSetValueStream {
         self.read_size(timeout).await
     }
 
-    async fn read_size(&mut self, timeout: Duration) -> Result<i32, TgError> {
-        let value = Base128Variant::read_unsigned(&mut self.byte_stream, timeout).await?;
-        if value < 0 || value > (i32::MAX as i64) {
-            // TODO BrokenEncodingException
-            return Err(client_error!(format!("saw unsupported size {value}")));
-        }
-        Ok(value as i32)
-    }
-
     fn require(&self, expected: EntryType) -> Result<EntryType, TgError> {
         let found = self.current_entry_type;
         if found != expected {
@@ -583,6 +608,44 @@ impl ResultSetValueStream {
             )));
         }
         Ok(found)
+    }
+
+    async fn read4(&mut self, timeout: Duration) -> Result<u32, TgError> {
+        let buf = self.read_n(4, timeout).await?;
+        let value =
+            (buf[0] as u32) << 24 | (buf[1] as u32) << 16 | (buf[2] as u32) << 8 | (buf[3] as u32);
+        Ok(value)
+    }
+
+    async fn read8(&mut self, timeout: Duration) -> Result<u64, TgError> {
+        let buf = self.read_n(8, timeout).await?;
+        let value = (buf[0] as u64) << 56
+            | (buf[1] as u64) << 48
+            | (buf[2] as u64) << 40
+            | (buf[3] as u64) << 32
+            | (buf[4] as u64) << 24
+            | (buf[5] as u64) << 16
+            | (buf[6] as u64) << 8
+            | (buf[7] as u64);
+        Ok(value)
+    }
+
+    async fn read_n(&mut self, length: usize, timeout: Duration) -> Result<BytesMut, TgError> {
+        let buffer = self
+            .byte_stream
+            .read_all(length, timeout)
+            .await?
+            .ok_or(broken_encoding_error!("read_n()", "saw unexpected eof"))?;
+        Ok(buffer)
+    }
+
+    async fn read_size(&mut self, timeout: Duration) -> Result<i32, TgError> {
+        let value = Base128Variant::read_unsigned(&mut self.byte_stream, timeout).await?;
+        if value < 0 || value > (i32::MAX as i64) {
+            // TODO BrokenEncodingException
+            return Err(client_error!(format!("saw unsupported size {value}")));
+        }
+        Ok(value as i32)
     }
 }
 

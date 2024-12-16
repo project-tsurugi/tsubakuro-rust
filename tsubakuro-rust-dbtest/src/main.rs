@@ -82,11 +82,21 @@ mod test {
     }
 
     pub(crate) async fn execute_ddl(client: &SqlClient, sql: &str) {
-        let transaction_option = TransactionOption::from(TransactionType::Occ);
-        let transaction = client.start_transaction(&transaction_option).await.unwrap();
+        let transaction = start_occ(client).await;
 
         client.execute_statement(&transaction, sql).await.unwrap();
 
+        commit_and_close(client, &transaction).await;
+    }
+
+    pub(crate) async fn start_occ(client: &SqlClient) -> Transaction {
+        let mut option = TransactionOption::from(TransactionType::Occ);
+        option.set_transaction_label("tsubakuro-rust-dbtest.occ");
+        let transaction = client.start_transaction(&option).await.unwrap();
+        transaction
+    }
+
+    pub(crate) async fn commit_and_close(client: &SqlClient, transaction: &Transaction) {
         let commit_option = CommitOption::new();
         client.commit(&transaction, &commit_option).await.unwrap();
 
