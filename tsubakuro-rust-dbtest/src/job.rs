@@ -1,4 +1,4 @@
-use tsubakuro_rust_client::prelude::*;
+use tsubakuro_rust_core::prelude::*;
 
 use crate::create_connection_option;
 

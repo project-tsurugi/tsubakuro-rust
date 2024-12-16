@@ -2,7 +2,7 @@
 mod test {
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
     use tokio::test;
-    use tsubakuro_rust_client::prelude::*;
+    use tsubakuro_rust_core::prelude::*;
 
     #[test]
     async fn test() {

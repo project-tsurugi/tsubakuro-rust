@@ -2,7 +2,7 @@
 mod test {
     use crate::test::{create_table, create_test_sql_client, drop_table_if_exists};
     use tokio::test;
-    use tsubakuro_rust_client::prelude::name::TName;
+    use tsubakuro_rust_core::prelude::name::TName;
 
     #[test]
     async fn list_tables() {

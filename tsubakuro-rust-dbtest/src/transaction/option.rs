@@ -4,7 +4,7 @@ mod test {
 
     use crate::test::{create_table, create_test_sql_client, drop_table_if_exists};
     use tokio::test;
-    use tsubakuro_rust_client::prelude::*;
+    use tsubakuro_rust_core::prelude::*;
 
     #[test]
     async fn occ() {

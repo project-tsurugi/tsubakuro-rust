@@ -1,6 +1,6 @@
 use std::{env, process, time::Duration};
 
-use tsubakuro_rust_client::prelude::*;
+use tsubakuro_rust_core::prelude::*;
 
 mod job;
 mod service;

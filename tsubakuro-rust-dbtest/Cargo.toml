@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 tokio = "1.42.0"
-tsubakuro-rust-client = { path = "../tsubakuro-rust-client" }
+tsubakuro-rust-core = { path = "../tsubakuro-rust-core" }
