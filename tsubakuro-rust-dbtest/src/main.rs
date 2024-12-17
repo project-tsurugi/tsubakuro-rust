@@ -84,7 +84,7 @@ mod test {
     pub(crate) async fn execute_ddl(client: &SqlClient, sql: &str) {
         let transaction = start_occ(client).await;
 
-        client.execute_statement(&transaction, sql).await.unwrap();
+        client.execute(&transaction, sql).await.unwrap();
 
         commit_and_close(client, &transaction).await;
     }

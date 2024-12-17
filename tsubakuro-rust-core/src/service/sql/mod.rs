@@ -2,6 +2,7 @@ use std::{sync::Arc, time::Duration};
 
 use execute_result::{execute_result_processor, SqlExecuteResult};
 use log::trace;
+use prepare::{prepare_dispose_processor, prepare_processor, SqlPreparedStatement};
 use query_result::{query_result_processor, SqlQueryResult};
 use table_list::{list_tables_processor, TableList};
 
@@ -9,7 +10,7 @@ use crate::{
     error::TgError,
     job::Job,
     jogasaki::proto::sql::request::{request::Request as SqlRequestCommand, Request as SqlRequest},
-    prelude::{CommitOption, ServiceClient},
+    prelude::{CommitOption, ServiceClient, SqlParameter, SqlPlaceholder},
     session::{
         wire::{Wire, WireResponse},
         Session,
@@ -26,6 +27,7 @@ use prost::alloc::string::String as ProstString;
 pub(crate) mod error;
 pub mod execute_result;
 pub mod name;
+pub mod prepare;
 pub mod query_result;
 pub mod table_list;
 
@@ -118,7 +120,110 @@ impl SqlClient {
 
     // TODO SqlClient::get_table_metadata()
 
-    // TODO SqlClient::create_prepared_statement()
+    pub async fn prepare(
+        &self,
+        sql: &str,
+        placeholders: &Vec<SqlPlaceholder>,
+    ) -> Result<SqlPreparedStatement, TgError> {
+        let timeout = self.default_timeout;
+        self.prepare_for(sql, placeholders, timeout).await
+    }
+
+    pub async fn prepare_for(
+        &self,
+        sql: &str,
+        placeholders: &Vec<SqlPlaceholder>,
+        timeout: Duration,
+    ) -> Result<SqlPreparedStatement, TgError> {
+        const FUNCTION_NAME: &str = "prepare()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::prepare_command(sql, placeholders);
+        let response = self.send_and_pull_response(command, timeout).await?;
+
+        let session = self.session.clone();
+        let close_timeout = self.default_timeout;
+        let ps = prepare_processor(session, response, close_timeout)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(ps)
+    }
+
+    pub async fn prepare_async(
+        &self,
+        sql: &str,
+        placeholders: &Vec<SqlPlaceholder>,
+    ) -> Result<Job<SqlPreparedStatement>, TgError> {
+        let timeout = self.default_timeout;
+        self.prepare_async_for(sql, placeholders, timeout).await
+    }
+
+    pub async fn prepare_async_for(
+        &self,
+        sql: &str,
+        placeholders: &Vec<SqlPlaceholder>,
+        timeout: Duration,
+    ) -> Result<Job<SqlPreparedStatement>, TgError> {
+        const FUNCTION_NAME: &str = "prepare_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::prepare_command(sql, placeholders);
+        let session = self.session.clone();
+        let close_timeout = self.default_timeout;
+        let job = self
+            .send_and_pull_async(
+                command,
+                Box::new(move |response| prepare_processor(session, response, close_timeout)),
+                timeout,
+            )
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn prepare_command(sql: &str, placeholders: &Vec<SqlPlaceholder>) -> SqlRequestCommand {
+        let placeholders: Vec<crate::jogasaki::proto::sql::request::Placeholder> =
+            placeholders.iter().map(|p| p.request()).collect();
+
+        let request = crate::jogasaki::proto::sql::request::Prepare {
+            sql: sql.to_string(),
+            placeholders,
+        };
+        SqlRequestCommand::Prepare(request)
+    }
+
+    pub(crate) async fn dispose_prepare(
+        &self,
+        prepare_handle: u64,
+        has_result_records: bool,
+        timeout: Duration,
+    ) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "dispose_prepare()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::dispose_prepare_statement_command(prepare_handle, has_result_records);
+        let response = self.send_and_pull_response(command, timeout).await?;
+        let _ = prepare_dispose_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(())
+    }
+
+    fn dispose_prepare_statement_command(
+        prepare_handle: u64,
+        has_result_records: bool,
+    ) -> SqlRequestCommand {
+        let ps = crate::jogasaki::proto::sql::common::PreparedStatement {
+            handle: prepare_handle,
+            has_result_records,
+        };
+
+        let request = crate::jogasaki::proto::sql::request::DisposePreparedStatement {
+            prepared_statement_handle: Some(ps),
+        };
+        SqlRequestCommand::DisposePreparedStatement(request)
+    }
 
     pub async fn start_transaction(
         &self,
@@ -187,7 +292,7 @@ impl SqlClient {
     }
 
     fn begin_transaction_command(transaction_option: &TransactionOption) -> SqlRequestCommand {
-        let tx_option = transaction_option.as_request();
+        let tx_option = transaction_option.request();
 
         let request = crate::jogasaki::proto::sql::request::Begin {
             option: Some(tx_option),
@@ -195,22 +300,22 @@ impl SqlClient {
         SqlRequestCommand::Begin(request)
     }
 
-    pub async fn execute_statement(
+    pub async fn execute(
         &self,
         transaction: &Transaction,
         sql: &str,
     ) -> Result<SqlExecuteResult, TgError> {
         let timeout = self.default_timeout;
-        self.execute_statement_for(transaction, sql, timeout).await
+        self.execute_for(transaction, sql, timeout).await
     }
 
-    pub async fn execute_statement_for(
+    pub async fn execute_for(
         &self,
         transaction: &Transaction,
         sql: &str,
         timeout: Duration,
     ) -> Result<SqlExecuteResult, TgError> {
-        const FUNCTION_NAME: &str = "execute_statement()";
+        const FUNCTION_NAME: &str = "execute()";
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
@@ -223,23 +328,22 @@ impl SqlClient {
         Ok(execute_result)
     }
 
-    pub async fn execute_statement_async(
+    pub async fn execute_async(
         &self,
         transaction: &Transaction,
         sql: &str,
     ) -> Result<Job<SqlExecuteResult>, TgError> {
         let timeout = self.default_timeout;
-        self.execute_statement_async_for(transaction, sql, timeout)
-            .await
+        self.execute_async_for(transaction, sql, timeout).await
     }
 
-    pub async fn execute_statement_async_for(
+    pub async fn execute_async_for(
         &self,
         transaction: &Transaction,
         sql: &str,
         timeout: Duration,
     ) -> Result<Job<SqlExecuteResult>, TgError> {
-        const FUNCTION_NAME: &str = "execute_statement_async()";
+        const FUNCTION_NAME: &str = "execute_async()";
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
@@ -264,22 +368,107 @@ impl SqlClient {
         SqlRequestCommand::ExecuteStatement(request)
     }
 
-    pub async fn execute_query(
+    pub async fn prepared_execute(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> Result<SqlExecuteResult, TgError> {
+        let timeout = self.default_timeout;
+        self.prepared_execute_for(transaction, prepared_statement, parameters, timeout)
+            .await
+    }
+
+    pub async fn prepared_execute_for(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+        timeout: Duration,
+    ) -> Result<SqlExecuteResult, TgError> {
+        const FUNCTION_NAME: &str = "prepared_execute()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command =
+            Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
+        let response = self.send_and_pull_response(command, timeout).await?;
+        let execute_result = execute_result_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(execute_result)
+    }
+
+    pub async fn prepared_execute_async(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> Result<Job<SqlExecuteResult>, TgError> {
+        let timeout = self.default_timeout;
+        self.prepared_execute_async_for(transaction, prepared_statement, parameters, timeout)
+            .await
+    }
+
+    pub async fn prepared_execute_async_for(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+        timeout: Duration,
+    ) -> Result<Job<SqlExecuteResult>, TgError> {
+        const FUNCTION_NAME: &str = "execute_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command =
+            Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
+        let job = self
+            .send_and_pull_async(command, Box::new(execute_result_processor), timeout)
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn execute_prepared_statement_command(
+        transaction_handle: u64,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> SqlRequestCommand {
+        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
+            handle: transaction_handle,
+        };
+        let ps_handle = crate::jogasaki::proto::sql::common::PreparedStatement {
+            handle: prepared_statement.prepare_handle(),
+            has_result_records: prepared_statement.has_result_records(),
+        };
+        let request = crate::jogasaki::proto::sql::request::ExecutePreparedStatement {
+            transaction_handle: Some(tx_handle),
+            prepared_statement_handle: Some(ps_handle),
+            parameters,
+        };
+        SqlRequestCommand::ExecutePreparedStatement(request)
+    }
+
+    pub async fn query(
         &self,
         transaction: &Transaction,
         sql: &str,
     ) -> Result<SqlQueryResult, TgError> {
         let timeout = self.default_timeout;
-        self.execute_query_for(transaction, sql, timeout).await
+        self.query_for(transaction, sql, timeout).await
     }
 
-    pub async fn execute_query_for(
+    pub async fn query_for(
         &self,
         transaction: &Transaction,
         sql: &str,
         timeout: Duration,
     ) -> Result<SqlQueryResult, TgError> {
-        const FUNCTION_NAME: &str = "execute_query()";
+        const FUNCTION_NAME: &str = "query()";
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
@@ -295,23 +484,22 @@ impl SqlClient {
         Ok(query_result)
     }
 
-    pub async fn execute_query_async(
+    pub async fn query_async(
         &self,
         transaction: &Transaction,
         sql: &str,
     ) -> Result<Job<SqlQueryResult>, TgError> {
         let timeout = self.default_timeout;
-        self.execute_query_async_for(transaction, sql, timeout)
-            .await
+        self.query_async_for(transaction, sql, timeout).await
     }
 
-    pub async fn execute_query_async_for(
+    pub async fn query_async_for(
         &self,
         transaction: &Transaction,
         sql: &str,
         timeout: Duration,
     ) -> Result<Job<SqlQueryResult>, TgError> {
-        const FUNCTION_NAME: &str = "execute_query_async()";
+        const FUNCTION_NAME: &str = "query_async()";
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
@@ -340,6 +528,100 @@ impl SqlClient {
             sql: ProstString::from(sql),
         };
         SqlRequestCommand::ExecuteQuery(request)
+    }
+
+    pub async fn prepared_query(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> Result<SqlQueryResult, TgError> {
+        let timeout = self.default_timeout;
+        self.prepared_query_for(transaction, prepared_statement, parameters, timeout)
+            .await
+    }
+
+    pub async fn prepared_query_for(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+        timeout: Duration,
+    ) -> Result<SqlQueryResult, TgError> {
+        const FUNCTION_NAME: &str = "prepared_query()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command =
+            Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
+        let response = self.send_and_pull_response(command, timeout).await?;
+
+        let wire = self.wire().clone();
+        let default_timeout = self.default_timeout;
+        let query_result = query_result_processor(wire, response, default_timeout)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(query_result)
+    }
+
+    pub async fn prepared_query_async(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> Result<Job<SqlQueryResult>, TgError> {
+        let timeout = self.default_timeout;
+        self.prepared_query_async_for(transaction, prepared_statement, parameters, timeout)
+            .await
+    }
+
+    pub async fn prepared_query_async_for(
+        &self,
+        transaction: &Transaction,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+        timeout: Duration,
+    ) -> Result<Job<SqlQueryResult>, TgError> {
+        const FUNCTION_NAME: &str = "prepared_query_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command =
+            Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
+        let wire = self.wire().clone();
+        let default_timeout = self.default_timeout;
+        let job = self
+            .send_and_pull_async(
+                command,
+                Box::new(move |response| query_result_processor(wire, response, default_timeout)),
+                timeout,
+            )
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn execute_prepared_query_command(
+        transaction_handle: u64,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> SqlRequestCommand {
+        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
+            handle: transaction_handle,
+        };
+        let ps_handle = crate::jogasaki::proto::sql::common::PreparedStatement {
+            handle: prepared_statement.prepare_handle(),
+            has_result_records: prepared_statement.has_result_records(),
+        };
+        let request = crate::jogasaki::proto::sql::request::ExecutePreparedQuery {
+            transaction_handle: Some(tx_handle),
+            prepared_statement_handle: Some(ps_handle),
+            parameters,
+        };
+        SqlRequestCommand::ExecutePreparedQuery(request)
     }
 
     pub async fn commit(

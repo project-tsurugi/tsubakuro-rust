@@ -3,6 +3,7 @@ use crate::{
     invalid_response_error,
     jogasaki::proto::sql::response::ResultSetMetadata,
     session::wire::{Wire, WireResponse},
+    sql_service_error,
 };
 use crate::{
     jogasaki::proto::sql::response::{
@@ -85,24 +86,48 @@ fn read_result_set_metadata(
 ) -> Result<(String, Option<ResultSetMetadata>), TgError> {
     const FUNCTION_NAME: &str = "read_result_set_metadata()";
 
-    if let WireResponse::ResponseSessionBodyhead(_slot, payload) = response {
-        let payload = payload.unwrap();
-        let message = SqlResponse::decode_length_delimited(payload)
-            .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
-        match message.response {
-            Some(SqlResponseCase::ExecuteQuery(execute_query)) => {
-                Ok((execute_query.name, execute_query.record_meta))
+    match response {
+        WireResponse::ResponseSessionBodyhead(_slot, payload) => {
+            let payload = payload.unwrap();
+            let message = SqlResponse::decode_length_delimited(payload)
+                .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
+            match message.response {
+                Some(SqlResponseCase::ExecuteQuery(execute_query)) => {
+                    Ok((execute_query.name, execute_query.record_meta))
+                }
+                _ => Err(invalid_response_error!(
+                    FUNCTION_NAME,
+                    format!("response {:?} is not ExecuteQuery", message.response),
+                )),
             }
-            _ => Err(invalid_response_error!(
-                FUNCTION_NAME,
-                format!("response {:?} is not ExecuteQuery", message.response),
-            )),
         }
-    } else {
-        Err(invalid_response_error!(
+        WireResponse::ResponseSessionPayload(_slot, payload) => {
+            let payload = payload.unwrap();
+            let message = SqlResponse::decode_length_delimited(payload)
+                .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
+            match message.response {
+                Some(SqlResponseCase::ResultOnly(result_only)) => match result_only.result.unwrap()
+                {
+                    crate::jogasaki::proto::sql::response::result_only::Result::Success(
+                        success,
+                    ) => Err(invalid_response_error!(
+                        FUNCTION_NAME,
+                        format!("illegal ResponseSessionPayload {:?}", success),
+                    )),
+                    crate::jogasaki::proto::sql::response::result_only::Result::Error(error) => {
+                        Err(sql_service_error!(FUNCTION_NAME, error))
+                    }
+                },
+                _ => Err(invalid_response_error!(
+                    FUNCTION_NAME,
+                    format!("response {:?} is not ResultOnly", message.response),
+                )),
+            }
+        }
+        _ => Err(invalid_response_error!(
             FUNCTION_NAME,
             format!("response({:?}) is not ResponseSessionBodyhead", response),
-        ))
+        )),
     }
 }
 

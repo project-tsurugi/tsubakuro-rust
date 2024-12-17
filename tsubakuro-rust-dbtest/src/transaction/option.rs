@@ -85,7 +85,7 @@ mod test {
 
         let transaction = client.start_transaction(&option).await.unwrap();
         client
-            .execute_statement(&transaction, "create table test (pk int)")
+            .execute(&transaction, "create table test (pk int)")
             .await
             .unwrap();
         client

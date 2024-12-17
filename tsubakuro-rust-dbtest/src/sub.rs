@@ -43,7 +43,7 @@ create table test (
         let tx = start_occ(&client).await?;
 
         let sql = "select * from test order by foo";
-        let mut result = client.execute_query(&tx, sql).await?;
+        let mut result = client.query(&tx, sql).await?;
         while result.next_row().await? {
             assert_eq!(true, result.next_column().await?);
             let foo: i32 = result.fetch().await?;
@@ -91,7 +91,7 @@ async fn commit(client: &SqlClient, transaction: &Transaction) -> Result<(), TgE
 async fn execute_statement(client: &SqlClient, sql: &str) -> Result<SqlExecuteResult, TgError> {
     let tx = start_occ(client).await?;
 
-    let result = client.execute_statement(&tx, &sql).await?;
+    let result = client.execute(&tx, &sql).await?;
 
     commit(&client, &tx).await?;
     tx.close().await?;

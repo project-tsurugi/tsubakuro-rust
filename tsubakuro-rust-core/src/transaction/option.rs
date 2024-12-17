@@ -162,7 +162,7 @@ impl TransactionOptionSetter<String> for TransactionOption {
 }
 
 impl TransactionOption {
-    pub(crate) fn as_request(&self) -> RequestTransactionOption {
+    pub(crate) fn request(&self) -> RequestTransactionOption {
         let tx_type = match self.transaction_type {
             TransactionType::Occ => RequestTransactionType::Short,
             TransactionType::Ltx => RequestTransactionType::Long,
@@ -278,7 +278,7 @@ mod test {
             assert_eq!(TransactionPriority::Unspecified, option.priority());
             assert_eq!(None, option.close_timeout());
 
-            let request = option.as_request();
+            let request = option.request();
             assert_eq!(RequestTransactionType::Short, request.r#type());
             assert_eq!(RequestTransactionPriority::Unspecified, request.priority());
             assert_eq!("", request.label);
@@ -298,7 +298,7 @@ mod test {
             option.set_priority(TransactionPriority::Interrupt);
             option.set_close_timeout(Duration::from_secs(123));
 
-            let request = option.as_request();
+            let request = option.request();
             assert_eq!(RequestTransactionType::Long, request.r#type());
             assert_eq!(RequestTransactionPriority::Interrupt, request.priority());
             assert_eq!("transaction_label", request.label);

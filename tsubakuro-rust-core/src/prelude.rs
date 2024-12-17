@@ -1,6 +1,11 @@
 pub use crate::error::*;
 pub use crate::job::*;
+pub use crate::jogasaki::proto::sql::common::AtomType;
+pub use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
 pub use crate::service::sql::execute_result::*;
+pub use crate::service::sql::prepare::parameter::*;
+pub use crate::service::sql::prepare::placeholder::*;
+pub use crate::service::sql::prepare::*;
 pub use crate::service::sql::query_result::*;
 pub use crate::service::sql::table_list::*;
 pub use crate::service::sql::*;
