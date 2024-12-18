@@ -1,14 +1,12 @@
 use std::time::Duration;
 
-use crate::{client_error, error::TgError};
-
-use super::byte_stream::ResultSetByteStream;
+use crate::{client_error, error::TgError, session::wire::data_channel::DataChannel};
 
 pub(crate) struct Base128Variant {}
 
 impl Base128Variant {
     pub(crate) async fn read_unsigned(
-        stream: &mut ResultSetByteStream,
+        stream: &mut DataChannel,
         timeout: Duration,
     ) -> Result<i64, TgError> {
         let mut result = 0_i64;
@@ -27,7 +25,7 @@ impl Base128Variant {
     }
 
     pub(crate) async fn read_signed(
-        stream: &mut ResultSetByteStream,
+        stream: &mut DataChannel,
         timeout: Duration,
     ) -> Result<i64, TgError> {
         let v = Self::read_unsigned(stream, timeout).await? as u64;
@@ -35,7 +33,7 @@ impl Base128Variant {
         Ok(r as i64)
     }
 
-    async fn read_u8(stream: &mut ResultSetByteStream, timeout: Duration) -> Result<u8, TgError> {
+    async fn read_u8(stream: &mut DataChannel, timeout: Duration) -> Result<u8, TgError> {
         if let Some(c) = stream.read_u8(timeout).await? {
             Ok(c)
         } else {

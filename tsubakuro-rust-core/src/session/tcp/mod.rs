@@ -18,10 +18,10 @@ use super::{
 };
 use crate::service::endpoint::EndpointBroker;
 
+pub(crate) mod data_channel_box;
+pub(crate) mod data_channel_wire;
 pub(crate) mod r#enum;
 pub(crate) mod link;
-pub(crate) mod result_set_box;
-pub(crate) mod result_set_wire;
 pub(crate) mod wire;
 
 pub(crate) struct TcpConnector {}

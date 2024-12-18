@@ -3,6 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+use data_channel::{DataChannel, DataChannelWire};
 use prost::{
     bytes::{Buf, BytesMut},
     Message as ProstMessage,
@@ -11,7 +12,6 @@ use response_box::{ResponseBox, SlotEntryHandle};
 
 use crate::{
     core_service_error,
-    prelude::sql::query_result::result_set_wire::ResultSetWire,
     tateyama::{
         self,
         proto::{
@@ -28,6 +28,7 @@ use crate::{error::TgError, job::Job, prost_decode_error};
 
 use super::tcp::wire::TcpWire;
 
+pub(crate) mod data_channel;
 pub(crate) mod link;
 pub(crate) mod response_box;
 
@@ -145,12 +146,13 @@ impl Wire {
         }
     }
 
-    pub(crate) fn create_result_set_wire(
+    pub(crate) fn create_data_channel(
         self: &Arc<Self>,
-        result_set_name: &String,
-    ) -> Result<Arc<dyn ResultSetWire>, TgError> {
-        self.wire
-            .create_result_set_wire(self.clone(), result_set_name)
+        dc_name: &String,
+    ) -> Result<DataChannel, TgError> {
+        let dc_wire = self.wire.create_data_channel_wire(self.clone(), dc_name)?;
+        let data_channel = DataChannel::new(dc_name, dc_wire);
+        Ok(data_channel)
     }
 
     pub async fn close(&self) -> Result<(), TgError> {
@@ -219,13 +221,13 @@ impl DelegateWire {
         }
     }
 
-    fn create_result_set_wire(
+    fn create_data_channel_wire(
         &self,
         wire: Arc<Wire>,
-        result_set_name: &String,
-    ) -> Result<Arc<dyn ResultSetWire>, TgError> {
+        dc_name: &String,
+    ) -> Result<Arc<dyn DataChannelWire>, TgError> {
         match self {
-            DelegateWire::Tcp(tcp_wire) => tcp_wire.create_result_set_wire(wire, result_set_name),
+            DelegateWire::Tcp(tcp_wire) => tcp_wire.create_data_channel_wire(wire, dc_name),
             _ => todo!("DelegateWire"),
         }
     }

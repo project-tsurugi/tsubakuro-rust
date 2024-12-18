@@ -9,17 +9,19 @@ use crate::{
     client_error,
     error::TgError,
     invalid_response_error,
-    prelude::sql::query_result::result_set_wire::ResultSetWire,
     session::{
         tcp::link::TcpLink,
-        wire::{link::LinkMessage, response_box::ResponseBox, skip_framework_header, WireResponse},
+        wire::{
+            data_channel::DataChannelWire, link::LinkMessage, response_box::ResponseBox,
+            skip_framework_header, WireResponse,
+        },
     },
 };
 
 use super::{
+    data_channel_box::TcpDataChannelBox,
+    data_channel_wire::TcpDataChannelWire,
     r#enum::{TcpRequestInfo, TcpResponseInfo},
-    result_set_box::TcpResultSetBox,
-    result_set_wire::TcpResultSetWire,
     Wire,
 };
 
@@ -30,7 +32,7 @@ pub(crate) struct TcpWire {
     link: TcpLink,
     session_id: AtomicI64,
     response_box: Arc<ResponseBox>,
-    result_set_box: TcpResultSetBox,
+    data_channel_box: TcpDataChannelBox,
 }
 
 impl TcpWire {
@@ -39,7 +41,7 @@ impl TcpWire {
             link,
             session_id: AtomicI64::new(SESSION_ID_IS_NOT_ASSIGNED),
             response_box: Arc::new(ResponseBox::new()),
-            result_set_box: TcpResultSetBox::new(),
+            data_channel_box: TcpDataChannelBox::new(),
         }
     }
 }
@@ -88,27 +90,27 @@ impl TcpWire {
 
         let info = TcpResponseInfo::from(link_message.info());
         if Self::is_result_set_response(info) {
-            self.process_result_set_response(link_message)?;
+            self.process_result_set_response(link_message).await?;
             return Ok(());
         }
 
         let slot = link_message.slot();
         let is_slot_end = Self::is_slot_end(info);
-        let response = tcp_convert_wire_response(link_message)?;
+        let response = tcp_convert_wire_response(link_message).await?;
         self.response_box
             .set_response_to_slot_handle(slot, response, is_slot_end);
         Ok(())
     }
 
-    pub(crate) fn create_result_set_wire(
+    pub(crate) fn create_data_channel_wire(
         &self,
         wire: Arc<Wire>,
-        result_set_name: &String,
-    ) -> Result<Arc<dyn ResultSetWire>, TgError> {
-        let rs_wire = Arc::new(TcpResultSetWire::new(wire));
-        self.result_set_box
-            .register_result_set_wire(result_set_name, rs_wire.clone())?;
-        Ok(rs_wire)
+        dc_name: &String,
+    ) -> Result<Arc<dyn DataChannelWire>, TgError> {
+        let dc_wire = Arc::new(TcpDataChannelWire::new(wire));
+        self.data_channel_box
+            .register_data_channel_wire(dc_name, dc_wire.clone())?;
+        Ok(dc_wire)
     }
 
     pub(crate) async fn close(&self) -> Result<(), TgError> {
@@ -154,20 +156,20 @@ impl TcpWire {
             .await
     }
 
-    fn process_result_set_response(&self, link_message: LinkMessage) -> Result<(), TgError> {
-        let response = tcp_convert_wire_response(link_message)?;
+    async fn process_result_set_response(&self, link_message: LinkMessage) -> Result<(), TgError> {
+        let response = tcp_convert_wire_response(link_message).await?;
         match response {
             WireResponse::ResponseResultSetHello(rs_slot, name) => {
-                self.result_set_box.set_result_set_name(name, rs_slot);
+                self.data_channel_box.set_data_channel_name(name, rs_slot);
             }
             WireResponse::ResponseResultSetPayload(rs_slot, _writer, ref _payload) => {
-                let rs_wire = self.result_set_box.get_result_set_wire(rs_slot)?;
-                rs_wire.add_result_set_response(response);
+                let dc_wire = self.data_channel_box.get_data_channel_wire(rs_slot)?;
+                dc_wire.add_response(response);
             }
             WireResponse::ResponseResultSetBye(rs_slot) => {
-                let rs_wire = self.result_set_box.release_result_set_wire(rs_slot)?;
-                rs_wire.add_result_set_response(response);
-                rs_wire.set_end();
+                let dc_wire = self.data_channel_box.release_data_channel_wire(rs_slot)?;
+                dc_wire.add_response(response);
+                dc_wire.set_end();
             }
             _ => {
                 return Err(client_error!(format!(
@@ -181,14 +183,14 @@ impl TcpWire {
     }
 }
 
-fn tcp_convert_wire_response(link_message: LinkMessage) -> Result<WireResponse, TgError> {
+async fn tcp_convert_wire_response(link_message: LinkMessage) -> Result<WireResponse, TgError> {
     const FUNCTION_NAME: &str = "tcp_convert_wire_response()";
 
     match TcpResponseInfo::from(link_message.info()) {
         TcpResponseInfo::ResponseSessionPayload => {
             // trace!("{}: RESPONSE_SESSION_PAYLOAD", FUNCTION_NAME);
             let slot = link_message.slot();
-            let mut payload = link_message.take_payload();
+            let mut payload = link_message.take_payload().await;
             if let Some(before) = payload {
                 payload = Some(skip_framework_header(before)?);
             }
@@ -198,7 +200,7 @@ fn tcp_convert_wire_response(link_message: LinkMessage) -> Result<WireResponse, 
         TcpResponseInfo::ResponseSessionBodyhead => {
             // trace!("{}: RESPONSE_SESSION_BODYHEAD", FUNCTION_NAME);
             let slot = link_message.slot();
-            let mut payload = link_message.take_payload();
+            let mut payload = link_message.take_payload().await;
             if let Some(before) = payload {
                 payload = Some(skip_framework_header(before)?);
             }
@@ -209,7 +211,7 @@ fn tcp_convert_wire_response(link_message: LinkMessage) -> Result<WireResponse, 
             // trace!("{}: RESPONSE_RESULT_SET_PAYLOAD", FUNCTION_NAME);
             let slot = link_message.slot();
             let writer = link_message.writer();
-            let payload = link_message.take_payload();
+            let payload = link_message.take_payload().await;
 
             Ok(WireResponse::ResponseResultSetPayload(
                 slot, writer, payload,
@@ -218,7 +220,7 @@ fn tcp_convert_wire_response(link_message: LinkMessage) -> Result<WireResponse, 
         TcpResponseInfo::ResponseResultSetHello => {
             // trace!("{}: RESPONSE_RESULT_SET_HELLO", FUNCTION_NAME);
             let slot = link_message.slot();
-            let payload = link_message.take_payload();
+            let payload = link_message.take_payload().await;
             let payload = payload.ok_or(invalid_response_error!(
                 FUNCTION_NAME,
                 "RESPONSE_RESULT_SET_HELLO.payload is None",

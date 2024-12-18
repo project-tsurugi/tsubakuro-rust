@@ -1,6 +1,5 @@
-use std::{fmt::Debug, sync::Mutex};
-
 use prost::bytes::BytesMut;
+use tokio::sync::Mutex;
 
 #[derive(Debug)]
 pub(crate) struct LinkMessage {
@@ -28,8 +27,8 @@ impl LinkMessage {
         self.info
     }
 
-    pub fn take_payload(&self) -> Option<BytesMut> {
-        let mut payload = self.payload.lock().unwrap();
+    pub async fn take_payload(&self) -> Option<BytesMut> {
+        let mut payload = self.payload.lock().await;
         payload.take()
     }
 

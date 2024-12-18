@@ -12,13 +12,10 @@ use crate::{
     prost_decode_error,
 };
 use async_trait::async_trait;
-use byte_stream::ResultSetByteStream;
 use prost::Message;
-use std::{fmt::Debug, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 use value_stream::ResultSetValueStream;
 
-mod byte_stream;
-pub(crate) mod result_set_wire;
 mod value_stream;
 mod variant;
 
@@ -30,7 +27,7 @@ pub struct SqlQueryResult {
     default_timeout: Duration,
 }
 
-impl Debug for SqlQueryResult {
+impl std::fmt::Debug for SqlQueryResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ResultSet")
             .field("name", &self.name)
@@ -70,13 +67,11 @@ pub(crate) fn query_result_processor(
 ) -> Result<SqlQueryResult, TgError> {
     // const FUNCTION_NAME: &str = "query_result_processor()";
 
-    let (result_set_name, metadata) = read_result_set_metadata(response)?;
+    let (dc_name, metadata) = read_result_set_metadata(response)?;
 
-    let rs_wire = wire.create_result_set_wire(&result_set_name)?;
-    let byte_stream = ResultSetByteStream::new(rs_wire);
-    let value_stream = ResultSetValueStream::new(byte_stream);
-    let query_result =
-        SqlQueryResult::new(result_set_name, metadata, value_stream, default_timeout);
+    let data_channel = wire.create_data_channel(&dc_name)?;
+    let value_stream = ResultSetValueStream::new(data_channel);
+    let query_result = SqlQueryResult::new(dc_name, metadata, value_stream, default_timeout);
 
     Ok(query_result)
 }

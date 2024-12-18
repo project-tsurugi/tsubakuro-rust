@@ -2,9 +2,12 @@ use std::{collections::VecDeque, time::Duration};
 
 use prost::bytes::BytesMut;
 
-use crate::{broken_encoding_error, broken_relation_error, client_error, error::TgError};
+use crate::{
+    broken_encoding_error, broken_relation_error, client_error, error::TgError,
+    session::wire::data_channel::DataChannel,
+};
 
-use super::{byte_stream::ResultSetByteStream, variant::Base128Variant};
+use super::variant::Base128Variant;
 
 // https://github.com/project-tsurugi/tsubakuro/blob/master/modules/session/src/main/java/com/tsurugidb/tsubakuro/sql/impl/ValueInputBackedRelationCursor.java
 #[derive(Debug)]
@@ -245,7 +248,7 @@ const OFFSET_INDEPENDENT_ENTRY_TYPE: i32 = -(HEADER_UNKNOWN as i32);
 
 #[derive(Debug)]
 pub(crate) struct ResultSetValueStream {
-    byte_stream: ResultSetByteStream,
+    data_channel: DataChannel,
     saw_eof: bool,
     current_entry_type: EntryType,
     current_header_category: i32,
@@ -255,9 +258,9 @@ pub(crate) struct ResultSetValueStream {
 }
 
 impl ResultSetValueStream {
-    pub(crate) fn new(byte_stream: ResultSetByteStream) -> ResultSetValueStream {
+    pub(crate) fn new(data_channel: DataChannel) -> ResultSetValueStream {
         ResultSetValueStream {
-            byte_stream,
+            data_channel,
             saw_eof: false,
             current_entry_type: EntryType::Nothing,
             current_header_category: HEADER_UNGAINED,
@@ -531,7 +534,7 @@ impl ResultSetValueStream {
             HEADER_EMBED_NEGATIVE_INT => (payload + MIN_EMBED_NEGATIVE_INT_VALUE) as i64,
             _ => {
                 debug_assert_eq!(category, HEADER_INT);
-                Base128Variant::read_signed(&mut self.byte_stream, timeout).await?
+                Base128Variant::read_signed(&mut self.data_channel, timeout).await?
             }
         };
 
@@ -559,7 +562,7 @@ impl ResultSetValueStream {
         let size = self.read_character_size(timeout).await?;
 
         let buffer = {
-            if let Some(buffer) = self.byte_stream.read_all(size as usize, timeout).await? {
+            if let Some(buffer) = self.data_channel.read_all(size as usize, timeout).await? {
                 buffer
             } else {
                 // TODO BrokenEncodingException
@@ -632,7 +635,7 @@ impl ResultSetValueStream {
 
     async fn read_n(&mut self, length: usize, timeout: Duration) -> Result<BytesMut, TgError> {
         let buffer = self
-            .byte_stream
+            .data_channel
             .read_all(length, timeout)
             .await?
             .ok_or(broken_encoding_error!("read_n()", "saw unexpected eof"))?;
@@ -640,7 +643,7 @@ impl ResultSetValueStream {
     }
 
     async fn read_size(&mut self, timeout: Duration) -> Result<i32, TgError> {
-        let value = Base128Variant::read_unsigned(&mut self.byte_stream, timeout).await?;
+        let value = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
         if value < 0 || value > (i32::MAX as i64) {
             // TODO BrokenEncodingException
             return Err(client_error!(format!("saw unsupported size {value}")));
@@ -664,7 +667,7 @@ impl ResultSetValueStream {
             return Ok(());
         }
 
-        if let Some(c) = self.byte_stream.read_u8(timeout).await? {
+        if let Some(c) = self.data_channel.read_u8(timeout).await? {
             self.fetch_header_internal(c as i32)?;
         } else {
             self.saw_eof = true;
