@@ -8,13 +8,19 @@ use table_list::{list_tables_processor, TableList};
 
 use crate::{
     error::TgError,
+    invalid_response_error,
     job::Job,
-    jogasaki::proto::sql::request::{request::Request as SqlRequestCommand, Request as SqlRequest},
+    jogasaki::proto::sql::{
+        request::{request::Request as SqlRequestCommand, Request as SqlRequest},
+        response::{response::Response as SqlResponseType, Response as SqlResponse},
+    },
     prelude::{CommitOption, ServiceClient, SqlParameter, SqlPlaceholder},
+    prost_decode_error,
     session::{
         wire::{Wire, WireResponse},
         Session,
     },
+    sql_service_error,
     transaction::{
         option::{CommitType, TransactionOption},
         transaction_begin_processor, transaction_commit_processor, transaction_dispose_processor,
@@ -22,7 +28,7 @@ use crate::{
     },
 };
 
-use prost::alloc::string::String as ProstString;
+use prost::{alloc::string::String as ProstString, Message};
 
 pub(crate) mod error;
 pub mod execute_result;
@@ -831,6 +837,60 @@ impl SqlClient {
             service_message_version_minor: SERVICE_MESSAGE_VERSION_MINOR,
             request: Some(command),
         }
+    }
+}
+
+pub(crate) fn convert_sql_response(
+    function_name: &str,
+    response: &WireResponse,
+) -> Result<Option<SqlResponse>, TgError> {
+    match response {
+        WireResponse::ResponseSessionPayload(_slot, payload) => {
+            // let payload = payload.as_deref().unwrap();
+            let payload = &payload.as_ref().unwrap()[..];
+            let sql_response = SqlResponse::decode_length_delimited(payload)
+                .map_err(|e| prost_decode_error!(function_name, "SqlResponse", e))?;
+            match &sql_response.response {
+                Some(SqlResponseType::ResultOnly(result_only)) => match &result_only.result {
+                    Some(crate::jogasaki::proto::sql::response::result_only::Result::Success(
+                        _,
+                    )) => Ok(Some(sql_response)),
+                    Some(crate::jogasaki::proto::sql::response::result_only::Result::Error(
+                        error,
+                    )) => {
+                        let error = error.clone();
+                        Err(sql_service_error!(function_name, error))
+                    }
+                    _ => Ok(Some(sql_response)),
+                },
+                _ => Ok(Some(sql_response)),
+            }
+        }
+        _ => Ok(None),
+    }
+}
+
+pub(crate) fn sql_result_only_success_processor(
+    function_name: &str,
+    response: WireResponse,
+) -> Result<(), TgError> {
+    let sql_response = convert_sql_response(function_name, &response)?;
+    let message = sql_response.ok_or(invalid_response_error!(
+        function_name,
+        format!("response {:?} is not ResponseSessionPayload", response),
+    ))?;
+    match message.response {
+        Some(SqlResponseType::ResultOnly(result_only)) => match result_only.result {
+            Some(crate::jogasaki::proto::sql::response::result_only::Result::Success(_)) => Ok(()),
+            _ => Err(invalid_response_error!(
+                function_name,
+                format!("fail. {:?}", result_only),
+            )),
+        },
+        _ => Err(invalid_response_error!(
+            function_name,
+            format!("response {:?} is not ResultOnly", message.response),
+        )),
     }
 }
 

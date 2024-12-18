@@ -1,12 +1,8 @@
-use prost::Message;
-
 use crate::{
     error::TgError,
     invalid_response_error,
-    jogasaki::proto::sql::response::{
-        response::Response as SqlResponseCase, Name, Response as SqlResponse,
-    },
-    prost_decode_error,
+    jogasaki::proto::sql::response::{response::Response as SqlResponseType, Name},
+    prelude::convert_sql_response,
     session::wire::WireResponse,
     sql_service_error,
 };
@@ -37,19 +33,13 @@ impl TableList {
 pub(crate) fn list_tables_processor(response: WireResponse) -> Result<TableList, TgError> {
     const FUNCTION_NAME: &str = "list_tables_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload) = response {
-        payload.unwrap()
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
-
-    let message = SqlResponse::decode_length_delimited(payload)
-        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
+    let sql_response = convert_sql_response(FUNCTION_NAME, &response)?;
+    let message = sql_response.ok_or(invalid_response_error!(
+        FUNCTION_NAME,
+        format!("response {:?} is not ResponseSessionPayload", response),
+    ))?;
     match message.response {
-        Some(SqlResponseCase::ListTables(list_tables)) => match list_tables.result.unwrap() {
+        Some(SqlResponseType::ListTables(list_tables)) => match list_tables.result.unwrap() {
             crate::jogasaki::proto::sql::response::list_tables::Result::Success(success) => {
                 Ok(TableList::new(success))
             }

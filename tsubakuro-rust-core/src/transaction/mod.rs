@@ -4,17 +4,16 @@ use std::{
 };
 
 use log::debug;
-use prost::Message;
 
 use crate::{
     client_error,
     error::TgError,
     invalid_response_error,
-    jogasaki::proto::sql::response::{
-        response::Response as SqlResponseCase, Response as SqlResponse,
+    jogasaki::proto::sql::response::response::Response as SqlResponseType,
+    prelude::{
+        convert_sql_response, sql::SqlClient, sql_result_only_success_processor, ServiceClient,
+        Session,
     },
-    prelude::{sql::SqlClient, ServiceClient, Session},
-    prost_decode_error,
     session::wire::WireResponse,
     sql_service_error,
 };
@@ -123,19 +122,13 @@ pub(crate) fn transaction_begin_processor(
 ) -> Result<Transaction, TgError> {
     const FUNCTION_NAME: &str = "transaction_begin_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload) = response {
-        payload.unwrap()
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
-
-    let message = SqlResponse::decode_length_delimited(payload)
-        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
+    let sql_response = convert_sql_response(FUNCTION_NAME, &response)?;
+    let message = sql_response.ok_or(invalid_response_error!(
+        FUNCTION_NAME,
+        format!("response {:?} is not ResponseSessionPayload", response),
+    ))?;
     match message.response {
-        Some(SqlResponseCase::Begin(begin)) => match begin.result.unwrap() {
+        Some(SqlResponseType::Begin(begin)) => match begin.result.unwrap() {
             crate::jogasaki::proto::sql::response::begin::Result::Success(success) => {
                 let tx_handle = success
                     .transaction_handle
@@ -167,83 +160,17 @@ pub(crate) fn transaction_begin_processor(
 pub(crate) fn transaction_commit_processor(response: WireResponse) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "transaction_commit_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload) = response {
-        payload.unwrap()
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
-
-    let message = SqlResponse::decode_length_delimited(payload)
-        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
-    match message.response {
-        Some(SqlResponseCase::ResultOnly(result_only)) => match result_only.result.unwrap() {
-            crate::jogasaki::proto::sql::response::result_only::Result::Success(_) => Ok(()),
-            crate::jogasaki::proto::sql::response::result_only::Result::Error(error) => {
-                Err(sql_service_error!(FUNCTION_NAME, error))
-            }
-        },
-        _ => Err(invalid_response_error!(
-            FUNCTION_NAME,
-            format!("response {:?} is not ResultOnly", message.response),
-        )),
-    }
+    sql_result_only_success_processor(FUNCTION_NAME, response)
 }
 
 pub(crate) fn transaction_rollback_processor(response: WireResponse) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "transaction_rollback_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload) = response {
-        payload.unwrap()
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
-
-    let message = SqlResponse::decode_length_delimited(payload)
-        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
-    match message.response {
-        Some(SqlResponseCase::ResultOnly(result_only)) => match result_only.result.unwrap() {
-            crate::jogasaki::proto::sql::response::result_only::Result::Success(_) => Ok(()),
-            crate::jogasaki::proto::sql::response::result_only::Result::Error(error) => {
-                Err(sql_service_error!(FUNCTION_NAME, error))
-            }
-        },
-        _ => Err(invalid_response_error!(
-            FUNCTION_NAME,
-            format!("response {:?} is not ResultOnly", message.response),
-        )),
-    }
+    sql_result_only_success_processor(FUNCTION_NAME, response)
 }
 
 pub(crate) fn transaction_dispose_processor(response: WireResponse) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "transaction_dispose_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload) = response {
-        payload.unwrap()
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
-
-    let message = SqlResponse::decode_length_delimited(payload)
-        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
-    match message.response {
-        Some(SqlResponseCase::ResultOnly(result_only)) => match result_only.result.unwrap() {
-            crate::jogasaki::proto::sql::response::result_only::Result::Success(_) => Ok(()),
-            crate::jogasaki::proto::sql::response::result_only::Result::Error(error) => {
-                Err(sql_service_error!(FUNCTION_NAME, error))
-            }
-        },
-        _ => Err(invalid_response_error!(
-            FUNCTION_NAME,
-            format!("response {:?} is not ResultOnly", message.response),
-        )),
-    }
+    sql_result_only_success_processor(FUNCTION_NAME, response)
 }

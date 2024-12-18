@@ -1,14 +1,12 @@
 use std::collections::HashMap;
 
-use prost::Message;
-
 use crate::{
     error::TgError,
     invalid_response_error,
     jogasaki::proto::sql::response::{
-        execute_result::CounterType, response::Response as SqlResponseCase, Response as SqlResponse,
+        execute_result::CounterType, response::Response as SqlResponseType,
     },
-    prost_decode_error,
+    prelude::convert_sql_response,
     session::wire::WireResponse,
     sql_service_error,
 };
@@ -60,19 +58,13 @@ pub(crate) fn execute_result_processor(
 ) -> Result<SqlExecuteResult, TgError> {
     const FUNCTION_NAME: &str = "execute_result_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload) = response {
-        payload.unwrap()
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
-
-    let message = SqlResponse::decode_length_delimited(payload)
-        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
+    let sql_response = convert_sql_response(FUNCTION_NAME, &response)?;
+    let message = sql_response.ok_or(invalid_response_error!(
+        FUNCTION_NAME,
+        format!("response {:?} is not ResponseSessionPayload", response),
+    ))?;
     match message.response {
-        Some(SqlResponseCase::ExecuteResult(execute_result)) => {
+        Some(SqlResponseType::ExecuteResult(execute_result)) => {
             match execute_result.result.unwrap() {
                 crate::jogasaki::proto::sql::response::execute_result::Result::Success(success) => {
                     Ok(SqlExecuteResult::new(success))
