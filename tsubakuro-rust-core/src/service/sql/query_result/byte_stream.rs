@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use prost::bytes::{Buf, BufMut, BytesMut};
+use prost::bytes::{Buf, BytesMut};
 
 use crate::error::TgError;
 
@@ -44,26 +44,43 @@ impl ResultSetByteStream {
             }
         };
         let bytes_len = bytes.len();
-        if size == bytes_len {
+        if bytes_len == size {
             let bytes = self.current.take();
             return Ok(bytes);
         }
-        if size < bytes_len {
+        if bytes_len > size {
             let bytes = bytes.split_to(size);
             return Ok(Some(bytes));
         }
 
-        // TODO 効率の良い方法
-        let mut buffer = BytesMut::with_capacity(size);
-        for _ in 0..size {
-            if let Some(value) = self.read_u8(timeout).await? {
-                buffer.put_u8(value);
-            } else {
-                return Ok(None);
-            }
-        }
+        let mut buffer = self.current.take().unwrap();
+        let mut remain_size = size - bytes_len;
+        buffer.reserve(remain_size);
+        loop {
+            let bytes = {
+                if let Some(bytes) = self.get_bytes(timeout).await? {
+                    bytes
+                } else {
+                    return Ok(None);
+                }
+            };
+            let bytes_len = bytes.len();
 
-        Ok(Some(buffer))
+            if bytes_len == remain_size {
+                let bytes = self.current.take().unwrap();
+                buffer.unsplit(bytes);
+                return Ok(Some(buffer));
+            }
+            if bytes_len > remain_size {
+                let bytes = bytes.split_to(remain_size);
+                buffer.unsplit(bytes);
+                return Ok(Some(buffer));
+            }
+
+            let bytes = self.current.take().unwrap();
+            buffer.unsplit(bytes);
+            remain_size -= bytes_len;
+        }
     }
 
     async fn get_bytes(&mut self, timeout: Duration) -> Result<Option<&mut BytesMut>, TgError> {
