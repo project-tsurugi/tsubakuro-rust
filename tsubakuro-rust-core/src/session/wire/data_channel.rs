@@ -11,7 +11,7 @@ use tokio::{
     time::Instant,
 };
 
-use crate::{error::TgError, timeout_error};
+use crate::{error::TgError, util::calculate_timeout};
 
 #[async_trait]
 pub(crate) trait DataChannelWire: std::fmt::Debug + Send + Sync {
@@ -144,13 +144,7 @@ impl DataChannel {
                 return Ok(None);
             }
 
-            if !timeout.is_zero() {
-                let elapsed = start.elapsed();
-                if elapsed > timeout {
-                    return Err(timeout_error!("DataChannel.pull() timeout"));
-                }
-            }
-
+            let timeout = calculate_timeout("DataChannel.pull()", timeout, start)?;
             self.dc_wire.pull1(&self, timeout).await?;
         }
     }

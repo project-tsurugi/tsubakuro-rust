@@ -123,8 +123,8 @@ macro_rules! io_error {
 
 #[macro_export]
 macro_rules! timeout_error {
-    ($message:expr) => {
-        $crate::error::TgError::TimeoutError(format!("{}", $message))
+    ($function_name:expr) => {
+        $crate::error::TgError::TimeoutError(format!("{} timeout", $function_name))
     };
 }
 

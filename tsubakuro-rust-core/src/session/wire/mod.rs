@@ -1,7 +1,4 @@
-use std::{
-    sync::Arc,
-    time::{Duration, Instant},
-};
+use std::{sync::Arc, time::Duration};
 
 use data_channel::{DataChannel, DataChannelWire};
 use prost::{
@@ -9,6 +6,7 @@ use prost::{
     Message as ProstMessage,
 };
 use response_box::{ResponseBox, SlotEntryHandle};
+use tokio::time::Instant;
 
 use crate::{
     core_service_error,
@@ -22,7 +20,7 @@ use crate::{
             },
         },
     },
-    timeout_error,
+    util::calculate_timeout,
 };
 use crate::{error::TgError, job::Job, prost_decode_error};
 
@@ -135,13 +133,7 @@ impl Wire {
                 return Ok(response);
             }
 
-            if !timeout.is_zero() {
-                let elapsed = start.elapsed();
-                if elapsed > timeout {
-                    return Err(timeout_error!("Wire.pull() timeout"));
-                }
-            }
-
+            let timeout = calculate_timeout("Wire.pull()", timeout, start)?;
             self.wire.pull1(timeout).await?;
         }
     }

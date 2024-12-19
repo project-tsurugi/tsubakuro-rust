@@ -100,7 +100,7 @@ impl TcpLink {
         match result {
             Ok(Ok(_)) => Ok(()),
             Ok(Err(e)) => Err(e),
-            Err(_) => Err(timeout_error!("TcpLink.send(): timeout")),
+            Err(_) => Err(timeout_error!("TcpLink.send()")),
         }
     }
 
@@ -133,7 +133,7 @@ impl TcpLink {
         match result {
             Ok(Ok(_)) => Ok(()),
             Ok(Err(e)) => Err(e),
-            Err(_) => Err(timeout_error!("TcpLink.send_header_only(): timeout")),
+            Err(_) => Err(timeout_error!("TcpLink.send_header_only()")),
         }
     }
 
@@ -214,7 +214,7 @@ impl TcpLink {
         match result {
             Ok(Ok(message)) => Ok(message),
             Ok(Err(e)) => Err(e),
-            Err(_) => Err(timeout_error!("TcpLink.recv(): timeout")),
+            Err(_) => Err(timeout_error!("TcpLink.recv()")),
         }
     }
 
