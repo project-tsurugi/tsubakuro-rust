@@ -90,7 +90,8 @@ impl TcpWire {
 
         let info = TcpResponseInfo::from(link_message.info());
         if Self::is_result_set_response(info) {
-            self.process_result_set_response(link_message).await?;
+            self.process_result_set_response(link_message, timeout)
+                .await?;
             return Ok(());
         }
 
@@ -156,7 +157,11 @@ impl TcpWire {
             .await
     }
 
-    async fn process_result_set_response(&self, link_message: LinkMessage) -> Result<(), TgError> {
+    async fn process_result_set_response(
+        &self,
+        link_message: LinkMessage,
+        timeout: Duration,
+    ) -> Result<(), TgError> {
         let response = tcp_convert_wire_response(link_message).await?;
         match response {
             WireResponse::ResponseResultSetHello(rs_slot, name) => {
@@ -169,7 +174,7 @@ impl TcpWire {
             WireResponse::ResponseResultSetBye(rs_slot) => {
                 let dc_wire = self.data_channel_box.release_data_channel_wire(rs_slot)?;
                 dc_wire.add_response(response);
-                dc_wire.set_end();
+                self.send_result_set_bye_ok(rs_slot, timeout).await?;
             }
             _ => {
                 return Err(client_error!(format!(

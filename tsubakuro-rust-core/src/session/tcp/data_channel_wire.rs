@@ -40,20 +40,6 @@ impl TcpDataChannelWire {
             end: AtomicBool::new(false),
         }
     }
-
-    pub(crate) fn add_response(&self, response: WireResponse) {
-        let mut queue = self.response.lock().unwrap();
-        queue.push_back(response);
-    }
-
-    fn take_response(&self) -> Option<WireResponse> {
-        let mut queue = self.response.lock().unwrap();
-        queue.pop_front()
-    }
-
-    pub(crate) fn set_end(&self) {
-        self.end.store(true, std::sync::atomic::Ordering::SeqCst);
-    }
 }
 
 #[async_trait]
@@ -68,7 +54,7 @@ impl DataChannelWire for TcpDataChannelWire {
 
             let response = self.take_response();
             match response {
-                Some(WireResponse::ResponseResultSetPayload(_slot, writer, payload)) => {
+                Some(WireResponse::ResponseResultSetPayload(_rs_slot, writer, payload)) => {
                     if let Some(payload) = payload {
                         data_channel.add_writer_payload(writer, payload).await;
                     } else {
@@ -76,9 +62,8 @@ impl DataChannelWire for TcpDataChannelWire {
                         break;
                     }
                 }
-                Some(WireResponse::ResponseResultSetBye(slot)) => {
+                Some(WireResponse::ResponseResultSetBye(_rs_slot)) => {
                     self.set_end();
-                    self.tcp_wire.send_result_set_bye_ok(slot, timeout).await?;
                     break;
                 }
                 None => (),
@@ -95,5 +80,21 @@ impl DataChannelWire for TcpDataChannelWire {
 
     fn is_end(&self) -> bool {
         self.end.load(std::sync::atomic::Ordering::SeqCst)
+    }
+}
+
+impl TcpDataChannelWire {
+    pub(crate) fn add_response(&self, response: WireResponse) {
+        let mut queue = self.response.lock().unwrap();
+        queue.push_back(response);
+    }
+
+    fn take_response(&self) -> Option<WireResponse> {
+        let mut queue = self.response.lock().unwrap();
+        queue.pop_front()
+    }
+
+    fn set_end(&self) {
+        self.end.store(true, std::sync::atomic::Ordering::SeqCst);
     }
 }
