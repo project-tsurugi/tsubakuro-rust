@@ -22,9 +22,8 @@ use crate::{
     },
     sql_service_error,
     transaction::{
-        option::{CommitType, TransactionOption},
-        transaction_begin_processor, transaction_commit_processor, transaction_dispose_processor,
-        transaction_rollback_processor, Transaction,
+        option::TransactionOption, transaction_begin_processor, transaction_commit_processor,
+        transaction_dispose_processor, transaction_rollback_processor, Transaction,
     },
 };
 
@@ -129,7 +128,7 @@ impl SqlClient {
     pub async fn prepare(
         &self,
         sql: &str,
-        placeholders: &Vec<SqlPlaceholder>,
+        placeholders: Vec<SqlPlaceholder>,
     ) -> Result<SqlPreparedStatement, TgError> {
         let timeout = self.default_timeout;
         self.prepare_for(sql, placeholders, timeout).await
@@ -138,7 +137,7 @@ impl SqlClient {
     pub async fn prepare_for(
         &self,
         sql: &str,
-        placeholders: &Vec<SqlPlaceholder>,
+        placeholders: Vec<SqlPlaceholder>,
         timeout: Duration,
     ) -> Result<SqlPreparedStatement, TgError> {
         const FUNCTION_NAME: &str = "prepare()";
@@ -158,7 +157,7 @@ impl SqlClient {
     pub async fn prepare_async(
         &self,
         sql: &str,
-        placeholders: &Vec<SqlPlaceholder>,
+        placeholders: Vec<SqlPlaceholder>,
     ) -> Result<Job<SqlPreparedStatement>, TgError> {
         let timeout = self.default_timeout;
         self.prepare_async_for(sql, placeholders, timeout).await
@@ -167,7 +166,7 @@ impl SqlClient {
     pub async fn prepare_async_for(
         &self,
         sql: &str,
-        placeholders: &Vec<SqlPlaceholder>,
+        placeholders: Vec<SqlPlaceholder>,
         timeout: Duration,
     ) -> Result<Job<SqlPreparedStatement>, TgError> {
         const FUNCTION_NAME: &str = "prepare_async()";
@@ -188,10 +187,7 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn prepare_command(sql: &str, placeholders: &Vec<SqlPlaceholder>) -> SqlRequestCommand {
-        let placeholders: Vec<crate::jogasaki::proto::sql::request::Placeholder> =
-            placeholders.iter().map(|p| p.request()).collect();
-
+    fn prepare_command(sql: &str, placeholders: Vec<SqlPlaceholder>) -> SqlRequestCommand {
         let request = crate::jogasaki::proto::sql::request::Prepare {
             sql: sql.to_string(),
             placeholders,
@@ -693,18 +689,9 @@ impl SqlClient {
             handle: transaction_handle,
         };
 
-        use crate::jogasaki::proto::sql::request::CommitStatus;
-        let commit_type = match commit_option.commit_type() {
-            CommitType::Default => CommitStatus::Unspecified,
-            CommitType::Accepted => CommitStatus::Accepted,
-            CommitType::Available => CommitStatus::Available,
-            CommitType::Stored => CommitStatus::Stored,
-            CommitType::Propagated => CommitStatus::Propagated,
-        };
-
         let request = crate::jogasaki::proto::sql::request::Commit {
             transaction_handle: Some(tx_handle),
-            notification_type: commit_type.into(),
+            notification_type: commit_option.commit_type().into(),
             auto_dispose: commit_option.auto_dispose(),
         };
         SqlRequestCommand::Commit(request)

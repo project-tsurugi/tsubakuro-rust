@@ -1,7 +1,11 @@
 pub use crate::error::*;
 pub use crate::job::*;
 pub use crate::jogasaki::proto::sql::common::AtomType;
+pub use crate::jogasaki::proto::sql::request::CommitStatus as CommitType;
 pub use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
+pub use crate::jogasaki::proto::sql::request::Placeholder as SqlPlaceholder;
+pub use crate::jogasaki::proto::sql::request::TransactionPriority;
+pub use crate::jogasaki::proto::sql::request::TransactionType;
 pub use crate::service::sql::execute_result::*;
 pub use crate::service::sql::prepare::parameter::*;
 pub use crate::service::sql::prepare::placeholder::*;

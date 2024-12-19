@@ -1,37 +1,12 @@
 use std::time::Duration;
 
+use crate::jogasaki::proto::sql::request::CommitStatus as CommitType;
 use crate::jogasaki::proto::sql::request::ReadArea;
 use crate::jogasaki::proto::sql::request::TransactionOption as RequestTransactionOption;
-use crate::jogasaki::proto::sql::request::TransactionPriority as RequestTransactionPriority;
-use crate::jogasaki::proto::sql::request::TransactionType as RequestTransactionType;
+use crate::jogasaki::proto::sql::request::TransactionPriority;
+use crate::jogasaki::proto::sql::request::TransactionType;
 use crate::jogasaki::proto::sql::request::WritePreserve;
 use crate::util::string_to_prost_string;
-
-#[derive(Debug, PartialEq, Clone, Copy)]
-#[repr(i32)]
-pub enum TransactionType {
-    /// short transactions (optimistic concurrency control)
-    Occ = 1,
-    /// long transactions (pessimistic concurrency control)
-    Ltx = 2,
-    /// read only transactions (may be abort-free)
-    Rtx = 3,
-}
-
-#[derive(Debug, PartialEq, Clone, Copy)]
-#[repr(i32)]
-pub enum TransactionPriority {
-    /// use default transaction priority.
-    Unspecified = 0,
-    /// halts the running transactions immediately.
-    Interrupt = 1,
-    /// prevents new transactions and waits for the running transactions will end.
-    Wait = 2,
-    /// halts the running transactions immediately, and keep lock-out until its end.
-    InterruptExclude = 3,
-    /// prevents new transactions and waits for the running transactions will end, and keep lock-out until its end.
-    WaitExclude = 4,
-}
 
 #[derive(Debug, Clone)]
 pub struct TransactionOption {
@@ -48,7 +23,7 @@ pub struct TransactionOption {
 impl TransactionOption {
     pub fn new() -> TransactionOption {
         TransactionOption {
-            transaction_type: TransactionType::Occ,
+            transaction_type: TransactionType::Short,
             transaction_label: None,
             modifies_definitions: false,
             write_preserve: vec![],
@@ -163,23 +138,11 @@ impl TransactionOptionSetter<String> for TransactionOption {
 
 impl TransactionOption {
     pub(crate) fn request(&self) -> RequestTransactionOption {
-        let tx_type = match self.transaction_type {
-            TransactionType::Occ => RequestTransactionType::Short,
-            TransactionType::Ltx => RequestTransactionType::Long,
-            TransactionType::Rtx => RequestTransactionType::ReadOnly,
-        };
-        let tx_priority = match self.priority {
-            TransactionPriority::Unspecified => RequestTransactionPriority::Unspecified,
-            TransactionPriority::Interrupt => RequestTransactionPriority::Interrupt,
-            TransactionPriority::Wait => RequestTransactionPriority::Wait,
-            TransactionPriority::InterruptExclude => RequestTransactionPriority::InterruptExclude,
-            TransactionPriority::WaitExclude => RequestTransactionPriority::WaitExclude,
-        };
         let tx_label = self.transaction_label.as_ref();
 
         RequestTransactionOption {
-            r#type: tx_type.into(),
-            priority: tx_priority.into(),
+            r#type: self.transaction_type.into(),
+            priority: self.priority.into(),
             label: string_to_prost_string(tx_label),
             modifies_definitions: self.modifies_definitions,
             write_preserves: Self::to_write_preserve(&self.write_preserve),
@@ -207,21 +170,6 @@ impl TransactionOption {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
-#[repr(i32)]
-pub enum CommitType {
-    /// the default commit type (rely on the database settings).
-    Default = 0,
-    /// commit operation has accepted, and the transaction will never abort except system errors.
-    Accepted = 10,
-    /// commit data has been visible for others.
-    Available = 20,
-    /// commit data has been saved on the local disk.
-    Stored = 30,
-    /// commit data has been propagated to the all suitable nodes.
-    Propagated = 40,
-}
-
 #[derive(Debug, Clone)]
 pub struct CommitOption {
     commit_type: CommitType,
@@ -231,7 +179,7 @@ pub struct CommitOption {
 impl CommitOption {
     pub fn new() -> CommitOption {
         CommitOption {
-            commit_type: CommitType::Default,
+            commit_type: CommitType::Unspecified,
             auto_dispose: false,
         }
     }
@@ -269,7 +217,7 @@ mod test {
     fn transaction_option() {
         {
             let option = TransactionOption::new();
-            assert_eq!(TransactionType::Occ, option.transaction_type());
+            assert_eq!(TransactionType::Short, option.transaction_type());
             assert_eq!(None, option.transaction_label());
             assert_eq!(false, option.modifies_definitions());
             assert_eq!(true, option.write_preserve().is_empty());
@@ -279,8 +227,8 @@ mod test {
             assert_eq!(None, option.close_timeout());
 
             let request = option.request();
-            assert_eq!(RequestTransactionType::Short, request.r#type());
-            assert_eq!(RequestTransactionPriority::Unspecified, request.priority());
+            assert_eq!(TransactionType::Short, request.r#type());
+            assert_eq!(TransactionPriority::Unspecified, request.priority());
             assert_eq!("", request.label);
             assert_eq!(false, request.modifies_definitions);
             assert_eq!(true, request.write_preserves.is_empty());
@@ -289,7 +237,7 @@ mod test {
         }
         {
             let mut option = TransactionOption::new();
-            option.set_transaction_type(TransactionType::Ltx);
+            option.set_transaction_type(TransactionType::Long);
             option.set_transaction_label("transaction_label");
             option.set_modifies_definitions(true);
             option.set_write_preserve(&vec!["wp"]);
@@ -299,8 +247,8 @@ mod test {
             option.set_close_timeout(Duration::from_secs(123));
 
             let request = option.request();
-            assert_eq!(RequestTransactionType::Long, request.r#type());
-            assert_eq!(RequestTransactionPriority::Interrupt, request.priority());
+            assert_eq!(TransactionType::Long, request.r#type());
+            assert_eq!(TransactionPriority::Interrupt, request.priority());
             assert_eq!("transaction_label", request.label);
             assert_eq!(true, request.modifies_definitions);
             assert_eq!(
@@ -329,7 +277,7 @@ mod test {
     fn commit_option() {
         {
             let option = CommitOption::new();
-            assert_eq!(CommitType::Default, option.commit_type());
+            assert_eq!(CommitType::Unspecified, option.commit_type());
             assert_eq!(false, option.auto_dispose());
         }
         {

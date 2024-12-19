@@ -79,7 +79,7 @@ async fn list_tables(client: &SqlClient) -> Result<(), TgError> {
 }
 
 async fn start_occ(client: &SqlClient) -> Result<Transaction, TgError> {
-    let option = TransactionOption::from(TransactionType::Occ);
+    let option = TransactionOption::from(TransactionType::Short);
     client.start_transaction(&option).await
 }
 

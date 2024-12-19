@@ -26,7 +26,7 @@ mod test {
             i64::placeholder("bar"),
             String::placeholder("zzz"),
         ];
-        let ps = client.prepare(sql, &placeholders).await.unwrap();
+        let ps = client.prepare(sql, placeholders).await.unwrap();
         assert_eq!(false, ps.has_result_records());
 
         let transaction = start_occ(&client).await;
@@ -74,7 +74,7 @@ mod test {
     async fn select(client: &SqlClient) {
         let sql = "select * from test where foo = :foo";
         let placeholders = vec![i32::placeholder("foo")];
-        let ps = client.prepare(sql, &placeholders).await.unwrap();
+        let ps = client.prepare(sql, placeholders).await.unwrap();
         assert_eq!(true, ps.has_result_records());
 
         let transaction = start_occ(&client).await;
@@ -149,7 +149,7 @@ mod test {
             i64::placeholder("bar"),
             String::placeholder("zzz"),
         ];
-        let job = client.prepare_async(sql, &placeholders).await.unwrap();
+        let job = client.prepare_async(sql, placeholders).await.unwrap();
         let ps = job.take().await.unwrap();
         assert_eq!(false, ps.has_result_records());
 
@@ -201,7 +201,7 @@ mod test {
     async fn select_async(client: &SqlClient) {
         let sql = "select * from test where foo = :foo";
         let placeholders = vec![i32::placeholder("foo")];
-        let job = client.prepare_async(sql, &placeholders).await.unwrap();
+        let job = client.prepare_async(sql, placeholders).await.unwrap();
         let ps = job.take().await.unwrap();
         assert_eq!(true, ps.has_result_records());
 
@@ -274,7 +274,7 @@ mod test {
             i64::placeholder("bar"),
             // not defined String::placeholder("zzz"),
         ];
-        let error = client.prepare(sql, &placeholders).await.unwrap_err();
+        let error = client.prepare(sql, placeholders).await.unwrap_err();
         match error {
             TgError::ServerError(_message, code, _server_message) => {
                 assert_eq!("SYMBOL_ANALYZE_EXCEPTION", code.name());

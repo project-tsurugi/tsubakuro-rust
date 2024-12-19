@@ -77,7 +77,7 @@ mod test {
 
         let sql = "insert into test values(:pk, :value)";
         let placeholders = vec![i32::placeholder("pk"), i32::placeholder("value")];
-        let ps = client.prepare(sql, &placeholders).await.unwrap();
+        let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![

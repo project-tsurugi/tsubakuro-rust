@@ -1,12 +1,16 @@
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
 
-fn new_parameter(name: &str, value: Option<Value>) -> SqlParameter {
-    let placement = Placement::Name(name.to_string());
+struct SqlParameterUtil;
 
-    SqlParameter {
-        placement: Some(placement),
-        value,
+impl SqlParameterUtil {
+    fn new_parameter(name: &str, value: Option<Value>) -> SqlParameter {
+        let placement = Placement::Name(name.to_string());
+
+        SqlParameter {
+            placement: Some(placement),
+            value,
+        }
     }
 }
 
@@ -16,7 +20,7 @@ pub trait SqlParameterNull {
 
 impl SqlParameterNull for SqlParameter {
     fn null(name: &str) -> SqlParameter {
-        new_parameter(name, None)
+        SqlParameterUtil::new_parameter(name, None)
     }
 }
 
@@ -27,42 +31,42 @@ pub trait SqlParameterOf<T> {
 impl SqlParameterOf<i32> for SqlParameter {
     fn of(name: &str, value: i32) -> SqlParameter {
         let value = Value::Int4Value(value);
-        new_parameter(name, Some(value))
+        SqlParameterUtil::new_parameter(name, Some(value))
     }
 }
 
 impl SqlParameterOf<i64> for SqlParameter {
     fn of(name: &str, value: i64) -> SqlParameter {
         let value = Value::Int8Value(value);
-        new_parameter(name, Some(value))
+        SqlParameterUtil::new_parameter(name, Some(value))
     }
 }
 
 impl SqlParameterOf<f32> for SqlParameter {
     fn of(name: &str, value: f32) -> SqlParameter {
         let value = Value::Float4Value(value);
-        new_parameter(name, Some(value))
+        SqlParameterUtil::new_parameter(name, Some(value))
     }
 }
 
 impl SqlParameterOf<f64> for SqlParameter {
     fn of(name: &str, value: f64) -> SqlParameter {
         let value = Value::Float8Value(value);
-        new_parameter(name, Some(value))
+        SqlParameterUtil::new_parameter(name, Some(value))
     }
 }
 
 impl SqlParameterOf<&str> for SqlParameter {
     fn of(name: &str, value: &str) -> SqlParameter {
         let value = Value::CharacterValue(value.to_string());
-        new_parameter(name, Some(value))
+        SqlParameterUtil::new_parameter(name, Some(value))
     }
 }
 
 impl SqlParameterOf<String> for SqlParameter {
     fn of(name: &str, value: String) -> SqlParameter {
         let value = Value::CharacterValue(value);
-        new_parameter(name, Some(value))
+        SqlParameterUtil::new_parameter(name, Some(value))
     }
 }
 

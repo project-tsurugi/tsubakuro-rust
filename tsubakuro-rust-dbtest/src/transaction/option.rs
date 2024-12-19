@@ -11,7 +11,7 @@ mod test {
         let client = create_test_sql_client().await;
 
         let mut option = TransactionOption::new();
-        option.set_transaction_type(TransactionType::Occ);
+        option.set_transaction_type(TransactionType::Short);
         option.set_transaction_label("tsubakuro-rust-dbtest.occ");
 
         let transaction = client.start_transaction(&option).await.unwrap();
@@ -32,7 +32,7 @@ mod test {
             create_table(&client, "test", "create table test (pk int primary key)").await;
 
             let mut option = TransactionOption::new();
-            option.set_transaction_type(TransactionType::Ltx);
+            option.set_transaction_type(TransactionType::Long);
             option.set_transaction_label("tsubakuro-rust-dbtest.ltx");
             f(&mut option);
 
@@ -43,7 +43,7 @@ mod test {
             drop_table_if_exists(&client, "test").await;
 
             let mut option = TransactionOption::new();
-            option.set_transaction_type(TransactionType::Ltx);
+            option.set_transaction_type(TransactionType::Long);
             option.set_transaction_label("tsubakuro-rust-dbtest.ltx");
             f(&mut option);
 
@@ -79,7 +79,7 @@ mod test {
         drop_table_if_exists(&client, "test").await;
 
         let mut option = TransactionOption::new();
-        option.set_transaction_type(TransactionType::Ltx);
+        option.set_transaction_type(TransactionType::Long);
         option.set_transaction_label("tsubakuro-rust-dbtest.ltx");
         option.set_modifies_definitions(true);
 
@@ -100,7 +100,7 @@ mod test {
         let client = create_test_sql_client().await;
 
         let mut option = TransactionOption::new();
-        option.set_transaction_type(TransactionType::Rtx);
+        option.set_transaction_type(TransactionType::ReadOnly);
         option.set_transaction_label("tsubakuro-rust-dbtest.rtx");
 
         let transaction = client.start_transaction(&option).await.unwrap();

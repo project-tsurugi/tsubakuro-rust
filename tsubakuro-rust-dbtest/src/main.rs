@@ -90,7 +90,7 @@ mod test {
     }
 
     pub(crate) async fn start_occ(client: &SqlClient) -> Transaction {
-        let mut option = TransactionOption::from(TransactionType::Occ);
+        let mut option = TransactionOption::from(TransactionType::Short);
         option.set_transaction_label("tsubakuro-rust-dbtest.occ");
         let transaction = client.start_transaction(&option).await.unwrap();
         transaction
