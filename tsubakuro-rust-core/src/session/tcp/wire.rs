@@ -79,12 +79,12 @@ impl TcpWire {
         self.link.send(slot, frame_header, payload, timeout).await
     }
 
-    pub(crate) async fn pull1(&self, timeout: Duration) -> Result<(), TgError> {
+    pub(crate) async fn pull1(&self, timeout: Duration) -> Result<bool, TgError> {
         let link_message = {
             if let Some(link_message) = self.link.recv(timeout).await? {
                 link_message
             } else {
-                return Ok(());
+                return Ok(false);
             }
         };
 
@@ -92,7 +92,7 @@ impl TcpWire {
         if Self::is_result_set_response(info) {
             self.process_result_set_response(link_message, timeout)
                 .await?;
-            return Ok(());
+            return Ok(true);
         }
 
         let slot = link_message.slot();
@@ -100,7 +100,7 @@ impl TcpWire {
         let response = tcp_convert_wire_response(link_message).await?;
         self.response_box
             .set_response_to_slot_handle(slot, response, is_slot_end);
-        Ok(())
+        Ok(true)
     }
 
     pub(crate) fn create_data_channel_wire(

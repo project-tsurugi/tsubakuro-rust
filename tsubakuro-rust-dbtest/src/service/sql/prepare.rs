@@ -149,7 +149,7 @@ mod test {
             i64::placeholder("bar"),
             String::placeholder("zzz"),
         ];
-        let job = client.prepare_async(sql, placeholders).await.unwrap();
+        let mut job = client.prepare_async(sql, placeholders).await.unwrap();
         let ps = job.take().await.unwrap();
         assert_eq!(false, ps.has_result_records());
 
@@ -160,7 +160,7 @@ mod test {
             SqlParameter::of("bar", 11_i64),
             SqlParameter::of("zzz", "abc"),
         ];
-        let job = client
+        let mut job = client
             .prepared_execute_async(&transaction, &ps, parameters)
             .await
             .unwrap();
@@ -172,7 +172,7 @@ mod test {
             SqlParameter::of("bar", 22_i64),
             SqlParameter::of("zzz", "def"),
         ];
-        let job = client
+        let mut job = client
             .prepared_execute_async(&transaction, &ps, parameters)
             .await
             .unwrap();
@@ -184,7 +184,7 @@ mod test {
             SqlParameter::of("bar", 33_i64),
             SqlParameter::null("zzz"),
         ];
-        let job = client
+        let mut job = client
             .prepared_execute_async(&transaction, &ps, parameters)
             .await
             .unwrap();
@@ -201,7 +201,7 @@ mod test {
     async fn select_async(client: &SqlClient) {
         let sql = "select * from test where foo = :foo";
         let placeholders = vec![i32::placeholder("foo")];
-        let job = client.prepare_async(sql, placeholders).await.unwrap();
+        let mut job = client.prepare_async(sql, placeholders).await.unwrap();
         let ps = job.take().await.unwrap();
         assert_eq!(true, ps.has_result_records());
 
@@ -209,7 +209,7 @@ mod test {
 
         {
             let parameters = vec![SqlParameter::of("foo", 1)];
-            let job = client
+            let mut job = client
                 .prepared_query_async(&transaction, &ps, parameters)
                 .await
                 .unwrap();
@@ -231,7 +231,7 @@ mod test {
 
         {
             let parameters = vec![SqlParameter::of("foo", 3)];
-            let job = client
+            let mut job = client
                 .prepared_query_async(&transaction, &ps, parameters)
                 .await
                 .unwrap();

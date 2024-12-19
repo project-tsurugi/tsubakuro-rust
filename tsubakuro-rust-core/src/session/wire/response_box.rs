@@ -60,6 +60,11 @@ impl SlotEntryHandle {
         let mut queue = self.response.lock().unwrap();
         queue.pop_front()
     }
+
+    pub(crate) fn exists_wire_response(&self) -> bool {
+        let queue = self.response.lock().unwrap();
+        !queue.is_empty()
+    }
 }
 
 impl Drop for SlotEntryHandle {

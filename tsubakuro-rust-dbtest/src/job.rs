@@ -7,8 +7,8 @@ pub(super) async fn execute(endpoint: &str) -> Result<(), TgError> {
 
     let connection_option = create_connection_option(endpoint)?;
 
-    let session_job = Session::connect_async(&connection_option).await?;
-    let session = session_job.take().await?;
+    let mut job = Session::connect_async(&connection_option).await?;
+    let session = job.take().await?;
     println!("{session:?}");
 
     let client: SqlClient = session.make_client();
@@ -44,7 +44,7 @@ create table test (
         let tx = start_occ(&client).await?;
 
         let sql = "select * from test order by foo";
-        let job = client.query_async(&tx, sql).await?;
+        let mut job = client.query_async(&tx, sql).await?;
         let mut result = job.take().await?;
         while result.next_row().await? {
             assert_eq!(true, result.next_column().await?);
@@ -72,7 +72,7 @@ create table test (
 }
 
 async fn list_tables(client: &SqlClient) -> Result<(), TgError> {
-    let job = client.list_tables_async().await?;
+    let mut job = client.list_tables_async().await?;
     let table_list = job.take().await?;
     println!("list_tables={:?}", table_list.get_table_names());
     Ok(())
@@ -85,7 +85,7 @@ async fn start_occ(client: &SqlClient) -> Result<Transaction, TgError> {
 
 async fn commit(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
     let option = CommitOption::new();
-    let job = client.commit_async(transaction, &option).await?;
+    let mut job = client.commit_async(transaction, &option).await?;
     job.take().await?;
 
     transaction.close().await?;
@@ -95,7 +95,7 @@ async fn commit(client: &SqlClient, transaction: &Transaction) -> Result<(), TgE
 async fn execute_statement(client: &SqlClient, sql: &str) -> Result<SqlExecuteResult, TgError> {
     let tx = start_occ(client).await?;
 
-    let job = client.execute_async(&tx, &sql).await?;
+    let mut job = client.execute_async(&tx, &sql).await?;
     let result = job.take().await?;
 
     commit(&client, &tx).await?;

@@ -70,29 +70,23 @@ impl Wire {
         timeout: Duration,
     ) -> Result<WireResponse, TgError> {
         let slot_handle = self.send_internal(service_id, request, timeout).await?;
-        let response = self.pull_internal(slot_handle, timeout).await?;
+        let response = self.pull_response(slot_handle, timeout).await?;
         Ok(response)
     }
 
     pub async fn send_and_pull_async<R: ProstMessage, T: 'static>(
         self: Arc<Wire>,
+        job_name: &str,
         service_id: i32,
         request: R,
-        converter: Box<dyn FnOnce(WireResponse) -> Result<T, TgError> + Send>,
+        converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
         timeout: Duration,
         default_timeout: Duration,
     ) -> Result<Job<T>, TgError> {
         let slot_handle = self.send_internal(service_id, request, timeout).await?;
+
         let wire = self.clone();
-        let job = Job::new(
-            |timeout| {
-                Box::pin(async move {
-                    let response = wire.pull_internal(slot_handle, timeout).await?;
-                    converter(response)
-                })
-            },
-            default_timeout,
-        );
+        let job = Job::new(job_name, wire, slot_handle, converter, default_timeout);
         Ok(job)
     }
 
@@ -120,7 +114,7 @@ impl Wire {
         Ok(slot_handle)
     }
 
-    async fn pull_internal(
+    pub(crate) async fn pull_response(
         &self,
         slot_handle: Arc<SlotEntryHandle>,
         timeout: Duration,
@@ -135,6 +129,43 @@ impl Wire {
 
             let timeout = calculate_timeout("Wire.pull()", timeout, start)?;
             self.wire.pull1(timeout).await?;
+        }
+    }
+
+    pub(crate) async fn wait_response(
+        &self,
+        slot_handle: Arc<SlotEntryHandle>,
+        wait: Duration,
+        timeout: Duration,
+    ) -> Result<bool, TgError> {
+        let start = Instant::now();
+        loop {
+            if slot_handle.exists_wire_response() {
+                return Ok(true);
+            }
+
+            let elapsed = start.elapsed();
+            if elapsed >= wait {
+                return Ok(false);
+            }
+
+            self.wire.pull1(timeout).await?;
+        }
+    }
+
+    pub(crate) async fn check_response(
+        &self,
+        slot_handle: Arc<SlotEntryHandle>,
+        timeout: Duration,
+    ) -> Result<bool, TgError> {
+        loop {
+            if slot_handle.exists_wire_response() {
+                return Ok(true);
+            }
+
+            if !self.wire.pull1(timeout).await? {
+                return Ok(false);
+            }
         }
     }
 
@@ -206,7 +237,7 @@ impl DelegateWire {
         }
     }
 
-    async fn pull1(&self, timeout: Duration) -> Result<(), TgError> {
+    async fn pull1(&self, timeout: Duration) -> Result<bool, TgError> {
         match self {
             DelegateWire::Tcp(wire) => wire.pull1(timeout).await,
             _ => todo!("DelegateWire"),

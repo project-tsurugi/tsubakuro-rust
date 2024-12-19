@@ -54,13 +54,17 @@ impl EndpointBroker {
         Ok(session_id)
     }
 
-    pub(crate) async fn handshake_async(
+    pub(crate) async fn handshake_async<F, T: 'static>(
         wire: Arc<Wire>,
         client_information: ClientInformation,
         wire_information: WireInformation,
+        converter: F,
         timeout: Duration,
         default_timeout: Duration,
-    ) -> Result<Job<i64>, TgError> {
+    ) -> Result<Job<T>, TgError>
+    where
+        F: Fn(/*session_id*/ i64) -> Result<T, TgError> + Send + 'static,
+    {
         const FUNCTION_NAME: &str = "handshake_async()";
         trace!("{} start", FUNCTION_NAME);
 
@@ -69,11 +73,13 @@ impl EndpointBroker {
 
         let job = wire
             .send_and_pull_async(
+                "Handshake",
                 SERVICE_ID_ENDPOINT_BROKER,
                 request,
                 Box::new(move |response| {
                     let session_id = handshake_processor(response)?;
-                    Ok(session_id)
+                    let result = converter(session_id);
+                    result
                 }),
                 timeout,
                 default_timeout,

@@ -54,27 +54,18 @@ impl TcpConnector {
         let wire = TcpConnector::create_wire(endpoint).await?;
 
         let wire_information = Self::create_information();
-        let handshake_job = EndpointBroker::handshake_async(
+        let job = EndpointBroker::handshake_async(
             wire.clone(),
             client_information,
             wire_information,
+            move |session_id| {
+                wire.set_session_id(session_id)?;
+                Ok(Session::new(wire.clone(), default_timeout))
+            },
             timeout,
             default_timeout,
         )
         .await?;
-
-        let job = Job::new(
-            move |timeout| {
-                Box::pin(async move {
-                    let session_id = handshake_job.take_for(timeout).await?;
-
-                    wire.set_session_id(session_id)?;
-
-                    Ok(Session::new(wire, default_timeout))
-                })
-            },
-            timeout,
-        );
         Ok(job)
     }
 

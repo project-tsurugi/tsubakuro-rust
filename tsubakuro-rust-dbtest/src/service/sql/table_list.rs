@@ -32,7 +32,7 @@ mod test {
 
         let test = TName::new(vec!["test".to_string()]);
         {
-            let job = client.list_tables_async().await.unwrap();
+            let mut job = client.list_tables_async().await.unwrap();
             let table_list = job.take().await.unwrap();
             let names = table_list.get_table_names();
             assert_eq!(false, names.contains(&test));
@@ -41,7 +41,7 @@ mod test {
         create_table(&client, "test", "create table test (pk int primary key)").await;
 
         {
-            let job = client.list_tables_async().await.unwrap();
+            let mut job = client.list_tables_async().await.unwrap();
             let table_list = job.take().await.unwrap();
             let names = table_list.get_table_names();
             assert_eq!(true, names.contains(&test));
