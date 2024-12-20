@@ -7,7 +7,7 @@ pub enum TgError {
     TimeoutError(/*message*/ String),
     IoError(
         /*message*/ String,
-        /*cause*/ Box<dyn std::error::Error>,
+        /*cause*/ Option<Box<dyn std::error::Error>>,
     ),
 
     ServerError(
@@ -20,15 +20,15 @@ pub enum TgError {
 impl std::fmt::Display for TgError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            TgError::ClientError(message, cause) => {
-                if let Some(cause) = cause {
-                    write!(f, "{message} ({cause})")
-                } else {
-                    write!(f, "{message}")
-                }
-            }
+            TgError::ClientError(message, cause) => match cause {
+                Some(cause) => write!(f, "{message} ({cause})"),
+                _ => write!(f, "{message}"),
+            },
             TgError::TimeoutError(message) => write!(f, "{message}"),
-            TgError::IoError(message, cause) => write!(f, "{message} ({cause})"),
+            TgError::IoError(message, cause) => match cause {
+                Some(cause) => write!(f, "{message} ({cause})"),
+                _ => write!(f, "{message}"),
+            },
             TgError::ServerError(message, code, server_message) => {
                 write!(f, "{message} ({code:?}) {server_message}")
             }
@@ -41,7 +41,7 @@ impl std::error::Error for TgError {
         match self {
             TgError::ClientError(_, cause) => cause.as_deref(),
             TgError::TimeoutError(_) => None,
-            TgError::IoError(_, cause) => Some(cause.as_ref()),
+            TgError::IoError(_, cause) => cause.as_deref(),
             TgError::ServerError(_, _, _) => None,
         }
     }
@@ -116,8 +116,11 @@ macro_rules! illegal_argument_error {
 
 #[macro_export]
 macro_rules! io_error {
+    ($message:expr) => {
+        $crate::error::TgError::IoError(format!("{}", $message), None)
+    };
     ($message:expr, $cause:expr) => {
-        $crate::error::TgError::IoError(format!("{}", $message), Box::new($cause))
+        $crate::error::TgError::IoError(format!("{}", $message), Some(Box::new($cause)))
     };
 }
 

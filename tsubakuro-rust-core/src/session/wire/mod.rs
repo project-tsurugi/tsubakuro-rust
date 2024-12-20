@@ -69,7 +69,7 @@ impl Wire {
         request: R,
         timeout: Duration,
     ) -> Result<WireResponse, TgError> {
-        let slot_handle = self.send_internal(service_id, request, timeout).await?;
+        let slot_handle = self.send_internal(service_id, request).await?;
         let response = self.pull_response(slot_handle, timeout).await?;
         Ok(response)
     }
@@ -80,10 +80,9 @@ impl Wire {
         service_id: i32,
         request: R,
         converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
-        timeout: Duration,
         default_timeout: Duration,
     ) -> Result<Job<T>, TgError> {
-        let slot_handle = self.send_internal(service_id, request, timeout).await?;
+        let slot_handle = self.send_internal(service_id, request).await?;
 
         let wire = self.clone();
         let job = Job::new(job_name, wire, slot_handle, converter, default_timeout);
@@ -94,7 +93,6 @@ impl Wire {
         &self,
         service_id: i32,
         request: T,
-        timeout: Duration,
     ) -> Result<Arc<SlotEntryHandle>, TgError> {
         let header = FrameworkRequestHeader {
             service_message_version_major: SERVICE_MESSAGE_VERSION_MAJOR,
@@ -109,7 +107,7 @@ impl Wire {
         let slot_handle = self.wire.response_box().create_slot_handle();
         let slot = slot_handle.slot();
 
-        self.wire.send(slot, &header, &payload, timeout).await?;
+        self.wire.send(slot, &header, &payload).await?;
 
         Ok(slot_handle)
     }
@@ -127,8 +125,8 @@ impl Wire {
                 return Ok(response);
             }
 
-            let timeout = calculate_timeout("Wire.pull()", timeout, start)?;
-            self.wire.pull1(timeout).await?;
+            let _timeout = calculate_timeout("Wire.pull()", timeout, start)?;
+            self.wire.pull1().await?;
         }
     }
 
@@ -136,7 +134,6 @@ impl Wire {
         &self,
         slot_handle: Arc<SlotEntryHandle>,
         wait: Duration,
-        timeout: Duration,
     ) -> Result<bool, TgError> {
         let start = Instant::now();
         loop {
@@ -149,21 +146,20 @@ impl Wire {
                 return Ok(false);
             }
 
-            self.wire.pull1(timeout).await?;
+            self.wire.pull1().await?;
         }
     }
 
     pub(crate) async fn check_response(
         &self,
         slot_handle: Arc<SlotEntryHandle>,
-        timeout: Duration,
     ) -> Result<bool, TgError> {
         loop {
             if slot_handle.exists_wire_response() {
                 return Ok(true);
             }
 
-            if !self.wire.pull1(timeout).await? {
+            if !self.wire.pull1().await? {
                 return Ok(false);
             }
         }
@@ -229,17 +225,16 @@ impl DelegateWire {
         slot: i32,
         frame_header: &Vec<u8>,
         payload: &Vec<u8>,
-        timeout: Duration,
     ) -> Result<(), TgError> {
         match self {
-            DelegateWire::Tcp(wire) => wire.send(slot, frame_header, payload, timeout).await,
+            DelegateWire::Tcp(wire) => wire.send(slot, frame_header, payload).await,
             _ => todo!("DelegateWire"),
         }
     }
 
-    async fn pull1(&self, timeout: Duration) -> Result<bool, TgError> {
+    async fn pull1(&self) -> Result<bool, TgError> {
         match self {
-            DelegateWire::Tcp(wire) => wire.pull1(timeout).await,
+            DelegateWire::Tcp(wire) => wire.pull1().await,
             _ => todo!("DelegateWire"),
         }
     }

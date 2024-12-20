@@ -79,10 +79,7 @@ impl<T> Job<T> {
         }
 
         let slot_handle = self.slot_handle.clone();
-        let result = self
-            .wire
-            .wait_response(slot_handle, wait, self.default_timeout)
-            .await;
+        let result = self.wire.wait_response(slot_handle, wait).await;
         match result {
             Ok(exists) => {
                 if exists {
@@ -104,10 +101,7 @@ impl<T> Job<T> {
         }
 
         let slot_handle = self.slot_handle.clone();
-        let result = self
-            .wire
-            .check_response(slot_handle, self.default_timeout)
-            .await;
+        let result = self.wire.check_response(slot_handle).await;
         match result {
             Ok(exists) => {
                 if exists {

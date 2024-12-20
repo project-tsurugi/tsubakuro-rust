@@ -1,7 +1,4 @@
-use std::{
-    sync::{atomic::AtomicI64, Arc},
-    time::Duration,
-};
+use std::sync::{atomic::AtomicI64, Arc};
 
 use log::debug;
 
@@ -74,14 +71,13 @@ impl TcpWire {
         slot: i32,
         frame_header: &Vec<u8>,
         payload: &Vec<u8>,
-        timeout: Duration,
     ) -> Result<(), TgError> {
-        self.link.send(slot, frame_header, payload, timeout).await
+        self.link.send(slot, frame_header, payload).await
     }
 
-    pub(crate) async fn pull1(&self, timeout: Duration) -> Result<bool, TgError> {
+    pub(crate) async fn pull1(&self) -> Result<bool, TgError> {
         let link_message = {
-            if let Some(link_message) = self.link.recv(timeout).await? {
+            if let Some(link_message) = self.link.recv().await? {
                 link_message
             } else {
                 return Ok(false);
@@ -90,8 +86,7 @@ impl TcpWire {
 
         let info = TcpResponseInfo::from(link_message.info());
         if Self::is_result_set_response(info) {
-            self.process_result_set_response(link_message, timeout)
-                .await?;
+            self.process_result_set_response(link_message).await?;
             return Ok(true);
         }
 
@@ -147,21 +142,13 @@ impl TcpWire {
         }
     }
 
-    pub(crate) async fn send_result_set_bye_ok(
-        &self,
-        slot: i32,
-        timeout: Duration,
-    ) -> Result<(), TgError> {
+    pub(crate) async fn send_result_set_bye_ok(&self, slot: i32) -> Result<(), TgError> {
         self.link
-            .send_header_only(TcpRequestInfo::RequestResultSetByeOk, slot, timeout)
+            .send_header_only(TcpRequestInfo::RequestResultSetByeOk, slot)
             .await
     }
 
-    async fn process_result_set_response(
-        &self,
-        link_message: LinkMessage,
-        timeout: Duration,
-    ) -> Result<(), TgError> {
+    async fn process_result_set_response(&self, link_message: LinkMessage) -> Result<(), TgError> {
         let response = tcp_convert_wire_response(link_message).await?;
         match response {
             WireResponse::ResponseResultSetHello(rs_slot, name) => {
@@ -174,7 +161,7 @@ impl TcpWire {
             WireResponse::ResponseResultSetBye(rs_slot) => {
                 let dc_wire = self.data_channel_box.release_data_channel_wire(rs_slot)?;
                 dc_wire.add_response(response);
-                self.send_result_set_bye_ok(rs_slot, timeout).await?;
+                self.send_result_set_bye_ok(rs_slot).await?;
             }
             _ => {
                 return Err(client_error!(format!(

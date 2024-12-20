@@ -11,6 +11,8 @@ pub struct ConnectionOption {
     application_name: Option<String>,
     label: Option<String>,
     default_timeout: Duration,
+    send_timeout: Duration,
+    recv_timeout: Duration,
 }
 
 impl ConnectionOption {
@@ -20,6 +22,8 @@ impl ConnectionOption {
             application_name: None,
             label: None,
             default_timeout: Duration::ZERO,
+            send_timeout: Duration::ZERO,
+            recv_timeout: Duration::ZERO,
         }
     }
 
@@ -59,6 +63,22 @@ impl ConnectionOption {
 
     pub fn default_timeout(&self) -> Duration {
         self.default_timeout
+    }
+
+    pub fn set_send_timeout(&mut self, timeout: Duration) {
+        self.send_timeout = timeout;
+    }
+
+    pub fn send_timeout(&self) -> Duration {
+        self.send_timeout
+    }
+
+    pub fn set_recv_timeout(&mut self, timeout: Duration) {
+        self.recv_timeout = timeout;
+    }
+
+    pub fn recv_timeout(&self) -> Duration {
+        self.recv_timeout
     }
 }
 
@@ -143,5 +163,32 @@ mod test {
         option.set_label(&label);
 
         assert_eq!(Some(&label), option.label());
+    }
+
+    #[test]
+    fn default_timeout() {
+        let mut option = ConnectionOption::new();
+        assert_eq!(Duration::ZERO, option.default_timeout());
+
+        option.set_default_timeout(Duration::from_secs(123));
+        assert_eq!(Duration::from_secs(123), option.default_timeout());
+    }
+
+    #[test]
+    fn send_timeout() {
+        let mut option = ConnectionOption::new();
+        assert_eq!(Duration::ZERO, option.send_timeout());
+
+        option.set_send_timeout(Duration::from_secs(123));
+        assert_eq!(Duration::from_secs(123), option.send_timeout());
+    }
+
+    #[test]
+    fn recv_timeout() {
+        let mut option = ConnectionOption::new();
+        assert_eq!(Duration::ZERO, option.recv_timeout());
+
+        option.set_recv_timeout(Duration::from_secs(123));
+        assert_eq!(Duration::from_secs(123), option.recv_timeout());
     }
 }

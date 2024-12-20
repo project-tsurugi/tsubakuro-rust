@@ -49,8 +49,8 @@ impl DataChannelWire for TcpDataChannelWire {
 
         let start = Instant::now();
         loop {
-            let timeout = calculate_timeout(FUNCTION_NAME, timeout, start)?;
-            self.tcp_wire.pull1(timeout).await?;
+            let _timeout = calculate_timeout(FUNCTION_NAME, timeout, start)?;
+            self.tcp_wire.pull1().await?;
 
             let response = self.take_response();
             match response {

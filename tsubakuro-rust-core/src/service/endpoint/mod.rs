@@ -59,7 +59,6 @@ impl EndpointBroker {
         client_information: ClientInformation,
         wire_information: WireInformation,
         converter: F,
-        timeout: Duration,
         default_timeout: Duration,
     ) -> Result<Job<T>, TgError>
     where
@@ -81,7 +80,6 @@ impl EndpointBroker {
                     let result = converter(session_id);
                     result
                 }),
-                timeout,
                 default_timeout,
             )
             .await?;

@@ -36,7 +36,14 @@ impl Session {
 
         match endpoint {
             Endpoint::Tcp(_, _) => {
-                TcpConnector::connect(endpoint, client_information, timeout, default_timeout).await
+                TcpConnector::connect(
+                    endpoint,
+                    connection_option,
+                    client_information,
+                    timeout,
+                    default_timeout,
+                )
+                .await
             }
             _ => Err(illegal_argument_error!("unsupported endpoint")),
         }
@@ -45,21 +52,18 @@ impl Session {
     pub async fn connect_async(
         connection_option: &ConnectionOption,
     ) -> Result<Job<Arc<Session>>, TgError> {
-        let timeout = connection_option.default_timeout();
-        Self::connect_async_for(connection_option, timeout).await
-    }
-
-    pub async fn connect_async_for(
-        connection_option: &ConnectionOption,
-        timeout: Duration,
-    ) -> Result<Job<Arc<Session>>, TgError> {
         let (endpoint, client_information) = Self::create_information(connection_option)?;
         let default_timeout = connection_option.default_timeout();
 
         let job = match endpoint {
             Endpoint::Tcp(_, _) => {
-                TcpConnector::connect_async(endpoint, client_information, timeout, default_timeout)
-                    .await?
+                TcpConnector::connect_async(
+                    endpoint,
+                    connection_option,
+                    client_information,
+                    default_timeout,
+                )
+                .await?
             }
             _ => return Err(illegal_argument_error!("unsupported endpoint")),
         };

@@ -12,6 +12,7 @@ use crate::tateyama::proto::endpoint::request::{
     ClientInformation, WireInformation,
 };
 
+use super::option::ConnectionOption;
 use super::{
     wire::{DelegateWire, Wire},
     Session,
@@ -29,11 +30,12 @@ pub(crate) struct TcpConnector {}
 impl TcpConnector {
     pub(crate) async fn connect(
         endpoint: &Endpoint,
+        connection_option: &ConnectionOption,
         client_information: ClientInformation,
         timeout: Duration,
         default_timeout: Duration,
     ) -> Result<Arc<Session>, TgError> {
-        let wire = TcpConnector::create_wire(endpoint).await?;
+        let wire = TcpConnector::create_wire(endpoint, connection_option).await?;
 
         let wire_information = Self::create_information();
         let session_id =
@@ -47,11 +49,11 @@ impl TcpConnector {
 
     pub(crate) async fn connect_async(
         endpoint: &Endpoint,
+        connection_option: &ConnectionOption,
         client_information: ClientInformation,
-        timeout: Duration,
         default_timeout: Duration,
     ) -> Result<Job<Arc<Session>>, TgError> {
-        let wire = TcpConnector::create_wire(endpoint).await?;
+        let wire = TcpConnector::create_wire(endpoint, connection_option).await?;
 
         let wire_information = Self::create_information();
         let job = EndpointBroker::handshake_async(
@@ -62,15 +64,17 @@ impl TcpConnector {
                 wire.set_session_id(session_id)?;
                 Ok(Session::new(wire.clone(), default_timeout))
             },
-            timeout,
             default_timeout,
         )
         .await?;
         Ok(job)
     }
 
-    async fn create_wire(endpoint: &Endpoint) -> Result<Arc<Wire>, TgError> {
-        let link = TcpLink::connect(endpoint).await?;
+    async fn create_wire(
+        endpoint: &Endpoint,
+        connection_option: &ConnectionOption,
+    ) -> Result<Arc<Wire>, TgError> {
+        let link = TcpLink::connect(endpoint, connection_option).await?;
         let wire = TcpWire::new(link);
         let wire = Wire::new(DelegateWire::Tcp(Arc::new(wire)));
         Ok(wire)
