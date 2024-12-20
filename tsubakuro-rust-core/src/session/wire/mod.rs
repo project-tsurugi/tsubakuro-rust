@@ -6,7 +6,6 @@ use prost::{
     Message as ProstMessage,
 };
 use response_box::{ResponseBox, SlotEntryHandle};
-use tokio::time::Instant;
 
 use crate::{
     core_service_error,
@@ -20,7 +19,7 @@ use crate::{
             },
         },
     },
-    util::calculate_timeout,
+    util::Timeout,
 };
 use crate::{error::TgError, job::Job, prost_decode_error};
 
@@ -35,6 +34,8 @@ const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 
 /// The minor service message version for FrameworkRequest.Header.
 const SERVICE_MESSAGE_VERSION_MINOR: u64 = 0;
+
+const POLLING_INTERVAL: Duration = Duration::from_millis(20);
 
 pub(crate) struct Wire {
     wire: DelegateWire,
@@ -69,8 +70,9 @@ impl Wire {
         request: R,
         timeout: Duration,
     ) -> Result<WireResponse, TgError> {
+        let timeout = Timeout::new(timeout);
         let slot_handle = self.send_internal(service_id, request).await?;
-        let response = self.pull_response(slot_handle, timeout).await?;
+        let response = self.pull_response(slot_handle, &timeout).await?;
         Ok(response)
     }
 
@@ -115,38 +117,48 @@ impl Wire {
     pub(crate) async fn pull_response(
         &self,
         slot_handle: Arc<SlotEntryHandle>,
-        timeout: Duration,
+        timeout: &Timeout,
     ) -> Result<WireResponse, TgError> {
-        // trace!("wire.pull() loop start");
-        let start = Instant::now();
+        if let Some(response) = slot_handle.take_wire_response() {
+            return Ok(response);
+        }
+
+        let mut interval = tokio::time::interval(POLLING_INTERVAL);
         loop {
+            interval.tick().await;
+
+            self.wire.pull1().await?;
+
             if let Some(response) = slot_handle.take_wire_response() {
-                // trace!("wire.pull() loop end");
                 return Ok(response);
             }
 
-            let _timeout = calculate_timeout("Wire.pull()", timeout, start)?;
-            self.wire.pull1().await?;
+            timeout.return_err_if_timeout("Wire.pull()")?;
         }
     }
 
     pub(crate) async fn wait_response(
         &self,
         slot_handle: Arc<SlotEntryHandle>,
-        wait: Duration,
+        timeout: &Timeout,
     ) -> Result<bool, TgError> {
-        let start = Instant::now();
+        if slot_handle.exists_wire_response() {
+            return Ok(true);
+        }
+
+        let mut interval = tokio::time::interval(POLLING_INTERVAL);
         loop {
+            interval.tick().await;
+
+            self.wire.pull1().await?;
+
             if slot_handle.exists_wire_response() {
                 return Ok(true);
             }
 
-            let elapsed = start.elapsed();
-            if elapsed >= wait {
+            if timeout.is_timeout() {
                 return Ok(false);
             }
-
-            self.wire.pull1().await?;
         }
     }
 
@@ -154,15 +166,17 @@ impl Wire {
         &self,
         slot_handle: Arc<SlotEntryHandle>,
     ) -> Result<bool, TgError> {
-        loop {
-            if slot_handle.exists_wire_response() {
-                return Ok(true);
-            }
-
-            if !self.wire.pull1().await? {
-                return Ok(false);
-            }
+        if slot_handle.exists_wire_response() {
+            return Ok(true);
         }
+
+        // 一度だけ受信状態を確認する
+        if !self.wire.pull1().await? {
+            return Ok(false);
+        }
+
+        let exists = slot_handle.exists_wire_response();
+        Ok(exists)
     }
 
     pub(crate) fn create_data_channel(

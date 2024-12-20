@@ -1,21 +1,19 @@
 use std::{
     collections::{HashMap, VecDeque},
     sync::Arc,
-    time::Duration,
 };
 
 use async_trait::async_trait;
 use prost::bytes::{Buf, BytesMut};
-use tokio::{
-    sync::{Mutex, MutexGuard},
-    time::Instant,
-};
+use tokio::sync::{Mutex, MutexGuard};
 
-use crate::{error::TgError, util::calculate_timeout};
+use crate::error::TgError;
+
+use super::Timeout;
 
 #[async_trait]
 pub(crate) trait DataChannelWire: std::fmt::Debug + Send + Sync {
-    async fn pull1(&self, data_channel: &DataChannel, timeout: Duration) -> Result<(), TgError>;
+    async fn pull1(&self, data_channel: &DataChannel, timeout: &Timeout) -> Result<(), TgError>;
     fn is_end(&self) -> bool;
 }
 
@@ -50,7 +48,7 @@ impl DataChannel {
 
 impl DataChannel {
     // TODO EOFのときはOk(None)でなくErr(EOF)を返すべき？
-    pub(crate) async fn read_u8(&mut self, timeout: Duration) -> Result<Option<u8>, TgError> {
+    pub(crate) async fn read_u8(&mut self, timeout: &Timeout) -> Result<Option<u8>, TgError> {
         let mut current = self.current.lock().await;
 
         if !self.exists_current(&mut current, timeout).await? {
@@ -66,7 +64,7 @@ impl DataChannel {
     pub(crate) async fn read_all(
         &mut self,
         size: usize,
-        timeout: Duration,
+        timeout: &Timeout,
     ) -> Result<Option<BytesMut>, TgError> {
         let mut current = self.current.lock().await;
 
@@ -114,7 +112,7 @@ impl DataChannel {
     async fn exists_current<'a>(
         &self,
         current: &mut MutexGuard<'a, Option<BytesMut>>,
-        timeout: Duration,
+        timeout: &Timeout,
     ) -> Result<bool, TgError> {
         if current.as_ref().is_some_and(|b| !b.is_empty()) {
             return Ok(true);
@@ -129,8 +127,7 @@ impl DataChannel {
 }
 
 impl DataChannel {
-    async fn pull(&self, timeout: Duration) -> Result<Option<BytesMut>, TgError> {
-        let start = Instant::now();
+    async fn pull(&self, timeout: &Timeout) -> Result<Option<BytesMut>, TgError> {
         loop {
             let bytes = {
                 let mut bytes_list = self.bytes_list.lock().await;
@@ -144,7 +141,8 @@ impl DataChannel {
                 return Ok(None);
             }
 
-            let timeout = calculate_timeout("DataChannel.pull()", timeout, start)?;
+            timeout.return_err_if_timeout("DataChannel.pull()")?;
+
             self.dc_wire.pull1(&self, timeout).await?;
         }
     }

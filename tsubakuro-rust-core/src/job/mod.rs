@@ -6,6 +6,7 @@ use crate::{
     client_error,
     error::TgError,
     session::wire::{response_box::SlotEntryHandle, Wire, WireResponse},
+    util::Timeout,
 };
 
 /// thread unsafe
@@ -72,24 +73,19 @@ impl<T> Job<T> {
         self.close_timeout = timeout;
     }
 
-    pub async fn wait(&mut self, wait: Duration) -> Result<bool, TgError> {
+    pub async fn wait(&mut self, timeout: Duration) -> Result<bool, TgError> {
         self.check_closed()?;
         if self.done {
             return Ok(true);
         }
 
         let slot_handle = self.slot_handle.clone();
-        let result = self.wire.wait_response(slot_handle, wait).await;
-        match result {
-            Ok(exists) => {
-                if exists {
-                    self.done = true;
-                }
-                Ok(exists)
-            }
-            Err(TgError::TimeoutError(_)) => Ok(false), // TODO 安全か？（Link.recv()でタイムアウトすると受信データの整合性が崩れそう）
-            Err(rror) => Err(rror),
+        let timeout = Timeout::new(timeout);
+        let result = self.wire.wait_response(slot_handle, &timeout).await;
+        if let Ok(true) = result {
+            self.done = true;
         }
+        result
     }
 
     pub async fn is_done(&mut self) -> Result<bool, TgError> {
@@ -102,16 +98,10 @@ impl<T> Job<T> {
 
         let slot_handle = self.slot_handle.clone();
         let result = self.wire.check_response(slot_handle).await;
-        match result {
-            Ok(exists) => {
-                if exists {
-                    self.done = true;
-                }
-                Ok(exists)
-            }
-            Err(TgError::TimeoutError(_)) => Ok(false), // TODO 安全か？（Link.recv()でタイムアウトすると受信データの整合性が崩れそう）
-            Err(rror) => Err(rror),
+        if let Ok(true) = result {
+            self.done = true;
         }
+        result
     }
 
     pub async fn take(&mut self) -> Result<T, TgError> {
@@ -126,7 +116,8 @@ impl<T> Job<T> {
         self.check_closed()?;
 
         let slot_handle = self.slot_handle.clone();
-        let response = self.wire.pull_response(slot_handle, timeout).await?;
+        let timeout = Timeout::new(timeout);
+        let response = self.wire.pull_response(slot_handle, &timeout).await?;
         self.done = true;
         self.taked = true;
         (self.converter)(response)

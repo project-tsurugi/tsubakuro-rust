@@ -70,15 +70,11 @@ mod test {
     pub(crate) async fn create_table(client: &SqlClient, table_name: &str, sql: &str) {
         drop_table_if_exists(client, table_name).await;
 
-        // println!("+++---create_table({table_name}) start");
         execute_ddl(client, sql).await;
-        // println!("+++---create_table({table_name}) end");
     }
 
     pub(crate) async fn drop_table_if_exists(client: &SqlClient, table_name: &str) {
-        // println!("+++---drop_table_if_exists({table_name}) start");
         execute_ddl(client, &format!("drop table if exists {table_name}")).await;
-        // println!("+++---drop_table_if_exists({table_name}) end");
     }
 
     pub(crate) async fn execute_ddl(client: &SqlClient, sql: &str) {

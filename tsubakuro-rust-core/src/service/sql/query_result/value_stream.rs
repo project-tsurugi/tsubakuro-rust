@@ -1,10 +1,10 @@
-use std::{collections::VecDeque, time::Duration};
+use std::collections::VecDeque;
 
 use prost::bytes::BytesMut;
 
 use crate::{
     broken_encoding_error, broken_relation_error, client_error, error::TgError,
-    session::wire::data_channel::DataChannel,
+    session::wire::data_channel::DataChannel, util::Timeout,
 };
 
 use super::variant::Base128Variant;
@@ -270,7 +270,7 @@ impl ResultSetValueStream {
         }
     }
 
-    pub(crate) async fn next_row(&mut self, timeout: Duration) -> Result<bool, TgError> {
+    pub(crate) async fn next_row(&mut self, timeout: &Timeout) -> Result<bool, TgError> {
         self.discard_top_level_row(timeout).await?;
 
         let entry_type = self.peek_entry_type(timeout).await?;
@@ -287,14 +287,14 @@ impl ResultSetValueStream {
         }
     }
 
-    async fn discard_top_level_row(&mut self, timeout: Duration) -> Result<(), TgError> {
+    async fn discard_top_level_row(&mut self, timeout: &Timeout) -> Result<(), TgError> {
         while !self.kind_stack_is_empty() {
             self.discard_current_frame(timeout).await?;
         }
         Ok(())
     }
 
-    async fn discard_current_frame(&mut self, timeout: Duration) -> Result<(), TgError> {
+    async fn discard_current_frame(&mut self, timeout: &Timeout) -> Result<(), TgError> {
         let entry = self.kind_stack_pop();
         if let Some((_, rest)) = entry {
             for _i in 0..rest {
@@ -305,7 +305,7 @@ impl ResultSetValueStream {
         Ok(())
     }
 
-    async fn force_discard_current_entry(&mut self, timeout: Duration) -> Result<(), TgError> {
+    async fn force_discard_current_entry(&mut self, timeout: &Timeout) -> Result<(), TgError> {
         const FUNCTION_NAME: &str = "force_discard_current_entry";
         if !self.skip(true, timeout).await? {
             return Err(broken_relation_error!(
@@ -316,9 +316,8 @@ impl ResultSetValueStream {
         Ok(())
     }
 
-    pub(crate) async fn next_column(&mut self, timeout: Duration) -> Result<bool, TgError> {
+    pub(crate) async fn next_column(&mut self, timeout: &Timeout) -> Result<bool, TgError> {
         if self.kind_stack_is_empty() {
-            // trace!("+++---next_column()=false kind_stack is empty");
             return Ok(false);
         }
 
@@ -326,7 +325,6 @@ impl ResultSetValueStream {
 
         let rest = self.kind_stack_get_top().unwrap().1;
         if rest == 0 {
-            // trace!("+++---next_column()=false rest==0");
             return Ok(false);
         }
 
@@ -335,11 +333,10 @@ impl ResultSetValueStream {
             return Err(client_error!("saw unexpected end of contents"));
         }
 
-        // trace!("+++---next_column()=true");
         Ok(true)
     }
 
-    async fn discard_current_column_if_exists(&mut self, timeout: Duration) -> Result<(), TgError> {
+    async fn discard_current_column_if_exists(&mut self, timeout: &Timeout) -> Result<(), TgError> {
         debug_assert_eq!(false, self.kind_stack_is_empty());
         if self.current_column_type != EntryType::Nothing {
             self.force_discard_current_entry(timeout).await?;
@@ -352,7 +349,7 @@ impl ResultSetValueStream {
         Ok(self.current_column_type == EntryType::Null)
     }
 
-    pub(crate) async fn fetch_int4_value(&mut self, timeout: Duration) -> Result<i32, TgError> {
+    pub(crate) async fn fetch_int4_value(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
         self.require_column_type(EntryType::Int)?;
         let value = self.read_int(timeout).await?;
         self.column_consumed();
@@ -366,21 +363,21 @@ impl ResultSetValueStream {
         }
     }
 
-    pub(crate) async fn fetch_int8_value(&mut self, timeout: Duration) -> Result<i64, TgError> {
+    pub(crate) async fn fetch_int8_value(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
         self.require_column_type(EntryType::Int)?;
         let value = self.read_int(timeout).await?;
         self.column_consumed();
         Ok(value)
     }
 
-    pub(crate) async fn fetch_float4_value(&mut self, timeout: Duration) -> Result<f32, TgError> {
+    pub(crate) async fn fetch_float4_value(&mut self, timeout: &Timeout) -> Result<f32, TgError> {
         self.require_column_type(EntryType::Float4)?;
         let value = self.read_float4(timeout).await?;
         self.column_consumed();
         Ok(value)
     }
 
-    pub(crate) async fn fetch_float8_value(&mut self, timeout: Duration) -> Result<f64, TgError> {
+    pub(crate) async fn fetch_float8_value(&mut self, timeout: &Timeout) -> Result<f64, TgError> {
         self.require_column_type(EntryType::Float8)?;
         let value = self.read_float8(timeout).await?;
         self.column_consumed();
@@ -389,7 +386,7 @@ impl ResultSetValueStream {
 
     pub(crate) async fn fetch_character_value(
         &mut self,
-        timeout: Duration,
+        timeout: &Timeout,
     ) -> Result<String, TgError> {
         self.require_column_type(EntryType::Character)?;
         let value = self.read_character(timeout).await?;
@@ -418,15 +415,14 @@ impl ResultSetValueStream {
 }
 
 impl ResultSetValueStream {
-    async fn peek_entry_type(&mut self, timeout: Duration) -> Result<EntryType, TgError> {
-        // trace!("+++---peek_entry_type={:?}", self.current_entry_type);
+    async fn peek_entry_type(&mut self, timeout: &Timeout) -> Result<EntryType, TgError> {
         if self.current_entry_type == EntryType::Nothing {
             self.fetch_header(timeout).await?;
         }
         Ok(self.current_entry_type)
     }
 
-    async fn skip(&mut self, _deep: bool, timeout: Duration) -> Result<bool, TgError> {
+    async fn skip(&mut self, _deep: bool, timeout: &Timeout) -> Result<bool, TgError> {
         const FUNCTION_NAME: &str = "ResultSetValueStream.skip()";
         let entry_type = self.peek_entry_type(timeout).await?;
         match entry_type {
@@ -502,7 +498,7 @@ impl ResultSetValueStream {
         }
     }
 
-    async fn _skip_n(&mut self, count: i32, timeout: Duration) -> Result<bool, TgError> {
+    async fn _skip_n(&mut self, count: i32, timeout: &Timeout) -> Result<bool, TgError> {
         for _i in 0..count {
             if !self.skip(true, timeout).await? {
                 return Ok(false);
@@ -519,12 +515,12 @@ impl ResultSetValueStream {
         Ok(())
     }
 
-    async fn read_int(&mut self, timeout: Duration) -> Result<i64, TgError> {
+    async fn read_int(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
         self.require(EntryType::Int)?;
         self.read_int_body(timeout).await
     }
 
-    async fn read_int_body(&mut self, timeout: Duration) -> Result<i64, TgError> {
+    async fn read_int_body(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
         let category = self.current_header_category;
         let payload = self.current_header_payload;
         self.clear_header_info();
@@ -541,7 +537,7 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
-    async fn read_float4(&mut self, timeout: Duration) -> Result<f32, TgError> {
+    async fn read_float4(&mut self, timeout: &Timeout) -> Result<f32, TgError> {
         self.require(EntryType::Float4)?;
         self.clear_header_info();
         let bits = self.read4(timeout).await?;
@@ -549,7 +545,7 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
-    async fn read_float8(&mut self, timeout: Duration) -> Result<f64, TgError> {
+    async fn read_float8(&mut self, timeout: &Timeout) -> Result<f64, TgError> {
         self.require(EntryType::Float8)?;
         self.clear_header_info();
         let bits = self.read8(timeout).await?;
@@ -557,7 +553,7 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
-    async fn read_character(&mut self, timeout: Duration) -> Result<String, TgError> {
+    async fn read_character(&mut self, timeout: &Timeout) -> Result<String, TgError> {
         self.require(EntryType::Character)?;
         let size = self.read_character_size(timeout).await?;
 
@@ -575,7 +571,7 @@ impl ResultSetValueStream {
         Ok(s)
     }
 
-    async fn read_character_size(&mut self, timeout: Duration) -> Result<i32, TgError> {
+    async fn read_character_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
         let category = self.current_header_category;
         let payload = self.current_header_payload;
         self.clear_header_info();
@@ -588,7 +584,7 @@ impl ResultSetValueStream {
         self.read_size(timeout).await
     }
 
-    pub(crate) async fn read_row_begin(&mut self, timeout: Duration) -> Result<i32, TgError> {
+    pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
         self.require(EntryType::Row)?;
 
         let category = self.current_header_category;
@@ -613,14 +609,14 @@ impl ResultSetValueStream {
         Ok(found)
     }
 
-    async fn read4(&mut self, timeout: Duration) -> Result<u32, TgError> {
+    async fn read4(&mut self, timeout: &Timeout) -> Result<u32, TgError> {
         let buf = self.read_n(4, timeout).await?;
         let value =
             (buf[0] as u32) << 24 | (buf[1] as u32) << 16 | (buf[2] as u32) << 8 | (buf[3] as u32);
         Ok(value)
     }
 
-    async fn read8(&mut self, timeout: Duration) -> Result<u64, TgError> {
+    async fn read8(&mut self, timeout: &Timeout) -> Result<u64, TgError> {
         let buf = self.read_n(8, timeout).await?;
         let value = (buf[0] as u64) << 56
             | (buf[1] as u64) << 48
@@ -633,7 +629,7 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
-    async fn read_n(&mut self, length: usize, timeout: Duration) -> Result<BytesMut, TgError> {
+    async fn read_n(&mut self, length: usize, timeout: &Timeout) -> Result<BytesMut, TgError> {
         let buffer = self
             .data_channel
             .read_all(length, timeout)
@@ -642,7 +638,7 @@ impl ResultSetValueStream {
         Ok(buffer)
     }
 
-    async fn read_size(&mut self, timeout: Duration) -> Result<i32, TgError> {
+    async fn read_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
         let value = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
         if value < 0 || value > (i32::MAX as i64) {
             // TODO BrokenEncodingException
@@ -659,7 +655,7 @@ impl ResultSetValueStream {
         self.current_header_payload = 0;
     }
 
-    async fn fetch_header(&mut self, timeout: Duration) -> Result<(), TgError> {
+    async fn fetch_header(&mut self, timeout: &Timeout) -> Result<(), TgError> {
         if self.saw_eof {
             self.current_entry_type = EntryType::EndOfContents;
             self.current_header_category = HEADER_HARD_EOF;

@@ -4,6 +4,7 @@ use crate::{
     jogasaki::proto::sql::response::ResultSetMetadata,
     prelude::convert_sql_response,
     session::wire::{Wire, WireResponse},
+    util::Timeout,
 };
 use crate::{
     jogasaki::proto::sql::response::{
@@ -118,7 +119,8 @@ impl SqlQueryResult {
     /// If this operation was succeeded (returns `true`), this cursor points the head of the next row.
     /// After this operation, you need to invoke [`next_column`] to retrieve the first column data of the next row.
     pub async fn next_row_for(&mut self, timeout: Duration) -> Result<bool, TgError> {
-        self.value_stream.next_row(timeout).await
+        let timeout = Timeout::new(timeout);
+        self.value_stream.next_row(&timeout).await
     }
 
     /// Advances the cursor to the next column in the current row.
@@ -134,7 +136,8 @@ impl SqlQueryResult {
     /// If this operation was succeeded (returns `true`), this cursor will point to the next column of the row.
     /// You can invoke [`fetch`] method to obtain the column value.
     pub async fn next_column_for(&mut self, timeout: Duration) -> Result<bool, TgError> {
-        self.value_stream.next_column(timeout).await
+        let timeout = Timeout::new(timeout);
+        self.value_stream.next_column(&timeout).await
     }
 
     /// Returns whether or not the column on this cursor is `NULL`.
@@ -155,16 +158,16 @@ impl SqlQueryResultFetch<i32> for SqlQueryResult {
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<i32, TgError> {
-        self.value_stream
-            .fetch_int4_value(self.default_timeout)
-            .await
+        let timeout = Timeout::new(self.default_timeout);
+        self.value_stream.fetch_int4_value(&timeout).await
     }
 
     /// Retrieves a `INT4` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<i32, TgError> {
-        self.value_stream.fetch_int4_value(timeout).await
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_int4_value(&timeout).await
     }
 }
 
@@ -174,16 +177,16 @@ impl SqlQueryResultFetch<i64> for SqlQueryResult {
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<i64, TgError> {
-        self.value_stream
-            .fetch_int8_value(self.default_timeout)
-            .await
+        let timeout = Timeout::new(self.default_timeout);
+        self.value_stream.fetch_int8_value(&timeout).await
     }
 
     /// Retrieves a `INT8` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<i64, TgError> {
-        self.value_stream.fetch_int8_value(timeout).await
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_int8_value(&timeout).await
     }
 }
 
@@ -193,16 +196,16 @@ impl SqlQueryResultFetch<f32> for SqlQueryResult {
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<f32, TgError> {
-        self.value_stream
-            .fetch_float4_value(self.default_timeout)
-            .await
+        let timeout = Timeout::new(self.default_timeout);
+        self.value_stream.fetch_float4_value(&timeout).await
     }
 
     /// Retrieves a `FLOAT4` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<f32, TgError> {
-        self.value_stream.fetch_float4_value(timeout).await
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_float4_value(&timeout).await
     }
 }
 
@@ -212,16 +215,16 @@ impl SqlQueryResultFetch<f64> for SqlQueryResult {
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<f64, TgError> {
-        self.value_stream
-            .fetch_float8_value(self.default_timeout)
-            .await
+        let timeout = Timeout::new(self.default_timeout);
+        self.value_stream.fetch_float8_value(&timeout).await
     }
 
     /// Retrieves a `FLOAT8` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<f64, TgError> {
-        self.value_stream.fetch_float8_value(timeout).await
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_float8_value(&timeout).await
     }
 }
 
@@ -231,15 +234,15 @@ impl SqlQueryResultFetch<String> for SqlQueryResult {
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<String, TgError> {
-        self.value_stream
-            .fetch_character_value(self.default_timeout)
-            .await
+        let timeout = Timeout::new(self.default_timeout);
+        self.value_stream.fetch_character_value(&timeout).await
     }
 
     /// Retrieves a `CHARACTER` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<String, TgError> {
-        self.value_stream.fetch_character_value(timeout).await
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_character_value(&timeout).await
     }
 }

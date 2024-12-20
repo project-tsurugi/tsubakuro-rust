@@ -13,19 +13,56 @@ pub(crate) fn string_to_prost_string(s: Option<&String>) -> ProstString {
     }
 }
 
-pub(crate) fn calculate_timeout(
-    function_name: &str,
+#[derive(Debug)]
+pub(crate) struct Timeout {
     timeout: Duration,
     start: Instant,
-) -> Result<Duration, TgError> {
-    if timeout.is_zero() {
-        return Ok(timeout);
+}
+
+impl Timeout {
+    pub(crate) fn new(timeout: Duration) -> Timeout {
+        Timeout {
+            timeout,
+            start: Instant::now(),
+        }
     }
 
-    let elapsed = start.elapsed();
-    if timeout > elapsed {
-        Ok(timeout - elapsed)
-    } else {
-        Err(timeout_error!(function_name))
+    pub(crate) fn is_timeout(&self) -> bool {
+        let timeout = self.timeout;
+        if timeout.is_zero() {
+            return false;
+        }
+
+        let elapsed = self.start.elapsed();
+        elapsed > timeout
+    }
+
+    pub(crate) fn return_err_if_timeout(&self, function_name: &str) -> Result<(), TgError> {
+        if self.is_timeout() {
+            Err(timeout_error!(function_name))
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn timeout() {
+        let zero = Timeout::new(Duration::ZERO);
+        let timeout = Timeout::new(Duration::from_millis(100));
+        assert_eq!(false, zero.is_timeout());
+        assert_eq!(false, timeout.is_timeout());
+
+        std::thread::sleep(Duration::from_millis(20));
+        assert_eq!(false, zero.is_timeout());
+        assert_eq!(false, timeout.is_timeout());
+
+        std::thread::sleep(Duration::from_millis(200));
+        assert_eq!(false, zero.is_timeout());
+        assert_eq!(true, timeout.is_timeout());
     }
 }

@@ -1,11 +1,9 @@
 use std::{
     collections::VecDeque,
     sync::{atomic::AtomicBool, Arc, Mutex},
-    time::Duration,
 };
 
 use async_trait::async_trait;
-use tokio::time::Instant;
 
 use crate::{
     error::TgError,
@@ -14,7 +12,7 @@ use crate::{
         data_channel::{DataChannel, DataChannelWire},
         Wire, WireResponse,
     },
-    util::calculate_timeout,
+    util::Timeout,
 };
 
 use super::{wire::TcpWire, DelegateWire};
@@ -44,12 +42,12 @@ impl TcpDataChannelWire {
 
 #[async_trait]
 impl DataChannelWire for TcpDataChannelWire {
-    async fn pull1(&self, data_channel: &DataChannel, timeout: Duration) -> Result<(), TgError> {
+    async fn pull1(&self, data_channel: &DataChannel, timeout: &Timeout) -> Result<(), TgError> {
         const FUNCTION_NAME: &str = "TcpDataChannelWire.pull1()";
 
-        let start = Instant::now();
         loop {
-            let _timeout = calculate_timeout(FUNCTION_NAME, timeout, start)?;
+            timeout.return_err_if_timeout(FUNCTION_NAME)?;
+
             self.tcp_wire.pull1().await?;
 
             let response = self.take_response();
