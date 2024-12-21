@@ -19,8 +19,8 @@ use super::r#enum::TcpResponseInfo;
 
 pub(crate) struct TcpLink {
     endpoint: Endpoint,
-    reader: Mutex<Option<ReadHalf<TcpStream>>>,
-    writer: Mutex<Option<WriteHalf<TcpStream>>>,
+    reader: Mutex<Option<ReadHalf<TcpStream>>>, // recv()とclose()の排他（recv()を呼ぶ側で排他するので、recv()同士の排他は不要）
+    writer: Mutex<Option<WriteHalf<TcpStream>>>, // send()系同士およびclose()の排他
     send_timeout: Duration,
     recv_timeout: Duration,
     broken: AtomicBool,
@@ -31,6 +31,10 @@ impl std::fmt::Debug for TcpLink {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("TcpLink")
             .field("endpoint", &self.endpoint)
+            .field("send_timeout", &self.send_timeout)
+            .field("recv_timeout", &self.recv_timeout)
+            .field("broken", &self.broken)
+            .field("closed", &self.closed)
             .finish()
     }
 }
@@ -70,6 +74,8 @@ impl TcpLink {
         frame_header: &Vec<u8>,
         payload: &Vec<u8>,
     ) -> Result<(), TgError> {
+        self.check_close()?;
+
         let mut tcp_header = [0u8; 7];
         let length = frame_header.len() + payload.len();
         tcp_header[0] = TcpRequestInfo::RequestSessionPayload.into();
@@ -135,6 +141,8 @@ impl TcpLink {
         info: TcpRequestInfo,
         slot: i32,
     ) -> Result<(), TgError> {
+        self.check_close()?;
+
         let mut tcp_header = [0u8; 7];
         tcp_header[0] = info.into();
         tcp_header[1] = (slot & 0xff) as u8;
@@ -179,6 +187,8 @@ impl TcpLink {
     }
 
     pub(crate) async fn recv(&self) -> Result<Option<LinkMessage>, TgError> {
+        self.check_close()?;
+
         let mut reader = match self.reader.try_lock() {
             Ok(reader) => reader,
             Err(_) => return Ok(None),
@@ -272,14 +282,17 @@ impl TcpLink {
         self.broken.store(true, std::sync::atomic::Ordering::SeqCst);
     }
 
+    fn is_broken(&self) -> bool {
+        self.broken.load(std::sync::atomic::Ordering::SeqCst)
+    }
+
     fn check_broken(&self) -> Result<(), TgError> {
-        if self.broken.load(std::sync::atomic::Ordering::SeqCst) {
+        if self.is_broken() {
             Err(io_error!("TcpLink is broken"))
         } else {
             Ok(())
         }
     }
-
     pub(crate) async fn close(&self) -> Result<(), TgError> {
         if let Ok(_) = self.closed.compare_exchange(
             false,
@@ -287,6 +300,7 @@ impl TcpLink {
             std::sync::atomic::Ordering::SeqCst,
             std::sync::atomic::Ordering::SeqCst,
         ) {
+            // FIXME send()/recv()の終了を待たずにNoneにする方法
             {
                 let mut writer = self.writer.lock().await;
                 writer.take(); // upadte to None
@@ -301,5 +315,13 @@ impl TcpLink {
 
     pub(crate) fn is_closed(&self) -> bool {
         self.closed.load(std::sync::atomic::Ordering::SeqCst)
+    }
+
+    fn check_close(&self) -> Result<(), TgError> {
+        if self.is_closed() {
+            Err(io_error!("TcpLink already closed"))
+        } else {
+            Ok(())
+        }
     }
 }

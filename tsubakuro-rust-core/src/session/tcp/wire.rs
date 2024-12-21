@@ -1,6 +1,7 @@
 use std::sync::{atomic::AtomicI64, Arc};
 
 use log::debug;
+use tokio::sync::Mutex;
 
 use crate::{
     client_error,
@@ -30,6 +31,8 @@ pub(crate) struct TcpWire {
     session_id: AtomicI64,
     response_box: Arc<ResponseBox>,
     data_channel_box: TcpDataChannelBox,
+    // send_lock: Mutex<bool>, // TcpLink::send()内でロックしているので、呼び出し側では排他不要
+    pull_lock: Mutex<bool>, // TcpLink::recv()してからaddResponse()するまでの排他が必要
 }
 
 impl TcpWire {
@@ -39,6 +42,8 @@ impl TcpWire {
             session_id: AtomicI64::new(SESSION_ID_IS_NOT_ASSIGNED),
             response_box: Arc::new(ResponseBox::new()),
             data_channel_box: TcpDataChannelBox::new(),
+            // send_lock: Mutex::new(true),
+            pull_lock: Mutex::new(true),
         }
     }
 }
@@ -72,10 +77,16 @@ impl TcpWire {
         frame_header: &Vec<u8>,
         payload: &Vec<u8>,
     ) -> Result<(), TgError> {
+        // let _lock = self.send_lock.lock().await;
         self.link.send(slot, frame_header, payload).await
     }
 
     pub(crate) async fn pull1(&self) -> Result<bool, TgError> {
+        let _lock = match self.pull_lock.try_lock() {
+            Ok(lock) => lock,
+            Err(_) => return Ok(false),
+        };
+
         let link_message = {
             if let Some(link_message) = self.link.recv().await? {
                 link_message
@@ -143,6 +154,7 @@ impl TcpWire {
     }
 
     pub(crate) async fn send_result_set_bye_ok(&self, slot: i32) -> Result<(), TgError> {
+        // let _lock = self.send_lock.lock().await;
         self.link
             .send_header_only(TcpRequestInfo::RequestResultSetByeOk, slot)
             .await
