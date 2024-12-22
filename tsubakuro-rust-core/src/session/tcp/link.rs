@@ -254,17 +254,22 @@ impl TcpLink {
                 .await
                 .map_err(|e| io_error!("TcpLink.recv(): read[length] error", e))?;
 
-            let mut length = 0;
-            for i in 0..3 {
-                length |= (buffer[i] as i32) << (i * 8);
+            let mut length = 0_usize;
+            for i in 0..4 {
+                length |= (buffer[i] as usize) << (i * 8);
+            }
+            if (length as i32) < 0 {
+                return Err(io_error!(format!(
+                    "TcpLink.recv(): read[length] error (length={})",
+                    length as i32
+                )));
             }
             length
         };
 
         let payload = if length > 0 {
-            // TODO 指定サイズ読む効率の良い方法
-            let mut buffer = BytesMut::with_capacity(length as usize);
-            buffer.resize(length as usize, 0);
+            let mut buffer = BytesMut::with_capacity(length);
+            unsafe { buffer.set_len(length) };
             reader
                 .read_exact(&mut buffer)
                 .await
