@@ -10,7 +10,8 @@ use crate::{
     invalid_response_error,
     session::wire::{
         data_channel::{DataChannel, DataChannelWire},
-        Wire, WireResponse,
+        response::WireResponse,
+        Wire,
     },
     util::Timeout,
 };

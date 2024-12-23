@@ -6,7 +6,7 @@ use std::{
 
 use log::debug;
 
-use super::WireResponse;
+use super::response::WireResponse;
 
 const SLOT_SIZE: i32 = 8;
 

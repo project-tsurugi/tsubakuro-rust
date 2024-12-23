@@ -7,7 +7,7 @@ use crate::{
         execute_result::CounterType, response::Response as SqlResponseType,
     },
     prelude::convert_sql_response,
-    session::wire::WireResponse,
+    session::wire::response::WireResponse,
     sql_service_error,
 };
 

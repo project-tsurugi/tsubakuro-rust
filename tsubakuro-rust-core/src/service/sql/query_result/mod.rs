@@ -3,7 +3,7 @@ use crate::{
     invalid_response_error,
     jogasaki::proto::sql::response::ResultSetMetadata,
     prelude::convert_sql_response,
-    session::wire::{Wire, WireResponse},
+    session::wire::{response::WireResponse, Wire},
     util::Timeout,
 };
 use crate::{
@@ -84,7 +84,10 @@ fn read_result_set_metadata(
 
     let _ = convert_sql_response(FUNCTION_NAME, &response)?;
     match response {
-        WireResponse::ResponseSessionBodyhead(_slot, payload) => {
+        WireResponse::ResponseSessionBodyhead(_slot, payload, error) => {
+            if let Some(e) = error {
+                return Err(e.to_tg_error());
+            }
             let payload = payload.unwrap();
             let message = SqlResponse::decode_length_delimited(payload)
                 .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;

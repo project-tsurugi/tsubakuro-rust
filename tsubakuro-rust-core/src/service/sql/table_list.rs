@@ -3,7 +3,7 @@ use crate::{
     invalid_response_error,
     jogasaki::proto::sql::response::{response::Response as SqlResponseType, Name},
     prelude::convert_sql_response,
-    session::wire::WireResponse,
+    session::wire::response::WireResponse,
     sql_service_error,
 };
 

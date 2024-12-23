@@ -9,10 +9,10 @@ use crate::{
     invalid_response_error,
     job::Job,
     prost_decode_error,
-    session::wire::{Wire, WireResponse},
+    session::wire::{response::WireResponse, Wire},
     tateyama::proto::endpoint::{
         request::{
-            request::Command as EndointRequestCommand, ClientInformation,
+            request::Command as EndointRequestCommand, Cancel as CancelRequest, ClientInformation,
             Handshake as HandshakeRequest, Request as EndpointRequest, WireInformation,
         },
         response::{handshake::Result as HandshakeResult, Handshake as HandshakeResponse},
@@ -34,7 +34,7 @@ pub struct EndpointBroker;
 
 impl EndpointBroker {
     pub(crate) async fn handshake(
-        wire: Arc<Wire>,
+        wire: &Arc<Wire>,
         client_information: ClientInformation,
         wire_information: WireInformation,
         timeout: Duration,
@@ -55,7 +55,7 @@ impl EndpointBroker {
     }
 
     pub(crate) async fn handshake_async<F, T: 'static>(
-        wire: Arc<Wire>,
+        wire: &Arc<Wire>,
         client_information: ClientInformation,
         wire_information: WireInformation,
         converter: F,
@@ -99,6 +99,25 @@ impl EndpointBroker {
         EndointRequestCommand::Handshake(handshake)
     }
 
+    pub(crate) async fn cancel(wire: &Arc<Wire>, slot: i32) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "cancel()";
+        trace!("{} (slot={} start)", FUNCTION_NAME, slot);
+
+        let command = Self::cancel_command();
+        let request = Self::new_request(command);
+
+        wire.send_to_slot(slot, SERVICE_ID_ENDPOINT_BROKER, request)
+            .await?;
+
+        trace!("{} (slot={}) send end", FUNCTION_NAME, slot);
+        Ok(())
+    }
+
+    fn cancel_command() -> EndointRequestCommand {
+        let cancel = CancelRequest {};
+        EndointRequestCommand::Cancel(cancel)
+    }
+
     fn new_request(command: EndointRequestCommand) -> EndpointRequest {
         EndpointRequest {
             service_message_version_major: ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR,
@@ -111,7 +130,11 @@ impl EndpointBroker {
 fn handshake_processor(wire_response: WireResponse) -> Result<i64, TgError> {
     const FUNCTION_NAME: &str = "handshake_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload) = wire_response {
+    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload, error) = wire_response
+    {
+        if let Some(e) = error {
+            return Err(e.to_tg_error());
+        }
         payload.unwrap()
     } else {
         return Err(invalid_response_error!(

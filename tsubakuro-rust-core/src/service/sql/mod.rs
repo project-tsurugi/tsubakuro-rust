@@ -17,7 +17,7 @@ use crate::{
     prelude::{CommitOption, ServiceClient, SqlParameter, SqlPlaceholder},
     prost_decode_error,
     session::{
-        wire::{Wire, WireResponse},
+        wire::{response::WireResponse, Wire},
         Session,
     },
     sql_service_error,
@@ -754,7 +754,10 @@ pub(crate) fn convert_sql_response(
     response: &WireResponse,
 ) -> Result<Option<SqlResponse>, TgError> {
     match response {
-        WireResponse::ResponseSessionPayload(_slot, payload) => {
+        WireResponse::ResponseSessionPayload(_slot, payload, error) => {
+            if let Some(e) = error {
+                return Err(e.to_tg_error());
+            }
             // let payload = payload.as_deref().unwrap();
             let payload = &payload.as_ref().unwrap()[..];
             let sql_response = SqlResponse::decode_length_delimited(payload)

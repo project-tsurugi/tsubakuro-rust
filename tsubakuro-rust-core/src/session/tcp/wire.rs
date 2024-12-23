@@ -10,8 +10,8 @@ use crate::{
     session::{
         tcp::link::TcpLink,
         wire::{
-            data_channel::DataChannelWire, link::LinkMessage, response_box::ResponseBox,
-            skip_framework_header, WireResponse,
+            data_channel::DataChannelWire, link::LinkMessage, response::WireResponse,
+            response_box::ResponseBox, skip_framework_header,
         },
     },
 };
@@ -195,21 +195,15 @@ async fn tcp_convert_wire_response(link_message: LinkMessage) -> Result<WireResp
             // trace!("{}: RESPONSE_SESSION_PAYLOAD", FUNCTION_NAME);
             let slot = link_message.slot();
             let mut payload = link_message.take_payload().await;
-            if let Some(before) = payload {
-                payload = Some(skip_framework_header(before)?);
-            }
-
-            Ok(WireResponse::ResponseSessionPayload(slot, payload))
+            let error = skip_framework_header(&mut payload);
+            Ok(WireResponse::ResponseSessionPayload(slot, payload, error))
         }
         TcpResponseInfo::ResponseSessionBodyhead => {
             // trace!("{}: RESPONSE_SESSION_BODYHEAD", FUNCTION_NAME);
             let slot = link_message.slot();
             let mut payload = link_message.take_payload().await;
-            if let Some(before) = payload {
-                payload = Some(skip_framework_header(before)?);
-            }
-
-            Ok(WireResponse::ResponseSessionBodyhead(slot, payload))
+            let error = skip_framework_header(&mut payload);
+            Ok(WireResponse::ResponseSessionBodyhead(slot, payload, error))
         }
         TcpResponseInfo::ResponseResultSetPayload => {
             // trace!("{}: RESPONSE_RESULT_SET_PAYLOAD", FUNCTION_NAME);

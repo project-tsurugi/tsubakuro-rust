@@ -14,6 +14,12 @@ macro_rules! core_service_error {
 
 impl From<crate::tateyama::proto::diagnostics::Record> for DiagnosticCode {
     fn from(value: crate::tateyama::proto::diagnostics::Record) -> Self {
+        DiagnosticCode::from(&value)
+    }
+}
+
+impl From<&crate::tateyama::proto::diagnostics::Record> for DiagnosticCode {
+    fn from(value: &crate::tateyama::proto::diagnostics::Record) -> Self {
         let code = value.code();
         let code_number = to_core_service_diagnostic_code_number(code);
         let name = code.as_str_name();
@@ -23,7 +29,9 @@ impl From<crate::tateyama::proto::diagnostics::Record> for DiagnosticCode {
 }
 
 // https://github.com/project-tsurugi/tsubakuro/blob/master/modules/common/src/main/java/com/tsurugidb/tsubakuro/exception/CoreServiceCode.java
-pub(crate) fn to_core_service_diagnostic_code_number(code: crate::tateyama::proto::diagnostics::Code) -> i32 {
+pub(crate) fn to_core_service_diagnostic_code_number(
+    code: crate::tateyama::proto::diagnostics::Code,
+) -> i32 {
     match code {
         crate::tateyama::proto::diagnostics::Code::Unknown => 0,
         crate::tateyama::proto::diagnostics::Code::SystemError => 1_00,

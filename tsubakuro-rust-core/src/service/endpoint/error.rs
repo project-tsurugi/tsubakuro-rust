@@ -22,7 +22,7 @@ impl From<crate::tateyama::proto::endpoint::response::Error> for DiagnosticCode 
 
         DiagnosticCode::new(
             SERVICE_ID_ENDPOINT_BROKER,
-            /*FIXME*/ "EDP",
+            /*FIXME*/ "SCD",
             code_number,
             name,
         )

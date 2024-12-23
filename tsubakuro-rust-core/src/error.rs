@@ -47,7 +47,7 @@ impl std::error::Error for TgError {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DiagnosticCode {
     category_number: i32,
     category_str: String,

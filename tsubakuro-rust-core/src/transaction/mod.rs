@@ -14,7 +14,7 @@ use crate::{
         convert_sql_response, sql::SqlClient, sql_result_only_success_processor, ServiceClient,
         Session,
     },
-    session::wire::WireResponse,
+    session::wire::response::WireResponse,
     sql_service_error,
 };
 

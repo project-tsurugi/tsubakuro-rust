@@ -5,28 +5,29 @@ use prost::{
     bytes::{Buf, BytesMut},
     Message as ProstMessage,
 };
+use response::{WireResponse, WireResponseError};
 use response_box::{ResponseBox, SlotEntryHandle};
 
 use crate::{
-    core_service_error,
-    tateyama::{
-        self,
-        proto::{
-            diagnostics::Record as DiagnosticsRecord,
-            framework::{
-                request::Header as FrameworkRequestHeader,
-                response::Header as FrameworkResponseHeader,
-            },
+    core_service_wire_response_error,
+    error::TgError,
+    job::Job,
+    prost_decode_wire_response_error,
+    tateyama::proto::{
+        diagnostics::Record as DiagnosticsRecord,
+        framework::{
+            request::Header as FrameworkRequestHeader, response::Header as FrameworkResponseHeader,
         },
     },
     util::Timeout,
 };
-use crate::{error::TgError, job::Job, prost_decode_error};
 
 use super::tcp::wire::TcpWire;
 
+pub(crate) mod cancel;
 pub(crate) mod data_channel;
 pub(crate) mod link;
+pub(crate) mod response;
 pub(crate) mod response_box;
 
 /// The major service message version for FrameworkRequest.Header.
@@ -72,12 +73,12 @@ impl Wire {
     ) -> Result<WireResponse, TgError> {
         let timeout = Timeout::new(timeout);
         let slot_handle = self.send_internal(service_id, request).await?;
-        let response = self.pull_response(slot_handle, &timeout).await?;
+        let response = self.pull_response(&slot_handle, &timeout).await?;
         Ok(response)
     }
 
     pub async fn send_and_pull_async<R: ProstMessage, T: 'static>(
-        self: Arc<Wire>,
+        self: &Arc<Wire>,
         job_name: &str,
         service_id: i32,
         request: R,
@@ -114,9 +115,29 @@ impl Wire {
         Ok(slot_handle)
     }
 
+    pub(crate) async fn send_to_slot<R: ProstMessage>(
+        &self,
+        slot: i32,
+        service_id: i32,
+        request: R,
+    ) -> Result<(), TgError> {
+        let header = FrameworkRequestHeader {
+            service_message_version_major: SERVICE_MESSAGE_VERSION_MAJOR,
+            service_message_version_minor: SERVICE_MESSAGE_VERSION_MINOR,
+            service_id: service_id as u64,
+            session_id: self.session_id() as u64,
+        };
+        let header = header.encode_length_delimited_to_vec();
+
+        let payload = request.encode_length_delimited_to_vec();
+
+        self.wire.send(slot, &header, &payload).await?;
+        Ok(())
+    }
+
     pub(crate) async fn pull_response(
         &self,
-        slot_handle: Arc<SlotEntryHandle>,
+        slot_handle: &Arc<SlotEntryHandle>,
         timeout: &Timeout,
     ) -> Result<WireResponse, TgError> {
         if let Some(response) = slot_handle.take_wire_response() {
@@ -279,36 +300,37 @@ impl DelegateWire {
     }
 }
 
-#[derive(Debug)]
-pub(crate) enum WireResponse {
-    ResponseSessionPayload(/* slot */ i32, /* payload */ Option<BytesMut>),
-    ResponseResultSetHello(/* slot */ i32, /* ResultSet name */ String),
-    ResponseSessionBodyhead(/* slot */ i32, /* payload */ Option<BytesMut>),
-    ResponseResultSetPayload(
-        /* slot */ i32,
-        /* writer */ u8,
-        /* payload */ Option<BytesMut>,
-    ),
-    ResponseResultSetBye(/* slot */ i32),
-}
+pub(crate) fn skip_framework_header(payload: &mut Option<BytesMut>) -> Option<WireResponseError> {
+    if let Some(payload) = payload.as_mut() {
+        let mut slice = payload.as_ref();
+        let before_length = slice.len();
 
-pub(crate) fn skip_framework_header(mut payload: BytesMut) -> Result<BytesMut, TgError> {
-    const FUNCTION_NAME: &str = "skip_framework_header()";
+        let result = skip_framework_header_body(&mut slice);
 
-    let mut slice = payload.as_ref();
-    let before_length = slice.len();
-    let header = FrameworkResponseHeader::decode_length_delimited(&mut slice)
-        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "FrameworkResponseHeader", e))?;
+        let after_length = slice.len();
+        payload.advance(before_length - after_length);
 
-    if header.payload_type()
-        == tateyama::proto::framework::response::header::PayloadType::ServerDiagnostics
-    {
-        let error_response = DiagnosticsRecord::decode_length_delimited(&mut slice)
-            .map_err(|e| prost_decode_error!(FUNCTION_NAME, "DiagnosticsRecord", e))?;
-        return Err(core_service_error!(FUNCTION_NAME, error_response));
+        if let Err(e) = result {
+            return Some(e);
+        }
     }
 
-    let after_length = slice.len();
-    payload.advance(before_length - after_length);
-    Ok(payload)
+    None
+}
+
+fn skip_framework_header_body(slice: &mut &[u8]) -> Result<(), WireResponseError> {
+    const FUNCTION_NAME: &str = "skip_framework_header()";
+
+    let header = FrameworkResponseHeader::decode_length_delimited(&mut *slice).map_err(|e| {
+        prost_decode_wire_response_error!(FUNCTION_NAME, "FrameworkResponseHeader", e)
+    })?;
+    match header.payload_type() {
+        crate::tateyama::proto::framework::response::header::PayloadType::ServerDiagnostics => {
+            let record = DiagnosticsRecord::decode_length_delimited(&mut *slice).map_err(|e| {
+                prost_decode_wire_response_error!(FUNCTION_NAME, "DiagnosticsRecord", e)
+            })?;
+            Err(core_service_wire_response_error!(FUNCTION_NAME, record))
+        }
+        _ => Ok(()),
+    }
 }
