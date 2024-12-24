@@ -25,3 +25,4 @@ cd tsubakuro-rust-core
 cargo test
 ```
 
+See also [tsubakuro-rust-dbtest](../tsubakuro-rust-dbtest).
