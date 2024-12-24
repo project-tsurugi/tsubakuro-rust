@@ -6,13 +6,13 @@ C ABI format library is also provided.
 
 ## libraries
 
-- [tsubakuro-rust-client](tsubakuro-rust-client)
-  - Main library to access Tsurugi.
+- [tsubakuro-rust-core](tsubakuro-rust-core)
+  - Core library to access Tsurugi.
   - Written in Rust.
 - [tsubakuro-rust-ffi](tsubakuro-rust-ffi)
   - Library providing functions in C ABI format. (Functions called from other programming languages)
   - Written in Rust.
-  - Using tsubakuro-rust-client.
+  - Using tsubakuro-rust-core.
 - [tsubakuro-rust-java](tsubakuro-rust-java)
   - For testing tsubakuro-rust-ffi.
   - Written in Java.
