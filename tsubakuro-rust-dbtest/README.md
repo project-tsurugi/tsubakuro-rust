@@ -1,6 +1,6 @@
 # tsubakuro-rust-dbtest
 
-tsubakuro-rust-dbtest tests [tsubakuro-rust-client](../tsubakuro-rust-client).
+tsubakuro-rust-dbtest tests [tsubakuro-rust-core](../tsubakuro-rust-core).
 tsubakuro-rust-dbtest actually connects to tsurugidb.
 
 ## How to execute
