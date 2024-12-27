@@ -1,0 +1,68 @@
+name: Tsubakuro-Rust-CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      tsurugi_version:
+        type: string
+        default: 'snapshot'
+      os_version:
+        type: string
+        default: 'ubuntu-22.04'
+      tsurugi_loglevel:
+        type: number
+        default: 30
+
+jobs:
+  Build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: [self-hosted, docker]
+    permissions:
+      checks: write
+      contents: read
+    timeout-minutes: 30
+    container:
+      image: ghcr.io/project-tsurugi/tsurugi-ci:${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
+    services:
+      tsurugi:
+        image: ghcr.io/project-tsurugi/tsurugidb:${{ inputs.tsurugi_version || 'snapshot' }}-${{ inputs.os_version || 'ubuntu-22.04' }}
+        env:
+          GLOG_v: ${{ inputs.tsurugi_loglevel || 30 }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout_Tsubakuro
+        uses: actions/checkout@v4
+        with:
+          repository: project-tsurugi/tsubakuro
+          path: tsubakuro
+          ref: master
+
+      - name: Test_Core
+        run: |
+          cp -rp tsubakuro/modules/proto/src/main/protos tsubakuro-rust-core
+          cd tsubakuro-rust-core
+          cargo build
+          cargo test
+
+      - name: Test_DBTest
+        run: |
+          cd tsubakuro-rust-dbtest
+          cargo run tcp://tsurugi:12345
+          cargo test "" -- --test-threads=1 endpoint=tcp://tsurugi:12345
+
+      - name: Lint_Core
+        run: |
+          cd tsubakuro-rust-core
+          cargo clippy
