@@ -73,28 +73,27 @@ impl SqlParameterOf<String> for SqlParameter {
     }
 }
 
-pub trait SqlParameterGenerator<T> {
-    fn parameter(self, name: &str) -> SqlParameter;
-}
-
-impl<T> SqlParameterGenerator<T> for T
+impl<T> SqlParameterOf<Option<T>> for SqlParameter
 where
     SqlParameter: SqlParameterOf<T>,
 {
-    fn parameter(self, name: &str) -> SqlParameter {
-        SqlParameter::of(name, self)
+    fn of(name: &str, value: Option<T>) -> SqlParameter {
+        match value {
+            Some(value) => SqlParameter::of(name, value),
+            _ => SqlParameter::null(name),
+        }
     }
 }
 
 pub trait SqlParameterBind<T> {
-    fn bind(&self, value: T) -> SqlParameter;
+    fn parameter(&self, value: T) -> SqlParameter;
 }
 
 impl<T> SqlParameterBind<T> for &str
 where
     SqlParameter: SqlParameterOf<T>,
 {
-    fn bind(&self, value: T) -> SqlParameter {
+    fn parameter(&self, value: T) -> SqlParameter {
         SqlParameter::of(self, value)
     }
 }
@@ -103,23 +102,23 @@ impl<T> SqlParameterBind<T> for String
 where
     SqlParameter: SqlParameterOf<T>,
 {
-    fn bind(&self, value: T) -> SqlParameter {
+    fn parameter(&self, value: T) -> SqlParameter {
         SqlParameter::of(self, value)
     }
 }
 
 pub trait SqlParameterBindNull {
-    fn bind_null(&self) -> SqlParameter;
+    fn parameter_null(&self) -> SqlParameter;
 }
 
 impl SqlParameterBindNull for &str {
-    fn bind_null(&self) -> SqlParameter {
+    fn parameter_null(&self) -> SqlParameter {
         SqlParameter::null(self)
     }
 }
 
 impl SqlParameterBindNull for String {
-    fn bind_null(&self) -> SqlParameter {
+    fn parameter_null(&self) -> SqlParameter {
         SqlParameter::null(self)
     }
 }
@@ -134,10 +133,13 @@ mod test {
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(None, target0.value);
 
-        let target = "test".bind_null();
+        let target = SqlParameter::of("test", None::<i32>);
         assert_eq!(target0, target);
 
-        let target = "test".to_string().bind_null();
+        let target = "test".parameter_null();
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter_null();
         assert_eq!(target0, target);
     }
 
@@ -147,13 +149,13 @@ mod test {
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::Int4Value(123), target0.value().unwrap());
 
-        let target = 123.parameter("test");
+        let target = SqlParameter::of("test", Some(123));
         assert_eq!(target0, target);
 
-        let target = "test".bind(123);
+        let target = "test".parameter(123);
         assert_eq!(target0, target);
 
-        let target = "test".to_string().bind(123);
+        let target = "test".to_string().parameter(123);
         assert_eq!(target0, target);
     }
 
@@ -163,13 +165,13 @@ mod test {
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::Int8Value(123), target0.value().unwrap());
 
-        let target = 123_i64.parameter("test");
+        let target = SqlParameter::of("test", Some(123_i64));
         assert_eq!(target0, target);
 
-        let target = "test".bind(123_i64);
+        let target = "test".parameter(123_i64);
         assert_eq!(target0, target);
 
-        let target = "test".to_string().bind(123_i64);
+        let target = "test".to_string().parameter(123_i64);
         assert_eq!(target0, target);
     }
 
@@ -179,13 +181,13 @@ mod test {
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::Float4Value(123.0), target0.value().unwrap());
 
-        let target = 123_f32.parameter("test");
+        let target = SqlParameter::of("test", Some(123_f32));
         assert_eq!(target0, target);
 
-        let target = "test".bind(123_f32);
+        let target = "test".parameter(123_f32);
         assert_eq!(target0, target);
 
-        let target = "test".to_string().bind(123_f32);
+        let target = "test".to_string().parameter(123_f32);
         assert_eq!(target0, target);
     }
 
@@ -195,13 +197,13 @@ mod test {
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::Float8Value(123.0), target0.value().unwrap());
 
-        let target = 123_f64.parameter("test");
+        let target = SqlParameter::of("test", Some(123_f64));
         assert_eq!(target0, target);
 
-        let target = "test".bind(123_f64);
+        let target = "test".parameter(123_f64);
         assert_eq!(target0, target);
 
-        let target = "test".to_string().bind(123_f64);
+        let target = "test".to_string().parameter(123_f64);
         assert_eq!(target0, target);
     }
 
@@ -214,13 +216,13 @@ mod test {
             target0.value().unwrap()
         );
 
-        let target = "abc".parameter("test");
+        let target = SqlParameter::of("test", Some("abc"));
         assert_eq!(target0, target);
 
-        let target = "test".bind("abc");
+        let target = "test".parameter("abc");
         assert_eq!(target0, target);
 
-        let target = "test".to_string().bind("abc");
+        let target = "test".to_string().parameter("abc");
         assert_eq!(target0, target);
     }
 
@@ -233,13 +235,13 @@ mod test {
             target0.value().unwrap()
         );
 
-        let target = "abc".to_string().parameter("test");
+        let target = SqlParameter::of("test", Some("abc".to_string()));
         assert_eq!(target0, target);
 
-        let target = "test".bind("abc".to_string());
+        let target = "test".parameter("abc".to_string());
         assert_eq!(target0, target);
 
-        let target = "test".to_string().bind("abc".to_string());
+        let target = "test".to_string().parameter("abc".to_string());
         assert_eq!(target0, target);
     }
 }

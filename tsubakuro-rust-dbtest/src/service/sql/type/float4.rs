@@ -86,7 +86,10 @@ mod test {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test values(:pk, :value)";
-        let placeholders = vec![i32::placeholder("pk"), f32::placeholder("value")];
+        let placeholders = vec![
+            SqlPlaceholder::of::<i32>("pk"),
+            SqlPlaceholder::of::<f32>("value"),
+        ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {

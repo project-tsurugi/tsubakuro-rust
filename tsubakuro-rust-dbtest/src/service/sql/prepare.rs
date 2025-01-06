@@ -22,9 +22,9 @@ mod test {
     async fn insert(client: &SqlClient) {
         let sql = "insert into test values(:foo, :bar, :zzz)";
         let placeholders = vec![
-            i32::placeholder("foo"),
-            i64::placeholder("bar"),
-            String::placeholder("zzz"),
+            SqlPlaceholder::of::<i32>("foo"),
+            SqlPlaceholder::of::<i64>("bar"),
+            SqlPlaceholder::of::<String>("zzz"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
         assert_eq!(false, ps.has_result_records());
@@ -73,7 +73,7 @@ mod test {
 
     async fn select(client: &SqlClient) {
         let sql = "select * from test where foo = :foo";
-        let placeholders = vec![i32::placeholder("foo")];
+        let placeholders = vec![SqlPlaceholder::of::<i32>("foo")];
         let ps = client.prepare(sql, placeholders).await.unwrap();
         assert_eq!(true, ps.has_result_records());
 
@@ -145,9 +145,9 @@ mod test {
     async fn insert_async(client: &SqlClient) {
         let sql = "insert into test values(:foo, :bar, :zzz)";
         let placeholders = vec![
-            i32::placeholder("foo"),
-            i64::placeholder("bar"),
-            String::placeholder("zzz"),
+            SqlPlaceholder::of::<i32>("foo"),
+            SqlPlaceholder::of::<i64>("bar"),
+            SqlPlaceholder::of::<String>("zzz"),
         ];
         let mut job = client.prepare_async(sql, placeholders).await.unwrap();
         let ps = job.take().await.unwrap();
@@ -200,7 +200,7 @@ mod test {
 
     async fn select_async(client: &SqlClient) {
         let sql = "select * from test where foo = :foo";
-        let placeholders = vec![i32::placeholder("foo")];
+        let placeholders = vec![SqlPlaceholder::of::<i32>("foo")];
         let mut job = client.prepare_async(sql, placeholders).await.unwrap();
         let ps = job.take().await.unwrap();
         assert_eq!(true, ps.has_result_records());
@@ -270,9 +270,9 @@ mod test {
 
         let sql = "insert into test values(:foo, :bar, :zzz)";
         let placeholders = vec![
-            i32::placeholder("foo"),
-            i64::placeholder("bar"),
-            // not defined String::placeholder("zzz"),
+            SqlPlaceholder::of::<i32>("foo"),
+            SqlPlaceholder::of::<i64>("bar"),
+            // not defined SqlPlaceholder::of::<String>("zzz"),
         ];
         let error = client.prepare(sql, placeholders).await.unwrap_err();
         match error {
