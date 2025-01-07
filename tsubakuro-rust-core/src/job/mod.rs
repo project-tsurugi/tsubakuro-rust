@@ -1,5 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
+use cancel_job::CancelJob;
 use log::debug;
 
 use crate::{
@@ -10,6 +11,8 @@ use crate::{
     util::Timeout,
 };
 
+mod cancel_job;
+
 /// thread unsafe
 pub struct Job<T> {
     name: String,
@@ -17,7 +20,6 @@ pub struct Job<T> {
     slot_handle: Arc<SlotEntryHandle>,
     converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
     default_timeout: Duration,
-    close_timeout: Duration,
     done: bool,
     taked: bool,
     canceled: bool,
@@ -31,7 +33,6 @@ impl<T> std::fmt::Debug for Job<T> {
             .field("wire", &self.wire)
             .field("slot_handle", &self.slot_handle)
             .field("default_timeout", &self.default_timeout)
-            .field("close_timeout", &self.close_timeout)
             .field("done", &self.done)
             .field("taked", &self.taked)
             .field("canceled", &self.canceled)
@@ -57,7 +58,6 @@ impl<T> Job<T> {
             slot_handle,
             converter: Box::new(converter),
             default_timeout,
-            close_timeout: default_timeout,
             done: false,
             taked: false,
             canceled: false,
@@ -73,13 +73,9 @@ impl<T> Job<T> {
         self.default_timeout = timeout;
     }
 
-    pub fn set_close_timeout(&mut self, timeout: Duration) {
-        self.close_timeout = timeout;
-    }
-
     pub async fn wait(&mut self, timeout: Duration) -> Result<bool, TgError> {
-        self.check_cancel()?;
-        self.check_close()?;
+        // self.check_cancel()?;
+        // self.check_close()?;
         if self.done {
             return Ok(true);
         }
@@ -121,8 +117,8 @@ impl<T> Job<T> {
         if self.taked {
             return Err(client_error!(format!("Job<{}> already taked", self.name)));
         }
-        self.check_cancel()?;
-        self.check_close()?;
+        // self.check_cancel()?;
+        // self.check_close()?;
 
         let slot_handle = &self.slot_handle;
         let timeout = Timeout::new(timeout);
@@ -141,75 +137,76 @@ impl<T> Job<T> {
         }
     }
 
-    pub async fn cancel(&mut self) -> Result<(), TgError> {
+    pub async fn cancel(self) -> Result<bool, TgError> {
         let timeout = self.default_timeout;
         self.cancel_for(timeout).await
     }
 
-    pub async fn cancel_for(&mut self, _timeout: Duration) -> Result<(), TgError> {
-        self.check_close()?;
+    // 戻り値は、タイムアウトしたときfalse, レスポンスが来たらtrue（レスポンスはOPERATION_CANCELEDとは限らない。タイミングによっては正常な処理結果であることもある）
+    pub async fn cancel_for(self, timeout: Duration) -> Result<bool, TgError> {
+        let job = self.cancel_async().await?;
+        match job {
+            Some(mut job) => {
+                let done = job.wait(timeout).await?;
+                Ok(done)
+            }
+            _ => Ok(true),
+        }
+    }
+
+    pub async fn cancel_async(mut self) -> Result<Option<CancelJob>, TgError> {
+        // self.check_close()?;
         if self.done {
-            return Ok(());
+            return Ok(None);
         }
         if self.canceled {
-            return Ok(());
+            return Ok(None);
         }
         self.canceled = true;
 
-        let slot = self.slot_handle.slot();
-        EndpointBroker::cancel(&self.wire, slot).await?;
-        // TODO wait for cancel response
-        Ok(())
+        self.send_cancel().await?;
+        let job = CancelJob::new(self.wire.clone(), self.slot_handle.clone());
+        Ok(Some(job))
     }
 
-    pub async fn cancel_async(&mut self) -> Result<(), TgError> {
-        self.check_close()?;
-        if self.done {
-            return Ok(());
-        }
-        if self.canceled {
-            return Ok(());
-        }
-        self.canceled = true;
+    // fn check_cancel(&self) -> Result<(), TgError> {
+    //     if self.canceled {
+    //         return Err(client_error!(format!("Job<{}> canceled", self.name)));
+    //     }
+    //     Ok(())
+    // }
 
-        let slot = self.slot_handle.slot();
-        EndpointBroker::cancel(&self.wire, slot).await?;
-        Ok(()) // TODO CancelJob
-    }
-
-    fn check_cancel(&self) -> Result<(), TgError> {
-        if self.closed {
-            return Err(client_error!(format!("Job<{}> canceled", self.name)));
-        } else {
-            Ok(())
-        }
-    }
-
-    pub async fn close(&mut self) -> Result<(), TgError> {
+    pub async fn close(mut self) -> Result<(), TgError> {
         if self.closed {
             return Ok(());
         }
         self.closed = true;
 
-        if !self.done {
-            let slot = self.slot_handle.slot();
-            EndpointBroker::cancel(&self.wire, slot).await?; // send only (do not check response)
+        if self.done || self.canceled {
+            return Ok(());
         }
-        Ok(())
+
+        self.send_cancel().await // send only (do not check response)
     }
 
-    fn check_close(&self) -> Result<(), TgError> {
-        if self.closed {
-            return Err(client_error!(format!("Job<{}> already closed", self.name)));
-        } else {
-            Ok(())
-        }
+    // fn check_close(&self) -> Result<(), TgError> {
+    //     if self.closed {
+    //         return Err(client_error!(format!("Job<{}> already closed", self.name)));
+    //     }
+    //     Ok(())
+    // }
+
+    async fn send_cancel(&self) -> Result<(), TgError> {
+        let slot = self.slot_handle.slot();
+        EndpointBroker::cancel(&self.wire, slot).await?;
+
+        Ok(())
     }
 }
 
 impl<T> Drop for Job<T> {
     fn drop(&mut self) {
-        if self.closed {
+        if self.done || self.canceled || self.closed {
             return;
         }
 
@@ -225,7 +222,8 @@ impl<T> Drop for Job<T> {
                     }
                 };
                 runtime.block_on(async {
-                    if let Err(e) = self.close().await {
+                    let result = self.send_cancel().await; // send only (do not check response)
+                    if let Err(e) = result {
                         debug!("Job<{}>.drop() error. {}", self.name, e);
                     }
                 })

@@ -1,9 +1,10 @@
 use std::{env, process, time::Duration};
 
-use execute::{job, sub};
+use execute::{job::execute as job_execute, sub::execute as sub_execute};
 use tsubakuro_rust_core::prelude::*;
 
 mod execute;
+mod job;
 mod service;
 mod transaction;
 
@@ -15,13 +16,10 @@ async fn main() -> Result<(), TgError> {
         process::exit(1);
     }
 
-    let endpoint = match args.get(1) {
-        Some(arg) => arg,
-        None => panic!(),
-    };
+    let endpoint = args.get(1).unwrap();
 
-    sub::execute(endpoint).await?;
-    job::execute(endpoint).await?;
+    sub_execute(endpoint).await?;
+    job_execute(endpoint).await?;
 
     Ok(())
 }

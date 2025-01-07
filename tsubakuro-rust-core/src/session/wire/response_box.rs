@@ -1,6 +1,5 @@
 use std::{
     collections::VecDeque,
-    fmt::Debug,
     sync::{atomic::AtomicI32, Arc, Mutex},
 };
 
@@ -28,7 +27,7 @@ pub(crate) struct SlotEntryHandle {
     response: Mutex<VecDeque<WireResponse>>,
 }
 
-impl Debug for SlotEntryHandle {
+impl std::fmt::Debug for SlotEntryHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("SlotEntryHandle")
             .field("slot", &self.slot)
@@ -82,7 +81,7 @@ pub(crate) struct ResponseBox {
     recv_wait_pool: Mutex<Vec<Option<Arc<SlotEntryHandle>>>>,
 }
 
-impl Debug for ResponseBox {
+impl std::fmt::Debug for ResponseBox {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ResponseBox")
             .field("slot_max", &self.slot_max)

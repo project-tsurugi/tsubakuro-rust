@@ -1,7 +1,5 @@
 use crate::jogasaki::proto::sql::response::Name as ProtoName;
 
-use std::fmt::{Debug, Display};
-
 #[derive(PartialEq)]
 pub struct TName {
     identifiers: Vec<String>,
@@ -26,14 +24,14 @@ impl TName {
     }
 }
 
-impl Display for TName {
+impl std::fmt::Display for TName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = self.identifiers.join(".");
         write!(f, "{}", s)
     }
 }
 
-impl Debug for TName {
+impl std::fmt::Debug for TName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self)
     }
