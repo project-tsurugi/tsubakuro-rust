@@ -139,4 +139,28 @@ mod test {
 
         job.close().await.unwrap();
     }
+
+    #[test]
+    async fn drop() {
+        let client = create_test_sql_client().await;
+
+        let _job = client.list_tables_async().await.unwrap();
+    }
+
+    #[test]
+    async fn drop_after_done() {
+        let client = create_test_sql_client().await;
+
+        let mut job = client.list_tables_async().await.unwrap();
+        let _result = job.take().await.unwrap();
+    }
+
+    #[test]
+    async fn drop_after_cancel() {
+        let client = create_test_sql_client().await;
+
+        let job = client.list_tables_async().await.unwrap();
+
+        let _job = job.cancel_async().await.unwrap();
+    }
 }

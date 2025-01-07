@@ -209,6 +209,9 @@ impl<T> Drop for Job<T> {
         if self.done || self.canceled || self.closed {
             return;
         }
+        if self.slot_handle.exists_wire_response() {
+            return;
+        }
 
         std::thread::scope(|scope| {
             scope.spawn(move || {
