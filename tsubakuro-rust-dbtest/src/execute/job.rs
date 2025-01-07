@@ -26,6 +26,7 @@ create table test (
     .await?;
 
     list_tables(&client).await?;
+    table_metadata(&client).await?;
 
     println!("insert start");
     let r = execute_statement(&client, "insert into test values(1, 11, 'aaa')").await?;
@@ -74,7 +75,14 @@ create table test (
 async fn list_tables(client: &SqlClient) -> Result<(), TgError> {
     let mut job = client.list_tables_async().await?;
     let table_list = job.take().await?;
-    println!("list_tables={:?}", table_list.get_table_names());
+    println!("list_tables={:?}", table_list.table_names());
+    Ok(())
+}
+
+async fn table_metadata(client: &SqlClient) -> Result<(), TgError> {
+    let mut job = client.get_table_metadata_async("test").await?;
+    let metadata = job.take().await?;
+    println!("table_metadata={:?}", metadata);
     Ok(())
 }
 

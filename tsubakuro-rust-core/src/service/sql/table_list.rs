@@ -25,7 +25,7 @@ impl TableList {
         }
     }
 
-    pub fn get_table_names(&self) -> &Vec<TName> {
+    pub fn table_names(&self) -> &Vec<TName> {
         &self.table_names
     }
 }

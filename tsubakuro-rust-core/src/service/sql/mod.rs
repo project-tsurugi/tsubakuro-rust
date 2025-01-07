@@ -5,6 +5,7 @@ use log::trace;
 use prepare::{prepare_dispose_processor, prepare_processor, SqlPreparedStatement};
 use query_result::{query_result_processor, SqlQueryResult};
 use table_list::{list_tables_processor, TableList};
+use table_metadata::{table_metadata_processor, TableMetadata};
 
 use crate::{
     error::TgError,
@@ -29,12 +30,14 @@ use crate::{
 
 use prost::{alloc::string::String as ProstString, Message};
 
+pub mod column;
 pub(crate) mod error;
 pub mod execute_result;
 pub mod name;
 pub mod prepare;
 pub mod query_result;
 pub mod table_list;
+pub mod table_metadata;
 
 /// The symbolic ID of the destination service.
 const SERVICE_SYMBOLIC_ID: &str = "sql";
@@ -89,7 +92,7 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "list_tables()";
         trace!("{} start", FUNCTION_NAME);
 
-        let command = Self::list_table_command();
+        let command = Self::list_tables_command();
         let response = self.send_and_pull_response(command, timeout).await?;
         let table_list = list_tables_processor(response)?;
 
@@ -101,7 +104,7 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "list_tables_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let command = Self::list_table_command();
+        let command = Self::list_tables_command();
         let job = self
             .send_and_pull_async("ListTables", command, Box::new(list_tables_processor))
             .await?;
@@ -110,12 +113,54 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn list_table_command() -> SqlRequestCommand {
+    fn list_tables_command() -> SqlRequestCommand {
         let request = crate::jogasaki::proto::sql::request::ListTables {};
         SqlRequestCommand::ListTables(request)
     }
 
-    // TODO SqlClient::get_table_metadata()
+    pub async fn get_table_metadata(&self, table_name: &str) -> Result<TableMetadata, TgError> {
+        let timeout = self.default_timeout;
+        self.get_table_metadata_for(table_name, timeout).await
+    }
+
+    pub async fn get_table_metadata_for(
+        &self,
+        table_name: &str,
+        timeout: Duration,
+    ) -> Result<TableMetadata, TgError> {
+        const FUNCTION_NAME: &str = "get_table_metadata()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::table_metadata_command(table_name);
+        let response = self.send_and_pull_response(command, timeout).await?;
+        let metadata = table_metadata_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(metadata)
+    }
+
+    pub async fn get_table_metadata_async(
+        &self,
+        table_name: &str,
+    ) -> Result<Job<TableMetadata>, TgError> {
+        const FUNCTION_NAME: &str = "get_table_metadata_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::table_metadata_command(table_name);
+        let job = self
+            .send_and_pull_async("TableMetadata", command, Box::new(table_metadata_processor))
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn table_metadata_command(table_name: &str) -> SqlRequestCommand {
+        let request = crate::jogasaki::proto::sql::request::DescribeTable {
+            name: table_name.to_string(),
+        };
+        SqlRequestCommand::DescribeTable(request)
+    }
 
     pub async fn prepare(
         &self,

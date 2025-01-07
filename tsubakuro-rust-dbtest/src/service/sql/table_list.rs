@@ -12,7 +12,7 @@ mod test {
         let test = TName::new(vec!["test".to_string()]);
         {
             let table_list = client.list_tables().await.unwrap();
-            let names = table_list.get_table_names();
+            let names = table_list.table_names();
             assert_eq!(false, names.contains(&test));
         }
 
@@ -20,7 +20,7 @@ mod test {
 
         {
             let table_list = client.list_tables().await.unwrap();
-            let names = table_list.get_table_names();
+            let names = table_list.table_names();
             assert_eq!(true, names.contains(&test));
         }
     }
@@ -33,8 +33,9 @@ mod test {
         let test = TName::new(vec!["test".to_string()]);
         {
             let mut job = client.list_tables_async().await.unwrap();
+            assert_eq!("ListTables", job.name());
             let table_list = job.take().await.unwrap();
-            let names = table_list.get_table_names();
+            let names = table_list.table_names();
             assert_eq!(false, names.contains(&test));
         }
 
@@ -43,7 +44,7 @@ mod test {
         {
             let mut job = client.list_tables_async().await.unwrap();
             let table_list = job.take().await.unwrap();
-            let names = table_list.get_table_names();
+            let names = table_list.table_names();
             assert_eq!(true, names.contains(&test));
         }
     }
