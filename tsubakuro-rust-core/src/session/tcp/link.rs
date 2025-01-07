@@ -298,6 +298,7 @@ impl TcpLink {
             Ok(())
         }
     }
+
     pub(crate) async fn close(&self) -> Result<(), TgError> {
         if let Ok(_) = self.closed.compare_exchange(
             false,

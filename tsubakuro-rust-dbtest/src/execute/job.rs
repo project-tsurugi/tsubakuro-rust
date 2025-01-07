@@ -2,12 +2,13 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::create_connection_option;
 
-pub(super) async fn execute(endpoint: &str) -> Result<(), TgError> {
-    println!("sub::execute start");
+pub(crate) async fn execute(endpoint: &str) -> Result<(), TgError> {
+    println!("job::execute start");
 
     let connection_option = create_connection_option(endpoint)?;
 
-    let session = Session::connect(&connection_option).await?;
+    let mut job = Session::connect_async(&connection_option).await?;
+    let session = job.take().await?;
     println!("{session:?}");
 
     let client: SqlClient = session.make_client();
@@ -43,7 +44,8 @@ create table test (
         let tx = start_occ(&client).await?;
 
         let sql = "select * from test order by foo";
-        let mut result = client.query(&tx, sql).await?;
+        let mut job = client.query_async(&tx, sql).await?;
+        let mut result = job.take().await?;
         while result.next_row().await? {
             assert_eq!(true, result.next_column().await?);
             let foo: i32 = result.fetch().await?;
@@ -65,12 +67,13 @@ create table test (
     println!("session close end");
     assert_eq!(true, session.is_closed());
 
-    println!("sub::execute end");
+    println!("job::execute end");
     Ok(())
 }
 
 async fn list_tables(client: &SqlClient) -> Result<(), TgError> {
-    let table_list = client.list_tables().await?;
+    let mut job = client.list_tables_async().await?;
+    let table_list = job.take().await?;
     println!("list_tables={:?}", table_list.get_table_names());
     Ok(())
 }
@@ -82,7 +85,8 @@ async fn start_occ(client: &SqlClient) -> Result<Transaction, TgError> {
 
 async fn commit(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
     let option = CommitOption::new();
-    client.commit(transaction, &option).await?;
+    let mut job = client.commit_async(transaction, &option).await?;
+    job.take().await?;
 
     transaction.close().await?;
     Ok(())
@@ -91,7 +95,8 @@ async fn commit(client: &SqlClient, transaction: &Transaction) -> Result<(), TgE
 async fn execute_statement(client: &SqlClient, sql: &str) -> Result<SqlExecuteResult, TgError> {
     let tx = start_occ(client).await?;
 
-    let result = client.execute(&tx, &sql).await?;
+    let mut job = client.execute_async(&tx, &sql).await?;
+    let result = job.take().await?;
 
     commit(&client, &tx).await?;
     tx.close().await?;
