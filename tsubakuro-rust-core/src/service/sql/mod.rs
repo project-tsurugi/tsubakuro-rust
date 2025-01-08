@@ -15,7 +15,10 @@ use crate::{
         request::{request::Request as SqlRequestCommand, Request as SqlRequest},
         response::{response::Response as SqlResponseType, Response as SqlResponse},
     },
-    prelude::{CommitOption, ServiceClient, SqlParameter, SqlPlaceholder},
+    prelude::{
+        status::{transaction_status_processor, TransactionStatus},
+        CommitOption, ServiceClient, SqlParameter, SqlPlaceholder,
+    },
     prost_decode_error,
     session::{
         wire::{response::WireResponse, Wire},
@@ -319,6 +322,60 @@ impl SqlClient {
             option: Some(tx_option),
         };
         SqlRequestCommand::Begin(request)
+    }
+
+    pub async fn get_transaction_status(
+        &self,
+        transaction: &Transaction,
+    ) -> Result<TransactionStatus, TgError> {
+        let timeout = self.default_timeout;
+        self.get_transaction_status_for(transaction, timeout).await
+    }
+
+    pub async fn get_transaction_status_for(
+        &self,
+        transaction: &Transaction,
+        timeout: Duration,
+    ) -> Result<TransactionStatus, TgError> {
+        const FUNCTION_NAME: &str = "get_transaction_status()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::transaction_status_command(transaction.transaction_handle()?);
+        let response = self.send_and_pull_response(command, timeout).await?;
+        let status = transaction_status_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(status)
+    }
+
+    pub async fn get_transaction_status_async(
+        &self,
+        transaction: &Transaction,
+    ) -> Result<Job<TransactionStatus>, TgError> {
+        const FUNCTION_NAME: &str = "get_transaction_status_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::transaction_status_command(transaction.transaction_handle()?);
+        let job = self
+            .send_and_pull_async(
+                "TransactionStatus",
+                command,
+                Box::new(transaction_status_processor),
+            )
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn transaction_status_command(transaction_handle: u64) -> SqlRequestCommand {
+        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
+            handle: transaction_handle,
+        };
+        let request = crate::jogasaki::proto::sql::request::GetErrorInfo {
+            transaction_handle: Some(tx_handle),
+        };
+        SqlRequestCommand::GetErrorInfo(request)
     }
 
     pub async fn execute(

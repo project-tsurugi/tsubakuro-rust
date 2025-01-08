@@ -1,0 +1,66 @@
+use crate::{
+    error::{DiagnosticCode, TgError},
+    invalid_response_error,
+    jogasaki::proto::sql::response::response::Response as SqlResponseType,
+    prelude::convert_sql_response,
+    session::wire::response::WireResponse,
+    sql_service_error,
+};
+
+pub struct TransactionStatus {
+    server_error: Option<TgError>,
+}
+
+impl TransactionStatus {
+    pub(crate) fn new(server_error: Option<TgError>) -> TransactionStatus {
+        TransactionStatus { server_error }
+    }
+
+    pub fn server_error(&self) -> Option<&TgError> {
+        self.server_error.as_ref()
+    }
+
+    pub fn is_normal(&self) -> bool {
+        self.server_error.is_none()
+    }
+
+    pub fn is_error(&self) -> bool {
+        self.server_error.is_some()
+    }
+
+    pub fn diagnostic_code(&self) -> Option<&DiagnosticCode> {
+        match &self.server_error {
+            Some(TgError::ServerError(_, code, _)) => Some(code),
+            _ => None,
+        }
+    }
+}
+
+pub(crate) fn transaction_status_processor(
+    response: WireResponse,
+) -> Result<TransactionStatus, TgError> {
+    const FUNCTION_NAME: &str = "transaction_status_processor()";
+
+    let sql_response = convert_sql_response(FUNCTION_NAME, &response)?;
+    let message = sql_response.ok_or(invalid_response_error!(
+        FUNCTION_NAME,
+        format!("response {:?} is not ResponseSessionPayload", response),
+    ))?;
+    match message.response {
+        Some(SqlResponseType::GetErrorInfo(info)) => match info.result.unwrap() {
+            crate::jogasaki::proto::sql::response::get_error_info::Result::Success(error) => Ok(
+                TransactionStatus::new(Some(sql_service_error!(FUNCTION_NAME, error))),
+            ),
+            crate::jogasaki::proto::sql::response::get_error_info::Result::ErrorNotFound(_) => {
+                Ok(TransactionStatus::new(None))
+            }
+            crate::jogasaki::proto::sql::response::get_error_info::Result::Error(error) => {
+                Err(sql_service_error!(FUNCTION_NAME, error))
+            }
+        },
+        _ => Err(invalid_response_error!(
+            FUNCTION_NAME,
+            format!("response {:?} is not GetErrorInfo", message.response),
+        )),
+    }
+}

@@ -19,6 +19,7 @@ use crate::{
 };
 
 pub mod option;
+pub mod status;
 
 #[derive(Debug)]
 pub struct Transaction {
