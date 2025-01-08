@@ -6,6 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 mod execute;
 mod job;
 mod service;
+mod session;
 mod transaction;
 
 #[tokio::main]

@@ -7,6 +7,8 @@ fn main() {
             "protos/jogasaki/proto/sql/error.proto",
             "protos/jogasaki/proto/sql/request.proto",
             "protos/jogasaki/proto/sql/response.proto",
+            "protos/tateyama/proto/core/request.proto",
+            "protos/tateyama/proto/core/response.proto",
             "protos/tateyama/proto/diagnostics.proto",
             "protos/tateyama/proto/endpoint/request.proto",
             "protos/tateyama/proto/endpoint/response.proto",

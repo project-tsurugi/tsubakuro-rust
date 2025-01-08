@@ -222,7 +222,7 @@ impl TcpLink {
                 .await
                 .map_err(|e| io_error!("TcpLink.recv(): read[info] error", e))?;
             if read_length == 0 {
-                return Ok::<Option<LinkMessage>, TgError>(None);
+                return Ok(None);
             }
             buffer[0]
         };

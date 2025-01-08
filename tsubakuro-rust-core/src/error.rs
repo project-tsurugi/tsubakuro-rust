@@ -47,6 +47,17 @@ impl std::error::Error for TgError {
     }
 }
 
+impl TgError {
+    pub fn message(&self) -> &String {
+        match self {
+            TgError::ClientError(message, _cause) => message,
+            TgError::TimeoutError(message) => message,
+            TgError::IoError(message, _cause) => message,
+            TgError::ServerError(message, _code, _server_message) => message,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiagnosticCode {
     category_number: i32,

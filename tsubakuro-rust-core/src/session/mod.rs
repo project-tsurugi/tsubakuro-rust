@@ -1,4 +1,7 @@
-use std::{sync::Arc, time::Duration};
+use std::{
+    sync::{atomic::AtomicBool, Arc},
+    time::Duration,
+};
 
 use endpoint::Endpoint;
 use option::ConnectionOption;
@@ -6,8 +9,12 @@ use tcp::TcpConnector;
 use wire::Wire;
 
 use crate::{
-    error::TgError, illegal_argument_error, job::Job, prelude::ServiceClient,
-    tateyama::proto::endpoint::request::ClientInformation, util::string_to_prost_string,
+    error::TgError,
+    illegal_argument_error,
+    job::Job,
+    prelude::{core::CoreService, ServiceClient, ShutdownType},
+    tateyama::proto::endpoint::request::ClientInformation,
+    util::string_to_prost_string,
 };
 
 pub mod endpoint;
@@ -19,6 +26,7 @@ pub(crate) mod wire;
 pub struct Session {
     wire: Arc<Wire>,
     default_timeout: Duration,
+    shutodowned: AtomicBool,
 }
 
 impl Session {
@@ -98,7 +106,33 @@ impl Session {
         T::new(self.clone())
     }
 
-    // TODO Session::shutdown()
+    pub async fn shutdown(&self, shutdown_type: ShutdownType) -> Result<(), TgError> {
+        let timeout = self.default_timeout;
+        self.shutdown_for(shutdown_type, timeout).await
+    }
+
+    pub async fn shutdown_for(
+        &self,
+        shutdown_type: ShutdownType,
+        timeout: Duration,
+    ) -> Result<(), TgError> {
+        self.set_shutdown();
+        CoreService::shutdown(&self.wire, shutdown_type, timeout).await
+    }
+
+    pub async fn shutdown_async(&self, shutdown_type: ShutdownType) -> Result<Job<()>, TgError> {
+        self.set_shutdown();
+        CoreService::shutdown_async(&self.wire, shutdown_type, self.default_timeout).await
+    }
+
+    fn set_shutdown(&self) {
+        self.shutodowned
+            .store(true, std::sync::atomic::Ordering::SeqCst);
+    }
+
+    pub fn is_shutdowned(&self) -> bool {
+        self.shutodowned.load(std::sync::atomic::Ordering::SeqCst)
+    }
 
     pub async fn close(&self) -> Result<(), TgError> {
         self.wire.close().await
@@ -114,6 +148,7 @@ impl Session {
         Arc::new(Session {
             wire,
             default_timeout,
+            shutodowned: AtomicBool::new(false),
         })
     }
 

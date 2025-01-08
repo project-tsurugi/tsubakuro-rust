@@ -12,7 +12,7 @@ use crate::{
     invalid_response_error,
     job::Job,
     jogasaki::proto::sql::{
-        request::{request::Request as SqlRequestCommand, Request as SqlRequest},
+        request::{request::Request as SqlCommand, Request as SqlRequest},
         response::{response::Response as SqlResponseType, Response as SqlResponse},
     },
     prelude::{
@@ -116,9 +116,9 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn list_tables_command() -> SqlRequestCommand {
+    fn list_tables_command() -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::ListTables {};
-        SqlRequestCommand::ListTables(request)
+        SqlCommand::ListTables(request)
     }
 
     pub async fn get_table_metadata(&self, table_name: &str) -> Result<TableMetadata, TgError> {
@@ -158,11 +158,11 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn table_metadata_command(table_name: &str) -> SqlRequestCommand {
+    fn table_metadata_command(table_name: &str) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::DescribeTable {
             name: table_name.to_string(),
         };
-        SqlRequestCommand::DescribeTable(request)
+        SqlCommand::DescribeTable(request)
     }
 
     pub async fn prepare(
@@ -219,12 +219,12 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn prepare_command(sql: &str, placeholders: Vec<SqlPlaceholder>) -> SqlRequestCommand {
+    fn prepare_command(sql: &str, placeholders: Vec<SqlPlaceholder>) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::Prepare {
             sql: sql.to_string(),
             placeholders,
         };
-        SqlRequestCommand::Prepare(request)
+        SqlCommand::Prepare(request)
     }
 
     pub(crate) async fn dispose_prepare(
@@ -247,7 +247,7 @@ impl SqlClient {
     fn dispose_prepare_statement_command(
         prepare_handle: u64,
         has_result_records: bool,
-    ) -> SqlRequestCommand {
+    ) -> SqlCommand {
         let ps = crate::jogasaki::proto::sql::common::PreparedStatement {
             handle: prepare_handle,
             has_result_records,
@@ -256,7 +256,7 @@ impl SqlClient {
         let request = crate::jogasaki::proto::sql::request::DisposePreparedStatement {
             prepared_statement_handle: Some(ps),
         };
-        SqlRequestCommand::DisposePreparedStatement(request)
+        SqlCommand::DisposePreparedStatement(request)
     }
 
     pub async fn start_transaction(
@@ -315,13 +315,13 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn begin_transaction_command(transaction_option: &TransactionOption) -> SqlRequestCommand {
+    fn begin_transaction_command(transaction_option: &TransactionOption) -> SqlCommand {
         let tx_option = transaction_option.request();
 
         let request = crate::jogasaki::proto::sql::request::Begin {
             option: Some(tx_option),
         };
-        SqlRequestCommand::Begin(request)
+        SqlCommand::Begin(request)
     }
 
     pub async fn get_transaction_status(
@@ -368,14 +368,14 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn transaction_status_command(transaction_handle: u64) -> SqlRequestCommand {
+    fn transaction_status_command(transaction_handle: u64) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
         let request = crate::jogasaki::proto::sql::request::GetErrorInfo {
             transaction_handle: Some(tx_handle),
         };
-        SqlRequestCommand::GetErrorInfo(request)
+        SqlCommand::GetErrorInfo(request)
     }
 
     pub async fn execute(
@@ -425,7 +425,7 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn execute_statement_command(transaction_handle: u64, sql: &str) -> SqlRequestCommand {
+    fn execute_statement_command(transaction_handle: u64, sql: &str) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
@@ -433,7 +433,7 @@ impl SqlClient {
             transaction_handle: Some(tx_handle),
             sql: ProstString::from(sql),
         };
-        SqlRequestCommand::ExecuteStatement(request)
+        SqlCommand::ExecuteStatement(request)
     }
 
     pub async fn prepared_execute(
@@ -497,7 +497,7 @@ impl SqlClient {
         transaction_handle: u64,
         prepared_statement: &SqlPreparedStatement,
         parameters: Vec<SqlParameter>,
-    ) -> SqlRequestCommand {
+    ) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
@@ -510,7 +510,7 @@ impl SqlClient {
             prepared_statement_handle: Some(ps_handle),
             parameters,
         };
-        SqlRequestCommand::ExecutePreparedStatement(request)
+        SqlCommand::ExecutePreparedStatement(request)
     }
 
     pub async fn query(
@@ -571,7 +571,7 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn execute_query_command(transaction_handle: u64, sql: &str) -> SqlRequestCommand {
+    fn execute_query_command(transaction_handle: u64, sql: &str) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
@@ -579,7 +579,7 @@ impl SqlClient {
             transaction_handle: Some(tx_handle),
             sql: ProstString::from(sql),
         };
-        SqlRequestCommand::ExecuteQuery(request)
+        SqlCommand::ExecuteQuery(request)
     }
 
     pub async fn prepared_query(
@@ -650,7 +650,7 @@ impl SqlClient {
         transaction_handle: u64,
         prepared_statement: &SqlPreparedStatement,
         parameters: Vec<SqlParameter>,
-    ) -> SqlRequestCommand {
+    ) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
@@ -663,7 +663,7 @@ impl SqlClient {
             prepared_statement_handle: Some(ps_handle),
             parameters,
         };
-        SqlRequestCommand::ExecutePreparedQuery(request)
+        SqlCommand::ExecutePreparedQuery(request)
     }
 
     pub async fn commit(
@@ -713,7 +713,7 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn commit_command(transaction_handle: u64, commit_option: &CommitOption) -> SqlRequestCommand {
+    fn commit_command(transaction_handle: u64, commit_option: &CommitOption) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
@@ -723,7 +723,7 @@ impl SqlClient {
             notification_type: commit_option.commit_type().into(),
             auto_dispose: commit_option.auto_dispose(),
         };
-        SqlRequestCommand::Commit(request)
+        SqlCommand::Commit(request)
     }
 
     pub async fn rollback(&self, transaction: &Transaction) -> Result<(), TgError> {
@@ -768,7 +768,7 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn rollback_command(transaction_handle: u64) -> SqlRequestCommand {
+    fn rollback_command(transaction_handle: u64) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
@@ -776,7 +776,7 @@ impl SqlClient {
         let request = crate::jogasaki::proto::sql::request::Rollback {
             transaction_handle: Some(tx_handle),
         };
-        SqlRequestCommand::Rollback(request)
+        SqlCommand::Rollback(request)
     }
 
     pub(crate) async fn dispose_transaction(
@@ -795,7 +795,7 @@ impl SqlClient {
         Ok(())
     }
 
-    fn dispose_transaction_command(transaction_handle: u64) -> SqlRequestCommand {
+    fn dispose_transaction_command(transaction_handle: u64) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
@@ -803,7 +803,7 @@ impl SqlClient {
         let request = crate::jogasaki::proto::sql::request::DisposeTransaction {
             transaction_handle: Some(tx_handle),
         };
-        SqlRequestCommand::DisposeTransaction(request)
+        SqlCommand::DisposeTransaction(request)
     }
 }
 
@@ -814,7 +814,7 @@ impl SqlClient {
 
     async fn send_and_pull_response(
         &self,
-        command: SqlRequestCommand,
+        command: SqlCommand,
         timeout: Duration,
     ) -> Result<WireResponse, TgError> {
         let request = Self::new_request(command);
@@ -826,7 +826,7 @@ impl SqlClient {
     async fn send_and_pull_async<T: 'static>(
         &self,
         job_name: &str,
-        command: SqlRequestCommand,
+        command: SqlCommand,
         converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
     ) -> Result<Job<T>, TgError> {
         let request = Self::new_request(command);
@@ -841,7 +841,7 @@ impl SqlClient {
             .await
     }
 
-    fn new_request(command: SqlRequestCommand) -> SqlRequest {
+    fn new_request(command: SqlCommand) -> SqlRequest {
         SqlRequest {
             session_handle: None,
             service_message_version_major: SERVICE_MESSAGE_VERSION_MAJOR,

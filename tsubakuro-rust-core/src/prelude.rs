@@ -20,6 +20,7 @@ pub use crate::service::*;
 pub use crate::session::endpoint::*;
 pub use crate::session::option::*;
 pub use crate::session::Session;
+pub use crate::tateyama::proto::core::request::ShutdownType;
 pub use crate::transaction::option::*;
 pub use crate::transaction::status::*;
 pub use crate::transaction::*;

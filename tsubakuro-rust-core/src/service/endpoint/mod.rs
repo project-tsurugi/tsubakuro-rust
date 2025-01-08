@@ -12,7 +12,7 @@ use crate::{
     session::wire::{response::WireResponse, Wire},
     tateyama::proto::endpoint::{
         request::{
-            request::Command as EndointRequestCommand, Cancel as CancelRequest, ClientInformation,
+            request::Command as EndointCommand, Cancel as CancelRequest, ClientInformation,
             Handshake as HandshakeRequest, Request as EndpointRequest, WireInformation,
         },
         response::{handshake::Result as HandshakeResult, Handshake as HandshakeResponse},
@@ -30,7 +30,7 @@ const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 /// The minor service message version for EndpointRequest.
 const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR: u64 = 0;
 
-pub struct EndpointBroker;
+pub(crate) struct EndpointBroker;
 
 impl EndpointBroker {
     pub(crate) async fn handshake(
@@ -91,12 +91,12 @@ impl EndpointBroker {
     fn handshake_command(
         client_information: ClientInformation,
         wire_information: WireInformation,
-    ) -> EndointRequestCommand {
+    ) -> EndointCommand {
         let handshake = HandshakeRequest {
             client_information: Some(client_information),
             wire_information: Some(wire_information),
         };
-        EndointRequestCommand::Handshake(handshake)
+        EndointCommand::Handshake(handshake)
     }
 
     pub(crate) async fn cancel(wire: &Arc<Wire>, slot: i32) -> Result<(), TgError> {
@@ -113,12 +113,12 @@ impl EndpointBroker {
         Ok(())
     }
 
-    fn cancel_command() -> EndointRequestCommand {
+    fn cancel_command() -> EndointCommand {
         let cancel = CancelRequest {};
-        EndointRequestCommand::Cancel(cancel)
+        EndointCommand::Cancel(cancel)
     }
 
-    fn new_request(command: EndointRequestCommand) -> EndpointRequest {
+    fn new_request(command: EndointCommand) -> EndpointRequest {
         EndpointRequest {
             service_message_version_major: ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR,
             service_message_version_minor: ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR,

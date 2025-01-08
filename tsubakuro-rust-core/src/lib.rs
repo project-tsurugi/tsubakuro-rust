@@ -27,6 +27,14 @@ pub(crate) mod jogasaki {
 
 pub(crate) mod tateyama {
     pub(crate) mod proto {
+        pub(crate) mod core {
+            pub(crate) mod request {
+                include!(concat!(env!("OUT_DIR"), "/tateyama.proto.core.request.rs"));
+            }
+            pub(crate) mod response {
+                include!(concat!(env!("OUT_DIR"), "/tateyama.proto.core.response.rs"));
+            }
+        }
         pub(crate) mod diagnostics {
             include!(concat!(env!("OUT_DIR"), "/tateyama.proto.diagnostics.rs"));
         }
