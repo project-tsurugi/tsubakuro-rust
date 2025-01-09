@@ -8,12 +8,7 @@ mod test {
     async fn literal() {
         let client = create_test_sql_client().await;
 
-        create_table(
-            &client,
-            "test",
-            "create table test (pk int primary key, v bigint)",
-        )
-        .await;
+        create_test_table(&client).await;
 
         let values = generate_values();
 
@@ -25,12 +20,7 @@ mod test {
     async fn prepare() {
         let client = create_test_sql_client().await;
 
-        create_table(
-            &client,
-            "test",
-            "create table test (pk int primary key, v bigint)",
-        )
-        .await;
+        create_test_table(&client).await;
 
         let values = generate_values();
 
@@ -38,18 +28,28 @@ mod test {
         select(&client, &values).await;
     }
 
-    fn generate_values() -> Vec<(i32, i64)> {
-        let mut values: Vec<(i32, i64)> = vec![];
+    async fn create_test_table(client: &SqlClient) {
+        create_table(
+            &client,
+            "test",
+            "create table test (pk int primary key, v bigint)",
+        )
+        .await;
+    }
 
-        values.push((0, 0));
-        values.push((1, i64::MIN));
-        values.push((2, i64::MAX));
+    fn generate_values() -> Vec<(i32, Option<i64>)> {
+        let mut values = vec![];
 
-        let mut i = 3;
+        values.push((0, None));
+        values.push((1, Some(0)));
+        values.push((2, Some(i64::MIN)));
+        values.push((3, Some(i64::MAX)));
+
+        let mut i = 4;
         let mut v = i64::MIN + 1;
-        let step = i64::MAX / 500 * 2;
+        let step = i64::MAX / 50 * 2;
         loop {
-            values.push((i, v));
+            values.push((i, Some(v)));
 
             if v > i64::MAX - step {
                 break;
@@ -61,18 +61,22 @@ mod test {
         values
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, i64)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<i64>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
-            let sql = format!("insert into test values({}, {})", value.0, value.1);
+            let sql = if let Some(v) = value.1 {
+                format!("insert into test values({}, '{}')", value.0, v)
+            } else {
+                format!("insert into test values({}, null)", value.0)
+            };
             client.execute(&transaction, &sql).await.unwrap();
         }
 
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, i64)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<i64>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test values(:pk, :value)";
@@ -98,7 +102,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, i64)>) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<i64>)>) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 

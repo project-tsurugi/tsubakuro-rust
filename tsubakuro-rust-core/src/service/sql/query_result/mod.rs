@@ -249,3 +249,33 @@ impl SqlQueryResultFetch<String> for SqlQueryResult {
         self.value_stream.fetch_character_value(&timeout).await
     }
 }
+
+#[async_trait(?Send)] // thread unsafe
+impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
+where
+    SqlQueryResult: SqlQueryResultFetch<T>,
+{
+    /// Retrieves a `Option<T>` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<Option<T>, TgError> {
+        if self.is_null()? {
+            Ok(None)
+        } else {
+            let value: T = self.fetch().await?;
+            Ok(Some(value))
+        }
+    }
+
+    /// Retrieves a `Option<T>` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<Option<T>, TgError> {
+        if self.is_null()? {
+            Ok(None)
+        } else {
+            let value: T = self.fetch_for(timeout).await?;
+            Ok(Some(value))
+        }
+    }
+}
