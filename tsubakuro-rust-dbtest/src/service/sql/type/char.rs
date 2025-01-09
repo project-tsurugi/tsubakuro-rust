@@ -35,6 +35,16 @@ mod test {
             "create table test (pk int primary key, v char(4))",
         )
         .await;
+
+        let metadata = client.get_table_metadata("test").await.unwrap();
+        let columns = metadata.columns();
+        assert_eq!(2, columns.len());
+        let c = &columns[0];
+        assert_eq!("pk", c.name());
+        assert_eq!(Some(AtomType::Int4), c.atom_type());
+        let c = &columns[1];
+        assert_eq!("v", c.name());
+        assert_eq!(Some(AtomType::Character), c.atom_type());
     }
 
     fn generate_values() -> Vec<(i32, Option<String>)> {
