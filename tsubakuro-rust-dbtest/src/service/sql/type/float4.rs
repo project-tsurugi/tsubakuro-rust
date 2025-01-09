@@ -13,7 +13,8 @@ mod test {
         let values = generate_values(false);
 
         insert_literal(&client, &values).await;
-        select(&client, &values).await;
+        select(&client, &values, false).await;
+        select(&client, &values, true).await;
     }
 
     #[test]
@@ -25,23 +26,21 @@ mod test {
         let values = generate_values(true);
 
         insert_prepared(&client, &values).await;
-        select(&client, &values).await;
+        select(&client, &values, false).await;
+        select(&client, &values, true).await;
     }
 
     async fn create_test_table(client: &SqlClient) {
         create_table(
             &client,
             "test",
-            "create table test (pk int primary key, v real)",
+            "create table test (pk int primary key, v real, r int default 999)",
         )
         .await;
 
         let metadata = client.get_table_metadata("test").await.unwrap();
         let columns = metadata.columns();
-        assert_eq!(2, columns.len());
-        let c = &columns[0];
-        assert_eq!("pk", c.name());
-        assert_eq!(Some(AtomType::Int4), c.atom_type());
+        assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
         assert_eq!(Some(AtomType::Float4), c.atom_type());
@@ -86,9 +85,9 @@ mod test {
 
         for value in values {
             let sql = if let Some(v) = value.1 {
-                format!("insert into test values({}, '{}')", value.0, v)
+                format!("insert into test (pk, v) values({}, '{}')", value.0, v)
             } else {
-                format!("insert into test values({}, null)", value.0)
+                format!("insert into test (pk, v) values({}, null)", value.0)
             };
             client.execute(&transaction, &sql).await.unwrap();
         }
@@ -99,7 +98,7 @@ mod test {
     async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<f32>)>) {
         let transaction = start_occ(&client).await;
 
-        let sql = "insert into test values(:pk, :value)";
+        let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
             SqlPlaceholder::of::<f32>("value"),
@@ -122,7 +121,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<f32>)>) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<f32>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -136,17 +135,23 @@ mod test {
             assert_eq!(expected.0, pk);
 
             assert_eq!(true, query_result.next_column().await.unwrap());
-            if let Some(expected) = expected.1 {
-                let v: f32 = query_result.fetch().await.unwrap();
-                if expected.is_nan() {
-                    assert_eq!(true, v.is_nan());
+            if !skip {
+                if let Some(expected) = expected.1 {
+                    let v: f32 = query_result.fetch().await.unwrap();
+                    if expected.is_nan() {
+                        assert_eq!(true, v.is_nan());
+                    } else {
+                        assert_eq!(expected, v);
+                    }
                 } else {
-                    assert_eq!(expected, v);
+                    let v = query_result.fetch().await.unwrap();
+                    assert_eq!(expected.1, v);
                 }
-            } else {
-                let v = query_result.fetch().await.unwrap();
-                assert_eq!(expected.1, v);
             }
+
+            assert_eq!(true, query_result.next_column().await.unwrap());
+            let r = query_result.fetch().await.unwrap();
+            assert_eq!(999, r);
 
             i += 1;
         }
