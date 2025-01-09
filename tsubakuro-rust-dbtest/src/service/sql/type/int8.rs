@@ -116,6 +116,14 @@ mod test {
         let transaction = start_occ(&client).await;
 
         let mut query_result = client.query(&transaction, sql).await.unwrap();
+
+        let metadata = query_result.get_metadata().unwrap();
+        let columns = metadata.columns();
+        assert_eq!(3, columns.len());
+        let c = &columns[1];
+        assert_eq!("v", c.name());
+        assert_eq!(Some(AtomType::Int8), c.atom_type());
+
         let mut i = 0;
         while query_result.next_row().await.unwrap() {
             let expected = expected[i];

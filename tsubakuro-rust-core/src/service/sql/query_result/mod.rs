@@ -17,6 +17,7 @@ use prost::Message;
 use std::{sync::Arc, time::Duration};
 use value_stream::ResultSetValueStream;
 
+pub mod metadata;
 mod value_stream;
 mod variant;
 
