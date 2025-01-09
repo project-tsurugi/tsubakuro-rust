@@ -73,6 +73,13 @@ impl SqlParameterOf<String> for SqlParameter {
     }
 }
 
+impl SqlParameterOf<&String> for SqlParameter {
+    fn of(name: &str, value: &String) -> SqlParameter {
+        let value = Value::CharacterValue(value.clone());
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl<T> SqlParameterOf<Option<T>> for SqlParameter
 where
     SqlParameter: SqlParameterOf<T>,
@@ -242,6 +249,25 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".to_string().parameter("abc".to_string());
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn string_ref() {
+        let target0 = SqlParameter::of("test", &"abc".to_string());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::CharacterValue("abc".to_string()),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(&"abc".to_string()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&"abc".to_string());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&"abc".to_string());
         assert_eq!(target0, target);
     }
 }
