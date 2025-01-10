@@ -1,16 +1,44 @@
 #[cfg(test)]
 mod test {
+    use std::time::Duration;
+
     use crate::test::create_test_session;
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
     #[test]
-    async fn shutdown() {
-        shutdown_main(ShutdownType::Graceful).await;
-        shutdown_main(ShutdownType::Forceful).await;
+    async fn update_expiration_time() {
+        let session = create_test_session().await;
+
+        session.update_expiration_time(None).await.unwrap();
+        session
+            .update_expiration_time(Some(Duration::from_secs(1)))
+            .await
+            .unwrap();
     }
 
-    async fn shutdown_main(shutdown_type: ShutdownType) {
+    #[test]
+    async fn update_expiration_time_async() {
+        let session = create_test_session().await;
+
+        let mut job = session.update_expiration_time_async(None).await.unwrap();
+        assert_eq!("updateExpirationTime", job.name());
+        job.take().await.unwrap();
+
+        let mut job = session
+            .update_expiration_time_async(Some(Duration::from_secs(1)))
+            .await
+            .unwrap();
+        job.take().await.unwrap();
+    }
+
+    #[test]
+    async fn shutdown() {
+        shutdown_test(ShutdownType::Graceful).await;
+        shutdown_test(ShutdownType::Forceful).await;
+    }
+
+    async fn shutdown_test(shutdown_type: ShutdownType) {
         let session = create_test_session().await;
         assert_eq!(false, session.is_shutdowned());
 
@@ -25,15 +53,16 @@ mod test {
 
     #[test]
     async fn shutdown_async() {
-        shutdown_async_main(ShutdownType::Graceful).await;
-        shutdown_async_main(ShutdownType::Forceful).await;
+        shutdown_async_test(ShutdownType::Graceful).await;
+        shutdown_async_test(ShutdownType::Forceful).await;
     }
 
-    async fn shutdown_async_main(shutdown_type: ShutdownType) {
+    async fn shutdown_async_test(shutdown_type: ShutdownType) {
         let session = create_test_session().await;
         assert_eq!(false, session.is_shutdowned());
 
         let mut job = session.shutdown_async(shutdown_type).await.unwrap();
+        assert_eq!("Shutdown", job.name());
         job.take().await.unwrap();
 
         assert_eq!(true, session.is_shutdowned());

@@ -10,6 +10,13 @@ macro_rules! core_service_error {
             server_message,
         )
     }};
+    ($function_name:expr, $cause:expr, $server_message:expr) => {{
+        $crate::error::TgError::ServerError(
+            format!("{}: core service error", $function_name),
+            $crate::error::DiagnosticCode::from($cause),
+            $server_message,
+        )
+    }};
 }
 
 impl From<crate::tateyama::proto::diagnostics::Record> for DiagnosticCode {
@@ -21,6 +28,16 @@ impl From<crate::tateyama::proto::diagnostics::Record> for DiagnosticCode {
 impl From<&crate::tateyama::proto::diagnostics::Record> for DiagnosticCode {
     fn from(value: &crate::tateyama::proto::diagnostics::Record) -> Self {
         let code = value.code();
+        let code_number = to_core_service_diagnostic_code_number(code);
+        let name = code.as_str_name();
+
+        DiagnosticCode::new(/*FIXME*/ 0, "SCD", code_number, name)
+    }
+}
+
+impl From<crate::tateyama::proto::core::response::UnknownError> for DiagnosticCode {
+    fn from(_value: crate::tateyama::proto::core::response::UnknownError) -> Self {
+        let code = crate::tateyama::proto::diagnostics::Code::Unknown;
         let code_number = to_core_service_diagnostic_code_number(code);
         let name = code.as_str_name();
 

@@ -106,6 +106,31 @@ impl Session {
         T::new(self.clone())
     }
 
+    pub async fn update_expiration_time(
+        &self,
+        expiration_time: Option<Duration>,
+    ) -> Result<(), TgError> {
+        let timeout = self.default_timeout;
+        self.update_expiration_time_for(expiration_time, timeout)
+            .await
+    }
+
+    pub async fn update_expiration_time_for(
+        &self,
+        expiration_time: Option<Duration>,
+        timeout: Duration,
+    ) -> Result<(), TgError> {
+        CoreService::update_expiration_time(&self.wire, expiration_time, timeout).await
+    }
+
+    pub async fn update_expiration_time_async(
+        &self,
+        expiration_time: Option<Duration>,
+    ) -> Result<Job<()>, TgError> {
+        CoreService::update_expiration_time_async(&self.wire, expiration_time, self.default_timeout)
+            .await
+    }
+
     pub async fn shutdown(&self, shutdown_type: ShutdownType) -> Result<(), TgError> {
         let timeout = self.default_timeout;
         self.shutdown_for(shutdown_type, timeout).await
