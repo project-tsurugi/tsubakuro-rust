@@ -3,7 +3,7 @@ use std::{
     time::Duration,
 };
 
-use log::debug;
+use log::{debug, trace};
 
 use crate::{
     error::TgError,
@@ -92,20 +92,22 @@ impl Drop for SqlPreparedStatement {
 
         std::thread::scope(|scope| {
             scope.spawn(move || {
+                trace!("SqlPreparedStatement.drop() start");
                 let runtime = {
                     match tokio::runtime::Runtime::new() {
                         Ok(runtime) => runtime,
                         Err(e) => {
-                            debug!("SqlPreparedStatement.drop() error. {}", e);
+                            debug!("SqlPreparedStatement.drop() runtime::new error. {}", e);
                             return;
                         }
                     }
                 };
                 runtime.block_on(async {
                     if let Err(e) = self.close().await {
-                        debug!("SqlPreparedStatement.drop() error. {}", e);
+                        debug!("SqlPreparedStatement.drop() close error. {}", e);
                     }
-                })
+                });
+                trace!("SqlPreparedStatement.drop() end");
             });
         });
     }

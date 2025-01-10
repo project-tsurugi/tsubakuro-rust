@@ -10,6 +10,7 @@ pub struct ConnectionOption {
     endpoint: Option<Endpoint>,
     application_name: Option<String>,
     label: Option<String>,
+    keep_alive: Duration,
     default_timeout: Duration,
     send_timeout: Duration,
     recv_timeout: Duration,
@@ -21,6 +22,7 @@ impl ConnectionOption {
             endpoint: None,
             application_name: None,
             label: None,
+            keep_alive: Duration::from_secs(60),
             default_timeout: Duration::ZERO,
             send_timeout: Duration::ZERO,
             recv_timeout: Duration::ZERO,
@@ -55,6 +57,15 @@ impl ConnectionOption {
 
     pub fn label(&self) -> Option<&String> {
         self.label.as_ref()
+    }
+
+    // ZEROのときはキープアライブしない
+    pub fn set_keep_alive(&mut self, keep_alive: Duration) {
+        self.keep_alive = keep_alive;
+    }
+
+    pub fn keep_alive(&self) -> Duration {
+        self.keep_alive
     }
 
     pub fn set_default_timeout(&mut self, timeout: Duration) {

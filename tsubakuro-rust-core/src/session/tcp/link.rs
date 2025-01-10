@@ -216,15 +216,18 @@ impl TcpLink {
 
     async fn recv_body(reader: &mut ReadHalf<TcpStream>) -> Result<Option<LinkMessage>, TgError> {
         let info = {
-            let mut buffer = [0u8; 1];
-            let read_length = reader
-                .read(&mut buffer)
-                .await
-                .map_err(|e| io_error!("TcpLink.recv(): read[info] error", e))?;
-            if read_length == 0 {
-                return Ok(None);
+            let result = tokio::time::timeout(Duration::from_nanos(10), reader.read_u8()).await;
+            match result {
+                Ok(result) => match result {
+                    Ok(info) => info,
+                    Err(e) => {
+                        return Err(io_error!("TcpLink.recv(): read[info] error", e));
+                    }
+                },
+                Err(_) => {
+                    return Ok(None); // timeout
+                }
             }
-            buffer[0]
         };
 
         let slot = {

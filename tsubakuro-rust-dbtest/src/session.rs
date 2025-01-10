@@ -1,8 +1,14 @@
 #[cfg(test)]
 mod test {
-    use std::time::Duration;
+    use std::{
+        time::{Duration, Instant},
+        vec,
+    };
 
-    use crate::test::create_test_session;
+    use crate::test::{
+        commit_and_close, create_table, create_test_connection_option, create_test_session,
+        start_occ,
+    };
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
@@ -30,6 +36,54 @@ mod test {
             .await
             .unwrap();
         job.take().await.unwrap();
+    }
+
+    #[test]
+    async fn keep_alive_on() {
+        // let _ = env_logger::builder().is_test(true).try_init();
+        keep_alive_test(Duration::from_millis(500)).await;
+    }
+
+    #[test]
+    async fn keep_alive_off() {
+        // let _ = env_logger::builder().is_test(true).try_init();
+        keep_alive_test(Duration::ZERO).await;
+    }
+
+    async fn keep_alive_test(keep_alive: Duration) {
+        let mut option = create_test_connection_option();
+        option.set_keep_alive(keep_alive);
+        let session = Session::connect(&option).await.unwrap();
+        let client: SqlClient = session.make_client();
+
+        create_table(&client, "test", "create table test(pk int primary key)").await;
+
+        let time = Duration::from_secs(3); // テストを実行する時間
+        let start = Instant::now();
+        let mut pk = 0;
+        while start.elapsed() < time {
+            let ps = client
+                .prepare(
+                    "insert into test values(:pk)",
+                    vec![SqlPlaceholder::of::<i32>("pk")],
+                )
+                .await
+                .unwrap();
+
+            let tx = start_occ(&client).await;
+            let result = client
+                .prepared_execute(&tx, &ps, vec![SqlParameter::of("pk", pk)])
+                .await
+                .unwrap();
+            assert_eq!(1, result.inserted_rows());
+            commit_and_close(&client, &tx).await;
+
+            ps.close().await.unwrap();
+
+            pk += 1;
+        }
+
+        session.close().await.unwrap();
     }
 
     #[test]

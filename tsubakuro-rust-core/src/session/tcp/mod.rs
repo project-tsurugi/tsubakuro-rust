@@ -43,7 +43,11 @@ impl TcpConnector {
 
         wire.set_session_id(session_id)?;
 
-        Ok(Session::new(wire, default_timeout))
+        Ok(Session::new(
+            wire,
+            connection_option.keep_alive(),
+            default_timeout,
+        ))
     }
 
     pub(crate) async fn connect_async(
@@ -55,13 +59,14 @@ impl TcpConnector {
         let wire = TcpConnector::create_wire(endpoint, connection_option).await?;
 
         let wire_information = Self::create_information();
+        let keep_alive = connection_option.keep_alive();
         let job = EndpointBroker::handshake_async(
             &wire.clone(),
             client_information,
             wire_information,
             move |session_id| {
                 wire.set_session_id(session_id)?;
-                Ok(Session::new(wire.clone(), default_timeout))
+                Ok(Session::new(wire.clone(), keep_alive, default_timeout))
             },
             default_timeout,
         )

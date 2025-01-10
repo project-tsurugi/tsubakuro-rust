@@ -29,6 +29,7 @@ fn create_connection_option(endpoint: &str) -> Result<ConnectionOption, TgError>
     let mut option = ConnectionOption::new();
     option.set_application_name("tsubakuro-rust-dbtest");
     option.set_endpoint_url(endpoint)?;
+    option.set_keep_alive(Duration::ZERO); // not keep alive
     option.set_default_timeout(Duration::from_secs(10));
 
     Ok(option)
@@ -39,7 +40,7 @@ mod test {
     use super::*;
     use std::{env, sync::Arc};
 
-    pub(crate) async fn create_test_session() -> Arc<Session> {
+    pub(crate) fn create_test_connection_option() -> ConnectionOption {
         let args: Vec<String> = env::args().collect();
 
         let endpoint = {
@@ -57,6 +58,11 @@ mod test {
         };
 
         let option = create_connection_option(&endpoint).unwrap();
+        option
+    }
+
+    pub(crate) async fn create_test_session() -> Arc<Session> {
+        let option = create_test_connection_option();
         let session = Session::connect(&option).await.unwrap();
         session
     }
@@ -73,13 +79,17 @@ mod test {
     }
 
     pub(crate) async fn drop_table_if_exists(client: &SqlClient, table_name: &str) {
+        // println!("drop_table_if_exists() start");
         execute_ddl(client, &format!("drop table if exists {table_name}")).await;
+        // println!("drop_table_if_exists() end");
     }
 
     pub(crate) async fn execute_ddl(client: &SqlClient, sql: &str) {
         let transaction = start_occ(client).await;
 
+        // println!("execute_ddl() execute start");
         client.execute(&transaction, sql).await.unwrap();
+        // println!("execute_ddl() execute end");
 
         commit_and_close(client, &transaction).await;
     }
@@ -93,8 +103,12 @@ mod test {
 
     pub(crate) async fn commit_and_close(client: &SqlClient, transaction: &Transaction) {
         let commit_option = CommitOption::new();
+        // println!("commit start");
         client.commit(&transaction, &commit_option).await.unwrap();
+        // println!("commit end");
 
-        transaction.close().await.unwrap()
+        // println!("transaction.close() start");
+        transaction.close().await.unwrap();
+        // println!("transaction.close() end");
     }
 }

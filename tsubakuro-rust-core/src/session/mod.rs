@@ -4,6 +4,7 @@ use std::{
 };
 
 use endpoint::Endpoint;
+use log::{debug, trace};
 use option::ConnectionOption;
 use tcp::TcpConnector;
 use wire::Wire;
@@ -169,15 +170,68 @@ impl Session {
 }
 
 impl Session {
-    fn new(wire: Arc<Wire>, default_timeout: Duration) -> Arc<Self> {
-        Arc::new(Session {
+    fn new(wire: Arc<Wire>, keep_alive: Duration, default_timeout: Duration) -> Arc<Self> {
+        let session = Arc::new(Session {
             wire,
             default_timeout,
             shutodowned: AtomicBool::new(false),
-        })
+        });
+
+        if !keep_alive.is_zero() {
+            let wire = session.wire();
+            tokio::spawn(async move {
+                trace!("session.keep_alive start");
+                loop {
+                    tokio::time::sleep(keep_alive).await;
+
+                    if wire.is_closed() {
+                        trace!("session.keep_alive end");
+                        break;
+                    }
+
+                    let result =
+                        CoreService::update_expiration_time(&wire, None, default_timeout).await;
+                    if let Err(error) = result {
+                        trace!("session.keep_alive end. {}", error);
+                        break;
+                    }
+                }
+            });
+        }
+
+        session
     }
 
     pub(crate) fn wire(&self) -> Arc<Wire> {
         self.wire.clone()
+    }
+}
+
+impl Drop for Session {
+    fn drop(&mut self) {
+        if self.is_closed() {
+            return;
+        }
+
+        std::thread::scope(|scope| {
+            scope.spawn(move || {
+                trace!("Session.drop() start");
+                let runtime = {
+                    match tokio::runtime::Runtime::new() {
+                        Ok(runtime) => runtime,
+                        Err(e) => {
+                            debug!("Session.drop() runtime::new error. {}", e);
+                            return;
+                        }
+                    }
+                };
+                runtime.block_on(async {
+                    if let Err(e) = self.close().await {
+                        debug!("Session.drop() close error. {}", e);
+                    }
+                });
+                trace!("Session.drop() end");
+            });
+        });
     }
 }
