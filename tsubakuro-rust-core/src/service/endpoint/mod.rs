@@ -60,6 +60,7 @@ impl EndpointBroker {
         wire_information: WireInformation,
         converter: F,
         default_timeout: Duration,
+        fail_on_drop_error: bool,
     ) -> Result<Job<T>, TgError>
     where
         F: Fn(/*session_id*/ i64) -> Result<T, TgError> + Send + 'static,
@@ -81,6 +82,7 @@ impl EndpointBroker {
                     result
                 }),
                 default_timeout,
+                fail_on_drop_error,
             )
             .await?;
 

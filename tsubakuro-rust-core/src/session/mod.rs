@@ -27,7 +27,8 @@ pub(crate) mod wire;
 pub struct Session {
     wire: Arc<Wire>,
     default_timeout: Duration,
-    shutodowned: AtomicBool,
+    shutdowned: AtomicBool,
+    fail_on_drop_error: AtomicBool,
 }
 
 impl Session {
@@ -128,8 +129,13 @@ impl Session {
         &self,
         expiration_time: Option<Duration>,
     ) -> Result<Job<()>, TgError> {
-        CoreService::update_expiration_time_async(&self.wire, expiration_time, self.default_timeout)
-            .await
+        CoreService::update_expiration_time_async(
+            &self.wire,
+            expiration_time,
+            self.default_timeout,
+            self.fail_on_drop_error(),
+        )
+        .await
     }
 
     pub async fn shutdown(&self, shutdown_type: ShutdownType) -> Result<(), TgError> {
@@ -148,16 +154,22 @@ impl Session {
 
     pub async fn shutdown_async(&self, shutdown_type: ShutdownType) -> Result<Job<()>, TgError> {
         self.set_shutdown();
-        CoreService::shutdown_async(&self.wire, shutdown_type, self.default_timeout).await
+        CoreService::shutdown_async(
+            &self.wire,
+            shutdown_type,
+            self.default_timeout,
+            self.fail_on_drop_error(),
+        )
+        .await
     }
 
     fn set_shutdown(&self) {
-        self.shutodowned
+        self.shutdowned
             .store(true, std::sync::atomic::Ordering::SeqCst);
     }
 
     pub fn is_shutdowned(&self) -> bool {
-        self.shutodowned.load(std::sync::atomic::Ordering::SeqCst)
+        self.shutdowned.load(std::sync::atomic::Ordering::SeqCst)
     }
 
     pub async fn close(&self) -> Result<(), TgError> {
@@ -167,6 +179,17 @@ impl Session {
     pub fn is_closed(&self) -> bool {
         self.wire.is_closed()
     }
+
+    // for debug
+    pub fn set_fail_on_drop_error(&self, value: bool) {
+        self.fail_on_drop_error
+            .store(value, std::sync::atomic::Ordering::SeqCst);
+    }
+
+    pub(crate) fn fail_on_drop_error(&self) -> bool {
+        self.fail_on_drop_error
+            .load(std::sync::atomic::Ordering::SeqCst)
+    }
 }
 
 impl Session {
@@ -174,7 +197,8 @@ impl Session {
         let session = Arc::new(Session {
             wire,
             default_timeout,
-            shutodowned: AtomicBool::new(false),
+            shutdowned: AtomicBool::new(false),
+            fail_on_drop_error: AtomicBool::new(false),
         });
 
         if !keep_alive.is_zero() {
@@ -221,6 +245,9 @@ impl Drop for Session {
                         Ok(runtime) => runtime,
                         Err(e) => {
                             debug!("Session.drop() runtime::new error. {}", e);
+                            if self.fail_on_drop_error() {
+                                panic!("Session.drop() runtime::new error. {}", e);
+                            }
                             return;
                         }
                     }
@@ -228,6 +255,9 @@ impl Drop for Session {
                 runtime.block_on(async {
                     if let Err(e) = self.close().await {
                         debug!("Session.drop() close error. {}", e);
+                        if self.fail_on_drop_error() {
+                            panic!("Session.drop() close error. {}", e);
+                        }
                     }
                 });
                 trace!("Session.drop() end");

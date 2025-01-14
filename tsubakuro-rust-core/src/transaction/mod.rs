@@ -28,6 +28,7 @@ pub struct Transaction {
     transaction_id: String,
     close_timeout: Duration,
     closed: AtomicBool,
+    fail_on_drop_error: AtomicBool,
 }
 
 impl Transaction {
@@ -37,12 +38,14 @@ impl Transaction {
         transaction_id: String,
         close_timeout: Duration,
     ) -> Transaction {
+        let fail_on_drop_error = session.fail_on_drop_error();
         Transaction {
             session,
             transaction_handle,
             transaction_id,
             close_timeout,
             closed: AtomicBool::new(false),
+            fail_on_drop_error: AtomicBool::new(fail_on_drop_error),
         }
     }
 
@@ -87,6 +90,17 @@ impl Transaction {
     pub fn is_closed(&self) -> bool {
         self.closed.load(std::sync::atomic::Ordering::SeqCst)
     }
+
+    // for debug
+    pub fn set_fail_on_drop_error(&self, value: bool) {
+        self.fail_on_drop_error
+            .store(value, std::sync::atomic::Ordering::SeqCst);
+    }
+
+    pub(crate) fn fail_on_drop_error(&self) -> bool {
+        self.fail_on_drop_error
+            .load(std::sync::atomic::Ordering::SeqCst)
+    }
 }
 
 impl Drop for Transaction {
@@ -101,14 +115,20 @@ impl Drop for Transaction {
                     match tokio::runtime::Runtime::new() {
                         Ok(runtime) => runtime,
                         Err(e) => {
-                            debug!("Transaction.drop() error. {}", e);
+                            debug!("Transaction.drop() runtime::new error. {}", e);
+                            if self.fail_on_drop_error() {
+                                panic!("Transaction.drop() runtime::new error. {}", e);
+                            }
                             return;
                         }
                     }
                 };
                 runtime.block_on(async {
                     if let Err(e) = self.close().await {
-                        debug!("Transaction.drop() error. {}", e);
+                        debug!("Transaction.drop() close error. {}", e);
+                        if self.fail_on_drop_error() {
+                            panic!("Transaction.drop() close error. {}", e);
+                        }
                     }
                 })
             });

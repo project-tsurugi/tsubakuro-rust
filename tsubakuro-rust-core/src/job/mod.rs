@@ -24,6 +24,7 @@ pub struct Job<T> {
     taked: bool,
     canceled: bool,
     closed: bool,
+    fail_on_drop_error: bool,
 }
 
 impl<T> std::fmt::Debug for Job<T> {
@@ -48,6 +49,7 @@ impl<T> Job<T> {
         slot_handle: Arc<SlotEntryHandle>,
         converter: F,
         default_timeout: Duration,
+        fail_on_drop_error: bool,
     ) -> Job<T>
     where
         F: Fn(WireResponse) -> Result<T, TgError> + Send + 'static,
@@ -62,6 +64,7 @@ impl<T> Job<T> {
             taked: false,
             canceled: false,
             closed: false,
+            fail_on_drop_error,
         }
     }
 
@@ -202,6 +205,15 @@ impl<T> Job<T> {
 
         Ok(())
     }
+
+    // for debug
+    pub fn set_fail_on_drop_error(&mut self, value: bool) {
+        self.fail_on_drop_error = value;
+    }
+
+    pub(crate) fn fail_on_drop_error(&self) -> bool {
+        self.fail_on_drop_error
+    }
 }
 
 impl<T> Drop for Job<T> {
@@ -219,7 +231,10 @@ impl<T> Drop for Job<T> {
                     match tokio::runtime::Runtime::new() {
                         Ok(runtime) => runtime,
                         Err(e) => {
-                            debug!("Job<{}>.drop() error. {}", self.name, e);
+                            debug!("Job<{}>.drop() runtime::new error. {}", self.name, e);
+                            if self.fail_on_drop_error() {
+                                panic!("Job<{}>.drop() runtime::new error. {}", self.name, e);
+                            }
                             return;
                         }
                     }
@@ -227,7 +242,10 @@ impl<T> Drop for Job<T> {
                 runtime.block_on(async {
                     let result = self.send_cancel().await; // send only (do not check response)
                     if let Err(e) = result {
-                        debug!("Job<{}>.drop() error. {}", self.name, e);
+                        debug!("Job<{}>.drop() close error. {}", self.name, e);
+                        if self.fail_on_drop_error() {
+                            panic!("Job<{}>.drop() close error. {}", self.name, e);
+                        }
                     }
                 })
             });

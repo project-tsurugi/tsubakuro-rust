@@ -53,6 +53,7 @@ impl CoreService {
         wire: &Arc<Wire>,
         expiration_time: Option<Duration>,
         default_timeout: Duration,
+        fail_on_drop_error: bool,
     ) -> Result<Job<()>, TgError> {
         const FUNCTION_NAME: &str = "update_expiration_time_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -67,6 +68,7 @@ impl CoreService {
                 request,
                 Box::new(update_expiration_time_processor),
                 default_timeout,
+                fail_on_drop_error,
             )
             .await?;
 
@@ -108,6 +110,7 @@ impl CoreService {
         wire: &Arc<Wire>,
         shutdown_type: ShutdownType,
         default_timeout: Duration,
+        fail_on_drop_error: bool,
     ) -> Result<Job<()>, TgError> {
         const FUNCTION_NAME: &str = "shutdown_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -123,6 +126,7 @@ impl CoreService {
                 request,
                 Box::new(move |response| shutdown_processor_for_job(&wire_clone, response)),
                 default_timeout,
+                fail_on_drop_error,
             )
             .await?;
 

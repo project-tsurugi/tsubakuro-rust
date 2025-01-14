@@ -26,6 +26,7 @@ pub struct SqlPreparedStatement {
     has_result_records: bool,
     close_timeout: Duration,
     closed: AtomicBool,
+    fail_on_drop_error: AtomicBool,
 }
 
 impl SqlPreparedStatement {
@@ -35,12 +36,14 @@ impl SqlPreparedStatement {
         has_result_records: bool,
         close_timeout: Duration,
     ) -> SqlPreparedStatement {
+        let fail_on_drop_error = session.fail_on_drop_error();
         SqlPreparedStatement {
             session,
             prepare_handle,
             has_result_records,
             close_timeout,
             closed: AtomicBool::new(false),
+            fail_on_drop_error: AtomicBool::new(fail_on_drop_error),
         }
     }
 
@@ -82,6 +85,17 @@ impl SqlPreparedStatement {
     pub fn is_closed(&self) -> bool {
         self.closed.load(std::sync::atomic::Ordering::SeqCst)
     }
+
+    // for debug
+    pub fn set_fail_on_drop_error(&self, value: bool) {
+        self.fail_on_drop_error
+            .store(value, std::sync::atomic::Ordering::SeqCst);
+    }
+
+    pub(crate) fn fail_on_drop_error(&self) -> bool {
+        self.fail_on_drop_error
+            .load(std::sync::atomic::Ordering::SeqCst)
+    }
 }
 
 impl Drop for SqlPreparedStatement {
@@ -98,6 +112,9 @@ impl Drop for SqlPreparedStatement {
                         Ok(runtime) => runtime,
                         Err(e) => {
                             debug!("SqlPreparedStatement.drop() runtime::new error. {}", e);
+                            if self.fail_on_drop_error() {
+                                panic!("SqlPreparedStatement.drop() runtime::new error. {}", e);
+                            }
                             return;
                         }
                     }
@@ -105,6 +122,9 @@ impl Drop for SqlPreparedStatement {
                 runtime.block_on(async {
                     if let Err(e) = self.close().await {
                         debug!("SqlPreparedStatement.drop() close error. {}", e);
+                        if self.fail_on_drop_error() {
+                            panic!("SqlPreparedStatement.drop() close error. {}", e);
+                        }
                     }
                 });
                 trace!("SqlPreparedStatement.drop() end");

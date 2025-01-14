@@ -77,18 +77,26 @@ impl Wire {
         Ok(response)
     }
 
-    pub async fn send_and_pull_async<R: ProstMessage, T: 'static>(
+    pub(crate) async fn send_and_pull_async<R: ProstMessage, T: 'static>(
         self: &Arc<Wire>,
         job_name: &str,
         service_id: i32,
         request: R,
         converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
         default_timeout: Duration,
+        fail_on_drop_error: bool,
     ) -> Result<Job<T>, TgError> {
         let slot_handle = self.send_internal(service_id, request).await?;
 
         let wire = self.clone();
-        let job = Job::new(job_name, wire, slot_handle, converter, default_timeout);
+        let job = Job::new(
+            job_name,
+            wire,
+            slot_handle,
+            converter,
+            default_timeout,
+            fail_on_drop_error,
+        );
         Ok(job)
     }
 

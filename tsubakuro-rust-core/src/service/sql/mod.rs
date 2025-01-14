@@ -837,6 +837,7 @@ impl SqlClient {
                 request,
                 converter,
                 self.default_timeout,
+                self.session.fail_on_drop_error(),
             )
             .await
     }

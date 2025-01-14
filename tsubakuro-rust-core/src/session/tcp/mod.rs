@@ -69,6 +69,7 @@ impl TcpConnector {
                 Ok(Session::new(wire.clone(), keep_alive, default_timeout))
             },
             default_timeout,
+            false,
         )
         .await?;
         Ok(job)

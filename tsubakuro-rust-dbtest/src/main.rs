@@ -64,6 +64,7 @@ mod test {
     pub(crate) async fn create_test_session() -> Arc<Session> {
         let option = create_test_connection_option();
         let session = Session::connect(&option).await.unwrap();
+        session.set_fail_on_drop_error(true);
         session
     }
 
