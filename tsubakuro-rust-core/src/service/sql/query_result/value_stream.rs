@@ -583,7 +583,7 @@ impl ResultSetValueStream {
     async fn read_decimal(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(Option<BytesMut>, i64, i32), TgError> {
+    ) -> Result<(Option<BytesMut>, i64, /*scale*/ i32), TgError> {
         let found = self.require_set(&[EntryType::Ddecimal, EntryType::Int])?;
         if found == EntryType::Int {
             let value = self.read_int_body(timeout).await?;
@@ -594,16 +594,16 @@ impl ResultSetValueStream {
         self.clear_header_info();
 
         if category == HEADER_DECIMAL_COMPACT {
-            let scale = self.read_signed_int32(timeout).await?;
+            let exponent = self.read_signed_int32(timeout).await?;
             let coefficient = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
-            return Ok((None, coefficient, -scale));
+            return Ok((None, coefficient, -exponent));
         }
 
         debug_assert_eq!(HEADER_DECIMAL, category);
         let exponent = self.read_signed_int32(timeout).await?;
         let coefficient_size = self.read_size(timeout).await?;
         let coefficient = self.read_n(coefficient_size as usize, timeout).await?;
-        Ok((Some(coefficient), 0, exponent))
+        Ok((Some(coefficient), 0, -exponent))
     }
 
     async fn read_character(&mut self, timeout: &Timeout) -> Result<String, TgError> {
@@ -702,7 +702,7 @@ impl ResultSetValueStream {
     }
 
     async fn read_signed_int32(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
-        let value = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
+        let value = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
         if value < (i32::MIN as i64) || value > (i32::MAX as i64) {
             // TODO BrokenEncodingException
             return Err(client_error!(format!("saw unsupported size {value}")));

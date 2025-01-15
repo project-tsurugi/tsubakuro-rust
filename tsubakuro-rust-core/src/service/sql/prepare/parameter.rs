@@ -80,6 +80,25 @@ impl SqlParameterOf<&bigdecimal::BigDecimal> for SqlParameter {
     }
 }
 
+#[cfg(feature = "with_rust_decimal")]
+impl SqlParameterOf<rust_decimal::Decimal> for SqlParameter {
+    fn of(name: &str, value: rust_decimal::Decimal) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_rust_decimal")]
+impl SqlParameterOf<&rust_decimal::Decimal> for SqlParameter {
+    fn of(name: &str, value: &rust_decimal::Decimal) -> SqlParameter {
+        let value = ProtoDecimal {
+            unscaled_value: value.mantissa().to_be_bytes().to_vec(),
+            exponent: -(value.scale() as i32),
+        };
+        let value = Value::DecimalValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl SqlParameterOf<&str> for SqlParameter {
     fn of(name: &str, value: &str) -> SqlParameter {
         let value = Value::CharacterValue(value.to_string());
@@ -277,6 +296,60 @@ mod test {
             &Value::DecimalValue(ProtoDecimal {
                 unscaled_value: expected.0.to_signed_bytes_be(),
                 exponent: -expected.1 as i32
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_rust_decimal")]
+    #[test]
+    fn rust_decimal() {
+        use std::str::FromStr;
+
+        let value = rust_decimal::Decimal::from_str("123.4").unwrap();
+
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::DecimalValue(ProtoDecimal {
+                unscaled_value: value.mantissa().to_be_bytes().to_vec(),
+                exponent: -(value.scale() as i32)
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_rust_decimal")]
+    #[test]
+    fn rust_decimal_ref() {
+        use std::str::FromStr;
+
+        let value = rust_decimal::Decimal::from_str("123.4").unwrap();
+
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::DecimalValue(ProtoDecimal {
+                unscaled_value: value.mantissa().to_be_bytes().to_vec(),
+                exponent: -(value.scale() as i32)
             }),
             target0.value().unwrap()
         );

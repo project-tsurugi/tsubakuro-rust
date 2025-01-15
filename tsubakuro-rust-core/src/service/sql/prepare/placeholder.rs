@@ -75,6 +75,13 @@ impl AtomTypeProvider for bigdecimal::BigDecimal {
     }
 }
 
+#[cfg(feature = "with_rust_decimal")]
+impl AtomTypeProvider for rust_decimal::Decimal {
+    fn atom_type() -> AtomType {
+        AtomType::Decimal
+    }
+}
+
 impl AtomTypeProvider for &str {
     fn atom_type() -> AtomType {
         AtomType::Character
@@ -172,6 +179,20 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<bigdecimal::BigDecimal>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_rust_decimal")]
+    #[test]
+    fn rust_decimal() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Decimal);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Decimal, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<rust_decimal::Decimal>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<rust_decimal::Decimal>();
         assert_eq!(target0, target);
     }
 

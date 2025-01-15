@@ -250,18 +250,49 @@ impl SqlQueryResultFetch<bigdecimal::BigDecimal> for SqlQueryResult {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_decimal_value(&timeout).await?;
         let value = match value {
-            (Some(coefficient), _, exponent) => {
+            (Some(coefficient), _, scale) => {
                 let value = bigdecimal::num_bigint::BigInt::from_signed_bytes_be(&coefficient);
-                bigdecimal::BigDecimal::new(value, exponent as i64)
+                bigdecimal::BigDecimal::new(value, scale as i64)
             }
-            (None, value, exponent) => {
-                if exponent == 0 {
+            (None, value, scale) => {
+                if scale == 0 {
                     bigdecimal::BigDecimal::from_i64(value).unwrap()
                 } else {
-                    let scale = -exponent;
                     let value = bigdecimal::num_bigint::BigInt::from_i64(value).unwrap();
                     bigdecimal::BigDecimal::from_bigint(value, scale as i64)
                 }
+            }
+        };
+        Ok(value)
+    }
+}
+
+#[cfg(feature = "with_rust_decimal")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<rust_decimal::Decimal> for SqlQueryResult {
+    /// Retrieves a `Decimal` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<rust_decimal::Decimal, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `Decimal` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<rust_decimal::Decimal, TgError> {
+        let timeout = Timeout::new(timeout);
+        let value = self.value_stream.fetch_decimal_value(&timeout).await?;
+        let value = match value {
+            (Some(coefficient), _, scale) => {
+                let top = coefficient[0] as i8;
+                let mut buf = if top >= 0 { [0u8; 16] } else { [0xffu8; 16] };
+                buf[16 - coefficient.len()..].copy_from_slice(&coefficient);
+                let value = i128::from_be_bytes(buf);
+                rust_decimal::Decimal::from_i128_with_scale(value, scale as u32)
+            }
+            (None, value, scale) => {
+                rust_decimal::Decimal::from_i128_with_scale(value as i128, scale as u32)
             }
         };
         Ok(value)
