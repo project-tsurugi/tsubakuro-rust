@@ -13,6 +13,7 @@ use crate::{
     prost_decode_error,
 };
 use async_trait::async_trait;
+use bigdecimal::FromPrimitive;
 use prost::Message;
 use std::{sync::Arc, time::Duration};
 use value_stream::ResultSetValueStream;
@@ -229,6 +230,41 @@ impl SqlQueryResultFetch<f64> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<f64, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_float8_value(&timeout).await
+    }
+}
+
+#[cfg(feature = "with_bigdecimal")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<bigdecimal::BigDecimal> for SqlQueryResult {
+    /// Retrieves a `BigDecimal` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<bigdecimal::BigDecimal, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `BigDecimal` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<bigdecimal::BigDecimal, TgError> {
+        let timeout = Timeout::new(timeout);
+        let value = self.value_stream.fetch_decimal_value(&timeout).await?;
+        let value = match value {
+            (Some(coefficient), _, exponent) => {
+                let value = bigdecimal::num_bigint::BigInt::from_signed_bytes_be(&coefficient);
+                bigdecimal::BigDecimal::new(value, exponent as i64)
+            }
+            (None, value, exponent) => {
+                if exponent == 0 {
+                    bigdecimal::BigDecimal::from_i64(value).unwrap()
+                } else {
+                    let scale = -exponent;
+                    let value = bigdecimal::num_bigint::BigInt::from_i64(value).unwrap();
+                    bigdecimal::BigDecimal::from_bigint(value, scale as i64)
+                }
+            }
+        };
+        Ok(value)
     }
 }
 

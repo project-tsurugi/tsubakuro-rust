@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 async-trait = "0.1.83"
+bigdecimal = { version = "0.4.7", optional = true }
 log = "0.4.22"
 prost = "0.13.3"
 tokio = { version = "1.42.0", features = ["full"] }
@@ -12,3 +13,8 @@ url = "2.5.4"
 
 [build-dependencies]
 prost-build = "0.13.3"
+
+[features]
+default = ["with_bigdecimal"]
+
+with_bigdecimal = ["bigdecimal"]

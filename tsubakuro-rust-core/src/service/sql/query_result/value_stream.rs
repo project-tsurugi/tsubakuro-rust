@@ -104,9 +104,9 @@ const HEADER_INT: i32 = 0xe9;
 
 // const HEADER_FLOAT8: i32 = 0xeb;
 
-// const HEADER_DECIMAL_COMPACT: i32 = 0xec;
+const HEADER_DECIMAL_COMPACT: i32 = 0xec;
 
-// const HEADER_DECIMAL: i32 = 0xed;
+const HEADER_DECIMAL: i32 = 0xed;
 
 // const HEADER_TIME_OF_DAY_WITH_TIME_ZONE: i32 = 0xee;
 
@@ -257,6 +257,7 @@ pub(crate) struct ResultSetValueStream {
     current_column_type: EntryType,
 }
 
+// https://github.com/project-tsurugi/tsubakuro/blob/master/modules/session/src/main/java/com/tsurugidb/tsubakuro/sql/impl/ValueInputBackedRelationCursor.java
 impl ResultSetValueStream {
     pub(crate) fn new(data_channel: DataChannel) -> ResultSetValueStream {
         ResultSetValueStream {
@@ -384,6 +385,16 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    pub(crate) async fn fetch_decimal_value(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(Option<BytesMut>, i64, i32), TgError> {
+        self.require_column_type_set(&[EntryType::Ddecimal, EntryType::Int])?;
+        let value = self.read_decimal(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
     pub(crate) async fn fetch_character_value(
         &mut self,
         timeout: &Timeout,
@@ -406,6 +417,20 @@ impl ResultSetValueStream {
         Ok(())
     }
 
+    fn require_column_type_set(&self, expected: &[EntryType]) -> Result<(), TgError> {
+        let found = self.current_column_type;
+        if found == EntryType::Nothing {
+            return Err(client_error!("invoke .nextColumn() before fetch value"));
+        }
+
+        if !expected.contains(&found) {
+            return Err(client_error!(format!(
+                "value is type is inconsistent: found '{found:?}' but expected one is {expected:?}"
+            )));
+        }
+        Ok(())
+    }
+
     fn column_consumed(&mut self) {
         self.current_column_type = EntryType::Nothing;
         let entry = self.kind_stack_get_top().unwrap();
@@ -414,6 +439,7 @@ impl ResultSetValueStream {
     }
 }
 
+// https://github.com/project-tsurugi/tsubakuro/blob/master/modules/session/src/main/java/com/tsurugidb/tsubakuro/sql/io/StreamBackedValueInput.java#
 impl ResultSetValueStream {
     async fn peek_entry_type(&mut self, timeout: &Timeout) -> Result<EntryType, TgError> {
         if self.current_entry_type == EntryType::Nothing {
@@ -442,9 +468,10 @@ impl ResultSetValueStream {
                 self.read_float8(timeout).await?;
                 Ok(true)
             }
-            // case DECIMAL:
-            //     readDecimal();
-            //     return true;
+            EntryType::Ddecimal => {
+                self.read_decimal(timeout).await?;
+                Ok(true)
+            }
             EntryType::Character => {
                 self.read_character(timeout).await?;
                 Ok(true)
@@ -553,6 +580,32 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    async fn read_decimal(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(Option<BytesMut>, i64, i32), TgError> {
+        let found = self.require_set(&[EntryType::Ddecimal, EntryType::Int])?;
+        if found == EntryType::Int {
+            let value = self.read_int_body(timeout).await?;
+            return Ok((None, value, 0));
+        }
+
+        let category = self.current_header_category;
+        self.clear_header_info();
+
+        if category == HEADER_DECIMAL_COMPACT {
+            let scale = self.read_signed_int32(timeout).await?;
+            let coefficient = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
+            return Ok((None, coefficient, -scale));
+        }
+
+        debug_assert_eq!(HEADER_DECIMAL, category);
+        let exponent = self.read_signed_int32(timeout).await?;
+        let coefficient_size = self.read_size(timeout).await?;
+        let coefficient = self.read_n(coefficient_size as usize, timeout).await?;
+        Ok((Some(coefficient), 0, exponent))
+    }
+
     async fn read_character(&mut self, timeout: &Timeout) -> Result<String, TgError> {
         self.require(EntryType::Character)?;
         let size = self.read_character_size(timeout).await?;
@@ -609,6 +662,16 @@ impl ResultSetValueStream {
         Ok(found)
     }
 
+    fn require_set(&self, expected: &[EntryType]) -> Result<EntryType, TgError> {
+        let found = self.current_entry_type;
+        if !expected.contains(&found) {
+            return Err(client_error!(format!(
+                "inconsistent value type: '{found:?}' is found, but'{expected:?}' was expected"
+            )));
+        }
+        Ok(found)
+    }
+
     async fn read4(&mut self, timeout: &Timeout) -> Result<u32, TgError> {
         let buf = self.read_n(4, timeout).await?;
         let value =
@@ -636,6 +699,15 @@ impl ResultSetValueStream {
             .await?
             .ok_or(broken_encoding_error!("read_n()", "saw unexpected eof"))?;
         Ok(buffer)
+    }
+
+    async fn read_signed_int32(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
+        let value = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
+        if value < (i32::MIN as i64) || value > (i32::MAX as i64) {
+            // TODO BrokenEncodingException
+            return Err(client_error!(format!("saw unsupported size {value}")));
+        }
+        Ok(value as i32)
     }
 
     async fn read_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {

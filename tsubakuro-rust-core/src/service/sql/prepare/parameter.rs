@@ -1,3 +1,4 @@
+use crate::jogasaki::proto::sql::common::Decimal as ProtoDecimal;
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
 
@@ -55,6 +56,26 @@ impl SqlParameterOf<f32> for SqlParameter {
 impl SqlParameterOf<f64> for SqlParameter {
     fn of(name: &str, value: f64) -> SqlParameter {
         let value = Value::Float8Value(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+#[cfg(feature = "with_bigdecimal")]
+impl SqlParameterOf<bigdecimal::BigDecimal> for SqlParameter {
+    fn of(name: &str, value: bigdecimal::BigDecimal) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_bigdecimal")]
+impl SqlParameterOf<&bigdecimal::BigDecimal> for SqlParameter {
+    fn of(name: &str, value: &bigdecimal::BigDecimal) -> SqlParameter {
+        let (value, scale) = value.as_bigint_and_exponent();
+        let value = ProtoDecimal {
+            unscaled_value: value.to_signed_bytes_be(),
+            exponent: -scale as i32,
+        };
+        let value = Value::DecimalValue(value);
         SqlParameter::new(name, Some(value))
     }
 }
@@ -211,6 +232,62 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".to_string().parameter(123_f64);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_bigdecimal")]
+    #[test]
+    fn bigdecimal() {
+        use std::str::FromStr;
+
+        let value = bigdecimal::BigDecimal::from_str("123.4").unwrap();
+        let expected = value.as_bigint_and_exponent();
+
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::DecimalValue(ProtoDecimal {
+                unscaled_value: expected.0.to_signed_bytes_be(),
+                exponent: -expected.1 as i32
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_bigdecimal")]
+    #[test]
+    fn bigdecimal_ref() {
+        use std::str::FromStr;
+
+        let value = bigdecimal::BigDecimal::from_str("123.4").unwrap();
+        let expected = value.as_bigint_and_exponent();
+
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::DecimalValue(ProtoDecimal {
+                unscaled_value: expected.0.to_signed_bytes_be(),
+                exponent: -expected.1 as i32
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
         assert_eq!(target0, target);
     }
 

@@ -83,7 +83,7 @@ mod test {
 
         for value in values {
             let sql = if let Some(v) = value.1 {
-                format!("insert into test (pk, v) values({}, '{}')", value.0, v)
+                format!("insert into test (pk, v) values({}, {:e})", value.0, v)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
             };

@@ -1,8 +1,13 @@
 #[cfg(test)]
 mod test {
+    use std::str::FromStr;
+
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
+    use bigdecimal::{num_bigint::BigInt, BigDecimal, Zero};
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
+
+    const DECIMAL_SIZE: u32 = 19;
 
     #[test]
     async fn literal() {
@@ -10,7 +15,7 @@ mod test {
 
         create_test_table(&client).await;
 
-        let values = generate_values(false);
+        let values = generate_values();
 
         insert_literal(&client, &values).await;
         select(&client, &values, false).await;
@@ -23,7 +28,7 @@ mod test {
 
         create_test_table(&client).await;
 
-        let values = generate_values(true);
+        let values = generate_values();
 
         insert_prepared(&client, &values).await;
         select(&client, &values, false).await;
@@ -34,7 +39,10 @@ mod test {
         create_table(
             &client,
             "test",
-            "create table test (pk int primary key, v real, r int default 999)",
+            &format!(
+                "create table test (pk int primary key, v decimal({}, 0), r int default 999)",
+                DECIMAL_SIZE
+            ),
         )
         .await;
 
@@ -43,49 +51,43 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::Float4), c.atom_type());
+        assert_eq!(Some(AtomType::Decimal), c.atom_type());
     }
 
-    fn generate_values(inf: bool) -> Vec<(i32, Option<f32>)> {
-        // TODO let min = f32::MIN;
-        // TODO let max = f32::MAX;
-        let min = -3.40282e+38;
-        let max = 3.40282e+38;
-
+    fn generate_values() -> Vec<(i32, Option<BigDecimal>)> {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, Some(0_f32)));
-        values.push((2, Some(min)));
-        values.push((3, Some(max)));
-        if inf {
-            values.push((4, Some(f32::NAN)));
-            values.push((5, Some(f32::NEG_INFINITY)));
-            values.push((6, Some(f32::INFINITY)));
-        }
+        values.push((1, Some(BigDecimal::zero())));
+        values.push((2, Some(BigDecimal::from_str("1").unwrap())));
+        values.push((3, Some(BigDecimal::from_str("-1").unwrap())));
+        values.push((4, Some(BigDecimal::from_str("1.0").unwrap())));
+        values.push((5, Some(BigDecimal::from_str("-1.0").unwrap())));
 
-        let mut i = 7;
-        let mut v = min + 1e+30;
-        let step = max / 50_f32 * 2_f32;
+        let mut i = 10;
+        let max = BigDecimal::new(BigInt::from(10).pow(DECIMAL_SIZE) - 1, 0);
+        let mut v = -&max;
+        let step: BigDecimal = &max / 50 * 2;
+        let step = step.with_scale(0);
         loop {
-            values.push((i, Some(v)));
+            values.push((i, Some(v.clone())));
 
-            if v > max - step {
+            if v > &max - &step {
                 break;
             }
             i += 1;
-            v += step;
+            v += &step;
         }
 
         values
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<f32>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<BigDecimal>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
-            let sql = if let Some(v) = value.1 {
-                format!("insert into test (pk, v) values({}, {:e})", value.0, v)
+            let sql = if let Some(v) = &value.1 {
+                format!("insert into test (pk, v) values({}, {})", value.0, v)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
             };
@@ -95,20 +97,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<f32>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<BigDecimal>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<f32>("value"),
+            SqlPlaceholder::of::<BigDecimal>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of("value", value.1),
+                SqlParameter::of("value", value.1.as_ref()),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -121,7 +123,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<f32>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<BigDecimal>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -132,11 +134,11 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::Float4), c.atom_type());
+        assert_eq!(Some(AtomType::Decimal), c.atom_type());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {
-            let expected = expected[i];
+            let expected = &expected[i];
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             let pk = query_result.fetch().await.unwrap();
@@ -144,16 +146,11 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                if let Some(expected) = expected.1 {
-                    let v: f32 = query_result.fetch().await.unwrap();
-                    if expected.is_nan() {
-                        assert_eq!(true, v.is_nan());
-                    } else {
-                        assert_eq!(expected, v);
-                    }
-                } else {
-                    let v = query_result.fetch().await.unwrap();
-                    assert_eq!(expected.1, v);
+                let v = query_result.fetch().await.unwrap();
+                assert_eq!(expected.1, v);
+                if let Some(value) = v {
+                    let scale = value.as_bigint_and_exponent().1;
+                    assert_eq!(0, scale);
                 }
             }
 

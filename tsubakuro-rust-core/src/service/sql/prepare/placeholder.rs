@@ -67,6 +67,14 @@ impl AtomTypeProvider for f64 {
         AtomType::Float8
     }
 }
+
+#[cfg(feature = "with_bigdecimal")]
+impl AtomTypeProvider for bigdecimal::BigDecimal {
+    fn atom_type() -> AtomType {
+        AtomType::Decimal
+    }
+}
+
 impl AtomTypeProvider for &str {
     fn atom_type() -> AtomType {
         AtomType::Character
@@ -150,6 +158,20 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<f64>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_bigdecimal")]
+    #[test]
+    fn bigdecimal() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Decimal);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Decimal, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<bigdecimal::BigDecimal>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<bigdecimal::BigDecimal>();
         assert_eq!(target0, target);
     }
 
