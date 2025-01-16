@@ -32,6 +32,13 @@ pub trait SqlParameterOf<T> {
     fn of(name: &str, value: T) -> SqlParameter;
 }
 
+impl SqlParameterOf<bool> for SqlParameter {
+    fn of(name: &str, value: bool) -> SqlParameter {
+        let value = Value::BooleanValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl SqlParameterOf<i32> for SqlParameter {
     fn of(name: &str, value: i32) -> SqlParameter {
         let value = Value::Int4Value(value);
@@ -187,6 +194,27 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".to_string().parameter_null();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn bool() {
+        bool_test(true);
+        bool_test(false);
+    }
+
+    fn bool_test(value: bool) {
+        let target0 = SqlParameter::of("test", value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::BooleanValue(value), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value);
         assert_eq!(target0, target);
     }
 

@@ -44,6 +44,12 @@ pub trait AtomTypeProvider {
     fn atom_type() -> AtomType;
 }
 
+impl AtomTypeProvider for bool {
+    fn atom_type() -> AtomType {
+        AtomType::Boolean
+    }
+}
+
 impl AtomTypeProvider for i32 {
     fn atom_type() -> AtomType {
         AtomType::Int4
@@ -115,6 +121,19 @@ impl SqlPlaceholderBind for String {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn bool() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Boolean);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Boolean, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<bool>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<bool>();
+        assert_eq!(target0, target);
+    }
 
     #[test]
     fn i32() {

@@ -158,6 +158,25 @@ pub trait SqlQueryResultFetch<T> {
 }
 
 #[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<bool> for SqlQueryResult {
+    /// Retrieves a `BOOLEAN` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<bool, TgError> {
+        let timeout = Timeout::new(self.default_timeout);
+        self.value_stream.fetch_boolean_value(&timeout).await
+    }
+
+    /// Retrieves a `BOOLEAN` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<bool, TgError> {
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_boolean_value(&timeout).await
+    }
+}
+
+#[async_trait(?Send)] // thread unsafe
 impl SqlQueryResultFetch<i32> for SqlQueryResult {
     /// Retrieves a `INT4` value on the column of the cursor position.
     ///
@@ -236,14 +255,14 @@ impl SqlQueryResultFetch<f64> for SqlQueryResult {
 #[cfg(feature = "with_bigdecimal")]
 #[async_trait(?Send)] // thread unsafe
 impl SqlQueryResultFetch<bigdecimal::BigDecimal> for SqlQueryResult {
-    /// Retrieves a `BigDecimal` value on the column of the cursor position.
+    /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<bigdecimal::BigDecimal, TgError> {
         self.fetch_for(self.default_timeout).await
     }
 
-    /// Retrieves a `BigDecimal` value on the column of the cursor position.
+    /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<bigdecimal::BigDecimal, TgError> {
@@ -270,14 +289,14 @@ impl SqlQueryResultFetch<bigdecimal::BigDecimal> for SqlQueryResult {
 #[cfg(feature = "with_rust_decimal")]
 #[async_trait(?Send)] // thread unsafe
 impl SqlQueryResultFetch<rust_decimal::Decimal> for SqlQueryResult {
-    /// Retrieves a `Decimal` value on the column of the cursor position.
+    /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<rust_decimal::Decimal, TgError> {
         self.fetch_for(self.default_timeout).await
     }
 
-    /// Retrieves a `Decimal` value on the column of the cursor position.
+    /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<rust_decimal::Decimal, TgError> {

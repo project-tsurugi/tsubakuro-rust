@@ -350,6 +350,21 @@ impl ResultSetValueStream {
         Ok(self.current_column_type == EntryType::Null)
     }
 
+    pub(crate) async fn fetch_boolean_value(&mut self, timeout: &Timeout) -> Result<bool, TgError> {
+        self.require_column_type(EntryType::Int)?;
+        let value = self.read_int(timeout).await?;
+        self.column_consumed();
+
+        match value {
+            0 => Ok(false),
+            1 => Ok(true),
+            // TODO BrokenRelationException
+            _ => Err(client_error!(format!(
+                "value is out of range for 'bool': value={value}"
+            ))),
+        }
+    }
+
     pub(crate) async fn fetch_int4_value(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
         self.require_column_type(EntryType::Int)?;
         let value = self.read_int(timeout).await?;
@@ -358,6 +373,7 @@ impl ResultSetValueStream {
         if i32::MIN as i64 <= value && value <= i32::MAX as i64 {
             Ok(value as i32)
         } else {
+            // TODO BrokenRelationException
             Err(client_error!(format!(
                 "value is out of range for 'i32': value={value}"
             )))

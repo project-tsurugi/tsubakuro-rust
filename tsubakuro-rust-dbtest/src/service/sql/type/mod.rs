@@ -1,5 +1,6 @@
 mod bigdecimal0;
 mod bigdecimal1;
+mod boolean;
 mod char;
 mod float4;
 mod float8;
