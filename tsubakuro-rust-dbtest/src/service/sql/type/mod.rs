@@ -3,6 +3,7 @@ mod bigdecimal1;
 mod binary;
 mod boolean;
 mod char;
+mod chrono_native_date;
 mod float4;
 mod float8;
 mod int4;

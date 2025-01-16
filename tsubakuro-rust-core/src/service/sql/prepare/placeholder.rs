@@ -112,6 +112,13 @@ impl AtomTypeProvider for Vec<u8> {
     }
 }
 
+#[cfg(feature = "with_chrono")]
+impl AtomTypeProvider for chrono::NaiveDate {
+    fn atom_type() -> AtomType {
+        AtomType::Date
+    }
+}
+
 pub trait SqlPlaceholderBind {
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
@@ -276,6 +283,20 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<Vec<u8>>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_date() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Date);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Date, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<chrono::NaiveDate>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<chrono::NaiveDate>();
         assert_eq!(target0, target);
     }
 }

@@ -148,6 +148,27 @@ impl SqlParameterOf<&Vec<u8>> for SqlParameter {
     }
 }
 
+#[cfg(feature = "with_chrono")]
+impl SqlParameterOf<chrono::NaiveDate> for SqlParameter {
+    fn of(name: &str, value: chrono::NaiveDate) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+#[cfg(feature = "with_chrono")]
+pub(crate) const NATIVE_DATE_EPOCH_START: Option<chrono::NaiveDate> =
+    chrono::NaiveDate::from_ymd_opt(1970, 1, 1);
+
+#[cfg(feature = "with_chrono")]
+impl SqlParameterOf<&chrono::NaiveDate> for SqlParameter {
+    fn of(name: &str, value: &chrono::NaiveDate) -> SqlParameter {
+        let days = value
+            .signed_duration_since(NATIVE_DATE_EPOCH_START.unwrap())
+            .num_days();
+        let value = Value::DateValue(days);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl<T> SqlParameterOf<Option<T>> for SqlParameter
 where
     SqlParameter: SqlParameterOf<T>,
@@ -510,6 +531,43 @@ mod test {
         let target0 = SqlParameter::of("test", &value);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::OctetValue(value.clone()), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_date() {
+        let value = chrono::NaiveDate::from_ymd_opt(2025, 1, 16).unwrap();
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::DateValue(20104), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_date_ref() {
+        let value = chrono::NaiveDate::from_ymd_opt(2025, 1, 16).unwrap();
+
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::DateValue(20104), target0.value().unwrap());
 
         let target = SqlParameter::of("test", Some(&value));
         assert_eq!(target0, target);

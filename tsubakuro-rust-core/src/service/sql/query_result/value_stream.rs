@@ -431,10 +431,17 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    pub(crate) async fn fetch_date_value(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
+        self.require_column_type(EntryType::Date)?;
+        let value = self.read_date(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
     fn require_column_type(&self, expected: EntryType) -> Result<(), TgError> {
         let found = self.current_column_type;
         if found == EntryType::Nothing {
-            return Err(client_error!("invoke .nextColumn() before fetch value"));
+            return Err(client_error!("invoke .next_column() before fetch value"));
         }
 
         if found != expected {
@@ -446,7 +453,7 @@ impl ResultSetValueStream {
     fn require_column_type_set(&self, expected: &[EntryType]) -> Result<(), TgError> {
         let found = self.current_column_type;
         if found == EntryType::Nothing {
-            return Err(client_error!("invoke .nextColumn() before fetch value"));
+            return Err(client_error!("invoke .next_column() before fetch value"));
         }
 
         if !expected.contains(&found) {
@@ -509,10 +516,10 @@ impl ResultSetValueStream {
             // case BIT:
             //     readBit(bitBuilder);
             //     return true;
-
-            // case DATE:
-            //     readDate();
-            //     return true;
+            EntryType::Date => {
+                self.read_date(timeout).await?;
+                Ok(true)
+            }
             // case TIME_OF_DAY:
             //     readTimeOfDay();
             //     return true;
@@ -682,6 +689,13 @@ impl ResultSetValueStream {
 
         debug_assert_eq!(category, HEADER_OCTET);
         self.read_size(timeout).await
+    }
+
+    async fn read_date(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
+        self.require(EntryType::Date)?;
+        self.clear_header_info();
+        let epoch_days = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
+        Ok(epoch_days)
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
