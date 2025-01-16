@@ -126,6 +126,13 @@ impl AtomTypeProvider for chrono::NaiveTime {
     }
 }
 
+#[cfg(feature = "with_chrono")]
+impl AtomTypeProvider for chrono::NaiveDateTime {
+    fn atom_type() -> AtomType {
+        AtomType::TimePoint
+    }
+}
+
 pub trait SqlPlaceholderBind {
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
@@ -318,6 +325,20 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<chrono::NaiveTime>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_date_time() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimePoint);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::TimePoint, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<chrono::NaiveDateTime>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<chrono::NaiveDateTime>();
         assert_eq!(target0, target);
     }
 }

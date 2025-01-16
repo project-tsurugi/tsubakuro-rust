@@ -448,6 +448,16 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    pub(crate) async fn fetch_time_point_value(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(i64, i32), TgError> {
+        self.require_column_type(EntryType::TimePoint)?;
+        let value = self.read_time_point(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
     fn require_column_type(&self, expected: EntryType) -> Result<(), TgError> {
         let found = self.current_column_type;
         if found == EntryType::Nothing {
@@ -534,9 +544,10 @@ impl ResultSetValueStream {
                 self.read_time_of_day(timeout).await?;
                 Ok(true)
             }
-            // case TIME_POINT:
-            //     readTimePoint();
-            //     return true;
+            EntryType::TimePoint => {
+                self.read_time_point(timeout).await?;
+                Ok(true)
+            }
             // case TIME_OF_DAY_WITH_TIME_ZONE:
             //     readTimeOfDayWithTimeZone();
             //     return true;
@@ -714,6 +725,14 @@ impl ResultSetValueStream {
         self.clear_header_info();
         let epoch_nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
         Ok(epoch_nanos)
+    }
+
+    async fn read_time_point(&mut self, timeout: &Timeout) -> Result<(i64, i32), TgError> {
+        self.require(EntryType::TimePoint)?;
+        self.clear_header_info();
+        let epoch_seconds = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
+        let nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
+        Ok((epoch_seconds, nanos as i32))
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<i32, TgError> {

@@ -393,10 +393,8 @@ impl SqlQueryResultFetch<chrono::NaiveDate> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDate, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_date_value(&timeout).await?;
-        let value = crate::prelude::NATIVE_DATE_EPOCH_START
-            .unwrap()
-            .checked_add_signed(chrono::Duration::days(value))
-            .unwrap();
+        let days = value + 719_163;
+        let value = chrono::NaiveDate::from_num_days_from_ce_opt(days as i32).unwrap();
         Ok(value)
     }
 }
@@ -420,6 +418,28 @@ impl SqlQueryResultFetch<chrono::NaiveTime> for SqlQueryResult {
         let seconds = (value / 1_000_000_000) as u32;
         let nanos = (value % 1_000_000_000) as u32;
         let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
+        Ok(value)
+    }
+}
+
+#[cfg(feature = "with_chrono")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<chrono::NaiveDateTime, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDateTime, TgError> {
+        let timeout = Timeout::new(timeout);
+        let value = self.value_stream.fetch_time_point_value(&timeout).await?;
+        let value = chrono::DateTime::from_timestamp(value.0, value.1 as u32).unwrap();
+        let value = value.naive_utc();
         Ok(value)
     }
 }
