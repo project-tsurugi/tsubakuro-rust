@@ -169,6 +169,25 @@ impl SqlParameterOf<&chrono::NaiveDate> for SqlParameter {
     }
 }
 
+#[cfg(feature = "with_chrono")]
+impl SqlParameterOf<chrono::NaiveTime> for SqlParameter {
+    fn of(name: &str, value: chrono::NaiveTime) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_chrono")]
+impl SqlParameterOf<&chrono::NaiveTime> for SqlParameter {
+    fn of(name: &str, value: &chrono::NaiveTime) -> SqlParameter {
+        use chrono::Timelike;
+
+        let seconds = value.num_seconds_from_midnight() as u64;
+        let nano = value.nanosecond() as u64;
+        let value = Value::TimeOfDayValue(seconds * 1_000_000_000 + nano);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl<T> SqlParameterOf<Option<T>> for SqlParameter
 where
     SqlParameter: SqlParameterOf<T>,
@@ -568,6 +587,61 @@ mod test {
         let target0 = SqlParameter::of("test", &value);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::DateValue(20104), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_time() {
+        let value = chrono::NaiveTime::from_hms_milli_opt(16, 24, 30, 456).unwrap();
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimeOfDayValue(59070456000000),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_time_ref() {
+        chrono_native_time_ref_test(chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap(), 0);
+        chrono_native_time_ref_test(
+            chrono::NaiveTime::from_hms_opt(23, 59, 59).unwrap(),
+            86399000000000,
+        );
+        chrono_native_time_ref_test(
+            chrono::NaiveTime::from_hms_nano_opt(0, 0, 0, 123456789).unwrap(),
+            123456789,
+        );
+        chrono_native_time_ref_test(
+            chrono::NaiveTime::from_hms_nano_opt(23, 59, 59, 999999999).unwrap(),
+            86399999999999,
+        );
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn chrono_native_time_ref_test(value: chrono::NaiveTime, expected: u64) {
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::TimeOfDayValue(expected), target0.value().unwrap());
 
         let target = SqlParameter::of("test", Some(&value));
         assert_eq!(target0, target);

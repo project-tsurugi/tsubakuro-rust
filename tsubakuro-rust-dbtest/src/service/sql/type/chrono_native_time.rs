@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod test {
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use chrono::NaiveDate;
+    use chrono::NaiveTime;
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
@@ -11,7 +11,7 @@ mod test {
 
         create_test_table(&client).await;
 
-        let values = generate_values(false);
+        let values = generate_values();
 
         insert_literal(&client, &values).await;
         select(&client, &values, false).await;
@@ -24,7 +24,7 @@ mod test {
 
         create_test_table(&client).await;
 
-        let values = generate_values(true);
+        let values = generate_values();
 
         insert_prepared(&client, &values).await;
         select(&client, &values, false).await;
@@ -35,7 +35,7 @@ mod test {
         create_table(
             &client,
             "test",
-            "create table test (pk int primary key, v date, r int default 999)",
+            "create table test (pk int primary key, v time, r int default 999)",
         )
         .await;
 
@@ -44,32 +44,27 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::Date), c.atom_type());
+        assert_eq!(Some(AtomType::TimeOfDay), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<NaiveDate>)> {
+    fn generate_values() -> Vec<(i32, Option<NaiveTime>)> {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, NaiveDate::from_ymd_opt(2025, 1, 16)));
-        values.push((2, NaiveDate::from_ymd_opt(1970, 1, 1)));
-        values.push((3, NaiveDate::from_ymd_opt(1969, 12, 31)));
-        values.push((4, NaiveDate::from_ymd_opt(1, 1, 1)));
-        values.push((5, NaiveDate::from_ymd_opt(9999, 12, 31)));
-        if minus {
-            values.push((10, NaiveDate::from_ymd_opt(0, 1, 1)));
-            values.push((11, NaiveDate::from_ymd_opt(-1, 1, 1)));
-        }
+        values.push((1, NaiveTime::from_hms_opt(0, 0, 0)));
+        values.push((2, NaiveTime::from_hms_milli_opt(0, 0, 0, 123)));
+        values.push((3, NaiveTime::from_hms_opt(23, 59, 59)));
+        values.push((4, NaiveTime::from_hms_nano_opt(23, 59, 59, 999999999)));
 
         values
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<NaiveDate>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<NaiveTime>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
             let sql = if let Some(v) = &value.1 {
-                format!("insert into test (pk, v) values({}, date'{}')", value.0, v)
+                format!("insert into test (pk, v) values({}, time'{}')", value.0, v)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
             };
@@ -79,13 +74,13 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<NaiveDate>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<NaiveTime>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<NaiveDate>("value"),
+            SqlPlaceholder::of::<NaiveTime>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
@@ -105,7 +100,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<NaiveDate>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<NaiveTime>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -116,7 +111,7 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::Date), c.atom_type());
+        assert_eq!(Some(AtomType::TimeOfDay), c.atom_type());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {

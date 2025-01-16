@@ -401,6 +401,29 @@ impl SqlQueryResultFetch<chrono::NaiveDate> for SqlQueryResult {
     }
 }
 
+#[cfg(feature = "with_chrono")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<chrono::NaiveTime> for SqlQueryResult {
+    /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<chrono::NaiveTime, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveTime, TgError> {
+        let timeout = Timeout::new(timeout);
+        let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
+        let seconds = (value / 1_000_000_000) as u32;
+        let nanos = (value % 1_000_000_000) as u32;
+        let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
+        Ok(value)
+    }
+}
+
 #[async_trait(?Send)] // thread unsafe
 impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
 where
