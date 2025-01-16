@@ -127,6 +127,27 @@ impl SqlParameterOf<&String> for SqlParameter {
     }
 }
 
+impl SqlParameterOf<&[u8]> for SqlParameter {
+    fn of(name: &str, value: &[u8]) -> SqlParameter {
+        let value = Value::OctetValue(value.to_vec());
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+impl SqlParameterOf<Vec<u8>> for SqlParameter {
+    fn of(name: &str, value: Vec<u8>) -> SqlParameter {
+        let value = Value::OctetValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+impl SqlParameterOf<&Vec<u8>> for SqlParameter {
+    fn of(name: &str, value: &Vec<u8>) -> SqlParameter {
+        let value = Value::OctetValue(value.clone());
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl<T> SqlParameterOf<Option<T>> for SqlParameter
 where
     SqlParameter: SqlParameterOf<T>,
@@ -446,6 +467,57 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".to_string().parameter(&"abc".to_string());
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn array_u8() {
+        let value = [0x12_u8, 0x34, 0xef].as_slice();
+        let target0 = SqlParameter::of("test", value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::OctetValue(value.to_vec()), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value);
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn vec_u8() {
+        let value = vec![0x12_u8, 0x34, 0xef];
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::OctetValue(value.clone()), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn vec_u8_ref() {
+        let value = vec![0x12_u8, 0x34, 0xef];
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::OctetValue(value.clone()), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
         assert_eq!(target0, target);
     }
 }

@@ -114,7 +114,7 @@ const HEADER_DECIMAL: i32 = 0xed;
 
 const HEADER_CHARACTER: i32 = 0xf0;
 
-// const HEADER_OCTET: i32 = 0xf1;
+const HEADER_OCTET: i32 = 0xf1;
 
 // const HEADER_BIT: i32 = 0xf2;
 
@@ -170,7 +170,7 @@ const MIN_EMBED_CHARACTER_SIZE: i32 = 0x01;
 
 // const MAX_EMBED_CHARACTER_SIZE: i32 = MASK_EMBED_CHARACTER + MIN_EMBED_CHARACTER_SIZE;
 
-// const MIN_EMBED_OCTET_SIZE: i32 = 0x01;
+const MIN_EMBED_OCTET_SIZE: i32 = 0x01;
 
 // const MAX_EMBED_OCTET_SIZE: i32 = MASK_EMBED_OCTET + MIN_EMBED_OCTET_SIZE;
 
@@ -421,6 +421,16 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    pub(crate) async fn fetch_octet_value(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<BytesMut, TgError> {
+        self.require_column_type(EntryType::Octet)?;
+        let value = self.read_octet(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
     fn require_column_type(&self, expected: EntryType) -> Result<(), TgError> {
         let found = self.current_column_type;
         if found == EntryType::Nothing {
@@ -492,12 +502,12 @@ impl ResultSetValueStream {
                 self.read_character(timeout).await?;
                 Ok(true)
             }
-
+            EntryType::Octet => {
+                self.read_octet(timeout).await?;
+                Ok(true)
+            }
             // case BIT:
             //     readBit(bitBuilder);
-            //     return true;
-            // case OCTET:
-            //     readOctet(byteBuilder);
             //     return true;
 
             // case DATE:
@@ -650,6 +660,27 @@ impl ResultSetValueStream {
         }
 
         debug_assert_eq!(category, HEADER_CHARACTER);
+        self.read_size(timeout).await
+    }
+
+    async fn read_octet(&mut self, timeout: &Timeout) -> Result<BytesMut, TgError> {
+        self.require(EntryType::Octet)?;
+        let size = self.read_octet_size(timeout).await?;
+
+        let buffer = self.read_n(size as usize, timeout).await?;
+        Ok(buffer)
+    }
+
+    async fn read_octet_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
+        let category = self.current_header_category;
+        let payload = self.current_header_payload;
+        self.clear_header_info();
+
+        if category == HEADER_EMBED_OCTET {
+            return Ok(payload + MIN_EMBED_OCTET_SIZE);
+        }
+
+        debug_assert_eq!(category, HEADER_OCTET);
         self.read_size(timeout).await
     }
 

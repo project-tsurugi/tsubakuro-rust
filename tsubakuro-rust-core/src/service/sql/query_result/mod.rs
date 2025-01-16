@@ -14,7 +14,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use bigdecimal::FromPrimitive;
-use prost::Message;
+use prost::{bytes::BytesMut, Message};
 use std::{sync::Arc, time::Duration};
 use value_stream::ResultSetValueStream;
 
@@ -334,6 +334,46 @@ impl SqlQueryResultFetch<String> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<String, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_character_value(&timeout).await
+    }
+}
+
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<BytesMut> for SqlQueryResult {
+    /// Retrieves a `OCTET` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<BytesMut, TgError> {
+        let timeout = Timeout::new(self.default_timeout);
+        self.value_stream.fetch_octet_value(&timeout).await
+    }
+
+    /// Retrieves a `OCTET` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<BytesMut, TgError> {
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_octet_value(&timeout).await
+    }
+}
+
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<Vec<u8>> for SqlQueryResult {
+    /// Retrieves a `OCTET` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<Vec<u8>, TgError> {
+        let timeout = Timeout::new(self.default_timeout);
+        let value = self.value_stream.fetch_octet_value(&timeout).await?;
+        Ok(value.to_vec())
+    }
+
+    /// Retrieves a `OCTET` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<Vec<u8>, TgError> {
+        let timeout = Timeout::new(timeout);
+        let value = self.value_stream.fetch_octet_value(&timeout).await?;
+        Ok(value.to_vec())
     }
 }
 

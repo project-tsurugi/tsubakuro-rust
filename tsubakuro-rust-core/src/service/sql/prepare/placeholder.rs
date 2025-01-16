@@ -100,6 +100,18 @@ impl AtomTypeProvider for String {
     }
 }
 
+impl AtomTypeProvider for &[u8] {
+    fn atom_type() -> AtomType {
+        AtomType::Octet
+    }
+}
+
+impl AtomTypeProvider for Vec<u8> {
+    fn atom_type() -> AtomType {
+        AtomType::Octet
+    }
+}
+
 pub trait SqlPlaceholderBind {
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
@@ -238,6 +250,32 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<String>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn array_u8() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Octet);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Octet, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<&[u8]>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<&[u8]>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn vec_u8() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Octet);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Octet, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<Vec<u8>>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<Vec<u8>>();
         assert_eq!(target0, target);
     }
 }

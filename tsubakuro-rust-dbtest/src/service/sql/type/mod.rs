@@ -1,5 +1,6 @@
 mod bigdecimal0;
 mod bigdecimal1;
+mod binary;
 mod boolean;
 mod char;
 mod float4;
@@ -8,4 +9,5 @@ mod int4;
 mod int8;
 mod rust_decimal0;
 mod rust_decimal1;
+mod varbinary;
 mod varchar;
