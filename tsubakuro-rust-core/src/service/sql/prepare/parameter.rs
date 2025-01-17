@@ -1,6 +1,7 @@
 use chrono::Datelike;
 
 use crate::jogasaki::proto::sql::common::Decimal as ProtoDecimal;
+use crate::jogasaki::proto::sql::common::TimeOfDayWithTimeZone as ProtoTimeOfDayWithTimeZone;
 use crate::jogasaki::proto::sql::common::TimePoint as ProtoTimePoint;
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
@@ -207,6 +208,34 @@ impl SqlParameterOf<&chrono::NaiveDateTime> for SqlParameter {
             nano_adjustment: nanos,
         };
         let value = Value::TimePointValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+#[cfg(feature = "with_chrono")]
+impl SqlParameterOf<(chrono::NaiveTime, chrono::FixedOffset)> for SqlParameter {
+    fn of(name: &str, value: (chrono::NaiveTime, chrono::FixedOffset)) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_chrono")]
+impl SqlParameterOf<&(chrono::NaiveTime, chrono::FixedOffset)> for SqlParameter {
+    fn of(name: &str, value: &(chrono::NaiveTime, chrono::FixedOffset)) -> SqlParameter {
+        use chrono::Timelike;
+
+        let time = value.0;
+        let offset = value.1;
+
+        let seconds = time.num_seconds_from_midnight() as u64;
+        let nano = time.nanosecond() as u64;
+        let time_zone_offset_minutes = offset.local_minus_utc() / 60;
+
+        let value = ProtoTimeOfDayWithTimeZone {
+            offset_nanoseconds: seconds * 1_000_000_000 + nano,
+            time_zone_offset: time_zone_offset_minutes,
+        };
+        let value = Value::TimeOfDayWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
 }
@@ -734,6 +763,85 @@ mod test {
             &Value::TimePointValue(ProtoTimePoint {
                 offset_seconds: expected_sec,
                 nano_adjustment: nano
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_time_with_offset() {
+        use std::str::FromStr;
+
+        let time = chrono::NaiveTime::from_hms_nano_opt(17, 42, 30, 123456789).unwrap();
+        let offset = chrono::FixedOffset::from_str("+09:00").unwrap();
+        let value = (time, offset);
+
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimeOfDayWithTimeZoneValue(ProtoTimeOfDayWithTimeZone {
+                offset_nanoseconds: (((17 * 60) + 42) * 60 + 30) * 1_000_000_000 + 123456789,
+                time_zone_offset: 9 * 60
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_native_time_with_offset_ref() {
+        chrono_native_time_with_offset_ref_test(17, 42, 30, 123456789, 9);
+        chrono_native_time_with_offset_ref_test(0, 0, 0, 0, 9);
+        chrono_native_time_with_offset_ref_test(23, 59, 59, 999999999, 9);
+        chrono_native_time_with_offset_ref_test(17, 42, 30, 123456789, -9);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn chrono_native_time_with_offset_ref_test(
+        hour: u32,
+        min: u32,
+        sec: u32,
+        nano: u32,
+        offset_hour: i32,
+    ) {
+        use std::str::FromStr;
+
+        let time = chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap();
+        let offset = if offset_hour >= 0 {
+            format!("+{:02}:00", offset_hour)
+        } else {
+            format!("-{:02}:00", offset_hour.abs())
+        };
+        let offset = chrono::FixedOffset::from_str(&offset).unwrap();
+        let value = (time, offset);
+
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimeOfDayWithTimeZoneValue(ProtoTimeOfDayWithTimeZone {
+                offset_nanoseconds: (((hour as u64 * 60) + min as u64) * 60 + sec as u64)
+                    * 1_000_000_000
+                    + nano as u64,
+                time_zone_offset: offset_hour * 60
             }),
             target0.value().unwrap()
         );

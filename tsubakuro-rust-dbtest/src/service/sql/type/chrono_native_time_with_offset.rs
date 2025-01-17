@@ -1,0 +1,193 @@
+#[cfg(test)]
+mod test {
+    use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
+    use chrono::{FixedOffset, NaiveTime, TimeZone};
+    use tokio::test;
+    use tsubakuro_rust_core::prelude::*;
+
+    // #[test] // TODO 'time with time zone' literal
+    async fn _literal() {
+        let client = create_test_sql_client().await;
+
+        create_test_table(&client).await;
+
+        let values = generate_values();
+
+        _insert_literal(&client, &values).await;
+        select(&client, &values, false).await;
+        select(&client, &values, true).await;
+    }
+
+    #[test]
+    async fn prepare() {
+        let client = create_test_sql_client().await;
+
+        create_test_table(&client).await;
+
+        let values = generate_values();
+
+        insert_prepared(&client, &values).await;
+        select(&client, &values, false).await;
+        select(&client, &values, true).await;
+    }
+
+    async fn create_test_table(client: &SqlClient) {
+        create_table(
+            &client,
+            "test",
+            "create table test (pk int primary key, v time with time zone, r int default 999)",
+        )
+        .await;
+
+        let metadata = client.get_table_metadata("test").await.unwrap();
+        let columns = metadata.columns();
+        assert_eq!(3, columns.len());
+        let c = &columns[1];
+        assert_eq!("v", c.name());
+        assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
+    }
+
+    fn generate_values() -> Vec<(i32, Option<(NaiveTime, FixedOffset)>)> {
+        let mut values = vec![];
+
+        values.push((0, None));
+        values.push((1, Some(native_time_with_offset(0, 0, 0, 0, 0))));
+        values.push((2, Some(native_time_with_offset(0, 0, 0, 0, 9))));
+        values.push((3, Some(native_time_with_offset(0, 0, 0, 0, -9))));
+        values.push((4, Some(native_time_with_offset(23, 59, 59, 999_999_999, 0))));
+        values.push((5, Some(native_time_with_offset(23, 59, 59, 999_999_999, 9))));
+        values.push((
+            6,
+            Some(native_time_with_offset(23, 59, 59, 999_999_999, -9)),
+        ));
+
+        values
+    }
+
+    fn native_time_with_offset(
+        hour: u32,
+        min: u32,
+        sec: u32,
+        nano: u32,
+        offset_hour: i32,
+    ) -> (NaiveTime, FixedOffset) {
+        let time = NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap();
+        let offset_secs = offset_hour * 60 * 60;
+        let offset = if offset_secs >= 0 {
+            FixedOffset::east_opt(offset_secs).unwrap()
+        } else {
+            FixedOffset::west_opt(-offset_secs).unwrap()
+        };
+        (time, offset)
+    }
+
+    async fn _insert_literal(
+        client: &SqlClient,
+        values: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
+    ) {
+        let transaction = start_occ(&client).await;
+
+        for value in values {
+            let sql = if let Some((v, offset)) = &value.1 {
+                format!(
+                    "insert into test (pk, v) values({}, time with time zone'{}{}')",
+                    value.0, v, offset
+                )
+            } else {
+                format!("insert into test (pk, v) values({}, null)", value.0)
+            };
+            client.execute(&transaction, &sql).await.unwrap();
+        }
+
+        commit_and_close(client, &transaction).await;
+    }
+
+    async fn insert_prepared(
+        client: &SqlClient,
+        values: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
+    ) {
+        let transaction = start_occ(&client).await;
+
+        let sql = "insert into test (pk, v) values(:pk, :value)";
+        let placeholders = vec![
+            SqlPlaceholder::of::<i32>("pk"),
+            SqlPlaceholder::of::<(NaiveTime, FixedOffset)>("value"),
+        ];
+        let ps = client.prepare(sql, placeholders).await.unwrap();
+
+        for value in values {
+            let parameters = vec![
+                SqlParameter::of("pk", value.0),
+                SqlParameter::of("value", value.1.as_ref()),
+            ];
+            client
+                .prepared_execute(&transaction, &ps, parameters)
+                .await
+                .unwrap();
+        }
+
+        commit_and_close(client, &transaction).await;
+
+        ps.close().await.unwrap();
+    }
+
+    async fn select(
+        client: &SqlClient,
+        expected: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
+        skip: bool,
+    ) {
+        let sql = "select * from test order by pk";
+        let transaction = start_occ(&client).await;
+
+        let mut query_result = client.query(&transaction, sql).await.unwrap();
+
+        let metadata = query_result.get_metadata().unwrap();
+        let columns = metadata.columns();
+        assert_eq!(3, columns.len());
+        let c = &columns[1];
+        assert_eq!("v", c.name());
+        assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
+
+        let mut i = 0;
+        while query_result.next_row().await.unwrap() {
+            let expected = &expected[i];
+
+            assert_eq!(true, query_result.next_column().await.unwrap());
+            let pk = query_result.fetch().await.unwrap();
+            assert_eq!(expected.0, pk);
+
+            assert_eq!(true, query_result.next_column().await.unwrap());
+            if !skip {
+                let v = query_result.fetch().await.unwrap();
+                assert_eq!(to_z(expected.1), v);
+            }
+
+            assert_eq!(true, query_result.next_column().await.unwrap());
+            let r = query_result.fetch().await.unwrap();
+            assert_eq!(999, r);
+
+            i += 1;
+        }
+        assert_eq!(expected.len(), i);
+
+        commit_and_close(client, &transaction).await;
+    }
+
+    fn to_z(value: Option<(NaiveTime, FixedOffset)>) -> Option<(NaiveTime, FixedOffset)> {
+        if value.is_none() {
+            return None;
+        }
+        let value = value.unwrap();
+
+        let native_date_time = chrono::NaiveDate::from_ymd_opt(1970, 1, 1)
+            .unwrap()
+            .and_time(value.0);
+        let date_time = value.1.from_local_datetime(&native_date_time).unwrap();
+        let utc_date_time = date_time.with_timezone(&chrono::Utc);
+        let utc_time = utc_date_time.time();
+
+        let utc_offset = FixedOffset::east_opt(0).unwrap();
+
+        Some((utc_time, utc_offset))
+    }
+}

@@ -444,6 +444,45 @@ impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
     }
 }
 
+#[cfg(feature = "with_chrono")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryResult {
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<(chrono::NaiveTime, chrono::FixedOffset), TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<(chrono::NaiveTime, chrono::FixedOffset), TgError> {
+        let timeout = Timeout::new(timeout);
+        let (time, offset_minutes) = self
+            .value_stream
+            .fetch_time_of_day_with_time_zone_value(&timeout)
+            .await?;
+
+        let seconds = (time / 1_000_000_000) as u32;
+        let nanos = (time % 1_000_000_000) as u32;
+        let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
+
+        let offset_seconds = offset_minutes * 60;
+        let offset = if offset_minutes >= 0 {
+            chrono::FixedOffset::east_opt(offset_seconds)
+        } else {
+            chrono::FixedOffset::west_opt(-offset_seconds)
+        }
+        .unwrap();
+
+        Ok((value, offset))
+    }
+}
+
 #[async_trait(?Send)] // thread unsafe
 impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
 where

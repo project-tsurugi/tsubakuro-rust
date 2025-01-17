@@ -6,6 +6,7 @@ mod char;
 mod chrono_native_date;
 mod chrono_native_date_time;
 mod chrono_native_time;
+mod chrono_native_time_with_offset;
 mod float4;
 mod float8;
 mod int4;
