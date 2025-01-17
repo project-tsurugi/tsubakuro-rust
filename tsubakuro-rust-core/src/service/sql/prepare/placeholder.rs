@@ -154,6 +154,13 @@ impl AtomTypeProvider for time::Date {
     }
 }
 
+#[cfg(feature = "with_time")]
+impl AtomTypeProvider for time::Time {
+    fn atom_type() -> AtomType {
+        AtomType::TimeOfDay
+    }
+}
+
 pub trait SqlPlaceholderBind {
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
@@ -408,6 +415,20 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<time::Date>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_time() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimeOfDay);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::TimeOfDay, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<time::Time>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<time::Time>();
         assert_eq!(target0, target);
     }
 }

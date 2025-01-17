@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod test {
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use chrono::NaiveTime;
+    use time::Time;
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
@@ -47,7 +47,7 @@ mod test {
         assert_eq!(Some(AtomType::TimeOfDay), c.atom_type());
     }
 
-    fn generate_values() -> Vec<(i32, Option<NaiveTime>)> {
+    fn generate_values() -> Vec<(i32, Option<Time>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -59,11 +59,11 @@ mod test {
         values
     }
 
-    fn time(hour: u32, min: u32, sec: u32, nano: u32) -> NaiveTime {
-        NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap()
+    fn time(hour: u8, min: u8, sec: u8, nano: u32) -> Time {
+        Time::from_hms_nano(hour, min, sec, nano).unwrap()
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<NaiveTime>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<Time>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
@@ -78,13 +78,13 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<NaiveTime>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<Time>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<NaiveTime>("value"),
+            SqlPlaceholder::of::<Time>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
@@ -104,7 +104,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<NaiveTime>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<Time>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 

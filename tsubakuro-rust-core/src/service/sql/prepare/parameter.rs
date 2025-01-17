@@ -282,13 +282,30 @@ impl SqlParameterOf<time::Date> for SqlParameter {
 // const TIME_EPOCH_START_DATE: Result<time::Date, time::error::ComponentRange> =
 //     time::Date::from_ordinal_date(1970, 1);
 
-#[cfg(feature = "with_chrono")]
+#[cfg(feature = "with_time")]
 impl SqlParameterOf<&time::Date> for SqlParameter {
     fn of(name: &str, value: &time::Date) -> SqlParameter {
         // let days = *value - TIME_EPOCH_START_DATE.unwrap();
         // let days = days.whole_days();
         let days = value.to_julian_day() - /* Date(1970-01-01).to_julian_day() */ 2440588;
         let value = Value::DateValue(days as i64);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<time::Time> for SqlParameter {
+    fn of(name: &str, value: time::Time) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<&time::Time> for SqlParameter {
+    fn of(name: &str, value: &time::Time) -> SqlParameter {
+        let (hour, minute, second, nano) = value.as_hms_nano();
+        let seconds = ((hour as u64) * 60 + minute as u64) * 60 + second as u64;
+        let value = Value::TimeOfDayValue(seconds * 1_000_000_000 + nano as u64);
         SqlParameter::new(name, Some(value))
     }
 }
@@ -1015,6 +1032,58 @@ mod test {
         let target0 = SqlParameter::of("test", &value);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::DateValue(expected), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_time() {
+        let value = time::Time::from_hms_milli(16, 24, 30, 456).unwrap();
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimeOfDayValue(59070456000000),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_time_ref() {
+        time_time_ref_test(time::Time::from_hms(0, 0, 0).unwrap(), 0);
+        time_time_ref_test(time::Time::from_hms(23, 59, 59).unwrap(), 86399000000000);
+        time_time_ref_test(
+            time::Time::from_hms_nano(0, 0, 0, 123456789).unwrap(),
+            123456789,
+        );
+        time_time_ref_test(
+            time::Time::from_hms_nano(23, 59, 59, 999999999).unwrap(),
+            86399999999999,
+        );
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_time_ref_test(value: time::Time, expected: u64) {
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::TimeOfDayValue(expected), target0.value().unwrap());
 
         let target = SqlParameter::of("test", Some(&value));
         assert_eq!(target0, target);

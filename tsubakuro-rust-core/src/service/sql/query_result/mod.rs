@@ -562,6 +562,37 @@ impl SqlQueryResultFetch<time::Date> for SqlQueryResult {
     }
 }
 
+#[cfg(feature = "with_time")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<time::Time> for SqlQueryResult {
+    /// Retrieves a `TIME` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<time::Time, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<time::Time, TgError> {
+        let timeout = Timeout::new(timeout);
+        let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
+
+        let nanosecond = value % 1000_000_000;
+        let value = value / 1000_000_000;
+        let second = value % 60;
+        let value = value / 60;
+        let minute = value % 60;
+        let hour = value / 60;
+
+        let value =
+            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanosecond as u32)
+                .unwrap();
+        Ok(value)
+    }
+}
+
 #[async_trait(?Send)] // thread unsafe
 impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
 where
