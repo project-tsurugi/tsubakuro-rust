@@ -10,6 +10,7 @@ chrono = { version = "0.4.39", optional = true }
 log = "0.4.22"
 prost = "0.13.3"
 rust_decimal = { version = "1.36.0", optional = true }
+time =  { version = "0.3.37", optional = true }
 tokio = { version = "1.42.0", features = ["full"] }
 url = "2.5.4"
 
@@ -17,8 +18,9 @@ url = "2.5.4"
 prost-build = "0.13.3"
 
 [features]
-default = ["with_bigdecimal", "with_rust_decimal", "with_chrono"]
+default = ["with_bigdecimal", "with_rust_decimal", "with_chrono", "with_time"]
 
 with_bigdecimal = ["bigdecimal"]
 with_rust_decimal = ["rust_decimal"]
 with_chrono = ["chrono"]
+with_time = ["time"]

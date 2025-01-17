@@ -51,17 +51,21 @@ mod test {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, NaiveDate::from_ymd_opt(2025, 1, 16)));
-        values.push((2, NaiveDate::from_ymd_opt(1970, 1, 1)));
-        values.push((3, NaiveDate::from_ymd_opt(1969, 12, 31)));
-        values.push((4, NaiveDate::from_ymd_opt(1, 1, 1)));
-        values.push((5, NaiveDate::from_ymd_opt(9999, 12, 31)));
+        values.push((1, Some(date(2025, 1, 16))));
+        values.push((2, Some(date(1970, 1, 1))));
+        values.push((3, Some(date(1969, 12, 31))));
+        values.push((4, Some(date(1, 1, 1))));
+        values.push((5, Some(date(9999, 12, 31))));
         if minus {
-            values.push((10, NaiveDate::from_ymd_opt(0, 1, 1)));
-            values.push((11, NaiveDate::from_ymd_opt(-1, 1, 1)));
+            values.push((10, Some(date(0, 1, 1))));
+            values.push((11, Some(date(-1, 1, 1))));
         }
 
         values
+    }
+
+    fn date(year: i32, month: u32, day: u32) -> NaiveDate {
+        NaiveDate::from_ymd_opt(year, month, day).unwrap()
     }
 
     async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<NaiveDate>)>) {

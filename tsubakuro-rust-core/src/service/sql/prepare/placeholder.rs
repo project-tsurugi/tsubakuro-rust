@@ -147,6 +147,13 @@ impl<Tz: chrono::TimeZone> AtomTypeProvider for chrono::DateTime<Tz> {
     }
 }
 
+#[cfg(feature = "with_time")]
+impl AtomTypeProvider for time::Date {
+    fn atom_type() -> AtomType {
+        AtomType::Date
+    }
+}
+
 pub trait SqlPlaceholderBind {
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
@@ -387,6 +394,20 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<chrono::DateTime<chrono::FixedOffset>>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_date() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Date);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Date, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<time::Date>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<time::Date>();
         assert_eq!(target0, target);
     }
 }

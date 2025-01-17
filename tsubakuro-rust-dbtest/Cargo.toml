@@ -8,5 +8,6 @@ bigdecimal = "0.4.7"
 chrono = "0.4.39"
 env_logger = "0.11.6"
 rust_decimal = "1.36.0"
+time = "0.3.37"
 tokio = "1.42.0"
 tsubakuro-rust-core = { path = "../tsubakuro-rust-core" }

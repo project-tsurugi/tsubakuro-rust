@@ -271,6 +271,28 @@ impl<Tz: chrono::TimeZone> SqlParameterOf<&chrono::DateTime<Tz>> for SqlParamete
     }
 }
 
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<time::Date> for SqlParameter {
+    fn of(name: &str, value: time::Date) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+// #[cfg(feature = "with_time")]
+// const TIME_EPOCH_START_DATE: Result<time::Date, time::error::ComponentRange> =
+//     time::Date::from_ordinal_date(1970, 1);
+
+#[cfg(feature = "with_chrono")]
+impl SqlParameterOf<&time::Date> for SqlParameter {
+    fn of(name: &str, value: &time::Date) -> SqlParameter {
+        // let days = *value - TIME_EPOCH_START_DATE.unwrap();
+        // let days = days.whole_days();
+        let days = value.to_julian_day() - /* Date(1970-01-01).to_julian_day() */ 2440588;
+        let value = Value::DateValue(days as i64);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl<T> SqlParameterOf<Option<T>> for SqlParameter
 where
     SqlParameter: SqlParameterOf<T>,
@@ -952,7 +974,55 @@ mod test {
     ) -> chrono::DateTime<chrono::FixedOffset> {
         use std::str::FromStr;
 
-        let s=format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nano:09} +{offset_hour:02}:00");
+        let s = format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nano:09} +{offset_hour:02}:00");
         chrono::DateTime::from_str(&s).unwrap()
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_date() {
+        let value = time::Date::from_calendar_date(2025, time::Month::January, 16).unwrap();
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::DateValue(20104), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_date_ref() {
+        time_date_ref_test(2025, 1, 16, 20104);
+        time_date_ref_test(1970, 1, 1, 0);
+        time_date_ref_test(1969, 12, 31, -1);
+        time_date_ref_test(0, 1, 1, -719528);
+        time_date_ref_test(9999, 12, 31, 2932896);
+        time_date_ref_test(-9999, 1, 1, -4371587);
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_date_ref_test(year: i32, month: u8, day: u8, expected: i64) {
+        let value =
+            time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
+                .unwrap();
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(&Value::DateValue(expected), target0.value().unwrap());
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
     }
 }

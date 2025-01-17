@@ -540,6 +540,28 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::Utc>> for SqlQueryResult {
     }
 }
 
+#[cfg(feature = "with_time")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<time::Date> for SqlQueryResult {
+    /// Retrieves a `DATE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<time::Date, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `DATE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<time::Date, TgError> {
+        let timeout = Timeout::new(timeout);
+        let value = self.value_stream.fetch_date_value(&timeout).await?;
+        let days = value + /* Date(1970-01-01).to_julian_day() */ 2440588;
+        let value = time::Date::from_julian_day(days as i32).unwrap();
+        Ok(value)
+    }
+}
+
 #[async_trait(?Send)] // thread unsafe
 impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
 where
