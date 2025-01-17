@@ -1,19 +1,21 @@
 #[cfg(test)]
 mod test {
+    use std::str::FromStr;
+
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use chrono::{FixedOffset, NaiveTime, TimeZone};
+    use chrono::{DateTime, FixedOffset};
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
-    // #[test] // TODO 'time with time zone' literal
-    async fn _literal() {
+    #[test]
+    async fn literal() {
         let client = create_test_sql_client().await;
 
         create_test_table(&client).await;
 
-        let values = generate_values();
+        let values = generate_values(false);
 
-        _insert_literal(&client, &values).await;
+        insert_literal(&client, &values).await;
         select(&client, &values, false).await;
         select(&client, &values, true).await;
     }
@@ -24,7 +26,7 @@ mod test {
 
         create_test_table(&client).await;
 
-        let values = generate_values();
+        let values = generate_values(true);
 
         insert_prepared(&client, &values).await;
         select(&client, &values, false).await;
@@ -35,7 +37,7 @@ mod test {
         create_table(
             &client,
             "test",
-            "create table test (pk int primary key, v time with time zone, r int default 999)",
+            "create table test (pk int primary key, v timestamp with time zone, r int default 999)",
         )
         .await;
 
@@ -44,54 +46,53 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
+        assert_eq!(Some(AtomType::TimePointWithTimeZone), c.atom_type());
     }
 
-    fn generate_values() -> Vec<(i32, Option<(NaiveTime, FixedOffset)>)> {
+    fn generate_values(minus: bool) -> Vec<(i32, Option<DateTime<FixedOffset>>)> {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, Some(native_time_with_offset(0, 0, 0, 0, 0))));
-        values.push((2, Some(native_time_with_offset(0, 0, 0, 0, 9))));
-        values.push((3, Some(native_time_with_offset(0, 0, 0, 0, -9))));
-        values.push((4, Some(native_time_with_offset(23, 59, 59, 999_999_999, 0))));
-        values.push((5, Some(native_time_with_offset(23, 59, 59, 999_999_999, 9))));
-        values.push((
-            6,
-            Some(native_time_with_offset(23, 59, 59, 999_999_999, -9)),
-        ));
+        values.push((1, Some(date_time(2025, 1, 16, 18, 9, 30, 123456789, 9))));
+        values.push((2, Some(date_time(1970, 1, 1, 0, 0, 0, 0, 0))));
+        values.push((3, Some(date_time(1969, 12, 31, 23, 59, 59, 999999999, 0))));
+        values.push((4, Some(date_time(1, 1, 1, 0, 0, 0, 0, 0))));
+        values.push((5, Some(date_time(9999, 12, 31, 23, 59, 59, 999999999, 0))));
+        if minus {
+            values.push((10, Some(date_time(0, 1, 1, 0, 0, 0, 0, 9))));
+            values.push((11, Some(date_time(-1, 1, 1, 0, 0, 0, 0, 9))));
+        }
 
         values
     }
 
-    fn native_time_with_offset(
+    fn date_time(
+        year: i32,
+        month: u32,
+        day: u32,
         hour: u32,
         min: u32,
         sec: u32,
         nano: u32,
         offset_hour: i32,
-    ) -> (NaiveTime, FixedOffset) {
-        let time = NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap();
-        let offset_secs = offset_hour * 60 * 60;
-        let offset = if offset_secs >= 0 {
-            FixedOffset::east_opt(offset_secs).unwrap()
-        } else {
-            FixedOffset::west_opt(-offset_secs).unwrap()
-        };
-        (time, offset)
+    ) -> DateTime<FixedOffset> {
+        let s=format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nano:09} +{offset_hour:02}:00");
+        DateTime::from_str(&s).unwrap()
     }
 
-    async fn _insert_literal(
+    async fn insert_literal(
         client: &SqlClient,
-        values: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
+        values: &Vec<(i32, Option<DateTime<FixedOffset>>)>,
     ) {
         let transaction = start_occ(&client).await;
 
         for value in values {
-            let sql = if let Some((v, offset)) = &value.1 {
+            let sql = if let Some(v) = &value.1 {
                 format!(
-                    "insert into test (pk, v) values({}, time with time zone'{}{}')",
-                    value.0, v, offset
+                    "insert into test (pk, v) values({}, timestamp with time zone'{}{}')",
+                    value.0,
+                    v.naive_local(),
+                    v.offset()
                 )
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
@@ -104,14 +105,14 @@ mod test {
 
     async fn insert_prepared(
         client: &SqlClient,
-        values: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
+        values: &Vec<(i32, Option<DateTime<FixedOffset>>)>,
     ) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<(NaiveTime, FixedOffset)>("value"),
+            SqlPlaceholder::of::<DateTime<FixedOffset>>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
@@ -133,7 +134,7 @@ mod test {
 
     async fn select(
         client: &SqlClient,
-        expected: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
+        expected: &Vec<(i32, Option<DateTime<FixedOffset>>)>,
         skip: bool,
     ) {
         let sql = "select * from test order by pk";
@@ -146,7 +147,7 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
+        assert_eq!(Some(AtomType::TimePointWithTimeZone), c.atom_type());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {
@@ -173,21 +174,15 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    fn to_z(value: Option<(NaiveTime, FixedOffset)>) -> Option<(NaiveTime, FixedOffset)> {
+    fn to_z(value: Option<DateTime<FixedOffset>>) -> Option<DateTime<FixedOffset>> {
         if value.is_none() {
             return None;
         }
         let value = value.unwrap();
 
-        let native_date_time = chrono::NaiveDate::from_ymd_opt(1970, 1, 1)
-            .unwrap()
-            .and_time(value.0);
-        let date_time = value.1.from_local_datetime(&native_date_time).unwrap();
-        let utc_date_time = date_time.with_timezone(&chrono::Utc);
-        let utc_time = utc_date_time.time();
-
         let utc_offset = FixedOffset::east_opt(0).unwrap();
+        let utc = value.with_timezone(&utc_offset);
 
-        Some((utc_time, utc_offset))
+        Some(utc)
     }
 }

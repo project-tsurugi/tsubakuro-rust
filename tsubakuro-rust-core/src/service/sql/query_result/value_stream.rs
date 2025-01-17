@@ -468,6 +468,16 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    pub(crate) async fn fetch_time_point_with_time_zone_value(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(i64, i32, i32), TgError> {
+        self.require_column_type(EntryType::TimePointWithTimeZone)?;
+        let value = self.read_time_point_with_time_zone(timeout).await?;
+        self.column_consumed();
+        Ok(value)
+    }
+
     fn require_column_type(&self, expected: EntryType) -> Result<(), TgError> {
         let found = self.current_column_type;
         if found == EntryType::Nothing {
@@ -562,9 +572,10 @@ impl ResultSetValueStream {
                 self.read_time_of_day_with_time_zone(timeout).await?;
                 Ok(true)
             }
-            // case TIME_POINT_WITH_TIME_ZONE:
-            //     readTimePointWithTimeZone();
-            //     return true;
+            EntryType::TimePointWithTimeZone => {
+                self.read_time_point_with_time_zone(timeout).await?;
+                Ok(true)
+            }
             // case DATETIME_INTERVAL:
             //     readDateTimeInterval();
             //     return true;
@@ -756,6 +767,19 @@ impl ResultSetValueStream {
         let time_zone_offset_minutes =
             Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
         Ok((epoch_nanos, time_zone_offset_minutes as i32))
+    }
+
+    async fn read_time_point_with_time_zone(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(i64, i32, i32), TgError> {
+        self.require(EntryType::TimePointWithTimeZone)?;
+        self.clear_header_info();
+        let epoch_seconds = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
+        let nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
+        let time_zone_offset_minutes =
+            Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
+        Ok((epoch_seconds, nanos as i32, time_zone_offset_minutes as i32))
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<i32, TgError> {

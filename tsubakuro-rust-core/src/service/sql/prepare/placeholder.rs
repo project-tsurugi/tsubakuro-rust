@@ -140,6 +140,13 @@ impl AtomTypeProvider for (chrono::NaiveTime, chrono::FixedOffset) {
     }
 }
 
+#[cfg(feature = "with_chrono")]
+impl<Tz: chrono::TimeZone> AtomTypeProvider for chrono::DateTime<Tz> {
+    fn atom_type() -> AtomType {
+        AtomType::TimePointWithTimeZone
+    }
+}
+
 pub trait SqlPlaceholderBind {
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
@@ -309,7 +316,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_date() {
+    fn chrono_naive_date() {
         let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Date);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(AtomType::Date, target0.atom_type().unwrap());
@@ -323,7 +330,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_time() {
+    fn chrono_naive_time() {
         let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimeOfDay);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(AtomType::TimeOfDay, target0.atom_type().unwrap());
@@ -337,7 +344,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_date_time() {
+    fn chrono_naive_date_time() {
         let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimePoint);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(AtomType::TimePoint, target0.atom_type().unwrap());
@@ -351,7 +358,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_time_with_offset() {
+    fn chrono_naive_time_with_offset() {
         let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimeOfDayWithTimeZone);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(
@@ -363,6 +370,23 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<(chrono::NaiveTime, chrono::FixedOffset)>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_date_time() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimePointWithTimeZone);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            AtomType::TimePointWithTimeZone,
+            target0.atom_type().unwrap()
+        );
+
+        let target = SqlPlaceholder::of::<chrono::DateTime<chrono::FixedOffset>>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<chrono::DateTime<chrono::FixedOffset>>();
         assert_eq!(target0, target);
     }
 }

@@ -51,26 +51,26 @@ mod test {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, Some(native_date_time(2025, 1, 16, 18, 9, 30, 123456789))));
-        values.push((2, Some(native_date_time(1970, 1, 1, 0, 0, 0, 0))));
+        values.push((1, Some(naive_date_time(2025, 1, 16, 18, 9, 30, 123456789))));
+        values.push((2, Some(naive_date_time(1970, 1, 1, 0, 0, 0, 0))));
         values.push((
             3,
-            Some(native_date_time(1969, 12, 31, 23, 59, 59, 999999999)),
+            Some(naive_date_time(1969, 12, 31, 23, 59, 59, 999999999)),
         ));
-        values.push((4, Some(native_date_time(1, 1, 1, 0, 0, 0, 0))));
+        values.push((4, Some(naive_date_time(1, 1, 1, 0, 0, 0, 0))));
         values.push((
             5,
-            Some(native_date_time(9999, 12, 31, 23, 59, 59, 999999999)),
+            Some(naive_date_time(9999, 12, 31, 23, 59, 59, 999999999)),
         ));
         if minus {
-            values.push((10, Some(native_date_time(0, 1, 1, 0, 0, 0, 0))));
-            values.push((11, Some(native_date_time(-1, 1, 1, 0, 0, 0, 0))));
+            values.push((10, Some(naive_date_time(0, 1, 1, 0, 0, 0, 0))));
+            values.push((11, Some(naive_date_time(-1, 1, 1, 0, 0, 0, 0))));
         }
 
         values
     }
 
-    fn native_date_time(
+    fn naive_date_time(
         year: i32,
         month: u32,
         day: u32,

@@ -483,6 +483,63 @@ impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryR
     }
 }
 
+#[cfg(feature = "with_chrono")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<chrono::DateTime<chrono::FixedOffset>> for SqlQueryResult {
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<chrono::DateTime<chrono::FixedOffset>, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<chrono::DateTime<chrono::FixedOffset>, TgError> {
+        let timeout = Timeout::new(timeout);
+        let (epoch_seconds, nanos, offset_minutes) = self
+            .value_stream
+            .fetch_time_point_with_time_zone_value(&timeout)
+            .await?;
+        let value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32).unwrap();
+        let offset_seconds = offset_minutes * 60;
+        let offset = if offset_minutes >= 0 {
+            chrono::FixedOffset::east_opt(offset_seconds)
+        } else {
+            chrono::FixedOffset::west_opt(-offset_seconds)
+        }
+        .unwrap();
+        let value = value.with_timezone(&offset);
+        Ok(value)
+    }
+}
+
+#[cfg(feature = "with_chrono")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<chrono::DateTime<chrono::Utc>> for SqlQueryResult {
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<chrono::DateTime<chrono::Utc>, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<chrono::DateTime<chrono::Utc>, TgError> {
+        let value: chrono::DateTime<chrono::FixedOffset> = self.fetch_for(timeout).await?;
+        Ok(value.to_utc())
+    }
+}
+
 #[async_trait(?Send)] // thread unsafe
 impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
 where

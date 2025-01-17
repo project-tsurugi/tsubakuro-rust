@@ -1,8 +1,10 @@
 use chrono::Datelike;
+use chrono::Offset;
 
 use crate::jogasaki::proto::sql::common::Decimal as ProtoDecimal;
 use crate::jogasaki::proto::sql::common::TimeOfDayWithTimeZone as ProtoTimeOfDayWithTimeZone;
 use crate::jogasaki::proto::sql::common::TimePoint as ProtoTimePoint;
+use crate::jogasaki::proto::sql::common::TimePointWithTimeZone as ProtoTimePointWithTimeZone;
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
 
@@ -236,6 +238,35 @@ impl SqlParameterOf<&(chrono::NaiveTime, chrono::FixedOffset)> for SqlParameter 
             time_zone_offset: time_zone_offset_minutes,
         };
         let value = Value::TimeOfDayWithTimeZoneValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+#[cfg(feature = "with_chrono")]
+impl<Tz: chrono::TimeZone> SqlParameterOf<chrono::DateTime<Tz>> for SqlParameter {
+    fn of(name: &str, value: chrono::DateTime<Tz>) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_chrono")]
+impl<Tz: chrono::TimeZone> SqlParameterOf<&chrono::DateTime<Tz>> for SqlParameter {
+    fn of(name: &str, value: &chrono::DateTime<Tz>) -> SqlParameter {
+        use chrono::Timelike;
+
+        let naive_date_time = value.naive_local();
+        let days = (naive_date_time.num_days_from_ce() - 719_163) as i64;
+        let seconds = naive_date_time.num_seconds_from_midnight() as i64;
+        let seconds = days * 24 * 60 * 60 + seconds;
+        let nanos = naive_date_time.nanosecond();
+        let time_zone_offset_minutes = value.offset().fix().local_minus_utc() / 60;
+
+        let value = ProtoTimePointWithTimeZone {
+            offset_seconds: seconds,
+            nano_adjustment: nanos,
+            time_zone_offset: time_zone_offset_minutes,
+        };
+        let value = Value::TimePointWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
 }
@@ -615,7 +646,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_date() {
+    fn chrono_naive_date() {
         let value = chrono::NaiveDate::from_ymd_opt(2025, 1, 16).unwrap();
         let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
@@ -633,7 +664,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_date_ref() {
+    fn chrono_naive_date_ref() {
         let value = chrono::NaiveDate::from_ymd_opt(2025, 1, 16).unwrap();
 
         let target0 = SqlParameter::of("test", &value);
@@ -652,7 +683,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_time() {
+    fn chrono_naive_time() {
         let value = chrono::NaiveTime::from_hms_milli_opt(16, 24, 30, 456).unwrap();
         let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
@@ -673,24 +704,24 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_time_ref() {
-        chrono_native_time_ref_test(chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap(), 0);
-        chrono_native_time_ref_test(
+    fn chrono_naive_time_ref() {
+        chrono_naive_time_ref_test(chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap(), 0);
+        chrono_naive_time_ref_test(
             chrono::NaiveTime::from_hms_opt(23, 59, 59).unwrap(),
             86399000000000,
         );
-        chrono_native_time_ref_test(
+        chrono_naive_time_ref_test(
             chrono::NaiveTime::from_hms_nano_opt(0, 0, 0, 123456789).unwrap(),
             123456789,
         );
-        chrono_native_time_ref_test(
+        chrono_naive_time_ref_test(
             chrono::NaiveTime::from_hms_nano_opt(23, 59, 59, 999999999).unwrap(),
             86399999999999,
         );
     }
 
     #[cfg(feature = "with_chrono")]
-    fn chrono_native_time_ref_test(value: chrono::NaiveTime, expected: u64) {
+    fn chrono_naive_time_ref_test(value: chrono::NaiveTime, expected: u64) {
         let target0 = SqlParameter::of("test", &value);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(&Value::TimeOfDayValue(expected), target0.value().unwrap());
@@ -707,7 +738,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_date_time() {
+    fn chrono_naive_date_time() {
         let value = chrono::NaiveDateTime::new(
             chrono::NaiveDate::from_ymd_opt(2025, 1, 16).unwrap(),
             chrono::NaiveTime::from_hms_nano_opt(17, 42, 30, 123456789).unwrap(),
@@ -735,14 +766,14 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_date_time_ref() {
-        chrono_native_date_time_ref_test(2025, 1, 16, 17, 42, 30, 123456789, 1737049350);
-        chrono_native_date_time_ref_test(1970, 1, 1, 0, 0, 0, 0, 0);
-        chrono_native_date_time_ref_test(1969, 12, 31, 23, 59, 59, 999999999, -1);
+    fn chrono_naive_date_time_ref() {
+        chrono_naive_date_time_ref_test(2025, 1, 16, 17, 42, 30, 123456789, 1737049350);
+        chrono_naive_date_time_ref_test(1970, 1, 1, 0, 0, 0, 0, 0);
+        chrono_naive_date_time_ref_test(1969, 12, 31, 23, 59, 59, 999999999, -1);
     }
 
     #[cfg(feature = "with_chrono")]
-    fn chrono_native_date_time_ref_test(
+    fn chrono_naive_date_time_ref_test(
         year: i32,
         month: u32,
         day: u32,
@@ -779,7 +810,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_time_with_offset() {
+    fn chrono_naive_time_with_offset() {
         use std::str::FromStr;
 
         let time = chrono::NaiveTime::from_hms_nano_opt(17, 42, 30, 123456789).unwrap();
@@ -808,15 +839,15 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     #[test]
-    fn chrono_native_time_with_offset_ref() {
-        chrono_native_time_with_offset_ref_test(17, 42, 30, 123456789, 9);
-        chrono_native_time_with_offset_ref_test(0, 0, 0, 0, 9);
-        chrono_native_time_with_offset_ref_test(23, 59, 59, 999999999, 9);
-        chrono_native_time_with_offset_ref_test(17, 42, 30, 123456789, -9);
+    fn chrono_naive_time_with_offset_ref() {
+        chrono_naive_time_with_offset_ref_test(17, 42, 30, 123456789, 9);
+        chrono_naive_time_with_offset_ref_test(0, 0, 0, 0, 9);
+        chrono_naive_time_with_offset_ref_test(23, 59, 59, 999999999, 9);
+        chrono_naive_time_with_offset_ref_test(17, 42, 30, 123456789, -9);
     }
 
     #[cfg(feature = "with_chrono")]
-    fn chrono_native_time_with_offset_ref_test(
+    fn chrono_naive_time_with_offset_ref_test(
         hour: u32,
         min: u32,
         sec: u32,
@@ -854,5 +885,74 @@ mod test {
 
         let target = "test".to_string().parameter(&value);
         assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_date_time() {
+        let value = date_time(2025, 1, 16, 17, 42, 30, 123456789, 9);
+
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimePointWithTimeZoneValue(ProtoTimePointWithTimeZone {
+                offset_seconds: 1737049350,
+                nano_adjustment: 123456789,
+                time_zone_offset: 9 * 60
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_date_time_ref() {
+        let value = date_time(2025, 1, 16, 17, 42, 30, 123456789, 9);
+
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimePointWithTimeZoneValue(ProtoTimePointWithTimeZone {
+                offset_seconds: 1737049350,
+                nano_adjustment: 123456789,
+                time_zone_offset: 9 * 60
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn date_time(
+        year: i32,
+        month: u32,
+        day: u32,
+        hour: u32,
+        min: u32,
+        sec: u32,
+        nano: u32,
+        offset_hour: i32,
+    ) -> chrono::DateTime<chrono::FixedOffset> {
+        use std::str::FromStr;
+
+        let s=format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nano:09} +{offset_hour:02}:00");
+        chrono::DateTime::from_str(&s).unwrap()
     }
 }
