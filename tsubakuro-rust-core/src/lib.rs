@@ -53,6 +53,12 @@ pub(crate) mod tateyama {
             }
         }
         pub(crate) mod framework {
+            pub(crate) mod common {
+                include!(concat!(
+                    env!("OUT_DIR"),
+                    "/tateyama.proto.framework.common.rs"
+                ));
+            }
             pub(crate) mod request {
                 include!(concat!(
                     env!("OUT_DIR"),

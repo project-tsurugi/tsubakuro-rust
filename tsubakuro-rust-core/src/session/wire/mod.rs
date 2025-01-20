@@ -110,6 +110,7 @@ impl Wire {
             service_message_version_minor: SERVICE_MESSAGE_VERSION_MINOR,
             service_id: service_id as u64,
             session_id: self.session_id() as u64,
+            blob_opt: None,
         };
         let header = header.encode_length_delimited_to_vec();
 
@@ -134,6 +135,7 @@ impl Wire {
             service_message_version_minor: SERVICE_MESSAGE_VERSION_MINOR,
             service_id: service_id as u64,
             session_id: self.session_id() as u64,
+            blob_opt: None,
         };
         let header = header.encode_length_delimited_to_vec();
 

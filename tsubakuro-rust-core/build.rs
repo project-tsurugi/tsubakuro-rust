@@ -12,6 +12,7 @@ fn main() {
             "protos/tateyama/proto/diagnostics.proto",
             "protos/tateyama/proto/endpoint/request.proto",
             "protos/tateyama/proto/endpoint/response.proto",
+            "protos/tateyama/proto/framework/common.proto",
             "protos/tateyama/proto/framework/request.proto",
             "protos/tateyama/proto/framework/response.proto",
         ],
