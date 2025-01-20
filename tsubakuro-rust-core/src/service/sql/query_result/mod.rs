@@ -437,8 +437,8 @@ impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDateTime, TgError> {
         let timeout = Timeout::new(timeout);
-        let value = self.value_stream.fetch_time_point_value(&timeout).await?;
-        let value = chrono::DateTime::from_timestamp(value.0, value.1 as u32).unwrap();
+        let (epoch_seconds, nanos) = self.value_stream.fetch_time_point_value(&timeout).await?;
+        let value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32).unwrap();
         let value = value.naive_utc();
         Ok(value)
     }
@@ -589,6 +589,46 @@ impl SqlQueryResultFetch<time::Time> for SqlQueryResult {
         let value =
             time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanosecond as u32)
                 .unwrap();
+        Ok(value)
+    }
+}
+
+#[cfg(feature = "with_time")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<time::PrimitiveDateTime> for SqlQueryResult {
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<time::PrimitiveDateTime, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<time::PrimitiveDateTime, TgError> {
+        let timeout = Timeout::new(timeout);
+        let (epoch_seconds, nanos) = self.value_stream.fetch_time_point_value(&timeout).await?;
+
+        const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
+        let mut days =
+            epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
+        let mut value = epoch_seconds % SECONDS_PER_DAY;
+        if value < 0 {
+            value += SECONDS_PER_DAY;
+            days -= 1;
+        }
+        let second = value % 60;
+        let value = value / 60;
+        let minute = value % 60;
+        let value = value / 60;
+        let hour = value % 24;
+
+        let value = time::PrimitiveDateTime::new(
+            time::Date::from_julian_day(days as i32).unwrap(),
+            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanos as u32)
+                .unwrap(),
+        );
         Ok(value)
     }
 }

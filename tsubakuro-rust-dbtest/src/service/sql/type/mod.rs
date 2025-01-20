@@ -16,6 +16,7 @@ mod int8;
 mod rust_decimal0;
 mod rust_decimal1;
 mod time_date;
+mod time_primitive_date_time;
 mod time_time;
 mod varbinary;
 mod varchar;

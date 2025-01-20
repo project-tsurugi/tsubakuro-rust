@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod test {
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use chrono::NaiveDateTime;
+    use time::PrimitiveDateTime;
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
@@ -47,7 +47,7 @@ mod test {
         assert_eq!(Some(AtomType::TimePoint), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<NaiveDateTime>)> {
+    fn generate_values(minus: bool) -> Vec<(i32, Option<PrimitiveDateTime>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -66,20 +66,21 @@ mod test {
 
     fn date_time(
         year: i32,
-        month: u32,
-        day: u32,
-        hour: u32,
-        min: u32,
-        sec: u32,
+        month: u8,
+        day: u8,
+        hour: u8,
+        min: u8,
+        sec: u8,
         nano: u32,
-    ) -> NaiveDateTime {
-        NaiveDateTime::new(
-            chrono::NaiveDate::from_ymd_opt(year, month, day).unwrap(),
-            chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap(),
+    ) -> PrimitiveDateTime {
+        PrimitiveDateTime::new(
+            time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
+                .unwrap(),
+            time::Time::from_hms_nano(hour, min, sec, nano).unwrap(),
         )
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<NaiveDateTime>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
@@ -97,13 +98,13 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<NaiveDateTime>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<NaiveDateTime>("value"),
+            SqlPlaceholder::of::<PrimitiveDateTime>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
@@ -123,7 +124,11 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<NaiveDateTime>)>, skip: bool) {
+    async fn select(
+        client: &SqlClient,
+        expected: &Vec<(i32, Option<PrimitiveDateTime>)>,
+        skip: bool,
+    ) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
