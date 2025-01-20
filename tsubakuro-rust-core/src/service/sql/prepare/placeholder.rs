@@ -175,6 +175,13 @@ impl AtomTypeProvider for (time::Time, time::UtcOffset) {
     }
 }
 
+#[cfg(feature = "with_time")]
+impl AtomTypeProvider for time::OffsetDateTime {
+    fn atom_type() -> AtomType {
+        AtomType::TimePointWithTimeZone
+    }
+}
+
 pub trait SqlPlaceholderBind {
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
@@ -474,6 +481,23 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<(time::Time, time::UtcOffset)>();
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_offset_date_time() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimePointWithTimeZone);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            AtomType::TimePointWithTimeZone,
+            target0.atom_type().unwrap()
+        );
+
+        let target = SqlPlaceholder::of::<time::OffsetDateTime>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<time::OffsetDateTime>();
         assert_eq!(target0, target);
     }
 }

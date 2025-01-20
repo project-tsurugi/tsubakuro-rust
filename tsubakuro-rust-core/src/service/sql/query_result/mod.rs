@@ -673,6 +673,53 @@ impl SqlQueryResultFetch<(time::Time, time::UtcOffset)> for SqlQueryResult {
     }
 }
 
+#[cfg(feature = "with_time")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<time::OffsetDateTime> for SqlQueryResult {
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<time::OffsetDateTime, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<time::OffsetDateTime, TgError> {
+        let timeout = Timeout::new(timeout);
+        let (epoch_seconds, nanos, offset_minutes) = self
+            .value_stream
+            .fetch_time_point_with_time_zone_value(&timeout)
+            .await?;
+
+        const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
+        let mut days =
+            epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
+        let mut value = epoch_seconds % SECONDS_PER_DAY;
+        if value < 0 {
+            value += SECONDS_PER_DAY;
+            days -= 1;
+        }
+        let second = value % 60;
+        let value = value / 60;
+        let minute = value % 60;
+        let value = value / 60;
+        let hour = value % 24;
+
+        let offset_seconds = offset_minutes * 60;
+        let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
+
+        let value = time::OffsetDateTime::new_in_offset(
+            time::Date::from_julian_day(days as i32).unwrap(),
+            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanos as u32)
+                .unwrap(),
+            offset,
+        );
+        Ok(value)
+    }
+}
+
 #[async_trait(?Send)] // thread unsafe
 impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
 where

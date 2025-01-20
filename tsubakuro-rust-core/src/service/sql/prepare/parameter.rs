@@ -358,6 +358,34 @@ impl SqlParameterOf<&(time::Time, time::UtcOffset)> for SqlParameter {
     }
 }
 
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<time::OffsetDateTime> for SqlParameter {
+    fn of(name: &str, value: time::OffsetDateTime) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<&time::OffsetDateTime> for SqlParameter {
+    fn of(name: &str, value: &time::OffsetDateTime) -> SqlParameter {
+        let days = value.to_julian_day() - /* Date(1970-01-01).to_julian_day() */ 2440588;
+        let (hour, minute, second, nanos) = value.to_hms_nano();
+        let seconds = ((hour as i64) * 60 + minute as i64) * 60 + second as i64;
+        let seconds = days as i64 * 24 * 60 * 60 + seconds;
+
+        let (hour, minute, second) = value.offset().as_hms();
+        let time_zone_offset_minutes = hour as i32 * 60 + minute as i32 + second as i32;
+
+        let value = ProtoTimePointWithTimeZone {
+            offset_seconds: seconds,
+            nano_adjustment: nanos,
+            time_zone_offset: time_zone_offset_minutes,
+        };
+        let value = Value::TimePointWithTimeZoneValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 impl<T> SqlParameterOf<Option<T>> for SqlParameter
 where
     SqlParameter: SqlParameterOf<T>,
@@ -1276,5 +1304,76 @@ mod test {
 
         let target = "test".to_string().parameter(&value);
         assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_offset_date_time() {
+        let value = offset_date_time(2025, 1, 16, 17, 42, 30, 123456789, 9);
+
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimePointWithTimeZoneValue(ProtoTimePointWithTimeZone {
+                offset_seconds: 1737049350,
+                nano_adjustment: 123456789,
+                time_zone_offset: 9 * 60
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_offset_date_time_ref() {
+        let value = offset_date_time(2025, 1, 16, 17, 42, 30, 123456789, 9);
+
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimePointWithTimeZoneValue(ProtoTimePointWithTimeZone {
+                offset_seconds: 1737049350,
+                nano_adjustment: 123456789,
+                time_zone_offset: 9 * 60
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    fn offset_date_time(
+        year: i32,
+        month: u8,
+        day: u8,
+        hour: u8,
+        min: u8,
+        sec: u8,
+        nano: u32,
+        offset_hour: i32,
+    ) -> time::OffsetDateTime {
+        time::OffsetDateTime::new_in_offset(
+            time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
+                .unwrap(),
+            time::Time::from_hms_nano(hour, min, sec, nano).unwrap(),
+            time::UtcOffset::from_whole_seconds(offset_hour * 60 * 60).unwrap(),
+        )
     }
 }
