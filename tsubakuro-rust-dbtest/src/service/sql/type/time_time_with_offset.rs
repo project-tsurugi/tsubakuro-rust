@@ -69,8 +69,8 @@ mod test {
         offset_hour: i32,
     ) -> (Time, UtcOffset) {
         let time = Time::from_hms_nano(hour, min, sec, nano).unwrap();
-        let offset_secs = offset_hour * 60 * 60;
-        let offset = UtcOffset::from_whole_seconds(offset_secs).unwrap();
+        let offset_seconds = offset_hour * 60 * 60;
+        let offset = UtcOffset::from_whole_seconds(offset_seconds).unwrap();
         (time, offset)
     }
 

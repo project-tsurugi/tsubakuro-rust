@@ -267,23 +267,34 @@ impl SqlQueryResultFetch<bigdecimal::BigDecimal> for SqlQueryResult {
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<bigdecimal::BigDecimal, TgError> {
         let timeout = Timeout::new(timeout);
-        let value = self.value_stream.fetch_decimal_value(&timeout).await?;
-        let value = match value {
-            (Some(coefficient), _, scale) => {
-                let value = bigdecimal::num_bigint::BigInt::from_signed_bytes_be(&coefficient);
-                bigdecimal::BigDecimal::new(value, scale as i64)
-            }
-            (None, value, scale) => {
-                if scale == 0 {
-                    bigdecimal::BigDecimal::from_i64(value).unwrap()
-                } else {
-                    let value = bigdecimal::num_bigint::BigInt::from_i64(value).unwrap();
-                    bigdecimal::BigDecimal::from_bigint(value, scale as i64)
-                }
-            }
-        };
+        let (coefficient_bytes, coefficient, scale) =
+            self.value_stream.fetch_decimal_value(&timeout).await?;
+        let value = bigdecimal_big_decimal(coefficient_bytes, coefficient, scale);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_bigdecimal")]
+fn bigdecimal_big_decimal(
+    coefficient_bytes: Option<BytesMut>,
+    coefficient: i64,
+    scale: i32,
+) -> bigdecimal::BigDecimal {
+    let value = match coefficient_bytes {
+        Some(coefficient) => {
+            let value = bigdecimal::num_bigint::BigInt::from_signed_bytes_be(&coefficient);
+            bigdecimal::BigDecimal::new(value, scale as i64)
+        }
+        None => {
+            if scale == 0 {
+                bigdecimal::BigDecimal::from_i64(coefficient).unwrap()
+            } else {
+                let value = bigdecimal::num_bigint::BigInt::from_i64(coefficient).unwrap();
+                bigdecimal::BigDecimal::from_bigint(value, scale as i64)
+            }
+        }
+    };
+    value
 }
 
 #[cfg(feature = "with_rust_decimal")]
@@ -301,21 +312,36 @@ impl SqlQueryResultFetch<rust_decimal::Decimal> for SqlQueryResult {
     /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<rust_decimal::Decimal, TgError> {
         let timeout = Timeout::new(timeout);
-        let value = self.value_stream.fetch_decimal_value(&timeout).await?;
-        let value = match value {
-            (Some(coefficient), _, scale) => {
-                let top = coefficient[0] as i8;
-                let mut buf = if top >= 0 { [0u8; 16] } else { [0xffu8; 16] };
-                buf[16 - coefficient.len()..].copy_from_slice(&coefficient);
-                let value = i128::from_be_bytes(buf);
-                rust_decimal::Decimal::from_i128_with_scale(value, scale as u32)
-            }
-            (None, value, scale) => {
-                rust_decimal::Decimal::from_i128_with_scale(value as i128, scale as u32)
-            }
-        };
+        let (coefficient_bytes, coefficient, scale) =
+            self.value_stream.fetch_decimal_value(&timeout).await?;
+        let value = rust_decimal_decimal(coefficient_bytes, coefficient, scale);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_rust_decimal")]
+fn rust_decimal_decimal(
+    coefficient_bytes: Option<BytesMut>,
+    coefficient: i64,
+    scale: i32,
+) -> rust_decimal::Decimal {
+    let value = match coefficient_bytes {
+        Some(coefficient) => {
+            let top = coefficient[0] as i8;
+            let mut buf = if top >= 0 { [0u8; 16] } else { [0xffu8; 16] };
+            buf[16 - coefficient.len()..].copy_from_slice(&coefficient);
+            i128::from_be_bytes(buf)
+        }
+        None => coefficient as i128,
+    };
+    let value = if scale >= 0 {
+        rust_decimal::Decimal::from_i128_with_scale(value, scale as u32)
+    } else {
+        let value = rust_decimal::Decimal::from_i128_with_scale(value, 0);
+        let factor = rust_decimal::Decimal::from_i128_with_scale(10_i128.pow(-scale as u32), 0);
+        value * factor
+    };
+    value
 }
 
 #[async_trait(?Send)] // thread unsafe
@@ -393,10 +419,16 @@ impl SqlQueryResultFetch<chrono::NaiveDate> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDate, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_date_value(&timeout).await?;
-        let days = value + 719_163;
-        let value = chrono::NaiveDate::from_num_days_from_ce_opt(days as i32).unwrap();
+        let value = chrono_naive_date(value);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_naive_date(value: i64) -> chrono::NaiveDate {
+    let days = value + /* NaiveDate(1970-01-01).num_days_from_ce() */ 719_163;
+    let value = chrono::NaiveDate::from_num_days_from_ce_opt(days as i32).unwrap();
+    value
 }
 
 #[cfg(feature = "with_chrono")]
@@ -415,11 +447,17 @@ impl SqlQueryResultFetch<chrono::NaiveTime> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveTime, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
-        let seconds = (value / 1_000_000_000) as u32;
-        let nanos = (value % 1_000_000_000) as u32;
-        let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
+        let value = chrono_naive_time(value);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_naive_time(value: i64) -> chrono::NaiveTime {
+    let seconds = (value / 1_000_000_000) as u32;
+    let nanos = (value % 1_000_000_000) as u32;
+    let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
+    value
 }
 
 #[cfg(feature = "with_chrono")]
@@ -438,10 +476,16 @@ impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDateTime, TgError> {
         let timeout = Timeout::new(timeout);
         let (epoch_seconds, nanos) = self.value_stream.fetch_time_point_value(&timeout).await?;
-        let value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32).unwrap();
-        let value = value.naive_utc();
+        let value = chrono_naive_date_time(epoch_seconds, nanos);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_naive_date_time(epoch_seconds: i64, nanos: i32) -> chrono::NaiveDateTime {
+    let value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32).unwrap();
+    let value = value.naive_utc();
+    value
 }
 
 #[cfg(feature = "with_chrono")]
@@ -466,21 +510,24 @@ impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryR
             .value_stream
             .fetch_time_of_day_with_time_zone_value(&timeout)
             .await?;
-
-        let seconds = (time / 1_000_000_000) as u32;
-        let nanos = (time % 1_000_000_000) as u32;
-        let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
-
-        let offset_seconds = offset_minutes * 60;
-        let offset = if offset_minutes >= 0 {
-            chrono::FixedOffset::east_opt(offset_seconds)
-        } else {
-            chrono::FixedOffset::west_opt(-offset_seconds)
-        }
-        .unwrap();
-
-        Ok((value, offset))
+        let value = chrono_naive_time_with_offset(time, offset_minutes);
+        Ok(value)
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_naive_time_with_offset(
+    time: i64,
+    offset_minutes: i32,
+) -> (chrono::NaiveTime, chrono::FixedOffset) {
+    let seconds = (time / 1_000_000_000) as u32;
+    let nanos = (time % 1_000_000_000) as u32;
+    let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
+
+    let offset_seconds = offset_minutes * 60;
+    let offset = chrono::FixedOffset::east_opt(offset_seconds).unwrap();
+
+    (value, offset)
 }
 
 #[cfg(feature = "with_chrono")]
@@ -505,17 +552,29 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::FixedOffset>> for SqlQueryResu
             .value_stream
             .fetch_time_point_with_time_zone_value(&timeout)
             .await?;
-        let value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32).unwrap();
-        let offset_seconds = offset_minutes * 60;
-        let offset = if offset_minutes >= 0 {
-            chrono::FixedOffset::east_opt(offset_seconds)
-        } else {
-            chrono::FixedOffset::west_opt(-offset_seconds)
-        }
-        .unwrap();
-        let value = value.with_timezone(&offset);
+        let value = chrono_date_time(epoch_seconds, nanos, offset_minutes);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_date_time(
+    epoch_seconds: i64,
+    nanos: i32,
+    offset_minutes: i32,
+) -> chrono::DateTime<chrono::FixedOffset> {
+    let mut value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32)
+        .unwrap()
+        .naive_utc();
+
+    let offset_seconds = offset_minutes * 60;
+    let offset = chrono::FixedOffset::east_opt(offset_seconds).unwrap();
+
+    if offset.local_minus_utc() != 0 {
+        value = value.checked_sub_offset(offset).unwrap();
+    }
+    let value = chrono::DateTime::<chrono::FixedOffset>::from_naive_utc_and_offset(value, offset);
+    value
 }
 
 #[cfg(feature = "with_chrono")]
@@ -556,10 +615,16 @@ impl SqlQueryResultFetch<time::Date> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<time::Date, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_date_value(&timeout).await?;
-        let days = value + /* Date(1970-01-01).to_julian_day() */ 2440588;
-        let value = time::Date::from_julian_day(days as i32).unwrap();
+        let value = time_date(value);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_date(value: i64) -> time::Date {
+    let days = value + /* Date(1970-01-01).to_julian_day() */ 2440588;
+    let value = time::Date::from_julian_day(days as i32).unwrap();
+    value
 }
 
 #[cfg(feature = "with_time")]
@@ -578,19 +643,22 @@ impl SqlQueryResultFetch<time::Time> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<time::Time, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
-
-        let nanosecond = value % 1000_000_000;
-        let value = value / 1000_000_000;
-        let second = value % 60;
-        let value = value / 60;
-        let minute = value % 60;
-        let hour = value / 60;
-
-        let value =
-            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanosecond as u32)
-                .unwrap();
+        let value = time_time(value);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_time(value: i64) -> time::Time {
+    let nanos = value % 1000_000_000;
+    let value = value / 1000_000_000;
+    let sec = value % 60;
+    let value = value / 60;
+    let min = value % 60;
+    let hour = value / 60;
+
+    let value = time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap();
+    value
 }
 
 #[cfg(feature = "with_time")]
@@ -609,28 +677,31 @@ impl SqlQueryResultFetch<time::PrimitiveDateTime> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<time::PrimitiveDateTime, TgError> {
         let timeout = Timeout::new(timeout);
         let (epoch_seconds, nanos) = self.value_stream.fetch_time_point_value(&timeout).await?;
-
-        const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
-        let mut days =
-            epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
-        let mut value = epoch_seconds % SECONDS_PER_DAY;
-        if value < 0 {
-            value += SECONDS_PER_DAY;
-            days -= 1;
-        }
-        let second = value % 60;
-        let value = value / 60;
-        let minute = value % 60;
-        let value = value / 60;
-        let hour = value % 24;
-
-        let value = time::PrimitiveDateTime::new(
-            time::Date::from_julian_day(days as i32).unwrap(),
-            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanos as u32)
-                .unwrap(),
-        );
+        let value = time_primitive_date_time(epoch_seconds, nanos);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_primitive_date_time(epoch_seconds: i64, nanos: i32) -> time::PrimitiveDateTime {
+    const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
+    let mut days = epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
+    let mut value = epoch_seconds % SECONDS_PER_DAY;
+    if value < 0 {
+        value += SECONDS_PER_DAY;
+        days -= 1;
+    }
+    let sec = value % 60;
+    let value = value / 60;
+    let min = value % 60;
+    let value = value / 60;
+    let hour = value % 24;
+
+    let value = time::PrimitiveDateTime::new(
+        time::Date::from_julian_day(days as i32).unwrap(),
+        time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap(),
+    );
+    value
 }
 
 #[cfg(feature = "with_time")]
@@ -655,22 +726,25 @@ impl SqlQueryResultFetch<(time::Time, time::UtcOffset)> for SqlQueryResult {
             .value_stream
             .fetch_time_of_day_with_time_zone_value(&timeout)
             .await?;
-
-        let nanosecond = time % 1000_000_000;
-        let value = time / 1000_000_000;
-        let second = value % 60;
-        let value = value / 60;
-        let minute = value % 60;
-        let hour = value / 60;
-        let value =
-            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanosecond as u32)
-                .unwrap();
-
-        let offset_seconds = offset_minutes * 60;
-        let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
-
-        Ok((value, offset))
+        let value = time_time_with_offset(time, offset_minutes);
+        Ok(value)
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_time_with_offset(time: i64, offset_minutes: i32) -> (time::Time, time::UtcOffset) {
+    let nanos = time % 1000_000_000;
+    let value = time / 1000_000_000;
+    let sec = value % 60;
+    let value = value / 60;
+    let min = value % 60;
+    let hour = value / 60;
+    let value = time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap();
+
+    let offset_seconds = offset_minutes * 60;
+    let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
+
+    (value, offset)
 }
 
 #[cfg(feature = "with_time")]
@@ -692,32 +766,39 @@ impl SqlQueryResultFetch<time::OffsetDateTime> for SqlQueryResult {
             .value_stream
             .fetch_time_point_with_time_zone_value(&timeout)
             .await?;
-
-        const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
-        let mut days =
-            epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
-        let mut value = epoch_seconds % SECONDS_PER_DAY;
-        if value < 0 {
-            value += SECONDS_PER_DAY;
-            days -= 1;
-        }
-        let second = value % 60;
-        let value = value / 60;
-        let minute = value % 60;
-        let value = value / 60;
-        let hour = value % 24;
-
-        let offset_seconds = offset_minutes * 60;
-        let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
-
-        let value = time::OffsetDateTime::new_in_offset(
-            time::Date::from_julian_day(days as i32).unwrap(),
-            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanos as u32)
-                .unwrap(),
-            offset,
-        );
+        let value = time_offset_date_time(epoch_seconds, nanos, offset_minutes);
         Ok(value)
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_offset_date_time(
+    epoch_seconds: i64,
+    nanos: i32,
+    offset_minutes: i32,
+) -> time::OffsetDateTime {
+    const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
+    let mut days = epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
+    let mut value = epoch_seconds % SECONDS_PER_DAY;
+    if value < 0 {
+        value += SECONDS_PER_DAY;
+        days -= 1;
+    }
+    let sec = value % 60;
+    let value = value / 60;
+    let min = value % 60;
+    let value = value / 60;
+    let hour = value % 24;
+
+    let offset_seconds = offset_minutes * 60;
+    let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
+
+    let value = time::OffsetDateTime::new_in_offset(
+        time::Date::from_julian_day(days as i32).unwrap(),
+        time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap(),
+        offset,
+    );
+    value
 }
 
 #[async_trait(?Send)] // thread unsafe
@@ -746,6 +827,537 @@ where
         } else {
             let value: T = self.fetch_for(timeout).await?;
             Ok(Some(value))
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::str::FromStr;
+
+    use prost::bytes::BytesMut;
+
+    #[cfg(feature = "with_bigdecimal")]
+    #[test]
+    fn bigdecimal_big_decimal() {
+        bigdecimal_big_decimal_test(Some(&[0]), 0, 0, "0");
+        bigdecimal_big_decimal_test(Some(&[0]), 0, 1, "0");
+        bigdecimal_big_decimal_test(Some(&[0]), 0, -1, "0");
+        bigdecimal_big_decimal_test(Some(&[0x04, 0xd2]), 0, 0, "1234.0");
+        bigdecimal_big_decimal_test(Some(&[0x04, 0xd2]), 0, 1, "123.4");
+        bigdecimal_big_decimal_test(Some(&[0x04, 0xd2]), 0, -1, "12340");
+        bigdecimal_big_decimal_test(Some(&[0xfb, 0x2e]), 0, 0, "-1234.0");
+        bigdecimal_big_decimal_test(Some(&[0xfb, 0x2e]), 0, 1, "-123.4");
+        bigdecimal_big_decimal_test(Some(&[0xfb, 0x2e]), 0, -1, "-12340");
+        bigdecimal_big_decimal_test(None, 0, 0, "0");
+        bigdecimal_big_decimal_test(None, 0, 1, "0");
+        bigdecimal_big_decimal_test(None, 0, -1, "0");
+        bigdecimal_big_decimal_test(None, 1234, 0, "1234.0");
+        bigdecimal_big_decimal_test(None, 1234, 1, "123.4");
+        bigdecimal_big_decimal_test(None, 1234, -1, "12340");
+        bigdecimal_big_decimal_test(None, -1234, 0, "-1234.0");
+        bigdecimal_big_decimal_test(None, -1234, 1, "-123.4");
+        bigdecimal_big_decimal_test(None, -1234, -1, "-12340");
+    }
+
+    #[cfg(feature = "with_bigdecimal")]
+    fn bigdecimal_big_decimal_test(
+        coefficient_bytes: Option<&[u8]>,
+        coefficient: i64,
+        scale: i32,
+        expected: &str,
+    ) {
+        let value = super::bigdecimal_big_decimal(
+            coefficient_bytes.map(|slice| BytesMut::from(slice)),
+            coefficient,
+            scale,
+        );
+        let expected = bigdecimal::BigDecimal::from_str(expected).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_rust_decimal")]
+    #[test]
+    fn rust_decimal_decimal() {
+        rust_decimal_decimal_test(Some(&[0]), 0, 0, "0");
+        rust_decimal_decimal_test(Some(&[0]), 0, 1, "0");
+        rust_decimal_decimal_test(Some(&[0]), 0, -1, "0");
+        rust_decimal_decimal_test(Some(&[0x04, 0xd2]), 0, 0, "1234.0");
+        rust_decimal_decimal_test(Some(&[0x04, 0xd2]), 0, 1, "123.4");
+        rust_decimal_decimal_test(Some(&[0x04, 0xd2]), 0, -1, "12340");
+        rust_decimal_decimal_test(Some(&[0xfb, 0x2e]), 0, 0, "-1234.0");
+        rust_decimal_decimal_test(Some(&[0xfb, 0x2e]), 0, 1, "-123.4");
+        rust_decimal_decimal_test(Some(&[0xfb, 0x2e]), 0, -1, "-12340");
+        rust_decimal_decimal_test(None, 0, 0, "0");
+        rust_decimal_decimal_test(None, 0, 1, "0");
+        rust_decimal_decimal_test(None, 0, -1, "0");
+        rust_decimal_decimal_test(None, 1234, 0, "1234.0");
+        rust_decimal_decimal_test(None, 1234, 1, "123.4");
+        rust_decimal_decimal_test(None, 1234, -1, "12340");
+        rust_decimal_decimal_test(None, -1234, 0, "-1234.0");
+        rust_decimal_decimal_test(None, -1234, 1, "-123.4");
+        rust_decimal_decimal_test(None, -1234, -1, "-12340");
+    }
+
+    #[cfg(feature = "with_rust_decimal")]
+    fn rust_decimal_decimal_test(
+        coefficient_bytes: Option<&[u8]>,
+        coefficient: i64,
+        scale: i32,
+        expected: &str,
+    ) {
+        let value = super::rust_decimal_decimal(
+            coefficient_bytes.map(|slice| BytesMut::from(slice)),
+            coefficient,
+            scale,
+        );
+        let expected = rust_decimal::Decimal::from_str(expected).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_naive_date() {
+        chrono_naive_date_test(0, "1970-01-01");
+        chrono_naive_date_test(-1, "1969-12-31");
+        chrono_naive_date_test(1, "1970-01-02");
+        chrono_naive_date_test(-719528, "0000-01-01");
+        chrono_naive_date_test(-719162, "0001-01-01");
+        chrono_naive_date_test(-719893, "-0001-01-01");
+        chrono_naive_date_test(2932896, "9999-12-31");
+        chrono_naive_date_test(20108, "2025-01-20");
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn chrono_naive_date_test(value: i64, expected: &str) {
+        let value = super::chrono_naive_date(value);
+        let expected = chrono::NaiveDate::from_str(expected).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_naive_time() {
+        chrono_naive_time_test(0, "00:00:00");
+        chrono_naive_time_test(1, "00:00:00.000000001");
+        chrono_naive_time_test(123456789, "00:00:00.123456789");
+        chrono_naive_time_test(
+            ((23 * 60 + 59) * 60 + 59) * 1_000_000_000 + 999_999_999,
+            "23:59:59.999999999",
+        );
+        chrono_naive_time_test(
+            ((14 * 60 + 35) * 60 + 30) * 1_000_000_000 + 123_000_000,
+            "14:35:30.123",
+        );
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn chrono_naive_time_test(value: i64, expected: &str) {
+        let value = super::chrono_naive_time(value);
+        let expected = chrono::NaiveTime::from_str(expected).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_naive_date_time() {
+        chrono_naive_date_time_test(0, 0, "1970-01-01T00:00:00");
+        chrono_naive_date_time_test(0, 123456789, "1970-01-01T00:00:00.123456789");
+        chrono_naive_date_time_test(1, 123_000_000, "1970-01-01T00:00:01.123");
+        chrono_naive_date_time_test(-1, 123_000_000, "1969-12-31T23:59:59.123");
+        chrono_naive_date_time_test(-719528 * 24 * 60 * 60, 0, "0000-01-01T00:00:00");
+        chrono_naive_date_time_test(-719162 * 24 * 60 * 60, 0, "0001-01-01T00:00:00");
+        chrono_naive_date_time_test(-719893 * 24 * 60 * 60, 0, "-0001-01-01T00:00:00");
+        chrono_naive_date_time_test(
+            2932896 * 24 * 60 * 60 + (23 * 60 + 59) * 60 + 59,
+            999_999_999,
+            "9999-12-31T23:59:59.999999999",
+        );
+        chrono_naive_date_time_test(
+            20108 * 24 * 60 * 60 + (14 * 60 + 57) * 60 + 30,
+            123456789,
+            "2025-01-20T14:57:30.123456789",
+        );
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn chrono_naive_date_time_test(epoch_seconds: i64, nanos: i32, expected: &str) {
+        let value = super::chrono_naive_date_time(epoch_seconds, nanos);
+        let expected = chrono::NaiveDateTime::from_str(expected).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_naive_time_with_offset() {
+        chrono_naive_time_with_offset_test(0, 0, "00:00:00", "+00:00");
+        chrono_naive_time_with_offset_test(0, 9 * 60, "00:00:00", "+09:00");
+        chrono_naive_time_with_offset_test(0, -9 * 60, "00:00:00", "-09:00");
+        chrono_naive_time_with_offset_test(1, 0, "00:00:00.000000001", "+00:00");
+        chrono_naive_time_with_offset_test(123456789, 0, "00:00:00.123456789", "+00:00");
+        chrono_naive_time_with_offset_test(
+            ((23 * 60 + 59) * 60 + 59) * 1_000_000_000 + 999_999_999,
+            0,
+            "23:59:59.999999999",
+            "+00:00",
+        );
+        chrono_naive_time_with_offset_test(
+            ((14 * 60 + 35) * 60 + 30) * 1_000_000_000 + 123_000_000,
+            9 * 60,
+            "14:35:30.123",
+            "+09:00",
+        );
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn chrono_naive_time_with_offset_test(
+        value: i64,
+        offset_minutes: i32,
+        expected: &str,
+        expected_offset: &str,
+    ) {
+        let (value, offset) = super::chrono_naive_time_with_offset(value, offset_minutes);
+        let expected = chrono::NaiveTime::from_str(expected).unwrap();
+        assert_eq!(expected, value);
+        let expected = chrono::FixedOffset::from_str(expected_offset).unwrap();
+        assert_eq!(expected, offset);
+    }
+
+    #[cfg(feature = "with_chrono")]
+    #[test]
+    fn chrono_date_time() {
+        chrono_date_time_test(0, 0, 0, "1970-01-01T00:00:00+00:00");
+        chrono_date_time_test(0, 0, 9 * 60, "1970-01-01T00:00:00+09:00");
+        chrono_date_time_test(0, 0, -9 * 60, "1970-01-01T00:00:00-09:00");
+        chrono_date_time_test(0, 123456789, 0, "1970-01-01T00:00:00.123456789+00:00");
+        chrono_date_time_test(1, 123_000_000, 0, "1970-01-01T00:00:01.123+00:00");
+        chrono_date_time_test(1, 123_000_000, 9 * 60, "1970-01-01T00:00:01.123+09:00");
+        chrono_date_time_test(1, 123_000_000, -9 * 60, "1970-01-01T00:00:01.123-09:00");
+        chrono_date_time_test(-1, 123_000_000, 0, "1969-12-31T23:59:59.123+00:00");
+        chrono_date_time_test(-1, 123_000_000, 9 * 60, "1969-12-31T23:59:59.123+09:00");
+        chrono_date_time_test(-1, 123_000_000, -9 * 60, "1969-12-31T23:59:59.123-09:00");
+        chrono_date_time_test(-719528 * 24 * 60 * 60, 0, 0, "0000-01-01T00:00:00+00:00");
+        chrono_date_time_test(-719162 * 24 * 60 * 60, 0, 0, "0001-01-01T00:00:00+00:00");
+        chrono_date_time_test(-719893 * 24 * 60 * 60, 0, 0, "-0001-01-01T00:00:00+00:00");
+        chrono_date_time_test(
+            2932896 * 24 * 60 * 60 + (23 * 60 + 59) * 60 + 59,
+            999_999_999,
+            0,
+            "9999-12-31T23:59:59.999999999+00:00",
+        );
+        chrono_date_time_test(
+            20108 * 24 * 60 * 60 + (14 * 60 + 57) * 60 + 30,
+            123456789,
+            9 * 60,
+            "2025-01-20T14:57:30.123456789+09:00",
+        );
+    }
+
+    #[cfg(feature = "with_chrono")]
+    fn chrono_date_time_test(epoch_seconds: i64, nanos: i32, offset_minutes: i32, expected: &str) {
+        let value = super::chrono_date_time(epoch_seconds, nanos, offset_minutes);
+        let expected = chrono::DateTime::<chrono::FixedOffset>::from_str(expected).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_date() {
+        time_date_test(0, "1970-01-01");
+        time_date_test(-1, "1969-12-31");
+        time_date_test(1, "1970-01-02");
+        time_date_test(-719528, "0000-01-01");
+        time_date_test(-719162, "0001-01-01");
+        time_date_test(-719893, "-0001-01-01");
+        time_date_test(2932896, "9999-12-31");
+        time_date_test(20108, "2025-01-20");
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_date_test(value: i64, expected: &str) {
+        let value = super::time_date(value);
+
+        let mut s = TimeString::new(expected);
+        let year = s.next_year();
+        let month = s.next_month();
+        let day = s.next_day();
+        let expected = time::Date::from_calendar_date(year, month, day).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_time() {
+        time_time_test(0, "00:00:00");
+        time_time_test(1, "00:00:00.000000001");
+        time_time_test(123456789, "00:00:00.123456789");
+        time_time_test(
+            ((23 * 60 + 59) * 60 + 59) * 1_000_000_000 + 999_999_999,
+            "23:59:59.999999999",
+        );
+        time_time_test(
+            ((14 * 60 + 35) * 60 + 30) * 1_000_000_000 + 123_000_000,
+            "14:35:30.123",
+        );
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_time_test(value: i64, expected: &str) {
+        let value = super::time_time(value);
+
+        let mut s = TimeString::new(expected);
+        let hour = s.next_hour();
+        let min = s.next_min();
+        let sec = s.next_sec();
+        let nanos = s.next_nanos();
+        let expected = time::Time::from_hms_nano(hour, min, sec, nanos).unwrap();
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_primitive_date_time() {
+        time_primitive_date_time_test(0, 0, "1970-01-01T00:00:00");
+        time_primitive_date_time_test(0, 123456789, "1970-01-01T00:00:00.123456789");
+        time_primitive_date_time_test(1, 123_000_000, "1970-01-01T00:00:01.123");
+        time_primitive_date_time_test(-1, 123_000_000, "1969-12-31T23:59:59.123");
+        time_primitive_date_time_test(-719528 * 24 * 60 * 60, 0, "0000-01-01T00:00:00");
+        time_primitive_date_time_test(-719162 * 24 * 60 * 60, 0, "0001-01-01T00:00:00");
+        time_primitive_date_time_test(-719893 * 24 * 60 * 60, 0, "-0001-01-01T00:00:00");
+        time_primitive_date_time_test(
+            2932896 * 24 * 60 * 60 + (23 * 60 + 59) * 60 + 59,
+            999_999_999,
+            "9999-12-31T23:59:59.999999999",
+        );
+        time_primitive_date_time_test(
+            20108 * 24 * 60 * 60 + (14 * 60 + 57) * 60 + 30,
+            123456789,
+            "2025-01-20T14:57:30.123456789",
+        );
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_primitive_date_time_test(epoch_seconds: i64, nanos: i32, expected: &str) {
+        let value = super::time_primitive_date_time(epoch_seconds, nanos);
+
+        let mut s = TimeString::new(expected);
+        let year = s.next_year();
+        let month = s.next_month();
+        let day = s.next_day();
+        s.skip(1); // T
+        let hour = s.next_hour();
+        let min = s.next_min();
+        let sec = s.next_sec();
+        let nanos = s.next_nanos();
+        let expected = time::PrimitiveDateTime::new(
+            time::Date::from_calendar_date(year, month, day).unwrap(),
+            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
+        );
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_time_with_offset() {
+        time_time_with_offset_test(0, 0, "00:00:00", "+00:00");
+        time_time_with_offset_test(0, 9 * 60, "00:00:00", "+09:00");
+        time_time_with_offset_test(0, -9 * 60, "00:00:00", "-09:00");
+        time_time_with_offset_test(1, 0, "00:00:00.000000001", "+00:00");
+        time_time_with_offset_test(123456789, 0, "00:00:00.123456789", "+00:00");
+        time_time_with_offset_test(
+            ((23 * 60 + 59) * 60 + 59) * 1_000_000_000 + 999_999_999,
+            0,
+            "23:59:59.999999999",
+            "+00:00",
+        );
+        time_time_with_offset_test(
+            ((14 * 60 + 35) * 60 + 30) * 1_000_000_000 + 123_000_000,
+            9 * 60,
+            "14:35:30.123",
+            "+09:00",
+        );
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_time_with_offset_test(
+        value: i64,
+        offset_minutes: i32,
+        expected: &str,
+        expected_offset: &str,
+    ) {
+        let (value, offset) = super::time_time_with_offset(value, offset_minutes);
+
+        let mut s = TimeString::new(expected);
+        let hour = s.next_hour();
+        let min = s.next_min();
+        let sec = s.next_sec();
+        let nanos = s.next_nanos();
+        let expected = time::Time::from_hms_nano(hour, min, sec, nanos).unwrap();
+        assert_eq!(expected, value);
+        let mut s = TimeString::new(expected_offset);
+        let offset_minutes = s.next_offset();
+        let expected = time::UtcOffset::from_whole_seconds(offset_minutes * 60).unwrap();
+        assert_eq!(expected, offset);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_offset_date_time() {
+        time_offset_date_time_test(0, 0, 0, "1970-01-01T00:00:00+00:00");
+        time_offset_date_time_test(0, 0, 9 * 60, "1970-01-01T00:00:00+09:00");
+        time_offset_date_time_test(0, 0, -9 * 60, "1970-01-01T00:00:00-09:00");
+        time_offset_date_time_test(0, 123456789, 0, "1970-01-01T00:00:00.123456789+00:00");
+        time_offset_date_time_test(1, 123_000_000, 0, "1970-01-01T00:00:01.123+00:00");
+        time_offset_date_time_test(1, 123_000_000, 9 * 60, "1970-01-01T00:00:01.123+09:00");
+        time_offset_date_time_test(1, 123_000_000, -9 * 60, "1970-01-01T00:00:01.123-09:00");
+        time_offset_date_time_test(-1, 123_000_000, 0, "1969-12-31T23:59:59.123+00:00");
+        time_offset_date_time_test(-1, 123_000_000, 9 * 60, "1969-12-31T23:59:59.123+09:00");
+        time_offset_date_time_test(-1, 123_000_000, -9 * 60, "1969-12-31T23:59:59.123-09:00");
+        time_offset_date_time_test(-719528 * 24 * 60 * 60, 0, 0, "0000-01-01T00:00:00+00:00");
+        time_offset_date_time_test(-719162 * 24 * 60 * 60, 0, 0, "0001-01-01T00:00:00+00:00");
+        time_offset_date_time_test(-719893 * 24 * 60 * 60, 0, 0, "-0001-01-01T00:00:00+00:00");
+        time_offset_date_time_test(
+            2932896 * 24 * 60 * 60 + (23 * 60 + 59) * 60 + 59,
+            999_999_999,
+            0,
+            "9999-12-31T23:59:59.999999999+00:00",
+        );
+        time_offset_date_time_test(
+            20108 * 24 * 60 * 60 + (14 * 60 + 57) * 60 + 30,
+            123456789,
+            9 * 60,
+            "2025-01-20T14:57:30.123456789+09:00",
+        );
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_offset_date_time_test(
+        epoch_seconds: i64,
+        nanos: i32,
+        offset_minutes: i32,
+        expected: &str,
+    ) {
+        let value = super::time_offset_date_time(epoch_seconds, nanos, offset_minutes);
+
+        let mut s = TimeString::new(expected);
+        let year = s.next_year();
+        let month = s.next_month();
+        let day = s.next_day();
+        s.skip(1); // T
+        let hour = s.next_hour();
+        let min = s.next_min();
+        let sec = s.next_sec();
+        let nanos = s.next_nanos();
+        let offset_minutes = s.next_offset();
+        let expected = time::OffsetDateTime::new_in_offset(
+            time::Date::from_calendar_date(year, month, day).unwrap(),
+            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
+            time::UtcOffset::from_whole_seconds(offset_minutes * 60).unwrap(),
+        );
+        assert_eq!(expected, value);
+    }
+
+    #[cfg(feature = "with_time")]
+    struct TimeString {
+        text: String,
+        position: usize,
+    }
+
+    impl TimeString {
+        fn new(s: &str) -> TimeString {
+            TimeString {
+                text: s.to_string(),
+                position: 0,
+            }
+        }
+
+        fn next_year(&mut self) -> i32 {
+            if self.is_minus() {
+                self.pop(5)
+            } else {
+                self.pop(4)
+            }
+        }
+
+        fn next_month(&mut self) -> time::Month {
+            self.skip(1); // -
+            let month = self.pop(2) as u8;
+            time::Month::try_from(month).unwrap()
+        }
+
+        fn next_day(&mut self) -> u8 {
+            self.skip(1); // -
+            self.pop(2) as u8
+        }
+
+        fn next_hour(&mut self) -> u8 {
+            self.pop(2) as u8
+        }
+
+        fn next_min(&mut self) -> u8 {
+            self.skip(1); // :
+            self.pop(2) as u8
+        }
+
+        fn next_sec(&mut self) -> u8 {
+            self.skip(1); // :
+            self.pop(2) as u8
+        }
+
+        fn next_nanos(&mut self) -> u32 {
+            if self.position >= self.text.len() {
+                return 0;
+            }
+            if !self.is_period() {
+                return 0;
+            }
+            self.skip(1); // .
+
+            let mut value: u32 = 0;
+            let mut factor = 100_000_000;
+            while factor >= 1 {
+                if self.position >= self.text.len() {
+                    break;
+                }
+
+                let c = &self.text[self.position..self.position + 1];
+                let result: Result<u32, _> = c.parse();
+                if result.is_err() {
+                    break;
+                }
+
+                value += result.unwrap() * factor;
+                self.position += 1;
+                factor /= 10;
+            }
+
+            return value;
+        }
+
+        fn next_offset(&mut self) -> i32 {
+            let hour = self.pop(3);
+            self.skip(1); // :
+            let min = self.pop(2);
+            hour * 60 + min
+        }
+
+        fn is_minus(&self) -> bool {
+            self.text.chars().nth(self.position) == Some('-')
+        }
+
+        fn is_period(&self) -> bool {
+            self.text.chars().nth(self.position) == Some('.')
+        }
+
+        fn skip(&mut self, skip: usize) {
+            self.position += skip;
+        }
+
+        fn pop(&mut self, len: usize) -> i32 {
+            let start = self.position;
+            self.position += len;
+            let slice = &self.text[start..self.position];
+            slice.parse().unwrap()
         }
     }
 }
