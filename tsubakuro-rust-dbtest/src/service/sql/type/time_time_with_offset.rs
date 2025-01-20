@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod test {
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use chrono::{FixedOffset, NaiveTime, TimeZone};
+    use time::{Time, UtcOffset};
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
@@ -47,7 +47,7 @@ mod test {
         assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
     }
 
-    fn generate_values() -> Vec<(i32, Option<(NaiveTime, FixedOffset)>)> {
+    fn generate_values() -> Vec<(i32, Option<(Time, UtcOffset)>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -62,26 +62,19 @@ mod test {
     }
 
     fn time_with_offset(
-        hour: u32,
-        min: u32,
-        sec: u32,
+        hour: u8,
+        min: u8,
+        sec: u8,
         nano: u32,
         offset_hour: i32,
-    ) -> (NaiveTime, FixedOffset) {
-        let time = NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap();
+    ) -> (Time, UtcOffset) {
+        let time = Time::from_hms_nano(hour, min, sec, nano).unwrap();
         let offset_secs = offset_hour * 60 * 60;
-        let offset = if offset_secs >= 0 {
-            FixedOffset::east_opt(offset_secs).unwrap()
-        } else {
-            FixedOffset::west_opt(-offset_secs).unwrap()
-        };
+        let offset = UtcOffset::from_whole_seconds(offset_secs).unwrap();
         (time, offset)
     }
 
-    async fn _insert_literal(
-        client: &SqlClient,
-        values: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
-    ) {
+    async fn _insert_literal(client: &SqlClient, values: &Vec<(i32, Option<(Time, UtcOffset)>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
@@ -99,16 +92,13 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(
-        client: &SqlClient,
-        values: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
-    ) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<(Time, UtcOffset)>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<(NaiveTime, FixedOffset)>("value"),
+            SqlPlaceholder::of::<(Time, UtcOffset)>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
@@ -130,7 +120,7 @@ mod test {
 
     async fn select(
         client: &SqlClient,
-        expected: &Vec<(i32, Option<(NaiveTime, FixedOffset)>)>,
+        expected: &Vec<(i32, Option<(Time, UtcOffset)>)>,
         skip: bool,
     ) {
         let sql = "select * from test order by pk";
@@ -170,21 +160,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    fn to_z(value: Option<(NaiveTime, FixedOffset)>) -> Option<(NaiveTime, FixedOffset)> {
+    fn to_z(value: Option<(Time, UtcOffset)>) -> Option<(Time, UtcOffset)> {
         if value.is_none() {
             return None;
         }
         let (time, offset) = value.unwrap();
 
-        let naive_date_time = chrono::NaiveDate::from_ymd_opt(1970, 1, 1)
-            .unwrap()
-            .and_time(time);
-        let date_time = offset.from_local_datetime(&naive_date_time).unwrap();
-        let utc_date_time = date_time.with_timezone(&chrono::Utc);
+        let date_time = time::OffsetDateTime::new_in_offset(
+            time::Date::from_ordinal_date(1970, 1).unwrap(),
+            time,
+            offset,
+        );
+        let utc_date_time = date_time.to_offset(UtcOffset::UTC);
         let utc_time = utc_date_time.time();
 
-        let utc_offset = FixedOffset::east_opt(0).unwrap();
-
-        Some((utc_time, utc_offset))
+        Some((utc_time, UtcOffset::UTC))
     }
 }

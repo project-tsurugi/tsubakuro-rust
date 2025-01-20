@@ -226,8 +226,7 @@ impl SqlParameterOf<&(chrono::NaiveTime, chrono::FixedOffset)> for SqlParameter 
     fn of(name: &str, value: &(chrono::NaiveTime, chrono::FixedOffset)) -> SqlParameter {
         use chrono::Timelike;
 
-        let time = value.0;
-        let offset = value.1;
+        let (time, offset) = value;
 
         let seconds = time.num_seconds_from_midnight() as u64;
         let nano = time.nanosecond() as u64;
@@ -329,6 +328,32 @@ impl SqlParameterOf<&time::PrimitiveDateTime> for SqlParameter {
             nano_adjustment: nanos,
         };
         let value = Value::TimePointValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<(time::Time, time::UtcOffset)> for SqlParameter {
+    fn of(name: &str, value: (time::Time, time::UtcOffset)) -> SqlParameter {
+        Self::of(name, &value)
+    }
+}
+
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<&(time::Time, time::UtcOffset)> for SqlParameter {
+    fn of(name: &str, value: &(time::Time, time::UtcOffset)) -> SqlParameter {
+        let (time, offset) = value;
+
+        let (hour, minute, second, nano) = time.as_hms_nano();
+        let seconds = ((hour as u64) * 60 + minute as u64) * 60 + second as u64;
+        let (hour, minute, second) = offset.as_hms();
+        let time_zone_offset_minutes = hour as i32 * 60 + minute as i32 + second as i32;
+
+        let value = ProtoTimeOfDayWithTimeZone {
+            offset_nanoseconds: seconds * 1_000_000_000 + nano as u64,
+            time_zone_offset: time_zone_offset_minutes,
+        };
+        let value = Value::TimeOfDayWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
 }
@@ -1175,6 +1200,70 @@ mod test {
             &Value::TimePointValue(ProtoTimePoint {
                 offset_seconds: expected,
                 nano_adjustment: nano
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(&value));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(&value);
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(&value);
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_time_with_offset() {
+        let time = time::Time::from_hms_nano(17, 42, 30, 123456789).unwrap();
+        let offset = time::UtcOffset::from_hms(9, 0, 0).unwrap();
+        let value = (time, offset);
+
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimeOfDayWithTimeZoneValue(ProtoTimeOfDayWithTimeZone {
+                offset_nanoseconds: (((17 * 60) + 42) * 60 + 30) * 1_000_000_000 + 123456789,
+                time_zone_offset: 9 * 60
+            }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let target = "test".parameter(value.clone());
+        assert_eq!(target0, target);
+
+        let target = "test".to_string().parameter(value.clone());
+        assert_eq!(target0, target);
+    }
+
+    #[cfg(feature = "with_time")]
+    #[test]
+    fn time_naive_time_with_offset_ref() {
+        time_time_with_offset_ref_test(17, 42, 30, 123456789, 9);
+        time_time_with_offset_ref_test(0, 0, 0, 0, 9);
+        time_time_with_offset_ref_test(23, 59, 59, 999999999, 9);
+        time_time_with_offset_ref_test(17, 42, 30, 123456789, -9);
+    }
+
+    #[cfg(feature = "with_time")]
+    fn time_time_with_offset_ref_test(hour: u8, min: u8, sec: u8, nano: u32, offset_hour: i8) {
+        let time = time::Time::from_hms_nano(hour, min, sec, nano).unwrap();
+        let offset = time::UtcOffset::from_hms(offset_hour, 0, 0).unwrap();
+        let value = (time, offset);
+
+        let target0 = SqlParameter::of("test", &value);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            &Value::TimeOfDayWithTimeZoneValue(ProtoTimeOfDayWithTimeZone {
+                offset_nanoseconds: (((hour as u64 * 60) + min as u64) * 60 + sec as u64)
+                    * 1_000_000_000
+                    + nano as u64,
+                time_zone_offset: offset_hour as i32 * 60
             }),
             target0.value().unwrap()
         );

@@ -633,6 +633,46 @@ impl SqlQueryResultFetch<time::PrimitiveDateTime> for SqlQueryResult {
     }
 }
 
+#[cfg(feature = "with_time")]
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<(time::Time, time::UtcOffset)> for SqlQueryResult {
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<(time::Time, time::UtcOffset), TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<(time::Time, time::UtcOffset), TgError> {
+        let timeout = Timeout::new(timeout);
+        let (time, offset_minutes) = self
+            .value_stream
+            .fetch_time_of_day_with_time_zone_value(&timeout)
+            .await?;
+
+        let nanosecond = time % 1000_000_000;
+        let value = time / 1000_000_000;
+        let second = value % 60;
+        let value = value / 60;
+        let minute = value % 60;
+        let hour = value / 60;
+        let value =
+            time::Time::from_hms_nano(hour as u8, minute as u8, second as u8, nanosecond as u32)
+                .unwrap();
+
+        let offset_seconds = offset_minutes * 60;
+        let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
+
+        Ok((value, offset))
+    }
+}
+
 #[async_trait(?Send)] // thread unsafe
 impl<T> SqlQueryResultFetch<Option<T>> for SqlQueryResult
 where
