@@ -764,9 +764,8 @@ impl ResultSetValueStream {
         self.require(EntryType::TimeOfDayWithTimeZone)?;
         self.clear_header_info();
         let epoch_nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
-        let time_zone_offset_minutes =
-            Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
-        Ok((epoch_nanos, time_zone_offset_minutes as i32))
+        let offset_minutes = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
+        Ok((epoch_nanos, offset_minutes as i32))
     }
 
     async fn read_time_point_with_time_zone(
@@ -777,9 +776,8 @@ impl ResultSetValueStream {
         self.clear_header_info();
         let epoch_seconds = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
         let nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
-        let time_zone_offset_minutes =
-            Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
-        Ok((epoch_seconds, nanos as i32, time_zone_offset_minutes as i32))
+        let offset_minutes = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
+        Ok((epoch_seconds, nanos as i32, offset_minutes as i32))
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<i32, TgError> {

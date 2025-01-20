@@ -164,10 +164,16 @@ impl SqlParameterOf<chrono::NaiveDate> for SqlParameter {
 #[cfg(feature = "with_chrono")]
 impl SqlParameterOf<&chrono::NaiveDate> for SqlParameter {
     fn of(name: &str, value: &chrono::NaiveDate) -> SqlParameter {
-        let days = value.num_days_from_ce() - 719_163;
-        let value = Value::DateValue(days as i64);
+        let days = chrono_naive_date_to_days(&value);
+
+        let value = Value::DateValue(days);
         SqlParameter::new(name, Some(value))
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_naive_date_to_days(value: &chrono::NaiveDate) -> i64 {
+    value.num_days_from_ce() as i64 - /* NaiveDate(1970-01-01).num_days_from_ce() */ 719_163
 }
 
 #[cfg(feature = "with_chrono")]
@@ -180,13 +186,22 @@ impl SqlParameterOf<chrono::NaiveTime> for SqlParameter {
 #[cfg(feature = "with_chrono")]
 impl SqlParameterOf<&chrono::NaiveTime> for SqlParameter {
     fn of(name: &str, value: &chrono::NaiveTime) -> SqlParameter {
-        use chrono::Timelike;
+        let (seconds, nanos) = chrono_naive_time_to_seconds(value);
+        let value = seconds * 1_000_000_000 + nanos as u64;
 
-        let seconds = value.num_seconds_from_midnight() as u64;
-        let nano = value.nanosecond() as u64;
-        let value = Value::TimeOfDayValue(seconds * 1_000_000_000 + nano);
+        let value = Value::TimeOfDayValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_naive_time_to_seconds(value: &chrono::NaiveTime) -> (u64, u32) {
+    use chrono::Timelike;
+
+    let seconds = value.num_seconds_from_midnight() as u64;
+    let nanos = value.nanosecond();
+
+    (seconds, nanos)
 }
 
 #[cfg(feature = "with_chrono")]
@@ -199,12 +214,8 @@ impl SqlParameterOf<chrono::NaiveDateTime> for SqlParameter {
 #[cfg(feature = "with_chrono")]
 impl SqlParameterOf<&chrono::NaiveDateTime> for SqlParameter {
     fn of(name: &str, value: &chrono::NaiveDateTime) -> SqlParameter {
-        use chrono::Timelike;
+        let (seconds, nanos) = chrono_naive_date_time_to_seconds(value);
 
-        let days = (value.num_days_from_ce() - 719_163) as i64;
-        let seconds = value.num_seconds_from_midnight() as i64;
-        let seconds = days * 24 * 60 * 60 + seconds;
-        let nanos = value.nanosecond();
         let value = ProtoTimePoint {
             offset_seconds: seconds,
             nano_adjustment: nanos,
@@ -212,6 +223,15 @@ impl SqlParameterOf<&chrono::NaiveDateTime> for SqlParameter {
         let value = Value::TimePointValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_naive_date_time_to_seconds(value: &chrono::NaiveDateTime) -> (i64, u32) {
+    let days = chrono_naive_date_to_days(&value.date());
+    let (seconds, nanos) = chrono_naive_time_to_seconds(&value.time());
+    let seconds = days * 24 * 60 * 60 + seconds as i64;
+
+    (seconds, nanos)
 }
 
 #[cfg(feature = "with_chrono")]
@@ -224,21 +244,23 @@ impl SqlParameterOf<(chrono::NaiveTime, chrono::FixedOffset)> for SqlParameter {
 #[cfg(feature = "with_chrono")]
 impl SqlParameterOf<&(chrono::NaiveTime, chrono::FixedOffset)> for SqlParameter {
     fn of(name: &str, value: &(chrono::NaiveTime, chrono::FixedOffset)) -> SqlParameter {
-        use chrono::Timelike;
-
         let (time, offset) = value;
 
-        let seconds = time.num_seconds_from_midnight() as u64;
-        let nano = time.nanosecond() as u64;
-        let time_zone_offset_minutes = offset.local_minus_utc() / 60;
+        let (seconds, nanos) = chrono_naive_time_to_seconds(time);
+        let offset_minutes = chrono_fixed_offset_to_minutes(offset);
 
         let value = ProtoTimeOfDayWithTimeZone {
-            offset_nanoseconds: seconds * 1_000_000_000 + nano,
-            time_zone_offset: time_zone_offset_minutes,
+            offset_nanoseconds: seconds * 1_000_000_000 + nanos as u64,
+            time_zone_offset: offset_minutes,
         };
         let value = Value::TimeOfDayWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_fixed_offset_to_minutes(value: &chrono::FixedOffset) -> i32 {
+    value.local_minus_utc() / 60
 }
 
 #[cfg(feature = "with_chrono")]
@@ -251,19 +273,13 @@ impl<Tz: chrono::TimeZone> SqlParameterOf<chrono::DateTime<Tz>> for SqlParameter
 #[cfg(feature = "with_chrono")]
 impl<Tz: chrono::TimeZone> SqlParameterOf<&chrono::DateTime<Tz>> for SqlParameter {
     fn of(name: &str, value: &chrono::DateTime<Tz>) -> SqlParameter {
-        use chrono::Timelike;
-
-        let naive_date_time = value.naive_local();
-        let days = (naive_date_time.num_days_from_ce() - 719_163) as i64;
-        let seconds = naive_date_time.num_seconds_from_midnight() as i64;
-        let seconds = days * 24 * 60 * 60 + seconds;
-        let nanos = naive_date_time.nanosecond();
-        let time_zone_offset_minutes = value.offset().fix().local_minus_utc() / 60;
+        let (seconds, nanos) = chrono_naive_date_time_to_seconds(&value.naive_local());
+        let offset_minutes = chrono_fixed_offset_to_minutes(&value.offset().fix());
 
         let value = ProtoTimePointWithTimeZone {
             offset_seconds: seconds,
             nano_adjustment: nanos,
-            time_zone_offset: time_zone_offset_minutes,
+            time_zone_offset: offset_minutes,
         };
         let value = Value::TimePointWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
@@ -277,19 +293,25 @@ impl SqlParameterOf<time::Date> for SqlParameter {
     }
 }
 
+#[cfg(feature = "with_time")]
+impl SqlParameterOf<&time::Date> for SqlParameter {
+    fn of(name: &str, value: &time::Date) -> SqlParameter {
+        let days = time_date_to_days(value);
+
+        let value = Value::DateValue(days);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
 // #[cfg(feature = "with_time")]
 // const TIME_EPOCH_START_DATE: Result<time::Date, time::error::ComponentRange> =
 //     time::Date::from_ordinal_date(1970, 1);
 
 #[cfg(feature = "with_time")]
-impl SqlParameterOf<&time::Date> for SqlParameter {
-    fn of(name: &str, value: &time::Date) -> SqlParameter {
-        // let days = *value - TIME_EPOCH_START_DATE.unwrap();
-        // let days = days.whole_days();
-        let days = value.to_julian_day() - /* Date(1970-01-01).to_julian_day() */ 2440588;
-        let value = Value::DateValue(days as i64);
-        SqlParameter::new(name, Some(value))
-    }
+fn time_date_to_days(value: &time::Date) -> i64 {
+    // let days = *value - TIME_EPOCH_START_DATE.unwrap();
+    // let days = days.whole_days();
+    value.to_julian_day() as i64 - /* Date(1970-01-01).to_julian_day() */ 2440588
 }
 
 #[cfg(feature = "with_time")]
@@ -302,11 +324,20 @@ impl SqlParameterOf<time::Time> for SqlParameter {
 #[cfg(feature = "with_time")]
 impl SqlParameterOf<&time::Time> for SqlParameter {
     fn of(name: &str, value: &time::Time) -> SqlParameter {
-        let (hour, minute, second, nano) = value.as_hms_nano();
-        let seconds = ((hour as u64) * 60 + minute as u64) * 60 + second as u64;
-        let value = Value::TimeOfDayValue(seconds * 1_000_000_000 + nano as u64);
+        let (seconds, nanos) = time_time_to_seconds(value);
+        let value = seconds * 1_000_000_000 + nanos as u64;
+
+        let value = Value::TimeOfDayValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_time_to_seconds(value: &time::Time) -> (u64, u32) {
+    let (hour, min, sec, nanos) = value.as_hms_nano();
+    let seconds = ((hour as u64) * 60 + min as u64) * 60 + sec as u64;
+
+    (seconds, nanos)
 }
 
 #[cfg(feature = "with_time")]
@@ -319,10 +350,8 @@ impl SqlParameterOf<time::PrimitiveDateTime> for SqlParameter {
 #[cfg(feature = "with_time")]
 impl SqlParameterOf<&time::PrimitiveDateTime> for SqlParameter {
     fn of(name: &str, value: &time::PrimitiveDateTime) -> SqlParameter {
-        let days = value.to_julian_day() - /* Date(1970-01-01).to_julian_day() */ 2440588;
-        let (hour, minute, second, nanos) = value.as_hms_nano();
-        let seconds = ((hour as i64) * 60 + minute as i64) * 60 + second as i64;
-        let seconds = days as i64 * 24 * 60 * 60 + seconds;
+        let (seconds, nanos) = time_date_time_to_seconds(&value.date(), &value.time());
+
         let value = ProtoTimePoint {
             offset_seconds: seconds,
             nano_adjustment: nanos,
@@ -330,6 +359,15 @@ impl SqlParameterOf<&time::PrimitiveDateTime> for SqlParameter {
         let value = Value::TimePointValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_date_time_to_seconds(date: &time::Date, time: &time::Time) -> (i64, u32) {
+    let days = time_date_to_days(&date);
+    let (seconds, nanos) = time_time_to_seconds(&time);
+    let seconds = days * 24 * 60 * 60 + seconds as i64;
+
+    (seconds, nanos)
 }
 
 #[cfg(feature = "with_time")]
@@ -344,18 +382,22 @@ impl SqlParameterOf<&(time::Time, time::UtcOffset)> for SqlParameter {
     fn of(name: &str, value: &(time::Time, time::UtcOffset)) -> SqlParameter {
         let (time, offset) = value;
 
-        let (hour, minute, second, nano) = time.as_hms_nano();
-        let seconds = ((hour as u64) * 60 + minute as u64) * 60 + second as u64;
-        let (hour, minute, second) = offset.as_hms();
-        let time_zone_offset_minutes = hour as i32 * 60 + minute as i32 + second as i32;
+        let (seconds, nanos) = time_time_to_seconds(time);
+        let offset_minutes = time_utc_offset_to_minutes(offset);
 
         let value = ProtoTimeOfDayWithTimeZone {
-            offset_nanoseconds: seconds * 1_000_000_000 + nano as u64,
-            time_zone_offset: time_zone_offset_minutes,
+            offset_nanoseconds: seconds * 1_000_000_000 + nanos as u64,
+            time_zone_offset: offset_minutes,
         };
         let value = Value::TimeOfDayWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
+
+#[cfg(feature = "with_time")]
+fn time_utc_offset_to_minutes(offset: &time::UtcOffset) -> i32 {
+    let (hour, min, _sec) = offset.as_hms();
+    hour as i32 * 60 + min as i32
 }
 
 #[cfg(feature = "with_time")]
@@ -368,18 +410,13 @@ impl SqlParameterOf<time::OffsetDateTime> for SqlParameter {
 #[cfg(feature = "with_time")]
 impl SqlParameterOf<&time::OffsetDateTime> for SqlParameter {
     fn of(name: &str, value: &time::OffsetDateTime) -> SqlParameter {
-        let days = value.to_julian_day() - /* Date(1970-01-01).to_julian_day() */ 2440588;
-        let (hour, minute, second, nanos) = value.to_hms_nano();
-        let seconds = ((hour as i64) * 60 + minute as i64) * 60 + second as i64;
-        let seconds = days as i64 * 24 * 60 * 60 + seconds;
-
-        let (hour, minute, second) = value.offset().as_hms();
-        let time_zone_offset_minutes = hour as i32 * 60 + minute as i32 + second as i32;
+        let (seconds, nanos) = time_date_time_to_seconds(&value.date(), &value.time());
+        let offset_minutes = time_utc_offset_to_minutes(&value.offset());
 
         let value = ProtoTimePointWithTimeZone {
             offset_seconds: seconds,
             nano_adjustment: nanos,
-            time_zone_offset: time_zone_offset_minutes,
+            time_zone_offset: offset_minutes,
         };
         let value = Value::TimePointWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
