@@ -21,7 +21,7 @@ use crate::{
     },
     prost_decode_error,
     session::{
-        wire::{response::WireResponse, Wire},
+        wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
         Session,
     },
     sql_service_error,
@@ -239,6 +239,21 @@ impl SqlClient {
         let command = Self::dispose_prepare_statement_command(prepare_handle, has_result_records);
         let response = self.send_and_pull_response(command, timeout).await?;
         prepare_dispose_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(())
+    }
+
+    pub(crate) async fn dispose_prepare_send_only(
+        &self,
+        prepare_handle: u64,
+        has_result_records: bool,
+    ) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "dispose_prepare_send_only()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::dispose_prepare_statement_command(prepare_handle, has_result_records);
+        let _ = self.send_only(command).await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
@@ -810,6 +825,11 @@ impl SqlClient {
 impl SqlClient {
     fn wire(&self) -> Arc<Wire> {
         self.session.wire()
+    }
+
+    async fn send_only(&self, command: SqlCommand) -> Result<Arc<SlotEntryHandle>, TgError> {
+        let request = Self::new_request(command);
+        self.wire().send_only(SERVICE_ID_SQL, request).await
     }
 
     async fn send_and_pull_response(

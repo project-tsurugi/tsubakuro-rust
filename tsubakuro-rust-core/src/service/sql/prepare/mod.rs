@@ -120,10 +120,14 @@ impl Drop for SqlPreparedStatement {
                     }
                 };
                 runtime.block_on(async {
-                    if let Err(e) = self.close().await {
-                        debug!("SqlPreparedStatement.drop() close error. {}", e);
+                    let sql_client = SqlClient::new(self.session.clone());
+                    if let Err(e) = sql_client
+                        .dispose_prepare_send_only(self.prepare_handle, self.has_result_records)
+                        .await
+                    {
+                        debug!("SqlPreparedStatement.drop() dispose error. {}", e);
                         if self.fail_on_drop_error() {
-                            panic!("SqlPreparedStatement.drop() close error. {}", e);
+                            panic!("SqlPreparedStatement.drop() dispose error. {}", e);
                         }
                     }
                 });

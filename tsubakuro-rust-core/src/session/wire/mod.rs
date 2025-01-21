@@ -66,7 +66,16 @@ impl Wire {
         self.wire.session_id()
     }
 
-    pub async fn send_and_pull_response<R: ProstMessage>(
+    pub(crate) async fn send_only<R: ProstMessage>(
+        &self,
+        service_id: i32,
+        request: R,
+    ) -> Result<Arc<SlotEntryHandle>, TgError> {
+        let slot_handle = self.send_internal(service_id, request).await?;
+        Ok(slot_handle)
+    }
+
+    pub(crate) async fn send_and_pull_response<R: ProstMessage>(
         &self,
         service_id: i32,
         request: R,

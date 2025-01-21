@@ -317,7 +317,6 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     async fn prepare_drop() {
         let client = create_test_sql_client().await;
 
@@ -328,15 +327,13 @@ mod test {
         )
         .await;
 
-        for i in 0..10 {
-            println!("prepare_drop {}", i);
+        for _i in 0..10 {
             prepare_dispose_test(&client, false, false).await;
         }
     }
 
-    #[test]
-    #[ignore]
-    async fn prepare_drop1() {
+    // #[test]
+    async fn _prepare_drop1() {
         let client = create_test_sql_client().await;
 
         create_table(
