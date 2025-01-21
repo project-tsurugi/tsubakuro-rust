@@ -810,6 +810,20 @@ impl SqlClient {
         Ok(())
     }
 
+    pub(crate) async fn dispose_transaction_send_only(
+        &self,
+        transaction_handle: u64,
+    ) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "dispose_transaction()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::dispose_transaction_command(transaction_handle);
+        let _ = self.send_only(command).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(())
+    }
+
     fn dispose_transaction_command(transaction_handle: u64) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,

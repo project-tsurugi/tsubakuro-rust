@@ -124,10 +124,12 @@ impl Drop for Transaction {
                     }
                 };
                 runtime.block_on(async {
-                    if let Err(e) = self.close().await {
-                        debug!("Transaction.drop() close error. {}", e);
+                    let sql_client = SqlClient::new(self.session.clone());
+                    let tx_handle = self.transaction_handle;
+                    if let Err(e) = sql_client.dispose_transaction_send_only(tx_handle).await {
+                        debug!("Transaction.drop() dispose error. {}", e);
                         if self.fail_on_drop_error() {
-                            panic!("Transaction.drop() close error. {}", e);
+                            panic!("Transaction.drop() dispose error. {}", e);
                         }
                     }
                 })
