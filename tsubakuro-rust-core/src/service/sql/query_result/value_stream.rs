@@ -279,7 +279,7 @@ impl ResultSetValueStream {
             EntryType::EndOfContents => Ok(false),
             EntryType::Row => {
                 let elements = self.read_row_begin(timeout).await?;
-                self.kind_stack_push(EntryKind::TopLevelRow, elements);
+                self.kind_stack_push(EntryKind::TopLevelRow, elements as i32);
                 Ok(true)
             }
             _ => Err(client_error!(format!(
@@ -691,7 +691,7 @@ impl ResultSetValueStream {
         debug_assert_eq!(HEADER_DECIMAL, category);
         let exponent = self.read_signed_int32(timeout).await?;
         let coefficient_size = self.read_size(timeout).await?;
-        let coefficient = self.read_n(coefficient_size as usize, timeout).await?;
+        let coefficient = self.read_n(coefficient_size, timeout).await?;
         Ok((Some(coefficient), 0, -exponent))
     }
 
@@ -700,7 +700,7 @@ impl ResultSetValueStream {
         let size = self.read_character_size(timeout).await?;
 
         let buffer = {
-            if let Some(buffer) = self.data_channel.read_all(size as usize, timeout).await? {
+            if let Some(buffer) = self.data_channel.read_all(size, timeout).await? {
                 buffer
             } else {
                 // TODO BrokenEncodingException
@@ -713,13 +713,13 @@ impl ResultSetValueStream {
         Ok(s)
     }
 
-    async fn read_character_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
+    async fn read_character_size(&mut self, timeout: &Timeout) -> Result<usize, TgError> {
         let category = self.current_header_category;
         let payload = self.current_header_payload;
         self.clear_header_info();
 
         if category == HEADER_EMBED_CHARACTER {
-            return Ok(payload + MIN_EMBED_CHARACTER_SIZE);
+            return Ok((payload + MIN_EMBED_CHARACTER_SIZE) as usize);
         }
 
         debug_assert_eq!(category, HEADER_CHARACTER);
@@ -730,17 +730,17 @@ impl ResultSetValueStream {
         self.require(EntryType::Octet)?;
         let size = self.read_octet_size(timeout).await?;
 
-        let buffer = self.read_n(size as usize, timeout).await?;
+        let buffer = self.read_n(size, timeout).await?;
         Ok(buffer)
     }
 
-    async fn read_octet_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
+    async fn read_octet_size(&mut self, timeout: &Timeout) -> Result<usize, TgError> {
         let category = self.current_header_category;
         let payload = self.current_header_payload;
         self.clear_header_info();
 
         if category == HEADER_EMBED_OCTET {
-            return Ok(payload + MIN_EMBED_OCTET_SIZE);
+            return Ok((payload + MIN_EMBED_OCTET_SIZE) as usize);
         }
 
         debug_assert_eq!(category, HEADER_OCTET);
@@ -792,7 +792,7 @@ impl ResultSetValueStream {
         Ok((epoch_seconds, nanos as u32, offset_minutes as i32))
     }
 
-    pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
+    pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<usize, TgError> {
         self.require(EntryType::Row)?;
 
         let category = self.current_header_category;
@@ -800,7 +800,7 @@ impl ResultSetValueStream {
         self.clear_header_info();
 
         if category == HEADER_EMBED_ROW {
-            return Ok(payload + MIN_EMBED_ROW_SIZE);
+            return Ok((payload + MIN_EMBED_ROW_SIZE) as usize);
         }
 
         debug_assert_eq!(category, HEADER_ROW);
@@ -865,13 +865,13 @@ impl ResultSetValueStream {
         Ok(value as i32)
     }
 
-    async fn read_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
+    async fn read_size(&mut self, timeout: &Timeout) -> Result<usize, TgError> {
         let value = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
         if (value as i64) < 0 || value > (i32::MAX as u64) {
             // TODO BrokenEncodingException
             return Err(client_error!(format!("saw unsupported size {value}")));
         }
-        Ok(value as i32)
+        Ok(value as usize)
     }
 }
 
