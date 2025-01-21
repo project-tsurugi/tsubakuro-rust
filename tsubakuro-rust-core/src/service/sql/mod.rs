@@ -238,7 +238,7 @@ impl SqlClient {
 
         let command = Self::dispose_prepare_statement_command(prepare_handle, has_result_records);
         let response = self.send_and_pull_response(command, timeout).await?;
-        let _ = prepare_dispose_processor(response)?;
+        prepare_dispose_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())

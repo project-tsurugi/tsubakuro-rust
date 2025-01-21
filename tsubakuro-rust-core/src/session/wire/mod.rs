@@ -1,6 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
 use data_channel::{DataChannel, DataChannelWire};
+use log::trace;
 use prost::{
     bytes::{Buf, BytesMut},
     Message as ProstMessage,
@@ -119,7 +120,13 @@ impl Wire {
         let slot_handle = self.wire.response_box().create_slot_handle();
         let slot = slot_handle.slot();
 
+        trace!(
+            "Wire::send_internal() start. slot={}, request={:?}",
+            slot,
+            request
+        );
         self.wire.send(slot, &header, &payload).await?;
+        trace!("Wire::send_internal() end");
 
         Ok(slot_handle)
     }
@@ -154,17 +161,18 @@ impl Wire {
             return Ok(response);
         }
 
-        let mut interval = tokio::time::interval(POLLING_INTERVAL);
+        trace!("Wire::pull() start");
         loop {
-            interval.tick().await;
-
             self.wire.pull1().await?;
 
             if let Some(response) = slot_handle.take_wire_response() {
+                trace!("Wire::pull() end. response={:?}", response);
                 return Ok(response);
             }
 
             timeout.return_err_if_timeout("Wire.pull()")?;
+
+            tokio::time::sleep(POLLING_INTERVAL).await;
         }
     }
 
@@ -177,10 +185,7 @@ impl Wire {
             return Ok(true);
         }
 
-        let mut interval = tokio::time::interval(POLLING_INTERVAL);
         loop {
-            interval.tick().await;
-
             self.wire.pull1().await?;
 
             if slot_handle.exists_wire_response() {
@@ -190,6 +195,7 @@ impl Wire {
             if timeout.is_timeout() {
                 return Ok(false);
             }
+            tokio::time::sleep(POLLING_INTERVAL).await;
         }
     }
 

@@ -1,6 +1,6 @@
 use std::sync::{atomic::AtomicI64, Arc};
 
-use log::debug;
+use log::{debug, trace};
 use tokio::sync::Mutex;
 
 use crate::{
@@ -82,22 +82,28 @@ impl TcpWire {
     }
 
     pub(crate) async fn pull1(&self) -> Result<bool, TgError> {
+        // trace!("TcpWire::pull1() start");
         let _lock = match self.pull_lock.try_lock() {
             Ok(lock) => lock,
-            Err(_) => return Ok(false),
+            Err(_) => {
+                trace!("TcpWire::pull1() end. try_lock fail");
+                return Ok(false);}
         };
 
         let link_message = {
             if let Some(link_message) = self.link.recv().await? {
                 link_message
             } else {
+                // trace!("TcpWire::pull1() end. recv none");
                 return Ok(false);
             }
         };
+        trace!("TcpWire::pull1(): link_message={:?}", link_message);
 
         let info = TcpResponseInfo::from(link_message.info());
         if Self::is_result_set_response(info) {
             self.process_result_set_response(link_message).await?;
+            trace!("TcpWire::pull1() end. process_result_set_response");
             return Ok(true);
         }
 
@@ -106,6 +112,7 @@ impl TcpWire {
         let response = tcp_convert_wire_response(link_message).await?;
         self.response_box
             .set_response_to_slot_handle(slot, response, is_slot_end);
+        trace!("TcpWire::pull1() end. set_response_to_slot_handle");
         Ok(true)
     }
 

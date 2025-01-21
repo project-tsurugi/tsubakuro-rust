@@ -40,13 +40,13 @@ mod test {
 
     #[test]
     async fn keep_alive_on() {
-        // let _ = env_logger::builder().is_test(true).try_init();
+        // env_logger::builder().is_test(true).try_init().unwrap();
         keep_alive_test(Duration::from_millis(500)).await;
     }
 
     #[test]
     async fn keep_alive_off() {
-        // let _ = env_logger::builder().is_test(true).try_init();
+        // env_logger::builder().is_test(true).try_init().unwrap();
         keep_alive_test(Duration::ZERO).await;
     }
 

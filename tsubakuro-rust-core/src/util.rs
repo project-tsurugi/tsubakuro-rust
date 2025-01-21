@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use log::trace;
 use prost::alloc::string::String as ProstString;
 use tokio::time::Instant;
 
@@ -39,6 +40,7 @@ impl Timeout {
 
     pub(crate) fn return_err_if_timeout(&self, function_name: &str) -> Result<(), TgError> {
         if self.is_timeout() {
+            trace!("{function_name}: timeout");
             Err(timeout_error!(function_name))
         } else {
             Ok(())

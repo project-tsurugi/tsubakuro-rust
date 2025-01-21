@@ -282,4 +282,70 @@ mod test {
             _ => panic!("{:?}", error),
         };
     }
+
+    #[test]
+    async fn prepare_close() {
+        let client = create_test_sql_client().await;
+
+        create_table(
+            &client,
+            "test",
+            "create table test (foo int primary key, bar bigint, zzz varchar(10))",
+        )
+        .await;
+
+        for _i in 0..30 {
+            prepare_dispose_test(&client, true, false).await;
+        }
+    }
+
+    async fn prepare_dispose_test(client: &SqlClient, close: bool, logger_init: bool) {
+        let sql = "insert into test values(:foo, :bar, :zzz)";
+        let placeholders = vec![
+            SqlPlaceholder::of::<i32>("foo"),
+            SqlPlaceholder::of::<i64>("bar"),
+            SqlPlaceholder::of::<String>("zzz"),
+        ];
+        let ps = client.prepare(sql, placeholders).await.unwrap();
+
+        if logger_init {
+            env_logger::builder().is_test(true).try_init().unwrap();
+        }
+        if close {
+            ps.close().await.unwrap();
+        }
+    }
+
+    #[test]
+    #[ignore]
+    async fn prepare_drop() {
+        let client = create_test_sql_client().await;
+
+        create_table(
+            &client,
+            "test",
+            "create table test (foo int primary key, bar bigint, zzz varchar(10))",
+        )
+        .await;
+
+        for i in 0..10 {
+            println!("prepare_drop {}", i);
+            prepare_dispose_test(&client, false, false).await;
+        }
+    }
+
+    #[test]
+    #[ignore]
+    async fn prepare_drop1() {
+        let client = create_test_sql_client().await;
+
+        create_table(
+            &client,
+            "test",
+            "create table test (foo int primary key, bar bigint, zzz varchar(10))",
+        )
+        .await;
+
+        prepare_dispose_test(&client, false, true).await;
+    }
 }
