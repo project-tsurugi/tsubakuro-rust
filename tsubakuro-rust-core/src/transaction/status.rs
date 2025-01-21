@@ -47,16 +47,23 @@ pub(crate) fn transaction_status_processor(
         format!("response {:?} is not ResponseSessionPayload", response),
     ))?;
     match message.response {
-        Some(SqlResponseType::GetErrorInfo(info)) => match info.result.unwrap() {
-            crate::jogasaki::proto::sql::response::get_error_info::Result::Success(error) => Ok(
-                TransactionStatus::new(Some(sql_service_error!(FUNCTION_NAME, error))),
-            ),
-            crate::jogasaki::proto::sql::response::get_error_info::Result::ErrorNotFound(_) => {
-                Ok(TransactionStatus::new(None))
+        Some(SqlResponseType::GetErrorInfo(info)) => match info.result {
+            Some(crate::jogasaki::proto::sql::response::get_error_info::Result::Success(error)) => {
+                Ok(TransactionStatus::new(Some(sql_service_error!(
+                    FUNCTION_NAME,
+                    error
+                ))))
             }
-            crate::jogasaki::proto::sql::response::get_error_info::Result::Error(error) => {
+            Some(crate::jogasaki::proto::sql::response::get_error_info::Result::ErrorNotFound(
+                _,
+            )) => Ok(TransactionStatus::new(None)),
+            Some(crate::jogasaki::proto::sql::response::get_error_info::Result::Error(error)) => {
                 Err(sql_service_error!(FUNCTION_NAME, error))
             }
+            None => Err(invalid_response_error!(
+                FUNCTION_NAME,
+                format!("response GetErrorInfo.result is None"),
+            )),
         },
         _ => Err(invalid_response_error!(
             FUNCTION_NAME,

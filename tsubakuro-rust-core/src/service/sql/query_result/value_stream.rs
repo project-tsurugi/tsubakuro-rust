@@ -324,9 +324,15 @@ impl ResultSetValueStream {
 
         self.discard_current_column_if_exists(timeout).await?;
 
-        let rest = self.kind_stack_get_top().unwrap().1;
-        if rest == 0 {
-            return Ok(false);
+        match self.kind_stack_get_top() {
+            Some((_kind, rest)) => {
+                if *rest == 0 {
+                    return Ok(false);
+                }
+            }
+            None => {
+                return Err(client_error!("ValueStream::kind_stack_get_top() is None"));
+            }
         }
 
         self.current_column_type = self.peek_entry_type(timeout).await?;
@@ -341,7 +347,7 @@ impl ResultSetValueStream {
         debug_assert_eq!(false, self.kind_stack_is_empty());
         if self.current_column_type != EntryType::Nothing {
             self.force_discard_current_entry(timeout).await?;
-            self.column_consumed();
+            self.column_consumed()?;
         }
         Ok(())
     }
@@ -353,7 +359,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_boolean_value(&mut self, timeout: &Timeout) -> Result<bool, TgError> {
         self.require_column_type(EntryType::Int)?;
         let value = self.read_int(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
 
         match value {
             0 => Ok(false),
@@ -368,7 +374,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_int4_value(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
         self.require_column_type(EntryType::Int)?;
         let value = self.read_int(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
 
         if i32::MIN as i64 <= value && value <= i32::MAX as i64 {
             Ok(value as i32)
@@ -383,21 +389,21 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_int8_value(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
         self.require_column_type(EntryType::Int)?;
         let value = self.read_int(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
     pub(crate) async fn fetch_float4_value(&mut self, timeout: &Timeout) -> Result<f32, TgError> {
         self.require_column_type(EntryType::Float4)?;
         let value = self.read_float4(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
     pub(crate) async fn fetch_float8_value(&mut self, timeout: &Timeout) -> Result<f64, TgError> {
         self.require_column_type(EntryType::Float8)?;
         let value = self.read_float8(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -407,7 +413,7 @@ impl ResultSetValueStream {
     ) -> Result<(Option<BytesMut>, i64, i32), TgError> {
         self.require_column_type_set(&[EntryType::Ddecimal, EntryType::Int])?;
         let value = self.read_decimal(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -417,7 +423,7 @@ impl ResultSetValueStream {
     ) -> Result<String, TgError> {
         self.require_column_type(EntryType::Character)?;
         let value = self.read_character(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -427,14 +433,14 @@ impl ResultSetValueStream {
     ) -> Result<BytesMut, TgError> {
         self.require_column_type(EntryType::Octet)?;
         let value = self.read_octet(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
     pub(crate) async fn fetch_date_value(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
         self.require_column_type(EntryType::Date)?;
         let value = self.read_date(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -444,7 +450,7 @@ impl ResultSetValueStream {
     ) -> Result<i64, TgError> {
         self.require_column_type(EntryType::TimeOfDay)?;
         let value = self.read_time_of_day(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -454,7 +460,7 @@ impl ResultSetValueStream {
     ) -> Result<(i64, i32), TgError> {
         self.require_column_type(EntryType::TimePoint)?;
         let value = self.read_time_point(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -464,7 +470,7 @@ impl ResultSetValueStream {
     ) -> Result<(i64, i32), TgError> {
         self.require_column_type(EntryType::TimeOfDayWithTimeZone)?;
         let value = self.read_time_of_day_with_time_zone(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -474,7 +480,7 @@ impl ResultSetValueStream {
     ) -> Result<(i64, i32, i32), TgError> {
         self.require_column_type(EntryType::TimePointWithTimeZone)?;
         let value = self.read_time_point_with_time_zone(timeout).await?;
-        self.column_consumed();
+        self.column_consumed()?;
         Ok(value)
     }
 
@@ -504,11 +510,17 @@ impl ResultSetValueStream {
         Ok(())
     }
 
-    fn column_consumed(&mut self) {
+    fn column_consumed(&mut self) -> Result<(), TgError> {
         self.current_column_type = EntryType::Nothing;
-        let entry = self.kind_stack_get_top().unwrap();
+        let entry = match self.kind_stack_get_top() {
+            Some(value) => value,
+            None => {
+                return Err(client_error!("ValueStream::kind_stack_get_top() is None"));
+            }
+        };
         debug_assert!(entry.1 > 0);
         entry.1 -= 1;
+        Ok(())
     }
 }
 

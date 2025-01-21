@@ -158,7 +158,11 @@ fn update_expiration_time_processor(wire_response: WireResponse) -> Result<(), T
         if let Some(e) = error {
             return Err(e.to_tg_error());
         }
-        payload.unwrap()
+        if let Some(payload) = payload {
+            payload
+        } else {
+            return Err(invalid_response_error!(FUNCTION_NAME, "payload is None"));
+        }
     } else {
         return Err(invalid_response_error!(
             FUNCTION_NAME,
@@ -195,7 +199,11 @@ fn shutdown_processor_main(
         if let Some(e) = error {
             return Err(e.to_tg_error());
         }
-        payload.unwrap()
+        if let Some(payload) = payload {
+            payload
+        } else {
+            return Err(invalid_response_error!(function_name, "payload is None"));
+        }
     } else {
         return Err(invalid_response_error!(
             function_name,

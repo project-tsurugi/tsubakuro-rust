@@ -64,16 +64,18 @@ pub(crate) fn execute_result_processor(
         format!("response {:?} is not ResponseSessionPayload", response),
     ))?;
     match message.response {
-        Some(SqlResponseType::ExecuteResult(execute_result)) => {
-            match execute_result.result.unwrap() {
-                crate::jogasaki::proto::sql::response::execute_result::Result::Success(success) => {
-                    Ok(SqlExecuteResult::new(success))
-                }
-                crate::jogasaki::proto::sql::response::execute_result::Result::Error(error) => {
-                    Err(sql_service_error!(FUNCTION_NAME, error))
-                }
+        Some(SqlResponseType::ExecuteResult(execute_result)) => match execute_result.result {
+            Some(crate::jogasaki::proto::sql::response::execute_result::Result::Success(
+                success,
+            )) => Ok(SqlExecuteResult::new(success)),
+            Some(crate::jogasaki::proto::sql::response::execute_result::Result::Error(error)) => {
+                Err(sql_service_error!(FUNCTION_NAME, error))
             }
-        }
+            None => Err(invalid_response_error!(
+                FUNCTION_NAME,
+                "response ExecuteResult.result is None",
+            )),
+        },
         _ => Err(invalid_response_error!(
             FUNCTION_NAME,
             format!("response {:?} is not ExecuteResult", message.response),

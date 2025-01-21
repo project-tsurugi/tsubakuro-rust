@@ -1,4 +1,5 @@
 use crate::{
+    client_error,
     error::TgError,
     invalid_response_error,
     jogasaki::proto::sql::response::ResultSetMetadata,
@@ -14,6 +15,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use bigdecimal::FromPrimitive;
+use log::trace;
 use prost::{bytes::BytesMut, Message};
 use std::{sync::Arc, time::Duration};
 use value_stream::ResultSetValueStream;
@@ -90,7 +92,11 @@ fn read_result_set_metadata(
             if let Some(e) = error {
                 return Err(e.to_tg_error());
             }
-            let payload = payload.unwrap();
+            let payload = if let Some(payload) = payload {
+                payload
+            } else {
+                return Err(invalid_response_error!(FUNCTION_NAME, "payload is None"));
+            };
             let message = SqlResponse::decode_length_delimited(payload)
                 .map_err(|e| prost_decode_error!(FUNCTION_NAME, "SqlResponse", e))?;
             match message.response {
@@ -269,8 +275,7 @@ impl SqlQueryResultFetch<bigdecimal::BigDecimal> for SqlQueryResult {
         let timeout = Timeout::new(timeout);
         let (coefficient_bytes, coefficient, scale) =
             self.value_stream.fetch_decimal_value(&timeout).await?;
-        let value = bigdecimal_big_decimal(coefficient_bytes, coefficient, scale);
-        Ok(value)
+        bigdecimal_big_decimal(coefficient_bytes, coefficient, scale)
     }
 }
 
@@ -279,7 +284,7 @@ fn bigdecimal_big_decimal(
     coefficient_bytes: Option<BytesMut>,
     coefficient: i64,
     scale: i32,
-) -> bigdecimal::BigDecimal {
+) -> Result<bigdecimal::BigDecimal, TgError> {
     let value = match coefficient_bytes {
         Some(coefficient) => {
             let value = bigdecimal::num_bigint::BigInt::from_signed_bytes_be(&coefficient);
@@ -287,14 +292,32 @@ fn bigdecimal_big_decimal(
         }
         None => {
             if scale == 0 {
-                bigdecimal::BigDecimal::from_i64(coefficient).unwrap()
+                match bigdecimal::BigDecimal::from_i64(coefficient) {
+                    Some(value) => value,
+                    None => {
+                        trace!(
+                            "bigdecimal::BigDecimal::from_i64() error. coefficient={}",
+                            coefficient
+                        );
+                        return Err(client_error!("bigdecimal::BigDecimal generate error"));
+                    }
+                }
             } else {
-                let value = bigdecimal::num_bigint::BigInt::from_i64(coefficient).unwrap();
+                let value = match bigdecimal::num_bigint::BigInt::from_i64(coefficient) {
+                    Some(value) => value,
+                    None => {
+                        trace!(
+                            "bigdecimal::BigInt::from_i64() error. coefficient={}",
+                            coefficient
+                        );
+                        return Err(client_error!("bigdecimal::BigDecimal generate error"));
+                    }
+                };
                 bigdecimal::BigDecimal::from_bigint(value, scale as i64)
             }
         }
     };
-    value
+    Ok(value)
 }
 
 #[cfg(feature = "with_rust_decimal")]
@@ -314,8 +337,7 @@ impl SqlQueryResultFetch<rust_decimal::Decimal> for SqlQueryResult {
         let timeout = Timeout::new(timeout);
         let (coefficient_bytes, coefficient, scale) =
             self.value_stream.fetch_decimal_value(&timeout).await?;
-        let value = rust_decimal_decimal(coefficient_bytes, coefficient, scale);
-        Ok(value)
+        rust_decimal_decimal(coefficient_bytes, coefficient, scale)
     }
 }
 
@@ -324,7 +346,7 @@ fn rust_decimal_decimal(
     coefficient_bytes: Option<BytesMut>,
     coefficient: i64,
     scale: i32,
-) -> rust_decimal::Decimal {
+) -> Result<rust_decimal::Decimal, TgError> {
     let value = match coefficient_bytes {
         Some(coefficient) => {
             let top = coefficient[0] as i8;
@@ -341,7 +363,7 @@ fn rust_decimal_decimal(
         let factor = rust_decimal::Decimal::from_i128_with_scale(10_i128.pow(-scale as u32), 0);
         value * factor
     };
-    value
+    Ok(value)
 }
 
 #[async_trait(?Send)] // thread unsafe
@@ -419,16 +441,23 @@ impl SqlQueryResultFetch<chrono::NaiveDate> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDate, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_date_value(&timeout).await?;
-        let value = chrono_naive_date(value);
-        Ok(value)
+        chrono_naive_date(value)
     }
 }
 
 #[cfg(feature = "with_chrono")]
-fn chrono_naive_date(value: i64) -> chrono::NaiveDate {
+fn chrono_naive_date(value: i64) -> Result<chrono::NaiveDate, TgError> {
     let days = value + /* NaiveDate(1970-01-01).num_days_from_ce() */ 719_163;
-    let value = chrono::NaiveDate::from_num_days_from_ce_opt(days as i32).unwrap();
-    value
+    match chrono::NaiveDate::from_num_days_from_ce_opt(days as i32) {
+        Some(value) => Ok(value),
+        None => {
+            trace!(
+                "chrono::NaiveDate::from_num_days_from_ce_opt() error. days={}",
+                days
+            );
+            Err(client_error!("chrono::NaiveDate generate error"))
+        }
+    }
 }
 
 #[cfg(feature = "with_chrono")]
@@ -447,17 +476,25 @@ impl SqlQueryResultFetch<chrono::NaiveTime> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveTime, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
-        let value = chrono_naive_time(value);
-        Ok(value)
+        chrono_naive_time(value)
     }
 }
 
 #[cfg(feature = "with_chrono")]
-fn chrono_naive_time(value: i64) -> chrono::NaiveTime {
+fn chrono_naive_time(value: i64) -> Result<chrono::NaiveTime, TgError> {
     let seconds = (value / 1_000_000_000) as u32;
     let nanos = (value % 1_000_000_000) as u32;
-    let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
-    value
+    match chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos) {
+        Some(value) => Ok(value),
+        None => {
+            trace!(
+                "chrono::NaiveTime::from_num_seconds_from_midnight_opt() error. seconds={}, nanos={}",
+                seconds,
+                nanos
+            );
+            Err(client_error!("chrono::NaiveTime generate error"))
+        }
+    }
 }
 
 #[cfg(feature = "with_chrono")]
@@ -476,16 +513,26 @@ impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDateTime, TgError> {
         let timeout = Timeout::new(timeout);
         let (epoch_seconds, nanos) = self.value_stream.fetch_time_point_value(&timeout).await?;
-        let value = chrono_naive_date_time(epoch_seconds, nanos);
-        Ok(value)
+        chrono_naive_date_time(epoch_seconds, nanos)
     }
 }
 
 #[cfg(feature = "with_chrono")]
-fn chrono_naive_date_time(epoch_seconds: i64, nanos: i32) -> chrono::NaiveDateTime {
-    let value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32).unwrap();
-    let value = value.naive_utc();
-    value
+fn chrono_naive_date_time(
+    epoch_seconds: i64,
+    nanos: i32,
+) -> Result<chrono::NaiveDateTime, TgError> {
+    match chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32) {
+        Some(value) => Ok(value.naive_utc()),
+        None => {
+            trace!(
+                "chrono::DateTime::from_timestamp() error. epoch_seconds={}, nanos={}",
+                epoch_seconds,
+                nanos
+            );
+            Err(client_error!("chrono::DateTime generate error"))
+        }
+    }
 }
 
 #[cfg(feature = "with_chrono")]
@@ -510,8 +557,7 @@ impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryR
             .value_stream
             .fetch_time_of_day_with_time_zone_value(&timeout)
             .await?;
-        let value = chrono_naive_time_with_offset(time, offset_minutes);
-        Ok(value)
+        chrono_naive_time_with_offset(time, offset_minutes)
     }
 }
 
@@ -519,15 +565,26 @@ impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryR
 fn chrono_naive_time_with_offset(
     time: i64,
     offset_minutes: i32,
-) -> (chrono::NaiveTime, chrono::FixedOffset) {
-    let seconds = (time / 1_000_000_000) as u32;
-    let nanos = (time % 1_000_000_000) as u32;
-    let value = chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos).unwrap();
+) -> Result<(chrono::NaiveTime, chrono::FixedOffset), TgError> {
+    let value = chrono_naive_time(time)?;
+    let offset = chrono_fixed_offset(offset_minutes)?;
 
+    Ok((value, offset))
+}
+
+#[cfg(feature = "with_chrono")]
+fn chrono_fixed_offset(offset_minutes: i32) -> Result<chrono::FixedOffset, TgError> {
     let offset_seconds = offset_minutes * 60;
-    let offset = chrono::FixedOffset::east_opt(offset_seconds).unwrap();
-
-    (value, offset)
+    match chrono::FixedOffset::east_opt(offset_seconds) {
+        Some(value) => Ok(value),
+        None => {
+            trace!(
+                "chrono::FixedOffset::east_opt() error. offset_seconds={}",
+                offset_seconds
+            );
+            Err(client_error!("chrono::FixedOffset generate error"))
+        }
+    }
 }
 
 #[cfg(feature = "with_chrono")]
@@ -552,8 +609,7 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::FixedOffset>> for SqlQueryResu
             .value_stream
             .fetch_time_point_with_time_zone_value(&timeout)
             .await?;
-        let value = chrono_date_time(epoch_seconds, nanos, offset_minutes);
-        Ok(value)
+        chrono_date_time(epoch_seconds, nanos, offset_minutes)
     }
 }
 
@@ -562,19 +618,38 @@ fn chrono_date_time(
     epoch_seconds: i64,
     nanos: i32,
     offset_minutes: i32,
-) -> chrono::DateTime<chrono::FixedOffset> {
-    let mut value = chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32)
-        .unwrap()
-        .naive_utc();
+) -> Result<chrono::DateTime<chrono::FixedOffset>, TgError> {
+    let mut value = match chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32) {
+        Some(value) => value.naive_utc(),
+        None => {
+            trace!(
+                "chrono::DateTime::from_timestamp() error. epoch_seconds={}, nanos={}",
+                epoch_seconds,
+                nanos
+            );
+            return Err(client_error!("chrono::DateTime generate error"));
+        }
+    };
 
-    let offset_seconds = offset_minutes * 60;
-    let offset = chrono::FixedOffset::east_opt(offset_seconds).unwrap();
+    let offset = chrono_fixed_offset(offset_minutes)?;
 
     if offset.local_minus_utc() != 0 {
-        value = value.checked_sub_offset(offset).unwrap();
+        value = match value.checked_sub_offset(offset) {
+            Some(value) => value,
+            None => {
+                trace!(
+                    "chrono::NaiveDateTime::checked_sub_offset() error. value={}, offset={}",
+                    value,
+                    offset
+                );
+                return Err(client_error!(
+                    "chrono::NaiveDateTime checked_sub_offset() error"
+                ));
+            }
+        };
     }
     let value = chrono::DateTime::<chrono::FixedOffset>::from_naive_utc_and_offset(value, offset);
-    value
+    Ok(value)
 }
 
 #[cfg(feature = "with_chrono")]
@@ -615,16 +690,20 @@ impl SqlQueryResultFetch<time::Date> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<time::Date, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_date_value(&timeout).await?;
-        let value = time_date(value);
-        Ok(value)
+        time_date(value)
     }
 }
 
 #[cfg(feature = "with_time")]
-fn time_date(value: i64) -> time::Date {
+fn time_date(value: i64) -> Result<time::Date, TgError> {
     let days = value + /* Date(1970-01-01).to_julian_day() */ 2440588;
-    let value = time::Date::from_julian_day(days as i32).unwrap();
-    value
+    match time::Date::from_julian_day(days as i32) {
+        Ok(value) => Ok(value),
+        Err(e) => {
+            trace!("time::Date::from_julian_day() error. days={}", days);
+            Err(client_error!("time::Date generate error", e))
+        }
+    }
 }
 
 #[cfg(feature = "with_time")]
@@ -643,22 +722,35 @@ impl SqlQueryResultFetch<time::Time> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<time::Time, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
-        let value = time_time(value);
-        Ok(value)
+        time_time(value)
     }
 }
 
 #[cfg(feature = "with_time")]
-fn time_time(value: i64) -> time::Time {
+fn time_time(value: i64) -> Result<time::Time, TgError> {
     let nanos = value % 1000_000_000;
     let value = value / 1000_000_000;
-    let sec = value % 60;
-    let value = value / 60;
+    time_time_nanos(value, nanos as u32)
+}
+
+#[cfg(feature = "with_time")]
+fn time_time_nanos(seconds: i64, nanos: u32) -> Result<time::Time, TgError> {
+    let sec = seconds % 60;
+    let value = seconds / 60;
     let min = value % 60;
     let hour = value / 60;
 
-    let value = time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap();
-    value
+    match time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32) {
+        Ok(value) => Ok(value),
+        Err(e) => {
+            trace!(
+                "time::Time::from_hms_nano() error. seconds={}, nanos={}",
+                seconds,
+                nanos
+            );
+            Err(client_error!("time::Time generate error", e))
+        }
+    }
 }
 
 #[cfg(feature = "with_time")]
@@ -677,31 +769,27 @@ impl SqlQueryResultFetch<time::PrimitiveDateTime> for SqlQueryResult {
     async fn fetch_for(&mut self, timeout: Duration) -> Result<time::PrimitiveDateTime, TgError> {
         let timeout = Timeout::new(timeout);
         let (epoch_seconds, nanos) = self.value_stream.fetch_time_point_value(&timeout).await?;
-        let value = time_primitive_date_time(epoch_seconds, nanos);
-        Ok(value)
+        time_primitive_date_time(epoch_seconds, nanos)
     }
 }
 
 #[cfg(feature = "with_time")]
-fn time_primitive_date_time(epoch_seconds: i64, nanos: i32) -> time::PrimitiveDateTime {
+fn time_primitive_date_time(
+    epoch_seconds: i64,
+    nanos: i32,
+) -> Result<time::PrimitiveDateTime, TgError> {
     const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
-    let mut days = epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
+    let mut days = epoch_seconds / SECONDS_PER_DAY;
     let mut value = epoch_seconds % SECONDS_PER_DAY;
     if value < 0 {
         value += SECONDS_PER_DAY;
         days -= 1;
     }
-    let sec = value % 60;
-    let value = value / 60;
-    let min = value % 60;
-    let value = value / 60;
-    let hour = value % 24;
 
-    let value = time::PrimitiveDateTime::new(
-        time::Date::from_julian_day(days as i32).unwrap(),
-        time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap(),
-    );
-    value
+    let date = time_date(days)?;
+    let time = time_time_nanos(value, nanos as u32)?;
+    let value = time::PrimitiveDateTime::new(date, time);
+    Ok(value)
 }
 
 #[cfg(feature = "with_time")]
@@ -726,25 +814,34 @@ impl SqlQueryResultFetch<(time::Time, time::UtcOffset)> for SqlQueryResult {
             .value_stream
             .fetch_time_of_day_with_time_zone_value(&timeout)
             .await?;
-        let value = time_time_with_offset(time, offset_minutes);
-        Ok(value)
+        time_time_with_offset(time, offset_minutes)
     }
 }
 
 #[cfg(feature = "with_time")]
-fn time_time_with_offset(time: i64, offset_minutes: i32) -> (time::Time, time::UtcOffset) {
-    let nanos = time % 1000_000_000;
-    let value = time / 1000_000_000;
-    let sec = value % 60;
-    let value = value / 60;
-    let min = value % 60;
-    let hour = value / 60;
-    let value = time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap();
+fn time_time_with_offset(
+    time: i64,
+    offset_minutes: i32,
+) -> Result<(time::Time, time::UtcOffset), TgError> {
+    let value = time_time(time)?;
+    let offset = time_utc_offset(offset_minutes)?;
 
+    Ok((value, offset))
+}
+
+#[cfg(feature = "with_time")]
+fn time_utc_offset(offset_minutes: i32) -> Result<time::UtcOffset, TgError> {
     let offset_seconds = offset_minutes * 60;
-    let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
-
-    (value, offset)
+    match time::UtcOffset::from_whole_seconds(offset_seconds) {
+        Ok(value) => Ok(value),
+        Err(e) => {
+            trace!(
+                "time::UtcOffset::from_whole_seconds() error. offset_seconds={}",
+                offset_seconds
+            );
+            Err(client_error!("time::UtcOffset generate error", e))
+        }
+    }
 }
 
 #[cfg(feature = "with_time")]
@@ -766,8 +863,7 @@ impl SqlQueryResultFetch<time::OffsetDateTime> for SqlQueryResult {
             .value_stream
             .fetch_time_point_with_time_zone_value(&timeout)
             .await?;
-        let value = time_offset_date_time(epoch_seconds, nanos, offset_minutes);
-        Ok(value)
+        time_offset_date_time(epoch_seconds, nanos, offset_minutes)
     }
 }
 
@@ -776,29 +872,20 @@ fn time_offset_date_time(
     epoch_seconds: i64,
     nanos: i32,
     offset_minutes: i32,
-) -> time::OffsetDateTime {
+) -> Result<time::OffsetDateTime, TgError> {
     const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
-    let mut days = epoch_seconds / SECONDS_PER_DAY + /* Date(1970-01-01).to_julian_day() */ 2440588;
+    let mut days = epoch_seconds / SECONDS_PER_DAY;
     let mut value = epoch_seconds % SECONDS_PER_DAY;
     if value < 0 {
         value += SECONDS_PER_DAY;
         days -= 1;
     }
-    let sec = value % 60;
-    let value = value / 60;
-    let min = value % 60;
-    let value = value / 60;
-    let hour = value % 24;
 
-    let offset_seconds = offset_minutes * 60;
-    let offset = time::UtcOffset::from_whole_seconds(offset_seconds).unwrap();
-
-    let value = time::OffsetDateTime::new_in_offset(
-        time::Date::from_julian_day(days as i32).unwrap(),
-        time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32).unwrap(),
-        offset,
-    );
-    value
+    let date = time_date(days)?;
+    let time = time_time_nanos(value, nanos as u32)?;
+    let offset = time_utc_offset(offset_minutes)?;
+    let value = time::OffsetDateTime::new_in_offset(date, time, offset);
+    Ok(value)
 }
 
 #[async_trait(?Send)] // thread unsafe
@@ -871,7 +958,8 @@ mod test {
             coefficient_bytes.map(|slice| BytesMut::from(slice)),
             coefficient,
             scale,
-        );
+        )
+        .unwrap();
         let expected = bigdecimal::BigDecimal::from_str(expected).unwrap();
         assert_eq!(expected, value);
     }
@@ -910,7 +998,8 @@ mod test {
             coefficient_bytes.map(|slice| BytesMut::from(slice)),
             coefficient,
             scale,
-        );
+        )
+        .unwrap();
         let expected = rust_decimal::Decimal::from_str(expected).unwrap();
         assert_eq!(expected, value);
     }
@@ -930,7 +1019,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     fn chrono_naive_date_test(value: i64, expected: &str) {
-        let value = super::chrono_naive_date(value);
+        let value = super::chrono_naive_date(value).unwrap();
         let expected = chrono::NaiveDate::from_str(expected).unwrap();
         assert_eq!(expected, value);
     }
@@ -953,7 +1042,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     fn chrono_naive_time_test(value: i64, expected: &str) {
-        let value = super::chrono_naive_time(value);
+        let value = super::chrono_naive_time(value).unwrap();
         let expected = chrono::NaiveTime::from_str(expected).unwrap();
         assert_eq!(expected, value);
     }
@@ -982,7 +1071,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     fn chrono_naive_date_time_test(epoch_seconds: i64, nanos: i32, expected: &str) {
-        let value = super::chrono_naive_date_time(epoch_seconds, nanos);
+        let value = super::chrono_naive_date_time(epoch_seconds, nanos).unwrap();
         let expected = chrono::NaiveDateTime::from_str(expected).unwrap();
         assert_eq!(expected, value);
     }
@@ -1016,7 +1105,7 @@ mod test {
         expected: &str,
         expected_offset: &str,
     ) {
-        let (value, offset) = super::chrono_naive_time_with_offset(value, offset_minutes);
+        let (value, offset) = super::chrono_naive_time_with_offset(value, offset_minutes).unwrap();
         let expected = chrono::NaiveTime::from_str(expected).unwrap();
         assert_eq!(expected, value);
         let expected = chrono::FixedOffset::from_str(expected_offset).unwrap();
@@ -1055,7 +1144,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     fn chrono_date_time_test(epoch_seconds: i64, nanos: i32, offset_minutes: i32, expected: &str) {
-        let value = super::chrono_date_time(epoch_seconds, nanos, offset_minutes);
+        let value = super::chrono_date_time(epoch_seconds, nanos, offset_minutes).unwrap();
         let expected = chrono::DateTime::<chrono::FixedOffset>::from_str(expected).unwrap();
         assert_eq!(expected, value);
     }
@@ -1075,7 +1164,7 @@ mod test {
 
     #[cfg(feature = "with_time")]
     fn time_date_test(value: i64, expected: &str) {
-        let value = super::time_date(value);
+        let value = super::time_date(value).unwrap();
 
         let mut s = TimeString::new(expected);
         let year = s.next_year();
@@ -1103,7 +1192,7 @@ mod test {
 
     #[cfg(feature = "with_time")]
     fn time_time_test(value: i64, expected: &str) {
-        let value = super::time_time(value);
+        let value = super::time_time(value).unwrap();
 
         let mut s = TimeString::new(expected);
         let hour = s.next_hour();
@@ -1138,7 +1227,7 @@ mod test {
 
     #[cfg(feature = "with_time")]
     fn time_primitive_date_time_test(epoch_seconds: i64, nanos: i32, expected: &str) {
-        let value = super::time_primitive_date_time(epoch_seconds, nanos);
+        let value = super::time_primitive_date_time(epoch_seconds, nanos).unwrap();
 
         let mut s = TimeString::new(expected);
         let year = s.next_year();
@@ -1185,7 +1274,7 @@ mod test {
         expected: &str,
         expected_offset: &str,
     ) {
-        let (value, offset) = super::time_time_with_offset(value, offset_minutes);
+        let (value, offset) = super::time_time_with_offset(value, offset_minutes).unwrap();
 
         let mut s = TimeString::new(expected);
         let hour = s.next_hour();
@@ -1237,7 +1326,7 @@ mod test {
         offset_minutes: i32,
         expected: &str,
     ) {
-        let value = super::time_offset_date_time(epoch_seconds, nanos, offset_minutes);
+        let value = super::time_offset_date_time(epoch_seconds, nanos, offset_minutes).unwrap();
 
         let mut s = TimeString::new(expected);
         let year = s.next_year();
@@ -1322,11 +1411,13 @@ mod test {
 
                 let c = &self.text[self.position..self.position + 1];
                 let result: Result<u32, _> = c.parse();
-                if result.is_err() {
+                let v = if let Ok(value) = result {
+                    value
+                } else {
                     break;
-                }
+                };
 
-                value += result.unwrap() * factor;
+                value += v * factor;
                 self.position += 1;
                 factor /= 10;
             }

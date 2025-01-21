@@ -149,8 +149,8 @@ pub(crate) fn transaction_begin_processor(
         format!("response {:?} is not ResponseSessionPayload", response),
     ))?;
     match message.response {
-        Some(SqlResponseType::Begin(begin)) => match begin.result.unwrap() {
-            crate::jogasaki::proto::sql::response::begin::Result::Success(success) => {
+        Some(SqlResponseType::Begin(begin)) => match begin.result {
+            Some(crate::jogasaki::proto::sql::response::begin::Result::Success(success)) => {
                 let tx_handle = success
                     .transaction_handle
                     .ok_or(invalid_response_error!(
@@ -167,9 +167,13 @@ pub(crate) fn transaction_begin_processor(
                     .id;
                 Ok(Transaction::new(session, tx_handle, tx_id, close_timeout))
             }
-            crate::jogasaki::proto::sql::response::begin::Result::Error(error) => {
+            Some(crate::jogasaki::proto::sql::response::begin::Result::Error(error)) => {
                 Err(sql_service_error!(FUNCTION_NAME, error))
             }
+            None => Err(invalid_response_error!(
+                FUNCTION_NAME,
+                format!("response Begin.result is None"),
+            )),
         },
         _ => Err(invalid_response_error!(
             FUNCTION_NAME,

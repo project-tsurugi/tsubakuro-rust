@@ -58,16 +58,18 @@ pub(crate) fn table_metadata_processor(response: WireResponse) -> Result<TableMe
         format!("response {:?} is not ResponseSessionPayload", response),
     ))?;
     match message.response {
-        Some(SqlResponseType::DescribeTable(describe_table)) => {
-            match describe_table.result.unwrap() {
-                crate::jogasaki::proto::sql::response::describe_table::Result::Success(success) => {
-                    Ok(TableMetadata::new(success))
-                }
-                crate::jogasaki::proto::sql::response::describe_table::Result::Error(error) => {
-                    Err(sql_service_error!(FUNCTION_NAME, error))
-                }
+        Some(SqlResponseType::DescribeTable(describe_table)) => match describe_table.result {
+            Some(crate::jogasaki::proto::sql::response::describe_table::Result::Success(
+                success,
+            )) => Ok(TableMetadata::new(success)),
+            Some(crate::jogasaki::proto::sql::response::describe_table::Result::Error(error)) => {
+                Err(sql_service_error!(FUNCTION_NAME, error))
             }
-        }
+            None => Err(invalid_response_error!(
+                FUNCTION_NAME,
+                format!("response DescribeTable.result is None"),
+            )),
+        },
         _ => Err(invalid_response_error!(
             FUNCTION_NAME,
             format!("response {:?} is not DescribeTable", message.response),

@@ -39,13 +39,17 @@ pub(crate) fn list_tables_processor(response: WireResponse) -> Result<TableList,
         format!("response {:?} is not ResponseSessionPayload", response),
     ))?;
     match message.response {
-        Some(SqlResponseType::ListTables(list_tables)) => match list_tables.result.unwrap() {
-            crate::jogasaki::proto::sql::response::list_tables::Result::Success(success) => {
+        Some(SqlResponseType::ListTables(list_tables)) => match list_tables.result {
+            Some(crate::jogasaki::proto::sql::response::list_tables::Result::Success(success)) => {
                 Ok(TableList::new(success))
             }
-            crate::jogasaki::proto::sql::response::list_tables::Result::Error(error) => {
+            Some(crate::jogasaki::proto::sql::response::list_tables::Result::Error(error)) => {
                 Err(sql_service_error!(FUNCTION_NAME, error))
             }
+            None => Err(invalid_response_error!(
+                FUNCTION_NAME,
+                format!("response ListTables.result is None"),
+            )),
         },
         _ => Err(invalid_response_error!(
             FUNCTION_NAME,

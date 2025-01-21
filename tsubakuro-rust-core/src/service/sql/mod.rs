@@ -861,6 +861,9 @@ pub(crate) fn convert_sql_response(
             if let Some(e) = error {
                 return Err(e.to_tg_error());
             }
+            if payload.is_none() {
+                return Err(invalid_response_error!(function_name, "payload is None"));
+            }
             // let payload = payload.as_deref().unwrap();
             let payload = &payload.as_ref().unwrap()[..];
             let sql_response = SqlResponse::decode_length_delimited(payload)
