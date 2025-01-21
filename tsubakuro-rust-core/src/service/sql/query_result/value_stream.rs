@@ -447,7 +447,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_time_of_day_value(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<i64, TgError> {
+    ) -> Result<u64, TgError> {
         self.require_column_type(EntryType::TimeOfDay)?;
         let value = self.read_time_of_day(timeout).await?;
         self.column_consumed()?;
@@ -457,7 +457,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_time_point_value(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(i64, i32), TgError> {
+    ) -> Result<(i64, u32), TgError> {
         self.require_column_type(EntryType::TimePoint)?;
         let value = self.read_time_point(timeout).await?;
         self.column_consumed()?;
@@ -467,7 +467,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_time_of_day_with_time_zone_value(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(i64, i32), TgError> {
+    ) -> Result<(u64, i32), TgError> {
         self.require_column_type(EntryType::TimeOfDayWithTimeZone)?;
         let value = self.read_time_of_day_with_time_zone(timeout).await?;
         self.column_consumed()?;
@@ -477,7 +477,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_time_point_with_time_zone_value(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(i64, i32, i32), TgError> {
+    ) -> Result<(i64, u32, i32), TgError> {
         self.require_column_type(EntryType::TimePointWithTimeZone)?;
         let value = self.read_time_point_with_time_zone(timeout).await?;
         self.column_consumed()?;
@@ -754,25 +754,25 @@ impl ResultSetValueStream {
         Ok(epoch_days)
     }
 
-    async fn read_time_of_day(&mut self, timeout: &Timeout) -> Result<i64, TgError> {
+    async fn read_time_of_day(&mut self, timeout: &Timeout) -> Result<u64, TgError> {
         self.require(EntryType::TimeOfDay)?;
         self.clear_header_info();
         let epoch_nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
         Ok(epoch_nanos)
     }
 
-    async fn read_time_point(&mut self, timeout: &Timeout) -> Result<(i64, i32), TgError> {
+    async fn read_time_point(&mut self, timeout: &Timeout) -> Result<(i64, u32), TgError> {
         self.require(EntryType::TimePoint)?;
         self.clear_header_info();
         let epoch_seconds = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
         let nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
-        Ok((epoch_seconds, nanos as i32))
+        Ok((epoch_seconds, nanos as u32))
     }
 
     async fn read_time_of_day_with_time_zone(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(i64, i32), TgError> {
+    ) -> Result<(u64, i32), TgError> {
         self.require(EntryType::TimeOfDayWithTimeZone)?;
         self.clear_header_info();
         let epoch_nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
@@ -783,13 +783,13 @@ impl ResultSetValueStream {
     async fn read_time_point_with_time_zone(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(i64, i32, i32), TgError> {
+    ) -> Result<(i64, u32, i32), TgError> {
         self.require(EntryType::TimePointWithTimeZone)?;
         self.clear_header_info();
         let epoch_seconds = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
         let nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
         let offset_minutes = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
-        Ok((epoch_seconds, nanos as i32, offset_minutes as i32))
+        Ok((epoch_seconds, nanos as u32, offset_minutes as i32))
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
@@ -867,7 +867,7 @@ impl ResultSetValueStream {
 
     async fn read_size(&mut self, timeout: &Timeout) -> Result<i32, TgError> {
         let value = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
-        if value < 0 || value > (i32::MAX as i64) {
+        if (value as i64) < 0 || value > (i32::MAX as u64) {
             // TODO BrokenEncodingException
             return Err(client_error!(format!("saw unsupported size {value}")));
         }

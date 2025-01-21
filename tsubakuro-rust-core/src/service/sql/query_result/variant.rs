@@ -8,11 +8,11 @@ impl Base128Variant {
     pub(crate) async fn read_unsigned(
         stream: &mut DataChannel,
         timeout: &Timeout,
-    ) -> Result<i64, TgError> {
-        let mut result = 0_i64;
+    ) -> Result<u64, TgError> {
+        let mut result = 0_u64;
         for i in 0..8 {
             let c = Self::read_u8(stream, timeout).await?;
-            result |= ((c & 0x7f) as i64) << (i * 7);
+            result |= ((c & 0x7f) as u64) << (i * 7);
 
             if (c & 0x80) == 0 {
                 return Ok(result);
@@ -20,7 +20,7 @@ impl Base128Variant {
         }
 
         let c = Self::read_u8(stream, timeout).await?;
-        result |= (c as i64) << 56;
+        result |= (c as u64) << 56;
         Ok(result)
     }
 
@@ -28,7 +28,7 @@ impl Base128Variant {
         stream: &mut DataChannel,
         timeout: &Timeout,
     ) -> Result<i64, TgError> {
-        let v = Self::read_unsigned(stream, timeout).await? as u64;
+        let v = Self::read_unsigned(stream, timeout).await?;
         let r = if (v & 0x01) == 0 { v >> 1 } else { !(v >> 1) };
         Ok(r as i64)
     }

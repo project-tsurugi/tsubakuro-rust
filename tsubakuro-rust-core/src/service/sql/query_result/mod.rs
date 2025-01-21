@@ -481,7 +481,7 @@ impl SqlQueryResultFetch<chrono::NaiveTime> for SqlQueryResult {
 }
 
 #[cfg(feature = "with_chrono")]
-fn chrono_naive_time(value: i64) -> Result<chrono::NaiveTime, TgError> {
+fn chrono_naive_time(value: u64) -> Result<chrono::NaiveTime, TgError> {
     let seconds = (value / 1_000_000_000) as u32;
     let nanos = (value % 1_000_000_000) as u32;
     match chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds, nanos) {
@@ -520,9 +520,9 @@ impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
 #[cfg(feature = "with_chrono")]
 fn chrono_naive_date_time(
     epoch_seconds: i64,
-    nanos: i32,
+    nanos: u32,
 ) -> Result<chrono::NaiveDateTime, TgError> {
-    match chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32) {
+    match chrono::DateTime::from_timestamp(epoch_seconds, nanos) {
         Some(value) => Ok(value.naive_utc()),
         None => {
             trace!(
@@ -563,7 +563,7 @@ impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryR
 
 #[cfg(feature = "with_chrono")]
 fn chrono_naive_time_with_offset(
-    time: i64,
+    time: u64,
     offset_minutes: i32,
 ) -> Result<(chrono::NaiveTime, chrono::FixedOffset), TgError> {
     let value = chrono_naive_time(time)?;
@@ -616,10 +616,10 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::FixedOffset>> for SqlQueryResu
 #[cfg(feature = "with_chrono")]
 fn chrono_date_time(
     epoch_seconds: i64,
-    nanos: i32,
+    nanos: u32,
     offset_minutes: i32,
 ) -> Result<chrono::DateTime<chrono::FixedOffset>, TgError> {
-    let mut value = match chrono::DateTime::from_timestamp(epoch_seconds, nanos as u32) {
+    let mut value = match chrono::DateTime::from_timestamp(epoch_seconds, nanos) {
         Some(value) => value.naive_utc(),
         None => {
             trace!(
@@ -727,20 +727,20 @@ impl SqlQueryResultFetch<time::Time> for SqlQueryResult {
 }
 
 #[cfg(feature = "with_time")]
-fn time_time(value: i64) -> Result<time::Time, TgError> {
+fn time_time(value: u64) -> Result<time::Time, TgError> {
     let nanos = value % 1000_000_000;
     let value = value / 1000_000_000;
     time_time_nanos(value, nanos as u32)
 }
 
 #[cfg(feature = "with_time")]
-fn time_time_nanos(seconds: i64, nanos: u32) -> Result<time::Time, TgError> {
+fn time_time_nanos(seconds: u64, nanos: u32) -> Result<time::Time, TgError> {
     let sec = seconds % 60;
     let value = seconds / 60;
     let min = value % 60;
     let hour = value / 60;
 
-    match time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos as u32) {
+    match time::Time::from_hms_nano(hour as u8, min as u8, sec as u8, nanos) {
         Ok(value) => Ok(value),
         Err(e) => {
             trace!(
@@ -776,7 +776,7 @@ impl SqlQueryResultFetch<time::PrimitiveDateTime> for SqlQueryResult {
 #[cfg(feature = "with_time")]
 fn time_primitive_date_time(
     epoch_seconds: i64,
-    nanos: i32,
+    nanos: u32,
 ) -> Result<time::PrimitiveDateTime, TgError> {
     const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
     let mut days = epoch_seconds / SECONDS_PER_DAY;
@@ -787,7 +787,7 @@ fn time_primitive_date_time(
     }
 
     let date = time_date(days)?;
-    let time = time_time_nanos(value, nanos as u32)?;
+    let time = time_time_nanos(value as u64, nanos)?;
     let value = time::PrimitiveDateTime::new(date, time);
     Ok(value)
 }
@@ -820,7 +820,7 @@ impl SqlQueryResultFetch<(time::Time, time::UtcOffset)> for SqlQueryResult {
 
 #[cfg(feature = "with_time")]
 fn time_time_with_offset(
-    time: i64,
+    time: u64,
     offset_minutes: i32,
 ) -> Result<(time::Time, time::UtcOffset), TgError> {
     let value = time_time(time)?;
@@ -870,7 +870,7 @@ impl SqlQueryResultFetch<time::OffsetDateTime> for SqlQueryResult {
 #[cfg(feature = "with_time")]
 fn time_offset_date_time(
     epoch_seconds: i64,
-    nanos: i32,
+    nanos: u32,
     offset_minutes: i32,
 ) -> Result<time::OffsetDateTime, TgError> {
     const SECONDS_PER_DAY: i64 = 24 * 60 * 60;
@@ -882,7 +882,7 @@ fn time_offset_date_time(
     }
 
     let date = time_date(days)?;
-    let time = time_time_nanos(value, nanos as u32)?;
+    let time = time_time_nanos(value as u64, nanos)?;
     let offset = time_utc_offset(offset_minutes)?;
     let value = time::OffsetDateTime::new_in_offset(date, time, offset);
     Ok(value)
@@ -1041,7 +1041,7 @@ mod test {
     }
 
     #[cfg(feature = "with_chrono")]
-    fn chrono_naive_time_test(value: i64, expected: &str) {
+    fn chrono_naive_time_test(value: u64, expected: &str) {
         let value = super::chrono_naive_time(value).unwrap();
         let expected = chrono::NaiveTime::from_str(expected).unwrap();
         assert_eq!(expected, value);
@@ -1070,7 +1070,7 @@ mod test {
     }
 
     #[cfg(feature = "with_chrono")]
-    fn chrono_naive_date_time_test(epoch_seconds: i64, nanos: i32, expected: &str) {
+    fn chrono_naive_date_time_test(epoch_seconds: i64, nanos: u32, expected: &str) {
         let value = super::chrono_naive_date_time(epoch_seconds, nanos).unwrap();
         let expected = chrono::NaiveDateTime::from_str(expected).unwrap();
         assert_eq!(expected, value);
@@ -1100,7 +1100,7 @@ mod test {
 
     #[cfg(feature = "with_chrono")]
     fn chrono_naive_time_with_offset_test(
-        value: i64,
+        value: u64,
         offset_minutes: i32,
         expected: &str,
         expected_offset: &str,
@@ -1143,7 +1143,7 @@ mod test {
     }
 
     #[cfg(feature = "with_chrono")]
-    fn chrono_date_time_test(epoch_seconds: i64, nanos: i32, offset_minutes: i32, expected: &str) {
+    fn chrono_date_time_test(epoch_seconds: i64, nanos: u32, offset_minutes: i32, expected: &str) {
         let value = super::chrono_date_time(epoch_seconds, nanos, offset_minutes).unwrap();
         let expected = chrono::DateTime::<chrono::FixedOffset>::from_str(expected).unwrap();
         assert_eq!(expected, value);
@@ -1191,7 +1191,7 @@ mod test {
     }
 
     #[cfg(feature = "with_time")]
-    fn time_time_test(value: i64, expected: &str) {
+    fn time_time_test(value: u64, expected: &str) {
         let value = super::time_time(value).unwrap();
 
         let mut s = TimeString::new(expected);
@@ -1226,7 +1226,7 @@ mod test {
     }
 
     #[cfg(feature = "with_time")]
-    fn time_primitive_date_time_test(epoch_seconds: i64, nanos: i32, expected: &str) {
+    fn time_primitive_date_time_test(epoch_seconds: i64, nanos: u32, expected: &str) {
         let value = super::time_primitive_date_time(epoch_seconds, nanos).unwrap();
 
         let mut s = TimeString::new(expected);
@@ -1269,7 +1269,7 @@ mod test {
 
     #[cfg(feature = "with_time")]
     fn time_time_with_offset_test(
-        value: i64,
+        value: u64,
         offset_minutes: i32,
         expected: &str,
         expected_offset: &str,
@@ -1322,7 +1322,7 @@ mod test {
     #[cfg(feature = "with_time")]
     fn time_offset_date_time_test(
         epoch_seconds: i64,
-        nanos: i32,
+        nanos: u32,
         offset_minutes: i32,
         expected: &str,
     ) {
