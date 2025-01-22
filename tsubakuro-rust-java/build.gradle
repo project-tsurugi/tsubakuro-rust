@@ -1,0 +1,100 @@
+plugins {
+    id 'java-library'
+    id 'application'
+    id 'com.github.spotbugs' version '5.2.5'
+    id "com.github.hierynomus.license" version "0.16.1"
+}
+
+group = 'com.tsurugidb.tsubakuro.rust.java'
+version = '0.1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 8, 'hours'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
+
+tasks.withType(JavaCompile) { task ->
+    task.options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) { task ->
+    task.options.encoding 'UTF-8'
+}
+
+spotbugs {
+  excludeFilter = file("spotbugs-exclude-filter.xml")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/generated/java'
+        }
+    }
+}
+
+spotbugsMain {
+    reports {
+        xml {
+            enabled = true
+            destination = file("$buildDir/reports/spotbugs/main/spotbugs.xml")
+        }
+        html {
+            enabled = true
+            destination = file("$buildDir/reports/spotbugs/main/spotbugs.html")
+        }
+    }
+}
+
+spotbugsTest.enabled = false
+
+license {
+    header rootProject.file("source-header.txt")
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+        sh = 'SCRIPT_STYLE'
+        properties = 'SCRIPT_STYLE'
+    }
+    includes(['**/*.java', '**/*.sh', '**/*.properties'])
+}
+
+task licenseFormatDist(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
+    source = fileTree(dir: "src/dist")
+}
+licenseFormat.dependsOn licenseFormatDist
+
+dependencies {
+  testImplementation platform('org.junit:junit-bom:5.10.1')
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+
+    testLogging {
+        showStandardStreams true
+        events 'started', 'skipped', 'passed', 'failed'
+        exceptionFormat 'full'
+    }
+}
+
+application {
+    applicationName = 'Tsubakuro/Rust Java example'
+    mainClass = 'com.tsurugidb.tsubakuro.rust.java.example.ExampleMain'
+}
+
+distTar {
+    archiveFileName = "${project.name}.tar.gz"
+    archiveExtension = 'tar.gz'
+    compression = Compression.GZIP
+}
