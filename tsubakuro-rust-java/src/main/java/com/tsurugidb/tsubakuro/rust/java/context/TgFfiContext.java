@@ -4,9 +4,10 @@ import java.lang.foreign.MemorySegment;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
+import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcType;
+import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
-import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRcUtil;
 
 public class TgFfiContext extends TgFfiObject {
 
@@ -32,6 +33,16 @@ public class TgFfiContext extends TgFfiObject {
 		TgFfiRcUtil.throwIfNg(rc);
 
 		return outToInt(out);
+	}
+
+	public synchronized TgFfiRcType getErrorType() {
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_type(handle, out);
+		TgFfiRcUtil.throwIfNg(rc);
+
+		int type = outToInt(out);
+		return TgFfiRcType.of(type);
 	}
 
 	public synchronized String getErrorMessage() {

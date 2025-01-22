@@ -573,6 +573,42 @@ public class tsubakuro_rust_ffi_h {
     public static int _MAX_ENV() {
         return _MAX_ENV;
     }
+    private static final int TSURUGI_FFI_RC_TYPE_OK = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_TYPE_OK 0
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_OK() {
+        return TSURUGI_FFI_RC_TYPE_OK;
+    }
+    private static final int TSURUGI_FFI_RC_TYPE_FFI_ERROR = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_TYPE_FFI_ERROR 1
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_FFI_ERROR() {
+        return TSURUGI_FFI_RC_TYPE_FFI_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR 2
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR() {
+        return TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR = (int)3L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR 3
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR() {
+        return TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR;
+    }
     private static final int TSURUGI_FFI_RC_OK = (int)0L;
     /**
      * {@snippet lang=c :
@@ -15507,6 +15543,65 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_context_get_error_type {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_error_type");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context, TsurugiFfiRc *error_type_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_context_get_error_type$descriptor() {
+        return tsurugi_ffi_context_get_error_type.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context, TsurugiFfiRc *error_type_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_context_get_error_type$handle() {
+        return tsurugi_ffi_context_get_error_type.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context, TsurugiFfiRc *error_type_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_context_get_error_type$address() {
+        return tsurugi_ffi_context_get_error_type.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context, TsurugiFfiRc *error_type_out)
+     * }
+     */
+    public static int tsurugi_ffi_context_get_error_type(MemorySegment context, MemorySegment error_type_out) {
+        var mh$ = tsurugi_ffi_context_get_error_type.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_context_get_error_type", context, error_type_out);
+            }
+            return (int)mh$.invokeExact(context, error_type_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_context_get_error_message {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -16734,23 +16829,68 @@ public class tsubakuro_rust_ffi_h {
     public static int _CVTBUFSIZE() {
         return _CVTBUFSIZE;
     }
-    private static final long TSURUGI_FFI_RC_NG_FFI_HEADER = 3221225472L;
+    private static final int TSURUGI_FFI_RC_FFI_BASE = (int)268435456L;
     /**
      * {@snippet lang=c :
-     * #define TSURUGI_FFI_RC_NG_FFI_HEADER 3221225472
+     * #define TSURUGI_FFI_RC_FFI_BASE 268435456
      * }
      */
-    public static long TSURUGI_FFI_RC_NG_FFI_HEADER() {
-        return TSURUGI_FFI_RC_NG_FFI_HEADER;
+    public static int TSURUGI_FFI_RC_FFI_BASE() {
+        return TSURUGI_FFI_RC_FFI_BASE;
     }
-    private static final long TSURUGI_FFI_RC_NG_FFI_ARG0 = 3221225472L;
+    private static final int TSURUGI_FFI_RC_FFI_ARG_ERROR = (int)268435456L;
     /**
      * {@snippet lang=c :
-     * #define TSURUGI_FFI_RC_NG_FFI_ARG0 3221225472
+     * #define TSURUGI_FFI_RC_FFI_ARG_ERROR 268435456
      * }
      */
-    public static long TSURUGI_FFI_RC_NG_FFI_ARG0() {
-        return TSURUGI_FFI_RC_NG_FFI_ARG0;
+    public static int TSURUGI_FFI_RC_FFI_ARG_ERROR() {
+        return TSURUGI_FFI_RC_FFI_ARG_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_ERROR = (int)285212672L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_ERROR 285212672
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_ERROR() {
+        return TSURUGI_FFI_RC_FFI_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_ARG0_ERROR = (int)268435456L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_ARG0_ERROR 268435456
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_ARG0_ERROR() {
+        return TSURUGI_FFI_RC_FFI_ARG0_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_ARG1_ERROR = (int)268435457L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_ARG1_ERROR 268435457
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_ARG1_ERROR() {
+        return TSURUGI_FFI_RC_FFI_ARG1_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_ARG2_ERROR = (int)268435458L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_ARG2_ERROR 268435458
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_ARG2_ERROR() {
+        return TSURUGI_FFI_RC_FFI_ARG2_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_NUL_ERROR = (int)285212673L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_NUL_ERROR 285212673
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_NUL_ERROR() {
+        return TSURUGI_FFI_RC_FFI_NUL_ERROR;
     }
 }
 

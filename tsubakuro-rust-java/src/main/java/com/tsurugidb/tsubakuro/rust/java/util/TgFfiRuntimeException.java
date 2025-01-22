@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.util;
 
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
+import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 
 @SuppressWarnings("serial")
 public class TgFfiRuntimeException extends RuntimeException {
@@ -12,12 +13,19 @@ public class TgFfiRuntimeException extends RuntimeException {
 	}
 
 	public TgFfiRuntimeException(int rc, TgFfiContext context) {
-		super(message(context));
+		super(message(rc, context));
 		this.rc = rc;
 	}
 
-	private static String message(TgFfiContext context) {
-		return (context != null) ? context.getErrorMessage() : null;
+	private static String message(int rc, TgFfiContext context) {
+		String rcName = String.format("%s[%08x]", TgFfiRcUtil.toName(rc), rc);
+		if (context != null) {
+			String errorMessage = context.getErrorMessage();
+			if (errorMessage != null) {
+				return rcName + ": " + errorMessage;
+			}
+		}
+		return rcName;
 	}
 
 	public int getReturnCode() {
