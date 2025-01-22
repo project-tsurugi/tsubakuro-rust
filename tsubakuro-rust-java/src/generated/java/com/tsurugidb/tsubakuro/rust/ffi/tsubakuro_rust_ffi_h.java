@@ -15383,6 +15383,12 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final AddressLayout TsurugiFfiContextHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiEndpointHandle = tsubakuro_rust_ffi_h.C_POINTER;
 
     private static class tsurugi_ffi_context_create {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
@@ -15550,6 +15556,123 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_env_logger_init");
             }
             return (int)mh$.invokeExact();
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_endpoint_parse {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_endpoint_parse");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_endpoint_parse$descriptor() {
+        return tsurugi_ffi_endpoint_parse.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_endpoint_parse$handle() {
+        return tsurugi_ffi_endpoint_parse.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_endpoint_parse$address() {
+        return tsurugi_ffi_endpoint_parse.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * }
+     */
+    public static int tsurugi_ffi_endpoint_parse(MemorySegment context, MemorySegment endpoint, MemorySegment endpoint_out) {
+        var mh$ = tsurugi_ffi_endpoint_parse.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_endpoint_parse", context, endpoint, endpoint_out);
+            }
+            return (int)mh$.invokeExact(context, endpoint, endpoint_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_endpoint_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_endpoint_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_endpoint_dispose$descriptor() {
+        return tsurugi_ffi_endpoint_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_endpoint_dispose$handle() {
+        return tsurugi_ffi_endpoint_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_endpoint_dispose$address() {
+        return tsurugi_ffi_endpoint_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint)
+     * }
+     */
+    public static void tsurugi_ffi_endpoint_dispose(MemorySegment endpoint) {
+        var mh$ = tsurugi_ffi_endpoint_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_endpoint_dispose", endpoint);
+            }
+            mh$.invokeExact(endpoint);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

@@ -3,20 +3,30 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define TSURUGI_FFI_RC_OK 0
-
 #define TSURUGI_FFI_RC_NG_FFI_HEADER 3221225472
 
-#define TSURUGI_FFI_RC_NG_FFI_ARG0 (TSURUGI_FFI_RC_NG_FFI_HEADER | 0)
-
 typedef struct TsurugiFfiContext TsurugiFfiContext;
+
+typedef struct TsurugiFfiEndpoint TsurugiFfiEndpoint;
 
 typedef uint32_t TsurugiFfiRc;
 
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
+
+typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
+
+#define TSURUGI_FFI_RC_OK 0
+
+#define TSURUGI_FFI_RC_NG_FFI_ARG0 (TSURUGI_FFI_RC_NG_FFI_HEADER | 0)
 
 TsurugiFfiRc tsurugi_ffi_context_create(TsurugiFfiContextHandle *context_out);
 
 void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
 
 TsurugiFfiRc tsurugi_ffi_env_logger_init(void);
+
+TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context,
+                                        const char *endpoint,
+                                        TsurugiFfiEndpointHandle *endpoint_out);
+
+void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint);

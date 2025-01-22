@@ -1,4 +1,4 @@
-package com.tsurugidb.tsubakuro.rust.java;
+package com.tsurugidb.tsubakuro.rust.java.util;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 

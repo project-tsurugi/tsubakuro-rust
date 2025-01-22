@@ -90,7 +90,7 @@ tasks.named('test') {
 
 application {
     applicationName = 'Tsubakuro/Rust Java example'
-    mainClass = 'com.tsurugidb.tsubakuro.rust.java.example.ExampleMain'
+    mainClass = 'com.tsurugidb.tsubakuro.rust.java.example.TgFfiExampleMain'
 }
 
 distTar {
