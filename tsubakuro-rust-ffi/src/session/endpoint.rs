@@ -5,7 +5,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    return_code::{rc_ffi_arg_error, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
+    return_code::{rc_ffi_arg_error, rc_ok, TsurugiFfiRc},
 };
 
 pub(crate) struct TsurugiFfiEndpoint {
@@ -53,7 +53,7 @@ pub extern "C" fn tsurugi_ffi_endpoint_parse(
     }
 
     trace!("{FUNCTION_NAME} end. endpoint={:?}", handle);
-    TSURUGI_FFI_RC_OK
+    rc_ok(context)
 }
 
 #[no_mangle]

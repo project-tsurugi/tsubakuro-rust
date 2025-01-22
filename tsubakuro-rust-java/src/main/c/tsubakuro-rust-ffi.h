@@ -21,6 +21,12 @@ typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 
 TsurugiFfiRc tsurugi_ffi_context_create(TsurugiFfiContextHandle *context_out);
 
+TsurugiFfiRc tsurugi_ffi_context_get_return_code(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiRc *rc_out);
+
+TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context,
+                                                   char **error_message_out);
+
 void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
 
 TsurugiFfiRc tsurugi_ffi_env_logger_init(void);

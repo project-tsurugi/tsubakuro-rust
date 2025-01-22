@@ -12,6 +12,11 @@ pub const TSURUGI_FFI_RC_NG_FFI_ARG0: TsurugiFfiRc = TSURUGI_FFI_RC_NG_FFI_HEADE
 // pub const TSURUGI_FFI_RC_NG_FFI_ARG1: TsurugiFfiRc = TSURUGI_FFI_RC_NG_FFI_HEADER | 1;
 // pub const TSURUGI_FFI_RC_NG_FFI_ARG2: TsurugiFfiRc = TSURUGI_FFI_RC_NG_FFI_HEADER | 2;
 
+pub(crate) fn rc_ok(context: TsurugiFfiContextHandle) -> TsurugiFfiRc {
+    TsurugiFfiContext::clear(context);
+    TSURUGI_FFI_RC_OK
+}
+
 pub(crate) fn rc_ffi_arg_error(
     context: TsurugiFfiContextHandle,
     function_name: &str,

@@ -1,10 +1,10 @@
 use std::ffi::{c_char, CString};
 
-use log::{debug, trace};
+use log::trace;
 
 use crate::{
     error::TsurugiFfiError,
-    return_code::{TsurugiFfiRc, TSURUGI_FFI_RC_NG_FFI_ARG0, TSURUGI_FFI_RC_OK},
+    return_code::{rc_ffi_arg_error, TsurugiFfiRc, TSURUGI_FFI_RC_NG_FFI_ARG0, TSURUGI_FFI_RC_OK},
 };
 
 #[derive(Debug)]
@@ -15,34 +15,35 @@ pub(crate) struct TsurugiFfiContext {
 }
 
 impl TsurugiFfiContext {
+    pub(crate) fn clear(context: TsurugiFfiContextHandle) {
+        Self::set(context, TSURUGI_FFI_RC_OK, None);
+    }
+
     pub(crate) fn set_error(
         context: TsurugiFfiContextHandle,
         rc: TsurugiFfiRc,
         error: TsurugiFfiError,
     ) -> TsurugiFfiRc {
-        if !context.is_null() {
-            let context = unsafe { &mut *context };
+        Self::set(context, rc, Some(error));
+        rc
+    }
 
-            context.rc = rc;
-
-            if !context.error_message.is_null() {
-                let _ = unsafe { CString::from_raw(context.error_message) };
-                context.error_message = std::ptr::null_mut();
-            }
-
-            // TODO contextからerror_messageを取得するときにcontext.error_messageにセットする
-            let message = error.message();
-            match CString::new(message.as_str()) {
-                Ok(message) => context.error_message = message.into_raw(),
-                Err(e) => {
-                    debug!("TsurugiFfiContext::set_error_message() error. {:?}", e);
-                }
-            }
-
-            context.error = Some(error);
+    fn set(context: TsurugiFfiContextHandle, rc: TsurugiFfiRc, error: Option<TsurugiFfiError>) {
+        if context.is_null() {
+            return;
         }
 
-        rc
+        let context = unsafe { &mut *context };
+
+        context.rc = rc;
+        context.error = error;
+
+        if !context.error_message.is_null() {
+            unsafe {
+                let _ = CString::from_raw(context.error_message);
+            }
+            context.error_message = std::ptr::null_mut();
+        }
     }
 }
 
@@ -72,6 +73,83 @@ pub extern "C" fn tsurugi_ffi_context_create(
     }
 
     trace!("{FUNCTION_NAME} end. context={:?}", handle);
+    TSURUGI_FFI_RC_OK
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_context_get_return_code(
+    context: TsurugiFfiContextHandle,
+    rc_out: *mut TsurugiFfiRc,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_return_code()";
+    trace!("{FUNCTION_NAME} start. context={:?}", context);
+
+    if context.is_null() {
+        return rc_ffi_arg_error(context, FUNCTION_NAME, 0, "context", "is null");
+    }
+    if rc_out.is_null() {
+        return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "rc_out", "is null");
+    }
+
+    unsafe {
+        let context = &*context;
+
+        *rc_out = context.rc;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    TSURUGI_FFI_RC_OK
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_context_get_error_message(
+    context: TsurugiFfiContextHandle,
+    error_message_out: *mut *mut c_char,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_message()";
+    trace!("{FUNCTION_NAME} start. context={:?}", context);
+
+    if context.is_null() {
+        return rc_ffi_arg_error(context, FUNCTION_NAME, 0, "context", "is null");
+    }
+    if error_message_out.is_null() {
+        return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "error_message_out", "is null");
+    }
+
+    let context = unsafe { &mut *context };
+
+    if !context.error_message.is_null() {
+        unsafe {
+            *error_message_out = context.error_message;
+        }
+        trace!("{FUNCTION_NAME} end");
+        return TSURUGI_FFI_RC_OK;
+    }
+    match &context.error {
+        Some(error) => {
+            let error_message = error.message();
+            match CString::new(error_message.as_str()) {
+                Ok(message) => {
+                    context.error_message = message.into_raw();
+                    unsafe {
+                        *error_message_out = context.error_message;
+                    }
+                }
+                Err(e) => {
+                    trace!("{FUNCTION_NAME} error. {:?}", e);
+                    unsafe {
+                        *error_message_out = std::ptr::null_mut();
+                    }
+                    return TSURUGI_FFI_RC_OK; // TODO error
+                }
+            }
+        }
+        None => unsafe {
+            *error_message_out = std::ptr::null_mut();
+        },
+    }
+
+    trace!("{FUNCTION_NAME} end");
     TSURUGI_FFI_RC_OK
 }
 

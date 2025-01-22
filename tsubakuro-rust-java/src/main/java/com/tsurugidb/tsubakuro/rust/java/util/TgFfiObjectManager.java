@@ -21,7 +21,7 @@ public class TgFfiObjectManager implements AutoCloseable {
 		this.arena = Arena.ofConfined();
 	}
 
-	public MemorySegment allocateHandleRef() {
+	public MemorySegment allocatePtr() {
 		return arena.allocate(ValueLayout.ADDRESS);
 	}
 

@@ -2,6 +2,7 @@ package com.tsurugidb.tsubakuro.rust.java.util;
 
 import java.io.Closeable;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
 import java.util.Objects;
 
@@ -26,6 +27,10 @@ public abstract class TgFfiObject implements Closeable {
 		return this.manager;
 	}
 
+	protected final MemorySegment allocatePtr() {
+		return manager.allocatePtr();
+	}
+
 	// use in synchronized(this)
 	public final MemorySegment handle() {
 		var handle = this.handle;
@@ -34,6 +39,22 @@ public abstract class TgFfiObject implements Closeable {
 		}
 
 		return handle;
+	}
+
+	protected static MemorySegment outToHandle(MemorySegment out) {
+		return out.get(ValueLayout.ADDRESS, 0);
+	}
+
+	protected static int outToInt(MemorySegment out) {
+		return out.get(ValueLayout.JAVA_INT, 0);
+	}
+
+	protected static String outToString(MemorySegment out) {
+		var handle = out.get(ValueLayout.ADDRESS, 0);
+		if (handle.equals(MemorySegment.NULL)) {
+			return null;
+		}
+		return handle.getString(0);
 	}
 
 	@Override

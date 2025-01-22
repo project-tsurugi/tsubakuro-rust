@@ -1,7 +1,6 @@
 package com.tsurugidb.tsubakuro.rust.java.session;
 
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -37,11 +36,11 @@ public class TgFfiEndpoint extends TgFfiObject {
 	private static TgFfiEndpoint parseMain(TgFfiObjectManager manager, TgFfiContext context, String endpoint) {
 		var contextHandle = (context != null) ? context.handle() : MemorySegment.NULL;
 		var endpointHandle = manager.allocateString(endpoint);
-		var handleRef = manager.allocateHandleRef();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(contextHandle, endpointHandle, handleRef);
+		var out = manager.allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(contextHandle, endpointHandle, out);
 		TgFfiRcUtil.throwIfNg(rc);
 
-		var handle = handleRef.get(ValueLayout.ADDRESS, 0);
+		var handle = outToHandle(out);
 		return new TgFfiEndpoint(manager, handle);
 	}
 
