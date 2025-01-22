@@ -1,0 +1,12 @@
+[package]
+name = "tsubakuro-rust-ffi"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+env_logger = "0.11.6"
+log = "0.4.25"
+tsubakuro-rust-core = { path = "../tsubakuro-rust-core" }
