@@ -1,14 +1,12 @@
-use std::ffi::{c_char, CString};
+use std::ffi::c_char;
 
 use log::trace;
 
 use crate::{
+    cchar_field_clear, cchar_field_dispose, cchar_field_set,
     error::TsurugiFfiError,
     rc_ffi_arg_error,
-    return_code::{
-        TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_FFI_NUL_ERROR,
-        TSURUGI_FFI_RC_OK,
-    },
+    return_code::{TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_OK},
 };
 
 #[derive(Debug)]
@@ -41,12 +39,8 @@ impl TsurugiFfiContext {
 
         context.rc = rc;
         context.error = error;
-
-        if !context.error_message.is_null() {
-            unsafe {
-                let _ = CString::from_raw(context.error_message);
-            }
-            context.error_message = std::ptr::null_mut();
+        unsafe {
+            cchar_field_clear!(context.error_message);
         }
     }
 }
@@ -159,21 +153,10 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
     }
     match &context.error {
         Some(error) => {
-            let error_message = error.message();
-            match CString::new(error_message.as_str()) {
-                Ok(message) => {
-                    context.error_message = message.into_raw();
-                    unsafe {
-                        *error_message_out = context.error_message;
-                    }
-                }
-                Err(e) => {
-                    trace!("{FUNCTION_NAME} error. {:?}", e);
-                    unsafe {
-                        *error_message_out = std::ptr::null_mut();
-                    }
-                    return TSURUGI_FFI_RC_FFI_NUL_ERROR;
-                }
+            let error_message = error.message().as_str();
+            unsafe {
+                cchar_field_set!(std::ptr::null_mut(), context.error_message, error_message);
+                *error_message_out = context.error_message;
             }
         }
         None => unsafe {
@@ -201,9 +184,7 @@ pub extern "C" fn tsurugi_ffi_context_dispose(context: TsurugiFfiContextHandle) 
     unsafe {
         let context = Box::from_raw(context);
 
-        if !context.error_message.is_null() {
-            let _ = CString::from_raw(context.error_message);
-        }
+        cchar_field_dispose!(context.error_message);
     }
 
     trace!("{FUNCTION_NAME} end");

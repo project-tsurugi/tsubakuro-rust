@@ -1,5 +1,5 @@
 use std::{
-    ffi::{c_char, CStr, CString},
+    ffi::{c_char, CStr},
     ops::Deref,
 };
 
@@ -7,6 +7,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
+    cchar_field_clear, cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
     rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
@@ -151,19 +152,15 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
     }
 
     let connection_option = unsafe { &mut *connection_option };
-    if !connection_option.endpoint_str.is_null() {
-        unsafe {
-            let _ = CString::from_raw(connection_option.endpoint_str);
-        }
-    }
+
     match connection_option.endpoint() {
-        Some(endpoint) => {
-            let s = endpoint.to_string();
-            connection_option.endpoint_str = CString::new(s).unwrap().into_raw();
-        }
-        None => {
-            connection_option.endpoint_str = std::ptr::null_mut();
-        }
+        Some(endpoint) => unsafe {
+            let endpoint = endpoint.to_string();
+            cchar_field_set!(context, connection_option.endpoint_str, endpoint);
+        },
+        None => unsafe {
+            cchar_field_clear!(connection_option.endpoint_str);
+        },
     }
     unsafe {
         *endpoint_out = connection_option.endpoint_str;
@@ -194,9 +191,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_dispose(
     unsafe {
         let connection_option = Box::from_raw(connection_option);
 
-        if !connection_option.endpoint_str.is_null() {
-            let _ = CString::from_raw(connection_option.endpoint_str);
-        }
+        cchar_field_dispose!(connection_option.endpoint_str);
     }
 
     trace!("{FUNCTION_NAME} end");
