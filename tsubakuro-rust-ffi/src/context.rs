@@ -4,9 +4,10 @@ use log::trace;
 
 use crate::{
     error::TsurugiFfiError,
+    rc_ffi_arg_error,
     return_code::{
-        rc_ffi_arg_error, TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR,
-        TSURUGI_FFI_RC_FFI_NUL_ERROR, TSURUGI_FFI_RC_OK,
+        TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_FFI_NUL_ERROR,
+        TSURUGI_FFI_RC_OK,
     },
 };
 
@@ -88,10 +89,10 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
     if context.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 0, "context", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 0, "context", "is null");
     }
     if rc_out.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "rc_out", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "rc_out", "is null");
     }
 
     unsafe {
@@ -113,10 +114,10 @@ pub extern "C" fn tsurugi_ffi_context_get_error_type(
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
     if context.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 0, "context", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 0, "context", "is null");
     }
     if error_type_out.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "error_type_out", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "error_type_out", "is null");
     }
 
     unsafe {
@@ -138,10 +139,10 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
     if context.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 0, "context", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 0, "context", "is null");
     }
     if error_message_out.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "error_message_out", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "error_message_out", "is null");
     }
 
     let context = unsafe { &mut *context };
@@ -150,7 +151,10 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
         unsafe {
             *error_message_out = context.error_message;
         }
-        trace!("{FUNCTION_NAME} end");
+        trace!(
+            "{FUNCTION_NAME} end. error_message={:?}",
+            context.error_message
+        );
         return TSURUGI_FFI_RC_OK;
     }
     match &context.error {
@@ -177,7 +181,10 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
         },
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!(
+        "{FUNCTION_NAME} end. error_message={:?}",
+        context.error_message
+    );
     TSURUGI_FFI_RC_OK
 }
 

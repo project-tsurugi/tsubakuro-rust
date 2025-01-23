@@ -5,7 +5,8 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    return_code::{rc_ffi_arg_error, rc_ok, TsurugiFfiRc},
+    rc_ffi_arg_error,
+    return_code::{rc_ok, TsurugiFfiRc},
 };
 
 pub(crate) struct TsurugiFfiEndpoint {
@@ -30,20 +31,20 @@ pub extern "C" fn tsurugi_ffi_endpoint_parse(
     trace!("{FUNCTION_NAME} start");
 
     if endpoint.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "endpoint", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", "is null");
     }
     if endpoint_out.is_null() {
-        return rc_ffi_arg_error(context, FUNCTION_NAME, 2, "endpoint_out", "is null");
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint_out", "is null");
     }
 
     let endpoint = unsafe { CStr::from_ptr(endpoint) };
     let endpoint = match endpoint.to_str() {
         Ok(value) => value,
-        Err(e) => return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "endpoint", &e.to_string()),
+        Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", &e.to_string()),
     };
     let endpoint = match Endpoint::parse(endpoint) {
         Ok(value) => value,
-        Err(e) => return rc_ffi_arg_error(context, FUNCTION_NAME, 1, "endpoint", e.message()),
+        Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", e.message()),
     };
     let endpoint = Box::new(TsurugiFfiEndpoint { endpoint });
 

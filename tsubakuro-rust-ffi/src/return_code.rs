@@ -1,9 +1,4 @@
-use log::trace;
-
-use crate::{
-    context::{TsurugiFfiContext, TsurugiFfiContextHandle},
-    error::TsurugiFfiError,
-};
+use crate::context::{TsurugiFfiContext, TsurugiFfiContextHandle};
 
 #[allow(dead_code)]
 pub const TSURUGI_FFI_RC_TYPE_OK: u32 = 0;
@@ -32,17 +27,17 @@ pub(crate) fn rc_ok(context: TsurugiFfiContextHandle) -> TsurugiFfiRc {
     TSURUGI_FFI_RC_OK
 }
 
-pub(crate) fn rc_ffi_arg_error(
-    context: TsurugiFfiContextHandle,
-    function_name: &str,
-    arg_index: u32,
-    arg_name: &str,
-    fail_message: &str,
-) -> TsurugiFfiRc {
-    let message = format!("{function_name} error. arg[{arg_name}] {fail_message}");
-    trace!("{message}");
+#[macro_export]
+macro_rules! rc_ffi_arg_error {
+    ($context:expr, $function_name:expr, $arg_index:expr, $arg_name:expr, $fail_message:expr) => {{
+        let message = format!(
+            "{} error. arg[{}] {}",
+            $function_name, $arg_name, $fail_message
+        );
+        log::trace!("{message}");
 
-    let rc = TSURUGI_FFI_RC_FFI_ARG_ERROR | arg_index;
-    let error = TsurugiFfiError::FfiError(rc, message);
-    TsurugiFfiContext::set_error(context, rc, error)
+        let rc = $crate::return_code::TSURUGI_FFI_RC_FFI_ARG_ERROR | $arg_index;
+        let error = $crate::error::TsurugiFfiError::FfiError(rc, message);
+        $crate::context::TsurugiFfiContext::set_error($context, rc, error)
+    }};
 }
