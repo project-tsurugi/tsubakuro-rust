@@ -51,7 +51,6 @@ class TgFfiEndpointTest extends TgFfiTester {
 	void parse_error() {
 		var manager = getFfiObjectManager();
 
-		tsubakuro_rust_ffi_h.tsurugi_ffi_env_logger_init();
 		try (var context = TgFfiContext.create(manager)) {
 			var e = assertThrowsExactly(TgFfiRuntimeException.class, () -> {
 				TgFfiEndpoint.parse(context, "ipc://tsurugidb");

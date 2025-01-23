@@ -13,9 +13,17 @@ pub(crate) struct TsurugiFfiEndpoint {
     endpoint: Endpoint,
 }
 
-impl TsurugiFfiEndpoint {
-    pub(crate) fn endpoint(&self) -> &Endpoint {
+impl std::ops::Deref for TsurugiFfiEndpoint {
+    type Target = Endpoint;
+
+    fn deref(&self) -> &Self::Target {
         &self.endpoint
+    }
+}
+
+impl std::ops::DerefMut for TsurugiFfiEndpoint {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.endpoint
     }
 }
 

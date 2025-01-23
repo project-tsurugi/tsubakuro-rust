@@ -31,6 +31,10 @@ public abstract class TgFfiObject implements Closeable {
 		return manager.allocatePtr();
 	}
 
+	protected final MemorySegment allocateString(String s) {
+		return manager.allocateString(s);
+	}
+
 	// use in synchronized(this)
 	public final MemorySegment handle() {
 		var handle = this.handle;

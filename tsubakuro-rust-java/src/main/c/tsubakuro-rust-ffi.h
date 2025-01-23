@@ -17,6 +17,8 @@
 
 #define TSURUGI_FFI_RC_FFI_ERROR (TSURUGI_FFI_RC_FFI_BASE | (1 << 24))
 
+typedef struct TsurugiFfiConnectionOption TsurugiFfiConnectionOption;
+
 typedef struct TsurugiFfiContext TsurugiFfiContext;
 
 typedef struct TsurugiFfiEndpoint TsurugiFfiEndpoint;
@@ -26,6 +28,8 @@ typedef uint32_t TsurugiFfiRc;
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
 
 typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
+
+typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 #define TSURUGI_FFI_RC_OK 0
 
@@ -57,3 +61,20 @@ TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context,
                                         TsurugiFfiEndpointHandle *endpoint_out);
 
 void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint);
+
+TsurugiFfiRc tsurugi_ffi_connection_option_create(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiConnectionOptionHandle *connection_option_out);
+
+TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiConnectionOptionHandle connection_option,
+                                                        TsurugiFfiEndpointHandle endpoint);
+
+TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiConnectionOptionHandle connection_option,
+                                                            const char *endpoint);
+
+TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiConnectionOptionHandle connection_option,
+                                                        char **endpoint_out);
+
+void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);
