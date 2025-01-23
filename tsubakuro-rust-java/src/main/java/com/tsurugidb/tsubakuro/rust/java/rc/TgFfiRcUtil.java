@@ -13,13 +13,13 @@ public class TgFfiRcUtil {
 		return rc == tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_OK();
 	}
 
-	public static void throwIfNg(int rc) {
+	public static void throwIfError(int rc) {
 		if (!isOk(rc)) {
 			throw new TgFfiRuntimeException(rc);
 		}
 	}
 
-	public static void throwIfNg(int rc, TgFfiContext context) {
+	public static void throwIfError(int rc, TgFfiContext context) {
 		if (!isOk(rc)) {
 			throw new TgFfiRuntimeException(rc, context);
 		}
@@ -31,6 +31,11 @@ public class TgFfiRcUtil {
 		if (name != null) {
 			return name;
 		}
+
+		if ((rc & 0xc000_0000) == tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_CORE_SERVER_ERROR()) {
+			return "SERVER_ERROR";
+		}
+
 		return String.format("Rc%08x", rc);
 	}
 
@@ -47,7 +52,11 @@ public class TgFfiRcUtil {
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), "FFI_ARG1_ERROR");
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), "FFI_ARG2_ERROR");
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_NUL_ERROR(), "FFI_NUL_ERROR");
+		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_CORE_CLIENT_CLIENT_ERROR(), "CLIENT_ERROR");
+		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_CORE_CLIENT_TIMEOUT_ERROR(), "TIMEOUT_ERROR");
+		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_CORE_CLIENT_IO_ERROR(), "IO_ERROR");
 		NAME_MAP = map;
+
 		return map;
 	}
 }

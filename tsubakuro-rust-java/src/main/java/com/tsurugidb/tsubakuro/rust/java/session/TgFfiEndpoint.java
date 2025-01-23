@@ -38,7 +38,7 @@ public class TgFfiEndpoint extends TgFfiObject {
 		var endpointHandle = manager.allocateString(endpoint);
 		var out = manager.allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(contextHandle, endpointHandle, out);
-		TgFfiRcUtil.throwIfNg(rc, context);
+		TgFfiRcUtil.throwIfError(rc, context);
 
 		var handle = outToHandle(out);
 		return new TgFfiEndpoint(manager, handle);

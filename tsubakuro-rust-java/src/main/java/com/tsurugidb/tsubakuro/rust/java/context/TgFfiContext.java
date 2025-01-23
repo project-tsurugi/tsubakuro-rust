@@ -16,7 +16,7 @@ public class TgFfiContext extends TgFfiObject {
 
 		var out = manager.allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_create(out);
-		TgFfiRcUtil.throwIfNg(rc);
+		TgFfiRcUtil.throwIfError(rc);
 
 		var handle = outToHandle(out);
 		return new TgFfiContext(manager, handle);
@@ -30,7 +30,7 @@ public class TgFfiContext extends TgFfiObject {
 		var handle = handle();
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_return_code(handle, out);
-		TgFfiRcUtil.throwIfNg(rc);
+		TgFfiRcUtil.throwIfError(rc);
 
 		return outToInt(out);
 	}
@@ -39,7 +39,7 @@ public class TgFfiContext extends TgFfiObject {
 		var handle = handle();
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_type(handle, out);
-		TgFfiRcUtil.throwIfNg(rc);
+		TgFfiRcUtil.throwIfError(rc);
 
 		int type = outToInt(out);
 		return TgFfiRcType.of(type);
@@ -49,7 +49,7 @@ public class TgFfiContext extends TgFfiObject {
 		var handle = handle();
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_message(handle, out);
-		TgFfiRcUtil.throwIfNg(rc);
+		TgFfiRcUtil.throwIfError(rc);
 
 		return outToString(out);
 	}

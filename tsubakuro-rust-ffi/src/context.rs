@@ -6,7 +6,9 @@ use crate::{
     cchar_field_clear, cchar_field_dispose, cchar_field_set,
     error::TsurugiFfiError,
     rc_ffi_arg_error,
-    return_code::{TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_OK},
+    return_code::{
+        get_rc_type_from_rc, TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_OK,
+    },
 };
 
 #[derive(Debug)]
@@ -117,7 +119,7 @@ pub extern "C" fn tsurugi_ffi_context_get_error_type(
     unsafe {
         let context = &*context;
 
-        *error_type_out = context.rc >> 28;
+        *error_type_out = get_rc_type_from_rc(context.rc);
     }
 
     trace!("{FUNCTION_NAME} end");

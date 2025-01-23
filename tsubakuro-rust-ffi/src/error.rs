@@ -4,15 +4,15 @@ use crate::return_code::TsurugiFfiRc;
 
 #[derive(Debug)]
 pub(crate) enum TsurugiFfiError {
-    FfiError(/*rc*/ TsurugiFfiRc, /* message */ String),
-    _CoreError(TgError),
+    FfiError(TsurugiFfiRc, /* message */ String),
+    CoreError(TsurugiFfiRc, TgError),
 }
 
 impl TsurugiFfiError {
     pub(crate) fn message(&self) -> &String {
         match self {
             TsurugiFfiError::FfiError(_rc, message) => message,
-            TsurugiFfiError::_CoreError(error) => error.message(),
+            TsurugiFfiError::CoreError(_rc, error) => error.message(),
         }
     }
 }

@@ -36,7 +36,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
 		var contextHandle = (context != null) ? context.handle() : MemorySegment.NULL;
 		var out = manager.allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_create(contextHandle, out);
-		TgFfiRcUtil.throwIfNg(rc, context);
+		TgFfiRcUtil.throwIfError(rc, context);
 
 		var handle = outToHandle(out);
 		return new TgFfiConnectionOption(manager, handle);
@@ -53,7 +53,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
 		var handle = handle();
 		var endpointHandle = endpoint.handle();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint(contextHandle, handle, endpointHandle);
-		TgFfiRcUtil.throwIfNg(rc, context);
+		TgFfiRcUtil.throwIfError(rc, context);
 	}
 
 	public synchronized void setEndpointUrl(TgFfiContext context, String endpoint) {
@@ -64,7 +64,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
 		var endpointHandle = allocateString(endpoint);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(contextHandle, handle,
 				endpointHandle);
-		TgFfiRcUtil.throwIfNg(rc, context);
+		TgFfiRcUtil.throwIfError(rc, context);
 	}
 
 	public synchronized String getEndpoint(TgFfiContext context) {
@@ -72,7 +72,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
 		var handle = handle();
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(contextHandle, handle, out);
-		TgFfiRcUtil.throwIfNg(rc, context);
+		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToString(out);
 	}
