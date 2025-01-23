@@ -50,11 +50,16 @@ public abstract class TgFfiObject implements Closeable {
 	}
 
 	protected static String outToString(MemorySegment out) {
-		var handle = out.get(ValueLayout.ADDRESS, 0);
-		if (handle.equals(MemorySegment.NULL)) {
+		var stringPtr = out.get(ValueLayout.ADDRESS, 0);
+		if (stringPtr.address() == 0) {
 			return null;
 		}
-		return handle.getString(0);
+
+		// stringPtr.byteSize() == 0 なので、
+		// stringPtr.getString(0)だと、1バイトも取得できずにIndexOutOfBoundsExceptionが発生する。
+		// そこで、バイト数を適当に増やしてからgetString()を呼ぶ。
+		var ptr = stringPtr.reinterpret(Short.MAX_VALUE);
+		return ptr.getString(0);
 	}
 
 	@Override
