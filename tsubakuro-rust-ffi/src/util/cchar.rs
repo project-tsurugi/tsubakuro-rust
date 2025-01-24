@@ -1,4 +1,23 @@
 #[macro_export]
+macro_rules! ffi_arg_cchar_to_str {
+    ($context:expr, $function_name:expr, $arg_index:expr, $arg:expr) => {{
+        let s = unsafe { std::ffi::CStr::from_ptr($arg) };
+        match s.to_str() {
+            Ok(value) => value,
+            Err(e) => {
+                return $crate::rc_ffi_arg_error!(
+                    $context,
+                    $function_name,
+                    $arg_index,
+                    stringify!($arg),
+                    &e.to_string()
+                )
+            }
+        }
+    }};
+}
+
+#[macro_export]
 macro_rules! cchar_field_set {
     ($context:expr, $field:expr, $string:expr) => {{
         $crate::cchar_field_clear!($field);

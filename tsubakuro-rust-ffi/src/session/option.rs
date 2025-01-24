@@ -1,7 +1,4 @@
-use std::{
-    ffi::{c_char, CStr},
-    ops::Deref,
-};
+use std::{ffi::c_char, ops::Deref};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -9,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_clear, cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    rc_ffi_arg_error,
+    ffi_arg_cchar_to_str, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -118,11 +115,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
         return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint", "is null");
     }
 
-    let endpoint = unsafe { CStr::from_ptr(endpoint) };
-    let endpoint = match endpoint.to_str() {
-        Ok(value) => value,
-        Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", &e.to_string()),
-    };
+    let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, endpoint);
 
     let connection_option = unsafe { &mut *connection_option };
     match connection_option.set_endpoint_url(endpoint) {
@@ -194,19 +187,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
         return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "application_name", "is null");
     }
 
-    let application_name = unsafe { CStr::from_ptr(application_name) };
-    let application_name = match application_name.to_str() {
-        Ok(value) => value,
-        Err(e) => {
-            return rc_ffi_arg_error!(
-                context,
-                FUNCTION_NAME,
-                1,
-                "application_name",
-                &e.to_string()
-            )
-        }
-    };
+    let application_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, application_name);
 
     let connection_option = unsafe { &mut *connection_option };
     connection_option.set_application_name(application_name);

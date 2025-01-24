@@ -1,11 +1,11 @@
-use std::ffi::{c_char, CStr};
+use std::ffi::c_char;
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    rc_ffi_arg_error,
+    ffi_arg_cchar_to_str, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -45,11 +45,7 @@ pub extern "C" fn tsurugi_ffi_endpoint_parse(
         return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint_out", "is null");
     }
 
-    let endpoint = unsafe { CStr::from_ptr(endpoint) };
-    let endpoint = match endpoint.to_str() {
-        Ok(value) => value,
-        Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", &e.to_string()),
-    };
+    let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, endpoint);
     let endpoint = match Endpoint::parse(endpoint) {
         Ok(value) => value,
         Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", e.message()),
