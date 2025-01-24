@@ -86,6 +86,9 @@ tasks.named('test') {
         events 'started', 'skipped', 'passed', 'failed'
         exceptionFormat 'full'
     }
+
+    systemProperty 'tsurugi.dbtest.endpoint', findProperty('dbtest.endpoint') ?: 'tcp://localhost:12345'
+    systemProperty 'tsurugi.ffi.library.path', findProperty('ffi.library.path')
 }
 
 application {

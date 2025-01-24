@@ -6,11 +6,17 @@ import org.junit.jupiter.api.BeforeEach;
 public class TgFfiTester {
 
 	static {
-		String ffiLibraryPath = System.getProperty("tsurugi.ffi_library_path");
-		if (ffiLibraryPath == null) {
-			throw new RuntimeException("-Dtsurugi.ffi_library_path is not defined");
+		TgFfiInitializer.loadFfiLibrary();
+	}
+
+	private static final String SYSPROP_DBTEST_ENDPOINT = "tsurugi.dbtest.endpoint";
+	private static String staticEndpoint;
+
+	protected static String getEndpoint() {
+		if (staticEndpoint == null) {
+			staticEndpoint = System.getProperty(SYSPROP_DBTEST_ENDPOINT, "tcp://localhost:12345");
 		}
-		System.load(ffiLibraryPath);
+		return staticEndpoint;
 	}
 
 	private TgFfiObjectManager manager;

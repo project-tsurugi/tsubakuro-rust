@@ -1,18 +1,17 @@
 package com.tsurugidb.tsubakuro.rust.java.example;
 
-import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
+import com.tsurugidb.tsubakuro.rust.java.util.TgFfiInitializer;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
 public class TgFfiExampleMain {
 
 	public static void main(String[] args) throws Exception {
-		var ffiLibraryPath = args[0];
-		System.load(ffiLibraryPath);
+		TgFfiInitializer.loadFfiLibrary();
 
-		int rc = tsubakuro_rust_ffi_h.tsurugi_ffi_env_logger_init();
+		int rc = TgFfiInitializer.initFfiEnvLogger();
 		System.out.println("tsurugi_ffi_env_logger_init() rc=" + rc);
 
 		try (var manager = TgFfiObjectManager.create()) {

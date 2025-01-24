@@ -1,2 +1,2 @@
-//module com.tsurugidb.tsubakuro.rust.java {
-//}
+module com.tsurugidb.tsubakuro.rust.java {
+}
