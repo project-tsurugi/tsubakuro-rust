@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
@@ -48,6 +49,17 @@ public class TgFfiSession extends TgFfiObject {
 
 	TgFfiSession(TgFfiObjectManager manager, MemorySegment handle) {
 		super(manager, handle);
+	}
+
+	public synchronized TgFfiSqlClient makeSqlClient(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_make_sql_client(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var client = outToHandle(out);
+		return new TgFfiSqlClient(manager(), client);
 	}
 
 	@Override

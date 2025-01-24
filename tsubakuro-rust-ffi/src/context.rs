@@ -155,7 +155,7 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
     }
     match &context.error {
         Some(error) => {
-            let error_message = error.message().as_str();
+            let error_message = error.message();
             unsafe {
                 cchar_field_set!(std::ptr::null_mut(), context.error_message, error_message);
                 *error_message_out = context.error_message;

@@ -18,14 +18,10 @@ macro_rules! ffi_arg_cchar_to_str {
 }
 
 #[macro_export]
-macro_rules! cchar_field_set {
-    ($context:expr, $field:expr, $string:expr) => {{
-        $crate::cchar_field_clear!($field);
-
-        match std::ffi::CString::new($string) {
-            Ok(s) => {
-                $field = s.into_raw();
-            }
+macro_rules! ffi_str_to_cchar {
+    ($context:expr, $value:expr) => {{
+        match std::ffi::CString::new($value) {
+            Ok(value) => value.into_raw(),
             Err(e) => {
                 let rc = $crate::return_code::TSURUGI_FFI_RC_FFI_NUL_ERROR;
                 let message = format!("CString::new() error. {:?}", e);
@@ -35,6 +31,22 @@ macro_rules! cchar_field_set {
                 return rc;
             }
         }
+    }};
+}
+
+#[macro_export]
+macro_rules! ffi_cchar_dispose {
+    ($value:expr) => {
+        let _ = std::ffi::CString::from_raw($value);
+    };
+}
+
+#[macro_export]
+macro_rules! cchar_field_set {
+    ($context:expr, $field:expr, $value:expr) => {{
+        $crate::cchar_field_clear!($field);
+
+        $field = $crate::ffi_str_to_cchar!($context, $value);
     }};
 }
 
@@ -53,7 +65,7 @@ macro_rules! cchar_field_clear {
 macro_rules! cchar_field_dispose {
     ($field:expr) => {
         if !$field.is_null() {
-            let _ = std::ffi::CString::from_raw($field);
+            $crate::ffi_cchar_dispose!($field);
         }
     };
 }

@@ -9,10 +9,10 @@ pub(crate) enum TsurugiFfiError {
 }
 
 impl TsurugiFfiError {
-    pub(crate) fn message(&self) -> &String {
+    pub(crate) fn message(&self) -> String {
         match self {
-            TsurugiFfiError::FfiError(_rc, message) => message,
-            TsurugiFfiError::CoreError(_rc, error) => error.message(),
+            TsurugiFfiError::FfiError(_rc, message) => message.clone(),
+            TsurugiFfiError::CoreError(_rc, error) => error.to_string(),
         }
     }
 }

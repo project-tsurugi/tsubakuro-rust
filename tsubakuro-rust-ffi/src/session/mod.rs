@@ -15,6 +15,7 @@ mod option;
 
 pub(crate) struct TsurugiFfiSession {
     session: Arc<Session>,
+    runtime: Arc<tokio::runtime::Runtime>,
 }
 
 impl std::ops::Deref for TsurugiFfiSession {
@@ -28,6 +29,12 @@ impl std::ops::Deref for TsurugiFfiSession {
 impl std::ops::DerefMut for TsurugiFfiSession {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.session
+    }
+}
+
+impl TsurugiFfiSession {
+    pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
+        &self.runtime
     }
 }
 
@@ -51,13 +58,19 @@ pub extern "C" fn tsurugi_ffi_session_connect(
 
     let connection_option = unsafe { &*connection_option };
 
-    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
     let result = runtime.block_on(Session::connect(connection_option));
     let session = match result {
         Ok(session) => session,
         Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
     };
-    let session = Box::new(TsurugiFfiSession { session });
+    let session = Box::new(TsurugiFfiSession {
+        session,
+        runtime: Arc::new(runtime),
+    });
 
     let handle = Box::into_raw(session);
     unsafe {

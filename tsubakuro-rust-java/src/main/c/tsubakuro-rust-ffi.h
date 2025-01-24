@@ -29,13 +29,21 @@ typedef struct TsurugiFfiEndpoint TsurugiFfiEndpoint;
 
 typedef struct TsurugiFfiSession TsurugiFfiSession;
 
+typedef struct TsurugiFfiSqlClient TsurugiFfiSqlClient;
+
+typedef struct TsurugiFfiTableList TsurugiFfiTableList;
+
 typedef uint32_t TsurugiFfiRc;
 
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
 
-typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
-
 typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
+
+typedef struct TsurugiFfiSqlClient *TsurugiFfiSqlClientHandle;
+
+typedef struct TsurugiFfiTableList *TsurugiFfiTableListHandle;
+
+typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 
@@ -46,6 +54,8 @@ typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 #define TSURUGI_FFI_RC_FFI_ARG1_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 1)
 
 #define TSURUGI_FFI_RC_FFI_ARG2_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 2)
+
+#define TSURUGI_FFI_RC_FFI_ARG3_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 3)
 
 #define TSURUGI_FFI_RC_FFI_NUL_ERROR (TSURUGI_FFI_RC_FFI_ERROR | 1)
 
@@ -69,6 +79,27 @@ TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle conte
 void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
 
 TsurugiFfiRc tsurugi_ffi_env_logger_init(void);
+
+TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSessionHandle session,
+                                                 TsurugiFfiSqlClientHandle *sql_client_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlClientHandle sql_client,
+                                                TsurugiFfiTableListHandle *table_list_out);
+
+void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
+
+TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiTableListHandle table_list,
+                                                         uint32_t *size_out);
+
+TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_element(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiTableListHandle table_list,
+                                                            uint32_t index,
+                                                            char **element_out);
+
+void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list);
 
 TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
                                          TsurugiFfiConnectionOptionHandle connection_option,

@@ -15421,16 +15421,28 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiContextHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
-     * typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle
-     * }
-     */
-    public static final AddressLayout TsurugiFfiConnectionOptionHandle = tsubakuro_rust_ffi_h.C_POINTER;
-    /**
-     * {@snippet lang=c :
      * typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle
      * }
      */
     public static final AddressLayout TsurugiFfiSessionHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiSqlClient *TsurugiFfiSqlClientHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiSqlClientHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiTableList *TsurugiFfiTableListHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiTableListHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiConnectionOptionHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
      * typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle
@@ -15781,6 +15793,361 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_env_logger_init");
             }
             return (int)mh$.invokeExact();
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_make_sql_client {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_make_sql_client");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSqlClientHandle *sql_client_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_make_sql_client$descriptor() {
+        return tsurugi_ffi_session_make_sql_client.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSqlClientHandle *sql_client_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_make_sql_client$handle() {
+        return tsurugi_ffi_session_make_sql_client.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSqlClientHandle *sql_client_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_make_sql_client$address() {
+        return tsurugi_ffi_session_make_sql_client.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSqlClientHandle *sql_client_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_make_sql_client(MemorySegment context, MemorySegment session, MemorySegment sql_client_out) {
+        var mh$ = tsurugi_ffi_session_make_sql_client.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_make_sql_client", context, session, sql_client_out);
+            }
+            return (int)mh$.invokeExact(context, session, sql_client_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_list_tables {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_list_tables");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTableListHandle *table_list_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_list_tables$descriptor() {
+        return tsurugi_ffi_sql_client_list_tables.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTableListHandle *table_list_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_list_tables$handle() {
+        return tsurugi_ffi_sql_client_list_tables.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTableListHandle *table_list_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_list_tables$address() {
+        return tsurugi_ffi_sql_client_list_tables.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTableListHandle *table_list_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_list_tables(MemorySegment context, MemorySegment sql_client, MemorySegment table_list_out) {
+        var mh$ = tsurugi_ffi_sql_client_list_tables.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_list_tables", context, sql_client, table_list_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, table_list_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_dispose$descriptor() {
+        return tsurugi_ffi_sql_client_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_dispose$handle() {
+        return tsurugi_ffi_sql_client_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_dispose$address() {
+        return tsurugi_ffi_sql_client_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client)
+     * }
+     */
+    public static void tsurugi_ffi_sql_client_dispose(MemorySegment sql_client) {
+        var mh$ = tsurugi_ffi_sql_client_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_dispose", sql_client);
+            }
+            mh$.invokeExact(sql_client);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_table_list_get_table_names_size {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_list_get_table_names_size");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_list_get_table_names_size$descriptor() {
+        return tsurugi_ffi_table_list_get_table_names_size.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_list_get_table_names_size$handle() {
+        return tsurugi_ffi_table_list_get_table_names_size.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_list_get_table_names_size$address() {
+        return tsurugi_ffi_table_list_get_table_names_size.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_table_list_get_table_names_size(MemorySegment context, MemorySegment table_list, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_table_list_get_table_names_size.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_list_get_table_names_size", context, table_list, size_out);
+            }
+            return (int)mh$.invokeExact(context, table_list, size_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_table_list_get_table_names_element {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_list_get_table_names_element");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_element(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t index, char **element_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_list_get_table_names_element$descriptor() {
+        return tsurugi_ffi_table_list_get_table_names_element.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_element(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t index, char **element_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_list_get_table_names_element$handle() {
+        return tsurugi_ffi_table_list_get_table_names_element.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_element(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t index, char **element_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_list_get_table_names_element$address() {
+        return tsurugi_ffi_table_list_get_table_names_element.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_element(TsurugiFfiContextHandle context, TsurugiFfiTableListHandle table_list, uint32_t index, char **element_out)
+     * }
+     */
+    public static int tsurugi_ffi_table_list_get_table_names_element(MemorySegment context, MemorySegment table_list, int index, MemorySegment element_out) {
+        var mh$ = tsurugi_ffi_table_list_get_table_names_element.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_list_get_table_names_element", context, table_list, index, element_out);
+            }
+            return (int)mh$.invokeExact(context, table_list, index, element_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_table_list_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_list_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_list_dispose$descriptor() {
+        return tsurugi_ffi_table_list_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_list_dispose$handle() {
+        return tsurugi_ffi_table_list_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_list_dispose$address() {
+        return tsurugi_ffi_table_list_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list)
+     * }
+     */
+    public static void tsurugi_ffi_table_list_dispose(MemorySegment table_list) {
+        var mh$ = tsurugi_ffi_table_list_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_list_dispose", table_list);
+            }
+            mh$.invokeExact(table_list);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17565,6 +17932,15 @@ public class tsubakuro_rust_ffi_h {
      */
     public static int TSURUGI_FFI_RC_FFI_ARG2_ERROR() {
         return TSURUGI_FFI_RC_FFI_ARG2_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_ARG3_ERROR = (int)1073741827L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_ARG3_ERROR 1073741827
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_ARG3_ERROR() {
+        return TSURUGI_FFI_RC_FFI_ARG3_ERROR;
     }
     private static final int TSURUGI_FFI_RC_FFI_NUL_ERROR = (int)1090519041L;
     /**
