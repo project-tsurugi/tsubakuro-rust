@@ -40,7 +40,9 @@ public class TgFfiObjectManager implements AutoCloseable {
 	@Override
 	public void close() {
 		List<RuntimeException> list = null;
-		for (var object : objectSet) {
+		for (var i = objectSet.iterator(); i.hasNext();) {
+			var object = i.next();
+			i.remove();
 			try {
 				object.dispose();
 			} catch (RuntimeException e) {

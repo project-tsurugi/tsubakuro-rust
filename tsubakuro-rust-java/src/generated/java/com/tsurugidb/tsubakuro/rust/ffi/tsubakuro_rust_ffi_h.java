@@ -16379,6 +16379,126 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_connection_option_set_label {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_label");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_set_label$descriptor() {
+        return tsurugi_ffi_connection_option_set_label.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_set_label$handle() {
+        return tsurugi_ffi_connection_option_set_label.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_set_label$address() {
+        return tsurugi_ffi_connection_option_set_label.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_set_label(MemorySegment context, MemorySegment connection_option, MemorySegment label) {
+        var mh$ = tsurugi_ffi_connection_option_set_label.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_set_label", context, connection_option, label);
+            }
+            return (int)mh$.invokeExact(context, connection_option, label);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_get_label {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_label");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_get_label$descriptor() {
+        return tsurugi_ffi_connection_option_get_label.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_get_label$handle() {
+        return tsurugi_ffi_connection_option_get_label.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_get_label$address() {
+        return tsurugi_ffi_connection_option_get_label.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_get_label(MemorySegment context, MemorySegment connection_option, MemorySegment label_out) {
+        var mh$ = tsurugi_ffi_connection_option_get_label.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_get_label", context, connection_option, label_out);
+            }
+            return (int)mh$.invokeExact(context, connection_option, label_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_connection_option_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

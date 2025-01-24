@@ -187,4 +187,61 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
+
+	@Test
+	void set_label() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			assertNull(target.getEndpoint(context));
+
+			target.setLabel(context, "tsubakuro-rust-java/test");
+
+			String s = target.getLabel(context);
+			assertEquals("tsubakuro-rust-java/test", s);
+		}
+	}
+
+	@Test
+	void set_label_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var contextObject = TgFfiContext.create(manager)) {
+			var context = contextObject.handle();
+			var target = MemorySegment.NULL;
+			var endpoint = manager.allocateString("tsubakuro-rust-java/test");
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_label(context, target, endpoint);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var contextObject = TgFfiContext.create(manager); //
+				var targetObject = TgFfiConnectionOption.create(contextObject)) {
+			var context = contextObject.handle();
+			var target = targetObject.handle();
+			var endpoint = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_label(context, target, endpoint);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_label_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var contextObject = TgFfiContext.create(manager)) {
+			var context = contextObject.handle();
+			var target = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_label(context, target, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var contextObject = TgFfiContext.create(manager); //
+				var targetObject = TgFfiConnectionOption.create(contextObject)) {
+			var context = contextObject.handle();
+			var target = targetObject.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_label(context, target, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
 }

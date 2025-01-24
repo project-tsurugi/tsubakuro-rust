@@ -105,4 +105,12 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContex
                                                                 TsurugiFfiConnectionOptionHandle connection_option,
                                                                 char **application_name_out);
 
+TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiConnectionOptionHandle connection_option,
+                                                     const char *label);
+
+TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiConnectionOptionHandle connection_option,
+                                                     char **label_out);
+
 void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);

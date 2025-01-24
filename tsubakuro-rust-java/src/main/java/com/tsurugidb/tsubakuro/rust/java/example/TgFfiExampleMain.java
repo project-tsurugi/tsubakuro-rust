@@ -19,9 +19,11 @@ public class TgFfiExampleMain {
 
 			var connectionOption = TgFfiConnectionOption.create(context);
 			connectionOption.setEndpointUrl(context, "tcp://localhost:12345");
+			connectionOption.setApplicationName(context, "tsubakuro-rust-java.FfiExample");
+			connectionOption.setLabel(context, "TgFfiExampleMain.session");
 
 			try (var session = TgFfiSession.connect(context, connectionOption)) {
-
+				Thread.sleep(3_000);
 			}
 		}
 	}
