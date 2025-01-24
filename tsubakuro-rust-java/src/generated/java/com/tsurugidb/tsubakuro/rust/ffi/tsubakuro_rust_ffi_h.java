@@ -16259,6 +16259,126 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_connection_option_set_application_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_application_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_set_application_name$descriptor() {
+        return tsurugi_ffi_connection_option_set_application_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_set_application_name$handle() {
+        return tsurugi_ffi_connection_option_set_application_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_set_application_name$address() {
+        return tsurugi_ffi_connection_option_set_application_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_set_application_name(MemorySegment context, MemorySegment connection_option, MemorySegment application_name) {
+        var mh$ = tsurugi_ffi_connection_option_set_application_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_set_application_name", context, connection_option, application_name);
+            }
+            return (int)mh$.invokeExact(context, connection_option, application_name);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_get_application_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_application_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_get_application_name$descriptor() {
+        return tsurugi_ffi_connection_option_get_application_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_get_application_name$handle() {
+        return tsurugi_ffi_connection_option_get_application_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_get_application_name$address() {
+        return tsurugi_ffi_connection_option_get_application_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_get_application_name(MemorySegment context, MemorySegment connection_option, MemorySegment application_name_out) {
+        var mh$ = tsurugi_ffi_connection_option_get_application_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_get_application_name", context, connection_option, application_name_out);
+            }
+            return (int)mh$.invokeExact(context, connection_option, application_name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_connection_option_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

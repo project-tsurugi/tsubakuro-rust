@@ -19,6 +19,7 @@ use super::endpoint::TsurugiFfiEndpointHandle;
 pub(crate) struct TsurugiFfiConnectionOption {
     connection_option: ConnectionOption,
     endpoint_str: *mut c_char,
+    application_name: *mut c_char,
 }
 
 impl std::ops::Deref for TsurugiFfiConnectionOption {
@@ -58,6 +59,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_create(
     let connection_option = Box::new(TsurugiFfiConnectionOption {
         connection_option: ConnectionOption::new(),
         endpoint_str: std::ptr::null_mut(),
+        application_name: std::ptr::null_mut(),
     });
 
     let handle = Box::into_raw(connection_option);
@@ -174,6 +176,91 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    application_name: *const c_char,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_application_name()";
+    trace!(
+        "{FUNCTION_NAME} start. connection_option={:?}",
+        connection_option
+    );
+
+    if connection_option.is_null() {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
+    }
+    if application_name.is_null() {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "application_name", "is null");
+    }
+
+    let application_name = unsafe { CStr::from_ptr(application_name) };
+    let application_name = match application_name.to_str() {
+        Ok(value) => value,
+        Err(e) => {
+            return rc_ffi_arg_error!(
+                context,
+                FUNCTION_NAME,
+                1,
+                "application_name",
+                &e.to_string()
+            )
+        }
+    };
+
+    let connection_option = unsafe { &mut *connection_option };
+    connection_option.set_application_name(application_name);
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    application_name_out: *mut *mut c_char,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_application_name()";
+    trace!(
+        "{FUNCTION_NAME} start. connection_option={:?}",
+        connection_option
+    );
+
+    if connection_option.is_null() {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
+    }
+    if application_name_out.is_null() {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "application_name_out", "is null");
+    }
+
+    let connection_option = unsafe { &mut *connection_option };
+
+    match connection_option.application_name() {
+        Some(application_name) => unsafe {
+            let application_name = application_name.to_string();
+            cchar_field_set!(
+                context,
+                connection_option.application_name,
+                application_name
+            );
+        },
+        None => unsafe {
+            cchar_field_clear!(connection_option.application_name);
+        },
+    }
+    unsafe {
+        *application_name_out = connection_option.application_name;
+    }
+
+    trace!(
+        "{FUNCTION_NAME} end. application_name={:?}",
+        connection_option.application_name
+    );
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_dispose(
     connection_option: TsurugiFfiConnectionOptionHandle,
 ) {
@@ -192,6 +279,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_dispose(
         let connection_option = Box::from_raw(connection_option);
 
         cchar_field_dispose!(connection_option.endpoint_str);
+        cchar_field_dispose!(connection_option.application_name);
     }
 
     trace!("{FUNCTION_NAME} end");

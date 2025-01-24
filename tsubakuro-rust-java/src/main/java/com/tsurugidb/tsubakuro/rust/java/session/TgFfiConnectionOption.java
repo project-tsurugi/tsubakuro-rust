@@ -33,9 +33,9 @@ public class TgFfiConnectionOption extends TgFfiObject {
 	}
 
 	private static TgFfiConnectionOption createMain(TgFfiObjectManager manager, TgFfiContext context) {
-		var contextHandle = (context != null) ? context.handle() : MemorySegment.NULL;
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var out = manager.allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_create(contextHandle, out);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_create(ctx, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		var handle = outToHandle(out);
@@ -49,29 +49,48 @@ public class TgFfiConnectionOption extends TgFfiObject {
 	public synchronized void setEndpoint(TgFfiContext context, TgFfiEndpoint endpoint) {
 		Objects.requireNonNull(endpoint, "endpoint must not be null");
 
-		var contextHandle = (context != null) ? context.handle() : MemorySegment.NULL;
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
-		var endpointHandle = endpoint.handle();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint(contextHandle, handle, endpointHandle);
+		var arg = endpoint.handle();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint(ctx, handle, arg);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
 
 	public synchronized void setEndpointUrl(TgFfiContext context, String endpoint) {
 		Objects.requireNonNull(endpoint, "endpoint must not be null");
 
-		var contextHandle = (context != null) ? context.handle() : MemorySegment.NULL;
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
-		var endpointHandle = allocateString(endpoint);
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(contextHandle, handle,
-				endpointHandle);
+		var arg = allocateString(endpoint);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(ctx, handle, arg);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
 
 	public synchronized String getEndpoint(TgFfiContext context) {
-		var contextHandle = (context != null) ? context.handle() : MemorySegment.NULL;
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var out = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(contextHandle, handle, out);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToString(out);
+	}
+
+	public synchronized void setApplicationName(TgFfiContext context, String applicationName) {
+		Objects.requireNonNull(applicationName, "applicationName must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateString(applicationName);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_application_name(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized String getApplicationName(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_application_name(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToString(out);

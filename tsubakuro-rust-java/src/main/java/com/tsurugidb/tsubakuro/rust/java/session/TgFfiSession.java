@@ -36,10 +36,10 @@ public class TgFfiSession extends TgFfiObject {
 
 	private static TgFfiSession connectMain(TgFfiObjectManager manager, TgFfiContext context,
 			TgFfiConnectionOption connectionOption) {
-		var contextHandle = (context != null) ? context.handle() : MemorySegment.NULL;
-		var connectionOptionHandle = connectionOption.handle();
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var arg = connectionOption.handle();
 		var out = manager.allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect(contextHandle, connectionOptionHandle, out);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect(ctx, arg, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		var handle = outToHandle(out);

@@ -97,4 +97,12 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle 
                                                         TsurugiFfiConnectionOptionHandle connection_option,
                                                         char **endpoint_out);
 
+TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context,
+                                                                TsurugiFfiConnectionOptionHandle connection_option,
+                                                                const char *application_name);
+
+TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context,
+                                                                TsurugiFfiConnectionOptionHandle connection_option,
+                                                                char **application_name_out);
+
 void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);
