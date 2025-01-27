@@ -5,7 +5,7 @@ use log::trace;
 use crate::{
     cchar_field_clear, cchar_field_dispose, cchar_field_set,
     error::TsurugiFfiError,
-    rc_ffi_arg_error,
+    ffi_arg_require_non_null,
     return_code::{
         get_rc_type_from_rc, TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_OK,
     },
@@ -84,12 +84,8 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_return_code()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
-    if context.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 0, "context", "is null");
-    }
-    if rc_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "rc_out", "is null");
-    }
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, rc_out);
 
     unsafe {
         let context = &*context;
@@ -109,12 +105,8 @@ pub extern "C" fn tsurugi_ffi_context_get_error_type(
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_return_code()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
-    if context.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 0, "context", "is null");
-    }
-    if error_type_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "error_type_out", "is null");
-    }
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, error_type_out);
 
     unsafe {
         let context = &*context;
@@ -134,12 +126,8 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_message()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
-    if context.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 0, "context", "is null");
-    }
-    if error_message_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "error_message_out", "is null");
-    }
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, error_message_out);
 
     let context = unsafe { &mut *context };
 

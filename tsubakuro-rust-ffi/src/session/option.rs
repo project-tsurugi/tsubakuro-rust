@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_clear, cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, rc_ffi_arg_error,
+    ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -44,15 +44,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_create(
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_create()";
     trace!("{FUNCTION_NAME} start");
 
-    if connection_option_out.is_null() {
-        return rc_ffi_arg_error!(
-            context,
-            FUNCTION_NAME,
-            1,
-            "connection_option_out",
-            "is null"
-        );
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option_out);
 
     let connection_option = Box::new(TsurugiFfiConnectionOption {
         connection_option: ConnectionOption::new(),
@@ -82,12 +74,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint(
         connection_option
     );
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if endpoint.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint);
 
     let endpoint = unsafe { &*endpoint };
 
@@ -110,12 +98,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
         connection_option
     );
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if endpoint.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint);
 
     let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, endpoint);
 
@@ -141,12 +125,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
         connection_option
     );
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if endpoint_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint_out);
 
     let connection_option = unsafe { &mut *connection_option };
 
@@ -182,12 +162,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
         connection_option
     );
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if application_name.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "application_name", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, application_name);
 
     let application_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, application_name);
 
@@ -210,12 +186,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
         connection_option
     );
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if application_name_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "application_name_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, application_name_out);
 
     let connection_option = unsafe { &mut *connection_option };
 
@@ -255,12 +227,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_label(
         connection_option
     );
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if label.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "label", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label);
 
     let label = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, label);
 
@@ -283,12 +251,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_label(
         connection_option
     );
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if label_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "label_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label_out);
 
     let connection_option = unsafe { &mut *connection_option };
 

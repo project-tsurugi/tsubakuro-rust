@@ -7,7 +7,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, rc_core_error, rc_ffi_arg_error,
+    ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_core_error,
     return_code::{rc_ok, TsurugiFfiRc},
     session::TsurugiFfiSessionHandle,
 };
@@ -53,12 +53,8 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_sql_client()";
     trace!("{FUNCTION_NAME} start");
 
-    if session.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "session", "is null");
-    }
-    if sql_client_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "sql_client_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_client_out);
 
     let session = unsafe { &*session };
     let sql_client: SqlClient = session.make_client();
@@ -85,12 +81,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables()";
     trace!("{FUNCTION_NAME} start");
 
-    if sql_client.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "sql_client", "is null");
-    }
-    if table_list_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "sql_client_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_list_out);
 
     let client = unsafe { &*sql_client };
 
@@ -122,15 +114,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata()";
     trace!("{FUNCTION_NAME} start");
 
-    if sql_client.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "sql_client", "is null");
-    }
-    if table_name.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "table_name", "is null");
-    }
-    if table_metadata_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 3, "sql_client_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_metadata_out);
 
     let client = unsafe { &*sql_client };
     let table_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, table_name);

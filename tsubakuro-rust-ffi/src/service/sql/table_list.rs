@@ -5,7 +5,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_cchar_dispose, ffi_str_to_cchar, rc_ffi_arg_error,
+    ffi_arg_require_non_null, ffi_cchar_dispose, ffi_str_to_cchar, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -48,12 +48,8 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names_size(
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names_size()";
     trace!("{FUNCTION_NAME} start. table_list={:?}", table_list);
 
-    if table_list.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "table_list", "is null");
-    }
-    if size_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "size_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_list);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
 
     let table_list = unsafe { &*table_list };
     let table_names = table_list.table_names();
@@ -76,12 +72,8 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names_element(
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names_element()";
     trace!("{FUNCTION_NAME} start. table_list={:?}", table_list);
 
-    if table_list.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "table_list", "is null");
-    }
-    if element_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 3, "element_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_list);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, element_out);
 
     let table_list = unsafe { &mut *table_list };
     let table_names = table_list.table_names();

@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    rc_ffi_arg_error,
+    ffi_arg_require_non_null,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -51,12 +51,8 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_name()";
     trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
 
-    if sql_column.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "sql_column", "is null");
-    }
-    if name_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "name_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
 
     let sql_column = unsafe { &mut *sql_column };
 
@@ -84,12 +80,8 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_atom_type(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_atom_type()";
     trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
 
-    if sql_column.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "sql_column", "is null");
-    }
-    if atom_type_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "atom_type_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, atom_type_out);
 
     let sql_column = unsafe { &mut *sql_column };
 

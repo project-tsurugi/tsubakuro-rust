@@ -5,7 +5,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, rc_ffi_arg_error,
+    ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -38,12 +38,8 @@ pub extern "C" fn tsurugi_ffi_endpoint_parse(
     const FUNCTION_NAME: &str = "tsurugi_ffi_endpoint_parse()";
     trace!("{FUNCTION_NAME} start");
 
-    if endpoint.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", "is null");
-    }
-    if endpoint_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, endpoint);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint_out);
 
     let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, endpoint);
     let endpoint = match Endpoint::parse(endpoint) {

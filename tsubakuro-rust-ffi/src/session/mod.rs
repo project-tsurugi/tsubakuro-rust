@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    rc_core_error, rc_ffi_arg_error,
+    ffi_arg_require_non_null, rc_core_error,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -49,12 +49,8 @@ pub extern "C" fn tsurugi_ffi_session_connect(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect()";
     trace!("{FUNCTION_NAME} start");
 
-    if connection_option.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "connection_option", "is null");
-    }
-    if session_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "session_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, session_out);
 
     let connection_option = unsafe { &*connection_option };
 

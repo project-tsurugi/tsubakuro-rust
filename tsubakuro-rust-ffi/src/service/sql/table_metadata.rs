@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    rc_ffi_arg_error,
+    ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::column::TsurugiFfiSqlColumn,
 };
@@ -55,12 +55,8 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_table_name()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
 
-    if table_metadata.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "table_metadata", "is null");
-    }
-    if table_name_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "table_name_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name_out);
 
     let table_metadata = unsafe { &mut *table_metadata };
 
@@ -88,12 +84,8 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_size(
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_columns_size()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
 
-    if table_metadata.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "table_metadata", "is null");
-    }
-    if size_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "size_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
 
     let table_metadata = unsafe { &*table_metadata };
     let columns = table_metadata.columns();
@@ -116,12 +108,8 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_element(
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_columns_element()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
 
-    if table_metadata.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "table_metadata", "is null");
-    }
-    if element_out.is_null() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 3, "element_out", "is null");
-    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, element_out);
 
     let table_metadata = unsafe { &mut *table_metadata };
     let columns = table_metadata.columns();
