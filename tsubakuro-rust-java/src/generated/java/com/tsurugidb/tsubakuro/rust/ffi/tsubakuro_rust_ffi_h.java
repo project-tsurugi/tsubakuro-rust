@@ -15407,6 +15407,192 @@ public class tsubakuro_rust_ffi_h {
            throw new AssertionError("should not reach here", ex$);
         }
     }
+    private static final int TSURUGI_FFI_ATOM_TYPE_TYPE_UNSPECIFIED = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_TYPE_UNSPECIFIED = 0
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_TYPE_UNSPECIFIED() {
+        return TSURUGI_FFI_ATOM_TYPE_TYPE_UNSPECIFIED;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_BOOLEAN = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_BOOLEAN = 1
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_BOOLEAN() {
+        return TSURUGI_FFI_ATOM_TYPE_BOOLEAN;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_INT4 = (int)4L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_INT4 = 4
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_INT4() {
+        return TSURUGI_FFI_ATOM_TYPE_INT4;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_INT8 = (int)5L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_INT8 = 5
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_INT8() {
+        return TSURUGI_FFI_ATOM_TYPE_INT8;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_FLOAT4 = (int)6L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_FLOAT4 = 6
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_FLOAT4() {
+        return TSURUGI_FFI_ATOM_TYPE_FLOAT4;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_FLOAT8 = (int)7L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_FLOAT8 = 7
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_FLOAT8() {
+        return TSURUGI_FFI_ATOM_TYPE_FLOAT8;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_DECIMAL = (int)8L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_DECIMAL = 8
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_DECIMAL() {
+        return TSURUGI_FFI_ATOM_TYPE_DECIMAL;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_CHARACTER = (int)9L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_CHARACTER = 9
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_CHARACTER() {
+        return TSURUGI_FFI_ATOM_TYPE_CHARACTER;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_OCTET = (int)11L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_OCTET = 11
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_OCTET() {
+        return TSURUGI_FFI_ATOM_TYPE_OCTET;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_BIT = (int)13L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_BIT = 13
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_BIT() {
+        return TSURUGI_FFI_ATOM_TYPE_BIT;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_DATE = (int)15L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_DATE = 15
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_DATE() {
+        return TSURUGI_FFI_ATOM_TYPE_DATE;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY = (int)16L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY = 16
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY() {
+        return TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_TIME_POINT = (int)17L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_TIME_POINT = 17
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_TIME_POINT() {
+        return TSURUGI_FFI_ATOM_TYPE_TIME_POINT;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_DATETIME_INTERVAL = (int)18L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_DATETIME_INTERVAL = 18
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_DATETIME_INTERVAL() {
+        return TSURUGI_FFI_ATOM_TYPE_DATETIME_INTERVAL;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY_WITH_TIME_ZONE = (int)19L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY_WITH_TIME_ZONE = 19
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY_WITH_TIME_ZONE() {
+        return TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY_WITH_TIME_ZONE;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_TIME_POINT_WITH_TIME_ZONE = (int)20L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_TIME_POINT_WITH_TIME_ZONE = 20
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_TIME_POINT_WITH_TIME_ZONE() {
+        return TSURUGI_FFI_ATOM_TYPE_TIME_POINT_WITH_TIME_ZONE;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_CLOB = (int)21L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_CLOB = 21
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_CLOB() {
+        return TSURUGI_FFI_ATOM_TYPE_CLOB;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_BLOB = (int)22L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_BLOB = 22
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_BLOB() {
+        return TSURUGI_FFI_ATOM_TYPE_BLOB;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_UNKNOWN = (int)31L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_UNKNOWN = 31
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_UNKNOWN() {
+        return TSURUGI_FFI_ATOM_TYPE_UNKNOWN;
+    }
+    private static final int TSURUGI_FFI_ATOM_TYPE_UNRECOGNIZED = (int)-1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiAtomType.TSURUGI_FFI_ATOM_TYPE_UNRECOGNIZED = -1
+     * }
+     */
+    public static int TSURUGI_FFI_ATOM_TYPE_UNRECOGNIZED() {
+        return TSURUGI_FFI_ATOM_TYPE_UNRECOGNIZED;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiAtomType
+     * }
+     */
+    public static final OfInt TsurugiFfiAtomType = tsubakuro_rust_ffi_h.C_INT;
     /**
      * {@snippet lang=c :
      * typedef uint32_t TsurugiFfiRc
@@ -16103,6 +16289,66 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_name", context, sql_column, name_out);
             }
             return (int)mh$.invokeExact(context, sql_column, name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_column_get_atom_type {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_atom_type");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiAtomType *atom_type_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_atom_type$descriptor() {
+        return tsurugi_ffi_sql_column_get_atom_type.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiAtomType *atom_type_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_atom_type$handle() {
+        return tsurugi_ffi_sql_column_get_atom_type.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiAtomType *atom_type_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_atom_type$address() {
+        return tsurugi_ffi_sql_column_get_atom_type.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiAtomType *atom_type_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_atom_type(MemorySegment context, MemorySegment sql_column, MemorySegment atom_type_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_atom_type.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_atom_type", context, sql_column, atom_type_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, atom_type_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

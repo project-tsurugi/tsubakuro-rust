@@ -24,6 +24,17 @@ public class TgFfiSqlColumn extends TgFfiObject {
 		return outToString(out);
 	}
 
+	public synchronized TgFfiAtomType getAtomType(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_atom_type(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var value = outToInt(out);
+		return TgFfiAtomType.forNumber(value);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_dispose(handle);

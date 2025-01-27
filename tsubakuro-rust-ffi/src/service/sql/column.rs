@@ -10,6 +10,8 @@ use crate::{
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
+use super::atom_type::TsurugiFfiAtomType;
+
 pub(crate) struct TsurugiFfiSqlColumn {
     sql_column: SqlColumn,
     name: *mut c_char,
@@ -67,6 +69,37 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
 
     unsafe {
         *name_out = sql_column.name;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_column_get_atom_type(
+    context: TsurugiFfiContextHandle,
+    sql_column: TsurugiFfiSqlColumnHandle,
+    atom_type_out: *mut TsurugiFfiAtomType,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_atom_type()";
+    trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
+
+    if sql_column.is_null() {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "sql_column", "is null");
+    }
+    if atom_type_out.is_null() {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "atom_type_out", "is null");
+    }
+
+    let sql_column = unsafe { &mut *sql_column };
+
+    let atom_type = match sql_column.atom_type() {
+        Some(value) => value.into(),
+        None => TsurugiFfiAtomType::Unrecognized,
+    };
+
+    unsafe {
+        *atom_type_out = atom_type;
     }
 
     trace!("{FUNCTION_NAME} end");

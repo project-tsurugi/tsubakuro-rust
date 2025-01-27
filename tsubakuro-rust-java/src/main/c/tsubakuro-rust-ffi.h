@@ -21,6 +21,90 @@
 
 #define TSURUGI_FFI_RC_CORE_SERVER_ERROR (TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR << 30)
 
+enum TsurugiFfiAtomType {
+  /**
+   * unspecified type.
+   */
+  TSURUGI_FFI_ATOM_TYPE_TYPE_UNSPECIFIED = 0,
+  /**
+   * boolean type.
+   */
+  TSURUGI_FFI_ATOM_TYPE_BOOLEAN = 1,
+  /**
+   * 32-bit signed integer.
+   */
+  TSURUGI_FFI_ATOM_TYPE_INT4 = 4,
+  /**
+   * 64-bit signed integer.
+   */
+  TSURUGI_FFI_ATOM_TYPE_INT8 = 5,
+  /**
+   * 32-bit floating point number.
+   */
+  TSURUGI_FFI_ATOM_TYPE_FLOAT4 = 6,
+  /**
+   * 64-bit floating point number.
+   */
+  TSURUGI_FFI_ATOM_TYPE_FLOAT8 = 7,
+  /**
+   * multi precision decimal number.
+   */
+  TSURUGI_FFI_ATOM_TYPE_DECIMAL = 8,
+  /**
+   * character sequence.
+   */
+  TSURUGI_FFI_ATOM_TYPE_CHARACTER = 9,
+  /**
+   * octet sequence.
+   */
+  TSURUGI_FFI_ATOM_TYPE_OCTET = 11,
+  /**
+   * bit sequence.
+   */
+  TSURUGI_FFI_ATOM_TYPE_BIT = 13,
+  /**
+   * date.
+   */
+  TSURUGI_FFI_ATOM_TYPE_DATE = 15,
+  /**
+   * time of day.
+   */
+  TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY = 16,
+  /**
+   * time point.
+   */
+  TSURUGI_FFI_ATOM_TYPE_TIME_POINT = 17,
+  /**
+   * date-time interval.
+   */
+  TSURUGI_FFI_ATOM_TYPE_DATETIME_INTERVAL = 18,
+  /**
+   * time of day with time zone.
+   */
+  TSURUGI_FFI_ATOM_TYPE_TIME_OF_DAY_WITH_TIME_ZONE = 19,
+  /**
+   * time point with time zone.
+   */
+  TSURUGI_FFI_ATOM_TYPE_TIME_POINT_WITH_TIME_ZONE = 20,
+  /**
+   * character large objects.
+   */
+  TSURUGI_FFI_ATOM_TYPE_CLOB = 21,
+  /**
+   * binary large objects.
+   */
+  TSURUGI_FFI_ATOM_TYPE_BLOB = 22,
+  /**
+   * unknown type.
+   */
+  TSURUGI_FFI_ATOM_TYPE_UNKNOWN = 31,
+  /**
+   *
+   */
+  TSURUGI_FFI_ATOM_TYPE_UNRECOGNIZED = -1,
+};
+typedef int32_t TsurugiFfiAtomType;
+
 typedef struct TsurugiFfiConnectionOption TsurugiFfiConnectionOption;
 
 typedef struct TsurugiFfiContext TsurugiFfiContext;
@@ -106,6 +190,10 @@ void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
 TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context,
                                              TsurugiFfiSqlColumnHandle sql_column,
                                              char **name_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlColumnHandle sql_column,
+                                                  TsurugiFfiAtomType *atom_type_out);
 
 void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column);
 

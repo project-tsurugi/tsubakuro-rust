@@ -31,6 +31,8 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 		}
 	}
 
+	// TODO get_columns()
+
 	@Test
 	void get_columns_size_argError() {
 		var manager = getFfiObjectManager();

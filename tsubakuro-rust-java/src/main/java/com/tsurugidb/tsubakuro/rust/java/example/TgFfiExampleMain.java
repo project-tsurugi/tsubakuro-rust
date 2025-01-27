@@ -8,6 +8,7 @@ import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiInitializer;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
+import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRuntimeException;
 
 public class TgFfiExampleMain {
 
@@ -28,6 +29,7 @@ public class TgFfiExampleMain {
 			try (var session = TgFfiSession.connect(context, connectionOption);
 					var client = session.makeSqlClient(context)) {
 				listTables(client, context);
+				getTableMetadata(client, context);
 			}
 		}
 	}
@@ -36,6 +38,23 @@ public class TgFfiExampleMain {
 		try (var tableList = client.listTables(context)) {
 			List<String> tableNames = tableList.getTableNames(context);
 			System.out.println("SqlClient.listTables().tableNames=" + tableNames);
+		}
+	}
+
+	static void getTableMetadata(TgFfiSqlClient client, TgFfiContext context) {
+		try (var tableMetadata = client.getTableMetadata(context, "test")) {
+			System.out.println("SqlClient.listTables().tableName=" + tableMetadata.getTableName(context));
+			var columns = tableMetadata.getColumns(context);
+			for (var column : columns) {
+				System.out.printf("%s: %s%n", column.getName(context), column.getAtomType(context));
+			}
+		} catch (TgFfiRuntimeException e) {
+			String message = e.getMessage();
+			if (message.contains("TARGET_NOT_FOUND_EXCEPTION")) {
+				System.out.println("getTableMetadata(): " + message);
+			} else {
+				throw e;
+			}
 		}
 	}
 }

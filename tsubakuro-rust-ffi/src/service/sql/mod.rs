@@ -12,6 +12,7 @@ use crate::{
     session::TsurugiFfiSessionHandle,
 };
 
+mod atom_type;
 mod column;
 mod table_list;
 mod table_metadata;
