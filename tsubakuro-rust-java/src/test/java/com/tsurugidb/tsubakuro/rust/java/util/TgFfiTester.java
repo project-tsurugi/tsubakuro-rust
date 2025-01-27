@@ -3,6 +3,14 @@ package com.tsurugidb.tsubakuro.rust.java.util;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlExecuteResult;
+import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
+import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionType;
+
 public class TgFfiTester {
 
 	static {
@@ -35,6 +43,40 @@ public class TgFfiTester {
 		try (var _ = this.manager) {
 		} finally {
 			this.manager = null;
+		}
+	}
+
+	protected static void dropAndCreateTable(String tableName, String createSql) {
+		dropIfExists(tableName);
+		executeSql(createSql);
+	}
+
+	protected static void dropIfExists(String tableName) {
+		executeSql("drop table if exists " + tableName);
+	}
+
+	protected static void executeSql(String sql) {
+		try (var manager = TgFfiObjectManager.create(); //
+				var context = TgFfiContext.create(manager); //
+				var connectionOption = TgFfiConnectionOption.create(context)) {
+			connectionOption.setEndpointUrl(context, getEndpoint());
+			connectionOption.setApplicationName(context, "tsubakuro-rust-java/test");
+			connectionOption.setLabel(context, "tsubakuro-rust-java/test.session");
+
+			try (var session = TgFfiSession.connect(context, connectionOption); //
+					var client = session.makeSqlClient(context); //
+					var transactionOption = TgFfiTransactionOption.create(context)) {
+				transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
+				transactionOption.setTransactionLabel(context, "tsubakuro-rust-java/execute()");
+
+				try (var transaction = client.startTransaction(context, transactionOption)) {
+					try (var executeResult = client.execute(context, transaction, sql)) {
+					}
+					try (var commitOption = TgFfiCommitOption.create(context)) {
+						client.commit(context, transaction, commitOption);
+					}
+				}
+			}
 		}
 	}
 }

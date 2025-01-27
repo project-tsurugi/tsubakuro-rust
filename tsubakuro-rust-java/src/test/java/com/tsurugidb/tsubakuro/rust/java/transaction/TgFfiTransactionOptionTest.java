@@ -74,6 +74,27 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 	}
 
 	@Test
+	void get_transaction_type_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_type(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_type(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
 	void set_transaction_label() {
 		var manager = getFfiObjectManager();
 
@@ -92,19 +113,40 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 	void set_transaction_label_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
 			var arg = manager.allocateString("tsubakuro-rust-java/test");
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(context, target, arg);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiTransactionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
 			var arg = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(context, target, arg);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_transaction_label_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_label(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_label(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}

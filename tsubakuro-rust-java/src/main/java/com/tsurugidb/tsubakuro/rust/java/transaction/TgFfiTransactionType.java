@@ -7,9 +7,9 @@ public enum TgFfiTransactionType {
 	 * use default transaction type.
 	 * </pre>
 	 *
-	 * <code>TRANSACTION_TYPE_UNSPECIFIED = 0;</code>
+	 * <code>UNSPECIFIED = 0;</code>
 	 */
-	TRANSACTION_TYPE_UNSPECIFIED(0),
+	UNSPECIFIED(0),
 	/**
 	 * <pre>
 	 * short transactions (optimistic concurrency control).
@@ -51,7 +51,7 @@ public enum TgFfiTransactionType {
 	public static TgFfiTransactionType forNumber(int value) {
 		switch (value) {
 		case 0:
-			return TRANSACTION_TYPE_UNSPECIFIED;
+			return UNSPECIFIED;
 		case 1:
 			return SHORT;
 		case 2:

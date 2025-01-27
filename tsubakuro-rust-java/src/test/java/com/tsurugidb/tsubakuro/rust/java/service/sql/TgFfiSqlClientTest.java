@@ -11,6 +11,8 @@ import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionType;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRuntimeException;
@@ -177,6 +179,160 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		}
 	}
 
+	@Test
+	void execute() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		try (var transaction = startOcc(client)) {
+			var sql = "drop table if exists test";
+			client.execute(context, transaction, sql);
+		}
+	}
+
+	@Test
+	void execute_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var tx = transaction.handle();
+			var arg = manager.allocateString("drop table if exists test");
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = MemorySegment.NULL;
+			var arg = manager.allocateString("drop table if exists test");
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = manager.allocateString("drop table if exists test");
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void commit() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		try (var transaction = startOcc(client); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			client.commit(context, transaction, commitOption);
+		}
+	}
+
+	@Test
+	void commit_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var tx = transaction.handle();
+			var arg = commitOption.handle();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit(ctx, handle, tx, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = MemorySegment.NULL;
+			var arg = commitOption.handle();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit(ctx, handle, tx, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit(ctx, handle, tx, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void rollback() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		try (var transaction = startOcc(client)) {
+			client.rollback(context, transaction);
+		}
+	}
+
+	@Test
+	void rollback_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var tx = transaction.handle();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback(ctx, handle, tx);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback(ctx, handle, tx);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
 	private TgFfiSqlClient createSqlClient() {
 		var manager = getFfiObjectManager();
 
@@ -187,6 +343,18 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			var session = TgFfiSession.connect(context, connectionOption);
 			var client = session.makeSqlClient(context);
 			return client;
+		}
+	}
+
+	private TgFfiTransaction startOcc(TgFfiSqlClient client) {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context)) {
+			transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
+
+			var transaction = client.startTransaction(context, transactionOption);
+			return transaction;
 		}
 	}
 }

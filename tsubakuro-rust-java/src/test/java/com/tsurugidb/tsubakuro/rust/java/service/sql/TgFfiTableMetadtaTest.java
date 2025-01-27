@@ -17,17 +17,42 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 
 	@BeforeAll
 	static void beforeAll() {
-		// TODO create table test
+		dropAndCreateTable("test", """
+				create table test (
+				  foo int primary key,
+				  bar bigint,
+				  zzz varchar(10)
+				)""");
 	}
 
 	@Test
 	void get_table_name() {
 		var manager = getFfiObjectManager();
 
-		try (var tableMetadata = getTableMetadata("test")) {
-			var context = TgFfiContext.create(manager);
+		try (var tableMetadata = getTableMetadata("test"); //
+				var context = TgFfiContext.create(manager)) {
 			var tableName = tableMetadata.getTableName(context);
 			assertEquals("test", tableName);
+
+			var columns = tableMetadata.getColumns(context);
+			assertEquals(3, columns.size());
+
+			int i = 0;
+			{
+				var column = columns.get(i++);
+				assertEquals("foo", column.getName(context));
+				assertEquals(TgFfiAtomType.INT4, column.getAtomType(context));
+			}
+			{
+				var column = columns.get(i++);
+				assertEquals("bar", column.getName(context));
+				assertEquals(TgFfiAtomType.INT8, column.getAtomType(context));
+			}
+			{
+				var column = columns.get(i++);
+				assertEquals("zzz", column.getName(context));
+				assertEquals(TgFfiAtomType.CHARACTER, column.getAtomType(context));
+			}
 		}
 	}
 

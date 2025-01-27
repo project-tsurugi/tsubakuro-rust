@@ -105,6 +105,30 @@ enum TsurugiFfiAtomType {
 };
 typedef int32_t TsurugiFfiAtomType;
 
+enum TsurugiFfiCommitType {
+  /**
+   * the default commit status (rely on the database settings).
+   */
+  TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED = 0,
+  /**
+   * commit operation has accepted, and the transaction will never abort except system errors.
+   */
+  TSURUGI_FFI_COMMIT_TYPE_ACCEPTED = 10,
+  /**
+   * commit data has been visible for others.
+   */
+  TSURUGI_FFI_COMMIT_TYPE_AVAILABLE = 20,
+  /**
+   * commit data has been saved on the local disk.
+   */
+  TSURUGI_FFI_COMMIT_TYPE_STORED = 30,
+  /**
+   * commit data has been propagated to the all suitable nodes.
+   */
+  TSURUGI_FFI_COMMIT_TYPE_PROPAGATED = 40,
+};
+typedef int32_t TsurugiFfiCommitType;
+
 enum TsurugiFfiTransactionType {
   /**
    * use default transaction type.
@@ -125,6 +149,8 @@ enum TsurugiFfiTransactionType {
 };
 typedef int32_t TsurugiFfiTransactionType;
 
+typedef struct TsurugiFfiCommitOption TsurugiFfiCommitOption;
+
 typedef struct TsurugiFfiConnectionOption TsurugiFfiConnectionOption;
 
 typedef struct TsurugiFfiContext TsurugiFfiContext;
@@ -136,6 +162,8 @@ typedef struct TsurugiFfiSession TsurugiFfiSession;
 typedef struct TsurugiFfiSqlClient TsurugiFfiSqlClient;
 
 typedef struct TsurugiFfiSqlColumn TsurugiFfiSqlColumn;
+
+typedef struct TsurugiFfiSqlExecuteResult TsurugiFfiSqlExecuteResult;
 
 typedef struct TsurugiFfiTableList TsurugiFfiTableList;
 
@@ -161,6 +189,10 @@ typedef struct TsurugiFfiTransactionOption *TsurugiFfiTransactionOptionHandle;
 
 typedef struct TsurugiFfiTransaction *TsurugiFfiTransactionHandle;
 
+typedef struct TsurugiFfiSqlExecuteResult *TsurugiFfiSqlExecuteResultHandle;
+
+typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
+
 typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 
 typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
@@ -176,6 +208,8 @@ typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 #define TSURUGI_FFI_RC_FFI_ARG2_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 2)
 
 #define TSURUGI_FFI_RC_FFI_ARG3_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 3)
+
+#define TSURUGI_FFI_RC_FFI_ARG4_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 4)
 
 #define TSURUGI_FFI_RC_FFI_NUL_ERROR (TSURUGI_FFI_RC_FFI_ERROR | 1)
 
@@ -218,6 +252,21 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle co
                                                       TsurugiFfiTransactionOptionHandle transaction_option,
                                                       TsurugiFfiTransactionHandle *transaction_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
+                                            TsurugiFfiSqlClientHandle sql_client,
+                                            TsurugiFfiTransactionHandle transaction,
+                                            const char *sql,
+                                            TsurugiFfiSqlExecuteResultHandle *execute_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_commit(TsurugiFfiContextHandle context,
+                                           TsurugiFfiSqlClientHandle sql_client,
+                                           TsurugiFfiTransactionHandle transaction,
+                                           TsurugiFfiCommitOptionHandle commit_option);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_rollback(TsurugiFfiContextHandle context,
+                                             TsurugiFfiSqlClientHandle sql_client,
+                                             TsurugiFfiTransactionHandle transaction);
+
 void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
 
 TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context,
@@ -229,6 +278,28 @@ TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle contex
                                                   TsurugiFfiAtomType *atom_type_out);
 
 void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column);
+
+TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_inserted_rows(TsurugiFfiContextHandle context,
+                                                              TsurugiFfiSqlExecuteResultHandle execute_result,
+                                                              int64_t *rows_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_updated_rows(TsurugiFfiContextHandle context,
+                                                             TsurugiFfiSqlExecuteResultHandle execute_result,
+                                                             int64_t *rows_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_merged_rows(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiSqlExecuteResultHandle execute_result,
+                                                            int64_t *rows_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_deleted_rows(TsurugiFfiContextHandle context,
+                                                             TsurugiFfiSqlExecuteResultHandle execute_result,
+                                                             int64_t *rows_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_rows(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlExecuteResultHandle execute_result,
+                                                     int64_t *rows_out);
+
+void tsurugi_ffi_sql_execute_result_dispose(TsurugiFfiSqlExecuteResultHandle execute_result);
 
 TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context,
                                                          TsurugiFfiTableListHandle table_list,
@@ -309,6 +380,19 @@ TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
                                            TsurugiFfiTransactionHandle transaction);
 
 void tsurugi_ffi_transaction_dispose(TsurugiFfiTransactionHandle transaction);
+
+TsurugiFfiRc tsurugi_ffi_commit_option_create(TsurugiFfiContextHandle context,
+                                              TsurugiFfiCommitOptionHandle *commit_option_out);
+
+TsurugiFfiRc tsurugi_ffi_commit_option_set_commit_type(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiCommitOptionHandle commit_option,
+                                                       TsurugiFfiCommitType commit_type);
+
+TsurugiFfiRc tsurugi_ffi_commit_option_get_commit_type(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiCommitOptionHandle commit_option,
+                                                       TsurugiFfiCommitType *commit_type_out);
+
+void tsurugi_ffi_commit_option_dispose(TsurugiFfiCommitOptionHandle commit_option);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_create(TsurugiFfiContextHandle context,
                                                    TsurugiFfiTransactionOptionHandle *transaction_option_out);

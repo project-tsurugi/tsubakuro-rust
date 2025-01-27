@@ -18,11 +18,20 @@ class TgFfiTableListTest extends TgFfiTester {
 	@Test
 	void get_table_names() {
 		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		dropIfExists("test");
 
 		try (var tableList = getTableList()) {
-			var context = TgFfiContext.create(manager);
 			List<String> tableNames = tableList.getTableNames(context);
-			// TODO create tableしてからtableNamesを取得し、そのテーブルが存在することを確認
+			assertFalse(tableNames.contains("test"));
+		}
+
+		executeSql("create table test (pk int primary key)");
+
+		try (var tableList = getTableList()) {
+			List<String> tableNames = tableList.getTableNames(context);
+			assertTrue(tableNames.contains("test"));
 		}
 	}
 

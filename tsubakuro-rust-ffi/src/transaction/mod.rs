@@ -10,6 +10,7 @@ use crate::{
     return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
 };
 
+pub(crate) mod commit_option;
 pub(crate) mod option;
 
 pub(crate) struct TsurugiFfiTransaction {

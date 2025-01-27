@@ -53,6 +53,10 @@ public abstract class TgFfiObject implements Closeable {
 		return out.get(ValueLayout.JAVA_INT, 0);
 	}
 
+	protected static long outToLong(MemorySegment out) {
+		return out.get(ValueLayout.JAVA_LONG, 0);
+	}
+
 	protected static String outToString(MemorySegment out) {
 		var stringPtr = out.get(ValueLayout.ADDRESS, 0);
 		if (stringPtr.address() == 0) {

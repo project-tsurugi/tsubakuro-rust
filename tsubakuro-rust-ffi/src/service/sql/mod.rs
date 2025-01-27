@@ -1,5 +1,6 @@
 use std::{ffi::c_char, sync::Arc};
 
+use execute_result::{TsurugiFfiSqlExecuteResult, TsurugiFfiSqlExecuteResultHandle};
 use log::trace;
 use table_list::{TsurugiFfiTableList, TsurugiFfiTableListHandle};
 use table_metadata::{TsurugiFfiTableMetadata, TsurugiFfiTableMetadataHandle};
@@ -11,13 +12,14 @@ use crate::{
     return_code::{rc_ok, TsurugiFfiRc},
     session::TsurugiFfiSessionHandle,
     transaction::{
-        option::TsurugiFfiTransactionOptionHandle, TsurugiFfiTransaction,
-        TsurugiFfiTransactionHandle,
+        commit_option::TsurugiFfiCommitOptionHandle, option::TsurugiFfiTransactionOptionHandle,
+        TsurugiFfiTransaction, TsurugiFfiTransactionHandle,
     },
 };
 
 mod atom_type;
 mod column;
+mod execute_result;
 mod table_list;
 mod table_metadata;
 
@@ -173,6 +175,102 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     }
 
     trace!("{FUNCTION_NAME} end. transaction={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_execute(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    sql: *const c_char,
+    execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, execute_result_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, sql);
+
+    let runtime = client.runtime();
+    let execute_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.execute(transaction, sql)
+    );
+
+    let execute_result = Box::new(TsurugiFfiSqlExecuteResult::new(execute_result));
+
+    let handle = Box::into_raw(execute_result);
+    unsafe {
+        *execute_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_commit(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    commit_option: TsurugiFfiCommitOptionHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_commit()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, commit_option);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let commit_option = unsafe { &*commit_option };
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.commit(transaction, commit_option)
+    );
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_rollback(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_rollback()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.rollback(transaction)
+    );
+
+    trace!("{FUNCTION_NAME} end");
     rc_ok(context)
 }
 
