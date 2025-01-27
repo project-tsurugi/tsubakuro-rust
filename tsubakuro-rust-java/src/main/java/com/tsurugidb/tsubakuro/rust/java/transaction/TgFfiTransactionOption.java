@@ -38,8 +38,8 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_create(ctx, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		var handle = outToHandle(out);
-		return new TgFfiTransactionOption(manager, handle);
+		var outHandle = outToHandle(out);
+		return new TgFfiTransactionOption(manager, outHandle);
 	}
 
 	TgFfiTransactionOption(TgFfiObjectManager manager, MemorySegment handle) {
@@ -63,8 +63,8 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_type(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		int type = outToInt(out);
-		return TgFfiTransactionType.forNumber(type);
+		int outInt = outToInt(out);
+		return TgFfiTransactionType.forNumber(outInt);
 	}
 
 	public synchronized void setTransactionLabel(TgFfiContext context, String label) {

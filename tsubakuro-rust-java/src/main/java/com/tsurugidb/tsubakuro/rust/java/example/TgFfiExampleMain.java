@@ -6,6 +6,9 @@ import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionType;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiInitializer;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRuntimeException;
@@ -30,6 +33,9 @@ public class TgFfiExampleMain {
 					var client = session.makeSqlClient(context)) {
 				listTables(client, context);
 				getTableMetadata(client, context);
+
+				try (var transaction = startOcc(client, context)) {
+				}
 			}
 		}
 	}
@@ -55,6 +61,15 @@ public class TgFfiExampleMain {
 			} else {
 				throw e;
 			}
+		}
+	}
+
+	static TgFfiTransaction startOcc(TgFfiSqlClient client, TgFfiContext context) {
+		try (var transactionOption = TgFfiTransactionOption.create(context)) {
+			transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
+			transactionOption.setTransactionLabel(context, "tsubakuro-rust-java.transaction");
+
+			return client.startTransaction(context, transactionOption);
 		}
 	}
 }

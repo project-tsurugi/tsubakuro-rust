@@ -31,8 +31,8 @@ public class TgFfiSqlColumn extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_atom_type(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		var value = outToInt(out);
-		return TgFfiAtomType.forNumber(value);
+		int outInt = outToInt(out);
+		return TgFfiAtomType.forNumber(outInt);
 	}
 
 	@Override

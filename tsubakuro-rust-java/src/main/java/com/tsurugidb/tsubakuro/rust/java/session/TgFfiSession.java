@@ -43,8 +43,8 @@ public class TgFfiSession extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect(ctx, arg, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		var handle = outToHandle(out);
-		return new TgFfiSession(manager, handle);
+		var outHandle = outToHandle(out);
+		return new TgFfiSession(manager, outHandle);
 	}
 
 	TgFfiSession(TgFfiObjectManager manager, MemorySegment handle) {
@@ -58,8 +58,8 @@ public class TgFfiSession extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_make_sql_client(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		var client = outToHandle(out);
-		return new TgFfiSqlClient(manager(), client);
+		var outHandle = outToHandle(out);
+		return new TgFfiSqlClient(manager(), outHandle);
 	}
 
 	@Override

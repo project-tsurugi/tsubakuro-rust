@@ -143,10 +143,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
         *endpoint_out = connection_option.endpoint_str;
     }
 
-    trace!(
-        "{FUNCTION_NAME} end. endpoint={:?}",
-        connection_option.endpoint_str
-    );
+    trace!("{FUNCTION_NAME} end");
     rc_ok(context)
 }
 
@@ -208,10 +205,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
         *application_name_out = connection_option.application_name;
     }
 
-    trace!(
-        "{FUNCTION_NAME} end. application_name={:?}",
-        connection_option.application_name
-    );
+    trace!("{FUNCTION_NAME} end");
     rc_ok(context)
 }
 
@@ -269,7 +263,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_label(
         *label_out = connection_option.label;
     }
 
-    trace!("{FUNCTION_NAME} end. label={:?}", connection_option.label);
+    trace!("{FUNCTION_NAME} end");
     rc_ok(context)
 }
 

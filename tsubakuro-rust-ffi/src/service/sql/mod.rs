@@ -10,6 +10,10 @@ use crate::{
     ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_core_error,
     return_code::{rc_ok, TsurugiFfiRc},
     session::TsurugiFfiSessionHandle,
+    transaction::{
+        option::TsurugiFfiTransactionOptionHandle, TsurugiFfiTransaction,
+        TsurugiFfiTransactionHandle,
+    },
 };
 
 mod atom_type;
@@ -136,6 +140,41 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     }
 
     trace!("{FUNCTION_NAME} end. table_metadata={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    transaction_out: *mut TsurugiFfiTransactionHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction_option = unsafe { &*transaction_option };
+
+    let runtime = client.runtime();
+    let result = runtime.block_on(client.start_transaction(transaction_option));
+    let transaction = match result {
+        Ok(value) => value,
+        Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
+    };
+
+    let transaction = Box::new(TsurugiFfiTransaction::new(transaction, runtime.clone()));
+
+    let handle = Box::into_raw(transaction);
+    unsafe {
+        *transaction_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. transaction={:?}", handle);
     rc_ok(context)
 }
 

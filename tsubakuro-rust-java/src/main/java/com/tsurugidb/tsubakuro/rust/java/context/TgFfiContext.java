@@ -18,8 +18,8 @@ public class TgFfiContext extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_create(out);
 		TgFfiRcUtil.throwIfError(rc);
 
-		var handle = outToHandle(out);
-		return new TgFfiContext(manager, handle);
+		var outHandle = outToHandle(out);
+		return new TgFfiContext(manager, outHandle);
 	}
 
 	TgFfiContext(TgFfiObjectManager manager, MemorySegment handle) {
@@ -41,8 +41,8 @@ public class TgFfiContext extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_type(handle, out);
 		TgFfiRcUtil.throwIfError(rc);
 
-		int type = outToInt(out);
-		return TgFfiRcType.of(type);
+		int outInt = outToInt(out);
+		return TgFfiRcType.of(outInt);
 	}
 
 	public synchronized String getErrorMessage() {

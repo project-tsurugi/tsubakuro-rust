@@ -40,8 +40,8 @@ public class TgFfiEndpoint extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(ctx, arg, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		var handle = outToHandle(out);
-		return new TgFfiEndpoint(manager, handle);
+		var outHandle = outToHandle(out);
+		return new TgFfiEndpoint(manager, outHandle);
 	}
 
 	TgFfiEndpoint(TgFfiObjectManager manager, MemorySegment handle) {

@@ -141,6 +141,8 @@ typedef struct TsurugiFfiTableList TsurugiFfiTableList;
 
 typedef struct TsurugiFfiTableMetadata TsurugiFfiTableMetadata;
 
+typedef struct TsurugiFfiTransaction TsurugiFfiTransaction;
+
 typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
 
 typedef uint32_t TsurugiFfiRc;
@@ -155,13 +157,15 @@ typedef struct TsurugiFfiTableList *TsurugiFfiTableListHandle;
 
 typedef struct TsurugiFfiTableMetadata *TsurugiFfiTableMetadataHandle;
 
+typedef struct TsurugiFfiTransactionOption *TsurugiFfiTransactionOptionHandle;
+
+typedef struct TsurugiFfiTransaction *TsurugiFfiTransactionHandle;
+
 typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 
 typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
-
-typedef struct TsurugiFfiTransactionOption *TsurugiFfiTransactionOptionHandle;
 
 #define TSURUGI_FFI_RC_OK 0
 
@@ -208,6 +212,11 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle c
                                                        TsurugiFfiSqlClientHandle sql_client,
                                                        const char *table_name,
                                                        TsurugiFfiTableMetadataHandle *table_metadata_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle context,
+                                                      TsurugiFfiSqlClientHandle sql_client,
+                                                      TsurugiFfiTransactionOptionHandle transaction_option,
+                                                      TsurugiFfiTransactionHandle *transaction_out);
 
 void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
 
@@ -291,6 +300,15 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle con
                                                      char **label_out);
 
 void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);
+
+TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiTransactionHandle transaction,
+                                                        char **transaction_id_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
+                                           TsurugiFfiTransactionHandle transaction);
+
+void tsurugi_ffi_transaction_dispose(TsurugiFfiTransactionHandle transaction);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_create(TsurugiFfiContextHandle context,
                                                    TsurugiFfiTransactionOptionHandle *transaction_option_out);

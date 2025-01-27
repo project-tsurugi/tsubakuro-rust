@@ -95,18 +95,16 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 		try (var contextObject = TgFfiContext.create(manager)) {
 			var context = contextObject.handle();
 			var target = MemorySegment.NULL;
-			var endpoint = manager.allocateString("tsubakuro-rust-java/test");
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(context, target,
-					endpoint);
+			var arg = manager.allocateString("tsubakuro-rust-java/test");
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(context, target, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		try (var contextObject = TgFfiContext.create(manager); //
 				var targetObject = TgFfiTransactionOption.create(contextObject)) {
 			var context = contextObject.handle();
 			var target = targetObject.handle();
-			var endpoint = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(context, target,
-					endpoint);
+			var arg = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_label(context, target, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}

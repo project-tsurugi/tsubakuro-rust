@@ -55,8 +55,8 @@ public class TgFfiTableMetadata extends TgFfiObject {
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_element(ctx, handle, i, out);
 			TgFfiRcUtil.throwIfError(rc, context);
 
-			var column = outToHandle(out);
-			list.add(new TgFfiSqlColumn(manager(), column));
+			var outHandle = outToHandle(out);
+			list.add(new TgFfiSqlColumn(manager(), outHandle));
 		}
 
 		return Collections.unmodifiableList(list);

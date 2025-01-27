@@ -38,8 +38,8 @@ public class TgFfiConnectionOption extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_create(ctx, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		var handle = outToHandle(out);
-		return new TgFfiConnectionOption(manager, handle);
+		var outHandle = outToHandle(out);
+		return new TgFfiConnectionOption(manager, outHandle);
 	}
 
 	TgFfiConnectionOption(TgFfiObjectManager manager, MemorySegment handle) {
