@@ -19,7 +19,7 @@ public class TgFfiTableList extends TgFfiObject {
 		super(manager, handle);
 	}
 
-	public synchronized List<String> tableNames(TgFfiContext context) {
+	public synchronized List<String> getTableNames(TgFfiContext context) {
 		if (this.tableNames == null) {
 			this.tableNames = createTablesNames(context);
 		}

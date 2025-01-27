@@ -34,7 +34,7 @@ public class TgFfiExampleMain {
 
 	static void listTables(TgFfiSqlClient client, TgFfiContext context) {
 		try (var tableList = client.listTables(context)) {
-			List<String> tableNames = tableList.tableNames(context);
+			List<String> tableNames = tableList.getTableNames(context);
 			System.out.println("SqlClient.listTables().tableNames=" + tableNames);
 		}
 	}

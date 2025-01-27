@@ -31,4 +31,8 @@ public class TgFfiRuntimeException extends RuntimeException {
 	public int getReturnCode() {
 		return this.rc;
 	}
+
+	public String getReturnCodeName() {
+		return TgFfiRcUtil.toName(this.rc);
+	}
 }

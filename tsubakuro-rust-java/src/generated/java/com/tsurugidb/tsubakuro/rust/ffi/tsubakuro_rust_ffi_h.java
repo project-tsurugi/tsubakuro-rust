@@ -15439,6 +15439,18 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiTableListHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef struct TsurugiFfiTableMetadata *TsurugiFfiTableMetadataHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiTableMetadataHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiSqlColumnHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle
      * }
      */
@@ -15918,6 +15930,67 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_client_get_table_metadata {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_table_metadata");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_get_table_metadata$descriptor() {
+        return tsurugi_ffi_sql_client_get_table_metadata.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_get_table_metadata$handle() {
+        return tsurugi_ffi_sql_client_get_table_metadata.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_get_table_metadata$address() {
+        return tsurugi_ffi_sql_client_get_table_metadata.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_get_table_metadata(MemorySegment context, MemorySegment sql_client, MemorySegment table_name, MemorySegment table_metadata_out) {
+        var mh$ = tsurugi_ffi_sql_client_get_table_metadata.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_get_table_metadata", context, sql_client, table_name, table_metadata_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, table_name, table_metadata_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_client_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER
@@ -15970,6 +16043,123 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_dispose", sql_client);
             }
             mh$.invokeExact(sql_client);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_column_get_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_name$descriptor() {
+        return tsurugi_ffi_sql_column_get_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_name$handle() {
+        return tsurugi_ffi_sql_column_get_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_name$address() {
+        return tsurugi_ffi_sql_column_get_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_name(MemorySegment context, MemorySegment sql_column, MemorySegment name_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_name", context, sql_column, name_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_column_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_dispose$descriptor() {
+        return tsurugi_ffi_sql_column_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_dispose$handle() {
+        return tsurugi_ffi_sql_column_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_dispose$address() {
+        return tsurugi_ffi_sql_column_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column)
+     * }
+     */
+    public static void tsurugi_ffi_sql_column_dispose(MemorySegment sql_column) {
+        var mh$ = tsurugi_ffi_sql_column_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_dispose", sql_column);
+            }
+            mh$.invokeExact(sql_column);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16148,6 +16338,244 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_list_dispose", table_list);
             }
             mh$.invokeExact(table_list);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_table_metadata_get_table_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_table_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_metadata_get_table_name$descriptor() {
+        return tsurugi_ffi_table_metadata_get_table_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_metadata_get_table_name$handle() {
+        return tsurugi_ffi_table_metadata_get_table_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_metadata_get_table_name$address() {
+        return tsurugi_ffi_table_metadata_get_table_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * }
+     */
+    public static int tsurugi_ffi_table_metadata_get_table_name(MemorySegment context, MemorySegment table_metadata, MemorySegment table_name_out) {
+        var mh$ = tsurugi_ffi_table_metadata_get_table_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_metadata_get_table_name", context, table_metadata, table_name_out);
+            }
+            return (int)mh$.invokeExact(context, table_metadata, table_name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_table_metadata_get_columns_size {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_columns_size");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_metadata_get_columns_size$descriptor() {
+        return tsurugi_ffi_table_metadata_get_columns_size.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_metadata_get_columns_size$handle() {
+        return tsurugi_ffi_table_metadata_get_columns_size.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_metadata_get_columns_size$address() {
+        return tsurugi_ffi_table_metadata_get_columns_size.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_table_metadata_get_columns_size(MemorySegment context, MemorySegment table_metadata, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_table_metadata_get_columns_size.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_metadata_get_columns_size", context, table_metadata, size_out);
+            }
+            return (int)mh$.invokeExact(context, table_metadata, size_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_table_metadata_get_columns_element {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_columns_element");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_element(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t index, TsurugiFfiSqlColumnHandle *element_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_metadata_get_columns_element$descriptor() {
+        return tsurugi_ffi_table_metadata_get_columns_element.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_element(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t index, TsurugiFfiSqlColumnHandle *element_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_metadata_get_columns_element$handle() {
+        return tsurugi_ffi_table_metadata_get_columns_element.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_element(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t index, TsurugiFfiSqlColumnHandle *element_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_metadata_get_columns_element$address() {
+        return tsurugi_ffi_table_metadata_get_columns_element.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_element(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, uint32_t index, TsurugiFfiSqlColumnHandle *element_out)
+     * }
+     */
+    public static int tsurugi_ffi_table_metadata_get_columns_element(MemorySegment context, MemorySegment table_metadata, int index, MemorySegment element_out) {
+        var mh$ = tsurugi_ffi_table_metadata_get_columns_element.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_metadata_get_columns_element", context, table_metadata, index, element_out);
+            }
+            return (int)mh$.invokeExact(context, table_metadata, index, element_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_table_metadata_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_metadata_dispose$descriptor() {
+        return tsurugi_ffi_table_metadata_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_metadata_dispose$handle() {
+        return tsurugi_ffi_table_metadata_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_metadata_dispose$address() {
+        return tsurugi_ffi_table_metadata_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata)
+     * }
+     */
+    public static void tsurugi_ffi_table_metadata_dispose(MemorySegment table_metadata) {
+        var mh$ = tsurugi_ffi_table_metadata_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_metadata_dispose", table_metadata);
+            }
+            mh$.invokeExact(table_metadata);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

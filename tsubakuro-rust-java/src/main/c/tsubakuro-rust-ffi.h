@@ -31,7 +31,11 @@ typedef struct TsurugiFfiSession TsurugiFfiSession;
 
 typedef struct TsurugiFfiSqlClient TsurugiFfiSqlClient;
 
+typedef struct TsurugiFfiSqlColumn TsurugiFfiSqlColumn;
+
 typedef struct TsurugiFfiTableList TsurugiFfiTableList;
+
+typedef struct TsurugiFfiTableMetadata TsurugiFfiTableMetadata;
 
 typedef uint32_t TsurugiFfiRc;
 
@@ -42,6 +46,10 @@ typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
 typedef struct TsurugiFfiSqlClient *TsurugiFfiSqlClientHandle;
 
 typedef struct TsurugiFfiTableList *TsurugiFfiTableListHandle;
+
+typedef struct TsurugiFfiTableMetadata *TsurugiFfiTableMetadataHandle;
+
+typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 
 typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
@@ -88,7 +96,18 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
                                                 TsurugiFfiTableListHandle *table_list_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlClientHandle sql_client,
+                                                       const char *table_name,
+                                                       TsurugiFfiTableMetadataHandle *table_metadata_out);
+
 void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
+
+TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context,
+                                             TsurugiFfiSqlColumnHandle sql_column,
+                                             char **name_out);
+
+void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column);
 
 TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context,
                                                          TsurugiFfiTableListHandle table_list,
@@ -100,6 +119,21 @@ TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_element(TsurugiFfiContextHan
                                                             char **element_out);
 
 void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list);
+
+TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiTableMetadataHandle table_metadata,
+                                                       char **table_name_out);
+
+TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiTableMetadataHandle table_metadata,
+                                                         uint32_t *size_out);
+
+TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_element(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiTableMetadataHandle table_metadata,
+                                                            uint32_t index,
+                                                            TsurugiFfiSqlColumnHandle *element_out);
+
+void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata);
 
 TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
                                          TsurugiFfiConnectionOptionHandle connection_option,

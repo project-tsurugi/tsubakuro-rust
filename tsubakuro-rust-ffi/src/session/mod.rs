@@ -64,7 +64,7 @@ pub extern "C" fn tsurugi_ffi_session_connect(
         .unwrap();
     let result = runtime.block_on(Session::connect(connection_option));
     let session = match result {
-        Ok(session) => session,
+        Ok(value) => value,
         Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
     };
     let session = Box::new(TsurugiFfiSession {

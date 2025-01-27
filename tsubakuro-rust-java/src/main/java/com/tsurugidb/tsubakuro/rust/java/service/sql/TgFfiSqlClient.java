@@ -25,6 +25,18 @@ public class TgFfiSqlClient extends TgFfiObject {
 		return new TgFfiTableList(manager(), tableList);
 	}
 
+	public synchronized TgFfiTableMetadata getTableMetadata(TgFfiContext context, String tableName) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateString(tableName);
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_table_metadata(ctx, handle, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var tableMetadata = outToHandle(out);
+		return new TgFfiTableMetadata(manager(), tableMetadata);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_dispose(handle);
