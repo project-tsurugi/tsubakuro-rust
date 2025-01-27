@@ -29,10 +29,10 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void create_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_create(context, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_create(ctx, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 	}
@@ -57,19 +57,19 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void set_endpoint_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
-			var endpoint = TgFfiEndpoint.parse(contextObject, "tcp://localhost:12345").handle();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = TgFfiEndpoint.parse(context, "tcp://localhost:12345").handle();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiConnectionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
-			var endpoint = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var arg = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
@@ -93,19 +93,19 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void set_endpoint_url_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
-			var endpoint = manager.allocateString("tcp://localhost:12345");
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = manager.allocateString("tcp://localhost:12345");
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiConnectionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
-			var endpoint = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var arg = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
@@ -114,19 +114,19 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void get_endpoint_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(context, target, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiConnectionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(context, target, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
@@ -150,19 +150,19 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void set_application_name_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
-			var endpoint = manager.allocateString("tsubakuro-rust-java/test");
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_application_name(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = manager.allocateString("tsubakuro-rust-java/test");
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_application_name(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiConnectionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
-			var endpoint = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_application_name(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var arg = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_application_name(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
@@ -171,19 +171,19 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void get_application_name_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_application_name(context, target, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_application_name(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiConnectionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_application_name(context, target, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_application_name(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
@@ -207,19 +207,19 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void set_label_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
-			var endpoint = manager.allocateString("tsubakuro-rust-java/test");
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_label(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = manager.allocateString("tsubakuro-rust-java/test");
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_label(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiConnectionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
-			var endpoint = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_label(context, target, endpoint);
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var arg = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_label(ctx, handle, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
@@ -228,19 +228,19 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 	void get_label_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var target = MemorySegment.NULL;
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_label(context, target, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_label(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager); //
-				var targetObject = TgFfiConnectionOption.create(contextObject)) {
-			var context = contextObject.handle();
-			var target = targetObject.handle();
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_label(context, target, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_label(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}

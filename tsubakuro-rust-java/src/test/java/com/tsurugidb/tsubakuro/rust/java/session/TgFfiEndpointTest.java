@@ -31,18 +31,18 @@ class TgFfiEndpointTest extends TgFfiTester {
 	void parse_argError() {
 		var manager = getFfiObjectManager();
 
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var endpoint = MemorySegment.NULL;
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var arg = MemorySegment.NULL;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(context, endpoint, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(ctx, arg, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var contextObject = TgFfiContext.create(manager)) {
-			var context = contextObject.handle();
-			var endpoint = manager.allocateString("tcp://localhost:12345");
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var arg = manager.allocateString("tcp://localhost:12345");
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(context, endpoint, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(ctx, arg, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}

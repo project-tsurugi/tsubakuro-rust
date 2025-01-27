@@ -105,6 +105,26 @@ enum TsurugiFfiAtomType {
 };
 typedef int32_t TsurugiFfiAtomType;
 
+enum TsurugiFfiTransactionType {
+  /**
+   * use default transaction type.
+   */
+  TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED = 0,
+  /**
+   * short transactions (optimistic concurrency control).
+   */
+  TSURUGI_FFI_TRANSACTION_TYPE_SHORT = 1,
+  /**
+   * long transactions (pessimistic concurrency control).
+   */
+  TSURUGI_FFI_TRANSACTION_TYPE_LONG = 2,
+  /**
+   * read only transactions (may be abort-free).
+   */
+  TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY = 3,
+};
+typedef int32_t TsurugiFfiTransactionType;
+
 typedef struct TsurugiFfiConnectionOption TsurugiFfiConnectionOption;
 
 typedef struct TsurugiFfiContext TsurugiFfiContext;
@@ -120,6 +140,8 @@ typedef struct TsurugiFfiSqlColumn TsurugiFfiSqlColumn;
 typedef struct TsurugiFfiTableList TsurugiFfiTableList;
 
 typedef struct TsurugiFfiTableMetadata TsurugiFfiTableMetadata;
+
+typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
 
 typedef uint32_t TsurugiFfiRc;
 
@@ -138,6 +160,8 @@ typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
+
+typedef struct TsurugiFfiTransactionOption *TsurugiFfiTransactionOptionHandle;
 
 #define TSURUGI_FFI_RC_OK 0
 
@@ -267,3 +291,24 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle con
                                                      char **label_out);
 
 void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_create(TsurugiFfiContextHandle context,
+                                                   TsurugiFfiTransactionOptionHandle *transaction_option_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_type(TsurugiFfiContextHandle context,
+                                                                 TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                 TsurugiFfiTransactionType transaction_type);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_type(TsurugiFfiContextHandle context,
+                                                                 TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                 TsurugiFfiTransactionType *transaction_type_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context,
+                                                                  TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                  const char *label);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context,
+                                                                  TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                  char **label_out);
+
+void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum TgFfiAtomType {
+
 	/**
 	 * <pre>
 	 * unspecified type.
