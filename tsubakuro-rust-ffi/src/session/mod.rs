@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, rc_core_error,
+    ffi_arg_require_non_null, ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -58,11 +58,12 @@ pub extern "C" fn tsurugi_ffi_session_connect(
         .enable_all()
         .build()
         .unwrap();
-    let result = runtime.block_on(Session::connect(connection_option));
-    let session = match result {
-        Ok(value) => value,
-        Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
-    };
+    let session = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        Session::connect(connection_option)
+    );
     let session = Box::new(TsurugiFfiSession {
         session,
         runtime: Arc::new(runtime),

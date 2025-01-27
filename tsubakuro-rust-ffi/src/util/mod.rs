@@ -14,3 +14,13 @@ macro_rules! ffi_arg_require_non_null {
         }
     }};
 }
+
+#[macro_export]
+macro_rules! ffi_exec_core_async {
+    ($context:expr, $function_name:expr, $runtime:expr, $executor:expr) => {
+        match $runtime.block_on($executor) {
+            Ok(value) => value,
+            Err(e) => return $crate::rc_core_error!($context, $function_name, e),
+        }
+    };
+}

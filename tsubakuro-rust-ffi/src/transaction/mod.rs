@@ -6,8 +6,8 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, rc_core_error,
-    return_code::{rc_ok, TsurugiFfiRc},
+    ffi_arg_require_non_null, ffi_exec_core_async,
+    return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
 };
 
 pub(crate) mod option;
@@ -93,11 +93,7 @@ pub extern "C" fn tsurugi_ffi_transaction_close(
     let transaction = unsafe { &mut *transaction };
 
     let runtime = transaction.runtime();
-    let result = runtime.block_on(transaction.close());
-    match result {
-        Ok(value) => value,
-        Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
-    };
+    ffi_exec_core_async!(context, FUNCTION_NAME, runtime, transaction.close());
 
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)
@@ -105,12 +101,16 @@ pub extern "C" fn tsurugi_ffi_transaction_close(
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_dispose(transaction: TsurugiFfiTransactionHandle) {
+    transaction_dispose(transaction);
+}
+
+fn transaction_dispose(transaction: TsurugiFfiTransactionHandle) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_dispose()";
     trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
 
     if transaction.is_null() {
         trace!("{FUNCTION_NAME} end. arg[transaction] is null");
-        return;
+        return TSURUGI_FFI_RC_OK;
     }
 
     unsafe {
@@ -119,17 +119,13 @@ pub extern "C" fn tsurugi_ffi_transaction_dispose(transaction: TsurugiFfiTransac
         cchar_field_dispose!(transaction.transaction_id);
 
         if !transaction.is_closed() {
+            let context = std::ptr::null_mut();
+
             let runtime = transaction.runtime();
-            let result = runtime.block_on(transaction.close());
-            match result {
-                Ok(value) => value,
-                Err(e) => {
-                    trace!("{FUNCTION_NAME} error. {:?}", e);
-                    return;
-                }
-            }
+            ffi_exec_core_async!(context, FUNCTION_NAME, runtime, transaction.close());
         }
     }
 
     trace!("{FUNCTION_NAME} end");
+    TSURUGI_FFI_RC_OK
 }

@@ -7,7 +7,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_core_error,
+    ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
     session::TsurugiFfiSessionHandle,
     transaction::{
@@ -91,11 +91,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     let client = unsafe { &*sql_client };
 
     let runtime = client.runtime();
-    let result = runtime.block_on(client.list_tables());
-    let table_list = match result {
-        Ok(value) => value,
-        Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
-    };
+    let table_list = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.list_tables());
 
     let table_list = Box::new(TsurugiFfiTableList::new(table_list));
 
@@ -126,11 +122,12 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     let table_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, table_name);
 
     let runtime = client.runtime();
-    let result = runtime.block_on(client.get_table_metadata(table_name));
-    let table_metadata = match result {
-        Ok(value) => value,
-        Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
-    };
+    let table_metadata = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_table_metadata(table_name)
+    );
 
     let table_metadata = Box::new(TsurugiFfiTableMetadata::new(table_metadata));
 
@@ -161,11 +158,12 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     let transaction_option = unsafe { &*transaction_option };
 
     let runtime = client.runtime();
-    let result = runtime.block_on(client.start_transaction(transaction_option));
-    let transaction = match result {
-        Ok(value) => value,
-        Err(e) => return rc_core_error!(context, FUNCTION_NAME, e),
-    };
+    let transaction = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.start_transaction(transaction_option)
+    );
 
     let transaction = Box::new(TsurugiFfiTransaction::new(transaction, runtime.clone()));
 
