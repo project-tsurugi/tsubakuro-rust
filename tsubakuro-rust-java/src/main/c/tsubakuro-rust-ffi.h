@@ -233,6 +233,8 @@ typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
 
 #define TSURUGI_FFI_RC_FFI_ARG5_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 5)
 
+#define TSURUGI_FFI_RC_FFI_ARG6_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 6)
+
 #define TSURUGI_FFI_RC_FFI_NUL_ERROR (TSURUGI_FFI_RC_FFI_ERROR | 1)
 
 #define TSURUGI_FFI_RC_CORE_CLIENT_CLIENT_ERROR (TSURUGI_FFI_RC_CORE_CLIENT_ERROR | (1 << 16))
@@ -419,11 +421,27 @@ TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
                                             const char *sql,
                                             TsurugiFfiSqlExecuteResultHandle *execute_result_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlClientHandle sql_client,
+                                                     TsurugiFfiTransactionHandle transaction,
+                                                     TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                     const TsurugiFfiSqlParameterHandle *parameters,
+                                                     uint32_t parameter_size,
+                                                     TsurugiFfiSqlExecuteResultHandle *execute_result_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
                                           TsurugiFfiSqlClientHandle sql_client,
                                           TsurugiFfiTransactionHandle transaction,
                                           const char *sql,
                                           TsurugiFfiSqlQueryResultHandle *query_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context,
+                                                   TsurugiFfiSqlClientHandle sql_client,
+                                                   TsurugiFfiTransactionHandle transaction,
+                                                   TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                   const TsurugiFfiSqlParameterHandle *parameters,
+                                                   uint32_t parameter_size,
+                                                   TsurugiFfiSqlQueryResultHandle *query_result_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_commit(TsurugiFfiContextHandle context,
                                            TsurugiFfiSqlClientHandle sql_client,

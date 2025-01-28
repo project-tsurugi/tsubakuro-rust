@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_require_non_null, ffi_exec_core_async,
-    return_code::{rc_ok, TsurugiFfiRc},
+    return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
 };
 
 #[derive(Debug)]
@@ -73,6 +73,12 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_dispose(
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
 ) {
+    prepared_statement_dispose(prepared_statement);
+}
+
+fn prepared_statement_dispose(
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_dispose()";
     trace!(
         "{FUNCTION_NAME} start. prepared_statement={:?}",
@@ -81,12 +87,20 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_dispose(
 
     if prepared_statement.is_null() {
         trace!("{FUNCTION_NAME} end. arg[prepared_statement] is null");
-        return;
+        return TSURUGI_FFI_RC_OK;
     }
 
     unsafe {
-        let _ = Box::from_raw(prepared_statement);
+        let prepared_statement = Box::from_raw(prepared_statement);
+
+        if !prepared_statement.is_closed() {
+            let context = std::ptr::null_mut();
+
+            let runtime = prepared_statement.runtime();
+            ffi_exec_core_async!(context, FUNCTION_NAME, runtime, prepared_statement.close());
+        }
     }
 
     trace!("{FUNCTION_NAME} end");
+    TSURUGI_FFI_RC_OK
 }

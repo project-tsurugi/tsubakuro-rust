@@ -22,7 +22,7 @@ use crate::{
 use super::{
     execute_result::TsurugiFfiSqlExecuteResultHandle,
     prepare::{
-        placeholder::TsurugiFfiSqlPlaceholderHandle,
+        parameter::TsurugiFfiSqlParameterHandle, placeholder::TsurugiFfiSqlPlaceholderHandle,
         prepared_statement::TsurugiFfiSqlPreparedStatementHandle,
     },
     query_result::TsurugiFfiSqlQueryResultHandle,
@@ -264,6 +264,63 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let prepared_statement = unsafe { &*prepared_statement };
+
+    let parameters: Vec<SqlParameter> = if parameter_size > 0 {
+        let src = unsafe { std::slice::from_raw_parts(parameters, parameter_size as usize) };
+        let mut dst = Vec::with_capacity(src.len());
+        for &parameter in src {
+            ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter);
+            let parameter = unsafe { &*parameter }.raw_clone();
+            dst.push(parameter);
+        }
+        dst
+    } else {
+        vec![]
+    };
+
+    let runtime = client.runtime();
+    let execute_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_execute(transaction, prepared_statement, parameters)
+    );
+
+    let execute_result = Box::new(TsurugiFfiSqlExecuteResult::new(execute_result));
+
+    let handle = Box::into_raw(execute_result);
+    unsafe {
+        *execute_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
@@ -289,6 +346,63 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
         FUNCTION_NAME,
         runtime,
         client.query(transaction, sql)
+    );
+
+    let query_result = Box::new(TsurugiFfiSqlQueryResult::new(query_result, runtime.clone()));
+
+    let handle = Box::into_raw(query_result);
+    unsafe {
+        *query_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, query_result_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let prepared_statement = unsafe { &*prepared_statement };
+
+    let parameters: Vec<SqlParameter> = if parameter_size > 0 {
+        let src = unsafe { std::slice::from_raw_parts(parameters, parameter_size as usize) };
+        let mut dst = Vec::with_capacity(src.len());
+        for &parameter in src {
+            ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter);
+            let parameter = unsafe { &*parameter }.raw_clone();
+            dst.push(parameter);
+        }
+        dst
+    } else {
+        vec![]
+    };
+
+    let runtime = client.runtime();
+    let query_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_query(transaction, prepared_statement, parameters)
     );
 
     let query_result = Box::new(TsurugiFfiSqlQueryResult::new(query_result, runtime.clone()));

@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
@@ -94,6 +95,29 @@ public class TgFfiSqlClient extends TgFfiObject {
 		return new TgFfiSqlExecuteResult(manager(), outHandle);
 	}
 
+	public synchronized TgFfiSqlExecuteResult preparedExecute(TgFfiContext context, TgFfiTransaction transaction,
+			TgFfiSqlPreparedStatement preparedStatement, List<TgFfiSqlParameter> parameters) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var tx = transaction.handle();
+		var ps = preparedStatement.handle();
+		MemorySegment arg;
+		int size;
+		if (parameters != null) {
+			arg = allocateArray(parameters);
+			size = parameters.size();
+		} else {
+			arg = MemorySegment.NULL;
+			size = 0;
+		}
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_execute(ctx, handle, tx, ps, arg, size, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiSqlExecuteResult(manager(), outHandle);
+	}
+
 	public synchronized TgFfiSqlQueryResult query(TgFfiContext context, TgFfiTransaction transaction, String sql) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
@@ -101,6 +125,29 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var arg = allocateString(sql);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query(ctx, handle, tx, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiSqlQueryResult(manager(), outHandle);
+	}
+
+	public synchronized TgFfiSqlQueryResult preparedQuery(TgFfiContext context, TgFfiTransaction transaction,
+			TgFfiSqlPreparedStatement preparedStatement, List<TgFfiSqlParameter> parameters) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var tx = transaction.handle();
+		var ps = preparedStatement.handle();
+		MemorySegment arg;
+		int size;
+		if (parameters != null) {
+			arg = allocateArray(parameters);
+			size = parameters.size();
+		} else {
+			arg = MemorySegment.NULL;
+			size = 0;
+		}
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query(ctx, handle, tx, ps, arg, size, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		var outHandle = outToHandle(out);

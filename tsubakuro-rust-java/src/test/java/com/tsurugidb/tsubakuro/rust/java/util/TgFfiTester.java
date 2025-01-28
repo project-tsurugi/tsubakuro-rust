@@ -1,10 +1,15 @@
 package com.tsurugidb.tsubakuro.rust.java.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResult;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
@@ -76,6 +81,7 @@ public class TgFfiTester {
 					try (var commitOption = TgFfiCommitOption.create(context)) {
 						client.commit(context, transaction, commitOption);
 					}
+					transaction.close(context);
 				}
 			}
 		}
@@ -113,5 +119,69 @@ public class TgFfiTester {
 				var commitOption = TgFfiCommitOption.create(context)) {
 			client.commit(context, transaction, commitOption);
 		}
+	}
+
+	public static record Entry(String name, Object value) {
+	}
+
+	public static class Row {
+		private final List<Entry> values = new ArrayList<>();
+
+		public Row add(String name, Object value) {
+			values.add(new Entry(name, value));
+			return this;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(values);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Row other = (Row) obj;
+			return Objects.equals(values, other.values);
+		}
+	}
+
+	protected List<Row> select(TgFfiSqlQueryResult qr) {
+		var rows = new ArrayList<Row>();
+
+		try (var context = TgFfiContext.create(manager); //
+				var metadata = qr.getMetadata(context)) {
+			var columns = metadata.getColumns(context);
+			while (qr.nextRow(context)) {
+				var row = new Row();
+				for (int i = 0; qr.nextColumn(context); i++) {
+					var column = columns.get(i);
+					String name = column.getName(context);
+
+					Object value;
+					if (qr.isNull(context)) {
+						value = null;
+					} else {
+						var type = column.getAtomType(context);
+						value = switch (type) {
+						case INT4 -> qr.fetchInt4(context);
+						case INT8 -> qr.fetchInt8(context);
+						case CHARACTER -> qr.fetchCharacter(context);
+						default -> throw new AssertionError("unsupported type " + type);
+						};
+					}
+
+					row.add(name, value);
+				}
+
+				rows.add(row);
+			}
+		}
+
+		return rows;
 	}
 }
