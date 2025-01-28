@@ -167,6 +167,8 @@ typedef struct TsurugiFfiSqlExecuteResult TsurugiFfiSqlExecuteResult;
 
 typedef struct TsurugiFfiSqlPlaceholder TsurugiFfiSqlPlaceholder;
 
+typedef struct TsurugiFfiSqlPreparedStatement TsurugiFfiSqlPreparedStatement;
+
 typedef struct TsurugiFfiSqlQueryResult TsurugiFfiSqlQueryResult;
 
 typedef struct TsurugiFfiSqlQueryResultMetadata TsurugiFfiSqlQueryResultMetadata;
@@ -188,6 +190,8 @@ typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 typedef struct TsurugiFfiSqlExecuteResult *TsurugiFfiSqlExecuteResultHandle;
 
 typedef struct TsurugiFfiSqlPlaceholder *TsurugiFfiSqlPlaceholderHandle;
+
+typedef struct TsurugiFfiSqlPreparedStatement *TsurugiFfiSqlPreparedStatementHandle;
 
 typedef struct TsurugiFfiSqlQueryResult *TsurugiFfiSqlQueryResultHandle;
 
@@ -222,6 +226,8 @@ typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
 #define TSURUGI_FFI_RC_FFI_ARG3_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 3)
 
 #define TSURUGI_FFI_RC_FFI_ARG4_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 4)
+
+#define TSURUGI_FFI_RC_FFI_ARG5_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 5)
 
 #define TSURUGI_FFI_RC_FFI_NUL_ERROR (TSURUGI_FFI_RC_FFI_ERROR | 1)
 
@@ -293,6 +299,11 @@ TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_atom_type(TsurugiFfiContextHandle c
 
 void tsurugi_ffi_sql_placeholder_dispose(TsurugiFfiSqlPlaceholderHandle placeholder);
 
+TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context,
+                                                      TsurugiFfiSqlPreparedStatementHandle prepared_statement);
+
+void tsurugi_ffi_sql_prepared_statement_dispose(TsurugiFfiSqlPreparedStatementHandle prepared_statement);
+
 TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
                                                        TsurugiFfiSqlQueryResultMetadataHandle *metadata_out);
@@ -350,6 +361,13 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle c
                                                        TsurugiFfiSqlClientHandle sql_client,
                                                        const char *table_name,
                                                        TsurugiFfiTableMetadataHandle *table_metadata_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context,
+                                            TsurugiFfiSqlClientHandle sql_client,
+                                            const char *sql,
+                                            const TsurugiFfiSqlPlaceholderHandle *placeholders,
+                                            uint32_t placeholder_size,
+                                            TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,

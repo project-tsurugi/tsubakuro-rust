@@ -1,10 +1,14 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import java.lang.foreign.MemorySegment;
+import java.util.List;
+import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
@@ -38,6 +42,30 @@ public class TgFfiSqlClient extends TgFfiObject {
 
 		var outHandle = outToHandle(out);
 		return new TgFfiTableMetadata(manager(), outHandle);
+	}
+
+	public synchronized TgFfiSqlPreparedStatement prepare(TgFfiContext context, String sql,
+			List<TgFfiSqlPlaceholder> placeholders) {
+		Objects.requireNonNull(sql, "sql must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg1 = allocateString(sql);
+		MemorySegment arg2;
+		int size;
+		if (placeholders != null) {
+			arg2 = allocateArray(placeholders);
+			size = placeholders.size();
+		} else {
+			arg2 = MemorySegment.NULL;
+			size = 0;
+		}
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare(ctx, handle, arg1, arg2, size, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiSqlPreparedStatement(manager(), outHandle);
 	}
 
 	public synchronized TgFfiTransaction startTransaction(TgFfiContext context,

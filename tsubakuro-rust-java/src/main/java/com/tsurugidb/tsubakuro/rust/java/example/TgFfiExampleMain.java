@@ -3,7 +3,9 @@ package com.tsurugidb.tsubakuro.rust.java.example;
 import java.util.List;
 
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiAtomType;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
@@ -51,6 +53,8 @@ public class TgFfiExampleMain {
 
 				insert(client, context);
 				select(client, context);
+
+				insertPrepared(client, context);
 			}
 		}
 	}
@@ -145,6 +149,20 @@ public class TgFfiExampleMain {
 			try (var commitOption = TgFfiCommitOption.create(context)) {
 				client.commit(context, transaction, commitOption);
 			}
+		}
+	}
+
+	static void insertPrepared(TgFfiSqlClient client, TgFfiContext context) {
+		var sql = "insert into test values(:foo, :bar, :zzz)";
+		var placeholders = List.of( //
+				TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4), //
+				TgFfiSqlPlaceholder.ofAtomType(context, "bar", TgFfiAtomType.INT8), //
+				TgFfiSqlPlaceholder.ofAtomType(context, "zzz", TgFfiAtomType.CHARACTER) //
+		);
+		try (var ps = client.prepare(context, sql, placeholders)) {
+			// TODO prepared_execute()
+
+			ps.close(context);
 		}
 	}
 }

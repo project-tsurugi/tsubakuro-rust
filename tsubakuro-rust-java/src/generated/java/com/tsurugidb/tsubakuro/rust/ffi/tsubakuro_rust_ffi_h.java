@@ -15718,6 +15718,12 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiSqlPlaceholderHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef struct TsurugiFfiSqlPreparedStatement *TsurugiFfiSqlPreparedStatementHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiSqlPreparedStatementHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiSqlQueryResult *TsurugiFfiSqlQueryResultHandle
      * }
      */
@@ -16903,6 +16909,122 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_prepared_statement_close {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_close");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_prepared_statement_close$descriptor() {
+        return tsurugi_ffi_sql_prepared_statement_close.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_prepared_statement_close$handle() {
+        return tsurugi_ffi_sql_prepared_statement_close.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_prepared_statement_close$address() {
+        return tsurugi_ffi_sql_prepared_statement_close.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static int tsurugi_ffi_sql_prepared_statement_close(MemorySegment context, MemorySegment prepared_statement) {
+        var mh$ = tsurugi_ffi_sql_prepared_statement_close.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_prepared_statement_close", context, prepared_statement);
+            }
+            return (int)mh$.invokeExact(context, prepared_statement);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_prepared_statement_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_prepared_statement_dispose(TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_prepared_statement_dispose$descriptor() {
+        return tsurugi_ffi_sql_prepared_statement_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_prepared_statement_dispose(TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_prepared_statement_dispose$handle() {
+        return tsurugi_ffi_sql_prepared_statement_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_prepared_statement_dispose(TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_prepared_statement_dispose$address() {
+        return tsurugi_ffi_sql_prepared_statement_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_sql_prepared_statement_dispose(TsurugiFfiSqlPreparedStatementHandle prepared_statement)
+     * }
+     */
+    public static void tsurugi_ffi_sql_prepared_statement_dispose(MemorySegment prepared_statement) {
+        var mh$ = tsurugi_ffi_sql_prepared_statement_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_prepared_statement_dispose", prepared_statement);
+            }
+            mh$.invokeExact(prepared_statement);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_query_result_get_metadata {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -17794,6 +17916,69 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_table_metadata", context, sql_client, table_name, table_metadata_out);
             }
             return (int)mh$.invokeExact(context, sql_client, table_name, table_metadata_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_prepare {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepare");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_prepare$descriptor() {
+        return tsurugi_ffi_sql_client_prepare.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_prepare$handle() {
+        return tsurugi_ffi_sql_client_prepare.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_prepare$address() {
+        return tsurugi_ffi_sql_client_prepare.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_prepare(MemorySegment context, MemorySegment sql_client, MemorySegment sql, MemorySegment placeholders, int placeholder_size, MemorySegment prepared_statement_out) {
+        var mh$ = tsurugi_ffi_sql_client_prepare.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_prepare", context, sql_client, sql, placeholders, placeholder_size, prepared_statement_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, sql, placeholders, placeholder_size, prepared_statement_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21203,6 +21388,15 @@ public class tsubakuro_rust_ffi_h {
      */
     public static int TSURUGI_FFI_RC_FFI_ARG4_ERROR() {
         return TSURUGI_FFI_RC_FFI_ARG4_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_ARG5_ERROR = (int)1073741829L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_ARG5_ERROR 1073741829
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_ARG5_ERROR() {
+        return TSURUGI_FFI_RC_FFI_ARG5_ERROR;
     }
     private static final int TSURUGI_FFI_RC_FFI_NUL_ERROR = (int)1090519041L;
     /**

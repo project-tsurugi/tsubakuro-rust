@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
@@ -157,6 +160,128 @@ class TgFfiSqlClientTest extends TgFfiTester {
 	}
 
 	@Test
+	void prepare() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		var sql = "insert into test values(:foo, :bar, :zzz)";
+		var placeholders = List.of( //
+				TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4), //
+				TgFfiSqlPlaceholder.ofAtomType(context, "bar", TgFfiAtomType.INT8), //
+				TgFfiSqlPlaceholder.ofAtomType(context, "zzz", TgFfiAtomType.CHARACTER) //
+		);
+		try (var ps = client.prepare(context, sql, placeholders)) {
+			ps.close(context);
+		}
+	}
+
+	@Test
+	void prepare_empty() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		var sql = "select * from test";
+		var placeholders = List.<TgFfiSqlPlaceholder>of();
+		try (var ps = client.prepare(context, sql, placeholders)) {
+			ps.close(context);
+		}
+	}
+
+	@Test
+	void prepare_null() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		var sql = "select * from test";
+		List<TgFfiSqlPlaceholder> placeholders = null;
+		try (var ps = client.prepare(context, sql, placeholders)) {
+			ps.close(context);
+		}
+	}
+
+	@Test
+	void prepare_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var sql = "select * from test where foo=:foo";
+			var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4));
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var arg1 = manager.allocateString(sql);
+				var arg2 = manager.allocateArray(placeholders);
+				int size = placeholders.size();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare(ctx, handle, arg1, arg2, size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg1 = MemorySegment.NULL;
+				var arg2 = manager.allocateArray(placeholders);
+				int size = placeholders.size();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare(ctx, handle, arg1, arg2, size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg1 = manager.allocateString(sql);
+				var arg2 = MemorySegment.NULL;
+				int size = placeholders.size();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare(ctx, handle, arg1, arg2, size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg1 = manager.allocateString(sql);
+				int size = 1;
+				var arg2 = manager.arena().allocate(ValueLayout.ADDRESS, size);
+				arg2.setAtIndex(ValueLayout.ADDRESS, 0, MemorySegment.NULL);
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare(ctx, handle, arg1, arg2, size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
+			{ // size==0のときは、arg2==NULLでもエラーにならない
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg1 = manager.allocateString("select * from test");
+				var arg2 = MemorySegment.NULL;
+				int size = 0;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare(ctx, handle, arg1, arg2, size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_OK(), rc);
+
+				var outHandle = out.get(ValueLayout.ADDRESS, 0);
+				tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_dispose(outHandle);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg1 = manager.allocateString(sql);
+				var arg2 = manager.allocateArray(placeholders);
+				int size = placeholders.size();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare(ctx, handle, arg1, arg2, size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+			}
+		}
+	}
+
+	@Test
 	void start_transaction() {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
@@ -167,6 +292,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
 
 		try (var transaction = client.startTransaction(context, transactionOption)) {
+			transaction.close(context);
 		}
 	}
 
@@ -176,7 +302,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		var client = createSqlClient();
 
 		try (var context = TgFfiContext.create(manager); //
-				var transactionOption = TgFfiTransactionOption.create(manager)) {
+				var transactionOption = TgFfiTransactionOption.create(context)) {
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
 			var arg = transactionOption.handle();
@@ -193,7 +319,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var transactionOption = TgFfiTransactionOption.create(manager)) {
+				var transactionOption = TgFfiTransactionOption.create(context)) {
 			var ctx = context.handle();
 			var handle = client.handle();
 			var arg = transactionOption.handle();

@@ -17,6 +17,12 @@ pub(crate) struct TsurugiFfiSqlPlaceholder {
     name: *mut c_char,
 }
 
+impl TsurugiFfiSqlPlaceholder {
+    pub(crate) fn raw_clone(&self) -> SqlPlaceholder {
+        self.placeholder.clone()
+    }
+}
+
 impl std::ops::Deref for TsurugiFfiSqlPlaceholder {
     type Target = SqlPlaceholder;
 

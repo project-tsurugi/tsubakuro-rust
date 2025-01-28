@@ -21,12 +21,31 @@ public class TgFfiObjectManager implements AutoCloseable {
 		this.arena = Arena.ofConfined();
 	}
 
+	public Arena arena() {
+		return this.arena;
+	}
+
 	public MemorySegment allocatePtr() {
 		return arena.allocate(ValueLayout.ADDRESS);
 	}
 
 	public MemorySegment allocateString(String s) {
 		return arena.allocateFrom(s);
+	}
+
+	public <T extends TgFfiObject> MemorySegment allocateArray(List<T> list) {
+		if (list == null) {
+			return MemorySegment.NULL;
+		}
+
+		var array = arena.allocate(ValueLayout.ADDRESS, list.size());
+		int i = 0;
+		for (var object : list) {
+			var handle = object.handle();
+			array.setAtIndex(ValueLayout.ADDRESS, i++, handle);
+		}
+
+		return array;
 	}
 
 	public void add(TgFfiObject object) {

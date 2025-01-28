@@ -1,4 +1,4 @@
-use std::{ffi::c_char, sync::Arc};
+use std::{ffi::c_char, sync::Arc, vec};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -8,8 +8,10 @@ use crate::{
     ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
-        execute_result::TsurugiFfiSqlExecuteResult, query_result::TsurugiFfiSqlQueryResult,
-        table_list::TsurugiFfiTableList, table_metadata::TsurugiFfiTableMetadata,
+        execute_result::TsurugiFfiSqlExecuteResult,
+        prepare::prepared_statement::TsurugiFfiSqlPreparedStatement,
+        query_result::TsurugiFfiSqlQueryResult, table_list::TsurugiFfiTableList,
+        table_metadata::TsurugiFfiTableMetadata,
     },
     transaction::{
         commit_option::TsurugiFfiCommitOptionHandle, option::TsurugiFfiTransactionOptionHandle,
@@ -18,8 +20,14 @@ use crate::{
 };
 
 use super::{
-    execute_result::TsurugiFfiSqlExecuteResultHandle, query_result::TsurugiFfiSqlQueryResultHandle,
-    table_list::TsurugiFfiTableListHandle, table_metadata::TsurugiFfiTableMetadataHandle,
+    execute_result::TsurugiFfiSqlExecuteResultHandle,
+    prepare::{
+        placeholder::TsurugiFfiSqlPlaceholderHandle,
+        prepared_statement::TsurugiFfiSqlPreparedStatementHandle,
+    },
+    query_result::TsurugiFfiSqlQueryResultHandle,
+    table_list::TsurugiFfiTableListHandle,
+    table_metadata::TsurugiFfiTableMetadataHandle,
 };
 
 pub(crate) struct TsurugiFfiSqlClient {
@@ -120,6 +128,63 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     }
 
     trace!("{FUNCTION_NAME} end. table_metadata={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepare(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    sql: *const c_char,
+    placeholders: *const TsurugiFfiSqlPlaceholderHandle,
+    placeholder_size: u32,
+    prepared_statement_out: *mut TsurugiFfiSqlPreparedStatementHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
+    if placeholder_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_out);
+
+    let client = unsafe { &*sql_client };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
+
+    let placeholders: Vec<SqlPlaceholder> = if placeholder_size > 0 {
+        let src = unsafe { std::slice::from_raw_parts(placeholders, placeholder_size as usize) };
+        let mut dst = Vec::with_capacity(src.len());
+        for &placeholder in src {
+            ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholder);
+            let placeholder = unsafe { &*placeholder }.raw_clone();
+            dst.push(placeholder);
+        }
+        dst
+    } else {
+        vec![]
+    };
+
+    let runtime = client.runtime();
+    let prepared_statement = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepare(sql, placeholders)
+    );
+
+    let prepared_statement = Box::new(TsurugiFfiSqlPreparedStatement::new(
+        prepared_statement,
+        runtime.clone(),
+    ));
+
+    let handle = Box::into_raw(prepared_statement);
+    unsafe {
+        *prepared_statement_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. prepared_statement={:?}", handle);
     rc_ok(context)
 }
 

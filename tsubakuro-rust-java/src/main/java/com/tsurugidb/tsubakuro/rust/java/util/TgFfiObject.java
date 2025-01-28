@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class TgFfiObject implements Closeable {
@@ -33,6 +34,10 @@ public abstract class TgFfiObject implements Closeable {
 
 	protected final MemorySegment allocateString(String s) {
 		return manager.allocateString(s);
+	}
+
+	protected final <T extends TgFfiObject> MemorySegment allocateArray(List<T> list) {
+		return manager.allocateArray(list);
 	}
 
 	// use in synchronized(this)
