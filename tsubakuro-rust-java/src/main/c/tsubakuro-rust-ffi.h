@@ -165,6 +165,8 @@ typedef struct TsurugiFfiSqlColumn TsurugiFfiSqlColumn;
 
 typedef struct TsurugiFfiSqlExecuteResult TsurugiFfiSqlExecuteResult;
 
+typedef struct TsurugiFfiSqlPlaceholder TsurugiFfiSqlPlaceholder;
+
 typedef struct TsurugiFfiSqlQueryResult TsurugiFfiSqlQueryResult;
 
 typedef struct TsurugiFfiSqlQueryResultMetadata TsurugiFfiSqlQueryResultMetadata;
@@ -181,6 +183,16 @@ typedef uint32_t TsurugiFfiRc;
 
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
 
+typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
+
+typedef struct TsurugiFfiSqlExecuteResult *TsurugiFfiSqlExecuteResultHandle;
+
+typedef struct TsurugiFfiSqlPlaceholder *TsurugiFfiSqlPlaceholderHandle;
+
+typedef struct TsurugiFfiSqlQueryResult *TsurugiFfiSqlQueryResultHandle;
+
+typedef struct TsurugiFfiSqlQueryResultMetadata *TsurugiFfiSqlQueryResultMetadataHandle;
+
 typedef struct TsurugiFfiSqlClient *TsurugiFfiSqlClientHandle;
 
 typedef struct TsurugiFfiTableList *TsurugiFfiTableListHandle;
@@ -191,21 +203,13 @@ typedef struct TsurugiFfiTransactionOption *TsurugiFfiTransactionOptionHandle;
 
 typedef struct TsurugiFfiTransaction *TsurugiFfiTransactionHandle;
 
-typedef struct TsurugiFfiSqlExecuteResult *TsurugiFfiSqlExecuteResultHandle;
-
-typedef struct TsurugiFfiSqlQueryResult *TsurugiFfiSqlQueryResultHandle;
-
 typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
 
-typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
-
-typedef struct TsurugiFfiSqlQueryResultMetadata *TsurugiFfiSqlQueryResultMetadataHandle;
+typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 
 typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
-
-typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 
 #define TSURUGI_FFI_RC_OK 0
 
@@ -242,43 +246,6 @@ void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
 
 TsurugiFfiRc tsurugi_ffi_env_logger_init(void);
 
-TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
-                                                TsurugiFfiSqlClientHandle sql_client,
-                                                TsurugiFfiTableListHandle *table_list_out);
-
-TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context,
-                                                       TsurugiFfiSqlClientHandle sql_client,
-                                                       const char *table_name,
-                                                       TsurugiFfiTableMetadataHandle *table_metadata_out);
-
-TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle context,
-                                                      TsurugiFfiSqlClientHandle sql_client,
-                                                      TsurugiFfiTransactionOptionHandle transaction_option,
-                                                      TsurugiFfiTransactionHandle *transaction_out);
-
-TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
-                                            TsurugiFfiSqlClientHandle sql_client,
-                                            TsurugiFfiTransactionHandle transaction,
-                                            const char *sql,
-                                            TsurugiFfiSqlExecuteResultHandle *execute_result_out);
-
-TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
-                                          TsurugiFfiSqlClientHandle sql_client,
-                                          TsurugiFfiTransactionHandle transaction,
-                                          const char *sql,
-                                          TsurugiFfiSqlQueryResultHandle *query_result_out);
-
-TsurugiFfiRc tsurugi_ffi_sql_client_commit(TsurugiFfiContextHandle context,
-                                           TsurugiFfiSqlClientHandle sql_client,
-                                           TsurugiFfiTransactionHandle transaction,
-                                           TsurugiFfiCommitOptionHandle commit_option);
-
-TsurugiFfiRc tsurugi_ffi_sql_client_rollback(TsurugiFfiContextHandle context,
-                                             TsurugiFfiSqlClientHandle sql_client,
-                                             TsurugiFfiTransactionHandle transaction);
-
-void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
-
 TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context,
                                              TsurugiFfiSqlColumnHandle sql_column,
                                              char **name_out);
@@ -310,6 +277,21 @@ TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_rows(TsurugiFfiContextHandle con
                                                      int64_t *rows_out);
 
 void tsurugi_ffi_sql_execute_result_dispose(TsurugiFfiSqlExecuteResultHandle execute_result);
+
+TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context,
+                                                      const char *name,
+                                                      TsurugiFfiAtomType atom_type,
+                                                      TsurugiFfiSqlPlaceholderHandle *placeholder_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlPlaceholderHandle placeholder,
+                                                  char **name_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_atom_type(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlPlaceholderHandle placeholder,
+                                                       TsurugiFfiAtomType *atom_type_out);
+
+void tsurugi_ffi_sql_placeholder_dispose(TsurugiFfiSqlPlaceholderHandle placeholder);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
@@ -360,6 +342,43 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_metadata_get_columns_value(TsurugiFfiC
 
 void tsurugi_ffi_sql_query_result_metadata_dispose(TsurugiFfiSqlQueryResultMetadataHandle query_result_metadata);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlClientHandle sql_client,
+                                                TsurugiFfiTableListHandle *table_list_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlClientHandle sql_client,
+                                                       const char *table_name,
+                                                       TsurugiFfiTableMetadataHandle *table_metadata_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle context,
+                                                      TsurugiFfiSqlClientHandle sql_client,
+                                                      TsurugiFfiTransactionOptionHandle transaction_option,
+                                                      TsurugiFfiTransactionHandle *transaction_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
+                                            TsurugiFfiSqlClientHandle sql_client,
+                                            TsurugiFfiTransactionHandle transaction,
+                                            const char *sql,
+                                            TsurugiFfiSqlExecuteResultHandle *execute_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
+                                          TsurugiFfiSqlClientHandle sql_client,
+                                          TsurugiFfiTransactionHandle transaction,
+                                          const char *sql,
+                                          TsurugiFfiSqlQueryResultHandle *query_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_commit(TsurugiFfiContextHandle context,
+                                           TsurugiFfiSqlClientHandle sql_client,
+                                           TsurugiFfiTransactionHandle transaction,
+                                           TsurugiFfiCommitOptionHandle commit_option);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_rollback(TsurugiFfiContextHandle context,
+                                             TsurugiFfiSqlClientHandle sql_client,
+                                             TsurugiFfiTransactionHandle transaction);
+
+void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
+
 TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context,
                                                          TsurugiFfiTableListHandle table_list,
                                                          uint32_t *size_out);
@@ -385,16 +404,6 @@ TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_value(TsurugiFfiContextHandl
                                                           TsurugiFfiSqlColumnHandle *value_out);
 
 void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata);
-
-TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
-                                         TsurugiFfiConnectionOptionHandle connection_option,
-                                         TsurugiFfiSessionHandle *session_out);
-
-TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context,
-                                                 TsurugiFfiSessionHandle session,
-                                                 TsurugiFfiSqlClientHandle *sql_client_out);
-
-void tsurugi_ffi_session_dispose(TsurugiFfiSessionHandle session);
 
 TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context,
                                         const char *endpoint,
@@ -435,14 +444,15 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle con
 
 void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);
 
-TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context,
-                                                        TsurugiFfiTransactionHandle transaction,
-                                                        char **transaction_id_out);
+TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
+                                         TsurugiFfiConnectionOptionHandle connection_option,
+                                         TsurugiFfiSessionHandle *session_out);
 
-TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
-                                           TsurugiFfiTransactionHandle transaction);
+TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSessionHandle session,
+                                                 TsurugiFfiSqlClientHandle *sql_client_out);
 
-void tsurugi_ffi_transaction_dispose(TsurugiFfiTransactionHandle transaction);
+void tsurugi_ffi_session_dispose(TsurugiFfiSessionHandle session);
 
 TsurugiFfiRc tsurugi_ffi_commit_option_create(TsurugiFfiContextHandle context,
                                               TsurugiFfiCommitOptionHandle *commit_option_out);
@@ -477,3 +487,12 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiCont
                                                                   char **label_out);
 
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
+
+TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiTransactionHandle transaction,
+                                                        char **transaction_id_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
+                                           TsurugiFfiTransactionHandle transaction);
+
+void tsurugi_ffi_transaction_dispose(TsurugiFfiTransactionHandle transaction);

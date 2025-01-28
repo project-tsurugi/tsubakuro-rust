@@ -175,6 +175,10 @@ public enum TgFfiAtomType {
 		this.value = value;
 	}
 
+	public int value() {
+		return this.value;
+	}
+
 	public static TgFfiAtomType forNumber(int value) {
 		var type = VALUE_MAP.get(value);
 		if (type != null) {
