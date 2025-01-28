@@ -55,7 +55,7 @@ impl WireResponseError {
 #[macro_export]
 macro_rules! prost_decode_wire_response_error {
     ($function_name:expr, $data_name:expr, $cause:expr) => {
-        $crate::session::wire::WireResponseError::ProstDecodeError(
+        $crate::session::wire::response::WireResponseError::ProstDecodeError(
             $function_name.to_string(),
             $data_name.to_string(),
             $cause,
@@ -66,7 +66,7 @@ macro_rules! prost_decode_wire_response_error {
 #[macro_export]
 macro_rules! core_service_wire_response_error {
     ($function_name:expr, $cause:expr) => {
-        $crate::session::wire::WireResponseError::CoreServiceError(
+        $crate::session::wire::response::WireResponseError::CoreServiceError(
             $function_name.to_string(),
             $cause,
         )

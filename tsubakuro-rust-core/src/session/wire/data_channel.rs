@@ -7,9 +7,7 @@ use async_trait::async_trait;
 use prost::bytes::{Buf, BytesMut};
 use tokio::sync::{Mutex, MutexGuard};
 
-use crate::error::TgError;
-
-use super::Timeout;
+use crate::{error::TgError, util::Timeout};
 
 #[async_trait]
 pub(crate) trait DataChannelWire: std::fmt::Debug + Send + Sync {

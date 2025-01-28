@@ -11,12 +11,12 @@ use crate::{
     session::wire::{
         data_channel::{DataChannel, DataChannelWire},
         response::WireResponse,
-        Wire,
+        DelegateWire, Wire,
     },
     util::Timeout,
 };
 
-use super::{wire::TcpWire, DelegateWire};
+use super::wire::TcpWire;
 
 #[derive(Debug)]
 pub(crate) struct TcpDataChannelWire {

@@ -1,6 +1,6 @@
 use crate::{error::DiagnosticCode, service::core::error::to_core_service_diagnostic_code_number};
 
-use super::SERVICE_ID_ENDPOINT_BROKER;
+use super::endpoint_broker::SERVICE_ID_ENDPOINT_BROKER;
 
 #[macro_export]
 macro_rules! endpoint_service_error {

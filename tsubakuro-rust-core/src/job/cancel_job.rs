@@ -1,8 +1,10 @@
 use std::{sync::Arc, time::Duration};
 
-use crate::error::TgError;
-
-use super::{SlotEntryHandle, Timeout, Wire};
+use crate::{
+    error::TgError,
+    session::wire::{response_box::SlotEntryHandle, Wire},
+    util::Timeout,
+};
 
 /// thread unsafe
 pub struct CancelJob {

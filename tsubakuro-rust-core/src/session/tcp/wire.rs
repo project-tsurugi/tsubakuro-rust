@@ -11,7 +11,7 @@ use crate::{
         tcp::link::TcpLink,
         wire::{
             data_channel::DataChannelWire, link::LinkMessage, response::WireResponse,
-            response_box::ResponseBox, skip_framework_header,
+            response_box::ResponseBox, skip_framework_header, Wire,
         },
     },
 };
@@ -20,7 +20,6 @@ use super::{
     data_channel_box::TcpDataChannelBox,
     data_channel_wire::TcpDataChannelWire,
     r#enum::{TcpRequestInfo, TcpResponseInfo},
-    Wire,
 };
 
 const SESSION_ID_IS_NOT_ASSIGNED: i64 = i64::MAX;
@@ -87,7 +86,8 @@ impl TcpWire {
             Ok(lock) => lock,
             Err(_) => {
                 trace!("TcpWire::pull1() end. try_lock fail");
-                return Ok(false);}
+                return Ok(false);
+            }
         };
 
         let link_message = {
