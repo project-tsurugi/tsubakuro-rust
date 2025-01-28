@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiAtomType;
-import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
 class TgFfiSqlPlaceholderTest extends TgFfiTester {
@@ -17,11 +16,7 @@ class TgFfiSqlPlaceholderTest extends TgFfiTester {
 	@Test
 	void of_atom_type() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
-
-		var connectionOption = TgFfiConnectionOption.create(context);
-		connectionOption.setEndpointUrl(context, getEndpoint());
 
 		try (var placeholder = TgFfiSqlPlaceholder.ofAtomType(context, "test", TgFfiAtomType.INT4)) {
 			assertEquals("test", placeholder.getName(context));

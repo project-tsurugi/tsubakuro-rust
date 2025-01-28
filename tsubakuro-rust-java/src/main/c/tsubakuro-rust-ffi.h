@@ -165,6 +165,8 @@ typedef struct TsurugiFfiSqlColumn TsurugiFfiSqlColumn;
 
 typedef struct TsurugiFfiSqlExecuteResult TsurugiFfiSqlExecuteResult;
 
+typedef struct TsurugiFfiSqlParameter TsurugiFfiSqlParameter;
+
 typedef struct TsurugiFfiSqlPlaceholder TsurugiFfiSqlPlaceholder;
 
 typedef struct TsurugiFfiSqlPreparedStatement TsurugiFfiSqlPreparedStatement;
@@ -188,6 +190,8 @@ typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
 typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 
 typedef struct TsurugiFfiSqlExecuteResult *TsurugiFfiSqlExecuteResultHandle;
+
+typedef struct TsurugiFfiSqlParameter *TsurugiFfiSqlParameterHandle;
 
 typedef struct TsurugiFfiSqlPlaceholder *TsurugiFfiSqlPlaceholderHandle;
 
@@ -283,6 +287,41 @@ TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_rows(TsurugiFfiContextHandle con
                                                      int64_t *rows_out);
 
 void tsurugi_ffi_sql_execute_result_dispose(TsurugiFfiSqlExecuteResultHandle execute_result);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context,
+                                            const char *name,
+                                            TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context,
+                                               const char *name,
+                                               int32_t value,
+                                               TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context,
+                                               const char *name,
+                                               int64_t value,
+                                               TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context,
+                                                 const char *name,
+                                                 float value,
+                                                 TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context,
+                                                 const char *name,
+                                                 double value,
+                                                 TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context,
+                                                    const char *name,
+                                                    const char *value,
+                                                    TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlParameterHandle parameter,
+                                                char **name_out);
+
+void tsurugi_ffi_sql_parameter_dispose(TsurugiFfiSqlParameterHandle parameter);
 
 TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context,
                                                       const char *name,
