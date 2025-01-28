@@ -2,6 +2,7 @@ use std::{ffi::c_char, sync::Arc};
 
 use execute_result::{TsurugiFfiSqlExecuteResult, TsurugiFfiSqlExecuteResultHandle};
 use log::trace;
+use query_result::{TsurugiFfiSqlQueryResult, TsurugiFfiSqlQueryResultHandle};
 use table_list::{TsurugiFfiTableList, TsurugiFfiTableListHandle};
 use table_metadata::{TsurugiFfiTableMetadata, TsurugiFfiTableMetadataHandle};
 use tsubakuro_rust_core::prelude::*;
@@ -10,7 +11,6 @@ use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
-    session::TsurugiFfiSessionHandle,
     transaction::{
         commit_option::TsurugiFfiCommitOptionHandle, option::TsurugiFfiTransactionOptionHandle,
         TsurugiFfiTransaction, TsurugiFfiTransactionHandle,
@@ -20,12 +20,30 @@ use crate::{
 mod atom_type;
 mod column;
 mod execute_result;
+mod query_result;
+mod query_result_metadata;
 mod table_list;
 mod table_metadata;
 
 pub(crate) struct TsurugiFfiSqlClient {
     sql_client: SqlClient,
     runtime: Arc<tokio::runtime::Runtime>,
+}
+
+impl TsurugiFfiSqlClient {
+    pub(crate) fn new(
+        sql_client: SqlClient,
+        runtime: Arc<tokio::runtime::Runtime>,
+    ) -> TsurugiFfiSqlClient {
+        TsurugiFfiSqlClient {
+            sql_client,
+            runtime,
+        }
+    }
+
+    pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
+        &self.runtime
+    }
 }
 
 impl std::ops::Deref for TsurugiFfiSqlClient {
@@ -42,41 +60,7 @@ impl std::ops::DerefMut for TsurugiFfiSqlClient {
     }
 }
 
-impl TsurugiFfiSqlClient {
-    pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
-        &self.runtime
-    }
-}
-
 pub type TsurugiFfiSqlClientHandle = *mut TsurugiFfiSqlClient;
-
-#[no_mangle]
-pub extern "C" fn tsurugi_ffi_session_make_sql_client(
-    context: TsurugiFfiContextHandle,
-    session: TsurugiFfiSessionHandle,
-    sql_client_out: *mut TsurugiFfiSqlClientHandle,
-) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_sql_client()";
-    trace!("{FUNCTION_NAME} start");
-
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_client_out);
-
-    let session = unsafe { &*session };
-    let sql_client: SqlClient = session.make_client();
-    let client = Box::new(TsurugiFfiSqlClient {
-        sql_client,
-        runtime: session.runtime().clone(),
-    });
-
-    let handle = Box::into_raw(client);
-    unsafe {
-        *sql_client_out = handle;
-    }
-
-    trace!("{FUNCTION_NAME} end. sql_client={:?}", handle);
-    rc_ok(context)
-}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
@@ -214,6 +198,45 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
     }
 
     trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_query(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    sql: *const c_char,
+    query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, query_result_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, sql);
+
+    let runtime = client.runtime();
+    let query_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.query(transaction, sql)
+    );
+
+    let query_result = Box::new(TsurugiFfiSqlQueryResult::new(query_result, runtime.clone()));
+
+    let handle = Box::into_raw(query_result);
+    unsafe {
+        *query_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
     rc_ok(context)
 }
 

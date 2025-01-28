@@ -48,6 +48,9 @@ public class TgFfiExampleMain {
 
 				listTables(client, context);
 				getTableMetadata(client, context);
+
+				insert(client, context);
+				select(client, context);
 			}
 		}
 	}
@@ -89,6 +92,55 @@ public class TgFfiExampleMain {
 		System.out.println("execute(): " + sql);
 		try (var transaction = startOcc(client, context)) {
 			client.execute(context, transaction, sql);
+
+			try (var commitOption = TgFfiCommitOption.create(context)) {
+				client.commit(context, transaction, commitOption);
+			}
+		}
+	}
+
+	static void insert(TgFfiSqlClient client, TgFfiContext context) {
+		try (var transaction = startOcc(client, context)) {
+			try (var er = client.execute(context, transaction, "insert into test values(1, 11, 'aaa')")) {
+			}
+			try (var er = client.execute(context, transaction, "insert into test values(2, 22, 'bbb')")) {
+			}
+			try (var er = client.execute(context, transaction, "insert into test values(3, 33, null)")) {
+			}
+
+			try (var commitOption = TgFfiCommitOption.create(context)) {
+				client.commit(context, transaction, commitOption);
+			}
+		}
+	}
+
+	static void select(TgFfiSqlClient client, TgFfiContext context) {
+		try (var transaction = startOcc(client, context)) {
+			try (var rs = client.query(context, transaction, "select * from test order by foo"); //
+					var metadata = rs.getMetadata(context)) {
+				var columns = metadata.getColumns(context);
+				for (int row = 0; rs.nextRow(context); row++) {
+					for (int i = 0; rs.nextColumn(context); i++) {
+						var column = columns.get(i);
+						String name = column.getName(context);
+
+						Object value;
+						if (rs.isNull(context)) {
+							value = null;
+						} else {
+							var type = column.getAtomType(context);
+							value = switch (type) {
+							case INT4 -> rs.fetchInt4(context);
+							case INT8 -> rs.fetchInt8(context);
+							case CHARACTER -> rs.fetchCharacter(context);
+							default -> throw new AssertionError("unsupported type " + type);
+							};
+						}
+
+						System.out.printf("%d.%s=%s%n", row, name, value);
+					}
+				}
+			}
 
 			try (var commitOption = TgFfiCommitOption.create(context)) {
 				client.commit(context, transaction, commitOption);

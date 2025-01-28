@@ -8,6 +8,7 @@ use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_require_non_null, ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
+    service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
 };
 
 mod endpoint;
@@ -16,6 +17,12 @@ mod option;
 pub(crate) struct TsurugiFfiSession {
     session: Arc<Session>,
     runtime: Arc<tokio::runtime::Runtime>,
+}
+
+impl TsurugiFfiSession {
+    pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
+        &self.runtime
+    }
 }
 
 impl std::ops::Deref for TsurugiFfiSession {
@@ -29,12 +36,6 @@ impl std::ops::Deref for TsurugiFfiSession {
 impl std::ops::DerefMut for TsurugiFfiSession {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.session
-    }
-}
-
-impl TsurugiFfiSession {
-    pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
-        &self.runtime
     }
 }
 
@@ -75,6 +76,34 @@ pub extern "C" fn tsurugi_ffi_session_connect(
     }
 
     trace!("{FUNCTION_NAME} end. session={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_make_sql_client(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    sql_client_out: *mut TsurugiFfiSqlClientHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_sql_client()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_client_out);
+
+    let session = unsafe { &*session };
+    let sql_client: SqlClient = session.make_client();
+    let client = Box::new(TsurugiFfiSqlClient::new(
+        sql_client,
+        session.runtime().clone(),
+    ));
+
+    let handle = Box::into_raw(client);
+    unsafe {
+        *sql_client_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. sql_client={:?}", handle);
     rc_ok(context)
 }
 

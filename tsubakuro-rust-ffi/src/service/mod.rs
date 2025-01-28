@@ -1,1 +1,1 @@
-mod sql;
+pub(crate) mod sql;

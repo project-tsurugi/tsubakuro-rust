@@ -1,10 +1,12 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.foreign.MemorySegment;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -12,13 +14,22 @@ import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
-import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionType;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRuntimeException;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
 class TgFfiSqlClientTest extends TgFfiTester {
+
+	@BeforeAll
+	static void beforeAll() {
+		dropAndCreateTable("test", """
+				create table test (
+				  foo int primary key,
+				  bar bigint,
+				  zzz varchar(10)
+				)""");
+	}
 
 	@Test
 	void make_sql_client() {
@@ -87,18 +98,31 @@ class TgFfiSqlClientTest extends TgFfiTester {
 	}
 
 	@Test
-	void get_table_metadata() {
+	void get_table_metadata_found() {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
 
 		var context = TgFfiContext.create(manager);
 		try (var tableMetadata = client.getTableMetadata(context, "test")) {
-		} catch (TgFfiRuntimeException e) {
-			// table not found であればOK
-			assertEquals("SERVER_ERROR", e.getReturnCodeName());
-			String message = e.getMessage();
-			assertTrue(message.contains("TARGET_NOT_FOUND_EXCEPTION")); // TODO e.getServerErrorName()
 		}
+	}
+
+	@Test
+	void get_table_metadata_notFound() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		dropIfExists("test2");
+
+		var context = TgFfiContext.create(manager);
+		var e = assertThrows(TgFfiRuntimeException.class, () -> {
+			try (var tableMetadata = client.getTableMetadata(context, "test2")) {
+			}
+		});
+
+		assertEquals("SERVER_ERROR", e.getReturnCodeName());
+		String message = e.getMessage();
+		assertTrue(message.contains("TARGET_NOT_FOUND_EXCEPTION")); // TODO e.getServerErrorName()
 	}
 
 	@Test
@@ -187,8 +211,23 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		var context = TgFfiContext.create(manager);
 
 		try (var transaction = startOcc(client)) {
-			var sql = "drop table if exists test";
-			client.execute(context, transaction, sql);
+			var sql = "insert into test values(1, 1, 'a')";
+			try (var er = client.execute(context, transaction, sql)) {
+				assertEquals(1, er.getRows(context));
+			}
+
+			try (var commitOption = TgFfiCommitOption.create(context)) {
+				client.commit(context, transaction, commitOption);
+			}
+		}
+		try (var transaction = startOcc(client)) {
+			var sql = "delete from test";
+			try (var er = client.execute(context, transaction, sql)) {
+			}
+
+			try (var commitOption = TgFfiCommitOption.create(context)) {
+				client.commit(context, transaction, commitOption);
+			}
 		}
 	}
 
@@ -239,6 +278,79 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			var arg = manager.allocateString("drop table if exists test");
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void query() {
+		executeSql("delete from test");
+		executeSql("""
+				insert into test values
+				(1, 11, 'aaa'),
+				(2, 22, null),
+				(3, 33, 'ccc')""");
+
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		try (var transaction = startOcc(client)) {
+			var sql = "select * from test order by foo";
+			try (var rs = client.query(context, transaction, sql)) {
+				assertTrue(rs.nextRow(context));
+			}
+		}
+	}
+
+	@Test
+	void query_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var tx = transaction.handle();
+			var arg = manager.allocateString("select * from test");
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = MemorySegment.NULL;
+			var arg = manager.allocateString("select * from test");
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = manager.allocateString("select * from test");
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query(ctx, handle, tx, arg, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
 		}
 	}
@@ -330,31 +442,6 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			var tx = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback(ctx, handle, tx);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
-		}
-	}
-
-	private TgFfiSqlClient createSqlClient() {
-		var manager = getFfiObjectManager();
-
-		try (var context = TgFfiContext.create(manager); //
-				var connectionOption = TgFfiConnectionOption.create(context)) {
-			connectionOption.setEndpointUrl(context, getEndpoint());
-
-			var session = TgFfiSession.connect(context, connectionOption);
-			var client = session.makeSqlClient(context);
-			return client;
-		}
-	}
-
-	private TgFfiTransaction startOcc(TgFfiSqlClient client) {
-		var manager = getFfiObjectManager();
-
-		try (var context = TgFfiContext.create(manager); //
-				var transactionOption = TgFfiTransactionOption.create(context)) {
-			transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
-
-			var transaction = client.startTransaction(context, transactionOption);
-			return transaction;
 		}
 	}
 }

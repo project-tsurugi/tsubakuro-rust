@@ -99,17 +99,17 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_size(
 }
 
 #[no_mangle]
-pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_element(
+pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_value(
     context: TsurugiFfiContextHandle,
     table_metadata: TsurugiFfiTableMetadataHandle,
     index: u32,
-    element_out: *mut TsurugiFfiSqlColumnHandle,
+    value_out: *mut TsurugiFfiSqlColumnHandle,
 ) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_columns_element()";
+    const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_columns_value()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, element_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let table_metadata = unsafe { &mut *table_metadata };
     let columns = table_metadata.columns();
@@ -124,7 +124,7 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_element(
 
     let handle = Box::into_raw(column);
     unsafe {
-        *element_out = handle;
+        *value_out = handle;
     }
 
     trace!("{FUNCTION_NAME} end. sql_column={:?}", handle);

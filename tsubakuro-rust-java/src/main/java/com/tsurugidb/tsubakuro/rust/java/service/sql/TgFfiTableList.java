@@ -42,7 +42,7 @@ public class TgFfiTableList extends TgFfiObject {
 		var list = new ArrayList<String>(size);
 		for (int i = 0; i < size; i++) {
 			var out = allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_element(ctx, handle, i, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_value(ctx, handle, i, out);
 			TgFfiRcUtil.throwIfError(rc, context);
 
 			String tableName = outToString(out);

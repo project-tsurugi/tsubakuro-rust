@@ -8,6 +8,7 @@ pub use crate::jogasaki::proto::sql::request::Placeholder as SqlPlaceholder;
 pub use crate::jogasaki::proto::sql::request::TransactionPriority;
 pub use crate::jogasaki::proto::sql::request::TransactionType;
 pub use crate::jogasaki::proto::sql::response::execute_result::CounterType as SqlCounterType;
+pub use crate::jogasaki::proto::sql::response::ResultSetMetadata as SqlQueryResultMetadata;
 // pub use crate::service::sql::column::*;
 pub use crate::service::sql::execute_result::*;
 pub use crate::service::sql::prepare::parameter::*;

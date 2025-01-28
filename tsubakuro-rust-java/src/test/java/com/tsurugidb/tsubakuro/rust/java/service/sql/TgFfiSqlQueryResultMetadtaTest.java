@@ -2,6 +2,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.Closeable;
 import java.lang.foreign.MemorySegment;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -9,11 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
-import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
-import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
-class TgFfiTableMetadtaTest extends TgFfiTester {
+class TgFfiSqlQueryResultMetadtaTest extends TgFfiTester {
 
 	@BeforeAll
 	static void beforeAll() {
@@ -25,14 +25,39 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 				)""");
 	}
 
+	private class TestResource implements Closeable {
+		final TgFfiSqlClient client;
+		final TgFfiTransaction transaction;
+		final TgFfiSqlQueryResult queryResult;
+		final TgFfiSqlQueryResultMetadata metadata;
+
+		public TestResource() {
+			var manager = getFfiObjectManager();
+			try (var context = TgFfiContext.create(manager)) {
+				this.client = createSqlClient();
+				this.transaction = startOcc(client);
+				this.queryResult = client.query(context, transaction, "select * from test");
+				this.metadata = queryResult.getMetadata(context);
+			}
+		}
+
+		@Override
+		public void close() {
+			try (client; transaction) {
+				try (queryResult; metadata) {
+				}
+				commit(client, transaction);
+			}
+		}
+	}
+
 	@Test
 	void metadata() {
 		var manager = getFfiObjectManager();
 
-		try (var metadata = getTableMetadata("test"); //
+		try (var resource = new TestResource(); //
 				var context = TgFfiContext.create(manager)) {
-			var tableName = metadata.getTableName(context);
-			assertEquals("test", tableName);
+			var metadata = resource.metadata;
 
 			var columns = metadata.getColumns(context);
 			assertEquals(3, columns.size());
@@ -64,15 +89,15 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_size(ctx, handle, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_size(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata("test")) {
+		try (var resource = new TestResource(); //
+				var context = TgFfiContext.create(manager)) {
 			var ctx = context.handle();
-			var handle = tableMetadata.handle();
+			var handle = resource.metadata.handle();
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_size(ctx, handle, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_size(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
@@ -86,40 +111,29 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 			var handle = MemorySegment.NULL;
 			int index = 0;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, index, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_value(ctx, handle, index,
+					out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata("test")) {
+		try (var resource = new TestResource(); //
+				var context = TgFfiContext.create(manager)) {
 			var ctx = context.handle();
-			var handle = tableMetadata.handle();
+			var handle = resource.metadata.handle();
 			int index = -1;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, index, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_value(ctx, handle, index,
+					out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
-		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata("test")) {
+		try (var resource = new TestResource(); //
+				var context = TgFfiContext.create(manager)) {
 			var ctx = context.handle();
-			var handle = tableMetadata.handle();
+			var handle = resource.metadata.handle();
 			int index = 0;
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, index, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_value(ctx, handle, index,
+					out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
-		}
-	}
-
-	private TgFfiTableMetadata getTableMetadata(String tableName) {
-		var manager = getFfiObjectManager();
-
-		var context = TgFfiContext.create(manager);
-
-		var connectionOption = TgFfiConnectionOption.create(context);
-		connectionOption.setEndpointUrl(context, getEndpoint());
-
-		try (var session = TgFfiSession.connect(context, connectionOption); //
-				var client = session.makeSqlClient(context)) {
-			return client.getTableMetadata(context, tableName);
 		}
 	}
 }

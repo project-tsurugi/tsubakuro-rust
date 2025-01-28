@@ -2,7 +2,7 @@ use crate::{
     client_error,
     error::TgError,
     invalid_response_error,
-    jogasaki::proto::sql::response::ResultSetMetadata,
+    jogasaki::proto::sql::response::ResultSetMetadata as SqlQueryResultMetadata,
     prelude::convert_sql_response,
     session::wire::{response::WireResponse, Wire},
     util::Timeout,
@@ -27,7 +27,7 @@ mod variant;
 /// thread unsafe
 pub struct SqlQueryResult {
     name: String,
-    metadata: Option<ResultSetMetadata>,
+    metadata: Option<SqlQueryResultMetadata>,
     value_stream: ResultSetValueStream,
     default_timeout: Duration,
 }
@@ -44,7 +44,7 @@ impl std::fmt::Debug for SqlQueryResult {
 impl SqlQueryResult {
     fn new(
         name: String,
-        metadata: Option<ResultSetMetadata>,
+        metadata: Option<SqlQueryResultMetadata>,
         value_stream: ResultSetValueStream,
         default_timeout: Duration,
     ) -> SqlQueryResult {
@@ -60,7 +60,7 @@ impl SqlQueryResult {
         self.default_timeout = timeout;
     }
 
-    pub fn get_metadata(&self) -> Option<&ResultSetMetadata> {
+    pub fn get_metadata(&self) -> Option<&SqlQueryResultMetadata> {
         self.metadata.as_ref()
     }
 }
@@ -83,7 +83,7 @@ pub(crate) fn query_result_processor(
 
 fn read_result_set_metadata(
     response: WireResponse,
-) -> Result<(String, Option<ResultSetMetadata>), TgError> {
+) -> Result<(String, Option<SqlQueryResultMetadata>), TgError> {
     const FUNCTION_NAME: &str = "read_result_set_metadata()";
 
     let _ = convert_sql_response(FUNCTION_NAME, &response)?;

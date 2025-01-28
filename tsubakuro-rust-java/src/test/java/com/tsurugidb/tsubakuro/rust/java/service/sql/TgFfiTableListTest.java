@@ -57,7 +57,7 @@ class TgFfiTableListTest extends TgFfiTester {
 	}
 
 	@Test
-	void get_table_names_element_argError() {
+	void get_table_names_value_argError() {
 		var manager = getFfiObjectManager();
 
 		try (var context = TgFfiContext.create(manager)) {
@@ -65,7 +65,7 @@ class TgFfiTableListTest extends TgFfiTester {
 			var handle = MemorySegment.NULL;
 			int index = 0;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_element(ctx, handle, index, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_value(ctx, handle, index, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
@@ -74,7 +74,7 @@ class TgFfiTableListTest extends TgFfiTester {
 			var handle = tableList.handle();
 			int index = -1;
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_element(ctx, handle, index, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_value(ctx, handle, index, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
@@ -83,7 +83,7 @@ class TgFfiTableListTest extends TgFfiTester {
 			var handle = tableList.handle();
 			int index = 0;
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_element(ctx, handle, index, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_value(ctx, handle, index, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}

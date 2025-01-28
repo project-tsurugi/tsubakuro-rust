@@ -11,22 +11,12 @@ import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
-public class TgFfiTableMetadata extends TgFfiObject {
+public class TgFfiSqlQueryResultMetadata extends TgFfiObject {
 
 	private List<TgFfiSqlColumn> columns = null;
 
-	TgFfiTableMetadata(TgFfiObjectManager manager, MemorySegment handle) {
+	TgFfiSqlQueryResultMetadata(TgFfiObjectManager manager, MemorySegment handle) {
 		super(manager, handle);
-	}
-
-	public synchronized String getTableName(TgFfiContext context) {
-		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-		var handle = handle();
-		var out = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_table_name(ctx, handle, out);
-		TgFfiRcUtil.throwIfError(rc, context);
-
-		return outToString(out);
 	}
 
 	public synchronized List<TgFfiSqlColumn> getColumns(TgFfiContext context) {
@@ -43,7 +33,7 @@ public class TgFfiTableMetadata extends TgFfiObject {
 		int size;
 		{
 			var out = allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_size(ctx, handle, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_size(ctx, handle, out);
 			TgFfiRcUtil.throwIfError(rc, context);
 
 			size = outToInt(out);
@@ -52,7 +42,7 @@ public class TgFfiTableMetadata extends TgFfiObject {
 		var list = new ArrayList<TgFfiSqlColumn>(size);
 		for (int i = 0; i < size; i++) {
 			var out = allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, i, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_value(ctx, handle, i, out);
 			TgFfiRcUtil.throwIfError(rc, context);
 
 			var outHandle = outToHandle(out);
@@ -104,6 +94,6 @@ public class TgFfiTableMetadata extends TgFfiObject {
 
 	@Override
 	protected void dispose(MemorySegment handle) {
-		tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_dispose(handle);
+		tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_dispose(handle);
 	}
 }

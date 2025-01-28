@@ -4,10 +4,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
-import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlExecuteResult;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionType;
 
@@ -77,6 +78,40 @@ public class TgFfiTester {
 					}
 				}
 			}
+		}
+	}
+
+	protected TgFfiSqlClient createSqlClient() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var connectionOption = TgFfiConnectionOption.create(context)) {
+			connectionOption.setEndpointUrl(context, getEndpoint());
+
+			var session = TgFfiSession.connect(context, connectionOption);
+			var client = session.makeSqlClient(context);
+			return client;
+		}
+	}
+
+	protected TgFfiTransaction startOcc(TgFfiSqlClient client) {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context)) {
+			transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
+
+			var transaction = client.startTransaction(context, transactionOption);
+			return transaction;
+		}
+	}
+
+	protected void commit(TgFfiSqlClient client, TgFfiTransaction transaction) {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			client.commit(context, transaction, commitOption);
 		}
 	}
 }

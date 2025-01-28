@@ -63,17 +63,17 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names_size(
 }
 
 #[no_mangle]
-pub extern "C" fn tsurugi_ffi_table_list_get_table_names_element(
+pub extern "C" fn tsurugi_ffi_table_list_get_table_names_value(
     context: TsurugiFfiContextHandle,
     table_list: TsurugiFfiTableListHandle,
     index: u32,
-    element_out: *mut *mut c_char,
+    value_out: *mut *mut c_char,
 ) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names_element()";
+    const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names_value()";
     trace!("{FUNCTION_NAME} start. table_list={:?}", table_list);
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_list);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, element_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let table_list = unsafe { &mut *table_list };
     let table_names = table_list.table_names();
@@ -97,7 +97,7 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names_element(
     let table_name = table_list.table_names.as_ref().unwrap()[index];
 
     unsafe {
-        *element_out = table_name;
+        *value_out = table_name;
     }
 
     trace!("{FUNCTION_NAME} end");

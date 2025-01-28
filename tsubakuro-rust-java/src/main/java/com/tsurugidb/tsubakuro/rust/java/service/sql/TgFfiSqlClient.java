@@ -66,6 +66,19 @@ public class TgFfiSqlClient extends TgFfiObject {
 		return new TgFfiSqlExecuteResult(manager(), outHandle);
 	}
 
+	public synchronized TgFfiSqlQueryResult query(TgFfiContext context, TgFfiTransaction transaction, String sql) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var tx = transaction.handle();
+		var arg = allocateString(sql);
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query(ctx, handle, tx, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiSqlQueryResult(manager(), outHandle);
+	}
+
 	public synchronized void commit(TgFfiContext context, TgFfiTransaction transaction,
 			TgFfiCommitOption commitOption) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;

@@ -19,20 +19,6 @@ pub(crate) struct TsurugiFfiTransaction {
     transaction_id: *mut c_char,
 }
 
-impl std::ops::Deref for TsurugiFfiTransaction {
-    type Target = Transaction;
-
-    fn deref(&self) -> &Self::Target {
-        &self.transaction
-    }
-}
-
-impl std::ops::DerefMut for TsurugiFfiTransaction {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.transaction
-    }
-}
-
 impl TsurugiFfiTransaction {
     pub(crate) fn new(
         transaction: Transaction,
@@ -45,8 +31,22 @@ impl TsurugiFfiTransaction {
         }
     }
 
-    pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
+    fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
         &self.runtime
+    }
+}
+
+impl std::ops::Deref for TsurugiFfiTransaction {
+    type Target = Transaction;
+
+    fn deref(&self) -> &Self::Target {
+        &self.transaction
+    }
+}
+
+impl std::ops::DerefMut for TsurugiFfiTransaction {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.transaction
     }
 }
 
