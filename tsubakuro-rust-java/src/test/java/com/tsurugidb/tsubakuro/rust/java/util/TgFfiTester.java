@@ -67,7 +67,7 @@ public class TgFfiTester {
 				var connectionOption = TgFfiConnectionOption.create(context)) {
 			connectionOption.setEndpointUrl(context, getEndpoint());
 			connectionOption.setApplicationName(context, "tsubakuro-rust-java/test");
-			connectionOption.setLabel(context, "tsubakuro-rust-java/test.session");
+			connectionOption.setSessionLabel(context, "tsubakuro-rust-java/test.session");
 
 			try (var session = TgFfiSession.connect(context, connectionOption); //
 					var client = session.makeSqlClient(context); //

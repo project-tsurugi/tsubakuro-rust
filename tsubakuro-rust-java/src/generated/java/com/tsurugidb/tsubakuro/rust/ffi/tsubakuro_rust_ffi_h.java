@@ -19855,7 +19855,7 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
-    private static class tsurugi_ffi_connection_option_set_label {
+    private static class tsurugi_ffi_connection_option_set_session_label {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
             tsubakuro_rust_ffi_h.C_POINTER,
@@ -19863,7 +19863,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_label");
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_session_label");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19871,43 +19871,43 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
      * }
      */
-    public static FunctionDescriptor tsurugi_ffi_connection_option_set_label$descriptor() {
-        return tsurugi_ffi_connection_option_set_label.DESC;
+    public static FunctionDescriptor tsurugi_ffi_connection_option_set_session_label$descriptor() {
+        return tsurugi_ffi_connection_option_set_session_label.DESC;
     }
 
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
      * }
      */
-    public static MethodHandle tsurugi_ffi_connection_option_set_label$handle() {
-        return tsurugi_ffi_connection_option_set_label.HANDLE;
+    public static MethodHandle tsurugi_ffi_connection_option_set_session_label$handle() {
+        return tsurugi_ffi_connection_option_set_session_label.HANDLE;
     }
 
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
      * }
      */
-    public static MemorySegment tsurugi_ffi_connection_option_set_label$address() {
-        return tsurugi_ffi_connection_option_set_label.ADDR;
+    public static MemorySegment tsurugi_ffi_connection_option_set_session_label$address() {
+        return tsurugi_ffi_connection_option_set_session_label.ADDR;
     }
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
      * }
      */
-    public static int tsurugi_ffi_connection_option_set_label(MemorySegment context, MemorySegment connection_option, MemorySegment label) {
-        var mh$ = tsurugi_ffi_connection_option_set_label.HANDLE;
+    public static int tsurugi_ffi_connection_option_set_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment label) {
+        var mh$ = tsurugi_ffi_connection_option_set_session_label.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_set_label", context, connection_option, label);
+                traceDowncall("tsurugi_ffi_connection_option_set_session_label", context, connection_option, label);
             }
             return (int)mh$.invokeExact(context, connection_option, label);
         } catch (Throwable ex$) {
@@ -19915,7 +19915,7 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
-    private static class tsurugi_ffi_connection_option_get_label {
+    private static class tsurugi_ffi_connection_option_get_session_label {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
             tsubakuro_rust_ffi_h.C_POINTER,
@@ -19923,7 +19923,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_label");
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_session_label");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19931,43 +19931,43 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
      * }
      */
-    public static FunctionDescriptor tsurugi_ffi_connection_option_get_label$descriptor() {
-        return tsurugi_ffi_connection_option_get_label.DESC;
+    public static FunctionDescriptor tsurugi_ffi_connection_option_get_session_label$descriptor() {
+        return tsurugi_ffi_connection_option_get_session_label.DESC;
     }
 
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
      * }
      */
-    public static MethodHandle tsurugi_ffi_connection_option_get_label$handle() {
-        return tsurugi_ffi_connection_option_get_label.HANDLE;
+    public static MethodHandle tsurugi_ffi_connection_option_get_session_label$handle() {
+        return tsurugi_ffi_connection_option_get_session_label.HANDLE;
     }
 
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
      * }
      */
-    public static MemorySegment tsurugi_ffi_connection_option_get_label$address() {
-        return tsurugi_ffi_connection_option_get_label.ADDR;
+    public static MemorySegment tsurugi_ffi_connection_option_get_session_label$address() {
+        return tsurugi_ffi_connection_option_get_session_label.ADDR;
     }
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
      * }
      */
-    public static int tsurugi_ffi_connection_option_get_label(MemorySegment context, MemorySegment connection_option, MemorySegment label_out) {
-        var mh$ = tsurugi_ffi_connection_option_get_label.HANDLE;
+    public static int tsurugi_ffi_connection_option_get_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment label_out) {
+        var mh$ = tsurugi_ffi_connection_option_get_session_label.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_get_label", context, connection_option, label_out);
+                traceDowncall("tsurugi_ffi_connection_option_get_session_label", context, connection_option, label_out);
             }
             return (int)mh$.invokeExact(context, connection_option, label_out);
         } catch (Throwable ex$) {

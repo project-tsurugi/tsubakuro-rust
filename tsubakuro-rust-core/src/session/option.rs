@@ -9,7 +9,7 @@ use super::endpoint::Endpoint;
 pub struct ConnectionOption {
     endpoint: Option<Endpoint>,
     application_name: Option<String>,
-    label: Option<String>,
+    session_label: Option<String>,
     keep_alive: Duration,
     default_timeout: Duration,
     send_timeout: Duration,
@@ -21,7 +21,7 @@ impl ConnectionOption {
         ConnectionOption {
             endpoint: None,
             application_name: None,
-            label: None,
+            session_label: None,
             keep_alive: Duration::from_secs(60),
             default_timeout: Duration::ZERO,
             send_timeout: Duration::ZERO,
@@ -51,12 +51,12 @@ impl ConnectionOption {
         self.application_name.as_ref()
     }
 
-    pub fn set_label(&mut self, label: &str) {
-        self.label = Some(label.to_string());
+    pub fn set_session_label(&mut self, label: &str) {
+        self.session_label = Some(label.to_string());
     }
 
-    pub fn label(&self) -> Option<&String> {
-        self.label.as_ref()
+    pub fn session_label(&self) -> Option<&String> {
+        self.session_label.as_ref()
     }
 
     // ZEROのときはキープアライブしない
@@ -161,9 +161,9 @@ mod test {
         let mut option = ConnectionOption::new();
 
         let label: &str = "label-test";
-        option.set_label(label);
+        option.set_session_label(label);
 
-        assert_eq!(Some(&label.to_string()), option.label());
+        assert_eq!(Some(&label.to_string()), option.session_label());
     }
 
     #[test]
@@ -171,9 +171,9 @@ mod test {
         let mut option = ConnectionOption::new();
 
         let label: String = "label-test".to_string();
-        option.set_label(&label);
+        option.set_session_label(&label);
 
-        assert_eq!(Some(&label), option.label());
+        assert_eq!(Some(&label), option.session_label());
     }
 
     #[test]

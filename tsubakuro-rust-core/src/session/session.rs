@@ -83,7 +83,7 @@ impl Session {
             .ok_or(illegal_argument_error!("endpoint not specified"))?;
 
         let client_information = ClientInformation {
-            connection_label: string_to_prost_string(option.label()),
+            connection_label: string_to_prost_string(option.session_label()),
             application_name: string_to_prost_string(option.application_name()),
             credential: None, // TODO Crendential
         };

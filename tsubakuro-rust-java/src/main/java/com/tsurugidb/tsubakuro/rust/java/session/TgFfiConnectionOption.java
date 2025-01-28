@@ -96,21 +96,21 @@ public class TgFfiConnectionOption extends TgFfiObject {
 		return outToString(out);
 	}
 
-	public synchronized void setLabel(TgFfiContext context, String label) {
+	public synchronized void setSessionLabel(TgFfiContext context, String label) {
 		Objects.requireNonNull(label, "label must not be null");
 
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var arg = allocateString(label);
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_label(ctx, handle, arg);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_session_label(ctx, handle, arg);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
 
-	public synchronized String getLabel(TgFfiContext context) {
+	public synchronized String getSessionLabel(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var out = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_label(ctx, handle, out);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_session_label(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToString(out);
