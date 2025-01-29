@@ -1,3 +1,3 @@
 mod endpoint;
 mod option;
-mod session;
+pub(crate) mod session;

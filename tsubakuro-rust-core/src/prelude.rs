@@ -1,5 +1,6 @@
 pub use crate::error::*;
-pub use crate::job::*;
+pub use crate::job::cancel_job::CancelJob;
+pub use crate::job::Job;
 pub use crate::jogasaki::proto::sql::common::AtomType;
 pub use crate::jogasaki::proto::sql::common::Column as SqlColumn;
 pub use crate::jogasaki::proto::sql::request::CommitStatus as CommitType;

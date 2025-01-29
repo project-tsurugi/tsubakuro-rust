@@ -15706,6 +15706,24 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiContextHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef struct TsurugiFfiCancelJob *TsurugiFfiCancelJobHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiCancelJobHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef uint64_t TsurugiFfiDuration
+     * }
+     */
+    public static final OfLong TsurugiFfiDuration = tsubakuro_rust_ffi_h.C_LONG_LONG;
+    /**
+     * {@snippet lang=c :
+     * typedef void *TsurugiFfiJobHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiJobHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle
      * }
      */
@@ -16088,6 +16106,721 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_dispose", context);
             }
             mh$.invokeExact(context);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_cancel_job_wait {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_cancel_job_wait");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_wait(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_cancel_job_wait$descriptor() {
+        return tsurugi_ffi_cancel_job_wait.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_wait(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_cancel_job_wait$handle() {
+        return tsurugi_ffi_cancel_job_wait.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_wait(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_cancel_job_wait$address() {
+        return tsurugi_ffi_cancel_job_wait.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_wait(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static int tsurugi_ffi_cancel_job_wait(MemorySegment context, MemorySegment cancel_job, long timeout, MemorySegment done_out) {
+        var mh$ = tsurugi_ffi_cancel_job_wait.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_cancel_job_wait", context, cancel_job, timeout, done_out);
+            }
+            return (int)mh$.invokeExact(context, cancel_job, timeout, done_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_cancel_job_is_done {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_cancel_job_is_done");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, _Bool *done_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_cancel_job_is_done$descriptor() {
+        return tsurugi_ffi_cancel_job_is_done.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, _Bool *done_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_cancel_job_is_done$handle() {
+        return tsurugi_ffi_cancel_job_is_done.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, _Bool *done_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_cancel_job_is_done$address() {
+        return tsurugi_ffi_cancel_job_is_done.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_cancel_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiCancelJobHandle cancel_job, _Bool *done_out)
+     * }
+     */
+    public static int tsurugi_ffi_cancel_job_is_done(MemorySegment context, MemorySegment cancel_job, MemorySegment done_out) {
+        var mh$ = tsurugi_ffi_cancel_job_is_done.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_cancel_job_is_done", context, cancel_job, done_out);
+            }
+            return (int)mh$.invokeExact(context, cancel_job, done_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_cancel_job_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_cancel_job_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_cancel_job_dispose(TsurugiFfiCancelJobHandle cancel_job)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_cancel_job_dispose$descriptor() {
+        return tsurugi_ffi_cancel_job_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_cancel_job_dispose(TsurugiFfiCancelJobHandle cancel_job)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_cancel_job_dispose$handle() {
+        return tsurugi_ffi_cancel_job_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_cancel_job_dispose(TsurugiFfiCancelJobHandle cancel_job)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_cancel_job_dispose$address() {
+        return tsurugi_ffi_cancel_job_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_cancel_job_dispose(TsurugiFfiCancelJobHandle cancel_job)
+     * }
+     */
+    public static void tsurugi_ffi_cancel_job_dispose(MemorySegment cancel_job) {
+        var mh$ = tsurugi_ffi_cancel_job_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_cancel_job_dispose", cancel_job);
+            }
+            mh$.invokeExact(cancel_job);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_get_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_get_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_get_name$descriptor() {
+        return tsurugi_ffi_job_get_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_get_name$handle() {
+        return tsurugi_ffi_job_get_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_get_name$address() {
+        return tsurugi_ffi_job_get_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_get_name(MemorySegment context, MemorySegment job, MemorySegment name_out) {
+        var mh$ = tsurugi_ffi_job_get_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_get_name", context, job, name_out);
+            }
+            return (int)mh$.invokeExact(context, job, name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_wait {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_wait");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_wait(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_wait$descriptor() {
+        return tsurugi_ffi_job_wait.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_wait(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_wait$handle() {
+        return tsurugi_ffi_job_wait.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_wait(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_wait$address() {
+        return tsurugi_ffi_job_wait.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_wait(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *done_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_wait(MemorySegment context, MemorySegment job, long timeout, MemorySegment done_out) {
+        var mh$ = tsurugi_ffi_job_wait.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_wait", context, job, timeout, done_out);
+            }
+            return (int)mh$.invokeExact(context, job, timeout, done_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_is_done {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_is_done");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *done_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_is_done$descriptor() {
+        return tsurugi_ffi_job_is_done.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *done_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_is_done$handle() {
+        return tsurugi_ffi_job_is_done.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *done_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_is_done$address() {
+        return tsurugi_ffi_job_is_done.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_is_done(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *done_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_is_done(MemorySegment context, MemorySegment job, MemorySegment done_out) {
+        var mh$ = tsurugi_ffi_job_is_done.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_is_done", context, job, done_out);
+            }
+            return (int)mh$.invokeExact(context, job, done_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_take {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_take");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_take$descriptor() {
+        return tsurugi_ffi_job_take.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_take$handle() {
+        return tsurugi_ffi_job_take.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_take$address() {
+        return tsurugi_ffi_job_take.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_take(MemorySegment context, MemorySegment job, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_job_take.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_take", context, job, value_out);
+            }
+            return (int)mh$.invokeExact(context, job, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_take_if_ready {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_take_if_ready");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_take_if_ready$descriptor() {
+        return tsurugi_ffi_job_take_if_ready.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_take_if_ready$handle() {
+        return tsurugi_ffi_job_take_if_ready.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_take_if_ready$address() {
+        return tsurugi_ffi_job_take_if_ready.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_take_if_ready(MemorySegment context, MemorySegment job, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_job_take_if_ready.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_take_if_ready", context, job, value_out);
+            }
+            return (int)mh$.invokeExact(context, job, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_cancel {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_cancel");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *cancell_done_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_cancel$descriptor() {
+        return tsurugi_ffi_job_cancel.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *cancell_done_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_cancel$handle() {
+        return tsurugi_ffi_job_cancel.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *cancell_done_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_cancel$address() {
+        return tsurugi_ffi_job_cancel.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *cancell_done_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_cancel(MemorySegment context, MemorySegment job, MemorySegment cancell_done_out) {
+        var mh$ = tsurugi_ffi_job_cancel.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_cancel", context, job, cancell_done_out);
+            }
+            return (int)mh$.invokeExact(context, job, cancell_done_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_cancel_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_cancel_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiCancelJobHandle *cancel_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_cancel_async$descriptor() {
+        return tsurugi_ffi_job_cancel_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiCancelJobHandle *cancel_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_cancel_async$handle() {
+        return tsurugi_ffi_job_cancel_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiCancelJobHandle *cancel_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_cancel_async$address() {
+        return tsurugi_ffi_job_cancel_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiCancelJobHandle *cancel_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_cancel_async(MemorySegment context, MemorySegment job, MemorySegment cancel_job_out) {
+        var mh$ = tsurugi_ffi_job_cancel_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_cancel_async", context, job, cancel_job_out);
+            }
+            return (int)mh$.invokeExact(context, job, cancel_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_close {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_close");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_close(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_close$descriptor() {
+        return tsurugi_ffi_job_close.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_close(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_close$handle() {
+        return tsurugi_ffi_job_close.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_close(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_close$address() {
+        return tsurugi_ffi_job_close.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_close(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job)
+     * }
+     */
+    public static int tsurugi_ffi_job_close(MemorySegment context, MemorySegment job) {
+        var mh$ = tsurugi_ffi_job_close.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_close", context, job);
+            }
+            return (int)mh$.invokeExact(context, job);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_job_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_job_dispose(TsurugiFfiJobHandle job)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_dispose$descriptor() {
+        return tsurugi_ffi_job_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_job_dispose(TsurugiFfiJobHandle job)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_dispose$handle() {
+        return tsurugi_ffi_job_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_job_dispose(TsurugiFfiJobHandle job)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_dispose$address() {
+        return tsurugi_ffi_job_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_job_dispose(TsurugiFfiJobHandle job)
+     * }
+     */
+    public static void tsurugi_ffi_job_dispose(MemorySegment job) {
+        var mh$ = tsurugi_ffi_job_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_dispose", job);
+            }
+            mh$.invokeExact(job);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20098,6 +20831,66 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_session_connect_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_connect_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiJobHandle *session_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_connect_async$descriptor() {
+        return tsurugi_ffi_session_connect_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiJobHandle *session_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_connect_async$handle() {
+        return tsurugi_ffi_session_connect_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiJobHandle *session_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_connect_async$address() {
+        return tsurugi_ffi_session_connect_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiJobHandle *session_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_connect_async(MemorySegment context, MemorySegment connection_option, MemorySegment session_job_out) {
+        var mh$ = tsurugi_ffi_session_connect_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_connect_async", context, connection_option, session_job_out);
+            }
+            return (int)mh$.invokeExact(context, connection_option, session_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_session_make_sql_client {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -21938,6 +22731,24 @@ public class tsubakuro_rust_ffi_h {
      */
     public static int TSURUGI_FFI_RC_FFI_ARG_ERROR() {
         return TSURUGI_FFI_RC_FFI_ARG_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_JOB_ERROR = (int)1090519040L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_JOB_ERROR 1090519040
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_JOB_ERROR() {
+        return TSURUGI_FFI_RC_FFI_JOB_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED = (int)1090519041L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED 1090519041
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED() {
+        return TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED;
     }
     private static final int TSURUGI_FFI_RC_FFI_ERROR = (int)1090519040L;
     /**

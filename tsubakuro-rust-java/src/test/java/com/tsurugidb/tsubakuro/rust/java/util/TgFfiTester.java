@@ -87,7 +87,7 @@ public class TgFfiTester {
 		}
 	}
 
-	protected TgFfiSqlClient createSqlClient() {
+	protected TgFfiSession createSession() {
 		var manager = getFfiObjectManager();
 
 		try (var context = TgFfiContext.create(manager); //
@@ -95,6 +95,15 @@ public class TgFfiTester {
 			connectionOption.setEndpointUrl(context, getEndpoint());
 
 			var session = TgFfiSession.connect(context, connectionOption);
+			return session;
+		}
+	}
+
+	protected TgFfiSqlClient createSqlClient() {
+		var manager = getFfiObjectManager();
+		var session = createSession();
+
+		try (var context = TgFfiContext.create(manager)) {
 			var client = session.makeSqlClient(context);
 			return client;
 		}

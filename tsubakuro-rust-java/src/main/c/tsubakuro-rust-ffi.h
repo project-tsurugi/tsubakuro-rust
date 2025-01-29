@@ -13,6 +13,10 @@
 
 #define TSURUGI_FFI_RC_FFI_ARG_ERROR (TSURUGI_FFI_RC_FFI_BASE | (0 << 24))
 
+#define TSURUGI_FFI_RC_FFI_JOB_ERROR (TSURUGI_FFI_RC_FFI_BASE | (1 << 24))
+
+#define TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED (TSURUGI_FFI_RC_FFI_JOB_ERROR | 1)
+
 #define TSURUGI_FFI_RC_FFI_ERROR (TSURUGI_FFI_RC_FFI_BASE | (1 << 24))
 
 #define TSURUGI_FFI_RC_CORE_CLIENT_ERROR (TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR << 30)
@@ -155,6 +159,8 @@ enum TsurugiFfiTransactionType {
 };
 typedef int32_t TsurugiFfiTransactionType;
 
+typedef struct TsurugiFfiCancelJob TsurugiFfiCancelJob;
+
 typedef struct TsurugiFfiCommitOption TsurugiFfiCommitOption;
 
 typedef struct TsurugiFfiConnectionOption TsurugiFfiConnectionOption;
@@ -192,6 +198,15 @@ typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
 typedef uint32_t TsurugiFfiRc;
 
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
+
+typedef struct TsurugiFfiCancelJob *TsurugiFfiCancelJobHandle;
+
+/**
+ * nanosecond
+ */
+typedef uint64_t TsurugiFfiDuration;
+
+typedef void *TsurugiFfiJobHandle;
 
 typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 
@@ -261,6 +276,50 @@ TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle conte
                                                    char **error_message_out);
 
 void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
+
+TsurugiFfiRc tsurugi_ffi_cancel_job_wait(TsurugiFfiContextHandle context,
+                                         TsurugiFfiCancelJobHandle cancel_job,
+                                         TsurugiFfiDuration timeout,
+                                         bool *done_out);
+
+TsurugiFfiRc tsurugi_ffi_cancel_job_is_done(TsurugiFfiContextHandle context,
+                                            TsurugiFfiCancelJobHandle cancel_job,
+                                            bool *done_out);
+
+void tsurugi_ffi_cancel_job_dispose(TsurugiFfiCancelJobHandle cancel_job);
+
+TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context,
+                                      TsurugiFfiJobHandle job,
+                                      char **name_out);
+
+TsurugiFfiRc tsurugi_ffi_job_wait(TsurugiFfiContextHandle context,
+                                  TsurugiFfiJobHandle job,
+                                  TsurugiFfiDuration timeout,
+                                  bool *done_out);
+
+TsurugiFfiRc tsurugi_ffi_job_is_done(TsurugiFfiContextHandle context,
+                                     TsurugiFfiJobHandle job,
+                                     bool *done_out);
+
+TsurugiFfiRc tsurugi_ffi_job_take(TsurugiFfiContextHandle context,
+                                  TsurugiFfiJobHandle job,
+                                  void **value_out);
+
+TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context,
+                                           TsurugiFfiJobHandle job,
+                                           void **value_out);
+
+TsurugiFfiRc tsurugi_ffi_job_cancel(TsurugiFfiContextHandle context,
+                                    TsurugiFfiJobHandle job,
+                                    bool *cancell_done_out);
+
+TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context,
+                                          TsurugiFfiJobHandle job,
+                                          TsurugiFfiCancelJobHandle *cancel_job_out);
+
+TsurugiFfiRc tsurugi_ffi_job_close(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job);
+
+void tsurugi_ffi_job_dispose(TsurugiFfiJobHandle job);
 
 TsurugiFfiRc tsurugi_ffi_env_logger_init(void);
 
@@ -528,6 +587,10 @@ void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle conn
 TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
                                          TsurugiFfiConnectionOptionHandle connection_option,
                                          TsurugiFfiSessionHandle *session_out);
+
+TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context,
+                                               TsurugiFfiConnectionOptionHandle connection_option,
+                                               TsurugiFfiJobHandle *session_job_out);
 
 TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context,
                                                  TsurugiFfiSessionHandle session,

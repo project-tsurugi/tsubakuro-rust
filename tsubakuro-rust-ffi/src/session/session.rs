@@ -6,6 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_require_non_null, ffi_exec_core_async,
+    job::{TsurugiFfiJob, TsurugiFfiJobHandle, TsurugiFfiJobValueType},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
 };
@@ -18,6 +19,10 @@ pub(crate) struct TsurugiFfiSession {
 }
 
 impl TsurugiFfiSession {
+    fn new(session: Arc<Session>, runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiSession {
+        TsurugiFfiSession { session, runtime }
+    }
+
     pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
         &self.runtime
     }
@@ -66,10 +71,7 @@ pub extern "C" fn tsurugi_ffi_session_connect(
         runtime,
         Session::connect(connection_option)
     );
-    let session = Box::new(TsurugiFfiSession {
-        session,
-        runtime: Arc::new(runtime),
-    });
+    let session = Box::new(TsurugiFfiSession::new(session, Arc::new(runtime)));
 
     let handle = Box::into_raw(session);
     unsafe {
@@ -81,13 +83,58 @@ pub extern "C" fn tsurugi_ffi_session_connect(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_connect_async(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    session_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, session_job_out);
+    unsafe {
+        *session_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+
+    let connection_option = unsafe { &*connection_option };
+
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        Session::connect_async(connection_option)
+    );
+    let runtime = Arc::new(runtime);
+    let job = TsurugiFfiJob::new(
+        TsurugiFfiJobValueType::Session,
+        job,
+        Box::new(move |session, runtime| TsurugiFfiSession::new(session, runtime)),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *session_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. session_job={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     context: TsurugiFfiContextHandle,
     session: TsurugiFfiSessionHandle,
     sql_client_out: *mut TsurugiFfiSqlClientHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_sql_client()";
-    trace!("{FUNCTION_NAME} start");
+    trace!("{FUNCTION_NAME} start. session={:?}", session);
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_client_out);
     unsafe {
