@@ -2,11 +2,31 @@ use tsubakuro_rust_core::error::TgError;
 
 use crate::context::{TsurugiFfiContext, TsurugiFfiContextHandle};
 
-#[allow(dead_code)]
-pub const TSURUGI_FFI_RC_TYPE_OK: u32 = 0;
-pub const TSURUGI_FFI_RC_TYPE_FFI_ERROR: u32 = 1;
-pub const TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR: u32 = 2;
-pub const TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR: u32 = 3;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u32)]
+pub enum TsurugiFfiRcType {
+    Ok = 0,
+    FfiError = 1,
+    CoreClientError = 2,
+    CoreServerError = 3,
+}
+
+impl From<TsurugiFfiRc> for TsurugiFfiRcType {
+    fn from(value: TsurugiFfiRc) -> Self {
+        match value >> 30 {
+            0 => Self::Ok,
+            1 => Self::FfiError,
+            2 => Self::CoreClientError,
+            3 => Self::CoreServerError,
+            _ => panic!("unsupported rc={:x}", value),
+        }
+    }
+}
+
+// pub const TSURUGI_FFI_RC_TYPE_OK: u32 = TsurugiFfiRcType::Ok as u32;
+pub const TSURUGI_FFI_RC_TYPE_FFI_ERROR: u32 = TsurugiFfiRcType::FfiError as u32;
+pub const TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR: u32 = TsurugiFfiRcType::CoreClientError as u32;
+pub const TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR: u32 = TsurugiFfiRcType::CoreServerError as u32;
 
 pub type TsurugiFfiRc = u32;
 pub const TSURUGI_FFI_RC_OK: TsurugiFfiRc = 0;
@@ -39,10 +59,6 @@ pub const TSURUGI_FFI_RC_CORE_CLIENT_IO_ERROR: TsurugiFfiRc =
     TSURUGI_FFI_RC_CORE_CLIENT_ERROR | (3 << 16);
 
 pub const TSURUGI_FFI_RC_CORE_SERVER_ERROR: u32 = TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR << 30;
-
-pub(crate) fn get_rc_type_from_rc(rc: TsurugiFfiRc) -> u32 {
-    rc >> 30
-}
 
 pub(crate) fn rc_ok(context: TsurugiFfiContextHandle) -> TsurugiFfiRc {
     TsurugiFfiContext::clear(context);

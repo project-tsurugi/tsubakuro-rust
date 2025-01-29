@@ -7,7 +7,7 @@ use crate::{
     error::TsurugiFfiError,
     ffi_arg_require_non_null,
     return_code::{
-        get_rc_type_from_rc, TsurugiFfiRc, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_OK,
+        TsurugiFfiRc, TsurugiFfiRcType, TSURUGI_FFI_RC_FFI_ARG0_ERROR, TSURUGI_FFI_RC_OK,
     },
 };
 
@@ -60,6 +60,9 @@ pub extern "C" fn tsurugi_ffi_context_create(
         trace!("{FUNCTION_NAME} error. arg[context_out] is null");
         return TSURUGI_FFI_RC_FFI_ARG0_ERROR;
     }
+    unsafe {
+        *context_out = std::ptr::null_mut();
+    }
 
     let context = Box::new(TsurugiFfiContext {
         rc: TSURUGI_FFI_RC_OK,
@@ -84,8 +87,11 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_return_code()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, rc_out);
+    unsafe {
+        *rc_out = TSURUGI_FFI_RC_FFI_ARG0_ERROR;
+    }
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
 
     unsafe {
         let context = &*context;
@@ -100,18 +106,21 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_error_type(
     context: TsurugiFfiContextHandle,
-    error_type_out: *mut TsurugiFfiRc,
+    error_type_out: *mut TsurugiFfiRcType,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_return_code()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, error_type_out);
+    unsafe {
+        *error_type_out = TsurugiFfiRcType::FfiError;
+    }
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
 
     unsafe {
         let context = &*context;
 
-        *error_type_out = get_rc_type_from_rc(context.rc);
+        *error_type_out = context.rc.into();
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -126,8 +135,11 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_message()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
 
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, error_message_out);
+    unsafe {
+        *error_message_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
 
     let context = unsafe { &mut *context };
 

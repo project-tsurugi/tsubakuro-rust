@@ -3,13 +3,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define TSURUGI_FFI_RC_TYPE_OK 0
 
-#define TSURUGI_FFI_RC_TYPE_FFI_ERROR 1
 
-#define TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR 2
 
-#define TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR 3
+
+
 
 #define TSURUGI_FFI_RC_FFI_BASE (TSURUGI_FFI_RC_TYPE_FFI_ERROR << 30)
 
@@ -128,6 +126,14 @@ enum TsurugiFfiCommitType {
   TSURUGI_FFI_COMMIT_TYPE_PROPAGATED = 40,
 };
 typedef int32_t TsurugiFfiCommitType;
+
+enum TsurugiFfiRcType {
+  TSURUGI_FFI_RC_TYPE_OK = 0,
+  TSURUGI_FFI_RC_TYPE_FFI_ERROR = 1,
+  TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR = 2,
+  TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR = 3,
+};
+typedef uint32_t TsurugiFfiRcType;
 
 enum TsurugiFfiTransactionType {
   /**
@@ -249,7 +255,7 @@ TsurugiFfiRc tsurugi_ffi_context_get_return_code(TsurugiFfiContextHandle context
                                                  TsurugiFfiRc *rc_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context,
-                                                TsurugiFfiRc *error_type_out);
+                                                TsurugiFfiRcType *error_type_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context,
                                                    char **error_message_out);
@@ -390,7 +396,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_metadata_get_columns_size(TsurugiFfiCo
 TsurugiFfiRc tsurugi_ffi_sql_query_result_metadata_get_columns_value(TsurugiFfiContextHandle context,
                                                                      TsurugiFfiSqlQueryResultMetadataHandle query_result_metadata,
                                                                      uint32_t index,
-                                                                     TsurugiFfiSqlColumnHandle *value_out);
+                                                                     TsurugiFfiSqlColumnHandle *sql_column_out);
 
 void tsurugi_ffi_sql_query_result_metadata_dispose(TsurugiFfiSqlQueryResultMetadataHandle query_result_metadata);
 
@@ -461,7 +467,7 @@ TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle
 TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_value(TsurugiFfiContextHandle context,
                                                           TsurugiFfiTableListHandle table_list,
                                                           uint32_t index,
-                                                          char **value_out);
+                                                          char **table_name_out);
 
 void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list);
 
@@ -476,7 +482,7 @@ TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle
 TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_value(TsurugiFfiContextHandle context,
                                                           TsurugiFfiTableMetadataHandle table_metadata,
                                                           uint32_t index,
-                                                          TsurugiFfiSqlColumnHandle *value_out);
+                                                          TsurugiFfiSqlColumnHandle *sql_column_out);
 
 void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata);
 

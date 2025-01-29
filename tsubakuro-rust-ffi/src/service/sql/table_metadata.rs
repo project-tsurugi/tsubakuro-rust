@@ -55,8 +55,11 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_table_name()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name_out);
+    unsafe {
+        *table_name_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
 
     let table_metadata = unsafe { &mut *table_metadata };
 
@@ -84,8 +87,11 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_size(
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_columns_size()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
+    unsafe {
+        *size_out = 0;
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
 
     let table_metadata = unsafe { &*table_metadata };
     let columns = table_metadata.columns();
@@ -103,13 +109,16 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_value(
     context: TsurugiFfiContextHandle,
     table_metadata: TsurugiFfiTableMetadataHandle,
     index: u32,
-    value_out: *mut TsurugiFfiSqlColumnHandle,
+    sql_column_out: *mut TsurugiFfiSqlColumnHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_columns_value()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
 
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql_column_out);
+    unsafe {
+        *sql_column_out = std::ptr::null_mut();
+    }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let table_metadata = unsafe { &mut *table_metadata };
     let columns = table_metadata.columns();
@@ -124,7 +133,7 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_value(
 
     let handle = Box::into_raw(column);
     unsafe {
-        *value_out = handle;
+        *sql_column_out = handle;
     }
 
     trace!("{FUNCTION_NAME} end. sql_column={:?}", handle);

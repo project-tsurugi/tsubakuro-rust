@@ -83,6 +83,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_create(
     trace!("{FUNCTION_NAME} start");
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option_out);
+    unsafe {
+        *transaction_option_out = std::ptr::null_mut();
+    }
 
     let transaction_option = Box::new(TsurugiFfiTransactionOption {
         transaction_option: TransactionOption::new(),
@@ -135,8 +138,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_type(
         transaction_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_type_out);
+    unsafe {
+        *transaction_type_out = TsurugiFfiTransactionType::Unspecified;
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
 
     let transaction_option = unsafe { &mut *transaction_option };
 
@@ -189,8 +195,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
         transaction_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label_out);
+    unsafe {
+        *label_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
 
     let transaction_option = unsafe { &mut *transaction_option };
 

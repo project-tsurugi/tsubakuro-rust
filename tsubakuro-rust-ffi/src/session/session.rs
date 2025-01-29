@@ -48,8 +48,11 @@ pub extern "C" fn tsurugi_ffi_session_connect(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, session_out);
+    unsafe {
+        *session_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
 
     let connection_option = unsafe { &*connection_option };
 
@@ -86,8 +89,11 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_sql_client()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_client_out);
+    unsafe {
+        *sql_client_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
 
     let session = unsafe { &*session };
     let sql_client: SqlClient = session.make_client();
