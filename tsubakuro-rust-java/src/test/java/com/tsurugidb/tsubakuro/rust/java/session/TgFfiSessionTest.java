@@ -48,6 +48,42 @@ class TgFfiSessionTest extends TgFfiTester {
 	}
 
 	@Test
+	void connect_async() {
+		var manager = getFfiObjectManager();
+
+		var context = TgFfiContext.create(manager);
+
+		var connectionOption = TgFfiConnectionOption.create(context);
+		connectionOption.setEndpointUrl(context, getEndpoint());
+
+		try (var sessionJob = TgFfiSession.connectAsync(context, connectionOption); //
+				var session = sessionJob.take(context)) {
+		}
+	}
+
+	@Test
+	void connect_async_argError() {
+		var manager = getFfiObjectManager();
+
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var arg = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_async(ctx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var connectionOption = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var arg = connectionOption.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_async(ctx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
 	void make_sql_client() {
 		var manager = getFfiObjectManager();
 
