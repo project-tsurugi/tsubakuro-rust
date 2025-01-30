@@ -209,7 +209,7 @@ public class TgFfiTester {
 			case TAKE:
 				return job.take(context);
 			case TAKE_FOR:
-				return job.take(context); // TODO takeFor()
+				return job.takeFor(context, TimeUnit.SECONDS.toNanos(5));
 			case TAKE_IF_READY:
 				for (int i = 0; i < 10; i++) {
 					job.wait(context, TimeUnit.SECONDS.toNanos(5));

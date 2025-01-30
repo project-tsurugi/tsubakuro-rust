@@ -33,6 +33,7 @@ class TgFfiJobTest extends TgFfiTester {
 				wait_argError(job);
 				is_done_argError(job);
 				take_argError(job);
+				take_for_argError(job);
 				take_if_ready_argError(job);
 				cancel_argError(job);
 				cancel_async_argError(job);
@@ -148,6 +149,48 @@ class TgFfiJobTest extends TgFfiTester {
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void take_for() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var connectionOption = TgFfiConnectionOption.create(context)) {
+			connectionOption.setEndpointUrl(context, getEndpoint());
+
+			try (var job = TgFfiSession.connectAsync(context, connectionOption)) {
+				try (var session = job.takeFor(context, TimeUnit.SECONDS.toNanos(5))) {
+					var e = assertThrows(TgFfiRuntimeException.class, () -> {
+						job.takeFor(context, TimeUnit.SECONDS.toNanos(5));
+					});
+					assertTrue(e.getMessage().contains("already taked"));
+				}
+			}
+		}
+	}
+
+	private void take_for_argError(TgFfiJob<TgFfiSession> job) {
+		var manager = getFfiObjectManager();
+
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = TimeUnit.SECONDS.toNanos(5);
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = job.handle();
+			var arg = TimeUnit.SECONDS.toNanos(5);
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}
 

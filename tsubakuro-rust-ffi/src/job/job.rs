@@ -253,6 +253,64 @@ fn job_take<T, FFI>(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_job_take_for(
+    context: TsurugiFfiContextHandle,
+    job: TsurugiFfiJobHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut *mut c_void, // FFI Handle out
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_for()";
+    trace!("{FUNCTION_NAME} start. job={:?}", job);
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+    unsafe {
+        *value_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+
+    match job_type(job) {
+        TsurugiFfiJobValueType::Session => job_take_for(
+            context,
+            job as *mut TsurugiFfiJob<Arc<Session>, TsurugiFfiSession>,
+            timeout,
+            value_out as *mut TsurugiFfiSessionHandle,
+        ),
+        TsurugiFfiJobValueType::TableList => job_take_for(
+            context,
+            job as *mut TsurugiFfiJob<TableList, TsurugiFfiTableList>,
+            timeout,
+            value_out as *mut TsurugiFfiTableListHandle,
+        ),
+    }
+}
+
+fn job_take_for<T, FFI>(
+    context: TsurugiFfiContextHandle,
+    job: *mut TsurugiFfiJob<T, FFI>,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut *mut FFI,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_for()";
+
+    let job = unsafe { &mut *job };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = job.runtime().clone();
+    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.raw_job());
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take_for(timeout));
+    let value = (job.converter)(value, runtime);
+    let value = Box::new(value);
+
+    let handle = Box::into_raw(value);
+    unsafe {
+        *value_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. {}={:?}", job.value_name(), handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_take_if_ready(
     context: TsurugiFfiContextHandle,
     job: TsurugiFfiJobHandle,

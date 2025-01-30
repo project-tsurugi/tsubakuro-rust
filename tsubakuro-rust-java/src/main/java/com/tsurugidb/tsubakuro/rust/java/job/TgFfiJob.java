@@ -56,6 +56,18 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
 		return valueToFfiObject(manager(), outHandle);
 	}
 
+	public synchronized T takeFor(TgFfiContext context, long timeoutNanos) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var arg = timeoutNanos;
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return valueToFfiObject(manager(), outHandle);
+	}
+
 	public synchronized T takeIfReady(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();

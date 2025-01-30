@@ -305,6 +305,11 @@ TsurugiFfiRc tsurugi_ffi_job_take(TsurugiFfiContextHandle context,
                                   TsurugiFfiJobHandle job,
                                   void **value_out);
 
+TsurugiFfiRc tsurugi_ffi_job_take_for(TsurugiFfiContextHandle context,
+                                      TsurugiFfiJobHandle job,
+                                      TsurugiFfiDuration timeout,
+                                      void **value_out);
+
 TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context,
                                            TsurugiFfiJobHandle job,
                                            void **value_out);
