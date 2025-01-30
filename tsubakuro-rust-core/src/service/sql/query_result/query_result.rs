@@ -1,5 +1,4 @@
 use crate::{
-    client_error,
     error::TgError,
     invalid_response_error,
     jogasaki::proto::sql::response::ResultSetMetadata as SqlQueryResultMetadata,
@@ -14,10 +13,15 @@ use crate::{
     prost_decode_error,
 };
 use async_trait::async_trait;
-use bigdecimal::FromPrimitive;
-use log::trace;
 use prost::{bytes::BytesMut, Message};
 use std::{sync::Arc, time::Duration};
+
+#[cfg(any(
+    feature = "with_bigdecimal",
+    feature = "with_chrono",
+    feature = "with_time"
+))]
+use {crate::client_error, log::trace};
 
 use super::value_stream::ResultSetValueStream;
 
@@ -282,6 +286,8 @@ fn bigdecimal_big_decimal(
     coefficient: i64,
     scale: i32,
 ) -> Result<bigdecimal::BigDecimal, TgError> {
+    use bigdecimal::FromPrimitive;
+
     let value = match coefficient_bytes {
         Some(coefficient) => {
             let value = bigdecimal::num_bigint::BigInt::from_signed_bytes_be(&coefficient);

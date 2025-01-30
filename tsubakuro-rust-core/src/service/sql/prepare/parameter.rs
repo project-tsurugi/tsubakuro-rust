@@ -1,12 +1,16 @@
-use chrono::Datelike;
-use chrono::Offset;
+#[cfg(feature = "with_chrono")]
+use {chrono::Datelike, chrono::Offset};
 
-use crate::jogasaki::proto::sql::common::Decimal as ProtoDecimal;
-use crate::jogasaki::proto::sql::common::TimeOfDayWithTimeZone as ProtoTimeOfDayWithTimeZone;
-use crate::jogasaki::proto::sql::common::TimePoint as ProtoTimePoint;
-use crate::jogasaki::proto::sql::common::TimePointWithTimeZone as ProtoTimePointWithTimeZone;
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
+
+#[cfg(any(feature = "with_chrono", feature = "with_time"))]
+use {
+    crate::jogasaki::proto::sql::common::Decimal as ProtoDecimal,
+    crate::jogasaki::proto::sql::common::TimeOfDayWithTimeZone as ProtoTimeOfDayWithTimeZone,
+    crate::jogasaki::proto::sql::common::TimePoint as ProtoTimePoint,
+    crate::jogasaki::proto::sql::common::TimePointWithTimeZone as ProtoTimePointWithTimeZone,
+};
 
 impl SqlParameter {
     fn new(name: &str, value: Option<Value>) -> SqlParameter {
