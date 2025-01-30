@@ -554,7 +554,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		var context = TgFfiContext.create(manager);
 
 		try (var transaction = startOcc(client)) {
-			var sql = "insert into test values(1, 1, 'a')";
+			var sql = "insert or replace into test values(1, 1, 'a')";
 			try (var er = client.execute(context, transaction, sql)) {
 				assertEquals(1, er.getRows(context));
 			}
@@ -623,6 +623,89 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			var arg = manager.allocateString("drop table if exists test");
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void execute_async() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		try (var transaction = startOcc(client)) {
+			var sql = "insert or replace into test values(1, 1, 'a')";
+			try (var erJob = client.executeAsync(context, transaction, sql); //
+					var er = erJob.take(context)) {
+				assertEquals(1, er.getRows(context));
+			}
+
+			try (var commitOption = TgFfiCommitOption.create(context)) {
+				client.commit(context, transaction, commitOption);
+			}
+			transaction.close(context);
+		}
+		try (var transaction = startOcc(client)) {
+			var sql = "delete from test";
+			try (var erJob = client.executeAsync(context, transaction, sql); //
+					var er = erJob.take(context)) {
+			}
+
+			try (var commitOption = TgFfiCommitOption.create(context)) {
+				client.commit(context, transaction, commitOption);
+			}
+			transaction.close(context);
+		}
+	}
+
+	@Test
+	void execute_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var tx = transaction.handle();
+			var arg = manager.allocateString("drop table if exists test");
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_async(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = MemorySegment.NULL;
+			var arg = manager.allocateString("drop table if exists test");
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_async(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_async(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = manager.allocateString("drop table if exists test");
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_async(ctx, handle, tx, arg, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
 		}
 	}

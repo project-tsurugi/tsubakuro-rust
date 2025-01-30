@@ -434,7 +434,6 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
     let transaction_option = unsafe { &*transaction_option };
 
     let runtime = client.runtime();
-
     let job = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
@@ -506,6 +505,68 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
 
     trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
     rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_execute_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    sql: *const c_char,
+    execute_result_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, execute_result_job_out);
+    unsafe {
+        *execute_result_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, sql);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.execute_async(transaction, sql)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(SqlExecuteResultJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *execute_result_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. execute_result_job={:?}", handle);
+    rc_ok(context)
+}
+
+impl_job_delegator! {
+    SqlExecuteResultJobDelegator,
+    SqlExecuteResult,
+    TsurugiFfiSqlExecuteResult,
+    "execute_result",
+}
+
+impl SqlExecuteResultJobDelegator {
+    fn convert(
+        value: SqlExecuteResult,
+        _runtime: Arc<tokio::runtime::Runtime>,
+    ) -> TsurugiFfiSqlExecuteResult {
+        TsurugiFfiSqlExecuteResult::new(value)
+    }
 }
 
 #[no_mangle]

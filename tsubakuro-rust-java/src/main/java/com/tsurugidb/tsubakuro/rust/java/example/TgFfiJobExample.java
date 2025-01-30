@@ -116,11 +116,14 @@ public class TgFfiJobExample {
 		System.out.println("SqlClient.execute() start");
 
 		try (var transaction = startOcc(client, context)) {
-			try (var er = client.execute(context, transaction, "insert into test values(1, 11, 'aaa')")) {
+			try (var erJob = client.executeAsync(context, transaction, "insert into test values(1, 11, 'aaa')"); //
+					var er = erJob.take(context)) {
 			}
-			try (var er = client.execute(context, transaction, "insert into test values(2, 22, 'bbb')")) {
+			try (var erJob = client.executeAsync(context, transaction, "insert into test values(2, 22, 'bbb')"); //
+					var er = erJob.take(context)) {
 			}
-			try (var er = client.execute(context, transaction, "insert into test values(3, 33, null)")) {
+			try (var erJob = client.executeAsync(context, transaction, "insert into test values(3, 33, null)"); //
+					var er = erJob.take(context)) {
 			}
 
 			try (var commitOption = TgFfiCommitOption.create(context)) {

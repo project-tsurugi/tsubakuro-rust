@@ -177,6 +177,25 @@ public class TgFfiSqlClient extends TgFfiObject {
 		return new TgFfiSqlExecuteResult(manager(), outHandle);
 	}
 
+	public synchronized TgFfiJob<TgFfiSqlExecuteResult> executeAsync(TgFfiContext context, TgFfiTransaction transaction,
+			String sql) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var tx = transaction.handle();
+		var arg = allocateString(sql);
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_async(ctx, handle, tx, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiJob<>(manager(), outHandle) {
+			@Override
+			protected TgFfiSqlExecuteResult valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+				return new TgFfiSqlExecuteResult(manager, valueHandle);
+			}
+		};
+	}
+
 	public synchronized TgFfiSqlExecuteResult preparedExecute(TgFfiContext context, TgFfiTransaction transaction,
 			TgFfiSqlPreparedStatement preparedStatement, List<TgFfiSqlParameter> parameters) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;

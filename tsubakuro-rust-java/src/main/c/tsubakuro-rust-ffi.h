@@ -512,6 +512,12 @@ TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
                                             const char *sql,
                                             TsurugiFfiSqlExecuteResultHandle *execute_result_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlClientHandle sql_client,
+                                                  TsurugiFfiTransactionHandle transaction,
+                                                  const char *sql,
+                                                  TsurugiFfiJobHandle *execute_result_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlClientHandle sql_client,
                                                      TsurugiFfiTransactionHandle transaction,
