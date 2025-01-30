@@ -489,6 +489,13 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context,
                                             uint32_t placeholder_size,
                                             TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlClientHandle sql_client,
+                                                  const char *sql,
+                                                  const TsurugiFfiSqlPlaceholderHandle *placeholders,
+                                                  uint32_t placeholder_size,
+                                                  TsurugiFfiJobHandle *prepared_statement_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,
                                                       TsurugiFfiTransactionOptionHandle transaction_option,

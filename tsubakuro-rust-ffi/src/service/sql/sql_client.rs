@@ -298,6 +298,83 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    sql: *const c_char,
+    placeholders: *const TsurugiFfiSqlPlaceholderHandle,
+    placeholder_size: u32,
+    prepared_statement_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_job_out);
+    unsafe {
+        *prepared_statement_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
+    if placeholder_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
+    }
+
+    let client = unsafe { &*sql_client };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
+
+    let placeholders: Vec<SqlPlaceholder> = if placeholder_size > 0 {
+        let src = unsafe { std::slice::from_raw_parts(placeholders, placeholder_size as usize) };
+        let mut dst = Vec::with_capacity(src.len());
+        for &placeholder in src {
+            ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholder);
+            let placeholder = unsafe { &*placeholder }.raw_clone();
+            dst.push(placeholder);
+        }
+        dst
+    } else {
+        vec![]
+    };
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepare_async(sql, placeholders)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(SqlPreparedStatementJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *prepared_statement_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. prepared_statement_job={:?}", handle);
+    rc_ok(context)
+}
+
+impl_job_delegator! {
+    SqlPreparedStatementJobDelegator,
+    SqlPreparedStatement,
+    TsurugiFfiSqlPreparedStatement,
+    "table_metadata",
+}
+
+impl SqlPreparedStatementJobDelegator {
+    fn convert(
+        value: SqlPreparedStatement,
+        runtime: Arc<tokio::runtime::Runtime>,
+    ) -> TsurugiFfiSqlPreparedStatement {
+        TsurugiFfiSqlPreparedStatement::new(value, runtime)
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
