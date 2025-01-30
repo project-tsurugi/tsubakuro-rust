@@ -366,6 +366,18 @@ public class TgFfiSqlClient extends TgFfiObject {
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
 
+	public synchronized TgFfiVoidJob rollbackAsync(TgFfiContext context, TgFfiTransaction transaction) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var tx = transaction.handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback_async(ctx, handle, tx, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiVoidJob(manager(), outHandle);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_dispose(handle);

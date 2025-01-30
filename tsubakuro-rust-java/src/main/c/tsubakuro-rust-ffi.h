@@ -577,6 +577,11 @@ TsurugiFfiRc tsurugi_ffi_sql_client_rollback(TsurugiFfiContextHandle context,
                                              TsurugiFfiSqlClientHandle sql_client,
                                              TsurugiFfiTransactionHandle transaction);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle context,
+                                                   TsurugiFfiSqlClientHandle sql_client,
+                                                   TsurugiFfiTransactionHandle transaction,
+                                                   TsurugiFfiJobHandle *rollback_job_out);
+
 void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
 
 TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context,

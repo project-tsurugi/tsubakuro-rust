@@ -20265,6 +20265,67 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_client_rollback_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_rollback_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *rollback_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_rollback_async$descriptor() {
+        return tsurugi_ffi_sql_client_rollback_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *rollback_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_rollback_async$handle() {
+        return tsurugi_ffi_sql_client_rollback_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *rollback_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_rollback_async$address() {
+        return tsurugi_ffi_sql_client_rollback_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *rollback_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_rollback_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment rollback_job_out) {
+        var mh$ = tsurugi_ffi_sql_client_rollback_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_rollback_async", context, sql_client, transaction, rollback_job_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, transaction, rollback_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_client_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

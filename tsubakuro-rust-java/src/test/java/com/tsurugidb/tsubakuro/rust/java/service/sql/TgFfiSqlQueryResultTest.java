@@ -96,7 +96,6 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 
 	private void query(boolean prepare, String pattern) {
 		var manager = getFfiObjectManager();
-		var client = createSqlClient();
 
 		var context = TgFfiContext.create(manager);
 

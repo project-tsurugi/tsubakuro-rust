@@ -1645,4 +1645,57 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void rollback_async(String pattern) {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		try (var transaction = startOcc(client)) {
+			try (var rollbackJob = client.rollbackAsync(context, transaction)) {
+				Void value = jobTake(rollbackJob, pattern);
+				assertNull(value);
+			}
+		}
+	}
+
+	@Test
+	void rollback_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var tx = transaction.handle();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback_async(ctx, handle, tx, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback_async(ctx, handle, tx, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback_async(ctx, handle, tx, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
 }
