@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.foreign.MemorySegment;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -15,16 +17,17 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
 class TgFfiTransactionTest extends TgFfiTester {
 
-	@Test
-	void get_transaction_id() {
-		getTransactionId(true);
-		getTransactionId(false);
+	@ParameterizedTest
+	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	void get_transaction_id(String pattern) {
+		getTransactionId(pattern, true);
+		getTransactionId(pattern, false);
 	}
 
-	private void getTransactionId(boolean close) {
+	private void getTransactionId(String pattern, boolean close) {
 		var manager = getFfiObjectManager();
 		try (var context = TgFfiContext.create(manager); //
-				var transaction = createTransaction()) {
+				var transaction = createTransaction(pattern)) {
 			String transactionId = transaction.getTransactionId(context);
 			assertTrue(transactionId.startsWith("TID-"));
 
@@ -46,7 +49,7 @@ class TgFfiTransactionTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var target = createTransaction()) {
+				var target = createTransaction(DIRECT)) {
 			var ctx = context.handle();
 			var handle = target.handle();
 			var out = MemorySegment.NULL;
@@ -67,7 +70,7 @@ class TgFfiTransactionTest extends TgFfiTester {
 		}
 	}
 
-	private TgFfiTransaction createTransaction() {
+	private TgFfiTransaction createTransaction(String pattern) {
 		var manager = getFfiObjectManager();
 
 		try (var context = TgFfiContext.create(manager); //
@@ -78,7 +81,13 @@ class TgFfiTransactionTest extends TgFfiTester {
 			var client = session.makeSqlClient(context);
 
 			try (var transactionOption = TgFfiTransactionOption.create(context)) {
-				return client.startTransaction(context, transactionOption);
+				if (pattern.equals(DIRECT)) {
+					return client.startTransaction(context, transactionOption);
+				} else {
+					try (var job = client.startTransactionAsync(context, transactionOption)) {
+						return jobTake(job, pattern);
+					}
+				}
 			}
 		}
 	}

@@ -362,7 +362,7 @@ impl_job_delegator! {
     SqlPreparedStatementJobDelegator,
     SqlPreparedStatement,
     TsurugiFfiSqlPreparedStatement,
-    "table_metadata",
+    "prepared_statement",
 }
 
 impl SqlPreparedStatementJobDelegator {
@@ -411,6 +411,59 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
 
     trace!("{FUNCTION_NAME} end. transaction={:?}", handle);
     rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    transaction_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_job_out);
+    unsafe {
+        *transaction_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_option);
+
+    let client = unsafe { &*sql_client };
+    let transaction_option = unsafe { &*transaction_option };
+
+    let runtime = client.runtime();
+
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.start_transaction_async(transaction_option)
+    );
+    let job = TsurugiFfiJob::new(job, Box::new(TransactionJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *transaction_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. transaction_job={:?}", handle);
+    rc_ok(context)
+}
+
+impl_job_delegator! {
+    TransactionJobDelegator,
+    Transaction,
+    TsurugiFfiTransaction,
+    "transaction",
+}
+
+impl TransactionJobDelegator {
+    fn convert(value: Transaction, runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiTransaction {
+        TsurugiFfiTransaction::new(value, runtime)
+    }
 }
 
 #[no_mangle]

@@ -501,6 +501,11 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle co
                                                       TsurugiFfiTransactionOptionHandle transaction_option,
                                                       TsurugiFfiTransactionHandle *transaction_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiSqlClientHandle sql_client,
+                                                            TsurugiFfiTransactionOptionHandle transaction_option,
+                                                            TsurugiFfiJobHandle *transaction_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
                                             TsurugiFfiTransactionHandle transaction,

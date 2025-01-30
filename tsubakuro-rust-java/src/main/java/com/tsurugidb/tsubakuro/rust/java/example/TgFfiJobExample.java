@@ -94,7 +94,9 @@ public class TgFfiJobExample {
 			transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
 			transactionOption.setTransactionLabel(context, "tsubakuro-rust-java.transaction");
 
-			return client.startTransaction(context, transactionOption);
+			try (var transactionJob = client.startTransactionAsync(context, transactionOption)) {
+				return transactionJob.take(context);
+			}
 		}
 	}
 

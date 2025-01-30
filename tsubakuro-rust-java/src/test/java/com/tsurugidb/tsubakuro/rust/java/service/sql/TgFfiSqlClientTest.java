@@ -498,6 +498,55 @@ class TgFfiSqlClientTest extends TgFfiTester {
 	}
 
 	@Test
+	void start_transaction_async() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		var transactionOption = TgFfiTransactionOption.create(context);
+		transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
+
+		try (var transactionJob = client.startTransactionAsync(context, transactionOption); //
+				var transaction = transactionJob.take(context)) {
+			transaction.close(context);
+		}
+	}
+
+	@Test
+	void start_transaction_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = transactionOption.handle();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_start_transaction_async(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var arg = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_start_transaction_async(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var arg = transactionOption.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_start_transaction_async(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
+
+	@Test
 	void execute() {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
