@@ -64,7 +64,8 @@ public class TgFfiJobExample {
 	}
 
 	static void listTables(TgFfiSqlClient client, TgFfiContext context) {
-		try (var tableList = client.listTables(context)) {
+		try (var tableListJob = client.listTablesAsync(context); //
+				var tableList = tableListJob.take(context)) {
 			List<String> tableNames = tableList.getTableNames(context);
 			System.out.println("SqlClient.listTables().tableNames=" + tableNames);
 		}

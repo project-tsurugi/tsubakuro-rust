@@ -5,8 +5,8 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async,
-    job::{TsurugiFfiJob, TsurugiFfiJobHandle, TsurugiFfiJobValueType},
+    ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
+    job::{TsurugiFfiJob, TsurugiFfiJobHandle},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
         execute_result::TsurugiFfiSqlExecuteResult,
@@ -118,12 +118,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
 
     let runtime = client.runtime();
     let job = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.list_tables_async());
-    let job = TsurugiFfiJob::new(
-        TsurugiFfiJobValueType::TableList,
-        job,
-        Box::new(move |table_list, _runtime| TsurugiFfiTableList::new(table_list)),
-        runtime.clone(),
-    );
+    let job = TsurugiFfiJob::new(job, Box::new(TableListJobDelegator {}), runtime.clone());
     let job = Box::new(job);
 
     let handle = Box::into_raw(job);
@@ -133,6 +128,19 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
 
     trace!("{FUNCTION_NAME} end. table_list_job={:?}", handle);
     rc_ok(context)
+}
+
+impl_job_delegator! {
+    TableListJobDelegator,
+    TableList,
+    TsurugiFfiTableList,
+    "table_list",
+}
+
+impl TableListJobDelegator {
+    fn convert(value: TableList, _runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiTableList {
+        TsurugiFfiTableList::new(value)
+    }
 }
 
 #[no_mangle]

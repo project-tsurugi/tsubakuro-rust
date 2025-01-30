@@ -13,56 +13,34 @@ use crate::{
     ffi_arg_require_non_null, ffi_exec_core_async,
     job::cancel_job::TsurugiFfiCancelJob,
     return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
-    service::sql::table_list::{TsurugiFfiTableList, TsurugiFfiTableListHandle},
-    session::session::{TsurugiFfiSession, TsurugiFfiSessionHandle},
     TsurugiFfiDuration,
 };
 
 use super::cancel_job::TsurugiFfiCancelJobHandle;
 
-#[derive(Clone, Copy, Debug)]
-pub(crate) enum TsurugiFfiJobValueType {
-    // Session
-    Session,
-    // SqlClient
-    TableList,
-}
-
-impl TsurugiFfiJobValueType {
-    fn name(&self) -> &str {
-        match self {
-            TsurugiFfiJobValueType::Session => "session",
-            TsurugiFfiJobValueType::TableList => "table_list",
-        }
-    }
-}
-
-pub(crate) struct TsurugiFfiJob<T, FFI> {
-    job_type: TsurugiFfiJobValueType,
+pub(crate) struct TsurugiFfiJob<T> {
     runtime: Arc<tokio::runtime::Runtime>,
     job: Option<Job<T>>,
-    converter: Box<dyn Fn(T, Arc<tokio::runtime::Runtime>) -> FFI>,
+    delegater: Box<dyn TsurugiFfiJobDelegator>,
     name: *mut c_char,
 }
 
-impl<T, FFI> TsurugiFfiJob<T, FFI> {
+impl<T> TsurugiFfiJob<T> {
     pub(crate) fn new(
-        job_type: TsurugiFfiJobValueType,
         job: Job<T>,
-        converter: Box<dyn Fn(T, Arc<tokio::runtime::Runtime>) -> FFI>,
+        delegater: Box<dyn TsurugiFfiJobDelegator>,
         runtime: Arc<tokio::runtime::Runtime>,
-    ) -> TsurugiFfiJob<T, FFI> {
+    ) -> TsurugiFfiJob<T> {
         TsurugiFfiJob {
-            job_type,
             runtime,
             job: Some(job),
-            converter,
+            delegater,
             name: std::ptr::null_mut(),
         }
     }
 
     fn value_name(&self) -> &str {
-        self.job_type.name()
+        self.delegater.value_name()
     }
 
     fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
@@ -78,14 +56,83 @@ impl<T, FFI> TsurugiFfiJob<T, FFI> {
     }
 }
 
-pub type TsurugiFfiJobHandle = *mut c_void; // *mut TsurugiFfiJob<T, FFI>
+pub(crate) trait TsurugiFfiJobDelegator {
+    fn value_name(&self) -> &str;
 
-fn unknown_job(job: TsurugiFfiJobHandle) -> *mut TsurugiFfiJob<c_void, c_void> {
-    job as *mut TsurugiFfiJob<c_void, c_void>
+    fn take(
+        &self,
+        context: TsurugiFfiContextHandle,
+        job: TsurugiFfiJobHandle,
+        value_out: *mut *mut c_void,
+    ) -> TsurugiFfiRc;
+
+    fn take_for(
+        &self,
+        context: TsurugiFfiContextHandle,
+        job: TsurugiFfiJobHandle,
+        timeout: TsurugiFfiDuration,
+        value_out: *mut *mut c_void,
+    ) -> TsurugiFfiRc;
+
+    fn take_if_ready(
+        &self,
+        context: TsurugiFfiContextHandle,
+        job: TsurugiFfiJobHandle,
+        value_out: *mut *mut c_void,
+    ) -> TsurugiFfiRc;
 }
 
-fn job_type(job: TsurugiFfiJobHandle) -> TsurugiFfiJobValueType {
-    unsafe { &*unknown_job(job) }.job_type
+#[macro_export]
+macro_rules! impl_job_delegator {
+    ( $struct_name:ident, $src:ty, $ffi:ty, $value_name:expr $(,)?) => {
+        struct $struct_name;
+
+        impl $crate::job::TsurugiFfiJobDelegator for $struct_name {
+            fn value_name(&self) -> &str {
+                $value_name
+            }
+
+            fn take(
+                &self,
+                context: TsurugiFfiContextHandle,
+                job: TsurugiFfiJobHandle,
+                value_out: *mut *mut std::ffi::c_void,
+            ) -> TsurugiFfiRc {
+                let job = unsafe { &mut *(job as *mut TsurugiFfiJob<$src>) };
+                let value_out = value_out as *mut *mut $ffi;
+                job.take(context, $struct_name::convert, value_out)
+            }
+
+            fn take_for(
+                &self,
+                context: TsurugiFfiContextHandle,
+                job: TsurugiFfiJobHandle,
+                timeout: $crate::TsurugiFfiDuration,
+                value_out: *mut *mut std::ffi::c_void,
+            ) -> TsurugiFfiRc {
+                let job = unsafe { &mut *(job as *mut TsurugiFfiJob<$src>) };
+                let value_out = value_out as *mut *mut $ffi;
+                job.take_for(context, timeout, $struct_name::convert, value_out)
+            }
+
+            fn take_if_ready(
+                &self,
+                context: TsurugiFfiContextHandle,
+                job: TsurugiFfiJobHandle,
+                value_out: *mut *mut std::ffi::c_void,
+            ) -> TsurugiFfiRc {
+                let job = unsafe { &mut *(job as *mut TsurugiFfiJob<$src>) };
+                let value_out = value_out as *mut *mut $ffi;
+                job.take_if_ready(context, $struct_name::convert, value_out)
+            }
+        }
+    };
+}
+
+pub type TsurugiFfiJobHandle = *mut c_void; // *mut TsurugiFfiJob<T>
+
+fn unknown_job(job: TsurugiFfiJobHandle) -> *mut TsurugiFfiJob<c_void> {
+    job as *mut TsurugiFfiJob<c_void>
 }
 
 macro_rules! get_raw_job {
@@ -203,7 +250,7 @@ pub extern "C" fn tsurugi_ffi_job_is_done(
 pub extern "C" fn tsurugi_ffi_job_take(
     context: TsurugiFfiContextHandle,
     job: TsurugiFfiJobHandle,
-    value_out: *mut *mut c_void, // FFI out
+    value_out: *mut *mut c_void, // FFI Handle out
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_take()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
@@ -214,42 +261,34 @@ pub extern "C" fn tsurugi_ffi_job_take(
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
 
-    match job_type(job) {
-        TsurugiFfiJobValueType::Session => job_take(
-            context,
-            job as *mut TsurugiFfiJob<Arc<Session>, TsurugiFfiSession>,
-            value_out as *mut TsurugiFfiSessionHandle,
-        ),
-        TsurugiFfiJobValueType::TableList => job_take(
-            context,
-            job as *mut TsurugiFfiJob<TableList, TsurugiFfiTableList>,
-            value_out as *mut TsurugiFfiTableListHandle,
-        ),
-    }
+    unsafe { &mut *unknown_job(job) }
+        .delegater
+        .take(context, job, value_out)
 }
 
-fn job_take<T, FFI>(
-    context: TsurugiFfiContextHandle,
-    job: *mut TsurugiFfiJob<T, FFI>,
-    value_out: *mut *mut FFI,
-) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_job_take()";
+impl<T> TsurugiFfiJob<T> {
+    pub(crate) fn take<FFI>(
+        &mut self,
+        context: TsurugiFfiContextHandle,
+        converter: fn(T, Arc<tokio::runtime::Runtime>) -> FFI,
+        value_out: *mut *mut FFI,
+    ) -> TsurugiFfiRc {
+        const FUNCTION_NAME: &str = "tsurugi_ffi_job_take()";
 
-    let job = unsafe { &mut *job };
+        let runtime = self.runtime().clone();
+        let raw_job = get_raw_job!(context, FUNCTION_NAME, self.raw_job());
+        let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take());
+        let value = converter(value, runtime);
+        let value = Box::new(value);
 
-    let runtime = job.runtime().clone();
-    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.raw_job());
-    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take());
-    let value = (job.converter)(value, runtime);
-    let value = Box::new(value);
+        let handle = Box::into_raw(value);
+        unsafe {
+            *value_out = handle;
+        }
 
-    let handle = Box::into_raw(value);
-    unsafe {
-        *value_out = handle;
+        trace!("{FUNCTION_NAME} end. {}={:?}", self.value_name(), handle);
+        rc_ok(context)
     }
-
-    trace!("{FUNCTION_NAME} end. {}={:?}", job.value_name(), handle);
-    rc_ok(context)
 }
 
 #[no_mangle]
@@ -268,53 +307,45 @@ pub extern "C" fn tsurugi_ffi_job_take_for(
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
 
-    match job_type(job) {
-        TsurugiFfiJobValueType::Session => job_take_for(
-            context,
-            job as *mut TsurugiFfiJob<Arc<Session>, TsurugiFfiSession>,
-            timeout,
-            value_out as *mut TsurugiFfiSessionHandle,
-        ),
-        TsurugiFfiJobValueType::TableList => job_take_for(
-            context,
-            job as *mut TsurugiFfiJob<TableList, TsurugiFfiTableList>,
-            timeout,
-            value_out as *mut TsurugiFfiTableListHandle,
-        ),
-    }
+    unsafe { &mut *unknown_job(job) }
+        .delegater
+        .take_for(context, job, timeout, value_out)
 }
 
-fn job_take_for<T, FFI>(
-    context: TsurugiFfiContextHandle,
-    job: *mut TsurugiFfiJob<T, FFI>,
-    timeout: TsurugiFfiDuration,
-    value_out: *mut *mut FFI,
-) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_for()";
+impl<T> TsurugiFfiJob<T> {
+    pub(crate) fn take_for<FFI>(
+        self: &mut Self,
+        context: TsurugiFfiContextHandle,
+        timeout: TsurugiFfiDuration,
+        converter: fn(T, Arc<tokio::runtime::Runtime>) -> FFI,
+        value_out: *mut *mut FFI,
+    ) -> TsurugiFfiRc {
+        const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_for()";
 
-    let job = unsafe { &mut *job };
-    let timeout = Duration::from_nanos(timeout);
+        let timeout = Duration::from_nanos(timeout);
 
-    let runtime = job.runtime().clone();
-    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.raw_job());
-    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take_for(timeout));
-    let value = (job.converter)(value, runtime);
-    let value = Box::new(value);
+        let runtime = self.runtime().clone();
+        let raw_job = get_raw_job!(context, FUNCTION_NAME, self.raw_job());
+        let value =
+            ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take_for(timeout));
+        let value = converter(value, runtime);
+        let value = Box::new(value);
 
-    let handle = Box::into_raw(value);
-    unsafe {
-        *value_out = handle;
+        let handle = Box::into_raw(value);
+        unsafe {
+            *value_out = handle;
+        }
+
+        trace!("{FUNCTION_NAME} end. {}={:?}", self.value_name(), handle);
+        rc_ok(context)
     }
-
-    trace!("{FUNCTION_NAME} end. {}={:?}", job.value_name(), handle);
-    rc_ok(context)
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_take_if_ready(
     context: TsurugiFfiContextHandle,
     job: TsurugiFfiJobHandle,
-    value_out: *mut *mut c_void, // FFI out
+    value_out: *mut *mut c_void, // FFI Handle out
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_if_ready()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
@@ -325,51 +356,43 @@ pub extern "C" fn tsurugi_ffi_job_take_if_ready(
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
 
-    match job_type(job) {
-        TsurugiFfiJobValueType::Session => job_take_if_ready(
-            context,
-            job as *mut TsurugiFfiJob<Arc<Session>, TsurugiFfiSession>,
-            value_out as *mut TsurugiFfiSessionHandle,
-        ),
-        TsurugiFfiJobValueType::TableList => job_take_if_ready(
-            context,
-            job as *mut TsurugiFfiJob<TableList, TsurugiFfiTableList>,
-            value_out as *mut TsurugiFfiTableListHandle,
-        ),
-    }
+    unsafe { &mut *unknown_job(job) }
+        .delegater
+        .take_if_ready(context, job, value_out)
 }
 
-fn job_take_if_ready<T, FFI>(
-    context: TsurugiFfiContextHandle,
-    job: *mut TsurugiFfiJob<T, FFI>,
-    value_out: *mut *mut FFI,
-) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_if_ready()";
+impl<T> TsurugiFfiJob<T> {
+    pub(crate) fn take_if_ready<FFI>(
+        self: &mut Self,
+        context: TsurugiFfiContextHandle,
+        converter: fn(T, Arc<tokio::runtime::Runtime>) -> FFI,
+        value_out: *mut *mut FFI,
+    ) -> TsurugiFfiRc {
+        const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_if_ready()";
 
-    let job = unsafe { &mut *job };
-
-    let runtime = job.runtime().clone();
-    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.raw_job());
-    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take_if_ready());
-    let value = match value {
-        Some(value) => (job.converter)(value, runtime),
-        None => {
-            unsafe {
-                *value_out = std::ptr::null_mut();
+        let runtime = self.runtime().clone();
+        let raw_job = get_raw_job!(context, FUNCTION_NAME, self.raw_job());
+        let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take_if_ready());
+        let value = match value {
+            Some(value) => converter(value, runtime),
+            None => {
+                unsafe {
+                    *value_out = std::ptr::null_mut();
+                }
+                trace!("{FUNCTION_NAME} end. {}=null", self.value_name());
+                return rc_ok(context);
             }
-            trace!("{FUNCTION_NAME} end. {}=null", job.value_name());
-            return rc_ok(context);
+        };
+        let value = Box::new(value);
+
+        let handle = Box::into_raw(value);
+        unsafe {
+            *value_out = handle;
         }
-    };
-    let value = Box::new(value);
 
-    let handle = Box::into_raw(value);
-    unsafe {
-        *value_out = handle;
+        trace!("{FUNCTION_NAME} end. {}={:?}", self.value_name(), handle);
+        rc_ok(context)
     }
-
-    trace!("{FUNCTION_NAME} end. {}={:?}", job.value_name(), handle);
-    rc_ok(context)
 }
 
 #[no_mangle]

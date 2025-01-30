@@ -5,8 +5,8 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, ffi_exec_core_async,
-    job::{TsurugiFfiJob, TsurugiFfiJobHandle, TsurugiFfiJobValueType},
+    ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
+    job::{TsurugiFfiJob, TsurugiFfiJobHandle},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
 };
@@ -110,12 +110,7 @@ pub extern "C" fn tsurugi_ffi_session_connect_async(
         Session::connect_async(connection_option)
     );
     let runtime = Arc::new(runtime);
-    let job = TsurugiFfiJob::new(
-        TsurugiFfiJobValueType::Session,
-        job,
-        Box::new(move |session, runtime| TsurugiFfiSession::new(session, runtime)),
-        runtime.clone(),
-    );
+    let job = TsurugiFfiJob::new(job, Box::new(ConnectJobDelegator {}), runtime.clone());
     let job = Box::new(job);
 
     let handle = Box::into_raw(job);
@@ -125,6 +120,19 @@ pub extern "C" fn tsurugi_ffi_session_connect_async(
 
     trace!("{FUNCTION_NAME} end. session_job={:?}", handle);
     rc_ok(context)
+}
+
+impl_job_delegator! {
+    ConnectJobDelegator,
+    Arc<Session>,
+    TsurugiFfiSession,
+    "session",
+}
+
+impl ConnectJobDelegator {
+    fn convert(value: Arc<Session>, runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiSession {
+        TsurugiFfiSession::new(value, runtime)
+    }
 }
 
 #[no_mangle]
