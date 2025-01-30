@@ -6,12 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Closeable;
 import java.lang.foreign.MemorySegment;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
@@ -32,21 +36,45 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 
 	private class TestResource implements Closeable {
 		final TgFfiSqlClient client;
+		final TgFfiSqlPreparedStatement preparedStatement;
 		final TgFfiTransaction transaction;
 		final TgFfiSqlQueryResult queryResult;
 
 		public TestResource() {
+			this(false, DIRECT, "select * from test order by foo");
+		}
+
+		public TestResource(boolean prepare, String pattern, String sql) {
 			var manager = getFfiObjectManager();
 			try (var context = TgFfiContext.create(manager)) {
 				this.client = createSqlClient();
 				this.transaction = startOcc(client);
-				this.queryResult = client.query(context, transaction, "select * from test order by foo");
+
+				if (prepare) {
+					this.preparedStatement = client.prepare(context, sql, List.of());
+					if (pattern.equals(DIRECT)) {
+						this.queryResult = client.preparedQuery(context, transaction, preparedStatement, List.of());
+					} else {
+						try (var job = client.preparedQueryAsync(context, transaction, preparedStatement, List.of())) {
+							this.queryResult = jobTake(job, pattern);
+						}
+					}
+				} else {
+					this.preparedStatement = null;
+					if (pattern.equals(DIRECT)) {
+						this.queryResult = client.query(context, transaction, sql);
+					} else {
+						try (var job = client.queryAsync(context, transaction, sql)) {
+							this.queryResult = jobTake(job, pattern);
+						}
+					}
+				}
 			}
 		}
 
 		@Override
 		public void close() {
-			try (client; transaction) {
+			try (client; preparedStatement; transaction) {
 				try (queryResult) {
 				}
 				commit(client, transaction);
@@ -54,55 +82,64 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 		}
 	}
 
-	@Test
-	void query() {
+	@ParameterizedTest
+	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	void query(String pattern) {
+		query(false, pattern);
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	void query_fromPs(String pattern) {
+		query(true, pattern);
+	}
+
+	private void query(boolean prepare, String pattern) {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
 
 		var context = TgFfiContext.create(manager);
 
-		try (var transaction = startOcc(client)) {
-			var sql = "select * from test order by foo";
-			try (var rs = client.query(context, transaction, sql)) {
-				assertTrue(rs.nextRow(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals(1, rs.fetchInt4(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals(11L, rs.fetchInt8(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals("aaa", rs.fetchCharacter(context));
-				assertFalse(rs.nextColumn(context));
+		var sql = "select * from test order by foo";
+		try (var resource = new TestResource(prepare, pattern, sql)) {
+			try (var qr = resource.queryResult) {
+				assertTrue(qr.nextRow(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals(1, qr.fetchInt4(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals(11L, qr.fetchInt8(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals("aaa", qr.fetchCharacter(context));
+				assertFalse(qr.nextColumn(context));
 
-				assertTrue(rs.nextRow(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals(2, rs.fetchInt4(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals(22L, rs.fetchInt8(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals("bbb", rs.fetchCharacter(context));
-				assertFalse(rs.nextColumn(context));
+				assertTrue(qr.nextRow(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals(2, qr.fetchInt4(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals(22L, qr.fetchInt8(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals("bbb", qr.fetchCharacter(context));
+				assertFalse(qr.nextColumn(context));
 
-				assertTrue(rs.nextRow(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals(3, rs.fetchInt4(context));
-				assertTrue(rs.nextColumn(context));
-				assertFalse(rs.isNull(context));
-				assertEquals(33L, rs.fetchInt8(context));
-				assertTrue(rs.nextColumn(context));
-				assertTrue(rs.isNull(context));
-				assertFalse(rs.nextColumn(context));
+				assertTrue(qr.nextRow(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals(3, qr.fetchInt4(context));
+				assertTrue(qr.nextColumn(context));
+				assertFalse(qr.isNull(context));
+				assertEquals(33L, qr.fetchInt8(context));
+				assertTrue(qr.nextColumn(context));
+				assertTrue(qr.isNull(context));
+				assertFalse(qr.nextColumn(context));
 
-				assertFalse(rs.nextRow(context));
+				assertFalse(qr.nextRow(context));
 			}
-
-			commit(client, transaction);
 		}
 	}
 

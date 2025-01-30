@@ -1323,6 +1323,165 @@ class TgFfiSqlClientTest extends TgFfiTester {
 	}
 
 	@Test
+	void prepared_query_async() {
+		executeSql("delete from test");
+		executeSql("""
+				insert into test values
+				(1, 11, 'aaa'),
+				(2, 22, null),
+				(3, 33, 'ccc')""");
+
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		{
+			var sql = "select * from test where foo=:foo";
+			var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4));
+			try (var ps = client.prepare(context, sql, placeholders)) {
+				try (var transaction = startOcc(client)) {
+					var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "foo", 2));
+					try (var qrJob = client.preparedQueryAsync(context, transaction, ps, parameters); //
+							var qr = qrJob.take(context)) {
+						assertTrue(qr.nextRow(context));
+						assertTrue(qr.nextColumn(context));
+						assertEquals(2, qr.fetchInt4(context));
+						assertTrue(qr.nextColumn(context));
+						assertEquals(22L, qr.fetchInt8(context));
+						assertTrue(qr.nextColumn(context));
+						assertTrue(qr.isNull(context));
+
+						assertFalse(qr.nextColumn(context));
+						assertFalse(qr.nextRow(context));
+					}
+
+					try (var commitOption = TgFfiCommitOption.create(context)) {
+						client.commit(context, transaction, commitOption);
+					}
+					transaction.close(context);
+				}
+
+				ps.close(context);
+			}
+		}
+		{
+			var sql = "select * from test order by foo";
+			var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4));
+			try (var ps = client.prepare(context, sql, placeholders)) {
+				try (var transaction = startOcc(client)) {
+					var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "foo", 2));
+					try (var qrJob = client.preparedQueryAsync(context, transaction, ps, parameters); //
+							var qr = qrJob.take(context)) {
+						var actual = select(qr);
+						var expected = List.of( //
+								new Row().add("foo", 1).add("bar", 11L).add("zzz", "aaa"), //
+								new Row().add("foo", 2).add("bar", 22L).add("zzz", null), //
+								new Row().add("foo", 3).add("bar", 33L).add("zzz", "ccc"));
+						assertIterableEquals(expected, actual);
+					}
+
+					try (var commitOption = TgFfiCommitOption.create(context)) {
+						client.commit(context, transaction, commitOption);
+					}
+					transaction.close(context);
+				}
+
+				ps.close(context);
+			}
+		}
+	}
+
+	@Test
+	void prepared_query_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var sql = "select * from test where foo=:foo";
+		var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(manager, "foo", TgFfiAtomType.INT4));
+		var parameters = List.of(TgFfiSqlParameter.ofInt4(manager, "foo", 9));
+
+		try (var context = TgFfiContext.create(manager); //
+				var preparedStatement = client.prepare(context, sql, placeholders); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption)) {
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var tx = transaction.handle();
+				var ps = preparedStatement.handle();
+				var arg = manager.allocateArray(parameters);
+				int size = parameters.size();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query_async(ctx, handle, tx, ps, arg,
+						size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var tx = MemorySegment.NULL;
+				var ps = preparedStatement.handle();
+				var arg = manager.allocateArray(parameters);
+				int size = parameters.size();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query_async(ctx, handle, tx, ps, arg,
+						size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var tx = transaction.handle();
+				var ps = MemorySegment.NULL;
+				var arg = manager.allocateArray(parameters);
+				int size = parameters.size();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query_async(ctx, handle, tx, ps, arg,
+						size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var tx = transaction.handle();
+				var ps = preparedStatement.handle();
+				var arg = MemorySegment.NULL;
+				int size = parameters.size();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query_async(ctx, handle, tx, ps, arg,
+						size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var tx = transaction.handle();
+				var ps = preparedStatement.handle();
+				int size = 1;
+				var arg = manager.arena().allocate(ValueLayout.ADDRESS, size);
+				arg.setAtIndex(ValueLayout.ADDRESS, 0, MemorySegment.NULL);
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query_async(ctx, handle, tx, ps, arg,
+						size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var tx = transaction.handle();
+				var ps = preparedStatement.handle();
+				var arg = manager.allocateArray(parameters);
+				int size = parameters.size();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query_async(ctx, handle, tx, ps, arg,
+						size, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG6_ERROR(), rc);
+			}
+		}
+	}
+
+	@Test
 	void commit() {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();

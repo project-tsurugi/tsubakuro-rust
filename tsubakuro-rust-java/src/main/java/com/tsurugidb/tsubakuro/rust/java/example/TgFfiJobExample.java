@@ -233,7 +233,8 @@ public class TgFfiJobExample {
 		try (var ps = client.prepare(context, sql, placeholders)) {
 			try (var transaction = startOcc(client, context)) {
 				var parameters = List.<TgFfiSqlParameter>of();
-				try (var qr = client.preparedQuery(context, transaction, ps, parameters)) {
+				try (var qrJob = client.preparedQueryAsync(context, transaction, ps, parameters); //
+						var qr = qrJob.take(context)) {
 					printQueryResult(context, qr);
 				}
 
