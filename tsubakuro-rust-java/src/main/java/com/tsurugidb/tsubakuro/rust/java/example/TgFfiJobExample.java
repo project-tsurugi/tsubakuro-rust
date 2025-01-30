@@ -106,7 +106,9 @@ public class TgFfiJobExample {
 			client.execute(context, transaction, sql);
 
 			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
+				try (var commitJob = client.commitAsync(context, transaction, commitOption)) {
+					commitJob.take(context);
+				}
 			}
 			transaction.close(context);
 		}
@@ -127,7 +129,9 @@ public class TgFfiJobExample {
 			}
 
 			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
+				try (var commitJob = client.commitAsync(context, transaction, commitOption)) {
+					commitJob.take(context);
+				}
 			}
 			transaction.close(context);
 		}
@@ -145,7 +149,9 @@ public class TgFfiJobExample {
 			}
 
 			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
+				try (var commitJob = client.commitAsync(context, transaction, commitOption)) {
+					commitJob.take(context);
+				}
 			}
 			transaction.close(context);
 		}
@@ -214,7 +220,9 @@ public class TgFfiJobExample {
 				}
 
 				try (var commitOption = TgFfiCommitOption.create(context)) {
-					client.commit(context, transaction, commitOption);
+					try (var commitJob = client.commitAsync(context, transaction, commitOption)) {
+						commitJob.take(context);
+					}
 				}
 				transaction.close(context);
 			}
@@ -239,7 +247,9 @@ public class TgFfiJobExample {
 				}
 
 				try (var commitOption = TgFfiCommitOption.create(context)) {
-					client.commit(context, transaction, commitOption);
+					try (var commitJob = client.commitAsync(context, transaction, commitOption)) {
+						commitJob.take(context);
+					}
 				}
 				transaction.close(context);
 			}

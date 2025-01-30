@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +13,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -1531,6 +1534,78 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			var arg = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit(ctx, handle, tx, arg);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void commit_async(String pattern) {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+
+		try (var transaction = startOcc(client); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			try (var commitJob = client.commitAsync(context, transaction, commitOption)) {
+				Void value = jobTake(commitJob, pattern);
+				assertNull(value);
+			}
+		}
+	}
+
+	@Test
+	void commit_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var tx = transaction.handle();
+			var arg = commitOption.handle();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit_async(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = MemorySegment.NULL;
+			var arg = commitOption.handle();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit_async(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit_async(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var transactionOption = TgFfiTransactionOption.create(context); //
+				var transaction = client.startTransaction(context, transactionOption); //
+				var commitOption = TgFfiCommitOption.create(context)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var tx = transaction.handle();
+			var arg = commitOption.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit_async(ctx, handle, tx, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
 		}
 	}
 

@@ -130,8 +130,11 @@ impl_job_delegator! {
 }
 
 impl ConnectJobDelegator {
-    fn convert(value: Arc<Session>, runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiSession {
-        TsurugiFfiSession::new(value, runtime)
+    fn convert(
+        value: Arc<Session>,
+        runtime: Arc<tokio::runtime::Runtime>,
+    ) -> Option<TsurugiFfiSession> {
+        Some(TsurugiFfiSession::new(value, runtime))
     }
 }
 

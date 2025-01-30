@@ -19,9 +19,9 @@ use crate::{
 use super::cancel_job::TsurugiFfiCancelJobHandle;
 
 pub(crate) struct TsurugiFfiJob<T> {
-    runtime: Arc<tokio::runtime::Runtime>,
     job: Option<Job<T>>,
     delegater: Box<dyn TsurugiFfiJobDelegator>,
+    runtime: Arc<tokio::runtime::Runtime>,
     name: *mut c_char,
 }
 
@@ -32,9 +32,9 @@ impl<T> TsurugiFfiJob<T> {
         runtime: Arc<tokio::runtime::Runtime>,
     ) -> TsurugiFfiJob<T> {
         TsurugiFfiJob {
-            runtime,
             job: Some(job),
             delegater,
+            runtime,
             name: std::ptr::null_mut(),
         }
     }
@@ -85,7 +85,7 @@ pub(crate) trait TsurugiFfiJobDelegator {
 #[macro_export]
 macro_rules! impl_job_delegator {
     ( $struct_name:ident, $src:ty, $ffi:ty, $value_name:expr $(,)?) => {
-        struct $struct_name;
+        pub(crate) struct $struct_name;
 
         impl $crate::job::TsurugiFfiJobDelegator for $struct_name {
             fn value_name(&self) -> &str {
@@ -127,6 +127,19 @@ macro_rules! impl_job_delegator {
             }
         }
     };
+}
+
+impl_job_delegator! {
+VoidJobDelegator,
+(),
+c_void,
+"void",
+}
+
+impl VoidJobDelegator {
+    fn convert(_value: (), _runtime: Arc<tokio::runtime::Runtime>) -> Option<c_void> {
+        None
+    }
 }
 
 pub type TsurugiFfiJobHandle = *mut c_void; // *mut TsurugiFfiJob<T>
@@ -270,7 +283,7 @@ impl<T> TsurugiFfiJob<T> {
     pub(crate) fn take<FFI>(
         &mut self,
         context: TsurugiFfiContextHandle,
-        converter: fn(T, Arc<tokio::runtime::Runtime>) -> FFI,
+        converter: fn(T, Arc<tokio::runtime::Runtime>) -> Option<FFI>,
         value_out: *mut *mut FFI,
     ) -> TsurugiFfiRc {
         const FUNCTION_NAME: &str = "tsurugi_ffi_job_take()";
@@ -279,9 +292,11 @@ impl<T> TsurugiFfiJob<T> {
         let raw_job = get_raw_job!(context, FUNCTION_NAME, self.raw_job());
         let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take());
         let value = converter(value, runtime);
-        let value = Box::new(value);
 
-        let handle = Box::into_raw(value);
+        let handle = match value {
+            Some(value) => Box::into_raw(Box::new(value)),
+            None => std::ptr::null_mut(),
+        };
         unsafe {
             *value_out = handle;
         }
@@ -317,7 +332,7 @@ impl<T> TsurugiFfiJob<T> {
         self: &mut Self,
         context: TsurugiFfiContextHandle,
         timeout: TsurugiFfiDuration,
-        converter: fn(T, Arc<tokio::runtime::Runtime>) -> FFI,
+        converter: fn(T, Arc<tokio::runtime::Runtime>) -> Option<FFI>,
         value_out: *mut *mut FFI,
     ) -> TsurugiFfiRc {
         const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_for()";
@@ -329,9 +344,11 @@ impl<T> TsurugiFfiJob<T> {
         let value =
             ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take_for(timeout));
         let value = converter(value, runtime);
-        let value = Box::new(value);
 
-        let handle = Box::into_raw(value);
+        let handle = match value {
+            Some(value) => Box::into_raw(Box::new(value)),
+            None => std::ptr::null_mut(),
+        };
         unsafe {
             *value_out = handle;
         }
@@ -365,7 +382,7 @@ impl<T> TsurugiFfiJob<T> {
     pub(crate) fn take_if_ready<FFI>(
         self: &mut Self,
         context: TsurugiFfiContextHandle,
-        converter: fn(T, Arc<tokio::runtime::Runtime>) -> FFI,
+        converter: fn(T, Arc<tokio::runtime::Runtime>) -> Option<FFI>,
         value_out: *mut *mut FFI,
     ) -> TsurugiFfiRc {
         const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_if_ready()";
@@ -383,9 +400,11 @@ impl<T> TsurugiFfiJob<T> {
                 return rc_ok(context);
             }
         };
-        let value = Box::new(value);
 
-        let handle = Box::into_raw(value);
+        let handle = match value {
+            Some(value) => Box::into_raw(Box::new(value)),
+            None => std::ptr::null_mut(),
+        };
         unsafe {
             *value_out = handle;
         }

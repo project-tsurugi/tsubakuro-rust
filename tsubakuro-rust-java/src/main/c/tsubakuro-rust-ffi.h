@@ -567,6 +567,12 @@ TsurugiFfiRc tsurugi_ffi_sql_client_commit(TsurugiFfiContextHandle context,
                                            TsurugiFfiTransactionHandle transaction,
                                            TsurugiFfiCommitOptionHandle commit_option);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_commit_async(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSqlClientHandle sql_client,
+                                                 TsurugiFfiTransactionHandle transaction,
+                                                 TsurugiFfiCommitOptionHandle commit_option,
+                                                 TsurugiFfiJobHandle *commit_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_rollback(TsurugiFfiContextHandle context,
                                              TsurugiFfiSqlClientHandle sql_client,
                                              TsurugiFfiTransactionHandle transaction);

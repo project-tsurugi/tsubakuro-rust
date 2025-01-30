@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
+import com.tsurugidb.tsubakuro.rust.java.job.TgFfiVoidJob;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
@@ -341,6 +342,20 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var arg = commitOption.handle();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit(ctx, handle, tx, arg);
 		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized TgFfiVoidJob commitAsync(TgFfiContext context, TgFfiTransaction transaction,
+			TgFfiCommitOption commitOption) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var tx = transaction.handle();
+		var arg = commitOption.handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit_async(ctx, handle, tx, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiVoidJob(manager(), outHandle);
 	}
 
 	public synchronized void rollback(TgFfiContext context, TgFfiTransaction transaction) {

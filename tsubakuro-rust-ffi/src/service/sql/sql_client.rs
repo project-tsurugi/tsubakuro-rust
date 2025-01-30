@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
-    job::{TsurugiFfiJob, TsurugiFfiJobHandle},
+    job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
         execute_result::TsurugiFfiSqlExecuteResult,
@@ -138,8 +138,11 @@ impl_job_delegator! {
 }
 
 impl TableListJobDelegator {
-    fn convert(value: TableList, _runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiTableList {
-        TsurugiFfiTableList::new(value)
+    fn convert(
+        value: TableList,
+        _runtime: Arc<tokio::runtime::Runtime>,
+    ) -> Option<TsurugiFfiTableList> {
+        Some(TsurugiFfiTableList::new(value))
     }
 }
 
@@ -232,8 +235,8 @@ impl TableMetadataJobDelegator {
     fn convert(
         value: TableMetadata,
         _runtime: Arc<tokio::runtime::Runtime>,
-    ) -> TsurugiFfiTableMetadata {
-        TsurugiFfiTableMetadata::new(value)
+    ) -> Option<TsurugiFfiTableMetadata> {
+        Some(TsurugiFfiTableMetadata::new(value))
     }
 }
 
@@ -365,8 +368,8 @@ impl SqlPreparedStatementJobDelegator {
     fn convert(
         value: SqlPreparedStatement,
         runtime: Arc<tokio::runtime::Runtime>,
-    ) -> TsurugiFfiSqlPreparedStatement {
-        TsurugiFfiSqlPreparedStatement::new(value, runtime)
+    ) -> Option<TsurugiFfiSqlPreparedStatement> {
+        Some(TsurugiFfiSqlPreparedStatement::new(value, runtime))
     }
 }
 
@@ -456,8 +459,11 @@ impl_job_delegator! {
 }
 
 impl TransactionJobDelegator {
-    fn convert(value: Transaction, runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiTransaction {
-        TsurugiFfiTransaction::new(value, runtime)
+    fn convert(
+        value: Transaction,
+        runtime: Arc<tokio::runtime::Runtime>,
+    ) -> Option<TsurugiFfiTransaction> {
+        Some(TsurugiFfiTransaction::new(value, runtime))
     }
 }
 
@@ -560,8 +566,8 @@ impl SqlExecuteResultJobDelegator {
     fn convert(
         value: SqlExecuteResult,
         _runtime: Arc<tokio::runtime::Runtime>,
-    ) -> TsurugiFfiSqlExecuteResult {
-        TsurugiFfiSqlExecuteResult::new(value)
+    ) -> Option<TsurugiFfiSqlExecuteResult> {
+        Some(TsurugiFfiSqlExecuteResult::new(value))
     }
 }
 
@@ -783,8 +789,8 @@ impl SqlQueryResultJobDelegator {
     fn convert(
         value: SqlQueryResult,
         runtime: Arc<tokio::runtime::Runtime>,
-    ) -> TsurugiFfiSqlQueryResult {
-        TsurugiFfiSqlQueryResult::new(value, runtime)
+    ) -> Option<TsurugiFfiSqlQueryResult> {
+        Some(TsurugiFfiSqlQueryResult::new(value, runtime))
     }
 }
 
@@ -915,6 +921,48 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit(
     );
 
     trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    commit_option: TsurugiFfiCommitOptionHandle,
+    commit_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_commit_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, commit_job_out);
+    unsafe {
+        *commit_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, commit_option);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let commit_option = unsafe { &*commit_option };
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.commit_async(transaction, commit_option)
+    );
+    let job = TsurugiFfiJob::new(job, Box::new(VoidJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *commit_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. commit_job={:?}", handle);
     rc_ok(context)
 }
 
