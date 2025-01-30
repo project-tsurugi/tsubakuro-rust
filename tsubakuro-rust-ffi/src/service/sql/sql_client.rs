@@ -237,6 +237,24 @@ impl TableMetadataJobDelegator {
     }
 }
 
+macro_rules! convert_placeholders {
+    ($context:expr, $function_name:expr, $arg_index:expr, $placeholders:expr, $placeholder_size:expr) => {
+        if $placeholder_size > 0 {
+            let src =
+                unsafe { std::slice::from_raw_parts($placeholders, $placeholder_size as usize) };
+            let mut dst = Vec::with_capacity(src.len());
+            for &placeholder in src {
+                ffi_arg_require_non_null!($context, $function_name, $arg_index, placeholder);
+                let placeholder = unsafe { &*placeholder }.raw_clone();
+                dst.push(placeholder);
+            }
+            dst
+        } else {
+            vec![]
+        }
+    };
+}
+
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     context: TsurugiFfiContextHandle,
@@ -261,19 +279,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
 
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
-
-    let placeholders: Vec<SqlPlaceholder> = if placeholder_size > 0 {
-        let src = unsafe { std::slice::from_raw_parts(placeholders, placeholder_size as usize) };
-        let mut dst = Vec::with_capacity(src.len());
-        for &placeholder in src {
-            ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholder);
-            let placeholder = unsafe { &*placeholder }.raw_clone();
-            dst.push(placeholder);
-        }
-        dst
-    } else {
-        vec![]
-    };
+    let placeholders: Vec<SqlPlaceholder> =
+        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholder_size);
 
     let runtime = client.runtime();
     let prepared_statement = ffi_exec_core_async!(
@@ -321,19 +328,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
 
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
-
-    let placeholders: Vec<SqlPlaceholder> = if placeholder_size > 0 {
-        let src = unsafe { std::slice::from_raw_parts(placeholders, placeholder_size as usize) };
-        let mut dst = Vec::with_capacity(src.len());
-        for &placeholder in src {
-            ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholder);
-            let placeholder = unsafe { &*placeholder }.raw_clone();
-            dst.push(placeholder);
-        }
-        dst
-    } else {
-        vec![]
-    };
+    let placeholders: Vec<SqlPlaceholder> =
+        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholder_size);
 
     let runtime = client.runtime();
     let job = ffi_exec_core_async!(
@@ -569,6 +565,23 @@ impl SqlExecuteResultJobDelegator {
     }
 }
 
+macro_rules! convert_parameters {
+    ($context:expr, $function_name:expr, $arg_index:expr, $parameters:expr, $parameter_size:expr) => {
+        if $parameter_size > 0 {
+            let src = unsafe { std::slice::from_raw_parts($parameters, $parameter_size as usize) };
+            let mut dst = Vec::with_capacity(src.len());
+            for &parameter in src {
+                ffi_arg_require_non_null!($context, $function_name, $arg_index, parameter);
+                let parameter = unsafe { &*parameter }.raw_clone();
+                dst.push(parameter);
+            }
+            dst
+        } else {
+            vec![]
+        }
+    };
+}
+
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     context: TsurugiFfiContextHandle,
@@ -596,19 +609,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
-
-    let parameters: Vec<SqlParameter> = if parameter_size > 0 {
-        let src = unsafe { std::slice::from_raw_parts(parameters, parameter_size as usize) };
-        let mut dst = Vec::with_capacity(src.len());
-        for &parameter in src {
-            ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter);
-            let parameter = unsafe { &*parameter }.raw_clone();
-            dst.push(parameter);
-        }
-        dst
-    } else {
-        vec![]
-    };
+    let parameters: Vec<SqlParameter> =
+        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
 
     let runtime = client.runtime();
     let execute_result = ffi_exec_core_async!(
@@ -626,6 +628,59 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     }
 
     trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    execute_result_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_job_out);
+    unsafe {
+        *execute_result_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
+    }
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let prepared_statement = unsafe { &*prepared_statement };
+    let parameters: Vec<SqlParameter> =
+        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_execute_async(transaction, prepared_statement, parameters)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(SqlExecuteResultJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *execute_result_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. execute_result_job={:?}", handle);
     rc_ok(context)
 }
 
@@ -698,19 +753,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
-
-    let parameters: Vec<SqlParameter> = if parameter_size > 0 {
-        let src = unsafe { std::slice::from_raw_parts(parameters, parameter_size as usize) };
-        let mut dst = Vec::with_capacity(src.len());
-        for &parameter in src {
-            ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter);
-            let parameter = unsafe { &*parameter }.raw_clone();
-            dst.push(parameter);
-        }
-        dst
-    } else {
-        vec![]
-    };
+    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
 
     let runtime = client.runtime();
     let query_result = ffi_exec_core_async!(

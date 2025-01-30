@@ -188,7 +188,8 @@ public class TgFfiJobExample {
 				TgFfiSqlPlaceholder.ofAtomType(context, "bar", TgFfiAtomType.INT8), //
 				TgFfiSqlPlaceholder.ofAtomType(context, "zzz", TgFfiAtomType.CHARACTER) //
 		);
-		try (var ps = client.prepare(context, sql, placeholders)) {
+		try (var psJob = client.prepareAsync(context, sql, placeholders); //
+				var ps = psJob.take(context)) {
 			try (var transaction = startOcc(client, context)) {
 				{
 					var parameters = List.of( //
@@ -196,7 +197,8 @@ public class TgFfiJobExample {
 							TgFfiSqlParameter.ofInt8(context, "bar", 44), //
 							TgFfiSqlParameter.ofCharacter(context, "zzz", "ddd") //
 					);
-					try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
+					try (var erJob = client.preparedExecuteAsync(context, transaction, ps, parameters); //
+							var er = erJob.take(context)) {
 					}
 				}
 				{
@@ -205,7 +207,8 @@ public class TgFfiJobExample {
 							TgFfiSqlParameter.ofNull(context, "bar"), //
 							TgFfiSqlParameter.ofCharacter(context, "zzz", "eee") //
 					);
-					try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
+					try (var erJob = client.preparedExecuteAsync(context, transaction, ps, parameters); //
+							var er = erJob.take(context)) {
 					}
 				}
 

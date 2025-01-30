@@ -526,6 +526,14 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle con
                                                      uint32_t parameter_size,
                                                      TsurugiFfiSqlExecuteResultHandle *execute_result_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlClientHandle sql_client,
+                                                           TsurugiFfiTransactionHandle transaction,
+                                                           TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                           const TsurugiFfiSqlParameterHandle *parameters,
+                                                           uint32_t parameter_size,
+                                                           TsurugiFfiJobHandle *execute_result_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
                                           TsurugiFfiSqlClientHandle sql_client,
                                           TsurugiFfiTransactionHandle transaction,
