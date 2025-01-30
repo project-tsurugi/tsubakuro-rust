@@ -727,6 +727,68 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_query_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    sql: *const c_char,
+    query_result_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, query_result_job_out);
+    unsafe {
+        *query_result_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, sql);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.query_async(transaction, sql)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(SqlQueryResultJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *query_result_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. query_result_job={:?}", handle);
+    rc_ok(context)
+}
+
+impl_job_delegator! {
+SqlQueryResultJobDelegator,
+SqlQueryResult,
+TsurugiFfiSqlQueryResult,
+"quert_result",
+}
+
+impl SqlQueryResultJobDelegator {
+    fn convert(
+        value: SqlQueryResult,
+        runtime: Arc<tokio::runtime::Runtime>,
+    ) -> TsurugiFfiSqlQueryResult {
+        TsurugiFfiSqlQueryResult::new(value, runtime)
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,

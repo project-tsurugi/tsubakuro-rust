@@ -139,7 +139,8 @@ public class TgFfiJobExample {
 		System.out.println("SqlClient.query() start");
 
 		try (var transaction = startOcc(client, context)) {
-			try (var qr = client.query(context, transaction, "select * from test order by foo")) {
+			try (var qrJob = client.queryAsync(context, transaction, "select * from test order by foo"); //
+					var qr = qrJob.take(context)) {
 				printQueryResult(context, qr);
 			}
 
