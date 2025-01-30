@@ -55,6 +55,9 @@ impl TcpLink {
             .await
             .map_err(|e| io_error!("TcpLink connect error", e))?;
         trace!("TcpLink connect end");
+        stream
+            .set_nodelay(true)
+            .map_err(|e| io_error!("TcpLink.connect(): set_nodelay error", e))?;
 
         let (reader, writer) = tokio::io::split(stream);
         Ok(TcpLink {
