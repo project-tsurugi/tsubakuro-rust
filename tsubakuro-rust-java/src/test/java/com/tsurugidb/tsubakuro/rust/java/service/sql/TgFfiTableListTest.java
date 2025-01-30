@@ -6,6 +6,8 @@ import java.lang.foreign.MemorySegment;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -15,21 +17,22 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
 class TgFfiTableListTest extends TgFfiTester {
 
-	@Test
-	void get_table_names() {
+	@ParameterizedTest
+	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	void get_table_names(String pattern) {
 		var manager = getFfiObjectManager();
 		var context = TgFfiContext.create(manager);
 
 		dropIfExists("test");
 
-		try (var tableList = getTableList()) {
+		try (var tableList = getTableList(pattern)) {
 			List<String> tableNames = tableList.getTableNames(context);
 			assertFalse(tableNames.contains("test"));
 		}
 
 		executeSql("create table test (pk int primary key)");
 
-		try (var tableList = getTableList()) {
+		try (var tableList = getTableList(pattern)) {
 			List<String> tableNames = tableList.getTableNames(context);
 			assertTrue(tableNames.contains("test"));
 		}
@@ -47,7 +50,7 @@ class TgFfiTableListTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var tableList = getTableList()) {
+				var tableList = getTableList(DIRECT)) {
 			var ctx = context.handle();
 			var handle = tableList.handle();
 			var out = MemorySegment.NULL;
@@ -69,7 +72,7 @@ class TgFfiTableListTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var tableList = getTableList()) {
+				var tableList = getTableList(DIRECT)) {
 			var ctx = context.handle();
 			var handle = tableList.handle();
 			int index = -1;
@@ -78,7 +81,7 @@ class TgFfiTableListTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var tableList = getTableList()) {
+				var tableList = getTableList(DIRECT)) {
 			var ctx = context.handle();
 			var handle = tableList.handle();
 			int index = 0;
@@ -88,7 +91,7 @@ class TgFfiTableListTest extends TgFfiTester {
 		}
 	}
 
-	private TgFfiTableList getTableList() {
+	private TgFfiTableList getTableList(String pattern) {
 		var manager = getFfiObjectManager();
 
 		var context = TgFfiContext.create(manager);
@@ -98,7 +101,13 @@ class TgFfiTableListTest extends TgFfiTester {
 
 		try (var session = TgFfiSession.connect(context, connectionOption); //
 				var client = session.makeSqlClient(context)) {
-			return client.listTables(context);
+			if (pattern.equals(DIRECT)) {
+				return client.listTables(context);
+			} else {
+				try (var job = client.listTablesAsync(context)) {
+					return jobTake(job, pattern);
+				}
+			}
 		}
 	}
 }

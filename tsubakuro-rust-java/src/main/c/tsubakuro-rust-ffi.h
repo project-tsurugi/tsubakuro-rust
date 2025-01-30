@@ -463,6 +463,10 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
                                                 TsurugiFfiTableListHandle *table_list_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_async(TsurugiFfiContextHandle context,
+                                                      TsurugiFfiSqlClientHandle sql_client,
+                                                      TsurugiFfiJobHandle *table_list_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlClientHandle sql_client,
                                                        const char *table_name,

@@ -1,13 +1,17 @@
 package com.tsurugidb.tsubakuro.rust.java.util;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
+import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResult;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
@@ -193,4 +197,32 @@ public class TgFfiTester {
 
 		return rows;
 	}
+
+	public static final String DIRECT = "DIRECT";
+	public static final String TAKE = "TAKE";
+	public static final String TAKE_FOR = "TAKE_FOR";
+	public static final String TAKE_IF_READY = "TAKE_IF_READY";
+
+	protected <T> T jobTake(TgFfiJob<T> job, String pattern) {
+		try (var context = TgFfiContext.create(getFfiObjectManager())) {
+			switch (pattern) {
+			case TAKE:
+				return job.take(context);
+			case TAKE_FOR:
+				return job.take(context); // TODO takeFor()
+			case TAKE_IF_READY:
+				for (int i = 0; i < 10; i++) {
+					job.wait(context, TimeUnit.SECONDS.toNanos(5));
+					var value = job.takeIfReady(context);
+					if (value != null) {
+						return value;
+					}
+				}
+				fail("Job.take_if_ready() was not ready");
+			default:
+				throw new AssertionError("unsupported pattern=" + pattern);
+			}
+		}
+	}
+
 }

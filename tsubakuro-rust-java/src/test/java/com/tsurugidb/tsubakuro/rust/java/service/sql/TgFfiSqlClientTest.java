@@ -17,8 +17,6 @@ import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
-import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
-import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionType;
@@ -37,16 +35,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				)""");
 	}
 
-	@Test
-	void list_tables() {
-		var manager = getFfiObjectManager();
-		var client = createSqlClient();
-
-		var context = TgFfiContext.create(manager);
-
-		try (var tableList = client.listTables(context)) {
-		}
-	}
+	// list_tables() → TgFfiTableListTest
 
 	@Test
 	void list_tables_argError() {
@@ -65,6 +54,29 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			var handle = client.handle();
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_list_tables(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	// list_tables_async() → TgFfiTableListTest
+
+	@Test
+	void list_tables_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_list_tables_async(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_list_tables_async(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}

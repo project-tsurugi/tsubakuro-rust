@@ -6,6 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async,
+    job::{TsurugiFfiJob, TsurugiFfiJobHandle, TsurugiFfiJobValueType},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
         execute_result::TsurugiFfiSqlExecuteResult,
@@ -95,6 +96,42 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     }
 
     trace!("{FUNCTION_NAME} end. table_list={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    table_list_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_list_job_out);
+    unsafe {
+        *table_list_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+
+    let client = unsafe { &*sql_client };
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.list_tables_async());
+    let job = TsurugiFfiJob::new(
+        TsurugiFfiJobValueType::TableList,
+        job,
+        Box::new(move |table_list, _runtime| TsurugiFfiTableList::new(table_list)),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *table_list_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. table_list_job={:?}", handle);
     rc_ok(context)
 }
 

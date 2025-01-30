@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
+import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
@@ -31,6 +32,22 @@ public class TgFfiSqlClient extends TgFfiObject {
 
 		var outHandle = outToHandle(out);
 		return new TgFfiTableList(manager(), outHandle);
+	}
+
+	public synchronized TgFfiJob<TgFfiTableList> listTablesAsync(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_list_tables_async(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiJob<>(manager(), outHandle) {
+			@Override
+			protected TgFfiTableList valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+				return new TgFfiTableList(manager, valueHandle);
+			}
+		};
 	}
 
 	public synchronized TgFfiTableMetadata getTableMetadata(TgFfiContext context, String tableName) {

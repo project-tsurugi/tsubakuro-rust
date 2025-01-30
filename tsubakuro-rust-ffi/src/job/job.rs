@@ -13,6 +13,7 @@ use crate::{
     ffi_arg_require_non_null, ffi_exec_core_async,
     job::cancel_job::TsurugiFfiCancelJob,
     return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
+    service::sql::table_list::{TsurugiFfiTableList, TsurugiFfiTableListHandle},
     session::session::{TsurugiFfiSession, TsurugiFfiSessionHandle},
     TsurugiFfiDuration,
 };
@@ -21,13 +22,17 @@ use super::cancel_job::TsurugiFfiCancelJobHandle;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum TsurugiFfiJobValueType {
+    // Session
     Session,
+    // SqlClient
+    TableList,
 }
 
 impl TsurugiFfiJobValueType {
     fn name(&self) -> &str {
         match self {
             TsurugiFfiJobValueType::Session => "session",
+            TsurugiFfiJobValueType::TableList => "table_list",
         }
     }
 }
@@ -215,6 +220,11 @@ pub extern "C" fn tsurugi_ffi_job_take(
             job as *mut TsurugiFfiJob<Arc<Session>, TsurugiFfiSession>,
             value_out as *mut TsurugiFfiSessionHandle,
         ),
+        TsurugiFfiJobValueType::TableList => job_take(
+            context,
+            job as *mut TsurugiFfiJob<TableList, TsurugiFfiTableList>,
+            value_out as *mut TsurugiFfiTableListHandle,
+        ),
     }
 }
 
@@ -262,6 +272,11 @@ pub extern "C" fn tsurugi_ffi_job_take_if_ready(
             context,
             job as *mut TsurugiFfiJob<Arc<Session>, TsurugiFfiSession>,
             value_out as *mut TsurugiFfiSessionHandle,
+        ),
+        TsurugiFfiJobValueType::TableList => job_take_if_ready(
+            context,
+            job as *mut TsurugiFfiJob<TableList, TsurugiFfiTableList>,
+            value_out as *mut TsurugiFfiTableListHandle,
         ),
     }
 }

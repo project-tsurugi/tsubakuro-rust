@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.lang.foreign.MemorySegment;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -47,8 +49,9 @@ class TgFfiSessionTest extends TgFfiTester {
 		}
 	}
 
-	@Test
-	void connect_async() {
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void connect_async(String pattern) {
 		var manager = getFfiObjectManager();
 
 		var context = TgFfiContext.create(manager);
@@ -57,7 +60,7 @@ class TgFfiSessionTest extends TgFfiTester {
 		connectionOption.setEndpointUrl(context, getEndpoint());
 
 		try (var sessionJob = TgFfiSession.connectAsync(context, connectionOption); //
-				var session = sessionJob.take(context)) {
+				var session = jobTake(sessionJob, pattern)) {
 		}
 	}
 
