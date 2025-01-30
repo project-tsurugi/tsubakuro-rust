@@ -62,6 +62,23 @@ public class TgFfiSqlClient extends TgFfiObject {
 		return new TgFfiTableMetadata(manager(), outHandle);
 	}
 
+	public synchronized TgFfiJob<TgFfiTableMetadata> getTableMetadataAsync(TgFfiContext context, String tableName) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateString(tableName);
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_table_metadata_async(ctx, handle, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiJob<>(manager(), outHandle) {
+			@Override
+			protected TgFfiTableMetadata valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+				return new TgFfiTableMetadata(manager, valueHandle);
+			}
+		};
+	}
+
 	public synchronized TgFfiSqlPreparedStatement prepare(TgFfiContext context, String sql,
 			List<TgFfiSqlPlaceholder> placeholders) {
 		Objects.requireNonNull(sql, "sql must not be null");

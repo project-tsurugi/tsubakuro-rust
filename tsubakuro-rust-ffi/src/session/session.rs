@@ -110,7 +110,7 @@ pub extern "C" fn tsurugi_ffi_session_connect_async(
         Session::connect_async(connection_option)
     );
     let runtime = Arc::new(runtime);
-    let job = TsurugiFfiJob::new(job, Box::new(ConnectJobDelegator {}), runtime.clone());
+    let job = TsurugiFfiJob::new(job, Box::new(ConnectJobDelegator {}), runtime);
     let job = Box::new(job);
 
     let handle = Box::into_raw(job);

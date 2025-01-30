@@ -183,6 +183,61 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    table_name: *const c_char,
+    table_metadata_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_metadata_job_out);
+    unsafe {
+        *table_metadata_job_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name);
+
+    let client = unsafe { &*sql_client };
+    let table_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, table_name);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_table_metadata_async(table_name)
+    );
+    let job = TsurugiFfiJob::new(job, Box::new(TableMetadataJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *table_metadata_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. table_metadata_job={:?}", handle);
+    rc_ok(context)
+}
+
+impl_job_delegator! {
+    TableMetadataJobDelegator,
+    TableMetadata,
+    TsurugiFfiTableMetadata,
+    "table_metadata",
+}
+
+impl TableMetadataJobDelegator {
+    fn convert(
+        value: TableMetadata,
+        _runtime: Arc<tokio::runtime::Runtime>,
+    ) -> TsurugiFfiTableMetadata {
+        TsurugiFfiTableMetadata::new(value)
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,

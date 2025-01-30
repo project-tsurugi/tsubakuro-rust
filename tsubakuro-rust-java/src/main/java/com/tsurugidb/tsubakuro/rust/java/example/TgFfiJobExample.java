@@ -72,7 +72,8 @@ public class TgFfiJobExample {
 	}
 
 	static void getTableMetadata(TgFfiSqlClient client, TgFfiContext context) {
-		try (var tableMetadata = client.getTableMetadata(context, "test")) {
+		try (var tableMetadataJob = client.getTableMetadataAsync(context, "test"); //
+				var tableMetadata = tableMetadataJob.take(context)) {
 			System.out.println("SqlClient.getTableMetadata().tableName=" + tableMetadata.getTableName(context));
 			var columns = tableMetadata.getColumns(context);
 			for (var column : columns) {

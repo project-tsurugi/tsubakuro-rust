@@ -6,6 +6,8 @@ import java.lang.foreign.MemorySegment;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -25,11 +27,12 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 				)""");
 	}
 
-	@Test
-	void metadata() {
+	@ParameterizedTest
+	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	void metadata(String pattern) {
 		var manager = getFfiObjectManager();
 
-		try (var metadata = getTableMetadata("test"); //
+		try (var metadata = getTableMetadata(pattern, "test"); //
 				var context = TgFfiContext.create(manager)) {
 			var tableName = metadata.getTableName(context);
 			assertEquals("test", tableName);
@@ -68,7 +71,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata("test")) {
+				var tableMetadata = getTableMetadata(DIRECT, "test")) {
 			var ctx = context.handle();
 			var handle = tableMetadata.handle();
 			var out = MemorySegment.NULL;
@@ -90,7 +93,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata("test")) {
+				var tableMetadata = getTableMetadata(DIRECT, "test")) {
 			var ctx = context.handle();
 			var handle = tableMetadata.handle();
 			int index = -1;
@@ -99,7 +102,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata("test")) {
+				var tableMetadata = getTableMetadata(DIRECT, "test")) {
 			var ctx = context.handle();
 			var handle = tableMetadata.handle();
 			int index = 0;
@@ -109,7 +112,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 		}
 	}
 
-	private TgFfiTableMetadata getTableMetadata(String tableName) {
+	private TgFfiTableMetadata getTableMetadata(String pattern, String tableName) {
 		var manager = getFfiObjectManager();
 
 		var context = TgFfiContext.create(manager);
@@ -119,7 +122,13 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 
 		try (var session = TgFfiSession.connect(context, connectionOption); //
 				var client = session.makeSqlClient(context)) {
-			return client.getTableMetadata(context, tableName);
+			if (pattern.equals(DIRECT)) {
+				return client.getTableMetadata(context, tableName);
+			} else {
+				try (var job = client.getTableMetadataAsync(context, tableName)) {
+					return jobTake(job, pattern);
+				}
+			}
 		}
 	}
 }

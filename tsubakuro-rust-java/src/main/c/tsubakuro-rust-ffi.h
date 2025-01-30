@@ -477,6 +477,11 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle c
                                                        const char *table_name,
                                                        TsurugiFfiTableMetadataHandle *table_metadata_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context,
+                                                             TsurugiFfiSqlClientHandle sql_client,
+                                                             const char *table_name,
+                                                             TsurugiFfiJobHandle *table_metadata_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
                                             const char *sql,

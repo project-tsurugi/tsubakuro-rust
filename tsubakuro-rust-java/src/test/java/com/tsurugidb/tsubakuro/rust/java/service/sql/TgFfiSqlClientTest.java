@@ -141,6 +141,68 @@ class TgFfiSqlClientTest extends TgFfiTester {
 	}
 
 	@Test
+	void get_table_metadata_async_found() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		var context = TgFfiContext.create(manager);
+		try (var tableMetadataJob = client.getTableMetadataAsync(context, "test"); //
+				var tableMetadata = tableMetadataJob.take(context)) {
+		}
+	}
+
+	@Test
+	void get_table_metadata_async_notFound() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		dropIfExists("test2");
+
+		var context = TgFfiContext.create(manager);
+		try (var tableMetadataJob = client.getTableMetadataAsync(context, "test2")) {
+			var e = assertThrows(TgFfiRuntimeException.class, () -> {
+				try (var tableMetadata = tableMetadataJob.take(context)) {
+				}
+			});
+
+			assertEquals("SERVER_ERROR", e.getReturnCodeName());
+			String message = e.getMessage();
+			assertTrue(message.contains("TARGET_NOT_FOUND_EXCEPTION")); // TODO e.getServerErrorName()
+		}
+	}
+
+	@Test
+	void get_table_metadata_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = manager.allocateString("test");
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_table_metadata_async(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var arg = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_table_metadata_async(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var arg = manager.allocateString("test");
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_table_metadata_async(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
+
+	@Test
 	void prepare() {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
