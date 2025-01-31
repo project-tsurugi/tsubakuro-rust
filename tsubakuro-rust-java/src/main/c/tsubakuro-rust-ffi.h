@@ -15,9 +15,7 @@
 
 #define TSURUGI_FFI_RC_FFI_JOB_ERROR (TSURUGI_FFI_RC_FFI_BASE | (1 << 24))
 
-#define TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED (TSURUGI_FFI_RC_FFI_JOB_ERROR | 1)
-
-#define TSURUGI_FFI_RC_FFI_ERROR (TSURUGI_FFI_RC_FFI_BASE | (1 << 24))
+#define TSURUGI_FFI_RC_FFI_ERROR (TSURUGI_FFI_RC_FFI_BASE | (2 << 24))
 
 #define TSURUGI_FFI_RC_CORE_CLIENT_ERROR (TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR << 30)
 
@@ -256,7 +254,11 @@ typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
 
 #define TSURUGI_FFI_RC_FFI_ARG6_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 6)
 
+#define TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED (TSURUGI_FFI_RC_FFI_JOB_ERROR | 1)
+
 #define TSURUGI_FFI_RC_FFI_NUL_ERROR (TSURUGI_FFI_RC_FFI_ERROR | 1)
+
+#define TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND (TSURUGI_FFI_RC_FFI_ERROR | 2)
 
 #define TSURUGI_FFI_RC_CORE_CLIENT_CLIENT_ERROR (TSURUGI_FFI_RC_CORE_CLIENT_ERROR | (1 << 16))
 
@@ -269,11 +271,25 @@ TsurugiFfiRc tsurugi_ffi_context_create(TsurugiFfiContextHandle *context_out);
 TsurugiFfiRc tsurugi_ffi_context_get_return_code(TsurugiFfiContextHandle context,
                                                  TsurugiFfiRc *rc_out);
 
+TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, char **name_out);
+
 TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context,
                                                 TsurugiFfiRcType *error_type_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context,
                                                    char **error_message_out);
+
+TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_number(TsurugiFfiContextHandle context,
+                                                                  int32_t *category_number_out);
+
+TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context,
+                                                               char **category_str_out);
+
+TsurugiFfiRc tsurugi_ffi_context_get_server_error_code_number(TsurugiFfiContextHandle context,
+                                                              int32_t *code_number_out);
+
+TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context,
+                                                                  char **structured_code_out);
 
 void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
 

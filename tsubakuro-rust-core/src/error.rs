@@ -56,6 +56,15 @@ impl TgError {
             TgError::ServerError(message, _code, _server_message) => message,
         }
     }
+
+    pub fn diagnostic_code(&self) -> Option<&DiagnosticCode> {
+        match self {
+            TgError::ClientError(_, _) => None,
+            TgError::TimeoutError(_) => None,
+            TgError::IoError(_, _) => None,
+            TgError::ServerError(_, code, _) => Some(code),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

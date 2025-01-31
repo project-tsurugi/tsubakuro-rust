@@ -47,10 +47,11 @@ pub const TSURUGI_FFI_RC_FFI_ARG5_ERROR: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ARG_E
 #[allow(dead_code)]
 pub const TSURUGI_FFI_RC_FFI_ARG6_ERROR: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ARG_ERROR | 6;
 pub const TSURUGI_FFI_RC_FFI_JOB_ERROR: u32 = TSURUGI_FFI_RC_FFI_BASE | (1 << 24);
-pub const TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED: u32 = TSURUGI_FFI_RC_FFI_JOB_ERROR | 1;
+pub const TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_JOB_ERROR | 1;
 
-pub const TSURUGI_FFI_RC_FFI_ERROR: u32 = TSURUGI_FFI_RC_FFI_BASE | (1 << 24);
+pub const TSURUGI_FFI_RC_FFI_ERROR: u32 = TSURUGI_FFI_RC_FFI_BASE | (2 << 24);
 pub const TSURUGI_FFI_RC_FFI_NUL_ERROR: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ERROR | 1;
+pub const TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ERROR | 2;
 
 pub const TSURUGI_FFI_RC_CORE_CLIENT_ERROR: u32 = TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR << 30;
 pub const TSURUGI_FFI_RC_CORE_CLIENT_CLIENT_ERROR: TsurugiFfiRc =
@@ -103,5 +104,27 @@ pub(crate) fn get_rc_from_core_error(error: &TgError) -> TsurugiFfiRc {
                 | ((code.category_number() as TsurugiFfiRc) << 20)
                 | (code.code_number() as TsurugiFfiRc)
         }
+    }
+}
+
+pub(crate) fn rc_to_name(rc: TsurugiFfiRc) -> &'static str {
+    let rc_type = TsurugiFfiRcType::from(rc);
+    match rc_type {
+        TsurugiFfiRcType::Ok => "OK",
+        TsurugiFfiRcType::FfiError => match rc {
+            TSURUGI_FFI_RC_FFI_ARG0_ERROR => "FFI_ARG0_ERROR",
+            TSURUGI_FFI_RC_FFI_ARG1_ERROR => "FFI_ARG1_ERROR",
+            TSURUGI_FFI_RC_FFI_ARG2_ERROR => "FFI_ARG2_ERROR",
+            TSURUGI_FFI_RC_FFI_ARG3_ERROR => "FFI_ARG3_ERROR",
+            TSURUGI_FFI_RC_FFI_ARG4_ERROR => "FFI_ARG4_ERROR",
+            TSURUGI_FFI_RC_FFI_ARG5_ERROR => "FFI_ARG5_ERROR",
+            TSURUGI_FFI_RC_FFI_ARG6_ERROR => "FFI_ARG6_ERROR",
+            TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED => "FFI_JOB_ALREADY_CLOSED",
+            TSURUGI_FFI_RC_FFI_NUL_ERROR => "FFI_NUL_ERROR",
+            TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND => "FFI_DIAGNOSTIC_CODE_NOT_FOUND",
+            _ => "FFI_ERROR",
+        },
+        TsurugiFfiRcType::CoreClientError => "CORE_CLIENT_ERROR",
+        TsurugiFfiRcType::CoreServerError => "CORE_SERVER_ERROR",
     }
 }

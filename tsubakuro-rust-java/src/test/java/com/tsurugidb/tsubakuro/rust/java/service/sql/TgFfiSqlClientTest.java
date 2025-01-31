@@ -108,8 +108,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		});
 
 		assertEquals("SERVER_ERROR", e.getReturnCodeName());
-		String message = e.getMessage();
-		assertTrue(message.contains("TARGET_NOT_FOUND_EXCEPTION")); // TODO e.getServerErrorName()
+		assertEquals("TARGET_NOT_FOUND_EXCEPTION", e.getErrorName());
 	}
 
 	@Test
@@ -169,8 +168,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			});
 
 			assertEquals("SERVER_ERROR", e.getReturnCodeName());
-			String message = e.getMessage();
-			assertTrue(message.contains("TARGET_NOT_FOUND_EXCEPTION")); // TODO e.getServerErrorName()
+			assertEquals("TARGET_NOT_FOUND_EXCEPTION", e.getErrorName());
 		}
 	}
 
