@@ -33,8 +33,6 @@ const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 /// The minor service message version for FrameworkRequest.Header.
 const SERVICE_MESSAGE_VERSION_MINOR: u64 = 0;
 
-const POLLING_INTERVAL: Duration = Duration::from_millis(20);
-
 pub(crate) struct Wire {
     wire: DelegateWire,
 }
@@ -176,8 +174,6 @@ impl Wire {
             }
 
             timeout.return_err_if_timeout("Wire.pull()")?;
-
-            tokio::time::sleep(POLLING_INTERVAL).await;
         }
     }
 
@@ -200,7 +196,6 @@ impl Wire {
             if timeout.is_timeout() {
                 return Ok(false);
             }
-            tokio::time::sleep(POLLING_INTERVAL).await;
         }
     }
 
