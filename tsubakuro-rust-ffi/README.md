@@ -8,6 +8,17 @@ Depends on [tsubakuro-rust-core](../tsubakuro-rust-core).
 
 ```bash
 cd tsubakuro-rust-ffi
-cargo build
+cargo build --release
+ls target/release/
 ```
 
+## How to generate C header file
+
+```bash
+cd tsubakuro-rust-ffi
+cbindgen --lang C --output tsubakuro-rust-ffi.h
+```
+
+- [cbindgen](https://github.com/mozilla/cbindgen)
+
+There is an example in [tsubakuro-rust-java](../tsubakuro-rust-java).
