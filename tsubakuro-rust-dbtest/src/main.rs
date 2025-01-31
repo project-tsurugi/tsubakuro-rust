@@ -19,6 +19,7 @@ async fn main() -> Result<(), TgError> {
 
     let endpoint = args.get(1).unwrap();
 
+    // env_logger::builder().format_timestamp_millis().init();
     sub_execute(endpoint).await?;
     job_execute(endpoint).await?;
 
