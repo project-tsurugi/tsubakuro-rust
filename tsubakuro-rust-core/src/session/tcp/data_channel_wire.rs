@@ -7,7 +7,7 @@ use async_trait::async_trait;
 
 use crate::{
     error::TgError,
-    invalid_response_error,
+    invalid_response_error, return_err_if_timeout,
     session::wire::{
         data_channel::{DataChannel, DataChannelWire},
         response::WireResponse,
@@ -47,7 +47,7 @@ impl DataChannelWire for TcpDataChannelWire {
         const FUNCTION_NAME: &str = "TcpDataChannelWire.pull1()";
 
         loop {
-            timeout.return_err_if_timeout(FUNCTION_NAME)?;
+            return_err_if_timeout!(timeout, FUNCTION_NAME);
 
             self.tcp_wire.pull1().await?;
 

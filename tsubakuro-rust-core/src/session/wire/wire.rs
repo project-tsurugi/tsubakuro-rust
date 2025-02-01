@@ -10,7 +10,7 @@ use crate::{
     core_service_wire_response_error,
     error::TgError,
     job::Job,
-    prost_decode_wire_response_error,
+    prost_decode_wire_response_error, return_err_if_timeout,
     session::tcp::wire::TcpWire,
     tateyama::proto::{
         diagnostics::Record as DiagnosticsRecord,
@@ -162,20 +162,25 @@ impl Wire {
         slot_handle: &Arc<SlotEntryHandle>,
         timeout: &Timeout,
     ) -> Result<WireResponse, TgError> {
+        const FUNCTION_NAME: &str = "Wire::pull()";
+        let slot = slot_handle.slot();
+        trace!("{FUNCTION_NAME} slot={slot} start");
+
         if let Some(response) = slot_handle.take_wire_response() {
+            trace!("{FUNCTION_NAME} slot={slot} end. response={:?}", response);
             return Ok(response);
         }
 
-        trace!("Wire::pull() start");
+        let function_name = format!("{FUNCTION_NAME} slot={slot}");
         loop {
             self.wire.pull1().await?;
 
             if let Some(response) = slot_handle.take_wire_response() {
-                trace!("Wire::pull() end. response={:?}", response);
+                trace!("{function_name} end. response={:?}", response);
                 return Ok(response);
             }
 
-            timeout.return_err_if_timeout("Wire.pull()")?;
+            return_err_if_timeout!(timeout, &function_name);
 
             tokio::time::sleep(POLLING_INTERVAL).await;
         }
@@ -186,7 +191,12 @@ impl Wire {
         slot_handle: Arc<SlotEntryHandle>,
         timeout: &Timeout,
     ) -> Result<bool, TgError> {
+        const FUNCTION_NAME: &str = "Wire::wait()";
+        let slot = slot_handle.slot();
+        trace!("{FUNCTION_NAME} slot={slot} start");
+
         if slot_handle.exists_wire_response() {
+            trace!("{FUNCTION_NAME} slot={slot} end. response exists");
             return Ok(true);
         }
 
@@ -194,10 +204,12 @@ impl Wire {
             self.wire.pull1().await?;
 
             if slot_handle.exists_wire_response() {
+                trace!("{FUNCTION_NAME} slot={slot} end. response exists");
                 return Ok(true);
             }
 
             if timeout.is_timeout() {
+                trace!("{FUNCTION_NAME} slot={slot} end. timeout");
                 return Ok(false);
             }
             tokio::time::sleep(POLLING_INTERVAL).await;
@@ -208,16 +220,27 @@ impl Wire {
         &self,
         slot_handle: Arc<SlotEntryHandle>,
     ) -> Result<bool, TgError> {
+        const FUNCTION_NAME: &str = "Wire::check()";
+        let slot = slot_handle.slot();
+        trace!("{FUNCTION_NAME} slot={slot} start");
+
         if slot_handle.exists_wire_response() {
+            trace!("{FUNCTION_NAME} slot={slot} end. response exists");
             return Ok(true);
         }
 
         // 一度だけ受信状態を確認する
         if !self.wire.pull1().await? {
+            trace!("{FUNCTION_NAME} slot={slot} end. response not exists");
             return Ok(false);
         }
 
         let exists = slot_handle.exists_wire_response();
+        if exists {
+            trace!("{FUNCTION_NAME} slot={slot} end. response exists");
+        } else {
+            trace!("{FUNCTION_NAME} slot={slot} end. response not exists");
+        }
         Ok(exists)
     }
 

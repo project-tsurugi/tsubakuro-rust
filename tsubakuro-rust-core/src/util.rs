@@ -1,10 +1,7 @@
 use std::time::Duration;
 
-use log::trace;
 use prost::alloc::string::String as ProstString;
 use tokio::time::Instant;
-
-use crate::{error::TgError, timeout_error};
 
 pub(crate) fn string_to_prost_string(s: Option<&String>) -> ProstString {
     if let Some(s) = s {
@@ -37,15 +34,16 @@ impl Timeout {
         let elapsed = self.start.elapsed();
         elapsed > timeout
     }
+}
 
-    pub(crate) fn return_err_if_timeout(&self, function_name: &str) -> Result<(), TgError> {
-        if self.is_timeout() {
-            trace!("{function_name}: timeout");
-            Err(timeout_error!(function_name))
-        } else {
-            Ok(())
+#[macro_export]
+macro_rules! return_err_if_timeout {
+    ($timeout:expr, $function_name:expr) => {
+        if $timeout.is_timeout() {
+            ::log::trace!("{}: timeout", $function_name);
+            return Err($crate::timeout_error!($function_name))
         }
-    }
+    };
 }
 
 #[cfg(test)]

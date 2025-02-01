@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use prost::bytes::{Buf, BytesMut};
 use tokio::sync::{Mutex, MutexGuard};
 
-use crate::{error::TgError, util::Timeout};
+use crate::{error::TgError, return_err_if_timeout, util::Timeout};
 
 #[async_trait]
 pub(crate) trait DataChannelWire: std::fmt::Debug + Send + Sync {
@@ -139,7 +139,7 @@ impl DataChannel {
                 return Ok(None);
             }
 
-            timeout.return_err_if_timeout("DataChannel.pull()")?;
+            return_err_if_timeout!(timeout, "DataChannel::pull()");
 
             self.dc_wire.pull1(&self, timeout).await?;
         }
