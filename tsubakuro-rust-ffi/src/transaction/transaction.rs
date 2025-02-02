@@ -1,4 +1,4 @@
-use std::{ffi::c_char, sync::Arc};
+use std::{ffi::c_char, sync::Arc, time::Duration};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -7,7 +7,7 @@ use crate::{
     cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
     ffi_arg_require_non_null, ffi_exec_core_async,
-    return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
+    return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK}, TsurugiFfiDuration,
 };
 
 pub(crate) struct TsurugiFfiTransaction {
@@ -95,6 +95,27 @@ pub extern "C" fn tsurugi_ffi_transaction_close(
 
     let runtime = transaction.runtime();
     ffi_exec_core_async!(context, FUNCTION_NAME, runtime, transaction.close());
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_close_for(
+    context: TsurugiFfiContextHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_close_for()";
+    trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
+
+    let transaction = unsafe { &mut *transaction };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = transaction.runtime();
+    ffi_exec_core_async!(context, FUNCTION_NAME, runtime, transaction.close_for(timeout));
 
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)

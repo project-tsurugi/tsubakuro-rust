@@ -650,7 +650,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
 
 		try (var transaction = client.startTransaction(context, transactionOption)) {
-			transaction.close(context);
+			commitAndClose(client, transaction, DIRECT);
 		}
 	}
 
@@ -697,9 +697,9 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		var transactionOption = TgFfiTransactionOption.create(context);
 		transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
 
-		var timout = Duration.ofSeconds(5);
-		try (var transaction = client.startTransactionFor(context, transactionOption, timout)) {
-			transaction.close(context);
+		var timeout = Duration.ofSeconds(5);
+		try (var transaction = client.startTransactionFor(context, transactionOption, timeout)) {
+			commitAndClose(client, transaction, DIRECT_FOR);
 		}
 	}
 
@@ -739,8 +739,9 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		}
 	}
 
-	@Test
-	void start_transaction_async() {
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void start_transaction_async(String pattern) {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
 
@@ -750,8 +751,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
 
 		try (var transactionJob = client.startTransactionAsync(context, transactionOption); //
-				var transaction = transactionJob.take(context)) {
-			transaction.close(context);
+				var transaction = jobTake(transactionJob, pattern)) {
+			commitAndClose(client, transaction, pattern);
 		}
 	}
 
@@ -801,20 +802,14 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				assertEquals(1, er.getRows(context));
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, DIRECT);
 		}
 		try (var transaction = startOcc(client)) {
 			var sql = "delete from test";
 			try (var er = client.execute(context, transaction, sql)) {
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, DIRECT);
 		}
 	}
 
@@ -878,26 +873,20 @@ class TgFfiSqlClientTest extends TgFfiTester {
 
 		try (var transaction = startOcc(client)) {
 			var sql = "insert or replace into test values(1, 1, 'a')";
-			var timout = Duration.ofSeconds(5);
-			try (var er = client.executeFor(context, transaction, sql, timout)) {
+			var timeout = Duration.ofSeconds(5);
+			try (var er = client.executeFor(context, transaction, sql, timeout)) {
 				assertEquals(1, er.getRows(context));
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, DIRECT_FOR);
 		}
 		try (var transaction = startOcc(client)) {
 			var sql = "delete from test";
-			var timout = Duration.ofSeconds(5);
-			try (var er = client.executeFor(context, transaction, sql, timout)) {
+			var timeout = Duration.ofSeconds(5);
+			try (var er = client.executeFor(context, transaction, sql, timeout)) {
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, DIRECT_FOR);
 		}
 	}
 
@@ -956,8 +945,9 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		}
 	}
 
-	@Test
-	void execute_async() {
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void execute_async(String pattern) {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
 
@@ -966,25 +956,19 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		try (var transaction = startOcc(client)) {
 			var sql = "insert or replace into test values(1, 1, 'a')";
 			try (var erJob = client.executeAsync(context, transaction, sql); //
-					var er = erJob.take(context)) {
+					var er = jobTake(erJob, pattern)) {
 				assertEquals(1, er.getRows(context));
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, pattern);
 		}
 		try (var transaction = startOcc(client)) {
 			var sql = "delete from test";
 			try (var erJob = client.executeAsync(context, transaction, sql); //
-					var er = erJob.take(context)) {
+					var er = jobTake(erJob, pattern)) {
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, pattern);
 		}
 	}
 
@@ -1064,10 +1048,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 						assertEquals(1, er.getRows(context));
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT);
 				}
 
 				ps.close(context);
@@ -1082,10 +1063,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 					try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT);
 				}
 
 				ps.close(context);
@@ -1203,15 +1181,12 @@ class TgFfiSqlClientTest extends TgFfiTester {
 							TgFfiSqlParameter.ofInt8(context, "bar", 44), //
 							TgFfiSqlParameter.ofCharacter(context, "zzz", "ddd") //
 					);
-					var timout = Duration.ofSeconds(5);
-					try (var er = client.preparedExecuteFor(context, transaction, ps, parameters, timout)) {
+					var timeout = Duration.ofSeconds(5);
+					try (var er = client.preparedExecuteFor(context, transaction, ps, parameters, timeout)) {
 						assertEquals(1, er.getRows(context));
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT_FOR);
 				}
 
 				ps.close(context);
@@ -1223,14 +1198,11 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			try (var ps = client.prepare(context, sql, placeholders)) {
 				try (var transaction = startOcc(client)) {
 					var parameters = List.<TgFfiSqlParameter>of();
-					var timout = Duration.ofSeconds(5);
-					try (var er = client.preparedExecuteFor(context, transaction, ps, parameters, timout)) {
+					var timeout = Duration.ofSeconds(5);
+					try (var er = client.preparedExecuteFor(context, transaction, ps, parameters, timeout)) {
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT_FOR);
 				}
 
 				ps.close(context);
@@ -1333,8 +1305,9 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		}
 	}
 
-	@Test
-	void prepared_execute_async() {
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void prepared_execute_async(String pattern) {
 		var manager = getFfiObjectManager();
 		var client = createSqlClient();
 
@@ -1355,14 +1328,11 @@ class TgFfiSqlClientTest extends TgFfiTester {
 							TgFfiSqlParameter.ofCharacter(context, "zzz", "ddd") //
 					);
 					try (var erJob = client.preparedExecuteAsync(context, transaction, ps, parameters); //
-							var er = erJob.take(context)) {
+							var er = jobTake(erJob, pattern)) {
 						assertEquals(1, er.getRows(context));
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, pattern);
 				}
 
 				ps.close(context);
@@ -1375,13 +1345,10 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				try (var transaction = startOcc(client)) {
 					var parameters = List.<TgFfiSqlParameter>of();
 					try (var erJob = client.preparedExecuteAsync(context, transaction, ps, parameters); //
-							var er = erJob.take(context)) {
+							var er = jobTake(erJob, pattern)) {
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, pattern);
 				}
 
 				ps.close(context);
@@ -1503,10 +1470,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				assertIterableEquals(expected, actual);
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, DIRECT);
 		}
 	}
 
@@ -1577,8 +1541,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 
 		try (var transaction = startOcc(client)) {
 			var sql = "select * from test order by foo";
-			var timout = Duration.ofSeconds(5);
-			try (var qr = client.queryFor(context, transaction, sql, timout)) {
+			var timeout = Duration.ofSeconds(5);
+			try (var qr = client.queryFor(context, transaction, sql, timeout)) {
 				var actual = select(qr);
 				var expected = List.of( //
 						new Row().add("foo", 1).add("bar", 11L).add("zzz", "aaa"), //
@@ -1587,10 +1551,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				assertIterableEquals(expected, actual);
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, DIRECT_FOR);
 		}
 	}
 
@@ -1649,8 +1610,9 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		}
 	}
 
-	@Test
-	void query_async() {
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void query_async(String pattern) {
 		executeSql("delete from test");
 		executeSql("""
 				insert into test values
@@ -1666,7 +1628,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		try (var transaction = startOcc(client)) {
 			var sql = "select * from test order by foo";
 			try (var qrJob = client.queryAsync(context, transaction, sql); //
-					var qr = qrJob.take(context)) {
+					var qr = jobTake(qrJob, pattern)) {
 				var actual = select(qr);
 				var expected = List.of( //
 						new Row().add("foo", 1).add("bar", 11L).add("zzz", "aaa"), //
@@ -1675,10 +1637,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				assertIterableEquals(expected, actual);
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
-			transaction.close(context);
+			commitAndClose(client, transaction, pattern);
 		}
 	}
 
@@ -1766,10 +1725,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 						assertFalse(qr.nextRow(context));
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT);
 				}
 
 				ps.close(context);
@@ -1790,10 +1746,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 						assertIterableEquals(expected, actual);
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT);
 				}
 
 				ps.close(context);
@@ -1910,8 +1863,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			try (var ps = client.prepare(context, sql, placeholders)) {
 				try (var transaction = startOcc(client)) {
 					var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "foo", 2));
-					var timout = Duration.ofSeconds(5);
-					try (var qr = client.preparedQueryFor(context, transaction, ps, parameters, timout)) {
+					var timeout = Duration.ofSeconds(5);
+					try (var qr = client.preparedQueryFor(context, transaction, ps, parameters, timeout)) {
 						assertTrue(qr.nextRow(context));
 						assertTrue(qr.nextColumn(context));
 						assertEquals(2, qr.fetchInt4(context));
@@ -1924,10 +1877,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 						assertFalse(qr.nextRow(context));
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT_FOR);
 				}
 
 				ps.close(context);
@@ -1939,8 +1889,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			try (var ps = client.prepare(context, sql, placeholders)) {
 				try (var transaction = startOcc(client)) {
 					var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "foo", 2));
-					var timout = Duration.ofSeconds(5);
-					try (var qr = client.preparedQueryFor(context, transaction, ps, parameters, timout)) {
+					var timeout = Duration.ofSeconds(5);
+					try (var qr = client.preparedQueryFor(context, transaction, ps, parameters, timeout)) {
 						var actual = select(qr);
 						var expected = List.of( //
 								new Row().add("foo", 1).add("bar", 11L).add("zzz", "aaa"), //
@@ -1949,10 +1899,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 						assertIterableEquals(expected, actual);
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, DIRECT_FOR);
 				}
 
 				ps.close(context);
@@ -2055,8 +2002,9 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		}
 	}
 
-	@Test
-	void prepared_query_async() {
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void prepared_query_async(String pattern) {
 		executeSql("delete from test");
 		executeSql("""
 				insert into test values
@@ -2076,7 +2024,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				try (var transaction = startOcc(client)) {
 					var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "foo", 2));
 					try (var qrJob = client.preparedQueryAsync(context, transaction, ps, parameters); //
-							var qr = qrJob.take(context)) {
+							var qr = jobTake(qrJob, pattern)) {
 						assertTrue(qr.nextRow(context));
 						assertTrue(qr.nextColumn(context));
 						assertEquals(2, qr.fetchInt4(context));
@@ -2089,10 +2037,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 						assertFalse(qr.nextRow(context));
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, pattern);
 				}
 
 				ps.close(context);
@@ -2105,7 +2050,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				try (var transaction = startOcc(client)) {
 					var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "foo", 2));
 					try (var qrJob = client.preparedQueryAsync(context, transaction, ps, parameters); //
-							var qr = qrJob.take(context)) {
+							var qr = jobTake(qrJob, pattern)) {
 						var actual = select(qr);
 						var expected = List.of( //
 								new Row().add("foo", 1).add("bar", 11L).add("zzz", "aaa"), //
@@ -2114,10 +2059,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 						assertIterableEquals(expected, actual);
 					}
 
-					try (var commitOption = TgFfiCommitOption.create(context)) {
-						client.commit(context, transaction, commitOption);
-					}
-					transaction.close(context);
+					commitAndClose(client, transaction, pattern);
 				}
 
 				ps.close(context);
@@ -2224,6 +2166,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		try (var transaction = startOcc(client); //
 				var commitOption = TgFfiCommitOption.create(context)) {
 			client.commit(context, transaction, commitOption);
+
+			transaction.close(context);
 		}
 	}
 
@@ -2276,8 +2220,10 @@ class TgFfiSqlClientTest extends TgFfiTester {
 
 		try (var transaction = startOcc(client); //
 				var commitOption = TgFfiCommitOption.create(context)) {
-			var timout = Duration.ofSeconds(5);
-			client.commitFor(context, transaction, commitOption, timout);
+			var timeout = Duration.ofSeconds(5);
+			client.commitFor(context, transaction, commitOption, timeout);
+
+			transaction.closeFor(context, timeout);
 		}
 	}
 
@@ -2405,6 +2351,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 
 		try (var transaction = startOcc(client)) {
 			client.rollback(context, transaction);
+
+			transaction.close(context);
 		}
 	}
 
@@ -2441,8 +2389,10 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		var context = TgFfiContext.create(manager);
 
 		try (var transaction = startOcc(client)) {
-			var timout = Duration.ofSeconds(5);
-			client.rollbackFor(context, transaction, timout);
+			var timeout = Duration.ofSeconds(5);
+			client.rollbackFor(context, transaction, timeout);
+
+			transaction.closeFor(context, timeout);
 		}
 	}
 

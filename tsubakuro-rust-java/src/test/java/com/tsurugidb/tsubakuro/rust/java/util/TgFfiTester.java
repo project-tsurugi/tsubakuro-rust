@@ -229,4 +229,46 @@ public class TgFfiTester {
 			}
 		}
 	}
+
+	protected void commitAndClose(TgFfiSqlClient client, TgFfiTransaction transaction, String pattern) {
+		var manager = getFfiObjectManager();
+
+		RuntimeException re = null;
+		try (var context = TgFfiContext.create(manager)) {
+			try (var commitOption = TgFfiCommitOption.create(context)) {
+				switch (pattern) {
+				case DIRECT:
+					client.commit(context, transaction, commitOption);
+					break;
+				case DIRECT_FOR:
+					client.commitFor(context, transaction, commitOption, Duration.ofSeconds(5));
+					break;
+				default:
+					jobTake(client.commitAsync(context, transaction, commitOption), pattern);
+					break;
+				}
+			} catch (RuntimeException e) {
+				re = e;
+				throw e;
+			} finally {
+				try {
+					switch (pattern) {
+					case DIRECT:
+					default:
+						transaction.close(context);
+						break;
+					case DIRECT_FOR:
+						transaction.closeFor(context, Duration.ofSeconds(5));
+						break;
+					}
+				} catch (RuntimeException e) {
+					if (re != null) {
+						re.addSuppressed(e);
+					} else {
+						throw e;
+					}
+				}
+			}
+		}
+	}
 }

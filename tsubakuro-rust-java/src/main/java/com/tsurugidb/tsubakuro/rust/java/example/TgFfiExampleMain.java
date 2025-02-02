@@ -130,7 +130,7 @@ public class TgFfiExampleMain {
 			}
 
 			doCommit(transaction);
-			transaction.close(context);
+			doClose(transaction);
 		}
 	}
 
@@ -164,6 +164,18 @@ public class TgFfiExampleMain {
 			return;
 		default:
 			take(client.commitAsync(context, transaction, commitOption));
+			return;
+		}
+	}
+
+	private void doClose(TgFfiTransaction transaction) {
+		switch (executeType) {
+		case DIRECT:
+		default:
+			transaction.close(context);
+			return;
+		case DIRECT_FOR:
+			transaction.closeFor(context, timeout);
 			return;
 		}
 	}
@@ -223,7 +235,7 @@ public class TgFfiExampleMain {
 			insert(transaction, "insert into test values(3, 33, null)");
 
 			doCommit(transaction);
-			transaction.close(context);
+			doClose(transaction);
 		}
 
 		System.out.println("SqlClient.execute() end");
@@ -255,7 +267,7 @@ public class TgFfiExampleMain {
 			}
 
 			doCommit(transaction);
-			transaction.close(context);
+			doClose(transaction);
 		}
 
 		System.out.println("SqlClient.query() end");
@@ -314,7 +326,7 @@ public class TgFfiExampleMain {
 				insertPrepared(transaction, ps, 5, null, "eee");
 
 				doCommit(transaction);
-				transaction.close(context);
+				doClose(transaction);
 			}
 
 			ps.close(context);
@@ -373,7 +385,7 @@ public class TgFfiExampleMain {
 				}
 
 				doCommit(transaction);
-				transaction.close(context);
+				doClose(transaction);
 			}
 
 			ps.close(context);

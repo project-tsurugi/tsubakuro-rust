@@ -795,4 +795,8 @@ TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle 
 TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
                                            TsurugiFfiTransactionHandle transaction);
 
+TsurugiFfiRc tsurugi_ffi_transaction_close_for(TsurugiFfiContextHandle context,
+                                               TsurugiFfiTransactionHandle transaction,
+                                               TsurugiFfiDuration timeout);
+
 void tsurugi_ffi_transaction_dispose(TsurugiFfiTransactionHandle transaction);

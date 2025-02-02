@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.transaction;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -28,6 +29,14 @@ public class TgFfiTransaction extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_close(ctx, handle);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized void closeFor(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_close_for(ctx, handle, t);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
 
