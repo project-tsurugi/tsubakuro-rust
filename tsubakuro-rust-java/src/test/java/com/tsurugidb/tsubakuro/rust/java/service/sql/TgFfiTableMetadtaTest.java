@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	@ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
 	void metadata(String pattern) {
 		var manager = getFfiObjectManager();
 
@@ -122,9 +123,12 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 
 		try (var session = TgFfiSession.connect(context, connectionOption); //
 				var client = session.makeSqlClient(context)) {
-			if (pattern.equals(DIRECT)) {
+			switch (pattern) {
+			case DIRECT:
 				return client.getTableMetadata(context, tableName);
-			} else {
+			case DIRECT_FOR:
+				return client.getTableMetadataFor(context, tableName, Duration.ofSeconds(5));
+			default:
 				try (var job = client.getTableMetadataAsync(context, tableName)) {
 					return jobTake(job, pattern);
 				}

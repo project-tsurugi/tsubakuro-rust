@@ -1,4 +1,4 @@
-use std::{ffi::c_char, sync::Arc, vec};
+use std::{ffi::c_char, sync::Arc, time::Duration, vec};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -18,6 +18,7 @@ use crate::{
         commit_option::TsurugiFfiCommitOptionHandle, option::TsurugiFfiTransactionOptionHandle,
         TsurugiFfiTransaction, TsurugiFfiTransactionHandle,
     },
+    TsurugiFfiDuration,
 };
 
 use super::{
@@ -87,6 +88,44 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
 
     let runtime = client.runtime();
     let table_list = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.list_tables());
+
+    let table_list = Box::new(TsurugiFfiTableList::new(table_list));
+
+    let handle = Box::into_raw(table_list);
+    unsafe {
+        *table_list_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. table_list={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    timeout: TsurugiFfiDuration,
+    table_list_out: *mut TsurugiFfiTableListHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_list_out);
+    unsafe {
+        *table_list_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+
+    let client = unsafe { &*sql_client };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let table_list = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.list_tables_for(timeout)
+    );
 
     let table_list = Box::new(TsurugiFfiTableList::new(table_list));
 
@@ -172,6 +211,47 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
         FUNCTION_NAME,
         runtime,
         client.get_table_metadata(table_name)
+    );
+
+    let table_metadata = Box::new(TsurugiFfiTableMetadata::new(table_metadata));
+
+    let handle = Box::into_raw(table_metadata);
+    unsafe {
+        *table_metadata_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. table_metadata={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    table_name: *const c_char,
+    timeout: TsurugiFfiDuration,
+    table_metadata_out: *mut TsurugiFfiTableMetadataHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, table_metadata_out);
+    unsafe {
+        *table_metadata_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name);
+
+    let client = unsafe { &*sql_client };
+    let table_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, table_name);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let table_metadata = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_table_metadata_for(table_name, timeout)
     );
 
     let table_metadata = Box::new(TsurugiFfiTableMetadata::new(table_metadata));
@@ -308,6 +388,57 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    sql: *const c_char,
+    placeholders: *const TsurugiFfiSqlPlaceholderHandle,
+    placeholder_size: u32,
+    timeout: TsurugiFfiDuration,
+    prepared_statement_out: *mut TsurugiFfiSqlPreparedStatementHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, prepared_statement_out);
+    unsafe {
+        *prepared_statement_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
+    if placeholder_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
+    }
+
+    let client = unsafe { &*sql_client };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
+    let placeholders: Vec<SqlPlaceholder> =
+        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholder_size);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let prepared_statement = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepare_for(sql, placeholders, timeout)
+    );
+
+    let prepared_statement = Box::new(TsurugiFfiSqlPreparedStatement::new(
+        prepared_statement,
+        runtime.clone(),
+    ));
+
+    let handle = Box::into_raw(prepared_statement);
+    unsafe {
+        *prepared_statement_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. prepared_statement={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
@@ -413,6 +544,47 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    timeout: TsurugiFfiDuration,
+    transaction_out: *mut TsurugiFfiTransactionHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, transaction_out);
+    unsafe {
+        *transaction_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_option);
+
+    let client = unsafe { &*sql_client };
+    let transaction_option = unsafe { &*transaction_option };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let transaction = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.start_transaction_for(transaction_option, timeout)
+    );
+
+    let transaction = Box::new(TsurugiFfiTransaction::new(transaction, runtime.clone()));
+
+    let handle = Box::into_raw(transaction);
+    unsafe {
+        *transaction_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. transaction={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
@@ -496,6 +668,50 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
         FUNCTION_NAME,
         runtime,
         client.execute(transaction, sql)
+    );
+
+    let execute_result = Box::new(TsurugiFfiSqlExecuteResult::new(execute_result));
+
+    let handle = Box::into_raw(execute_result);
+    unsafe {
+        *execute_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    sql: *const c_char,
+    timeout: TsurugiFfiDuration,
+    execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, execute_result_out);
+    unsafe {
+        *execute_result_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, sql);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let execute_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.execute_for(transaction, sql, timeout)
     );
 
     let execute_result = Box::new(TsurugiFfiSqlExecuteResult::new(execute_result));
@@ -638,6 +854,57 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    timeout: TsurugiFfiDuration,
+    execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, execute_result_out);
+    unsafe {
+        *execute_result_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
+    }
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let prepared_statement = unsafe { &*prepared_statement };
+    let parameters: Vec<SqlParameter> =
+        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let execute_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_execute_for(transaction, prepared_statement, parameters, timeout)
+    );
+
+    let execute_result = Box::new(TsurugiFfiSqlExecuteResult::new(execute_result));
+
+    let handle = Box::into_raw(execute_result);
+    unsafe {
+        *execute_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
@@ -719,6 +986,50 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
         FUNCTION_NAME,
         runtime,
         client.query(transaction, sql)
+    );
+
+    let query_result = Box::new(TsurugiFfiSqlQueryResult::new(query_result, runtime.clone()));
+
+    let handle = Box::into_raw(query_result);
+    unsafe {
+        *query_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_query_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    sql: *const c_char,
+    timeout: TsurugiFfiDuration,
+    query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, query_result_out);
+    unsafe {
+        *query_result_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, sql);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let query_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.query_for(transaction, sql, timeout)
     );
 
     let query_result = Box::new(TsurugiFfiSqlQueryResult::new(query_result, runtime.clone()));
@@ -843,6 +1154,56 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    timeout: TsurugiFfiDuration,
+    query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, query_result_out);
+    unsafe {
+        *query_result_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
+    }
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let prepared_statement = unsafe { &*prepared_statement };
+    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let query_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_query_for(transaction, prepared_statement, parameters, timeout)
+    );
+
+    let query_result = Box::new(TsurugiFfiSqlQueryResult::new(query_result, runtime.clone()));
+
+    let handle = Box::into_raw(query_result);
+    unsafe {
+        *query_result_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
@@ -925,6 +1286,38 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_commit_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    commit_option: TsurugiFfiCommitOptionHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_commit_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, commit_option);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let commit_option = unsafe { &*commit_option };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.commit_for(transaction, commit_option, timeout)
+    );
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
@@ -987,6 +1380,35 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback(
         FUNCTION_NAME,
         runtime,
         client.rollback(transaction)
+    );
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_rollback_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_rollback_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.rollback_for(transaction, timeout)
     );
 
     trace!("{FUNCTION_NAME} end");

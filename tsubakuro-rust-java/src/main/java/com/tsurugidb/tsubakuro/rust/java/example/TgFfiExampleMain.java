@@ -8,9 +8,13 @@ import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiVoidJob;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiAtomType;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlExecuteResult;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResult;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiTableList;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiTableMetadata;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
@@ -29,7 +33,10 @@ public class TgFfiExampleMain {
 		int rc = TgFfiInitializer.initFfiEnvLogger();
 		System.out.printf("tsurugi_ffi_env_logger_init() rc=%x%n", rc);
 
-		main(ExecuteType.DIRECT, "tcp://localhost:12345");
+		String endpoint = "tcp://localhost:12345";
+		for (var execType : ExecuteType.values()) {
+			main(execType, endpoint);
+		}
 	}
 
 	enum ExecuteType {
@@ -38,29 +45,35 @@ public class TgFfiExampleMain {
 	}
 
 	private static void main(ExecuteType execType, String endpoint) {
-		try (var manager = TgFfiObjectManager.create()) {
-			var context = TgFfiContext.create(manager);
+		System.out.println(execType + " start");
 
-			var main = new TgFfiExampleMain(execType, manager, context);
-			main.execute(endpoint);
+		try (var manager = TgFfiObjectManager.create(); //
+				var context = TgFfiContext.create(manager)) {
+			var example = new TgFfiExampleMain(execType, manager, context);
+			example.execute(endpoint);
 		}
+
+		System.out.println(execType + " end");
 	}
 
 	private final ExecuteType executeType;
 	private final TgFfiContext context;
-	private Duration timeout;
-	private TgFfiSqlClient client = null;
+
+	private Duration timeout = Duration.ofSeconds(5);
+	private TgFfiSqlClient client;
+	private TgFfiCommitOption commitOption;
 
 	TgFfiExampleMain(ExecuteType execType, TgFfiObjectManager manager, TgFfiContext context) {
 		this.executeType = execType;
 		this.context = context;
-		this.timeout = Duration.ofSeconds(5);
 	}
 
 	void execute(String endpoint) {
 		try (var session = connect(endpoint); //
-				var client = session.makeSqlClient(context)) {
+				var client = session.makeSqlClient(context); //
+				var commitOption = TgFfiCommitOption.create(context)) {
 			this.client = client;
+			this.commitOption = commitOption;
 
 			{
 				var sql = "drop table if exists test";
@@ -95,25 +108,28 @@ public class TgFfiExampleMain {
 			connectionOption.setApplicationName(context, "tsubakuro-rust-java.FfiExample");
 			connectionOption.setSessionLabel(context, "TgFfiExampleMain.session");
 
-			switch (executeType) {
-			case DIRECT:
-				return TgFfiSession.connect(context, connectionOption);
-			case DIRECT_FOR:
-				return TgFfiSession.connectFor(context, connectionOption, timeout);
-			default:
-				return take(TgFfiSession.connectAsync(context, connectionOption));
-			}
+			return doConnect(connectionOption);
+		}
+	}
+
+	private TgFfiSession doConnect(TgFfiConnectionOption connectionOption) {
+		switch (executeType) {
+		case DIRECT:
+			return TgFfiSession.connect(context, connectionOption);
+		case DIRECT_FOR:
+			return TgFfiSession.connectFor(context, connectionOption, timeout);
+		default:
+			return take(TgFfiSession.connectAsync(context, connectionOption));
 		}
 	}
 
 	void executeOcc(String sql) {
 		System.out.println("execute(): " + sql);
 		try (var transaction = startOcc()) {
-			client.execute(context, transaction, sql);
-
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
+			try (var er = doExecute(transaction, sql)) {
 			}
+
+			doCommit(transaction);
 			transaction.close(context);
 		}
 	}
@@ -123,27 +139,55 @@ public class TgFfiExampleMain {
 			transactionOption.setTransactionType(context, TgFfiTransactionType.SHORT);
 			transactionOption.setTransactionLabel(context, "tsubakuro-rust-java.transaction");
 
-			switch (executeType) {
-			case DIRECT:
-				return client.startTransaction(context, transactionOption);
-			case DIRECT_FOR:
-				throw new AssertionError("not yet implemented DIRECT_FOR");
-			default:
-				return take(client.startTransactionAsync(context, transactionOption));
+			return doStartTransaction(transactionOption);
+		}
+	}
 
-			}
+	private TgFfiTransaction doStartTransaction(TgFfiTransactionOption transactionOption) {
+		switch (executeType) {
+		case DIRECT:
+			return client.startTransaction(context, transactionOption);
+		case DIRECT_FOR:
+			return client.startTransactionFor(context, transactionOption, timeout);
+		default:
+			return take(client.startTransactionAsync(context, transactionOption));
+		}
+	}
+
+	private void doCommit(TgFfiTransaction transaction) {
+		switch (executeType) {
+		case DIRECT:
+			client.commit(context, transaction, commitOption);
+			return;
+		case DIRECT_FOR:
+			client.commitFor(context, transaction, commitOption, timeout);
+			return;
+		default:
+			take(client.commitAsync(context, transaction, commitOption));
+			return;
 		}
 	}
 
 	void listTables() {
-		try (var tableList = client.listTables(context)) {
+		try (var tableList = doListTables()) {
 			List<String> tableNames = tableList.getTableNames(context);
 			System.out.println("SqlClient.listTables().tableNames=" + tableNames);
 		}
 	}
 
+	private TgFfiTableList doListTables() {
+		switch (executeType) {
+		case DIRECT:
+			return client.listTables(context);
+		case DIRECT_FOR:
+			return client.listTablesFor(context, timeout);
+		default:
+			return take(client.listTablesAsync(context));
+		}
+	}
+
 	void getTableMetadata() {
-		try (var tableMetadata = client.getTableMetadata(context, "test")) {
+		try (var tableMetadata = doGetTableMetadata("test")) {
 			System.out.println("SqlClient.getTableMetadata().tableName=" + tableMetadata.getTableName(context));
 			var columns = tableMetadata.getColumns(context);
 			for (var column : columns) {
@@ -159,41 +203,73 @@ public class TgFfiExampleMain {
 		}
 	}
 
+	private TgFfiTableMetadata doGetTableMetadata(String tableName) {
+		switch (executeType) {
+		case DIRECT:
+			return client.getTableMetadata(context, tableName);
+		case DIRECT_FOR:
+			return client.getTableMetadataFor(context, tableName, timeout);
+		default:
+			return take(client.getTableMetadataAsync(context, tableName));
+		}
+	}
+
 	void insert() {
 		System.out.println("SqlClient.execute() start");
 
 		try (var transaction = startOcc()) {
-			try (var er = client.execute(context, transaction, "insert into test values(1, 11, 'aaa')")) {
-			}
-			try (var er = client.execute(context, transaction, "insert into test values(2, 22, 'bbb')")) {
-			}
-			try (var er = client.execute(context, transaction, "insert into test values(3, 33, null)")) {
-			}
+			insert(transaction, "insert into test values(1, 11, 'aaa')");
+			insert(transaction, "insert into test values(2, 22, 'bbb')");
+			insert(transaction, "insert into test values(3, 33, null)");
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
+			doCommit(transaction);
 			transaction.close(context);
 		}
 
 		System.out.println("SqlClient.execute() end");
 	}
 
+	private void insert(TgFfiTransaction transaction, String sql) {
+		try (var er = doExecute(transaction, sql)) {
+			System.out.println("inserted_rows=" + er.getInsertedRows(context));
+		}
+	}
+
+	private TgFfiSqlExecuteResult doExecute(TgFfiTransaction transaction, String sql) {
+		switch (executeType) {
+		case DIRECT:
+			return client.execute(context, transaction, sql);
+		case DIRECT_FOR:
+			return client.executeFor(context, transaction, sql, timeout);
+		default:
+			return take(client.executeAsync(context, transaction, sql));
+		}
+	}
+
 	void select() {
 		System.out.println("SqlClient.query() start");
 
 		try (var transaction = startOcc()) {
-			try (var qr = client.query(context, transaction, "select * from test order by foo")) {
+			try (var qr = doQuery(transaction, "select * from test order by foo")) {
 				printQueryResult(qr);
 			}
 
-			try (var commitOption = TgFfiCommitOption.create(context)) {
-				client.commit(context, transaction, commitOption);
-			}
+			doCommit(transaction);
 			transaction.close(context);
 		}
 
 		System.out.println("SqlClient.query() end");
+	}
+
+	private TgFfiSqlQueryResult doQuery(TgFfiTransaction transaction, String sql) {
+		switch (executeType) {
+		case DIRECT:
+			return client.query(context, transaction, sql);
+		case DIRECT_FOR:
+			return client.queryFor(context, transaction, sql, timeout);
+		default:
+			return take(client.queryAsync(context, transaction, sql));
+		}
 	}
 
 	private void printQueryResult(TgFfiSqlQueryResult qr) {
@@ -234,35 +310,50 @@ public class TgFfiExampleMain {
 		);
 		try (var ps = client.prepare(context, sql, placeholders)) {
 			try (var transaction = startOcc()) {
-				{
-					var parameters = List.of( //
-							TgFfiSqlParameter.ofInt4(context, "foo", 4), //
-							TgFfiSqlParameter.ofInt8(context, "bar", 44), //
-							TgFfiSqlParameter.ofCharacter(context, "zzz", "ddd") //
-					);
-					try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
-					}
-				}
-				{
-					var parameters = List.of( //
-							TgFfiSqlParameter.ofInt4(context, "foo", 5), //
-							TgFfiSqlParameter.ofNull(context, "bar"), //
-							TgFfiSqlParameter.ofCharacter(context, "zzz", "eee") //
-					);
-					try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
-					}
-				}
+				insertPrepared(transaction, ps, 4, 44L, "ddd");
+				insertPrepared(transaction, ps, 5, null, "eee");
 
-				try (var commitOption = TgFfiCommitOption.create(context)) {
-					client.commit(context, transaction, commitOption);
-				}
+				doCommit(transaction);
 				transaction.close(context);
 			}
 
 			ps.close(context);
 		}
 
+		for (var placeholder : placeholders) {
+			placeholder.close();
+		}
+
 		System.out.println("SqlClient.prepared_execute() end");
+	}
+
+	private void insertPrepared(TgFfiTransaction transaction, TgFfiSqlPreparedStatement ps, int foo, Long bar,
+			String zzz) {
+		var parameters = List.of( //
+				TgFfiSqlParameter.ofInt4(context, "foo", foo), //
+				(bar != null) ? TgFfiSqlParameter.ofInt8(context, "bar", bar)
+						: TgFfiSqlParameter.ofNull(context, "bar"), //
+				TgFfiSqlParameter.ofCharacter(context, "zzz", zzz) //
+		);
+		try (var er = doPreparedExecute(transaction, ps, parameters)) {
+			System.out.println("inserted_rows=" + er.getInsertedRows(context));
+		}
+
+		for (var parameter : parameters) {
+			parameter.close();
+		}
+	}
+
+	private TgFfiSqlExecuteResult doPreparedExecute(TgFfiTransaction transaction, TgFfiSqlPreparedStatement ps,
+			List<TgFfiSqlParameter> parameters) {
+		switch (executeType) {
+		case DIRECT:
+			return client.preparedExecute(context, transaction, ps, parameters);
+		case DIRECT_FOR:
+			return client.preparedExecuteFor(context, transaction, ps, parameters, timeout);
+		default:
+			return take(client.preparedExecuteAsync(context, transaction, ps, parameters));
+		}
 	}
 
 	void selectPrepared() {
@@ -273,42 +364,62 @@ public class TgFfiExampleMain {
 		try (var ps = client.prepare(context, sql, placeholders)) {
 			try (var transaction = startOcc()) {
 				var parameters = List.<TgFfiSqlParameter>of();
-				try (var qr = client.preparedQuery(context, transaction, ps, parameters)) {
+				try (var qr = doPreparedQuery(transaction, ps, parameters)) {
 					printQueryResult(qr);
 				}
 
-				try (var commitOption = TgFfiCommitOption.create(context)) {
-					client.commit(context, transaction, commitOption);
+				for (var parameter : parameters) {
+					parameter.close();
 				}
+
+				doCommit(transaction);
 				transaction.close(context);
 			}
 
 			ps.close(context);
 		}
 
+		for (var placeholder : placeholders) {
+			placeholder.close();
+		}
+
 		System.out.println("SqlClient.prepared_query() end");
 	}
 
-	private <T> T take(TgFfiJob<T> job) {
+	private TgFfiSqlQueryResult doPreparedQuery(TgFfiTransaction transaction, TgFfiSqlPreparedStatement ps,
+			List<TgFfiSqlParameter> parameters) {
 		switch (executeType) {
-		case JOB_TAKE:
-			return job.take(context);
-		case JOB_TAKE_FOR:
-			return job.takeFor(context, timeout);
-		case JOB_TAKE_IF_READY:
-			if (job.wait(context, Duration.ofSeconds(5)) == false) {
-				throw new RuntimeException("JOB_TAKE_IF_READY: wait() timeout");
-			}
-			var value = job.takeIfReady(context);
-			if (value != null) {
-				return value;
-			}
-			if (job instanceof TgFfiVoidJob) {
-				return null;
-			}
-			throw new RuntimeException("JOB_TAKE_IF_READY: take_if_ready() fail");
+		case DIRECT:
+			return client.preparedQuery(context, transaction, ps, parameters);
+		case DIRECT_FOR:
+			return client.preparedQueryFor(context, transaction, ps, parameters, timeout);
 		default:
-			throw new UnsupportedOperationException("unsupported executeType " + executeType);
+			return take(client.preparedQueryAsync(context, transaction, ps, parameters));
+		}
+	}
+
+	private <T> T take(TgFfiJob<T> job) {
+		try (job) {
+			switch (executeType) {
+			case JOB_TAKE:
+				return job.take(context);
+			case JOB_TAKE_FOR:
+				return job.takeFor(context, timeout);
+			case JOB_TAKE_IF_READY:
+				if (job.wait(context, Duration.ofSeconds(5)) == false) {
+					throw new RuntimeException("JOB_TAKE_IF_READY: wait() timeout");
+				}
+				var value = job.takeIfReady(context);
+				if (value != null) {
+					return value;
+				}
+				if (job instanceof TgFfiVoidJob) {
+					return null;
+				}
+				throw new RuntimeException("JOB_TAKE_IF_READY: take_if_ready() fail");
+			default:
+				throw new UnsupportedOperationException("unsupported executeType " + executeType);
+			}
 		}
 	}
 }

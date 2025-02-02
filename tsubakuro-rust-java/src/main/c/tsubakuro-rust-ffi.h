@@ -254,6 +254,8 @@ typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
 
 #define TSURUGI_FFI_RC_FFI_ARG6_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 6)
 
+#define TSURUGI_FFI_RC_FFI_ARG7_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 7)
+
 #define TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED (TSURUGI_FFI_RC_FFI_JOB_ERROR | 1)
 
 #define TSURUGI_FFI_RC_FFI_NUL_ERROR (TSURUGI_FFI_RC_FFI_ERROR | 1)
@@ -484,6 +486,11 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
                                                 TsurugiFfiTableListHandle *table_list_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_for(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiSqlClientHandle sql_client,
+                                                    TsurugiFfiDuration timeout,
+                                                    TsurugiFfiTableListHandle *table_list_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_async(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,
                                                       TsurugiFfiJobHandle *table_list_job_out);
@@ -492,6 +499,12 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle c
                                                        TsurugiFfiSqlClientHandle sql_client,
                                                        const char *table_name,
                                                        TsurugiFfiTableMetadataHandle *table_metadata_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlClientHandle sql_client,
+                                                           const char *table_name,
+                                                           TsurugiFfiDuration timeout,
+                                                           TsurugiFfiTableMetadataHandle *table_metadata_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context,
                                                              TsurugiFfiSqlClientHandle sql_client,
@@ -505,6 +518,14 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context,
                                             uint32_t placeholder_size,
                                             TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlClientHandle sql_client,
+                                                const char *sql,
+                                                const TsurugiFfiSqlPlaceholderHandle *placeholders,
+                                                uint32_t placeholder_size,
+                                                TsurugiFfiDuration timeout,
+                                                TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
                                                   const char *sql,
@@ -517,6 +538,12 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle co
                                                       TsurugiFfiTransactionOptionHandle transaction_option,
                                                       TsurugiFfiTransactionHandle *transaction_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_for(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiSqlClientHandle sql_client,
+                                                          TsurugiFfiTransactionOptionHandle transaction_option,
+                                                          TsurugiFfiDuration timeout,
+                                                          TsurugiFfiTransactionHandle *transaction_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHandle context,
                                                             TsurugiFfiSqlClientHandle sql_client,
                                                             TsurugiFfiTransactionOptionHandle transaction_option,
@@ -527,6 +554,13 @@ TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
                                             TsurugiFfiTransactionHandle transaction,
                                             const char *sql,
                                             TsurugiFfiSqlExecuteResultHandle *execute_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlClientHandle sql_client,
+                                                TsurugiFfiTransactionHandle transaction,
+                                                const char *sql,
+                                                TsurugiFfiDuration timeout,
+                                                TsurugiFfiSqlExecuteResultHandle *execute_result_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
@@ -542,6 +576,15 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle con
                                                      uint32_t parameter_size,
                                                      TsurugiFfiSqlExecuteResultHandle *execute_result_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlClientHandle sql_client,
+                                                         TsurugiFfiTransactionHandle transaction,
+                                                         TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                         const TsurugiFfiSqlParameterHandle *parameters,
+                                                         uint32_t parameter_size,
+                                                         TsurugiFfiDuration timeout,
+                                                         TsurugiFfiSqlExecuteResultHandle *execute_result_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
                                                            TsurugiFfiTransactionHandle transaction,
@@ -555,6 +598,13 @@ TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
                                           TsurugiFfiTransactionHandle transaction,
                                           const char *sql,
                                           TsurugiFfiSqlQueryResultHandle *query_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context,
+                                              TsurugiFfiSqlClientHandle sql_client,
+                                              TsurugiFfiTransactionHandle transaction,
+                                              const char *sql,
+                                              TsurugiFfiDuration timeout,
+                                              TsurugiFfiSqlQueryResultHandle *query_result_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -570,6 +620,15 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle conte
                                                    uint32_t parameter_size,
                                                    TsurugiFfiSqlQueryResultHandle *query_result_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlClientHandle sql_client,
+                                                       TsurugiFfiTransactionHandle transaction,
+                                                       TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                       const TsurugiFfiSqlParameterHandle *parameters,
+                                                       uint32_t parameter_size,
+                                                       TsurugiFfiDuration timeout,
+                                                       TsurugiFfiSqlQueryResultHandle *query_result_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlClientHandle sql_client,
                                                          TsurugiFfiTransactionHandle transaction,
@@ -583,6 +642,12 @@ TsurugiFfiRc tsurugi_ffi_sql_client_commit(TsurugiFfiContextHandle context,
                                            TsurugiFfiTransactionHandle transaction,
                                            TsurugiFfiCommitOptionHandle commit_option);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_commit_for(TsurugiFfiContextHandle context,
+                                               TsurugiFfiSqlClientHandle sql_client,
+                                               TsurugiFfiTransactionHandle transaction,
+                                               TsurugiFfiCommitOptionHandle commit_option,
+                                               TsurugiFfiDuration timeout);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_commit_async(TsurugiFfiContextHandle context,
                                                  TsurugiFfiSqlClientHandle sql_client,
                                                  TsurugiFfiTransactionHandle transaction,
@@ -592,6 +657,11 @@ TsurugiFfiRc tsurugi_ffi_sql_client_commit_async(TsurugiFfiContextHandle context
 TsurugiFfiRc tsurugi_ffi_sql_client_rollback(TsurugiFfiContextHandle context,
                                              TsurugiFfiSqlClientHandle sql_client,
                                              TsurugiFfiTransactionHandle transaction);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_rollback_for(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSqlClientHandle sql_client,
+                                                 TsurugiFfiTransactionHandle transaction,
+                                                 TsurugiFfiDuration timeout);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle context,
                                                    TsurugiFfiSqlClientHandle sql_client,

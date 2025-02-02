@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 class TgFfiTableListTest extends TgFfiTester {
 
 	@ParameterizedTest
-	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	@ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
 	void get_table_names(String pattern) {
 		var manager = getFfiObjectManager();
 		var context = TgFfiContext.create(manager);
@@ -101,9 +102,12 @@ class TgFfiTableListTest extends TgFfiTester {
 
 		try (var session = TgFfiSession.connect(context, connectionOption); //
 				var client = session.makeSqlClient(context)) {
-			if (pattern.equals(DIRECT)) {
+			switch (pattern) {
+			case DIRECT:
 				return client.listTables(context);
-			} else {
+			case DIRECT_FOR:
+				return client.listTablesFor(context, Duration.ofSeconds(5));
+			default:
 				try (var job = client.listTablesAsync(context)) {
 					return jobTake(job, pattern);
 				}

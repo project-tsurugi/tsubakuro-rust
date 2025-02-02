@@ -55,6 +55,7 @@ public class TgFfiRcUtil {
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), "FFI_ARG4_ERROR");
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), "FFI_ARG5_ERROR");
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG6_ERROR(), "FFI_ARG6_ERROR");
+		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG7_ERROR(), "FFI_ARG7_ERROR");
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED(), "FFI_JOB_ALREADY_CLOSED");
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_NUL_ERROR(), "FFI_NUL_ERROR");
 		map.put(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND(), "FFI_DIAGNOSTIC_CODE_NOT_FOUND");

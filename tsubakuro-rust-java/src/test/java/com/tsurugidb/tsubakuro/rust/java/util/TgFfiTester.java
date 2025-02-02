@@ -200,6 +200,7 @@ public class TgFfiTester {
 	}
 
 	public static final String DIRECT = "DIRECT";
+	public static final String DIRECT_FOR = "DIRECT_FOR";
 	public static final String TAKE = "TAKE";
 	public static final String TAKE_FOR = "TAKE_FOR";
 	public static final String TAKE_IF_READY = "TAKE_IF_READY";
