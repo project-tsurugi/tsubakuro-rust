@@ -336,6 +336,11 @@ TsurugiFfiRc tsurugi_ffi_job_cancel(TsurugiFfiContextHandle context,
                                     TsurugiFfiJobHandle job,
                                     bool *cancell_done_out);
 
+TsurugiFfiRc tsurugi_ffi_job_cancel_for(TsurugiFfiContextHandle context,
+                                        TsurugiFfiJobHandle job,
+                                        TsurugiFfiDuration timeout,
+                                        bool *cancell_done_out);
+
 TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context,
                                           TsurugiFfiJobHandle job,
                                           TsurugiFfiCancelJobHandle *cancel_job_out);

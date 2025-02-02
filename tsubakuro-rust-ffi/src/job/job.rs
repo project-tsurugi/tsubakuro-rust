@@ -430,10 +430,42 @@ pub extern "C" fn tsurugi_ffi_job_cancel(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
 
     let job = unsafe { &mut *unknown_job(job) };
-    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
 
     let runtime = job.runtime().clone();
+    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
     let cancel_done = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel());
+
+    unsafe {
+        *cancell_done_out = cancel_done;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_job_cancel_for(
+    context: TsurugiFfiContextHandle,
+    job: TsurugiFfiJobHandle,
+    timeout: TsurugiFfiDuration,
+    cancell_done_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_job_cancel_for()";
+    trace!("{FUNCTION_NAME} start. job={:?}", job);
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, cancell_done_out);
+    unsafe {
+        *cancell_done_out = false;
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+
+    let job = unsafe { &mut *unknown_job(job) };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = job.runtime().clone();
+    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
+    let cancel_done =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel_for(timeout));
 
     unsafe {
         *cancell_done_out = cancel_done;
@@ -459,9 +491,9 @@ pub extern "C" fn tsurugi_ffi_job_cancel_async(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
 
     let job = unsafe { &mut *unknown_job(job) };
-    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
 
     let runtime = job.runtime().clone();
+    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
     let cancel_job =
         match ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel_async()) {
             Some(value) => value,
@@ -496,9 +528,9 @@ pub extern "C" fn tsurugi_ffi_job_close(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
 
     let job = unsafe { &mut *unknown_job(job) };
-    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
 
     let runtime = job.runtime().clone();
+    let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
     ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.close());
 
     trace!("{FUNCTION_NAME} end");

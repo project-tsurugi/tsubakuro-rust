@@ -36,6 +36,7 @@ class TgFfiJobTest extends TgFfiTester {
 				take_for_argError(job);
 				take_if_ready_argError(job);
 				cancel_argError(job);
+				cancel_for_argError(job);
 				cancel_async_argError(job);
 				close_argError(job);
 			}
@@ -278,6 +279,44 @@ class TgFfiJobTest extends TgFfiTester {
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void cancel_for() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var connectionOption = TgFfiConnectionOption.create(context)) {
+			connectionOption.setEndpointUrl(context, getEndpoint());
+
+			try (var job = TgFfiSession.connectAsync(context, connectionOption)) {
+				var timeout = Duration.ofSeconds(5);
+				job.cancelFor(context, timeout);
+			}
+		}
+	}
+
+	private void cancel_for_argError(TgFfiJob<TgFfiSession> job) {
+		var manager = getFfiObjectManager();
+
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var t = Duration.ofSeconds(5).toNanos();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel_for(ctx, handle, t, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = job.handle();
+			var t = Duration.ofSeconds(5).toNanos();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel_for(ctx, handle, t, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}
 

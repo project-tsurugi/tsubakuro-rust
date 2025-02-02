@@ -17006,6 +17006,67 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_job_cancel_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_cancel_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_for(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *cancell_done_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_job_cancel_for$descriptor() {
+        return tsurugi_ffi_job_cancel_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_for(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *cancell_done_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_job_cancel_for$handle() {
+        return tsurugi_ffi_job_cancel_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_for(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *cancell_done_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_job_cancel_for$address() {
+        return tsurugi_ffi_job_cancel_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_job_cancel_for(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiDuration timeout, _Bool *cancell_done_out)
+     * }
+     */
+    public static int tsurugi_ffi_job_cancel_for(MemorySegment context, MemorySegment job, long timeout, MemorySegment cancell_done_out) {
+        var mh$ = tsurugi_ffi_job_cancel_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_job_cancel_for", context, job, timeout, cancell_done_out);
+            }
+            return (int)mh$.invokeExact(context, job, timeout, cancell_done_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_job_cancel_async {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,

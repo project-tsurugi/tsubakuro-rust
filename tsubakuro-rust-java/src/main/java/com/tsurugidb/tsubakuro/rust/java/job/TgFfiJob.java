@@ -93,6 +93,17 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
 		return outToBoolean(out);
 	}
 
+	public synchronized boolean cancelFor(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel_for(ctx, handle, t, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
 	public synchronized TgFfiCancelJob cancelAsync(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
