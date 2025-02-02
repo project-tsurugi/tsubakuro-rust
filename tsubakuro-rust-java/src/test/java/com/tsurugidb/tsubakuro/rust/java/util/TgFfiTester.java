@@ -2,10 +2,10 @@ package com.tsurugidb.tsubakuro.rust.java.util;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -210,9 +210,9 @@ public class TgFfiTester {
 			case TAKE:
 				return job.take(context);
 			case TAKE_FOR:
-				return job.takeFor(context, TimeUnit.SECONDS.toNanos(5));
+				return job.takeFor(context, Duration.ofSeconds(5));
 			case TAKE_IF_READY:
-				if (job.wait(context, TimeUnit.SECONDS.toNanos(5)) == false) {
+				if (job.wait(context, Duration.ofSeconds(5)) == false) {
 					fail("TAKE_IF_READY: wait() timeout");
 				}
 				var value = job.takeIfReady(context);

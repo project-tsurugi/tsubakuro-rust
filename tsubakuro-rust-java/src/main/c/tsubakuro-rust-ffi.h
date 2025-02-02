@@ -669,6 +669,11 @@ TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
                                          TsurugiFfiConnectionOptionHandle connection_option,
                                          TsurugiFfiSessionHandle *session_out);
 
+TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context,
+                                             TsurugiFfiConnectionOptionHandle connection_option,
+                                             TsurugiFfiDuration timeout,
+                                             TsurugiFfiSessionHandle *session_out);
+
 TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context,
                                                TsurugiFfiConnectionOptionHandle connection_option,
                                                TsurugiFfiJobHandle *session_job_out);

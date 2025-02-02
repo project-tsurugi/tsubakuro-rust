@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.session;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -46,6 +47,45 @@ class TgFfiSessionTest extends TgFfiTester {
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect(ctx, arg, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void connect_for() {
+		var manager = getFfiObjectManager();
+
+		var context = TgFfiContext.create(manager);
+
+		var connect_forionOption = TgFfiConnectionOption.create(context);
+		connect_forionOption.setEndpointUrl(context, getEndpoint());
+
+		var timeout = Duration.ofSeconds(5);
+
+		try (var session = TgFfiSession.connectFor(context, connect_forionOption, timeout)) {
+		}
+	}
+
+	@Test
+	void connect_for_argError() {
+		var manager = getFfiObjectManager();
+
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var arg = MemorySegment.NULL;
+			var t = Duration.ofSeconds(5).toNanos();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_for(ctx, arg, t, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var connect_forionOption = TgFfiConnectionOption.create(context)) {
+			var ctx = context.handle();
+			var arg = connect_forionOption.handle();
+			var t = Duration.ofSeconds(5).toNanos();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_for(ctx, arg, t, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}
 

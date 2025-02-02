@@ -21807,6 +21807,67 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_session_connect_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_connect_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout, TsurugiFfiSessionHandle *session_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_connect_for$descriptor() {
+        return tsurugi_ffi_session_connect_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout, TsurugiFfiSessionHandle *session_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_connect_for$handle() {
+        return tsurugi_ffi_session_connect_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout, TsurugiFfiSessionHandle *session_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_connect_for$address() {
+        return tsurugi_ffi_session_connect_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout, TsurugiFfiSessionHandle *session_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_connect_for(MemorySegment context, MemorySegment connection_option, long timeout, MemorySegment session_out) {
+        var mh$ = tsurugi_ffi_session_connect_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_connect_for", context, connection_option, timeout, session_out);
+            }
+            return (int)mh$.invokeExact(context, connection_option, timeout, session_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_session_connect_async {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,

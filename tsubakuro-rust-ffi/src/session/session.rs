@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -9,6 +9,7 @@ use crate::{
     job::{TsurugiFfiJob, TsurugiFfiJobHandle},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
+    TsurugiFfiDuration,
 };
 
 use super::option::TsurugiFfiConnectionOptionHandle;
@@ -70,6 +71,46 @@ pub extern "C" fn tsurugi_ffi_session_connect(
         FUNCTION_NAME,
         runtime,
         Session::connect(connection_option)
+    );
+    let session = Box::new(TsurugiFfiSession::new(session, Arc::new(runtime)));
+
+    let handle = Box::into_raw(session);
+    unsafe {
+        *session_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. session={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_connect_for(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    timeout: TsurugiFfiDuration,
+    session_out: *mut TsurugiFfiSessionHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, session_out);
+    unsafe {
+        *session_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+
+    let connection_option = unsafe { &*connection_option };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    let session = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        Session::connect_for(connection_option, timeout)
     );
     let session = Box::new(TsurugiFfiSession::new(session, Arc::new(runtime)));
 

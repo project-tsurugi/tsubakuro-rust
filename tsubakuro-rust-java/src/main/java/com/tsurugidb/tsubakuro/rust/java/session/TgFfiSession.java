@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.session;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -42,6 +43,44 @@ public class TgFfiSession extends TgFfiObject {
 		var arg = connectionOption.handle();
 		var out = manager.allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect(ctx, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiSession(manager, outHandle);
+	}
+
+	public static TgFfiSession connectFor(TgFfiContext context, TgFfiConnectionOption connectionOption,
+			Duration timeout) {
+		Objects.requireNonNull(context, "context must not be null");
+		return connectFor(context.manager(), context, connectionOption, timeout);
+	}
+
+	public static TgFfiSession connectFor(TgFfiObjectManager manager, TgFfiConnectionOption connectionOption,
+			Duration timeout) {
+		return connectFor(manager, null, connectionOption, timeout);
+	}
+
+	public static TgFfiSession connectFor(TgFfiObjectManager manager, TgFfiContext context,
+			TgFfiConnectionOption connectionOption, Duration timeout) {
+		Objects.requireNonNull(manager, "manager must not be null");
+		Objects.requireNonNull(connectionOption, "connectOption must not be null");
+
+		if (context != null) {
+			synchronized (context) {
+				return connectForMain(manager, context, connectionOption, timeout);
+			}
+		} else {
+			return connectForMain(manager, null, connectionOption, timeout);
+		}
+	}
+
+	private static TgFfiSession connectForMain(TgFfiObjectManager manager, TgFfiContext context,
+			TgFfiConnectionOption connectionOption, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var arg = connectionOption.handle();
+		var t = timeout.toNanos();
+		var out = manager.allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_for(ctx, arg, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		var outHandle = outToHandle(out);

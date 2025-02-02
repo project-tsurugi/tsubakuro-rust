@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.foreign.MemorySegment;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 
@@ -72,16 +72,16 @@ class TgFfiJobTest extends TgFfiTester {
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
 			var out = manager.allocatePtr();
-			var arg = 10;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, arg, out);
+			var t = 10;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, t, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		{
 			var ctx = context.handle();
 			var handle = job.handle();
-			var arg = 10;
+			var t = 10;
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, arg, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, t, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}
@@ -118,7 +118,7 @@ class TgFfiJobTest extends TgFfiTester {
 			try (var job = TgFfiSession.connectAsync(context, connectionOption)) {
 				assertEquals("Handshake", job.getName(context));
 
-				assertTrue(job.wait(context, TimeUnit.SECONDS.toNanos(5)));
+				assertTrue(job.wait(context, Duration.ofSeconds(5)));
 				assertTrue(job.isDone(context));
 
 				try (var session = job.take(context)) {
@@ -161,9 +161,9 @@ class TgFfiJobTest extends TgFfiTester {
 			connectionOption.setEndpointUrl(context, getEndpoint());
 
 			try (var job = TgFfiSession.connectAsync(context, connectionOption)) {
-				try (var session = job.takeFor(context, TimeUnit.SECONDS.toNanos(5))) {
+				try (var session = job.takeFor(context, Duration.ofSeconds(5))) {
 					var e = assertThrows(TgFfiRuntimeException.class, () -> {
-						job.takeFor(context, TimeUnit.SECONDS.toNanos(5));
+						job.takeFor(context, Duration.ofSeconds(5));
 					});
 					assertTrue(e.getMessage().contains("already taked"));
 				}
@@ -179,17 +179,17 @@ class TgFfiJobTest extends TgFfiTester {
 		{
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
-			var arg = TimeUnit.SECONDS.toNanos(5);
+			var t = Duration.ofSeconds(5).toNanos();
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, arg, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, t, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		{
 			var ctx = context.handle();
 			var handle = job.handle();
-			var arg = TimeUnit.SECONDS.toNanos(5);
+			var t = Duration.ofSeconds(5).toNanos();
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, arg, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, t, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}

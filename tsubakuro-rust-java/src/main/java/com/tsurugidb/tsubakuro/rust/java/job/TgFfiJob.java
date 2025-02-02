@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.job;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -24,12 +25,12 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
 		return outToString(out);
 	}
 
-	public synchronized boolean wait(TgFfiContext context, long timeoutNanos) {
+	public synchronized boolean wait(TgFfiContext context, Duration timeout) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var out = allocatePtr();
-		var arg = timeoutNanos;
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, arg, out);
+		var t = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToBoolean(out);
@@ -56,12 +57,12 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
 		return valueToFfiObject(manager(), outHandle);
 	}
 
-	public synchronized T takeFor(TgFfiContext context, long timeoutNanos) {
+	public synchronized T takeFor(TgFfiContext context, Duration timeout) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var out = allocatePtr();
-		var arg = timeoutNanos;
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, arg, out);
+		var t = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		var outHandle = outToHandle(out);
