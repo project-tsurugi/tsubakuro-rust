@@ -431,6 +431,10 @@ void tsurugi_ffi_sql_placeholder_dispose(TsurugiFfiSqlPlaceholderHandle placehol
 TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlPreparedStatementHandle prepared_statement);
 
+TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close_for(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                          TsurugiFfiDuration timeout);
+
 void tsurugi_ffi_sql_prepared_statement_dispose(TsurugiFfiSqlPreparedStatementHandle prepared_statement);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context,

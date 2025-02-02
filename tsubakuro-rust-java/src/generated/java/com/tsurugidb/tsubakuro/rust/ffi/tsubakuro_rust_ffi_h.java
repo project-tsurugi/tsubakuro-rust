@@ -18551,6 +18551,66 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_prepared_statement_close_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_close_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_prepared_statement_close_for$descriptor() {
+        return tsurugi_ffi_sql_prepared_statement_close_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_prepared_statement_close_for$handle() {
+        return tsurugi_ffi_sql_prepared_statement_close_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_prepared_statement_close_for$address() {
+        return tsurugi_ffi_sql_prepared_statement_close_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static int tsurugi_ffi_sql_prepared_statement_close_for(MemorySegment context, MemorySegment prepared_statement, long timeout) {
+        var mh$ = tsurugi_ffi_sql_prepared_statement_close_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_prepared_statement_close_for", context, prepared_statement, timeout);
+            }
+            return (int)mh$.invokeExact(context, prepared_statement, timeout);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_prepared_statement_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

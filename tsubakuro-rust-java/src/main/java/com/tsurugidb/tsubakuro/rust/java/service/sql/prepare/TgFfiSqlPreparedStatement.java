@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql.prepare;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -18,6 +19,14 @@ public class TgFfiSqlPreparedStatement extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_close(ctx, handle);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized void closeFor(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_close_for(ctx, handle, t);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
 

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -7,6 +7,7 @@ use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_require_non_null, ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
+    TsurugiFfiDuration,
 };
 
 #[derive(Debug)]
@@ -64,6 +65,35 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(
 
     let runtime = prepared_statement.runtime();
     ffi_exec_core_async!(context, FUNCTION_NAME, runtime, prepared_statement.close());
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close_for(
+    context: TsurugiFfiContextHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_close_for()";
+    trace!(
+        "{FUNCTION_NAME} start. prepared_statement={:?}",
+        prepared_statement
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, prepared_statement);
+
+    let prepared_statement = unsafe { &mut *prepared_statement };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = prepared_statement.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        prepared_statement.close_for(timeout)
+    );
 
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)

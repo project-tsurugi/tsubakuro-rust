@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql.prepare;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,7 +15,7 @@ import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
-class TgFfiPreparedStatementTest extends TgFfiTester {
+class TgFfiSqlPreparedStatementTest extends TgFfiTester {
 
 	@ParameterizedTest
 	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
@@ -30,7 +31,7 @@ class TgFfiPreparedStatementTest extends TgFfiTester {
 				var ps = getSqlPreparedStatement(pattern)) {
 
 			if (close) {
-				ps.close(context);
+				doClose(ps, pattern);
 			}
 		}
 	}
@@ -44,6 +45,20 @@ class TgFfiPreparedStatementTest extends TgFfiTester {
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_close(ctx, handle);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void close_for_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var client = createSqlClient()) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var t = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_close_for(ctx, handle, t);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 	}
@@ -64,6 +79,22 @@ class TgFfiPreparedStatementTest extends TgFfiTester {
 				try (var job = client.prepareAsync(context, "select * from test", null)) {
 					return jobTake(job, pattern);
 				}
+			}
+		}
+	}
+
+	private void doClose(TgFfiSqlPreparedStatement ps, String pattern) {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			switch (pattern) {
+			case DIRECT:
+			default:
+				ps.close(context);
+				break;
+			case DIRECT_FOR:
+				ps.closeFor(context, Duration.ofSeconds(5));
+				break;
 			}
 		}
 	}
