@@ -2,6 +2,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.time.Duration;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -36,11 +37,33 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
 		return outToBoolean(out);
 	}
 
+	public synchronized boolean nextRowFor(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row_for(ctx, handle, t, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
 	public synchronized boolean nextColumn(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
+	public synchronized boolean nextColumnFor(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column_for(ctx, handle, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToBoolean(out);
@@ -66,11 +89,33 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
 		return out.get(ValueLayout.JAVA_INT, 0);
 	}
 
+	public synchronized int fetchForInt4(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int4(ctx, handle, t, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return out.get(ValueLayout.JAVA_INT, 0);
+	}
+
 	public synchronized long fetchInt8(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int8(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return out.get(ValueLayout.JAVA_LONG, 0);
+	}
+
+	public synchronized long fetchForInt8(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int8(ctx, handle, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return out.get(ValueLayout.JAVA_LONG, 0);
@@ -86,6 +131,17 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
 		return out.get(ValueLayout.JAVA_FLOAT, 0);
 	}
 
+	public synchronized float fetchForFloat4(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float4(ctx, handle, t, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return out.get(ValueLayout.JAVA_FLOAT, 0);
+	}
+
 	public synchronized double fetchFloat8(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
@@ -96,11 +152,33 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
 		return out.get(ValueLayout.JAVA_DOUBLE, 0);
 	}
 
+	public synchronized double fetchForFloat8(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float8(ctx, handle, t, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return out.get(ValueLayout.JAVA_DOUBLE, 0);
+	}
+
 	public synchronized String fetchCharacter(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_character(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToString(out);
+	}
+
+	public synchronized String fetchForCharacter(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_character(ctx, handle, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToString(out);

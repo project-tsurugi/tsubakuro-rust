@@ -450,9 +450,19 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_next_row(TsurugiFfiContextHandle conte
                                                    TsurugiFfiSqlQueryResultHandle query_result,
                                                    bool *has_row_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_query_result_next_row_for(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlQueryResultHandle query_result,
+                                                       TsurugiFfiDuration timeout,
+                                                       bool *has_row_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_query_result_next_column(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlQueryResultHandle query_result,
                                                       bool *has_column_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_next_column_for(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiSqlQueryResultHandle query_result,
+                                                          TsurugiFfiDuration timeout,
+                                                          bool *has_column_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_is_null(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlQueryResultHandle query_result,
@@ -462,21 +472,46 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int4(TsurugiFfiContextHandle con
                                                      TsurugiFfiSqlQueryResultHandle query_result,
                                                      int32_t *value_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int4(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlQueryResultHandle query_result,
+                                                         TsurugiFfiDuration timeout,
+                                                         int32_t *value_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int8(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
                                                      int64_t *value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int8(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlQueryResultHandle query_result,
+                                                         TsurugiFfiDuration timeout,
+                                                         int64_t *value_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float4(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
                                                        float *value_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float4(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlQueryResultHandle query_result,
+                                                           TsurugiFfiDuration timeout,
+                                                           float *value_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float8(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
                                                        double *value_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float8(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlQueryResultHandle query_result,
+                                                           TsurugiFfiDuration timeout,
+                                                           double *value_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlQueryResultHandle query_result,
                                                           char **value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context,
+                                                              TsurugiFfiSqlQueryResultHandle query_result,
+                                                              TsurugiFfiDuration timeout,
+                                                              char **value_out);
 
 void tsurugi_ffi_sql_query_result_dispose(TsurugiFfiSqlQueryResultHandle query_result);
 
