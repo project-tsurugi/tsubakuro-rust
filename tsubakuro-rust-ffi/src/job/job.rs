@@ -10,7 +10,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, ffi_exec_core_async,
+    ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
     job::cancel_job::TsurugiFfiCancelJob,
     return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
     TsurugiFfiDuration,
@@ -175,11 +175,9 @@ pub extern "C" fn tsurugi_ffi_job_get_name(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_get_name()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
-    unsafe {
-        *name_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
 
     let job = unsafe { &mut *unknown_job(job) };
 
@@ -209,11 +207,9 @@ pub extern "C" fn tsurugi_ffi_job_wait(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_wait()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, done_out);
-    unsafe {
-        *done_out = false;
-    }
+    ffi_arg_out_initialize!(done_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, done_out);
 
     let job = unsafe { &mut *unknown_job(job) };
     let timeout = Duration::from_nanos(timeout);
@@ -239,11 +235,9 @@ pub extern "C" fn tsurugi_ffi_job_is_done(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_is_done()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, done_out);
-    unsafe {
-        *done_out = false;
-    }
+    ffi_arg_out_initialize!(done_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, done_out);
 
     let job = unsafe { &mut *unknown_job(job) };
 
@@ -268,11 +262,9 @@ pub extern "C" fn tsurugi_ffi_job_take(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_take()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
-    unsafe {
-        *value_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
 
     unsafe { &mut *unknown_job(job) }
         .delegater
@@ -316,11 +308,9 @@ pub extern "C" fn tsurugi_ffi_job_take_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_for()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
-    unsafe {
-        *value_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     unsafe { &mut *unknown_job(job) }
         .delegater
@@ -367,11 +357,9 @@ pub extern "C" fn tsurugi_ffi_job_take_if_ready(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_if_ready()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
-    unsafe {
-        *value_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
 
     unsafe { &mut *unknown_job(job) }
         .delegater
@@ -423,11 +411,9 @@ pub extern "C" fn tsurugi_ffi_job_cancel(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_cancel()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, cancell_done_out);
-    unsafe {
-        *cancell_done_out = false;
-    }
+    ffi_arg_out_initialize!(cancell_done_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, cancell_done_out);
 
     let job = unsafe { &mut *unknown_job(job) };
 
@@ -453,11 +439,9 @@ pub extern "C" fn tsurugi_ffi_job_cancel_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_cancel_for()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, cancell_done_out);
-    unsafe {
-        *cancell_done_out = false;
-    }
+    ffi_arg_out_initialize!(cancell_done_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, cancell_done_out);
 
     let job = unsafe { &mut *unknown_job(job) };
     let timeout = Duration::from_nanos(timeout);
@@ -484,11 +468,9 @@ pub extern "C" fn tsurugi_ffi_job_cancel_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_cancel_async()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, cancel_job_out);
-    unsafe {
-        *cancel_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(cancel_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, cancel_job_out);
 
     let job = unsafe { &mut *unknown_job(job) };
 

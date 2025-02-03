@@ -4,11 +4,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set,
-    context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_ffi_arg_error,
-    return_code::{rc_ok, TsurugiFfiRc},
-    service::sql::atom_type::TsurugiFfiAtomType,
+    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}, service::sql::atom_type::TsurugiFfiAtomType
 };
 
 #[derive(Debug)]
@@ -49,14 +45,12 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_of_atom_type()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholder_out);
-    unsafe {
-        *placeholder_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(placeholder_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
     if !TsurugiFfiAtomType::is_valid(atom_type as i32) {
         return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "atom_type", "is invalid");
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholder_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let placeholder = SqlPlaceholder::of_atom_type(name, atom_type.into());
@@ -84,11 +78,9 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_get_name()";
     trace!("{FUNCTION_NAME} start. placeholder={:?}", placeholder);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
-    unsafe {
-        *name_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, placeholder);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
 
     let placeholder = unsafe { &mut *placeholder };
 
@@ -119,11 +111,9 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_atom_type(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_get_atom_type()";
     trace!("{FUNCTION_NAME} start. placeholder={:?}", placeholder);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, atom_type_out);
-    unsafe {
-        *atom_type_out = TsurugiFfiAtomType::Unrecognized;
-    }
+    ffi_arg_out_initialize!(atom_type_out, TsurugiFfiAtomType::Unrecognized);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, placeholder);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, atom_type_out);
 
     let placeholder = unsafe { &*placeholder };
 

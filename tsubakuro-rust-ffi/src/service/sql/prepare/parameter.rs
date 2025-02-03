@@ -4,10 +4,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set,
-    context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_require_non_null,
-    return_code::{rc_ok, TsurugiFfiRc},
+    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, return_code::{rc_ok, TsurugiFfiRc}
 };
 
 #[derive(Debug)]
@@ -54,11 +51,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_null(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_null()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, parameter_out);
-    unsafe {
-        *parameter_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let parameter = SqlParameter::null(name);
@@ -84,11 +79,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int4(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_int4()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
-    unsafe {
-        *parameter_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let parameter = SqlParameter::of(name, value);
@@ -114,11 +107,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int8(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_int8()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
-    unsafe {
-        *parameter_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let parameter = SqlParameter::of(name, value);
@@ -144,11 +135,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float4(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_float4()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
-    unsafe {
-        *parameter_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let parameter = SqlParameter::of(name, value);
@@ -174,11 +163,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float8(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_float8()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
-    unsafe {
-        *parameter_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let parameter = SqlParameter::of(name, value);
@@ -204,12 +191,10 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_character()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
-    unsafe {
-        *parameter_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let value = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, value);
@@ -235,11 +220,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_get_name()";
     trace!("{FUNCTION_NAME} start. parameter={:?}", parameter);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
-    unsafe {
-        *name_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, parameter);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
 
     let parameter = unsafe { &mut *parameter };
 

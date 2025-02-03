@@ -5,7 +5,8 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
+    ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
+    impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
@@ -78,11 +79,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_list_out);
-    unsafe {
-        *table_list_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(table_list_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_list_out);
 
     let client = unsafe { &*sql_client };
 
@@ -110,11 +109,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_list_out);
-    unsafe {
-        *table_list_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(table_list_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_list_out);
 
     let client = unsafe { &*sql_client };
     let timeout = Duration::from_nanos(timeout);
@@ -147,11 +144,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_list_job_out);
-    unsafe {
-        *table_list_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(table_list_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_list_job_out);
 
     let client = unsafe { &*sql_client };
 
@@ -195,12 +190,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_metadata_out);
-    unsafe {
-        *table_metadata_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(table_metadata_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_metadata_out);
 
     let client = unsafe { &*sql_client };
     let table_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, table_name);
@@ -235,12 +228,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, table_metadata_out);
-    unsafe {
-        *table_metadata_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(table_metadata_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, table_metadata_out);
 
     let client = unsafe { &*sql_client };
     let table_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, table_name);
@@ -275,12 +266,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_metadata_job_out);
-    unsafe {
-        *table_metadata_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(table_metadata_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_metadata_job_out);
 
     let client = unsafe { &*sql_client };
     let table_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, table_name);
@@ -350,15 +339,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_out);
-    unsafe {
-        *prepared_statement_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(prepared_statement_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
     if placeholder_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_out);
 
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
@@ -400,15 +387,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, prepared_statement_out);
-    unsafe {
-        *prepared_statement_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(prepared_statement_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
     if placeholder_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, prepared_statement_out);
 
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
@@ -450,15 +435,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_job_out);
-    unsafe {
-        *prepared_statement_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(prepared_statement_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
     if placeholder_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_job_out);
 
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
@@ -514,12 +497,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_out);
-    unsafe {
-        *transaction_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(transaction_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_out);
 
     let client = unsafe { &*sql_client };
     let transaction_option = unsafe { &*transaction_option };
@@ -554,12 +535,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, transaction_out);
-    unsafe {
-        *transaction_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(transaction_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, transaction_out);
 
     let client = unsafe { &*sql_client };
     let transaction_option = unsafe { &*transaction_option };
@@ -594,12 +573,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_job_out);
-    unsafe {
-        *transaction_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(transaction_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_job_out);
 
     let client = unsafe { &*sql_client };
     let transaction_option = unsafe { &*transaction_option };
@@ -650,13 +627,11 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, execute_result_out);
-    unsafe {
-        *execute_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, execute_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -693,13 +668,11 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, execute_result_out);
-    unsafe {
-        *execute_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, execute_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -736,13 +709,11 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, execute_result_job_out);
-    unsafe {
-        *execute_result_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(execute_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, execute_result_job_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -817,16 +788,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_out);
-    unsafe {
-        *execute_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
     if parameter_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -867,16 +836,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, execute_result_out);
-    unsafe {
-        *execute_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
     if parameter_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, execute_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -917,16 +884,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_job_out);
-    unsafe {
-        *execute_result_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(execute_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
     if parameter_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_job_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -968,13 +933,11 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, query_result_out);
-    unsafe {
-        *query_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, query_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -1011,13 +974,11 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, query_result_out);
-    unsafe {
-        *query_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, query_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -1054,13 +1015,11 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, query_result_job_out);
-    unsafe {
-        *query_result_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(query_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, query_result_job_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -1118,16 +1077,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, query_result_out);
-    unsafe {
-        *query_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
     if parameter_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, query_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -1167,16 +1124,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, query_result_out);
-    unsafe {
-        *query_result_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
     if parameter_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, query_result_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -1216,16 +1171,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, query_result_job_out);
-    unsafe {
-        *query_result_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(query_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
     if parameter_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, query_result_job_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -1328,13 +1281,11 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_commit_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, commit_job_out);
-    unsafe {
-        *commit_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(commit_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, commit_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, commit_job_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
@@ -1425,12 +1376,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_rollback_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, rollback_job_out);
-    unsafe {
-        *rollback_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(rollback_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, rollback_job_out);
 
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };

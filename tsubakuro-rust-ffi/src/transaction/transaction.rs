@@ -4,10 +4,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set,
-    context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, ffi_exec_core_async,
-    return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK}, TsurugiFfiDuration,
+    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK}, TsurugiFfiDuration
 };
 
 pub(crate) struct TsurugiFfiTransaction {
@@ -58,11 +55,9 @@ pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_get_transaction_id()";
     trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_id_out);
-    unsafe {
-        *transaction_id_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(transaction_id_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_id_out);
 
     let transaction = unsafe { &mut *transaction };
 

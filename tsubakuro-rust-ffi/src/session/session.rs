@@ -5,7 +5,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
+    ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
@@ -54,11 +54,9 @@ pub extern "C" fn tsurugi_ffi_session_connect(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, session_out);
-    unsafe {
-        *session_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(session_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, session_out);
 
     let connection_option = unsafe { &*connection_option };
 
@@ -93,11 +91,9 @@ pub extern "C" fn tsurugi_ffi_session_connect_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect_for()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, session_out);
-    unsafe {
-        *session_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(session_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, session_out);
 
     let connection_option = unsafe { &*connection_option };
     let timeout = Duration::from_nanos(timeout);
@@ -132,11 +128,9 @@ pub extern "C" fn tsurugi_ffi_session_connect_async(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect_async()";
     trace!("{FUNCTION_NAME} start");
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, session_job_out);
-    unsafe {
-        *session_job_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(session_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, session_job_out);
 
     let connection_option = unsafe { &*connection_option };
 
@@ -188,11 +182,9 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_sql_client()";
     trace!("{FUNCTION_NAME} start. session={:?}", session);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_client_out);
-    unsafe {
-        *sql_client_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(sql_client_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_client_out);
 
     let session = unsafe { &*session };
     let sql_client: SqlClient = session.make_client();

@@ -2,9 +2,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, rc_ffi_arg_error,
-    return_code::{rc_ok, TsurugiFfiRc},
+    context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -82,10 +80,8 @@ pub extern "C" fn tsurugi_ffi_commit_option_create(
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_create()";
     trace!("{FUNCTION_NAME} start");
 
+    ffi_arg_out_initialize!(commit_option_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option_out);
-    unsafe {
-        *commit_option_out = std::ptr::null_mut();
-    }
 
     let commit_option = Box::new(TsurugiFfiCommitOption {
         commit_option: CommitOption::new(),
@@ -131,11 +127,9 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_commit_type(
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_get_commit_type()";
     trace!("{FUNCTION_NAME} start. commit_option={:?}", commit_option);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, commit_type_out);
-    unsafe {
-        *commit_type_out = TsurugiFfiCommitType::Unspecified;
-    }
+    ffi_arg_out_initialize!(commit_type_out, TsurugiFfiCommitType::Unspecified);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, commit_type_out);
 
     let commit_option = unsafe { &mut *commit_option };
 

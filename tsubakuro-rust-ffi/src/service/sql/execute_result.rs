@@ -2,9 +2,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null,
-    return_code::{rc_ok, TsurugiFfiRc},
+    context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, return_code::{rc_ok, TsurugiFfiRc}
 };
 
 pub(crate) struct TsurugiFfiSqlExecuteResult {
@@ -152,11 +150,9 @@ where
 {
     trace!("{function_name} start. execute_result={:?}", execute_result);
 
-    ffi_arg_require_non_null!(context, function_name, 2, rows_out);
-    unsafe {
-        *rows_out = 0;
-    }
+    ffi_arg_out_initialize!(rows_out, 0);
     ffi_arg_require_non_null!(context, function_name, 1, execute_result);
+    ffi_arg_require_non_null!(context, function_name, 2, rows_out);
 
     let execute_result = unsafe { &*execute_result };
     let rows = getter(execute_result);

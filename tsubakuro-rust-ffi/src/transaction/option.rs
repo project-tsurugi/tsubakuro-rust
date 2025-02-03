@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_clear, cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_ffi_arg_error,
+    ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     vec_cchar_field_clear, vec_cchar_field_dispose, vec_cchar_field_set_if_none,
     TsurugiFfiStringArrayHandle,
@@ -87,10 +87,8 @@ pub extern "C" fn tsurugi_ffi_transaction_option_create(
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_create()";
     trace!("{FUNCTION_NAME} start");
 
+    ffi_arg_out_initialize!(transaction_option_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option_out);
-    unsafe {
-        *transaction_option_out = std::ptr::null_mut();
-    }
 
     let transaction_option = Box::new(TsurugiFfiTransactionOption {
         transaction_option: TransactionOption::new(),
@@ -146,11 +144,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_type(
         transaction_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_type_out);
-    unsafe {
-        *transaction_type_out = TsurugiFfiTransactionType::Unspecified;
-    }
+    ffi_arg_out_initialize!(transaction_type_out, TsurugiFfiTransactionType::Unspecified);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_type_out);
 
     let transaction_option = unsafe { &mut *transaction_option };
 
@@ -203,11 +199,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
         transaction_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label_out);
-    unsafe {
-        *label_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(label_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label_out);
 
     let transaction_option = unsafe { &mut *transaction_option };
 
@@ -262,11 +256,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_modifies_definitions(
         transaction_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, modifies_definitions_out);
-    unsafe {
-        *modifies_definitions_out = false;
-    }
+    ffi_arg_out_initialize!(modifies_definitions_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, modifies_definitions_out);
 
     let transaction_option = unsafe { &mut *transaction_option };
 
@@ -342,15 +334,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
         transaction_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names_out);
-    unsafe {
-        *table_names_out = std::ptr::null_mut();
-    }
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_names_size_out);
-    unsafe {
-        *table_names_size_out = 0;
-    }
+    ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(table_names_size_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_names_size_out);
 
     let transaction_option = unsafe { &mut *transaction_option };
     let table_names = transaction_option.write_preserve();

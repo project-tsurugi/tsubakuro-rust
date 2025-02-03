@@ -4,10 +4,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set,
-    context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null,
-    return_code::{rc_ok, TsurugiFfiRc},
+    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, return_code::{rc_ok, TsurugiFfiRc}
 };
 
 use super::atom_type::TsurugiFfiAtomType;
@@ -51,11 +48,9 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_name()";
     trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
-    unsafe {
-        *name_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
 
     let sql_column = unsafe { &mut *sql_column };
 
@@ -83,11 +78,9 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_atom_type(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_atom_type()";
     trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, atom_type_out);
-    unsafe {
-        *atom_type_out = TsurugiFfiAtomType::Unrecognized;
-    }
+    ffi_arg_out_initialize!(atom_type_out, TsurugiFfiAtomType::Unrecognized);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, atom_type_out);
 
     let sql_column = unsafe { &mut *sql_column };
 

@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_clear, cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_ffi_arg_error,
+    ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -44,10 +44,8 @@ pub extern "C" fn tsurugi_ffi_connection_option_create(
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_create()";
     trace!("{FUNCTION_NAME} start");
 
+    ffi_arg_out_initialize!(connection_option_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option_out);
-    unsafe {
-        *connection_option_out = std::ptr::null_mut();
-    }
 
     let connection_option = Box::new(TsurugiFfiConnectionOption {
         connection_option: ConnectionOption::new(),
@@ -128,11 +126,9 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
         connection_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint_out);
-    unsafe {
-        *endpoint_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(endpoint_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint_out);
 
     let connection_option = unsafe { &mut *connection_option };
 
@@ -189,11 +185,9 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
         connection_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, application_name_out);
-    unsafe {
-        *application_name_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(application_name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, application_name_out);
 
     let connection_option = unsafe { &mut *connection_option };
 
@@ -254,11 +248,9 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_session_label(
         connection_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label_out);
-    unsafe {
-        *label_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(label_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label_out);
 
     let connection_option = unsafe { &mut *connection_option };
 

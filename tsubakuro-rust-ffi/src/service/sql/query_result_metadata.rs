@@ -2,10 +2,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, rc_ffi_arg_error,
-    return_code::{rc_ok, TsurugiFfiRc},
-    service::sql::column::TsurugiFfiSqlColumn,
+    context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}, service::sql::column::TsurugiFfiSqlColumn
 };
 
 use super::column::TsurugiFfiSqlColumnHandle;
@@ -52,11 +49,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_size(
         query_result_metadata
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
-    unsafe {
-        *size_out = 0;
-    }
+    ffi_arg_out_initialize!(size_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
 
     let sql_query_result_metadata = unsafe { &*query_result_metadata };
     let columns = sql_query_result_metadata.columns();
@@ -82,11 +77,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_value(
         query_result_metadata
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql_column_out);
-    unsafe {
-        *sql_column_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(sql_column_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, sql_column_out);
 
     let sql_query_result_metadata = unsafe { &mut *query_result_metadata };
     let columns = sql_query_result_metadata.columns();

@@ -4,12 +4,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set,
-    context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, ffi_exec_core, ffi_exec_core_async,
-    return_code::{rc_ok, TsurugiFfiRc},
-    service::sql::query_result_metadata::TsurugiFfiSqlQueryResultMetadata,
-    TsurugiFfiDuration,
+    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core, ffi_exec_core_async, return_code::{rc_ok, TsurugiFfiRc}, service::sql::query_result_metadata::TsurugiFfiSqlQueryResultMetadata, TsurugiFfiDuration
 };
 
 use super::query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle;
@@ -62,11 +57,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_get_metadata(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_get_metadata()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, metadata_out);
-    unsafe {
-        *metadata_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(metadata_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, metadata_out);
 
     let query_result = unsafe { &*query_result };
 
@@ -98,11 +91,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_next_row()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, has_row_out);
-    unsafe {
-        *has_row_out = false;
-    }
+    ffi_arg_out_initialize!(has_row_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, has_row_out);
 
     let query_result = unsafe { &mut *query_result };
 
@@ -127,11 +118,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_next_row_for()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, has_row_out);
-    unsafe {
-        *has_row_out = false;
-    }
+    ffi_arg_out_initialize!(has_row_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, has_row_out);
 
     let query_result = unsafe { &mut *query_result };
     let timeout = Duration::from_nanos(timeout);
@@ -161,11 +150,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_next_column()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, has_column_out);
-    unsafe {
-        *has_column_out = false;
-    }
+    ffi_arg_out_initialize!(has_column_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, has_column_out);
 
     let query_result = unsafe { &mut *query_result };
 
@@ -191,11 +178,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column_for(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_next_column_for()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, has_column_out);
-    unsafe {
-        *has_column_out = false;
-    }
+    ffi_arg_out_initialize!(has_column_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, has_column_out);
 
     let query_result = unsafe { &mut *query_result };
     let timeout = Duration::from_nanos(timeout);
@@ -225,11 +210,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_is_null()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, is_null_out);
-    unsafe {
-        *is_null_out = false;
-    }
+    ffi_arg_out_initialize!(is_null_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, is_null_out);
 
     let query_result = unsafe { &mut *query_result };
     let is_null = ffi_exec_core!(context, FUNCTION_NAME, query_result.is_null());
@@ -251,11 +234,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_int4()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
-    unsafe {
-        *value_out = 0;
-    }
+    ffi_arg_out_initialize!(value_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
 
     let query_result = unsafe { &mut *query_result };
 
@@ -280,11 +261,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_int4()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
-    unsafe {
-        *value_out = 0;
-    }
+    ffi_arg_out_initialize!(value_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let query_result = unsafe { &mut *query_result };
     let timeout = Duration::from_nanos(timeout);
@@ -314,11 +293,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_int8()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
-    unsafe {
-        *value_out = 0;
-    }
+    ffi_arg_out_initialize!(value_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
 
     let query_result = unsafe { &mut *query_result };
 
@@ -343,11 +320,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_int8()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
-    unsafe {
-        *value_out = 0;
-    }
+    ffi_arg_out_initialize!(value_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let query_result = unsafe { &mut *query_result };
     let timeout = Duration::from_nanos(timeout);
@@ -377,11 +352,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_float4()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
-    unsafe {
-        *value_out = 0f32;
-    }
+    ffi_arg_out_initialize!(value_out, 0f32);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
 
     let query_result = unsafe { &mut *query_result };
 
@@ -406,11 +379,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_float4()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
-    unsafe {
-        *value_out = 0f32;
-    }
+    ffi_arg_out_initialize!(value_out, 0f32);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let query_result = unsafe { &mut *query_result };
     let timeout = Duration::from_nanos(timeout);
@@ -440,11 +411,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_float8()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
-    unsafe {
-        *value_out = 0f64;
-    }
+    ffi_arg_out_initialize!(value_out, 0f64);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
 
     let query_result = unsafe { &mut *query_result };
 
@@ -469,11 +438,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_float8()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
-    unsafe {
-        *value_out = 0f64;
-    }
+    ffi_arg_out_initialize!(value_out, 0f64);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let query_result = unsafe { &mut *query_result };
     let timeout = Duration::from_nanos(timeout);
@@ -505,11 +472,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_character()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
-    unsafe {
-        *value_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
 
     let query_result = unsafe { &mut *query_result };
 
@@ -537,11 +502,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_character()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
-    unsafe {
-        *value_out = std::ptr::null_mut();
-    }
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     let query_result = unsafe { &mut *query_result };
     let timeout = Duration::from_nanos(timeout);

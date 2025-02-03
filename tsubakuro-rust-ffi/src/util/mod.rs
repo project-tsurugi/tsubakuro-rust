@@ -1,6 +1,17 @@
 mod cchar;
 
 #[macro_export]
+macro_rules! ffi_arg_out_initialize {
+    ($arg:expr, $value:expr) => {
+        if (!$arg.is_null()) {
+            unsafe {
+                *$arg = $value;
+            }
+        }
+    };
+}
+
+#[macro_export]
 macro_rules! ffi_arg_require_non_null {
     ($context:expr, $function_name:expr, $arg_index:expr, $arg:expr) => {{
         if ($arg.is_null()) {
