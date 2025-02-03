@@ -39,6 +39,37 @@ class TgFfiSqlClientTest extends TgFfiTester {
 				)""");
 	}
 
+	@Test
+	void get_service_message_version() {
+		var manager = getFfiObjectManager();
+		try (var context = TgFfiContext.create(manager); //
+				var client = createSqlClient()) {
+			String smv = client.getServiceMessageVersion(context);
+			assertEquals("sql-1.3", smv);
+		}
+	}
+
+	@Test
+	void get_service_message_version_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_service_message_version(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = client.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_service_message_version(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
 	// list_tables(), list_tables() → TgFfiTableListTest
 
 	@Test

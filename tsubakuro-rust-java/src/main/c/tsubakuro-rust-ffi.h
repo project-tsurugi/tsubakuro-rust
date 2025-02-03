@@ -552,6 +552,10 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_metadata_get_columns_value(TsurugiFfiC
 
 void tsurugi_ffi_sql_query_result_metadata_dispose(TsurugiFfiSqlQueryResultMetadataHandle query_result_metadata);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context,
+                                                                TsurugiFfiSqlClientHandle sql_client,
+                                                                char **smv_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
                                                 TsurugiFfiTableListHandle *table_list_out);

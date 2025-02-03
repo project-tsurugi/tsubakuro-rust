@@ -4,6 +4,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
+    cchar_field_dispose, cchar_field_set,
     context::TsurugiFfiContextHandle,
     ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
     impl_job_delegator,
@@ -36,6 +37,7 @@ use super::{
 pub(crate) struct TsurugiFfiSqlClient {
     sql_client: SqlClient,
     runtime: Arc<tokio::runtime::Runtime>,
+    service_message_version: *mut c_char,
 }
 
 impl TsurugiFfiSqlClient {
@@ -46,6 +48,7 @@ impl TsurugiFfiSqlClient {
         TsurugiFfiSqlClient {
             sql_client,
             runtime,
+            service_message_version: std::ptr::null_mut(),
         }
     }
 
@@ -69,6 +72,32 @@ impl std::ops::DerefMut for TsurugiFfiSqlClient {
 }
 
 pub type TsurugiFfiSqlClientHandle = *mut TsurugiFfiSqlClient;
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    smv_out: *mut *mut c_char,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_service_message_version()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_out_initialize!(smv_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, smv_out);
+
+    let client = unsafe { &mut *sql_client };
+
+    let smv = SqlClient::service_message_version();
+    unsafe {
+        cchar_field_set!(context, client.service_message_version, smv);
+
+        *smv_out = client.service_message_version;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
@@ -1414,7 +1443,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_dispose(sql_client: TsurugiFfiSqlClient
     }
 
     unsafe {
-        let _ = Box::from_raw(sql_client);
+        let client = Box::from_raw(sql_client);
+
+        cchar_field_dispose!(client.service_message_version);
     }
 
     trace!("{FUNCTION_NAME} end");

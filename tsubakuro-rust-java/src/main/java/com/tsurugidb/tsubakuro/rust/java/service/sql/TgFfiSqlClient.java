@@ -25,6 +25,16 @@ public class TgFfiSqlClient extends TgFfiObject {
 		super(manager, handle);
 	}
 
+	public synchronized String getServiceMessageVersion(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_service_message_version(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToString(out);
+	}
+
 	public synchronized TgFfiTableList listTables(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();

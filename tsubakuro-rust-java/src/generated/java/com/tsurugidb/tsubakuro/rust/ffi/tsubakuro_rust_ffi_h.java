@@ -19988,6 +19988,66 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_client_get_service_message_version {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_service_message_version");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_get_service_message_version$descriptor() {
+        return tsurugi_ffi_sql_client_get_service_message_version.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_get_service_message_version$handle() {
+        return tsurugi_ffi_sql_client_get_service_message_version.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_get_service_message_version$address() {
+        return tsurugi_ffi_sql_client_get_service_message_version.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_get_service_message_version(MemorySegment context, MemorySegment sql_client, MemorySegment smv_out) {
+        var mh$ = tsurugi_ffi_sql_client_get_service_message_version.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_get_service_message_version", context, sql_client, smv_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, smv_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_client_list_tables {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
