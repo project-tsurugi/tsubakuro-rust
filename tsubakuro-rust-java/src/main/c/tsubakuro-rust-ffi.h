@@ -841,6 +841,14 @@ TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context,
                                                TsurugiFfiConnectionOptionHandle connection_option,
                                                TsurugiFfiJobHandle *session_job_out);
 
+TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSessionHandle session,
+                                                     TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_session_get_default_timeout(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSessionHandle session,
+                                                     TsurugiFfiDuration *default_timeout_out);
+
 TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context,
                                                  TsurugiFfiSessionHandle session,
                                                  TsurugiFfiSqlClientHandle *sql_client_out);

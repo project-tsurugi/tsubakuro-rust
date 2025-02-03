@@ -174,6 +174,51 @@ impl ConnectJobDelegator {
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_set_default_timeout(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_set_default_timeout()";
+    trace!("{FUNCTION_NAME} start. session={:?}", session);
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+
+    let session = unsafe { &mut *session };
+    let timeout = Duration::from_nanos(timeout);
+
+    session.set_default_timeout(timeout);
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_get_default_timeout(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    default_timeout_out: *mut TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_get_default_timeout()";
+    trace!("{FUNCTION_NAME} start. session={:?}", session);
+
+    ffi_arg_out_initialize!(default_timeout_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, default_timeout_out);
+
+    let session = unsafe { &mut *session };
+
+    let timeout = session.default_timeout();
+
+    unsafe {
+        *default_timeout_out = timeout.as_nanos() as TsurugiFfiDuration;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     context: TsurugiFfiContextHandle,
     session: TsurugiFfiSessionHandle,

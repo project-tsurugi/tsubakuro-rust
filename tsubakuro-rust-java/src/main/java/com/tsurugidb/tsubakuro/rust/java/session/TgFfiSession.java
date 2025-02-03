@@ -132,6 +132,25 @@ public class TgFfiSession extends TgFfiObject {
 		super(manager, handle);
 	}
 
+	public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_set_default_timeout(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized Duration getDefaultTimeout(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_default_timeout(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		long value = outToLong(out);
+		return Duration.ofNanos(value);
+	}
+
 	public synchronized TgFfiSqlClient makeSqlClient(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();

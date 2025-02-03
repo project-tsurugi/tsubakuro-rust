@@ -18,7 +18,6 @@ class TgFfiSessionTest extends TgFfiTester {
 	@Test
 	void connect() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		var connectionOption = TgFfiConnectionOption.create(context);
@@ -31,7 +30,6 @@ class TgFfiSessionTest extends TgFfiTester {
 	@Test
 	void connect_argError() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		{
@@ -53,7 +51,6 @@ class TgFfiSessionTest extends TgFfiTester {
 	@Test
 	void connect_for() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		var connect_forionOption = TgFfiConnectionOption.create(context);
@@ -68,7 +65,6 @@ class TgFfiSessionTest extends TgFfiTester {
 	@Test
 	void connect_for_argError() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		{
@@ -93,7 +89,6 @@ class TgFfiSessionTest extends TgFfiTester {
 	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
 	void connect_async(String pattern) {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		var connectionOption = TgFfiConnectionOption.create(context);
@@ -107,7 +102,6 @@ class TgFfiSessionTest extends TgFfiTester {
 	@Test
 	void connect_async_argError() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		{
@@ -127,9 +121,59 @@ class TgFfiSessionTest extends TgFfiTester {
 	}
 
 	@Test
+	void set_default_timeout() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		var connectionOption = TgFfiConnectionOption.create(context);
+		connectionOption.setEndpointUrl(context, getEndpoint());
+
+		try (var session = TgFfiSession.connect(context, connectionOption)) {
+			session.setDefaultTimeout(context, Duration.ofSeconds(123));
+
+			var timeout = session.getDefaultTimeout(context);
+			assertEquals(Duration.ofSeconds(123), timeout);
+		}
+	}
+
+	@Test
+	void set_default_timeout_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_set_default_timeout(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_default_timeout_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_default_timeout(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var session = createSession()) {
+			var ctx = context.handle();
+			var handle = session.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_default_timeout(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
 	void make_sql_client() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		var connectionOption = TgFfiConnectionOption.create(context);
@@ -143,7 +187,6 @@ class TgFfiSessionTest extends TgFfiTester {
 	@Test
 	void make_sql_client_argError() {
 		var manager = getFfiObjectManager();
-
 		var context = TgFfiContext.create(manager);
 
 		{

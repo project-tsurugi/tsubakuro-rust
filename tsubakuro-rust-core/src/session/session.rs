@@ -1,5 +1,5 @@
 use std::{
-    sync::{atomic::AtomicBool, Arc},
+    sync::{atomic::AtomicBool, Arc, RwLock},
     time::Duration,
 };
 
@@ -20,7 +20,7 @@ use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
 #[derive(Debug)]
 pub struct Session {
     wire: Arc<Wire>,
-    default_timeout: Duration,
+    default_timeout: RwLock<Duration>,
     shutdowned: AtomicBool,
     fail_on_drop_error: AtomicBool,
 }
@@ -90,12 +90,14 @@ impl Session {
         Ok((endpoint, client_information))
     }
 
-    pub fn set_default_timeout(&mut self, timeout: Duration) {
-        self.default_timeout = timeout;
+    pub fn set_default_timeout(&self, timeout: Duration) {
+        let mut default_timeout = self.default_timeout.write().unwrap();
+        *default_timeout = timeout;
     }
 
     pub fn default_timeout(&self) -> Duration {
-        self.default_timeout
+        let default_timeout = self.default_timeout.read().unwrap();
+        *default_timeout
     }
 
     pub fn make_client<T: ServiceClient>(self: &Arc<Session>) -> T {
@@ -106,7 +108,7 @@ impl Session {
         &self,
         expiration_time: Option<Duration>,
     ) -> Result<(), TgError> {
-        let timeout = self.default_timeout;
+        let timeout = self.default_timeout();
         self.update_expiration_time_for(expiration_time, timeout)
             .await
     }
@@ -126,14 +128,14 @@ impl Session {
         CoreService::update_expiration_time_async(
             &self.wire,
             expiration_time,
-            self.default_timeout,
+            self.default_timeout(),
             self.fail_on_drop_error(),
         )
         .await
     }
 
     pub async fn shutdown(&self, shutdown_type: ShutdownType) -> Result<(), TgError> {
-        let timeout = self.default_timeout;
+        let timeout = self.default_timeout();
         self.shutdown_for(shutdown_type, timeout).await
     }
 
@@ -151,7 +153,7 @@ impl Session {
         CoreService::shutdown_async(
             &self.wire,
             shutdown_type,
-            self.default_timeout,
+            self.default_timeout(),
             self.fail_on_drop_error(),
         )
         .await
@@ -194,7 +196,7 @@ impl Session {
     ) -> Arc<Self> {
         let session = Arc::new(Session {
             wire,
-            default_timeout,
+            default_timeout: RwLock::new(default_timeout),
             shutdowned: AtomicBool::new(false),
             fail_on_drop_error: AtomicBool::new(false),
         });
