@@ -272,4 +272,156 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}
+
+	@Test
+	void set_inclusive_read_area() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			assertTrue(target.getInclusiveReadArea(context).isEmpty());
+
+			var list = List.of("abc", "def", "ghi");
+			target.setInclusiveReadArea(context, list);
+
+			var actual = target.getInclusiveReadArea(context);
+			assertEquals(list, actual);
+		}
+	}
+
+	@Test
+	void set_inclusive_read_area_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = manager.allocateStringArray(List.of("a"));
+			var size = 1;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_inclusive_read_area(ctx, handle, arg,
+					size);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var arg = MemorySegment.NULL;
+			var size = 1;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_inclusive_read_area(ctx, handle, arg,
+					size);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_inclusive_read_area_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var sout = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_inclusive_read_area(ctx, handle, out,
+					sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = MemorySegment.NULL;
+			var sout = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_inclusive_read_area(ctx, handle, out,
+					sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = manager.allocatePtr();
+			var sout = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_inclusive_read_area(ctx, handle, out,
+					sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void set_exclusive_read_area() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			assertTrue(target.getExclusiveReadArea(context).isEmpty());
+
+			var list = List.of("abc", "def", "ghi");
+			target.setExclusiveReadArea(context, list);
+
+			var actual = target.getExclusiveReadArea(context);
+			assertEquals(list, actual);
+		}
+	}
+
+	@Test
+	void set_exclusive_read_area_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = manager.allocateStringArray(List.of("a"));
+			var size = 1;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_exclusive_read_area(ctx, handle, arg,
+					size);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var arg = MemorySegment.NULL;
+			var size = 1;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_exclusive_read_area(ctx, handle, arg,
+					size);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_exclusive_read_area_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var sout = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_exclusive_read_area(ctx, handle, out,
+					sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = MemorySegment.NULL;
+			var sout = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_exclusive_read_area(ctx, handle, out,
+					sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = manager.allocatePtr();
+			var sout = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_exclusive_read_area(ctx, handle, out,
+					sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
 }

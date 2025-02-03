@@ -362,6 +362,146 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_set_inclusive_read_area(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    table_names: *const *const c_char,
+    table_names_size: u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_inclusive_read_area()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let table_names: Vec<String> =
+        convert_table_names!(context, FUNCTION_NAME, 2, table_names, table_names_size);
+
+    transaction_option.set_inclusive_read_area(&table_names);
+
+    unsafe {
+        vec_cchar_field_clear!(transaction_option.inclusive_read_area);
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    table_names_out: *mut TsurugiFfiStringArrayHandle,
+    table_names_size_out: *mut u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_inclusive_read_area()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(table_names_size_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_names_size_out);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let table_names = transaction_option.inclusive_read_area();
+
+    let size = table_names.len();
+
+    // TODO mutex.lock transaction_option.inclusive_read_area
+    vec_cchar_field_set_if_none!(context, transaction_option.inclusive_read_area, table_names);
+
+    unsafe {
+        *table_names_out = transaction_option
+            .inclusive_read_area
+            .as_mut()
+            .unwrap()
+            .as_mut_ptr();
+        *table_names_size_out = size as u32;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_set_exclusive_read_area(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    table_names: *const *const c_char,
+    table_names_size: u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_exclusive_read_area()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let table_names: Vec<String> =
+        convert_table_names!(context, FUNCTION_NAME, 2, table_names, table_names_size);
+
+    transaction_option.set_exclusive_read_area(&table_names);
+
+    unsafe {
+        vec_cchar_field_clear!(transaction_option.exclusive_read_area);
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    table_names_out: *mut TsurugiFfiStringArrayHandle,
+    table_names_size_out: *mut u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_exclusive_read_area()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(table_names_size_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_names_size_out);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let table_names = transaction_option.exclusive_read_area();
+
+    let size = table_names.len();
+
+    // TODO mutex.lock transaction_option.exclusive_read_area
+    vec_cchar_field_set_if_none!(context, transaction_option.exclusive_read_area, table_names);
+
+    unsafe {
+        *table_names_out = transaction_option
+            .exclusive_read_area
+            .as_mut()
+            .unwrap()
+            .as_mut_ptr();
+        *table_names_size_out = size as u32;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_dispose(
     transaction_option: TsurugiFfiTransactionOptionHandle,
 ) {

@@ -1,8 +1,6 @@
 package com.tsurugidb.tsubakuro.rust.java.transaction;
 
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -122,10 +120,53 @@ public class TgFfiTransactionOption extends TgFfiObject {
 	public synchronized List<String> getWritePreserve(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
-
 		var out = allocatePtr();
 		var sizeOut = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve(ctx, handle, out, sizeOut);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToStringList(out, sizeOut);
+	}
+
+	public synchronized void setInclusiveReadArea(TgFfiContext context, List<String> tableNames) {
+		Objects.requireNonNull(tableNames, "tableNames must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateStringArray(tableNames);
+		var size = tableNames.size();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_inclusive_read_area(ctx, handle, arg, size);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized List<String> getInclusiveReadArea(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var sizeOut = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_inclusive_read_area(ctx, handle, out, sizeOut);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToStringList(out, sizeOut);
+	}
+
+	public synchronized void setExclusiveReadArea(TgFfiContext context, List<String> tableNames) {
+		Objects.requireNonNull(tableNames, "tableNames must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateStringArray(tableNames);
+		var size = tableNames.size();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_exclusive_read_area(ctx, handle, arg, size);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized List<String> getExclusiveReadArea(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var sizeOut = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_exclusive_read_area(ctx, handle, out, sizeOut);
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToStringList(out, sizeOut);

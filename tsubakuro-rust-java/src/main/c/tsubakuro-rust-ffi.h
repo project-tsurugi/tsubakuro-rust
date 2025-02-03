@@ -846,6 +846,26 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve(TsurugiFfiContext
                                                                TsurugiFfiStringArrayHandle *table_names_out,
                                                                uint32_t *table_names_size_out);
 
+TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context,
+                                                                    TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                    const char *const *table_names,
+                                                                    uint32_t table_names_size);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_inclusive_read_area(TsurugiFfiContextHandle context,
+                                                                    TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                    TsurugiFfiStringArrayHandle *table_names_out,
+                                                                    uint32_t *table_names_size_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context,
+                                                                    TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                    const char *const *table_names,
+                                                                    uint32_t table_names_size);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_exclusive_read_area(TsurugiFfiContextHandle context,
+                                                                    TsurugiFfiTransactionOptionHandle transaction_option,
+                                                                    TsurugiFfiStringArrayHandle *table_names_out,
+                                                                    uint32_t *table_names_size_out);
+
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
 
 TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context,
