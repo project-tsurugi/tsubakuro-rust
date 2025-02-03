@@ -5,9 +5,9 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    ffi_arg_out_initialize, ffi_arg_require_non_null,
     return_code::{rc_ok, TsurugiFfiRc},
-    vec_cchar_field_dispose, vec_cchar_field_set_if_none,
+    vec_cchar_field_dispose, vec_cchar_field_set_if_none, TsurugiFfiStringArrayHandle,
 };
 
 pub(crate) struct TsurugiFfiTableList {
@@ -41,58 +41,32 @@ impl std::ops::DerefMut for TsurugiFfiTableList {
 pub type TsurugiFfiTableListHandle = *mut TsurugiFfiTableList;
 
 #[no_mangle]
-pub extern "C" fn tsurugi_ffi_table_list_get_table_names_size(
+pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
     context: TsurugiFfiContextHandle,
     table_list: TsurugiFfiTableListHandle,
-    size_out: *mut u32,
+    table_names_out: *mut TsurugiFfiStringArrayHandle,
+    table_names_size_out: *mut u32,
 ) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names_size()";
+    const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names()";
     trace!("{FUNCTION_NAME} start. table_list={:?}", table_list);
 
-    ffi_arg_out_initialize!(size_out, 0);
+    ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(table_names_size_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_list);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
-
-    let table_list = unsafe { &*table_list };
-    let table_names = table_list.table_names();
-
-    unsafe {
-        *size_out = table_names.len() as u32;
-    }
-
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
-}
-
-#[no_mangle]
-pub extern "C" fn tsurugi_ffi_table_list_get_table_names_value(
-    context: TsurugiFfiContextHandle,
-    table_list: TsurugiFfiTableListHandle,
-    index: u32,
-    table_name_out: *mut *mut c_char,
-) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names_value()";
-    trace!("{FUNCTION_NAME} start. table_list={:?}", table_list);
-
-    ffi_arg_out_initialize!(table_name_out, std::ptr::null_mut());
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_list);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_name_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_names_size_out);
 
     let table_list = unsafe { &mut *table_list };
     let table_names = table_list.table_names();
 
-    let index = index as usize;
-    if index >= table_names.len() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "index", "out of bounds");
-    }
+    let size = table_names.len();
 
     // TODO mutex.lock table_list.table_names
     vec_cchar_field_set_if_none!(context, table_list.table_names, table_names);
 
-    let table_name = table_list.table_names.as_ref().unwrap()[index];
-
     unsafe {
-        *table_name_out = table_name;
+        *table_names_out = table_list.table_names.as_mut().unwrap().as_mut_ptr();
+        *table_names_size_out = size as u32;
     }
 
     trace!("{FUNCTION_NAME} end");

@@ -1,8 +1,6 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import java.lang.foreign.MemorySegment;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -30,26 +28,12 @@ public class TgFfiTableList extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 
-		int size;
-		{
-			var out = allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_size(ctx, handle, out);
-			TgFfiRcUtil.throwIfError(rc, context);
+		var out = allocatePtr();
+		var sizeOut = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names(ctx, handle, out, sizeOut);
+		TgFfiRcUtil.throwIfError(rc, context);
 
-			size = outToInt(out);
-		}
-
-		var list = new ArrayList<String>(size);
-		for (int i = 0; i < size; i++) {
-			var out = allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names_value(ctx, handle, i, out);
-			TgFfiRcUtil.throwIfError(rc, context);
-
-			String tableName = outToString(out);
-			list.add(tableName);
-		}
-
-		return Collections.unmodifiableList(list);
+		return outToStringList(out, sizeOut);
 	}
 
 	@Override

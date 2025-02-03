@@ -232,13 +232,13 @@ typedef struct TsurugiFfiTransaction *TsurugiFfiTransactionHandle;
 
 typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
 
+typedef char **TsurugiFfiStringArrayHandle;
+
 typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 
 typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
-
-typedef char **TsurugiFfiStringArrayHandle;
 
 #define TSURUGI_FFI_RC_OK 0
 
@@ -716,14 +716,10 @@ TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle conte
 
 void tsurugi_ffi_sql_client_dispose(TsurugiFfiSqlClientHandle sql_client);
 
-TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_size(TsurugiFfiContextHandle context,
-                                                         TsurugiFfiTableListHandle table_list,
-                                                         uint32_t *size_out);
-
-TsurugiFfiRc tsurugi_ffi_table_list_get_table_names_value(TsurugiFfiContextHandle context,
-                                                          TsurugiFfiTableListHandle table_list,
-                                                          uint32_t index,
-                                                          char **table_name_out);
+TsurugiFfiRc tsurugi_ffi_table_list_get_table_names(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiTableListHandle table_list,
+                                                    TsurugiFfiStringArrayHandle *table_names_out,
+                                                    uint32_t *table_names_size_out);
 
 void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list);
 
