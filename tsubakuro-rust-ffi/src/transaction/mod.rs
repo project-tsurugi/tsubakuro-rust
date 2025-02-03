@@ -1,5 +1,6 @@
 pub(crate) mod commit_option;
 pub(crate) mod option;
+pub(crate) mod status;
 pub(crate) mod transaction;
 pub(crate) mod r#type;
 

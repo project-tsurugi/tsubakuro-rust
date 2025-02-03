@@ -7,6 +7,7 @@ use crate::{
     sql_service_error,
 };
 
+#[derive(Debug)]
 pub struct TransactionStatus {
     server_error: Option<TgError>,
 }

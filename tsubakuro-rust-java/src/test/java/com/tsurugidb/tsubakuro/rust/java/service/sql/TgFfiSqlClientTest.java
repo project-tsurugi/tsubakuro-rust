@@ -820,6 +820,119 @@ class TgFfiSqlClientTest extends TgFfiTester {
 		}
 	}
 
+	// get_transaction_status(), _for(), _async() → TgFfiTransactionStatus
+
+	@Test
+	void get_transaction_status_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transaction = startOcc(client)) {
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var arg = transaction.handle();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status(ctx, handle, arg, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status(ctx, handle, arg, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg = transaction.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status(ctx, handle, arg, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
+		}
+	}
+
+	@Test
+	void get_transaction_status_for_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transaction = startOcc(client)) {
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var arg = transaction.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t,
+						out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t,
+						out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg = transaction.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t,
+						out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+			}
+		}
+	}
+
+	@Test
+	void get_transaction_status_async_argError() {
+		var manager = getFfiObjectManager();
+		var client = createSqlClient();
+
+		try (var context = TgFfiContext.create(manager); //
+				var transaction = startOcc(client)) {
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var arg = transaction.handle();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_async(ctx, handle, arg,
+						out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_async(ctx, handle, arg,
+						out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = client.handle();
+				var arg = transaction.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_async(ctx, handle, arg,
+						out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
+		}
+	}
+
 	@Test
 	void execute() {
 		var manager = getFfiObjectManager();

@@ -15847,6 +15847,12 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiTransactionHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef struct TsurugiFfiTransactionStatus *TsurugiFfiTransactionStatusHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiTransactionStatusHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle
      * }
      */
@@ -20787,6 +20793,190 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_client_get_transaction_status {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_get_transaction_status$descriptor() {
+        return tsurugi_ffi_sql_client_get_transaction_status.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_get_transaction_status$handle() {
+        return tsurugi_ffi_sql_client_get_transaction_status.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_get_transaction_status$address() {
+        return tsurugi_ffi_sql_client_get_transaction_status.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_get_transaction_status(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment transaction_status_out) {
+        var mh$ = tsurugi_ffi_sql_client_get_transaction_status.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_get_transaction_status", context, sql_client, transaction, transaction_status_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, transaction, transaction_status_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_get_transaction_status_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_get_transaction_status_for$descriptor() {
+        return tsurugi_ffi_sql_client_get_transaction_status_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_get_transaction_status_for$handle() {
+        return tsurugi_ffi_sql_client_get_transaction_status_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_get_transaction_status_for$address() {
+        return tsurugi_ffi_sql_client_get_transaction_status_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout, TsurugiFfiTransactionStatusHandle *transaction_status_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_get_transaction_status_for(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, long timeout, MemorySegment transaction_status_out) {
+        var mh$ = tsurugi_ffi_sql_client_get_transaction_status_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_get_transaction_status_for", context, sql_client, transaction, timeout, transaction_status_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, transaction, timeout, transaction_status_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_get_transaction_status_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *transaction_status_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_get_transaction_status_async$descriptor() {
+        return tsurugi_ffi_sql_client_get_transaction_status_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *transaction_status_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_get_transaction_status_async$handle() {
+        return tsurugi_ffi_sql_client_get_transaction_status_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *transaction_status_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_get_transaction_status_async$address() {
+        return tsurugi_ffi_sql_client_get_transaction_status_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiJobHandle *transaction_status_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_get_transaction_status_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment transaction_status_job_out) {
+        var mh$ = tsurugi_ffi_sql_client_get_transaction_status_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_get_transaction_status_async", context, sql_client, transaction, transaction_status_job_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, transaction, transaction_status_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_client_execute {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -24591,6 +24781,543 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_dispose", transaction_option);
             }
             mh$.invokeExact(transaction_option);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_is_normal {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_is_normal");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_normal(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_normal_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_is_normal$descriptor() {
+        return tsurugi_ffi_transaction_status_is_normal.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_normal(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_normal_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_is_normal$handle() {
+        return tsurugi_ffi_transaction_status_is_normal.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_normal(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_normal_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_is_normal$address() {
+        return tsurugi_ffi_transaction_status_is_normal.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_normal(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_normal_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_is_normal(MemorySegment context, MemorySegment transaction_status, MemorySegment is_normal_out) {
+        var mh$ = tsurugi_ffi_transaction_status_is_normal.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_is_normal", context, transaction_status, is_normal_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, is_normal_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_is_error {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_is_error");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_error(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_error_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_is_error$descriptor() {
+        return tsurugi_ffi_transaction_status_is_error.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_error(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_error_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_is_error$handle() {
+        return tsurugi_ffi_transaction_status_is_error.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_error(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_error_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_is_error$address() {
+        return tsurugi_ffi_transaction_status_is_error.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_is_error(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, _Bool *is_error_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_is_error(MemorySegment context, MemorySegment transaction_status, MemorySegment is_error_out) {
+        var mh$ = tsurugi_ffi_transaction_status_is_error.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_is_error", context, transaction_status, is_error_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, is_error_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_get_server_error_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_get_server_error_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_name$descriptor() {
+        return tsurugi_ffi_transaction_status_get_server_error_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_name$handle() {
+        return tsurugi_ffi_transaction_status_get_server_error_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_name$address() {
+        return tsurugi_ffi_transaction_status_get_server_error_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_get_server_error_name(MemorySegment context, MemorySegment transaction_status, MemorySegment name_out) {
+        var mh$ = tsurugi_ffi_transaction_status_get_server_error_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_get_server_error_name", context, transaction_status, name_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_get_server_error_message {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_get_server_error_message");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_message$descriptor() {
+        return tsurugi_ffi_transaction_status_get_server_error_message.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_message$handle() {
+        return tsurugi_ffi_transaction_status_get_server_error_message.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_message$address() {
+        return tsurugi_ffi_transaction_status_get_server_error_message.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_get_server_error_message(MemorySegment context, MemorySegment transaction_status, MemorySegment error_message_out) {
+        var mh$ = tsurugi_ffi_transaction_status_get_server_error_message.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_get_server_error_message", context, transaction_status, error_message_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, error_message_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_get_server_error_category_number {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_get_server_error_category_number");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *category_number_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_category_number$descriptor() {
+        return tsurugi_ffi_transaction_status_get_server_error_category_number.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *category_number_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_category_number$handle() {
+        return tsurugi_ffi_transaction_status_get_server_error_category_number.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *category_number_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_category_number$address() {
+        return tsurugi_ffi_transaction_status_get_server_error_category_number.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *category_number_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_get_server_error_category_number(MemorySegment context, MemorySegment transaction_status, MemorySegment category_number_out) {
+        var mh$ = tsurugi_ffi_transaction_status_get_server_error_category_number.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_get_server_error_category_number", context, transaction_status, category_number_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, category_number_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_get_server_error_category_str {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_get_server_error_category_str");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_category_str$descriptor() {
+        return tsurugi_ffi_transaction_status_get_server_error_category_str.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_category_str$handle() {
+        return tsurugi_ffi_transaction_status_get_server_error_category_str.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_category_str$address() {
+        return tsurugi_ffi_transaction_status_get_server_error_category_str.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_get_server_error_category_str(MemorySegment context, MemorySegment transaction_status, MemorySegment category_str_out) {
+        var mh$ = tsurugi_ffi_transaction_status_get_server_error_category_str.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_get_server_error_category_str", context, transaction_status, category_str_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, category_str_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_get_server_error_code_number {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_get_server_error_code_number");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *code_number_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_code_number$descriptor() {
+        return tsurugi_ffi_transaction_status_get_server_error_code_number.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *code_number_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_code_number$handle() {
+        return tsurugi_ffi_transaction_status_get_server_error_code_number.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *code_number_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_code_number$address() {
+        return tsurugi_ffi_transaction_status_get_server_error_code_number.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, int32_t *code_number_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_get_server_error_code_number(MemorySegment context, MemorySegment transaction_status, MemorySegment code_number_out) {
+        var mh$ = tsurugi_ffi_transaction_status_get_server_error_code_number.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_get_server_error_code_number", context, transaction_status, code_number_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, code_number_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_get_server_error_structured_code {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_get_server_error_structured_code");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_structured_code$descriptor() {
+        return tsurugi_ffi_transaction_status_get_server_error_structured_code.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_structured_code$handle() {
+        return tsurugi_ffi_transaction_status_get_server_error_structured_code.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_structured_code$address() {
+        return tsurugi_ffi_transaction_status_get_server_error_structured_code.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_status_get_server_error_structured_code(MemorySegment context, MemorySegment transaction_status, MemorySegment structured_code_out) {
+        var mh$ = tsurugi_ffi_transaction_status_get_server_error_structured_code.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_get_server_error_structured_code", context, transaction_status, structured_code_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_status, structured_code_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_status_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_transaction_status_dispose(TsurugiFfiTransactionStatusHandle transaction_status)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_status_dispose$descriptor() {
+        return tsurugi_ffi_transaction_status_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_transaction_status_dispose(TsurugiFfiTransactionStatusHandle transaction_status)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_status_dispose$handle() {
+        return tsurugi_ffi_transaction_status_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_transaction_status_dispose(TsurugiFfiTransactionStatusHandle transaction_status)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_status_dispose$address() {
+        return tsurugi_ffi_transaction_status_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_transaction_status_dispose(TsurugiFfiTransactionStatusHandle transaction_status)
+     * }
+     */
+    public static void tsurugi_ffi_transaction_status_dispose(MemorySegment transaction_status) {
+        var mh$ = tsurugi_ffi_transaction_status_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_status_dispose", transaction_status);
+            }
+            mh$.invokeExact(transaction_status);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

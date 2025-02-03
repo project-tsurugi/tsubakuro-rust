@@ -17,7 +17,9 @@ use crate::{
         table_metadata::TsurugiFfiTableMetadata,
     },
     transaction::{
-        commit_option::TsurugiFfiCommitOptionHandle, option::TsurugiFfiTransactionOptionHandle,
+        commit_option::TsurugiFfiCommitOptionHandle,
+        option::TsurugiFfiTransactionOptionHandle,
+        status::{TsurugiFfiTransactionStatus, TsurugiFfiTransactionStatusHandle},
         TsurugiFfiTransaction, TsurugiFfiTransactionHandle,
     },
     TsurugiFfiDuration,
@@ -642,6 +644,139 @@ impl TransactionJobDelegator {
         runtime: Arc<tokio::runtime::Runtime>,
     ) -> Option<TsurugiFfiTransaction> {
         Some(TsurugiFfiTransaction::new(value, runtime))
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    transaction_status_out: *mut TsurugiFfiTransactionStatusHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_transaction_status()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_out_initialize!(transaction_status_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_status_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+
+    let runtime = client.runtime();
+    let status = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_transaction_status(transaction)
+    );
+
+    let status = Box::new(TsurugiFfiTransactionStatus::new(status));
+
+    let handle = Box::into_raw(status);
+    unsafe {
+        *transaction_status_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. transaction_status={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    timeout: TsurugiFfiDuration,
+    transaction_status_out: *mut TsurugiFfiTransactionStatusHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_transaction_status_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_out_initialize!(transaction_status_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, transaction_status_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let status = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_transaction_status_for(transaction, timeout)
+    );
+
+    let status = Box::new(TsurugiFfiTransactionStatus::new(status));
+
+    let handle = Box::into_raw(status);
+    unsafe {
+        *transaction_status_out = handle;
+    }
+
+    trace!("{FUNCTION_NAME} end. transaction_status={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    transaction_status_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_transaction_status_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_out_initialize!(transaction_status_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, transaction_status_job_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_transaction_status_async(transaction)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(TransactionStatusJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *transaction_status_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. transaction_status_job={:?}", handle);
+    rc_ok(context)
+}
+
+impl_job_delegator! {
+    TransactionStatusJobDelegator,
+    TransactionStatus,
+    TsurugiFfiTransactionStatus,
+    "transaction_status",
+}
+
+impl TransactionStatusJobDelegator {
+    fn convert(
+        value: TransactionStatus,
+        _runtime: Arc<tokio::runtime::Runtime>,
+    ) -> Option<TsurugiFfiTransactionStatus> {
+        Some(TsurugiFfiTransactionStatus::new(value))
     }
 }
 

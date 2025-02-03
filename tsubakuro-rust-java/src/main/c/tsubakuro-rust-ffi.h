@@ -217,6 +217,8 @@ typedef struct TsurugiFfiTransaction TsurugiFfiTransaction;
 
 typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
 
+typedef struct TsurugiFfiTransactionStatus TsurugiFfiTransactionStatus;
+
 typedef uint32_t TsurugiFfiRc;
 
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
@@ -253,6 +255,8 @@ typedef struct TsurugiFfiTableMetadata *TsurugiFfiTableMetadataHandle;
 typedef struct TsurugiFfiTransactionOption *TsurugiFfiTransactionOptionHandle;
 
 typedef struct TsurugiFfiTransaction *TsurugiFfiTransactionHandle;
+
+typedef struct TsurugiFfiTransactionStatus *TsurugiFfiTransactionStatusHandle;
 
 typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
 
@@ -623,6 +627,22 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHan
                                                             TsurugiFfiTransactionOptionHandle transaction_option,
                                                             TsurugiFfiJobHandle *transaction_job_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlClientHandle sql_client,
+                                                           TsurugiFfiTransactionHandle transaction,
+                                                           TsurugiFfiTransactionStatusHandle *transaction_status_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context,
+                                                               TsurugiFfiSqlClientHandle sql_client,
+                                                               TsurugiFfiTransactionHandle transaction,
+                                                               TsurugiFfiDuration timeout,
+                                                               TsurugiFfiTransactionStatusHandle *transaction_status_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context,
+                                                                 TsurugiFfiSqlClientHandle sql_client,
+                                                                 TsurugiFfiTransactionHandle transaction,
+                                                                 TsurugiFfiJobHandle *transaction_status_job_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
                                             TsurugiFfiTransactionHandle transaction,
@@ -911,6 +931,40 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextH
                                                               TsurugiFfiDuration *close_timeout_out);
 
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_is_normal(TsurugiFfiContextHandle context,
+                                                      TsurugiFfiTransactionStatusHandle transaction_status,
+                                                      bool *is_normal_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_is_error(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiTransactionStatusHandle transaction_status,
+                                                     bool *is_error_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context,
+                                                                  TsurugiFfiTransactionStatusHandle transaction_status,
+                                                                  char **name_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context,
+                                                                     TsurugiFfiTransactionStatusHandle transaction_status,
+                                                                     char **error_message_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(TsurugiFfiContextHandle context,
+                                                                             TsurugiFfiTransactionStatusHandle transaction_status,
+                                                                             int32_t *category_number_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context,
+                                                                          TsurugiFfiTransactionStatusHandle transaction_status,
+                                                                          char **category_str_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(TsurugiFfiContextHandle context,
+                                                                         TsurugiFfiTransactionStatusHandle transaction_status,
+                                                                         int32_t *code_number_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context,
+                                                                             TsurugiFfiTransactionStatusHandle transaction_status,
+                                                                             char **structured_code_out);
+
+void tsurugi_ffi_transaction_status_dispose(TsurugiFfiTransactionStatusHandle transaction_status);
 
 TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context,
                                                         TsurugiFfiTransactionHandle transaction,

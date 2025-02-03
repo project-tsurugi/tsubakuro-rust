@@ -16,6 +16,7 @@ import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedSta
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionStatus;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
@@ -237,6 +238,51 @@ public class TgFfiSqlClient extends TgFfiObject {
 			@Override
 			protected TgFfiTransaction valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
 				return new TgFfiTransaction(manager, valueHandle);
+			}
+		};
+	}
+
+	public synchronized TgFfiTransactionStatus getTransactionStatus(TgFfiContext context,
+			TgFfiTransaction transaction) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = transaction.handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status(ctx, handle, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiTransactionStatus(manager(), outHandle);
+	}
+
+	public synchronized TgFfiTransactionStatus getTransactionStatusFor(TgFfiContext context,
+			TgFfiTransaction transaction, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = transaction.handle();
+		var t = timeout.toNanos();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiTransactionStatus(manager(), outHandle);
+	}
+
+	public synchronized TgFfiJob<TgFfiTransactionStatus> getTransactionStatusAsync(TgFfiContext context,
+			TgFfiTransaction transaction) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = transaction.handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_async(ctx, handle, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiJob<>(manager(), outHandle) {
+			@Override
+			protected TgFfiTransactionStatus valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+				return new TgFfiTransactionStatus(manager, valueHandle);
 			}
 		};
 	}
