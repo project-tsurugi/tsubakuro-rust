@@ -238,6 +238,8 @@ typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
 
+typedef char **TsurugiFfiStringArrayHandle;
+
 #define TSURUGI_FFI_RC_OK 0
 
 #define TSURUGI_FFI_RC_FFI_ARG0_ERROR (TSURUGI_FFI_RC_FFI_ARG_ERROR | 0)
@@ -843,14 +845,10 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContext
                                                                const char *const *table_names,
                                                                uint32_t table_names_size);
 
-TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_size(TsurugiFfiContextHandle context,
-                                                                    TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                    uint32_t *size_out);
-
-TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_value(TsurugiFfiContextHandle context,
-                                                                     TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                     uint32_t index,
-                                                                     char **table_name_out);
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve(TsurugiFfiContextHandle context,
+                                                               TsurugiFfiTransactionOptionHandle transaction_option,
+                                                               TsurugiFfiStringArrayHandle *table_names_out,
+                                                               uint32_t *table_names_size_out);
 
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
 

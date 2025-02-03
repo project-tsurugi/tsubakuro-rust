@@ -9,6 +9,7 @@ use crate::{
     ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     vec_cchar_field_clear, vec_cchar_field_dispose, vec_cchar_field_set_if_none,
+    TsurugiFfiStringArrayHandle,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -329,10 +330,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_write_preserve(
 }
 
 #[no_mangle]
-pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve_size(
+pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
     context: TsurugiFfiContextHandle,
     transaction_option: TsurugiFfiTransactionOptionHandle,
-    size_out: *mut u32,
+    table_names_out: *mut TsurugiFfiStringArrayHandle,
+    table_names_size_out: *mut u32,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_write_preserve_size()";
     trace!(
@@ -340,57 +342,31 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve_size(
         transaction_option
     );
 
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names_out);
     unsafe {
-        *size_out = 0;
+        *table_names_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_names_size_out);
+    unsafe {
+        *table_names_size_out = 0;
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
 
     let transaction_option = unsafe { &mut *transaction_option };
     let table_names = transaction_option.write_preserve();
 
-    unsafe {
-        *size_out = table_names.len() as u32;
-    }
-
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
-}
-
-#[no_mangle]
-pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve_value(
-    context: TsurugiFfiContextHandle,
-    transaction_option: TsurugiFfiTransactionOptionHandle,
-    index: u32,
-    table_name_out: *mut *mut c_char,
-) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_write_preserve_value()";
-    trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
-    );
-
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_name_out);
-    unsafe {
-        *table_name_out = std::ptr::null_mut();
-    }
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
-
-    let transaction_option = unsafe { &mut *transaction_option };
-    let table_names = transaction_option.write_preserve();
-
-    let index = index as usize;
-    if index >= table_names.len() {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "index", "out of bounds");
-    }
+    let size = table_names.len();
 
     // TODO mutex.lock transaction_option.write_preserve
     vec_cchar_field_set_if_none!(context, transaction_option.write_preserve, table_names);
 
-    let table_name = transaction_option.write_preserve.as_ref().unwrap()[index];
-
     unsafe {
-        *table_name_out = table_name;
+        *table_names_out = transaction_option
+            .write_preserve
+            .as_mut()
+            .unwrap()
+            .as_mut_ptr();
+        *table_names_size_out = size as u32;
     }
 
     trace!("{FUNCTION_NAME} end");

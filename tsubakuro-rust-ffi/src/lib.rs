@@ -10,3 +10,5 @@ mod util;
 
 /// nanosecond
 pub type TsurugiFfiDuration = u64;
+
+pub type TsurugiFfiStringArrayHandle = *mut *mut std::ffi::c_char;

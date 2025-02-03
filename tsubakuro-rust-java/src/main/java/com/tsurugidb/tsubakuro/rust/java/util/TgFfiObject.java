@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,6 +82,25 @@ public abstract class TgFfiObject implements Closeable {
 		// そこで、バイト数を適当に増やしてからgetString()を呼ぶ。
 		var ptr = stringPtr.reinterpret(Short.MAX_VALUE);
 		return ptr.getString(0);
+	}
+
+	protected static List<String> outToStringList(MemorySegment out, MemorySegment sizeOut) {
+		int size = outToInt(sizeOut);
+		if (size == 0) {
+			return List.of();
+		}
+
+		var array = outToHandle(out).reinterpret(ValueLayout.ADDRESS.byteSize() * size);
+
+		var list = new ArrayList<String>();
+		for (int i = 0; i < size; i++) {
+			var ptr = array.getAtIndex(ValueLayout.ADDRESS, i).reinterpret(Short.MAX_VALUE);
+			String s = ptr.getString(0);
+
+			list.add(s);
+		}
+		return list;
+
 	}
 
 	@Override

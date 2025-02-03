@@ -241,4 +241,35 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 		}
 	}
 
+	@Test
+	void get_write_preserve_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var sout = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve(ctx, handle, out, sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = MemorySegment.NULL;
+			var sout = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve(ctx, handle, out, sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = manager.allocatePtr();
+			var sout = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve(ctx, handle, out, sout);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+		}
+	}
 }

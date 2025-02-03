@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.transaction;
 
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -122,29 +123,12 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 
-		int size;
-		{
-			var out = allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve_size(ctx, handle, out);
-			TgFfiRcUtil.throwIfError(rc, context);
+		var out = allocatePtr();
+		var sizeOut = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve(ctx, handle, out, sizeOut);
+		TgFfiRcUtil.throwIfError(rc, context);
 
-			size = outToInt(out);
-		}
-
-		if (size == 0) {
-			return List.of();
-		}
-
-		var list = new ArrayList<String>();
-		for (int i = 0; i < size; i++) {
-			var out = allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve_value(ctx, handle, i, out);
-			TgFfiRcUtil.throwIfError(rc, context);
-
-			String s = outToString(out);
-			list.add(s);
-		}
-		return list;
+		return outToStringList(out, sizeOut);
 	}
 
 	@Override
