@@ -8,6 +8,7 @@ use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_cchar_to_str, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
+    vec_cchar_field_clear, vec_cchar_field_dispose, vec_cchar_field_set_if_none,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -56,6 +57,9 @@ impl From<TsurugiFfiTransactionType> for TransactionType {
 pub(crate) struct TsurugiFfiTransactionOption {
     transaction_option: TransactionOption,
     transaction_label: *mut c_char,
+    write_preserve: Option<Vec<*mut c_char>>,
+    inclusive_read_area: Option<Vec<*mut c_char>>,
+    exclusive_read_area: Option<Vec<*mut c_char>>,
 }
 
 impl std::ops::Deref for TsurugiFfiTransactionOption {
@@ -90,6 +94,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_create(
     let transaction_option = Box::new(TsurugiFfiTransactionOption {
         transaction_option: TransactionOption::new(),
         transaction_label: std::ptr::null_mut(),
+        write_preserve: None,
+        inclusive_read_area: None,
+        exclusive_read_area: None,
     });
 
     let handle = Box::into_raw(transaction_option);
@@ -170,9 +177,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_label(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label);
 
-    let label = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, label);
-
     let transaction_option = unsafe { &mut *transaction_option };
+    let label = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, label);
+
     transaction_option.set_transaction_label(label);
 
     unsafe {
@@ -220,7 +227,175 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
     rc_ok(context)
 }
 
-// TODO tsurugi_ffi_transaction_option_set_modifies_definitions(), etc
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_set_modifies_definitions(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    modifies_definitions: bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_modifies_definitions()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+
+    transaction_option.set_modifies_definitions(modifies_definitions);
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_modifies_definitions(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    modifies_definitions_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_modifies_definitions()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, modifies_definitions_out);
+    unsafe {
+        *modifies_definitions_out = false;
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+
+    let modifies_definitions = transaction_option.modifies_definitions();
+    unsafe {
+        *modifies_definitions_out = modifies_definitions;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+macro_rules! convert_table_names {
+    ($context:expr, $function_name:expr, $arg_index:expr, $table_names:expr, $table_names_size:expr) => {
+        if $table_names_size > 0 {
+            let src =
+                unsafe { std::slice::from_raw_parts($table_names, $table_names_size as usize) };
+            let mut dst = Vec::with_capacity(src.len());
+            for &talbe_name in src {
+                ffi_arg_require_non_null!($context, $function_name, $arg_index, talbe_name);
+                let talbe_name =
+                    ffi_arg_cchar_to_str!($context, $function_name, $arg_index, talbe_name)
+                        .to_string();
+                dst.push(talbe_name);
+            }
+            dst
+        } else {
+            vec![]
+        }
+    };
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_set_write_preserve(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    table_names: *const *const c_char,
+    table_names_size: u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_write_preserve()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, table_names);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let table_names: Vec<String> =
+        convert_table_names!(context, FUNCTION_NAME, 2, table_names, table_names_size);
+
+    transaction_option.set_write_preserve(&table_names);
+
+    unsafe {
+        vec_cchar_field_clear!(transaction_option.write_preserve);
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve_size(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    size_out: *mut u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_write_preserve_size()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, size_out);
+    unsafe {
+        *size_out = 0;
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let table_names = transaction_option.write_preserve();
+
+    unsafe {
+        *size_out = table_names.len() as u32;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve_value(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    index: u32,
+    table_name_out: *mut *mut c_char,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_write_preserve_value()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, table_name_out);
+    unsafe {
+        *table_name_out = std::ptr::null_mut();
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let table_names = transaction_option.write_preserve();
+
+    let index = index as usize;
+    if index >= table_names.len() {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "index", "out of bounds");
+    }
+
+    // TODO mutex.lock transaction_option.write_preserve
+    vec_cchar_field_set_if_none!(context, transaction_option.write_preserve, table_names);
+
+    let table_name = transaction_option.write_preserve.as_ref().unwrap()[index];
+
+    unsafe {
+        *table_name_out = table_name;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_dispose(
@@ -241,6 +416,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_dispose(
         let transaction_option = Box::from_raw(transaction_option);
 
         cchar_field_dispose!(transaction_option.transaction_label);
+        vec_cchar_field_dispose!(transaction_option.write_preserve);
+        vec_cchar_field_dispose!(transaction_option.inclusive_read_area);
+        vec_cchar_field_dispose!(transaction_option.exclusive_read_area);
     }
 
     trace!("{FUNCTION_NAME} end");

@@ -5,8 +5,9 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, ffi_cchar_dispose, ffi_str_to_cchar, rc_ffi_arg_error,
+    ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
+    vec_cchar_field_dispose, vec_cchar_field_set_if_none,
 };
 
 pub(crate) struct TsurugiFfiTableList {
@@ -89,16 +90,8 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names_value(
         return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "index", "out of bounds");
     }
 
-    // TODO mutex.lock
-    if table_list.table_names.is_none() {
-        let mut vec = Vec::with_capacity(table_names.len());
-        for tname in table_names {
-            let s = tname.to_string();
-            let s = ffi_str_to_cchar!(context, s);
-            vec.push(s);
-        }
-        table_list.table_names = Some(vec);
-    }
+    // TODO mutex.lock table_list.table_names
+    vec_cchar_field_set_if_none!(context, table_list.table_names, table_names);
 
     let table_name = table_list.table_names.as_ref().unwrap()[index];
 
@@ -123,11 +116,7 @@ pub extern "C" fn tsurugi_ffi_table_list_dispose(table_list: TsurugiFfiTableList
     unsafe {
         let table_list = Box::from_raw(table_list);
 
-        if let Some(table_names) = table_list.table_names {
-            for table_name in table_names {
-                ffi_cchar_dispose!(table_name);
-            }
-        }
+        vec_cchar_field_dispose!(table_list.table_names);
     }
 
     trace!("{FUNCTION_NAME} end");

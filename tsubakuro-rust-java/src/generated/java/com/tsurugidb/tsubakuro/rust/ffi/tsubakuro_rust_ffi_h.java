@@ -23756,6 +23756,308 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_transaction_option_set_modifies_definitions {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_BOOL
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_modifies_definitions");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool modifies_definitions)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_set_modifies_definitions$descriptor() {
+        return tsurugi_ffi_transaction_option_set_modifies_definitions.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool modifies_definitions)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_set_modifies_definitions$handle() {
+        return tsurugi_ffi_transaction_option_set_modifies_definitions.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool modifies_definitions)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_set_modifies_definitions$address() {
+        return tsurugi_ffi_transaction_option_set_modifies_definitions.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool modifies_definitions)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_set_modifies_definitions(MemorySegment context, MemorySegment transaction_option, boolean modifies_definitions) {
+        var mh$ = tsurugi_ffi_transaction_option_set_modifies_definitions.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_set_modifies_definitions", context, transaction_option, modifies_definitions);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, modifies_definitions);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_option_get_modifies_definitions {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_modifies_definitions");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *modifies_definitions_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_get_modifies_definitions$descriptor() {
+        return tsurugi_ffi_transaction_option_get_modifies_definitions.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *modifies_definitions_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_get_modifies_definitions$handle() {
+        return tsurugi_ffi_transaction_option_get_modifies_definitions.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *modifies_definitions_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_get_modifies_definitions$address() {
+        return tsurugi_ffi_transaction_option_get_modifies_definitions.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_modifies_definitions(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *modifies_definitions_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_get_modifies_definitions(MemorySegment context, MemorySegment transaction_option, MemorySegment modifies_definitions_out) {
+        var mh$ = tsurugi_ffi_transaction_option_get_modifies_definitions.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_get_modifies_definitions", context, transaction_option, modifies_definitions_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, modifies_definitions_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_option_set_write_preserve {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_write_preserve");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_set_write_preserve$descriptor() {
+        return tsurugi_ffi_transaction_option_set_write_preserve.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_set_write_preserve$handle() {
+        return tsurugi_ffi_transaction_option_set_write_preserve.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_set_write_preserve$address() {
+        return tsurugi_ffi_transaction_option_set_write_preserve.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_set_write_preserve(MemorySegment context, MemorySegment transaction_option, MemorySegment table_names, int table_names_size) {
+        var mh$ = tsurugi_ffi_transaction_option_set_write_preserve.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_set_write_preserve", context, transaction_option, table_names, table_names_size);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, table_names, table_names_size);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_option_get_write_preserve_size {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_write_preserve_size");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_size(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_get_write_preserve_size$descriptor() {
+        return tsurugi_ffi_transaction_option_get_write_preserve_size.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_size(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_get_write_preserve_size$handle() {
+        return tsurugi_ffi_transaction_option_get_write_preserve_size.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_size(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_get_write_preserve_size$address() {
+        return tsurugi_ffi_transaction_option_get_write_preserve_size.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_size(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_get_write_preserve_size(MemorySegment context, MemorySegment transaction_option, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_transaction_option_get_write_preserve_size.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_get_write_preserve_size", context, transaction_option, size_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, size_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_option_get_write_preserve_value {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_write_preserve_value");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_value(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t index, char **table_name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_get_write_preserve_value$descriptor() {
+        return tsurugi_ffi_transaction_option_get_write_preserve_value.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_value(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t index, char **table_name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_get_write_preserve_value$handle() {
+        return tsurugi_ffi_transaction_option_get_write_preserve_value.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_value(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t index, char **table_name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_get_write_preserve_value$address() {
+        return tsurugi_ffi_transaction_option_get_write_preserve_value.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve_value(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, uint32_t index, char **table_name_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_get_write_preserve_value(MemorySegment context, MemorySegment transaction_option, int index, MemorySegment table_name_out) {
+        var mh$ = tsurugi_ffi_transaction_option_get_write_preserve_value.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_get_write_preserve_value", context, transaction_option, index, table_name_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, index, table_name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_transaction_option_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

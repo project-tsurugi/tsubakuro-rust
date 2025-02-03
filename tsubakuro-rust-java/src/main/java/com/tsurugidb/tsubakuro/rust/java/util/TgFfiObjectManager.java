@@ -48,6 +48,21 @@ public class TgFfiObjectManager implements AutoCloseable {
 		return array;
 	}
 
+	public MemorySegment allocateStringArray(List<String> list) {
+		if (list == null) {
+			return MemorySegment.NULL;
+		}
+
+		var array = arena.allocate(ValueLayout.ADDRESS, list.size());
+		int i = 0;
+		for (String s : list) {
+			var handle = allocateString(s);
+			array.setAtIndex(ValueLayout.ADDRESS, i++, handle);
+		}
+
+		return array;
+	}
+
 	public void add(TgFfiObject object) {
 		objectSet.add(object);
 	}

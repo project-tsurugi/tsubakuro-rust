@@ -69,3 +69,41 @@ macro_rules! cchar_field_dispose {
         }
     };
 }
+
+#[macro_export]
+macro_rules! vec_cchar_field_set_if_none {
+    ($context:expr, $field:expr, $values:expr) => {{
+        if $field.is_none() {
+            let mut vec = Vec::with_capacity($values.len());
+            for value in $values {
+                let s = value.to_string();
+                let s = $crate::ffi_str_to_cchar!($context, s);
+                vec.push(s);
+            }
+            $field = Some(vec);
+        }
+    }};
+}
+
+#[macro_export]
+macro_rules! vec_cchar_field_clear {
+    ($field:expr) => {
+        if $field.is_some() {
+            let ss = $field.take().unwrap();
+            for s in ss {
+                $crate::ffi_cchar_dispose!(s);
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! vec_cchar_field_dispose {
+    ($field:expr) => {
+        if let Some(ss) = $field {
+            for s in ss {
+                $crate::ffi_cchar_dispose!(s);
+            }
+        }
+    };
+}

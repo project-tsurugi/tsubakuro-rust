@@ -40,6 +40,10 @@ public abstract class TgFfiObject implements Closeable {
 		return manager.allocateArray(list);
 	}
 
+	protected final MemorySegment allocateStringArray(List<String> list) {
+		return manager.allocateStringArray(list);
+	}
+
 	// use in synchronized(this)
 	public final MemorySegment handle() {
 		var handle = this.handle;

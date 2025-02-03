@@ -1,6 +1,8 @@
 package com.tsurugidb.tsubakuro.rust.java.transaction;
 
 import java.lang.foreign.MemorySegment;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -85,6 +87,64 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToString(out);
+	}
+
+	public synchronized void setModifiesDefinitions(TgFfiContext context, boolean modifiesDefinitions) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = modifiesDefinitions;
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_modifies_definitions(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized boolean getModifiesDefinitions(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_modifies_definitions(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
+	public synchronized void setWritePreserve(TgFfiContext context, List<String> tableNames) {
+		Objects.requireNonNull(tableNames, "tableNames must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateStringArray(tableNames);
+		var size = tableNames.size();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_write_preserve(ctx, handle, arg, size);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized List<String> getWritePreserve(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+
+		int size;
+		{
+			var out = allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve_size(ctx, handle, out);
+			TgFfiRcUtil.throwIfError(rc, context);
+
+			size = outToInt(out);
+		}
+
+		if (size == 0) {
+			return List.of();
+		}
+
+		var list = new ArrayList<String>();
+		for (int i = 0; i < size; i++) {
+			var out = allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve_value(ctx, handle, i, out);
+			TgFfiRcUtil.throwIfError(rc, context);
+
+			String s = outToString(out);
+			list.add(s);
+		}
+		return list;
 	}
 
 	@Override
