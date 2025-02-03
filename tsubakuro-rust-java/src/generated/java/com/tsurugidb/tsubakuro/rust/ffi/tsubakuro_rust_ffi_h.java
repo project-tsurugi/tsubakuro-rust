@@ -15757,6 +15757,12 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiContextHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef const char *TsurugiFfiStringHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiStringHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiCancelJob *TsurugiFfiCancelJobHandle
      * }
      */
@@ -15859,7 +15865,7 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiCommitOptionHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
-     * typedef char **TsurugiFfiStringArrayHandle
+     * typedef const TsurugiFfiStringHandle *TsurugiFfiStringArrayHandle
      * }
      */
     public static final AddressLayout TsurugiFfiStringArrayHandle = tsubakuro_rust_ffi_h.C_POINTER;
@@ -16014,7 +16020,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_context_get_error_name$descriptor() {
@@ -16024,7 +16030,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_context_get_error_name$handle() {
@@ -16034,7 +16040,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_context_get_error_name$address() {
@@ -16043,7 +16049,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static int tsurugi_ffi_context_get_error_name(MemorySegment context, MemorySegment name_out) {
@@ -16132,7 +16138,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_context_get_error_message$descriptor() {
@@ -16142,7 +16148,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_context_get_error_message$handle() {
@@ -16152,7 +16158,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_context_get_error_message$address() {
@@ -16161,7 +16167,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static int tsurugi_ffi_context_get_error_message(MemorySegment context, MemorySegment error_message_out) {
@@ -16250,7 +16256,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_context_get_server_error_category_str$descriptor() {
@@ -16260,7 +16266,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_context_get_server_error_category_str$handle() {
@@ -16270,7 +16276,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_context_get_server_error_category_str$address() {
@@ -16279,7 +16285,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static int tsurugi_ffi_context_get_server_error_category_str(MemorySegment context, MemorySegment category_str_out) {
@@ -16368,7 +16374,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_context_get_server_error_structured_code$descriptor() {
@@ -16378,7 +16384,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_context_get_server_error_structured_code$handle() {
@@ -16388,7 +16394,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_context_get_server_error_structured_code$address() {
@@ -16397,7 +16403,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static int tsurugi_ffi_context_get_server_error_structured_code(MemorySegment context, MemorySegment structured_code_out) {
@@ -16663,7 +16669,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_job_get_name$descriptor() {
@@ -16673,7 +16679,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_job_get_name$handle() {
@@ -16683,7 +16689,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_job_get_name$address() {
@@ -16692,7 +16698,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static int tsurugi_ffi_job_get_name(MemorySegment context, MemorySegment job, MemorySegment name_out) {
@@ -17378,7 +17384,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_column_get_name$descriptor() {
@@ -17388,7 +17394,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_column_get_name$handle() {
@@ -17398,7 +17404,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_column_get_name$address() {
@@ -17407,7 +17413,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static int tsurugi_ffi_sql_column_get_name(MemorySegment context, MemorySegment sql_column, MemorySegment name_out) {
@@ -17912,7 +17918,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, const char *name, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_null$descriptor() {
@@ -17922,7 +17928,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, const char *name, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_null$handle() {
@@ -17932,7 +17938,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, const char *name, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_null$address() {
@@ -17941,7 +17947,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, const char *name, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static int tsurugi_ffi_sql_parameter_null(MemorySegment context, MemorySegment name, MemorySegment parameter_out) {
@@ -17973,7 +17979,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, const char *name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_int4$descriptor() {
@@ -17983,7 +17989,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, const char *name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_of_int4$handle() {
@@ -17993,7 +17999,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, const char *name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_of_int4$address() {
@@ -18002,7 +18008,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, const char *name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int32_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static int tsurugi_ffi_sql_parameter_of_int4(MemorySegment context, MemorySegment name, int value, MemorySegment parameter_out) {
@@ -18034,7 +18040,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, const char *name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_int8$descriptor() {
@@ -18044,7 +18050,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, const char *name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_of_int8$handle() {
@@ -18054,7 +18060,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, const char *name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_of_int8$address() {
@@ -18063,7 +18069,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, const char *name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static int tsurugi_ffi_sql_parameter_of_int8(MemorySegment context, MemorySegment name, long value, MemorySegment parameter_out) {
@@ -18095,7 +18101,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, const char *name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_float4$descriptor() {
@@ -18105,7 +18111,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, const char *name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_of_float4$handle() {
@@ -18115,7 +18121,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, const char *name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_of_float4$address() {
@@ -18124,7 +18130,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, const char *name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, float value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static int tsurugi_ffi_sql_parameter_of_float4(MemorySegment context, MemorySegment name, float value, MemorySegment parameter_out) {
@@ -18156,7 +18162,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, const char *name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_float8$descriptor() {
@@ -18166,7 +18172,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, const char *name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_of_float8$handle() {
@@ -18176,7 +18182,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, const char *name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_of_float8$address() {
@@ -18185,7 +18191,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, const char *name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, double value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static int tsurugi_ffi_sql_parameter_of_float8(MemorySegment context, MemorySegment name, double value, MemorySegment parameter_out) {
@@ -18217,7 +18223,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, const char *name, const char *value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiStringHandle value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_character$descriptor() {
@@ -18227,7 +18233,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, const char *name, const char *value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiStringHandle value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_of_character$handle() {
@@ -18237,7 +18243,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, const char *name, const char *value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiStringHandle value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_of_character$address() {
@@ -18246,7 +18252,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, const char *name, const char *value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiStringHandle value, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static int tsurugi_ffi_sql_parameter_of_character(MemorySegment context, MemorySegment name, MemorySegment value, MemorySegment parameter_out) {
@@ -18277,7 +18283,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_get_name$descriptor() {
@@ -18287,7 +18293,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_get_name$handle() {
@@ -18297,7 +18303,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_get_name$address() {
@@ -18306,7 +18312,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlParameterHandle parameter, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static int tsurugi_ffi_sql_parameter_get_name(MemorySegment context, MemorySegment parameter, MemorySegment name_out) {
@@ -18395,7 +18401,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, const char *name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_placeholder_of_atom_type$descriptor() {
@@ -18405,7 +18411,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, const char *name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_placeholder_of_atom_type$handle() {
@@ -18415,7 +18421,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, const char *name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_placeholder_of_atom_type$address() {
@@ -18424,7 +18430,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, const char *name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiAtomType atom_type, TsurugiFfiSqlPlaceholderHandle *placeholder_out)
      * }
      */
     public static int tsurugi_ffi_sql_placeholder_of_atom_type(MemorySegment context, MemorySegment name, int atom_type, MemorySegment placeholder_out) {
@@ -18455,7 +18461,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_placeholder_get_name$descriptor() {
@@ -18465,7 +18471,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_placeholder_get_name$handle() {
@@ -18475,7 +18481,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_placeholder_get_name$address() {
@@ -18484,7 +18490,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context, TsurugiFfiSqlPlaceholderHandle placeholder, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static int tsurugi_ffi_sql_placeholder_get_name(MemorySegment context, MemorySegment placeholder, MemorySegment name_out) {
@@ -19654,7 +19660,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_character$descriptor() {
@@ -19664,7 +19670,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_query_result_fetch_character$handle() {
@@ -19674,7 +19680,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_query_result_fetch_character$address() {
@@ -19683,7 +19689,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static int tsurugi_ffi_sql_query_result_fetch_character(MemorySegment context, MemorySegment query_result, MemorySegment value_out) {
@@ -19715,7 +19721,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_character$descriptor() {
@@ -19725,7 +19731,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_character$handle() {
@@ -19735,7 +19741,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_character$address() {
@@ -19744,7 +19750,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, char **value_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiStringHandle *value_out)
      * }
      */
     public static int tsurugi_ffi_sql_query_result_fetch_for_character(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out) {
@@ -20010,7 +20016,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_get_service_message_version$descriptor() {
@@ -20020,7 +20026,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_get_service_message_version$handle() {
@@ -20030,7 +20036,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_get_service_message_version$address() {
@@ -20039,7 +20045,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, char **smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_get_service_message_version(MemorySegment context, MemorySegment sql_client, MemorySegment smv_out) {
@@ -20252,7 +20258,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_get_table_metadata$descriptor() {
@@ -20262,7 +20268,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_get_table_metadata$handle() {
@@ -20272,7 +20278,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_get_table_metadata$address() {
@@ -20281,7 +20287,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_get_table_metadata(MemorySegment context, MemorySegment sql_client, MemorySegment table_name, MemorySegment table_metadata_out) {
@@ -20314,7 +20320,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_get_table_metadata_for$descriptor() {
@@ -20324,7 +20330,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_get_table_metadata_for$handle() {
@@ -20334,7 +20340,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_get_table_metadata_for$address() {
@@ -20343,7 +20349,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiDuration timeout, TsurugiFfiTableMetadataHandle *table_metadata_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_get_table_metadata_for(MemorySegment context, MemorySegment sql_client, MemorySegment table_name, long timeout, MemorySegment table_metadata_out) {
@@ -20375,7 +20381,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiJobHandle *table_metadata_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiJobHandle *table_metadata_job_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_get_table_metadata_async$descriptor() {
@@ -20385,7 +20391,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiJobHandle *table_metadata_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiJobHandle *table_metadata_job_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_get_table_metadata_async$handle() {
@@ -20395,7 +20401,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiJobHandle *table_metadata_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiJobHandle *table_metadata_job_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_get_table_metadata_async$address() {
@@ -20404,7 +20410,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *table_name, TsurugiFfiJobHandle *table_metadata_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle table_name, TsurugiFfiJobHandle *table_metadata_job_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_get_table_metadata_async(MemorySegment context, MemorySegment sql_client, MemorySegment table_name, MemorySegment table_metadata_job_out) {
@@ -20438,7 +20444,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepare$descriptor() {
@@ -20448,7 +20454,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepare$handle() {
@@ -20458,7 +20464,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepare$address() {
@@ -20467,7 +20473,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_prepare(MemorySegment context, MemorySegment sql_client, MemorySegment sql, MemorySegment placeholders, int placeholder_size, MemorySegment prepared_statement_out) {
@@ -20502,7 +20508,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepare_for$descriptor() {
@@ -20512,7 +20518,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepare_for$handle() {
@@ -20522,7 +20528,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepare_for$address() {
@@ -20531,7 +20537,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiDuration timeout, TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_prepare_for(MemorySegment context, MemorySegment sql_client, MemorySegment sql, MemorySegment placeholders, int placeholder_size, long timeout, MemorySegment prepared_statement_out) {
@@ -20565,7 +20571,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepare_async$descriptor() {
@@ -20575,7 +20581,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepare_async$handle() {
@@ -20585,7 +20591,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepare_async$address() {
@@ -20594,7 +20600,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, const char *sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle sql, const TsurugiFfiSqlPlaceholderHandle *placeholders, uint32_t placeholder_size, TsurugiFfiJobHandle *prepared_statement_job_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_prepare_async(MemorySegment context, MemorySegment sql_client, MemorySegment sql, MemorySegment placeholders, int placeholder_size, MemorySegment prepared_statement_job_out) {
@@ -20995,7 +21001,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_execute$descriptor() {
@@ -21005,7 +21011,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_execute$handle() {
@@ -21015,7 +21021,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_execute$address() {
@@ -21024,7 +21030,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_execute(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment sql, MemorySegment execute_result_out) {
@@ -21058,7 +21064,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_execute_for$descriptor() {
@@ -21068,7 +21074,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_execute_for$handle() {
@@ -21078,7 +21084,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_execute_for$address() {
@@ -21087,7 +21093,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_execute_for(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment sql, long timeout, MemorySegment execute_result_out) {
@@ -21120,7 +21126,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_execute_async$descriptor() {
@@ -21130,7 +21136,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_execute_async$handle() {
@@ -21140,7 +21146,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_execute_async$address() {
@@ -21149,7 +21155,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_execute_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment sql, MemorySegment execute_result_job_out) {
@@ -21375,7 +21381,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_query$descriptor() {
@@ -21385,7 +21391,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_query$handle() {
@@ -21395,7 +21401,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_query$address() {
@@ -21404,7 +21410,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_query(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment sql, MemorySegment query_result_out) {
@@ -21438,7 +21444,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_query_for$descriptor() {
@@ -21448,7 +21454,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_query_for$handle() {
@@ -21458,7 +21464,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_query_for$address() {
@@ -21467,7 +21473,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_query_for(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment sql, long timeout, MemorySegment query_result_out) {
@@ -21500,7 +21506,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_query_async$descriptor() {
@@ -21510,7 +21516,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_query_async$handle() {
@@ -21520,7 +21526,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_query_async$address() {
@@ -21529,7 +21535,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, const char *sql, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle sql, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
     public static int tsurugi_ffi_sql_client_query_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment sql, MemorySegment query_result_job_out) {
@@ -22295,7 +22301,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringHandle *table_name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_table_metadata_get_table_name$descriptor() {
@@ -22305,7 +22311,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringHandle *table_name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_table_metadata_get_table_name$handle() {
@@ -22315,7 +22321,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringHandle *table_name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_table_metadata_get_table_name$address() {
@@ -22324,7 +22330,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, char **table_name_out)
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringHandle *table_name_out)
      * }
      */
     public static int tsurugi_ffi_table_metadata_get_table_name(MemorySegment context, MemorySegment table_metadata, MemorySegment table_name_out) {
@@ -22533,7 +22539,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint, TsurugiFfiEndpointHandle *endpoint_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_endpoint_parse$descriptor() {
@@ -22543,7 +22549,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint, TsurugiFfiEndpointHandle *endpoint_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_endpoint_parse$handle() {
@@ -22553,7 +22559,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint, TsurugiFfiEndpointHandle *endpoint_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_endpoint_parse$address() {
@@ -22562,7 +22568,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, const char *endpoint, TsurugiFfiEndpointHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint, TsurugiFfiEndpointHandle *endpoint_out)
      * }
      */
     public static int tsurugi_ffi_endpoint_parse(MemorySegment context, MemorySegment endpoint, MemorySegment endpoint_out) {
@@ -22769,7 +22775,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_endpoint_url$descriptor() {
@@ -22779,7 +22785,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_endpoint_url$handle() {
@@ -22789,7 +22795,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_endpoint_url$address() {
@@ -22798,7 +22804,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
      * }
      */
     public static int tsurugi_ffi_connection_option_set_endpoint_url(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint) {
@@ -22829,7 +22835,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_endpoint$descriptor() {
@@ -22839,7 +22845,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_endpoint$handle() {
@@ -22849,7 +22855,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_endpoint$address() {
@@ -22858,7 +22864,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
     public static int tsurugi_ffi_connection_option_get_endpoint(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint_out) {
@@ -22889,7 +22895,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle application_name)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_application_name$descriptor() {
@@ -22899,7 +22905,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle application_name)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_application_name$handle() {
@@ -22909,7 +22915,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle application_name)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_application_name$address() {
@@ -22918,7 +22924,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *application_name)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle application_name)
      * }
      */
     public static int tsurugi_ffi_connection_option_set_application_name(MemorySegment context, MemorySegment connection_option, MemorySegment application_name) {
@@ -22949,7 +22955,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *application_name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_application_name$descriptor() {
@@ -22959,7 +22965,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *application_name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_application_name$handle() {
@@ -22969,7 +22975,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *application_name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_application_name$address() {
@@ -22978,7 +22984,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **application_name_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *application_name_out)
      * }
      */
     public static int tsurugi_ffi_connection_option_get_application_name(MemorySegment context, MemorySegment connection_option, MemorySegment application_name_out) {
@@ -23009,7 +23015,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_session_label$descriptor() {
@@ -23019,7 +23025,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_session_label$handle() {
@@ -23029,7 +23035,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_session_label$address() {
@@ -23038,7 +23044,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
      * }
      */
     public static int tsurugi_ffi_connection_option_set_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment label) {
@@ -23069,7 +23075,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_session_label$descriptor() {
@@ -23079,7 +23085,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_session_label$handle() {
@@ -23089,7 +23095,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_session_label$address() {
@@ -23098,7 +23104,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static int tsurugi_ffi_connection_option_get_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment label_out) {
@@ -23899,7 +23905,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_set_transaction_label$descriptor() {
@@ -23909,7 +23915,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_set_transaction_label$handle() {
@@ -23919,7 +23925,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_set_transaction_label$address() {
@@ -23928,7 +23934,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
      * }
      */
     public static int tsurugi_ffi_transaction_option_set_transaction_label(MemorySegment context, MemorySegment transaction_option, MemorySegment label) {
@@ -23959,7 +23965,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_get_transaction_label$descriptor() {
@@ -23969,7 +23975,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_get_transaction_label$handle() {
@@ -23979,7 +23985,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_get_transaction_label$address() {
@@ -23988,7 +23994,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, char **label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
      * }
      */
     public static int tsurugi_ffi_transaction_option_get_transaction_label(MemorySegment context, MemorySegment transaction_option, MemorySegment label_out) {
@@ -24140,7 +24146,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_set_write_preserve$descriptor() {
@@ -24150,7 +24156,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_set_write_preserve$handle() {
@@ -24160,7 +24166,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_set_write_preserve$address() {
@@ -24169,7 +24175,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static int tsurugi_ffi_transaction_option_set_write_preserve(MemorySegment context, MemorySegment transaction_option, MemorySegment table_names, int table_names_size) {
@@ -24262,7 +24268,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_set_inclusive_read_area$descriptor() {
@@ -24272,7 +24278,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_set_inclusive_read_area$handle() {
@@ -24282,7 +24288,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_set_inclusive_read_area$address() {
@@ -24291,7 +24297,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static int tsurugi_ffi_transaction_option_set_inclusive_read_area(MemorySegment context, MemorySegment transaction_option, MemorySegment table_names, int table_names_size) {
@@ -24384,7 +24390,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_set_exclusive_read_area$descriptor() {
@@ -24394,7 +24400,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_set_exclusive_read_area$handle() {
@@ -24404,7 +24410,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_set_exclusive_read_area$address() {
@@ -24413,7 +24419,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const char *const *table_names, uint32_t table_names_size)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, const TsurugiFfiStringHandle *table_names, uint32_t table_names_size)
      * }
      */
     public static int tsurugi_ffi_transaction_option_set_exclusive_read_area(MemorySegment context, MemorySegment transaction_option, MemorySegment table_names, int table_names_size) {
@@ -24922,7 +24928,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_name$descriptor() {
@@ -24932,7 +24938,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_name$handle() {
@@ -24942,7 +24948,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_name$address() {
@@ -24951,7 +24957,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **name_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *name_out)
      * }
      */
     public static int tsurugi_ffi_transaction_status_get_server_error_name(MemorySegment context, MemorySegment transaction_status, MemorySegment name_out) {
@@ -24982,7 +24988,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_message$descriptor() {
@@ -24992,7 +24998,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_message$handle() {
@@ -25002,7 +25008,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_message$address() {
@@ -25011,7 +25017,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **error_message_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *error_message_out)
      * }
      */
     public static int tsurugi_ffi_transaction_status_get_server_error_message(MemorySegment context, MemorySegment transaction_status, MemorySegment error_message_out) {
@@ -25102,7 +25108,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_category_str$descriptor() {
@@ -25112,7 +25118,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_category_str$handle() {
@@ -25122,7 +25128,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_category_str$address() {
@@ -25131,7 +25137,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **category_str_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *category_str_out)
      * }
      */
     public static int tsurugi_ffi_transaction_status_get_server_error_category_str(MemorySegment context, MemorySegment transaction_status, MemorySegment category_str_out) {
@@ -25222,7 +25228,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_status_get_server_error_structured_code$descriptor() {
@@ -25232,7 +25238,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_status_get_server_error_structured_code$handle() {
@@ -25242,7 +25248,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_status_get_server_error_structured_code$address() {
@@ -25251,7 +25257,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, char **structured_code_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context, TsurugiFfiTransactionStatusHandle transaction_status, TsurugiFfiStringHandle *structured_code_out)
      * }
      */
     public static int tsurugi_ffi_transaction_status_get_server_error_structured_code(MemorySegment context, MemorySegment transaction_status, MemorySegment structured_code_out) {
@@ -25339,7 +25345,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, char **transaction_id_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle *transaction_id_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_get_transaction_id$descriptor() {
@@ -25349,7 +25355,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, char **transaction_id_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle *transaction_id_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_get_transaction_id$handle() {
@@ -25359,7 +25365,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, char **transaction_id_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle *transaction_id_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_get_transaction_id$address() {
@@ -25368,7 +25374,7 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, char **transaction_id_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiStringHandle *transaction_id_out)
      * }
      */
     public static int tsurugi_ffi_transaction_get_transaction_id(MemorySegment context, MemorySegment transaction, MemorySegment transaction_id_out) {

@@ -1,24 +1,29 @@
-use std::ffi::c_char;
+use std::ffi::CString;
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}, service::sql::column::TsurugiFfiSqlColumn
+    cchar_field_set,
+    context::TsurugiFfiContextHandle,
+    cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    return_code::{rc_ok, TsurugiFfiRc},
+    service::sql::column::TsurugiFfiSqlColumn,
+    TsurugiFfiStringHandle,
 };
 
 use super::column::TsurugiFfiSqlColumnHandle;
 
 pub(crate) struct TsurugiFfiTableMetadata {
     table_metadata: TableMetadata,
-    table_name: *mut c_char,
+    table_name: Option<CString>,
 }
 
 impl TsurugiFfiTableMetadata {
     pub(crate) fn new(table_metadata: TableMetadata) -> TsurugiFfiTableMetadata {
         TsurugiFfiTableMetadata {
             table_metadata,
-            table_name: std::ptr::null_mut(),
+            table_name: None,
         }
     }
 }
@@ -46,7 +51,7 @@ pub type TsurugiFfiTableMetadataHandle = *mut TsurugiFfiTableMetadata;
 pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
     context: TsurugiFfiContextHandle,
     table_metadata: TsurugiFfiTableMetadataHandle,
-    table_name_out: *mut *mut c_char,
+    table_name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_table_name()";
     trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
@@ -57,15 +62,13 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
 
     let table_metadata = unsafe { &mut *table_metadata };
 
-    if table_metadata.table_name.is_null() {
+    if table_metadata.table_name.is_none() {
         let table_name = table_metadata.table_name().clone();
-        unsafe {
-            cchar_field_set!(context, table_metadata.table_name, table_name);
-        }
+        cchar_field_set!(context, table_metadata.table_name, table_name);
     }
 
     unsafe {
-        *table_name_out = table_metadata.table_name;
+        *table_name_out = cstring_to_cchar!(table_metadata.table_name);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -143,9 +146,7 @@ pub extern "C" fn tsurugi_ffi_table_metadata_dispose(
     }
 
     unsafe {
-        let table_metadata = Box::from_raw(table_metadata);
-
-        cchar_field_dispose!(table_metadata.table_name);
+        let _ = Box::from_raw(table_metadata);
     }
 
     trace!("{FUNCTION_NAME} end");

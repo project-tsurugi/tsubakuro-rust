@@ -1,24 +1,28 @@
-use std::ffi::c_char;
+use std::ffi::CString;
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, return_code::{rc_ok, TsurugiFfiRc}
+    cchar_field_set,
+    context::TsurugiFfiContextHandle,
+    cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null,
+    return_code::{rc_ok, TsurugiFfiRc},
+    TsurugiFfiStringHandle,
 };
 
 use super::atom_type::TsurugiFfiAtomType;
 
 pub(crate) struct TsurugiFfiSqlColumn {
     sql_column: SqlColumn,
-    name: *mut c_char,
+    name: Option<CString>,
 }
 
 impl TsurugiFfiSqlColumn {
     pub(crate) fn new(sql_column: SqlColumn) -> TsurugiFfiSqlColumn {
         TsurugiFfiSqlColumn {
             sql_column,
-            name: std::ptr::null_mut(),
+            name: None,
         }
     }
 }
@@ -43,7 +47,7 @@ pub type TsurugiFfiSqlColumnHandle = *mut TsurugiFfiSqlColumn;
 pub extern "C" fn tsurugi_ffi_sql_column_get_name(
     context: TsurugiFfiContextHandle,
     sql_column: TsurugiFfiSqlColumnHandle,
-    name_out: *mut *mut c_char,
+    name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_name()";
     trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
@@ -54,15 +58,13 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
 
     let sql_column = unsafe { &mut *sql_column };
 
-    if sql_column.name.is_null() {
+    if sql_column.name.is_none() {
         let table_name = sql_column.name().clone();
-        unsafe {
-            cchar_field_set!(context, sql_column.name, table_name);
-        }
+        cchar_field_set!(context, sql_column.name, table_name);
     }
 
     unsafe {
-        *name_out = sql_column.name;
+        *name_out = cstring_to_cchar!(sql_column.name);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -108,9 +110,7 @@ pub extern "C" fn tsurugi_ffi_sql_column_dispose(sql_column: TsurugiFfiSqlColumn
     }
 
     unsafe {
-        let sql_column = Box::from_raw(sql_column);
-
-        cchar_field_dispose!(sql_column.name);
+        let _ = Box::from_raw(sql_column);
     }
 
     trace!("{FUNCTION_NAME} end");

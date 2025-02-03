@@ -1,3 +1,5 @@
+use std::ffi::c_char;
+
 mod context;
 mod error;
 mod job;
@@ -8,7 +10,8 @@ mod session;
 mod transaction;
 mod util;
 
+pub type TsurugiFfiStringHandle = *const c_char;
+pub type TsurugiFfiStringArrayHandle = *const TsurugiFfiStringHandle;
+
 /// nanosecond
 pub type TsurugiFfiDuration = u64;
-
-pub type TsurugiFfiStringArrayHandle = *mut *mut std::ffi::c_char;

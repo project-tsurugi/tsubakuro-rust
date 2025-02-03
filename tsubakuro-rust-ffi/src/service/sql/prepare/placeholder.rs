@@ -1,16 +1,22 @@
-use std::ffi::c_char;
+use std::ffi::CString;
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}, service::sql::atom_type::TsurugiFfiAtomType
+    cchar_field_set,
+    context::TsurugiFfiContextHandle,
+    cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
+    rc_ffi_arg_error,
+    return_code::{rc_ok, TsurugiFfiRc},
+    service::sql::atom_type::TsurugiFfiAtomType,
+    TsurugiFfiStringHandle,
 };
 
 #[derive(Debug)]
 pub(crate) struct TsurugiFfiSqlPlaceholder {
     placeholder: SqlPlaceholder,
-    name: *mut c_char,
+    name: Option<CString>,
 }
 
 impl TsurugiFfiSqlPlaceholder {
@@ -38,7 +44,7 @@ pub type TsurugiFfiSqlPlaceholderHandle = *mut TsurugiFfiSqlPlaceholder;
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
     context: TsurugiFfiContextHandle,
-    name: *const c_char,
+    name: TsurugiFfiStringHandle,
     atom_type: TsurugiFfiAtomType,
     placeholder_out: *mut TsurugiFfiSqlPlaceholderHandle,
 ) -> TsurugiFfiRc {
@@ -57,7 +63,7 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
 
     let placeholder = Box::new(TsurugiFfiSqlPlaceholder {
         placeholder,
-        name: std::ptr::null_mut(),
+        name: None,
     });
 
     let handle = Box::into_raw(placeholder);
@@ -73,7 +79,7 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
 pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
     context: TsurugiFfiContextHandle,
     placeholder: TsurugiFfiSqlPlaceholderHandle,
-    name_out: *mut *mut c_char,
+    name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_get_name()";
     trace!("{FUNCTION_NAME} start. placeholder={:?}", placeholder);
@@ -84,18 +90,18 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
 
     let placeholder = unsafe { &mut *placeholder };
 
-    if placeholder.name.is_null() {
+    if placeholder.name.is_none() {
         match placeholder.name() {
-            Some(name) => unsafe {
+            Some(name) => {
                 let name = name.clone();
                 cchar_field_set!(context, placeholder.name, name);
-            },
+            }
             None => {}
         }
     }
 
     unsafe {
-        *name_out = placeholder.name;
+        *name_out = cstring_to_cchar!(placeholder.name);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -141,9 +147,7 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_dispose(placeholder: TsurugiFfiSql
     }
 
     unsafe {
-        let placeholder = Box::from_raw(placeholder);
-
-        cchar_field_dispose!(placeholder.name);
+        let _ = Box::from_raw(placeholder);
     }
 
     trace!("{FUNCTION_NAME} end");

@@ -1,13 +1,13 @@
-use std::{ffi::c_char, sync::Arc, time::Duration, vec};
+use std::{ffi::CString, sync::Arc, time::Duration, vec};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set,
+    cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
-    impl_job_delegator,
+    cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
+    ffi_exec_core_async, impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
@@ -22,7 +22,7 @@ use crate::{
         status::{TsurugiFfiTransactionStatus, TsurugiFfiTransactionStatusHandle},
         TsurugiFfiTransaction, TsurugiFfiTransactionHandle,
     },
-    TsurugiFfiDuration,
+    TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
 use super::{
@@ -39,7 +39,7 @@ use super::{
 pub(crate) struct TsurugiFfiSqlClient {
     sql_client: SqlClient,
     runtime: Arc<tokio::runtime::Runtime>,
-    service_message_version: *mut c_char,
+    service_message_version: Option<CString>,
 }
 
 impl TsurugiFfiSqlClient {
@@ -50,7 +50,7 @@ impl TsurugiFfiSqlClient {
         TsurugiFfiSqlClient {
             sql_client,
             runtime,
-            service_message_version: std::ptr::null_mut(),
+            service_message_version: None,
         }
     }
 
@@ -79,7 +79,7 @@ pub type TsurugiFfiSqlClientHandle = *mut TsurugiFfiSqlClient;
 pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    smv_out: *mut *mut c_char,
+    smv_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_service_message_version()";
     trace!("{FUNCTION_NAME} start");
@@ -91,10 +91,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
     let client = unsafe { &mut *sql_client };
 
     let smv = SqlClient::service_message_version();
+    cchar_field_set!(context, client.service_message_version, smv);
     unsafe {
-        cchar_field_set!(context, client.service_message_version, smv);
-
-        *smv_out = client.service_message_version;
+        *smv_out = cstring_to_cchar!(client.service_message_version);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -215,7 +214,7 @@ impl TableListJobDelegator {
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    table_name: *const c_char,
+    table_name: TsurugiFfiStringHandle,
     table_metadata_out: *mut TsurugiFfiTableMetadataHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata()";
@@ -252,7 +251,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    table_name: *const c_char,
+    table_name: TsurugiFfiStringHandle,
     timeout: TsurugiFfiDuration,
     table_metadata_out: *mut TsurugiFfiTableMetadataHandle,
 ) -> TsurugiFfiRc {
@@ -291,7 +290,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    table_name: *const c_char,
+    table_name: TsurugiFfiStringHandle,
     table_metadata_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata_async()";
@@ -362,7 +361,7 @@ macro_rules! convert_placeholders {
 pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     placeholders: *const TsurugiFfiSqlPlaceholderHandle,
     placeholder_size: u32,
     prepared_statement_out: *mut TsurugiFfiSqlPreparedStatementHandle,
@@ -409,7 +408,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
 pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     placeholders: *const TsurugiFfiSqlPlaceholderHandle,
     placeholder_size: u32,
     timeout: TsurugiFfiDuration,
@@ -458,7 +457,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
 pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     placeholders: *const TsurugiFfiSqlPlaceholderHandle,
     placeholder_size: u32,
     prepared_statement_job_out: *mut TsurugiFfiJobHandle,
@@ -785,7 +784,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
     transaction: TsurugiFfiTransactionHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute()";
@@ -825,7 +824,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
     transaction: TsurugiFfiTransactionHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     timeout: TsurugiFfiDuration,
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
@@ -867,7 +866,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
     transaction: TsurugiFfiTransactionHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     execute_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute_async()";
@@ -1091,7 +1090,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
     transaction: TsurugiFfiTransactionHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query()";
@@ -1131,7 +1130,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_for(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
     transaction: TsurugiFfiTransactionHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     timeout: TsurugiFfiDuration,
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
@@ -1173,7 +1172,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_async(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
     transaction: TsurugiFfiTransactionHandle,
-    sql: *const c_char,
+    sql: TsurugiFfiStringHandle,
     query_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query_async()";
@@ -1578,9 +1577,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_dispose(sql_client: TsurugiFfiSqlClient
     }
 
     unsafe {
-        let client = Box::from_raw(sql_client);
-
-        cchar_field_dispose!(client.service_message_version);
+        let _ = Box::from_raw(sql_client);
     }
 
     trace!("{FUNCTION_NAME} end");

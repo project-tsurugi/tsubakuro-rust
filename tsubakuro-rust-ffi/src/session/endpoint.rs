@@ -1,10 +1,11 @@
-use std::ffi::c_char;
-
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    context::TsurugiFfiContextHandle, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}
+    context::TsurugiFfiContextHandle,
+    ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    return_code::{rc_ok, TsurugiFfiRc},
+    TsurugiFfiStringHandle,
 };
 
 pub(crate) struct TsurugiFfiEndpoint {
@@ -30,7 +31,7 @@ pub type TsurugiFfiEndpointHandle = *mut TsurugiFfiEndpoint;
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_endpoint_parse(
     context: TsurugiFfiContextHandle,
-    endpoint: *const c_char,
+    endpoint: TsurugiFfiStringHandle,
     endpoint_out: *mut TsurugiFfiEndpointHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_endpoint_parse()";

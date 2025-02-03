@@ -1,5 +1,5 @@
 use std::{
-    ffi::{c_char, c_void},
+    ffi::{c_void, CString},
     sync::Arc,
     time::Duration,
 };
@@ -8,12 +8,12 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set,
+    cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
+    cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
     job::cancel_job::TsurugiFfiCancelJob,
     return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
-    TsurugiFfiDuration,
+    TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
 use super::cancel_job::TsurugiFfiCancelJobHandle;
@@ -22,7 +22,7 @@ pub(crate) struct TsurugiFfiJob<T> {
     job: Option<Job<T>>,
     delegater: Box<dyn TsurugiFfiJobDelegator>,
     runtime: Arc<tokio::runtime::Runtime>,
-    name: *mut c_char,
+    name: Option<CString>,
 }
 
 impl<T> TsurugiFfiJob<T> {
@@ -35,7 +35,7 @@ impl<T> TsurugiFfiJob<T> {
             job: Some(job),
             delegater,
             runtime,
-            name: std::ptr::null_mut(),
+            name: None,
         }
     }
 
@@ -170,7 +170,7 @@ macro_rules! get_raw_job {
 pub extern "C" fn tsurugi_ffi_job_get_name(
     context: TsurugiFfiContextHandle,
     job: TsurugiFfiJobHandle,
-    name_out: *mut *mut c_char,
+    name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_get_name()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
@@ -181,16 +181,14 @@ pub extern "C" fn tsurugi_ffi_job_get_name(
 
     let job = unsafe { &mut *unknown_job(job) };
 
-    if job.name.is_null() {
+    if job.name.is_none() {
         let raw_job = get_raw_job!(context, FUNCTION_NAME, job.raw_job());
         let name = raw_job.name().clone();
-        unsafe {
-            cchar_field_set!(context, job.name, name);
-        }
+        cchar_field_set!(context, job.name, name);
     }
 
     unsafe {
-        *name_out = job.name;
+        *name_out = cstring_to_cchar!(job.name);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -535,8 +533,6 @@ fn job_dispose(job: TsurugiFfiJobHandle) -> TsurugiFfiRc {
 
     unsafe {
         let mut job = Box::from_raw(unknown_job(job));
-
-        cchar_field_dispose!(job.name);
 
         let raw_job = job.take_raw_job();
         if let Some(raw_job) = raw_job {

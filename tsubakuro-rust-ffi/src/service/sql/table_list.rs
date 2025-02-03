@@ -1,4 +1,4 @@
-use std::ffi::c_char;
+use std::ffi::CString;
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -7,12 +7,14 @@ use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_out_initialize, ffi_arg_require_non_null,
     return_code::{rc_ok, TsurugiFfiRc},
-    vec_cchar_field_dispose, vec_cchar_field_set_if_none, TsurugiFfiStringArrayHandle,
+    vec_cchar_field_set_if_none, vec_cchar_field_to_ptr, TsurugiFfiStringArrayHandle,
+    TsurugiFfiStringHandle,
 };
 
 pub(crate) struct TsurugiFfiTableList {
     table_list: TableList,
-    table_names: Option<Vec<*mut c_char>>,
+    table_names: Option<Vec<CString>>,
+    table_names_ptr: Option<Vec<TsurugiFfiStringHandle>>,
 }
 
 impl TsurugiFfiTableList {
@@ -20,6 +22,7 @@ impl TsurugiFfiTableList {
         TsurugiFfiTableList {
             table_list,
             table_names: None,
+            table_names_ptr: None,
         }
     }
 }
@@ -62,10 +65,15 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
     let size = table_names.len();
 
     // TODO mutex.lock table_list.table_names
-    vec_cchar_field_set_if_none!(context, table_list.table_names, table_names);
+    vec_cchar_field_set_if_none!(
+        context,
+        table_list.table_names,
+        table_list.table_names_ptr,
+        table_names
+    );
 
     unsafe {
-        *table_names_out = table_list.table_names.as_mut().unwrap().as_mut_ptr();
+        *table_names_out = vec_cchar_field_to_ptr!(table_list.table_names_ptr);
         *table_names_size_out = size as u32;
     }
 
@@ -84,9 +92,7 @@ pub extern "C" fn tsurugi_ffi_table_list_dispose(table_list: TsurugiFfiTableList
     }
 
     unsafe {
-        let table_list = Box::from_raw(table_list);
-
-        vec_cchar_field_dispose!(table_list.table_names);
+        let _ = Box::from_raw(table_list);
     }
 
     trace!("{FUNCTION_NAME} end");

@@ -1,25 +1,26 @@
-use std::ffi::c_char;
+use std::ffi::CString;
 
 use log::trace;
 
 use crate::{
-    cchar_field_clear, cchar_field_dispose, cchar_field_set,
+    cchar_field_clear, cchar_field_set, cstring_to_cchar,
     error::TsurugiFfiError,
     ffi_arg_out_initialize, ffi_arg_require_non_null,
     return_code::{
         rc_to_name, TsurugiFfiRc, TsurugiFfiRcType, TSURUGI_FFI_RC_FFI_ARG0_ERROR,
         TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND, TSURUGI_FFI_RC_OK,
     },
+    TsurugiFfiStringHandle,
 };
 
 #[derive(Debug)]
 pub(crate) struct TsurugiFfiContext {
     rc: TsurugiFfiRc,
     error: Option<TsurugiFfiError>,
-    error_name: *mut c_char,
-    error_message: *mut c_char,
-    diagnostic_category_str: *mut c_char,
-    diagnostic_structured_code: *mut c_char,
+    error_name: Option<CString>,
+    error_message: Option<CString>,
+    diagnostic_category_str: Option<CString>,
+    diagnostic_structured_code: Option<CString>,
 }
 
 impl TsurugiFfiContext {
@@ -45,12 +46,10 @@ impl TsurugiFfiContext {
 
         context.rc = rc;
         context.error = error;
-        unsafe {
-            cchar_field_clear!(context.error_name);
-            cchar_field_clear!(context.error_message);
-            cchar_field_clear!(context.diagnostic_category_str);
-            cchar_field_clear!(context.diagnostic_structured_code);
-        }
+        cchar_field_clear!(context.error_name);
+        cchar_field_clear!(context.error_message);
+        cchar_field_clear!(context.diagnostic_category_str);
+        cchar_field_clear!(context.diagnostic_structured_code);
     }
 }
 
@@ -74,10 +73,10 @@ pub extern "C" fn tsurugi_ffi_context_create(
     let context = Box::new(TsurugiFfiContext {
         rc: TSURUGI_FFI_RC_OK,
         error: None,
-        error_name: std::ptr::null_mut(),
-        error_message: std::ptr::null_mut(),
-        diagnostic_category_str: std::ptr::null_mut(),
-        diagnostic_structured_code: std::ptr::null_mut(),
+        error_name: None,
+        error_message: None,
+        diagnostic_category_str: None,
+        diagnostic_structured_code: None,
     });
 
     let handle = Box::into_raw(context);
@@ -114,7 +113,7 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_error_name(
     context: TsurugiFfiContextHandle,
-    name_out: *mut *mut c_char,
+    name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_name()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
@@ -125,18 +124,16 @@ pub extern "C" fn tsurugi_ffi_context_get_error_name(
 
     let context = unsafe { &mut *context };
 
-    if context.error_name.is_null() {
+    if context.error_name.is_none() {
         let value = match &context.error {
             Some(e) => e.name(),
             None => rc_to_name(TSURUGI_FFI_RC_OK).to_string(),
         };
-        unsafe {
-            cchar_field_set!(std::ptr::null_mut(), context.error_name, value);
-        }
+        cchar_field_set!(std::ptr::null_mut(), context.error_name, value);
     }
 
     unsafe {
-        *name_out = context.error_name;
+        *name_out = cstring_to_cchar!(context.error_name);
     }
     trace!("{FUNCTION_NAME} end");
     TSURUGI_FFI_RC_OK
@@ -167,7 +164,7 @@ pub extern "C" fn tsurugi_ffi_context_get_error_type(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_error_message(
     context: TsurugiFfiContextHandle,
-    error_message_out: *mut *mut c_char,
+    error_message_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_message()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
@@ -178,20 +175,18 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
 
     let context = unsafe { &mut *context };
 
-    if context.error_message.is_null() {
+    if context.error_message.is_none() {
         match &context.error {
             Some(error) => {
                 let error_message = error.message();
-                unsafe {
-                    cchar_field_set!(std::ptr::null_mut(), context.error_message, error_message);
-                }
+                cchar_field_set!(std::ptr::null_mut(), context.error_message, error_message);
             }
             None => {}
         }
     }
 
     unsafe {
-        *error_message_out = context.error_message;
+        *error_message_out = cstring_to_cchar!(context.error_message);
     }
     trace!("{FUNCTION_NAME} end");
     TSURUGI_FFI_RC_OK
@@ -229,7 +224,7 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_number(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_server_error_category_str(
     context: TsurugiFfiContextHandle,
-    category_str_out: *mut *mut c_char,
+    category_str_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_server_error_category_str()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
@@ -240,18 +235,12 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_str(
 
     let context = unsafe { &mut *context };
 
-    if context.diagnostic_category_str.is_null() {
+    if context.diagnostic_category_str.is_none() {
         match &context.error {
             Some(e) => match e.diagnostic_code() {
                 Some(code) => {
                     let value = code.category_str().clone();
-                    unsafe {
-                        cchar_field_set!(
-                            std::ptr::null_mut(),
-                            context.diagnostic_category_str,
-                            value
-                        );
-                    }
+                    cchar_field_set!(std::ptr::null_mut(), context.diagnostic_category_str, value);
                 }
                 None => return TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND,
             },
@@ -260,7 +249,7 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_str(
     }
 
     unsafe {
-        *category_str_out = context.diagnostic_category_str;
+        *category_str_out = cstring_to_cchar!(context.diagnostic_category_str);
     }
     trace!("{FUNCTION_NAME} end");
     TSURUGI_FFI_RC_OK
@@ -298,7 +287,7 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_code_number(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_server_error_structured_code(
     context: TsurugiFfiContextHandle,
-    structured_code_out: *mut *mut c_char,
+    structured_code_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_server_error_structured_code()";
     trace!("{FUNCTION_NAME} start. context={:?}", context);
@@ -309,18 +298,16 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_structured_code(
 
     let context = unsafe { &mut *context };
 
-    if context.diagnostic_structured_code.is_null() {
+    if context.diagnostic_structured_code.is_none() {
         match &context.error {
             Some(e) => match e.diagnostic_code() {
                 Some(code) => {
                     let value = code.structured_code();
-                    unsafe {
-                        cchar_field_set!(
-                            std::ptr::null_mut(),
-                            context.diagnostic_structured_code,
-                            value
-                        );
-                    }
+                    cchar_field_set!(
+                        std::ptr::null_mut(),
+                        context.diagnostic_structured_code,
+                        value
+                    );
                 }
                 None => return TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND,
             },
@@ -329,7 +316,7 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_structured_code(
     }
 
     unsafe {
-        *structured_code_out = context.diagnostic_structured_code;
+        *structured_code_out = cstring_to_cchar!(context.diagnostic_structured_code);
     }
     trace!("{FUNCTION_NAME} end");
     TSURUGI_FFI_RC_OK
@@ -346,12 +333,7 @@ pub extern "C" fn tsurugi_ffi_context_dispose(context: TsurugiFfiContextHandle) 
     }
 
     unsafe {
-        let context = Box::from_raw(context);
-
-        cchar_field_dispose!(context.error_name);
-        cchar_field_dispose!(context.error_message);
-        cchar_field_dispose!(context.diagnostic_category_str);
-        cchar_field_dispose!(context.diagnostic_structured_code);
+        let _ = Box::from_raw(context);
     }
 
     trace!("{FUNCTION_NAME} end");

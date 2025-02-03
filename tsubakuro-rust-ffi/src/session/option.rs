@@ -1,13 +1,15 @@
-use std::{ffi::c_char, ops::Deref};
+use std::{ffi::CString, ops::Deref};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_clear, cchar_field_dispose, cchar_field_set,
+    cchar_field_clear, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
+    rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
+    TsurugiFfiStringHandle,
 };
 
 use super::endpoint::TsurugiFfiEndpointHandle;
@@ -15,9 +17,9 @@ use super::endpoint::TsurugiFfiEndpointHandle;
 #[derive(Debug)]
 pub(crate) struct TsurugiFfiConnectionOption {
     connection_option: ConnectionOption,
-    endpoint_str: *mut c_char,
-    application_name: *mut c_char,
-    session_label: *mut c_char,
+    endpoint: Option<CString>,
+    application_name: Option<CString>,
+    session_label: Option<CString>,
 }
 
 impl std::ops::Deref for TsurugiFfiConnectionOption {
@@ -49,9 +51,9 @@ pub extern "C" fn tsurugi_ffi_connection_option_create(
 
     let connection_option = Box::new(TsurugiFfiConnectionOption {
         connection_option: ConnectionOption::new(),
-        endpoint_str: std::ptr::null_mut(),
-        application_name: std::ptr::null_mut(),
-        session_label: std::ptr::null_mut(),
+        endpoint: None,
+        application_name: None,
+        session_label: None,
     });
 
     let handle = Box::into_raw(connection_option);
@@ -91,7 +93,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint(
 pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
     context: TsurugiFfiContextHandle,
     connection_option: TsurugiFfiConnectionOptionHandle,
-    endpoint: *const c_char,
+    endpoint: TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_endpoint()";
     trace!(
@@ -118,7 +120,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
 pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
     context: TsurugiFfiContextHandle,
     connection_option: TsurugiFfiConnectionOptionHandle,
-    endpoint_out: *mut *mut c_char,
+    endpoint_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_endpoint()";
     trace!(
@@ -133,16 +135,14 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
     let connection_option = unsafe { &mut *connection_option };
 
     match connection_option.endpoint() {
-        Some(endpoint) => unsafe {
+        Some(endpoint) => {
             let endpoint = endpoint.to_string();
-            cchar_field_set!(context, connection_option.endpoint_str, endpoint);
-        },
-        None => unsafe {
-            cchar_field_clear!(connection_option.endpoint_str);
-        },
+            cchar_field_set!(context, connection_option.endpoint, endpoint);
+        }
+        None => cchar_field_clear!(connection_option.endpoint),
     }
     unsafe {
-        *endpoint_out = connection_option.endpoint_str;
+        *endpoint_out = cstring_to_cchar!(connection_option.endpoint);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -153,7 +153,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
 pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
     context: TsurugiFfiContextHandle,
     connection_option: TsurugiFfiConnectionOptionHandle,
-    application_name: *const c_char,
+    application_name: TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_application_name()";
     trace!(
@@ -177,7 +177,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
 pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
     context: TsurugiFfiContextHandle,
     connection_option: TsurugiFfiConnectionOptionHandle,
-    application_name_out: *mut *mut c_char,
+    application_name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_application_name()";
     trace!(
@@ -192,20 +192,18 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
     let connection_option = unsafe { &mut *connection_option };
 
     match connection_option.application_name() {
-        Some(application_name) => unsafe {
+        Some(application_name) => {
             let application_name = application_name.to_string();
             cchar_field_set!(
                 context,
                 connection_option.application_name,
                 application_name
             );
-        },
-        None => unsafe {
-            cchar_field_clear!(connection_option.application_name);
-        },
+        }
+        None => cchar_field_clear!(connection_option.application_name),
     }
     unsafe {
-        *application_name_out = connection_option.application_name;
+        *application_name_out = cstring_to_cchar!(connection_option.application_name);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -216,7 +214,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
 pub extern "C" fn tsurugi_ffi_connection_option_set_session_label(
     context: TsurugiFfiContextHandle,
     connection_option: TsurugiFfiConnectionOptionHandle,
-    label: *const c_char,
+    label: TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_session_label()";
     trace!(
@@ -240,7 +238,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_session_label(
 pub extern "C" fn tsurugi_ffi_connection_option_get_session_label(
     context: TsurugiFfiContextHandle,
     connection_option: TsurugiFfiConnectionOptionHandle,
-    label_out: *mut *mut c_char,
+    label_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_session_label()";
     trace!(
@@ -255,16 +253,14 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_session_label(
     let connection_option = unsafe { &mut *connection_option };
 
     match connection_option.session_label() {
-        Some(label) => unsafe {
+        Some(label) => {
             let label = label.to_string();
             cchar_field_set!(context, connection_option.session_label, label);
-        },
-        None => unsafe {
-            cchar_field_clear!(connection_option.session_label);
-        },
+        }
+        None => cchar_field_clear!(connection_option.session_label),
     }
     unsafe {
-        *label_out = connection_option.session_label;
+        *label_out = cstring_to_cchar!(connection_option.session_label);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -287,11 +283,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_dispose(
     }
 
     unsafe {
-        let connection_option = Box::from_raw(connection_option);
-
-        cchar_field_dispose!(connection_option.endpoint_str);
-        cchar_field_dispose!(connection_option.application_name);
-        cchar_field_dispose!(connection_option.session_label);
+        let _ = Box::from_raw(connection_option);
     }
 
     trace!("{FUNCTION_NAME} end");

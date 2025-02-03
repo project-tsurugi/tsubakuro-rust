@@ -1,23 +1,27 @@
-use std::ffi::c_char;
+use std::ffi::CString;
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, return_code::{rc_ok, TsurugiFfiRc}
+    cchar_field_set,
+    context::TsurugiFfiContextHandle,
+    cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
+    return_code::{rc_ok, TsurugiFfiRc},
+    TsurugiFfiStringHandle,
 };
 
 #[derive(Debug)]
 pub(crate) struct TsurugiFfiSqlParameter {
     parameter: SqlParameter,
-    name: *mut c_char,
+    name: Option<CString>,
 }
 
 impl TsurugiFfiSqlParameter {
     fn new(parameter: SqlParameter) -> TsurugiFfiSqlParameter {
         TsurugiFfiSqlParameter {
             parameter,
-            name: std::ptr::null_mut(),
+            name: None,
         }
     }
 
@@ -45,7 +49,7 @@ pub type TsurugiFfiSqlParameterHandle = *mut TsurugiFfiSqlParameter;
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_null(
     context: TsurugiFfiContextHandle,
-    name: *const c_char,
+    name: TsurugiFfiStringHandle,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_null()";
@@ -72,7 +76,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_null(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_int4(
     context: TsurugiFfiContextHandle,
-    name: *const c_char,
+    name: TsurugiFfiStringHandle,
     value: i32,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
@@ -100,7 +104,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int4(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_int8(
     context: TsurugiFfiContextHandle,
-    name: *const c_char,
+    name: TsurugiFfiStringHandle,
     value: i64,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
@@ -128,7 +132,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int8(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_float4(
     context: TsurugiFfiContextHandle,
-    name: *const c_char,
+    name: TsurugiFfiStringHandle,
     value: f32,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
@@ -156,7 +160,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float4(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_float8(
     context: TsurugiFfiContextHandle,
-    name: *const c_char,
+    name: TsurugiFfiStringHandle,
     value: f64,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
@@ -184,8 +188,8 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float8(
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
     context: TsurugiFfiContextHandle,
-    name: *const c_char,
-    value: *const c_char,
+    name: TsurugiFfiStringHandle,
+    value: TsurugiFfiStringHandle,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_character()";
@@ -215,7 +219,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
 pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
     context: TsurugiFfiContextHandle,
     parameter: TsurugiFfiSqlParameterHandle,
-    name_out: *mut *mut c_char,
+    name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_get_name()";
     trace!("{FUNCTION_NAME} start. parameter={:?}", parameter);
@@ -226,18 +230,18 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
 
     let parameter = unsafe { &mut *parameter };
 
-    if parameter.name.is_null() {
+    if parameter.name.is_none() {
         match parameter.name() {
-            Some(name) => unsafe {
+            Some(name) => {
                 let name = name.clone();
                 cchar_field_set!(context, parameter.name, name);
-            },
+            }
             None => {}
         }
     }
 
     unsafe {
-        *name_out = parameter.name;
+        *name_out = cstring_to_cchar!(parameter.name);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -255,9 +259,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_dispose(parameter: TsurugiFfiSqlPara
     }
 
     unsafe {
-        let parameter = Box::from_raw(parameter);
-
-        cchar_field_dispose!(parameter.name);
+        let _ = Box::from_raw(parameter);
     }
 
     trace!("{FUNCTION_NAME} end");

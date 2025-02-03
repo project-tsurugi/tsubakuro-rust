@@ -1,16 +1,20 @@
-use std::{ffi::c_char, sync::Arc, time::Duration};
+use std::{ffi::CString, sync::Arc, time::Duration};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK}, TsurugiFfiDuration
+    cchar_field_set,
+    context::TsurugiFfiContextHandle,
+    cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
+    return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
+    TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
 pub(crate) struct TsurugiFfiTransaction {
     transaction: Transaction,
     runtime: Arc<tokio::runtime::Runtime>,
-    transaction_id: *mut c_char,
+    transaction_id: Option<CString>,
 }
 
 impl TsurugiFfiTransaction {
@@ -21,7 +25,7 @@ impl TsurugiFfiTransaction {
         TsurugiFfiTransaction {
             transaction,
             runtime,
-            transaction_id: std::ptr::null_mut(),
+            transaction_id: None,
         }
     }
 
@@ -50,7 +54,7 @@ pub type TsurugiFfiTransactionHandle = *mut TsurugiFfiTransaction;
 pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
     context: TsurugiFfiContextHandle,
     transaction: TsurugiFfiTransactionHandle,
-    transaction_id_out: *mut *mut c_char,
+    transaction_id_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_get_transaction_id()";
     trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
@@ -61,15 +65,13 @@ pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
 
     let transaction = unsafe { &mut *transaction };
 
-    if transaction.transaction_id.is_null() {
+    if transaction.transaction_id.is_none() {
         let transaction_id = transaction.transaction_id().clone();
-        unsafe {
-            cchar_field_set!(context, transaction.transaction_id, transaction_id);
-        }
+        cchar_field_set!(context, transaction.transaction_id, transaction_id);
     }
 
     unsafe {
-        *transaction_id_out = transaction.transaction_id;
+        *transaction_id_out = cstring_to_cchar!(transaction.transaction_id);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -110,7 +112,12 @@ pub extern "C" fn tsurugi_ffi_transaction_close_for(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = transaction.runtime();
-    ffi_exec_core_async!(context, FUNCTION_NAME, runtime, transaction.close_for(timeout));
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        transaction.close_for(timeout)
+    );
 
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)
@@ -132,8 +139,6 @@ fn transaction_dispose(transaction: TsurugiFfiTransactionHandle) -> TsurugiFfiRc
 
     unsafe {
         let transaction = Box::from_raw(transaction);
-
-        cchar_field_dispose!(transaction.transaction_id);
 
         if !transaction.is_closed() {
             let context = std::ptr::null_mut();

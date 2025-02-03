@@ -1,10 +1,16 @@
-use std::{ffi::c_char, sync::Arc, time::Duration};
+use std::{ffi::CString, sync::Arc, time::Duration};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_dispose, cchar_field_set, context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core, ffi_exec_core_async, return_code::{rc_ok, TsurugiFfiRc}, service::sql::query_result_metadata::TsurugiFfiSqlQueryResultMetadata, TsurugiFfiDuration
+    cchar_field_set,
+    context::TsurugiFfiContextHandle,
+    cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core,
+    ffi_exec_core_async,
+    return_code::{rc_ok, TsurugiFfiRc},
+    service::sql::query_result_metadata::TsurugiFfiSqlQueryResultMetadata,
+    TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
 use super::query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle;
@@ -12,7 +18,7 @@ use super::query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle;
 pub(crate) struct TsurugiFfiSqlQueryResult {
     query_result: SqlQueryResult,
     runtime: Arc<tokio::runtime::Runtime>,
-    character_value: *mut c_char,
+    character_value: Option<CString>,
 }
 
 impl TsurugiFfiSqlQueryResult {
@@ -23,7 +29,7 @@ impl TsurugiFfiSqlQueryResult {
         TsurugiFfiSqlQueryResult {
             query_result,
             runtime,
-            character_value: std::ptr::null_mut(),
+            character_value: None,
         }
     }
 
@@ -467,7 +473,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
     context: TsurugiFfiContextHandle,
     query_result: TsurugiFfiSqlQueryResultHandle,
-    value_out: *mut *mut c_char,
+    value_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_character()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
@@ -480,12 +486,10 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
 
     let runtime = query_result.runtime().clone();
     let value: String = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
-    unsafe {
-        cchar_field_set!(context, query_result.character_value, value);
-    }
+    cchar_field_set!(context, query_result.character_value, value);
 
     unsafe {
-        *value_out = query_result.character_value;
+        *value_out = cstring_to_cchar!(query_result.character_value);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -497,7 +501,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     context: TsurugiFfiContextHandle,
     query_result: TsurugiFfiSqlQueryResultHandle,
     timeout: TsurugiFfiDuration,
-    value_out: *mut *mut c_char,
+    value_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_character()";
     trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
@@ -516,12 +520,10 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
         runtime,
         query_result.fetch_for(timeout)
     );
-    unsafe {
-        cchar_field_set!(context, query_result.character_value, value);
-    }
+    cchar_field_set!(context, query_result.character_value, value);
 
     unsafe {
-        *value_out = query_result.character_value;
+        *value_out = cstring_to_cchar!(query_result.character_value);
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -543,9 +545,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_dispose(
     }
 
     unsafe {
-        let query_result = Box::from_raw(query_result);
-
-        cchar_field_dispose!(query_result.character_value);
+        let _ = Box::from_raw(query_result);
     }
 
     trace!("{FUNCTION_NAME} end");

@@ -223,6 +223,8 @@ typedef uint32_t TsurugiFfiRc;
 
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
 
+typedef const char *TsurugiFfiStringHandle;
+
 typedef struct TsurugiFfiCancelJob *TsurugiFfiCancelJobHandle;
 
 /**
@@ -260,7 +262,7 @@ typedef struct TsurugiFfiTransactionStatus *TsurugiFfiTransactionStatusHandle;
 
 typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
 
-typedef char **TsurugiFfiStringArrayHandle;
+typedef const TsurugiFfiStringHandle *TsurugiFfiStringArrayHandle;
 
 typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 
@@ -303,25 +305,26 @@ TsurugiFfiRc tsurugi_ffi_context_create(TsurugiFfiContextHandle *context_out);
 TsurugiFfiRc tsurugi_ffi_context_get_return_code(TsurugiFfiContextHandle context,
                                                  TsurugiFfiRc *rc_out);
 
-TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context, char **name_out);
+TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context,
+                                                TsurugiFfiStringHandle *name_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context,
                                                 TsurugiFfiRcType *error_type_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context,
-                                                   char **error_message_out);
+                                                   TsurugiFfiStringHandle *error_message_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_number(TsurugiFfiContextHandle context,
                                                                   int32_t *category_number_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context,
-                                                               char **category_str_out);
+                                                               TsurugiFfiStringHandle *category_str_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_code_number(TsurugiFfiContextHandle context,
                                                               int32_t *code_number_out);
 
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context,
-                                                                  char **structured_code_out);
+                                                                  TsurugiFfiStringHandle *structured_code_out);
 
 void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
 
@@ -338,7 +341,7 @@ void tsurugi_ffi_cancel_job_dispose(TsurugiFfiCancelJobHandle cancel_job);
 
 TsurugiFfiRc tsurugi_ffi_job_get_name(TsurugiFfiContextHandle context,
                                       TsurugiFfiJobHandle job,
-                                      char **name_out);
+                                      TsurugiFfiStringHandle *name_out);
 
 TsurugiFfiRc tsurugi_ffi_job_wait(TsurugiFfiContextHandle context,
                                   TsurugiFfiJobHandle job,
@@ -383,7 +386,7 @@ TsurugiFfiRc tsurugi_ffi_env_logger_init(void);
 
 TsurugiFfiRc tsurugi_ffi_sql_column_get_name(TsurugiFfiContextHandle context,
                                              TsurugiFfiSqlColumnHandle sql_column,
-                                             char **name_out);
+                                             TsurugiFfiStringHandle *name_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlColumnHandle sql_column,
@@ -414,48 +417,48 @@ TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_rows(TsurugiFfiContextHandle con
 void tsurugi_ffi_sql_execute_result_dispose(TsurugiFfiSqlExecuteResultHandle execute_result);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context,
-                                            const char *name,
+                                            TsurugiFfiStringHandle name,
                                             TsurugiFfiSqlParameterHandle *parameter_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context,
-                                               const char *name,
+                                               TsurugiFfiStringHandle name,
                                                int32_t value,
                                                TsurugiFfiSqlParameterHandle *parameter_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context,
-                                               const char *name,
+                                               TsurugiFfiStringHandle name,
                                                int64_t value,
                                                TsurugiFfiSqlParameterHandle *parameter_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context,
-                                                 const char *name,
+                                                 TsurugiFfiStringHandle name,
                                                  float value,
                                                  TsurugiFfiSqlParameterHandle *parameter_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context,
-                                                 const char *name,
+                                                 TsurugiFfiStringHandle name,
                                                  double value,
                                                  TsurugiFfiSqlParameterHandle *parameter_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context,
-                                                    const char *name,
-                                                    const char *value,
+                                                    TsurugiFfiStringHandle name,
+                                                    TsurugiFfiStringHandle value,
                                                     TsurugiFfiSqlParameterHandle *parameter_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlParameterHandle parameter,
-                                                char **name_out);
+                                                TsurugiFfiStringHandle *name_out);
 
 void tsurugi_ffi_sql_parameter_dispose(TsurugiFfiSqlParameterHandle parameter);
 
 TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context,
-                                                      const char *name,
+                                                      TsurugiFfiStringHandle name,
                                                       TsurugiFfiAtomType atom_type,
                                                       TsurugiFfiSqlPlaceholderHandle *placeholder_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_name(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlPlaceholderHandle placeholder,
-                                                  char **name_out);
+                                                  TsurugiFfiStringHandle *name_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_atom_type(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlPlaceholderHandle placeholder,
@@ -536,12 +539,12 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float8(TsurugiFfiContextHand
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlQueryResultHandle query_result,
-                                                          char **value_out);
+                                                          TsurugiFfiStringHandle *value_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context,
                                                               TsurugiFfiSqlQueryResultHandle query_result,
                                                               TsurugiFfiDuration timeout,
-                                                              char **value_out);
+                                                              TsurugiFfiStringHandle *value_out);
 
 void tsurugi_ffi_sql_query_result_dispose(TsurugiFfiSqlQueryResultHandle query_result);
 
@@ -558,7 +561,7 @@ void tsurugi_ffi_sql_query_result_metadata_dispose(TsurugiFfiSqlQueryResultMetad
 
 TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context,
                                                                 TsurugiFfiSqlClientHandle sql_client,
-                                                                char **smv_out);
+                                                                TsurugiFfiStringHandle *smv_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -575,30 +578,30 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_async(TsurugiFfiContextHandle co
 
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlClientHandle sql_client,
-                                                       const char *table_name,
+                                                       TsurugiFfiStringHandle table_name,
                                                        TsurugiFfiTableMetadataHandle *table_metadata_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
-                                                           const char *table_name,
+                                                           TsurugiFfiStringHandle table_name,
                                                            TsurugiFfiDuration timeout,
                                                            TsurugiFfiTableMetadataHandle *table_metadata_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context,
                                                              TsurugiFfiSqlClientHandle sql_client,
-                                                             const char *table_name,
+                                                             TsurugiFfiStringHandle table_name,
                                                              TsurugiFfiJobHandle *table_metadata_job_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
-                                            const char *sql,
+                                            TsurugiFfiStringHandle sql,
                                             const TsurugiFfiSqlPlaceholderHandle *placeholders,
                                             uint32_t placeholder_size,
                                             TsurugiFfiSqlPreparedStatementHandle *prepared_statement_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
-                                                const char *sql,
+                                                TsurugiFfiStringHandle sql,
                                                 const TsurugiFfiSqlPlaceholderHandle *placeholders,
                                                 uint32_t placeholder_size,
                                                 TsurugiFfiDuration timeout,
@@ -606,7 +609,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context,
 
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
-                                                  const char *sql,
+                                                  TsurugiFfiStringHandle sql,
                                                   const TsurugiFfiSqlPlaceholderHandle *placeholders,
                                                   uint32_t placeholder_size,
                                                   TsurugiFfiJobHandle *prepared_statement_job_out);
@@ -646,20 +649,20 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiConte
 TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
                                             TsurugiFfiTransactionHandle transaction,
-                                            const char *sql,
+                                            TsurugiFfiStringHandle sql,
                                             TsurugiFfiSqlExecuteResultHandle *execute_result_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
                                                 TsurugiFfiTransactionHandle transaction,
-                                                const char *sql,
+                                                TsurugiFfiStringHandle sql,
                                                 TsurugiFfiDuration timeout,
                                                 TsurugiFfiSqlExecuteResultHandle *execute_result_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
                                                   TsurugiFfiTransactionHandle transaction,
-                                                  const char *sql,
+                                                  TsurugiFfiStringHandle sql,
                                                   TsurugiFfiJobHandle *execute_result_job_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context,
@@ -690,20 +693,20 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHand
 TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
                                           TsurugiFfiSqlClientHandle sql_client,
                                           TsurugiFfiTransactionHandle transaction,
-                                          const char *sql,
+                                          TsurugiFfiStringHandle sql,
                                           TsurugiFfiSqlQueryResultHandle *query_result_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context,
                                               TsurugiFfiSqlClientHandle sql_client,
                                               TsurugiFfiTransactionHandle transaction,
-                                              const char *sql,
+                                              TsurugiFfiStringHandle sql,
                                               TsurugiFfiDuration timeout,
                                               TsurugiFfiSqlQueryResultHandle *query_result_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
                                                 TsurugiFfiTransactionHandle transaction,
-                                                const char *sql,
+                                                TsurugiFfiStringHandle sql,
                                                 TsurugiFfiJobHandle *query_result_job_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context,
@@ -773,7 +776,7 @@ void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list);
 
 TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context,
                                                        TsurugiFfiTableMetadataHandle table_metadata,
-                                                       char **table_name_out);
+                                                       TsurugiFfiStringHandle *table_name_out);
 
 TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle context,
                                                          TsurugiFfiTableMetadataHandle table_metadata,
@@ -787,7 +790,7 @@ TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_value(TsurugiFfiContextHandl
 void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata);
 
 TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context,
-                                        const char *endpoint,
+                                        TsurugiFfiStringHandle endpoint,
                                         TsurugiFfiEndpointHandle *endpoint_out);
 
 void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint);
@@ -801,27 +804,27 @@ TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint(TsurugiFfiContextHandle 
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context,
                                                             TsurugiFfiConnectionOptionHandle connection_option,
-                                                            const char *endpoint);
+                                                            TsurugiFfiStringHandle endpoint);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context,
                                                         TsurugiFfiConnectionOptionHandle connection_option,
-                                                        char **endpoint_out);
+                                                        TsurugiFfiStringHandle *endpoint_out);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context,
                                                                 TsurugiFfiConnectionOptionHandle connection_option,
-                                                                const char *application_name);
+                                                                TsurugiFfiStringHandle application_name);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContextHandle context,
                                                                 TsurugiFfiConnectionOptionHandle connection_option,
-                                                                char **application_name_out);
+                                                                TsurugiFfiStringHandle *application_name_out);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context,
                                                              TsurugiFfiConnectionOptionHandle connection_option,
-                                                             const char *label);
+                                                             TsurugiFfiStringHandle label);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context,
                                                              TsurugiFfiConnectionOptionHandle connection_option,
-                                                             char **label_out);
+                                                             TsurugiFfiStringHandle *label_out);
 
 void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);
 
@@ -870,11 +873,11 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_type(TsurugiFfiConte
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context,
                                                                   TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                  const char *label);
+                                                                  TsurugiFfiStringHandle label);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context,
                                                                   TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                  char **label_out);
+                                                                  TsurugiFfiStringHandle *label_out);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_modifies_definitions(TsurugiFfiContextHandle context,
                                                                      TsurugiFfiTransactionOptionHandle transaction_option,
@@ -886,7 +889,7 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_modifies_definitions(TsurugiFfiC
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_write_preserve(TsurugiFfiContextHandle context,
                                                                TsurugiFfiTransactionOptionHandle transaction_option,
-                                                               const char *const *table_names,
+                                                               const TsurugiFfiStringHandle *table_names,
                                                                uint32_t table_names_size);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve(TsurugiFfiContextHandle context,
@@ -896,7 +899,7 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_write_preserve(TsurugiFfiContext
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_inclusive_read_area(TsurugiFfiContextHandle context,
                                                                     TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                    const char *const *table_names,
+                                                                    const TsurugiFfiStringHandle *table_names,
                                                                     uint32_t table_names_size);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_get_inclusive_read_area(TsurugiFfiContextHandle context,
@@ -906,7 +909,7 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_inclusive_read_area(TsurugiFfiCo
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_exclusive_read_area(TsurugiFfiContextHandle context,
                                                                     TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                    const char *const *table_names,
+                                                                    const TsurugiFfiStringHandle *table_names,
                                                                     uint32_t table_names_size);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_get_exclusive_read_area(TsurugiFfiContextHandle context,
@@ -942,11 +945,11 @@ TsurugiFfiRc tsurugi_ffi_transaction_status_is_error(TsurugiFfiContextHandle con
 
 TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context,
                                                                   TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                  char **name_out);
+                                                                  TsurugiFfiStringHandle *name_out);
 
 TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context,
                                                                      TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                     char **error_message_out);
+                                                                     TsurugiFfiStringHandle *error_message_out);
 
 TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(TsurugiFfiContextHandle context,
                                                                              TsurugiFfiTransactionStatusHandle transaction_status,
@@ -954,7 +957,7 @@ TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(Tsu
 
 TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context,
                                                                           TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                          char **category_str_out);
+                                                                          TsurugiFfiStringHandle *category_str_out);
 
 TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(TsurugiFfiContextHandle context,
                                                                          TsurugiFfiTransactionStatusHandle transaction_status,
@@ -962,13 +965,13 @@ TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(Tsurugi
 
 TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context,
                                                                              TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                             char **structured_code_out);
+                                                                             TsurugiFfiStringHandle *structured_code_out);
 
 void tsurugi_ffi_transaction_status_dispose(TsurugiFfiTransactionStatusHandle transaction_status);
 
 TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context,
                                                         TsurugiFfiTransactionHandle transaction,
-                                                        char **transaction_id_out);
+                                                        TsurugiFfiStringHandle *transaction_id_out);
 
 TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
                                            TsurugiFfiTransactionHandle transaction);
