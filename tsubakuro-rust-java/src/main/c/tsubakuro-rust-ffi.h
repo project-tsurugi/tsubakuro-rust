@@ -898,6 +898,14 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_priority(TsurugiFfiContextHandle
                                                          TsurugiFfiTransactionOptionHandle transaction_option,
                                                          TsurugiFfiTransactionPriority *priority_out);
 
+TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context,
+                                                              TsurugiFfiTransactionOptionHandle transaction_option,
+                                                              TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context,
+                                                              TsurugiFfiTransactionOptionHandle transaction_option,
+                                                              TsurugiFfiDuration *close_timeout_out);
+
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
 
 TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle context,

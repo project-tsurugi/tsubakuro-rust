@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.transaction;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,8 +65,8 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_type(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		int outInt = outToInt(out);
-		return TgFfiTransactionType.forNumber(outInt);
+		int value = outToInt(out);
+		return TgFfiTransactionType.forNumber(value);
 	}
 
 	public synchronized void setTransactionLabel(TgFfiContext context, String label) {
@@ -189,8 +190,29 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_priority(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		int outInt = outToInt(out);
-		return TgFfiTransactionPriority.forNumber(outInt);
+		int value = outToInt(out);
+		return TgFfiTransactionPriority.forNumber(value);
+	}
+
+	public synchronized void setCloseTimeout(TgFfiContext context, Duration timeout) {
+		Objects.requireNonNull(timeout, "timeout must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_close_timeout(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized Duration getCloseTimeout(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_close_timeout(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		long value = outToLong(out);
+		return Duration.ofNanos(value);
 	}
 
 	@Override

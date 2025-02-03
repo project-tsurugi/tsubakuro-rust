@@ -1,4 +1,4 @@
-use std::ffi::c_char;
+use std::{ffi::c_char, time::Duration};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -9,7 +9,7 @@ use crate::{
     ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     vec_cchar_field_clear, vec_cchar_field_dispose, vec_cchar_field_set_if_none,
-    TsurugiFfiStringArrayHandle,
+    TsurugiFfiDuration, TsurugiFfiStringArrayHandle,
 };
 
 use super::r#type::{TsurugiFfiTransactionPriority, TsurugiFfiTransactionType};
@@ -507,6 +507,60 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_priority(
     let priority = transaction_option.priority();
     unsafe {
         *priority_out = priority.into();
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_set_close_timeout(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_close_timeout()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+    let timeout = Duration::from_nanos(timeout);
+
+    transaction_option.set_close_timeout(timeout);
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_close_timeout(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    close_timeout_out: *mut TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_close_timeout()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_out_initialize!(close_timeout_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, close_timeout_out);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+
+    let timeout = match transaction_option.close_timeout() {
+        Some(value) => value.as_nanos() as TsurugiFfiDuration,
+        None => 0, // FIXME close_timeout None
+    };
+
+    unsafe {
+        *close_timeout_out = timeout;
     }
 
     trace!("{FUNCTION_NAME} end");

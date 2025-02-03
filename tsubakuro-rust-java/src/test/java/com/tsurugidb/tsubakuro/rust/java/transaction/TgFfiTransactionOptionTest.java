@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -435,8 +436,8 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 
 			target.setPriority(context, TgFfiTransactionPriority.WAIT);
 
-			var type = target.getPriority(context);
-			assertEquals(TgFfiTransactionPriority.WAIT, type);
+			var priority = target.getPriority(context);
+			assertEquals(TgFfiTransactionPriority.WAIT, priority);
 		}
 	}
 
@@ -478,6 +479,55 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 			var handle = target.handle();
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_priority(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void set_close_timeout() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			assertEquals(Duration.ofNanos(0), target.getCloseTimeout(context));
+
+			target.setCloseTimeout(context, Duration.ofSeconds(5));
+
+			var timeout = target.getCloseTimeout(context);
+			assertEquals(Duration.ofSeconds(5), timeout);
+		}
+	}
+
+	@Test
+	void set_close_timeout_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = TgFfiTransactionType.LONG.value();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_close_timeout(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_close_timeout_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_close_timeout(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_close_timeout(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
