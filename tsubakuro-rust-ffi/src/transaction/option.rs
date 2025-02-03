@@ -12,47 +12,7 @@ use crate::{
     TsurugiFfiStringArrayHandle,
 };
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[repr(i32)]
-#[allow(dead_code)]
-pub enum TsurugiFfiTransactionType {
-    /// use default transaction type.
-    Unspecified = 0,
-    /// short transactions (optimistic concurrency control).
-    Short = 1,
-    /// long transactions (pessimistic concurrency control).
-    Long = 2,
-    /// read only transactions (may be abort-free).
-    ReadOnly = 3,
-}
-
-impl TsurugiFfiTransactionType {
-    fn is_valid(value: i32) -> bool {
-        matches!(value, 0 | 1 | 2 | 3)
-    }
-}
-
-impl From<TransactionType> for TsurugiFfiTransactionType {
-    fn from(value: TransactionType) -> Self {
-        match value {
-            TransactionType::Unspecified => TsurugiFfiTransactionType::Unspecified,
-            TransactionType::Short => TsurugiFfiTransactionType::Short,
-            TransactionType::Long => TsurugiFfiTransactionType::Long,
-            TransactionType::ReadOnly => TsurugiFfiTransactionType::ReadOnly,
-        }
-    }
-}
-
-impl From<TsurugiFfiTransactionType> for TransactionType {
-    fn from(value: TsurugiFfiTransactionType) -> Self {
-        match value {
-            TsurugiFfiTransactionType::Unspecified => Self::Unspecified,
-            TsurugiFfiTransactionType::Short => Self::Short,
-            TsurugiFfiTransactionType::Long => Self::Long,
-            TsurugiFfiTransactionType::ReadOnly => Self::ReadOnly,
-        }
-    }
-}
+use super::r#type::{TsurugiFfiTransactionPriority, TsurugiFfiTransactionType};
 
 #[derive(Debug)]
 pub(crate) struct TsurugiFfiTransactionOption {
@@ -495,6 +455,58 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
             .unwrap()
             .as_mut_ptr();
         *table_names_size_out = size as u32;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_set_priority(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    priority: TsurugiFfiTransactionPriority,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_priority()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    if !TsurugiFfiTransactionPriority::is_valid(priority as i32) {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "priority", "is invalid");
+    }
+
+    let transaction_option = unsafe { &mut *transaction_option };
+
+    transaction_option.set_priority(priority.into());
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_priority(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    priority_out: *mut TsurugiFfiTransactionPriority,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_priority()";
+    trace!(
+        "{FUNCTION_NAME} start. transaction_option={:?}",
+        transaction_option
+    );
+
+    ffi_arg_out_initialize!(priority_out, TsurugiFfiTransactionPriority::Unspecified);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, priority_out);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+
+    let priority = transaction_option.priority();
+    unsafe {
+        *priority_out = priority.into();
     }
 
     trace!("{FUNCTION_NAME} end");

@@ -172,6 +172,27 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		return outToStringList(out, sizeOut);
 	}
 
+	public synchronized void setPriority(TgFfiContext context, TgFfiTransactionPriority priority) {
+		Objects.requireNonNull(priority, "priority must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = priority.value();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_priority(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized TgFfiTransactionPriority getPriority(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_priority(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		int outInt = outToInt(out);
+		return TgFfiTransactionPriority.forNumber(outInt);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_dispose(handle);

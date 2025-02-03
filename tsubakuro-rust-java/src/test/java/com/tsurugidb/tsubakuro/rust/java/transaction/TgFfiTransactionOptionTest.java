@@ -424,4 +424,61 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}
+
+	@Test
+	void set_priority() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			assertEquals(TgFfiTransactionPriority.UNSPECIFIED, target.getPriority(context));
+
+			target.setPriority(context, TgFfiTransactionPriority.WAIT);
+
+			var type = target.getPriority(context);
+			assertEquals(TgFfiTransactionPriority.WAIT, type);
+		}
+	}
+
+	@Test
+	void set_priority_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = TgFfiTransactionType.LONG.value();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_priority(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var arg = -1;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_priority(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_priority_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_priority(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var context = TgFfiContext.create(manager); //
+				var target = TgFfiTransactionOption.create(context)) {
+			var ctx = context.handle();
+			var handle = target.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_priority(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
 }

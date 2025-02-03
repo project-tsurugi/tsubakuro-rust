@@ -15650,6 +15650,57 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final OfInt TsurugiFfiRcType = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionPriority.TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED = 0
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED() {
+        return TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED;
+    }
+    private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionPriority.TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT = 1
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT() {
+        return TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT;
+    }
+    private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionPriority.TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT = 2
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT() {
+        return TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT;
+    }
+    private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT_EXCLUDE = (int)3L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionPriority.TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT_EXCLUDE = 3
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT_EXCLUDE() {
+        return TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT_EXCLUDE;
+    }
+    private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT_EXCLUDE = (int)4L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionPriority.TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT_EXCLUDE = 4
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT_EXCLUDE() {
+        return TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT_EXCLUDE;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiTransactionPriority
+     * }
+     */
+    public static final OfInt TsurugiFfiTransactionPriority = tsubakuro_rust_ffi_h.C_INT;
     private static final int TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED = (int)0L;
     /**
      * {@snippet lang=c :
@@ -24183,6 +24234,126 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_exclusive_read_area", context, transaction_option, table_names_out, table_names_size_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, table_names_out, table_names_size_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_option_set_priority {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_priority");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority priority)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_set_priority$descriptor() {
+        return tsurugi_ffi_transaction_option_set_priority.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority priority)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_set_priority$handle() {
+        return tsurugi_ffi_transaction_option_set_priority.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority priority)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_set_priority$address() {
+        return tsurugi_ffi_transaction_option_set_priority.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority priority)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_set_priority(MemorySegment context, MemorySegment transaction_option, int priority) {
+        var mh$ = tsurugi_ffi_transaction_option_set_priority.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_set_priority", context, transaction_option, priority);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, priority);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_option_get_priority {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_priority");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority *priority_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_get_priority$descriptor() {
+        return tsurugi_ffi_transaction_option_get_priority.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority *priority_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_get_priority$handle() {
+        return tsurugi_ffi_transaction_option_get_priority.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority *priority_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_get_priority$address() {
+        return tsurugi_ffi_transaction_option_get_priority.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_priority(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiTransactionPriority *priority_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_get_priority(MemorySegment context, MemorySegment transaction_option, MemorySegment priority_out) {
+        var mh$ = tsurugi_ffi_transaction_option_get_priority.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_get_priority", context, transaction_option, priority_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, priority_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

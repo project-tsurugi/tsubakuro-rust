@@ -137,6 +137,30 @@ enum TsurugiFfiRcType {
 };
 typedef uint32_t TsurugiFfiRcType;
 
+enum TsurugiFfiTransactionPriority {
+  /**
+   * use default transaction priority.
+   */
+  TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED = 0,
+  /**
+   * halts the running transactions immediately.
+   */
+  TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT = 1,
+  /**
+   * prevents new transactions and waits for the running transactions will end.
+   */
+  TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT = 2,
+  /**
+   * halts the running transactions immediately, and keep lock-out until its end.
+   */
+  TSURUGI_FFI_TRANSACTION_PRIORITY_INTERRUPT_EXCLUDE = 3,
+  /**
+   * prevents new transactions and waits for the running transactions will end, and keep lock-out until its end.
+   */
+  TSURUGI_FFI_TRANSACTION_PRIORITY_WAIT_EXCLUDE = 4,
+};
+typedef int32_t TsurugiFfiTransactionPriority;
+
 enum TsurugiFfiTransactionType {
   /**
    * use default transaction type.
@@ -865,6 +889,14 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_exclusive_read_area(TsurugiFfiCo
                                                                     TsurugiFfiTransactionOptionHandle transaction_option,
                                                                     TsurugiFfiStringArrayHandle *table_names_out,
                                                                     uint32_t *table_names_size_out);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_set_priority(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiTransactionOptionHandle transaction_option,
+                                                         TsurugiFfiTransactionPriority priority);
+
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_priority(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiTransactionOptionHandle transaction_option,
+                                                         TsurugiFfiTransactionPriority *priority_out);
 
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
 
