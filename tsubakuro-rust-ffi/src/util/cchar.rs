@@ -1,3 +1,7 @@
+use std::ffi::CString;
+
+use crate::{TsurugiFfiStringArrayHandle, TsurugiFfiStringHandle};
+
 #[macro_export]
 macro_rules! ffi_arg_cchar_to_str {
     ($context:expr, $function_name:expr, $arg_index:expr, $arg:expr) => {{
@@ -75,36 +79,56 @@ macro_rules! cchar_field_clear {
     }};
 }
 
+#[derive(Debug)]
+pub(crate) struct TsurugiFfiCStringArray {
+    vec: Vec<CString>,
+    ptr_vec: Vec<TsurugiFfiStringHandle>,
+}
+
+impl TsurugiFfiCStringArray {
+    pub(crate) fn new(capacity: usize) -> TsurugiFfiCStringArray {
+        TsurugiFfiCStringArray {
+            vec: Vec::with_capacity(capacity),
+            ptr_vec: Vec::with_capacity(capacity),
+        }
+    }
+
+    pub(crate) fn push(&mut self, s: CString) {
+        self.ptr_vec.push(s.as_ptr());
+        self.vec.push(s);
+    }
+
+    pub(crate) fn as_ptr(&self) -> TsurugiFfiStringArrayHandle {
+        self.ptr_vec.as_ptr()
+    }
+}
+
 #[macro_export]
-macro_rules! vec_cchar_field_set_if_none {
-    ($context:expr, $field:expr, $ptr_field:expr, $values:expr) => {{
+macro_rules! cstring_array_field_set_if_none {
+    ($context:expr, $field:expr, $values:expr) => {{
         if $field.is_none() {
-            let mut vec = Vec::with_capacity($values.len());
-            let mut ptr_vec = Vec::with_capacity($values.len());
+            let mut array = $crate::util::cchar::TsurugiFfiCStringArray::new($values.len());
             for value in $values {
                 let s = value.to_string();
                 let s = $crate::ffi_str_to_cstring!($context, s);
-                ptr_vec.push(s.as_ptr());
-                vec.push(s);
+                array.push(s);
             }
-            $field = Some(vec);
-            $ptr_field = Some(ptr_vec);
+            $field = Some(array);
         }
     }};
 }
 
 #[macro_export]
-macro_rules! vec_cchar_field_clear {
-    ($field:expr, $ptr_field:expr) => {{
-        $ptr_field = None;
+macro_rules! cstring_array_field_clear {
+    ($field:expr) => {{
         $field = None;
     }};
 }
 
 #[macro_export]
-macro_rules! vec_cchar_field_to_ptr {
-    ($ptr_field:expr) => {
-        match &$ptr_field {
+macro_rules! cstring_array_field_to_ptr {
+    ($field:expr) => {
+        match &$field {
             Some(value) => value.as_ptr(),
             None => std::ptr::null(),
         }

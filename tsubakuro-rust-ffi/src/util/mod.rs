@@ -1,4 +1,4 @@
-mod cchar;
+pub(crate) mod cchar;
 
 #[macro_export]
 macro_rules! ffi_arg_out_initialize {

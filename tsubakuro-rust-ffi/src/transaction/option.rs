@@ -6,11 +6,12 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_clear, cchar_field_set,
     context::TsurugiFfiContextHandle,
+    cstring_array_field_clear, cstring_array_field_set_if_none, cstring_array_field_to_ptr,
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
     rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
-    vec_cchar_field_clear, vec_cchar_field_set_if_none, vec_cchar_field_to_ptr, TsurugiFfiDuration,
-    TsurugiFfiStringArrayHandle, TsurugiFfiStringHandle,
+    util::cchar::TsurugiFfiCStringArray,
+    TsurugiFfiDuration, TsurugiFfiStringArrayHandle, TsurugiFfiStringHandle,
 };
 
 use super::r#type::{TsurugiFfiTransactionPriority, TsurugiFfiTransactionType};
@@ -19,12 +20,9 @@ use super::r#type::{TsurugiFfiTransactionPriority, TsurugiFfiTransactionType};
 pub(crate) struct TsurugiFfiTransactionOption {
     transaction_option: TransactionOption,
     transaction_label: Option<CString>,
-    write_preserve: Option<Vec<CString>>,
-    write_preserve_ptr: Option<Vec<TsurugiFfiStringHandle>>,
-    inclusive_read_area: Option<Vec<CString>>,
-    inclusive_read_area_ptr: Option<Vec<TsurugiFfiStringHandle>>,
-    exclusive_read_area: Option<Vec<CString>>,
-    exclusive_read_area_ptr: Option<Vec<TsurugiFfiStringHandle>>,
+    write_preserve: Option<TsurugiFfiCStringArray>,
+    inclusive_read_area: Option<TsurugiFfiCStringArray>,
+    exclusive_read_area: Option<TsurugiFfiCStringArray>,
 }
 
 impl std::ops::Deref for TsurugiFfiTransactionOption {
@@ -58,11 +56,8 @@ pub extern "C" fn tsurugi_ffi_transaction_option_create(
         transaction_option: TransactionOption::new(),
         transaction_label: None,
         write_preserve: None,
-        write_preserve_ptr: None,
         inclusive_read_area: None,
-        inclusive_read_area_ptr: None,
         exclusive_read_area: None,
-        exclusive_read_area_ptr: None,
     });
 
     let handle = Box::into_raw(transaction_option);
@@ -278,10 +273,7 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_write_preserve(
 
     transaction_option.set_write_preserve(&table_names);
 
-    vec_cchar_field_clear!(
-        transaction_option.write_preserve,
-        transaction_option.write_preserve_ptr
-    );
+    cstring_array_field_clear!(transaction_option.write_preserve);
 
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)
@@ -312,15 +304,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
     let size = table_names.len();
 
     // TODO mutex.lock transaction_option.write_preserve
-    vec_cchar_field_set_if_none!(
-        context,
-        transaction_option.write_preserve,
-        transaction_option.write_preserve_ptr,
-        table_names
-    );
+    cstring_array_field_set_if_none!(context, transaction_option.write_preserve, table_names);
 
     unsafe {
-        *table_names_out = vec_cchar_field_to_ptr!(transaction_option.write_preserve_ptr);
+        *table_names_out = cstring_array_field_to_ptr!(transaction_option.write_preserve);
         *table_names_size_out = size as u32;
     }
 
@@ -350,10 +337,7 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_inclusive_read_area(
 
     transaction_option.set_inclusive_read_area(&table_names);
 
-    vec_cchar_field_clear!(
-        transaction_option.inclusive_read_area,
-        transaction_option.inclusive_read_area_ptr
-    );
+    cstring_array_field_clear!(transaction_option.inclusive_read_area);
 
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)
@@ -384,15 +368,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
     let size = table_names.len();
 
     // TODO mutex.lock transaction_option.inclusive_read_area
-    vec_cchar_field_set_if_none!(
-        context,
-        transaction_option.inclusive_read_area,
-        transaction_option.inclusive_read_area_ptr,
-        table_names
-    );
+    cstring_array_field_set_if_none!(context, transaction_option.inclusive_read_area, table_names);
 
     unsafe {
-        *table_names_out = vec_cchar_field_to_ptr!(transaction_option.inclusive_read_area_ptr);
+        *table_names_out = cstring_array_field_to_ptr!(transaction_option.inclusive_read_area);
         *table_names_size_out = size as u32;
     }
 
@@ -422,10 +401,7 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_exclusive_read_area(
 
     transaction_option.set_exclusive_read_area(&table_names);
 
-    vec_cchar_field_clear!(
-        transaction_option.exclusive_read_area,
-        transaction_option.exclusive_read_area_ptr
-    );
+    cstring_array_field_clear!(transaction_option.exclusive_read_area);
 
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)
@@ -456,15 +432,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
     let size = table_names.len();
 
     // TODO mutex.lock transaction_option.exclusive_read_area
-    vec_cchar_field_set_if_none!(
-        context,
-        transaction_option.exclusive_read_area,
-        transaction_option.exclusive_read_area_ptr,
-        table_names
-    );
+    cstring_array_field_set_if_none!(context, transaction_option.exclusive_read_area, table_names);
 
     unsafe {
-        *table_names_out = vec_cchar_field_to_ptr!(transaction_option.exclusive_read_area_ptr);
+        *table_names_out = cstring_array_field_to_ptr!(transaction_option.exclusive_read_area);
         *table_names_size_out = size as u32;
     }
 
