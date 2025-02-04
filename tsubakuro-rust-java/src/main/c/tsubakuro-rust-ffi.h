@@ -137,6 +137,22 @@ enum TsurugiFfiRcType {
 };
 typedef uint32_t TsurugiFfiRcType;
 
+enum TsurugiFfiShutdownType {
+  /**
+   * The default shutdown type.
+   */
+  TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET = 0,
+  /**
+   * Waits for the ongoing requests and safely shutdown the session.
+   */
+  TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL = 1,
+  /**
+   * Cancelling the ongoing requests and safely shutdown the session.
+   */
+  TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL = 2,
+};
+typedef int32_t TsurugiFfiShutdownType;
+
 enum TsurugiFfiTransactionPriority {
   /**
    * use default transaction priority.
@@ -870,6 +886,20 @@ TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_async(TsurugiFfiContextH
                                                               bool expiration_time_exists,
                                                               TsurugiFfiDuration expiration_time,
                                                               TsurugiFfiJobHandle *update_expiration_time_job_out);
+
+TsurugiFfiRc tsurugi_ffi_session_shutdown(TsurugiFfiContextHandle context,
+                                          TsurugiFfiSessionHandle session,
+                                          TsurugiFfiShutdownType shutdown_type);
+
+TsurugiFfiRc tsurugi_ffi_session_shutdown_for(TsurugiFfiContextHandle context,
+                                              TsurugiFfiSessionHandle session,
+                                              TsurugiFfiShutdownType shutdown_type,
+                                              TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_session_shutdown_async(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSessionHandle session,
+                                                TsurugiFfiShutdownType shutdown_type,
+                                                TsurugiFfiJobHandle *shutdown_job_out);
 
 void tsurugi_ffi_session_dispose(TsurugiFfiSessionHandle session);
 

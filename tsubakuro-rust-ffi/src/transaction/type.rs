@@ -2,7 +2,6 @@ use tsubakuro_rust_core::prelude::*;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
-#[allow(dead_code)]
 pub enum TsurugiFfiTransactionType {
     /// use default transaction type.
     Unspecified = 0,
@@ -44,7 +43,6 @@ impl From<TsurugiFfiTransactionType> for TransactionType {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
-#[allow(dead_code)]
 pub enum TsurugiFfiTransactionPriority {
     /// use default transaction priority.
     Unspecified = 0,

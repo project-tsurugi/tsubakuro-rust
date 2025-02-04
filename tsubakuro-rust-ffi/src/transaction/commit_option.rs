@@ -7,7 +7,6 @@ use crate::{
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
-#[allow(dead_code)]
 pub enum TsurugiFfiCommitType {
     /// the default commit status (rely on the database settings).
     Unspecified = 0,

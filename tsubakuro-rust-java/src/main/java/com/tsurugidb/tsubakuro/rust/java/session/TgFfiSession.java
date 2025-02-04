@@ -216,6 +216,35 @@ public class TgFfiSession extends TgFfiObject {
 		return new TgFfiVoidJob(manager(), outHandle);
 	}
 
+	public synchronized void shutdown(TgFfiContext context, TgFfiShutdownType shutdownType) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = shutdownType.value();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized void shutdownFor(TgFfiContext context, TgFfiShutdownType shutdownType, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = shutdownType.value();
+		var t = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_for(ctx, handle, arg, t);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized TgFfiVoidJob shutdownAsync(TgFfiContext context, TgFfiShutdownType shutdownType) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = shutdownType.value();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiVoidJob(manager(), outHandle);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_session_dispose(handle);

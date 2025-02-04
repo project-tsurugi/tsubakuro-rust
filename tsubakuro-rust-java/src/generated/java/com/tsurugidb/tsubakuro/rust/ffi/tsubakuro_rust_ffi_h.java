@@ -15650,6 +15650,39 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final OfInt TsurugiFfiRcType = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET = 0
+     * }
+     */
+    public static int TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET() {
+        return TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET;
+    }
+    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL = 1
+     * }
+     */
+    public static int TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL() {
+        return TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL;
+    }
+    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL = 2
+     * }
+     */
+    public static int TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL() {
+        return TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiShutdownType
+     * }
+     */
+    public static final OfInt TsurugiFfiShutdownType = tsubakuro_rust_ffi_h.C_INT;
     private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED = (int)0L;
     /**
      * {@snippet lang=c :
@@ -23718,6 +23751,188 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_update_expiration_time_async", context, session, expiration_time_exists, expiration_time, update_expiration_time_job_out);
             }
             return (int)mh$.invokeExact(context, session, expiration_time_exists, expiration_time, update_expiration_time_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_shutdown {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_shutdown");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_shutdown$descriptor() {
+        return tsurugi_ffi_session_shutdown.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_shutdown$handle() {
+        return tsurugi_ffi_session_shutdown.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_shutdown$address() {
+        return tsurugi_ffi_session_shutdown.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type)
+     * }
+     */
+    public static int tsurugi_ffi_session_shutdown(MemorySegment context, MemorySegment session, int shutdown_type) {
+        var mh$ = tsurugi_ffi_session_shutdown.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_shutdown", context, session, shutdown_type);
+            }
+            return (int)mh$.invokeExact(context, session, shutdown_type);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_shutdown_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_shutdown_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_shutdown_for$descriptor() {
+        return tsurugi_ffi_session_shutdown_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_shutdown_for$handle() {
+        return tsurugi_ffi_session_shutdown_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_shutdown_for$address() {
+        return tsurugi_ffi_session_shutdown_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static int tsurugi_ffi_session_shutdown_for(MemorySegment context, MemorySegment session, int shutdown_type, long timeout) {
+        var mh$ = tsurugi_ffi_session_shutdown_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_shutdown_for", context, session, shutdown_type, timeout);
+            }
+            return (int)mh$.invokeExact(context, session, shutdown_type, timeout);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_shutdown_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_shutdown_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiJobHandle *shutdown_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_shutdown_async$descriptor() {
+        return tsurugi_ffi_session_shutdown_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiJobHandle *shutdown_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_shutdown_async$handle() {
+        return tsurugi_ffi_session_shutdown_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiJobHandle *shutdown_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_shutdown_async$address() {
+        return tsurugi_ffi_session_shutdown_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_shutdown_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiShutdownType shutdown_type, TsurugiFfiJobHandle *shutdown_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_shutdown_async(MemorySegment context, MemorySegment session, int shutdown_type, MemorySegment shutdown_job_out) {
+        var mh$ = tsurugi_ffi_session_shutdown_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_shutdown_async", context, session, shutdown_type, shutdown_job_out);
+            }
+            return (int)mh$.invokeExact(context, session, shutdown_type, shutdown_job_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

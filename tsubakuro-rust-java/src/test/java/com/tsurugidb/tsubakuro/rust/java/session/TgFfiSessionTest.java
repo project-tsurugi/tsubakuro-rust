@@ -307,4 +307,125 @@ class TgFfiSessionTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
 		}
 	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "NOT_SET", "GRACEFUL", "FORCEFUL" })
+	void shutdown(String type) {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		try (var session = createSession()) {
+			var shutdownType = TgFfiShutdownType.valueOf(type);
+			session.shutdown(context, shutdownType);
+		}
+	}
+
+	@Test
+	void shutdown_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = TgFfiShutdownType.GRACEFUL.value();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var session = createSession()) {
+			var ctx = context.handle();
+			var handle = session.handle();
+			var arg = -1;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "NOT_SET", "GRACEFUL", "FORCEFUL" })
+	void shutdown_for(String type) {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		try (var session = createSession()) {
+			var shutdownType = TgFfiShutdownType.valueOf(type);
+			session.shutdownFor(context, shutdownType, Duration.ofSeconds(5));
+		}
+	}
+
+	@Test
+	void shutdown_for_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = TgFfiShutdownType.GRACEFUL.value();
+			var t = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_for(ctx, handle, arg, t);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var session = createSession()) {
+			var ctx = context.handle();
+			var handle = session.handle();
+			var arg = -1;
+			var t = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_for(ctx, handle, arg, t);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void shutdown_async(String pattern) {
+		shutdown_async(TgFfiShutdownType.NOT_SET, pattern);
+		shutdown_async(TgFfiShutdownType.GRACEFUL, pattern);
+		shutdown_async(TgFfiShutdownType.FORCEFUL, pattern);
+	}
+
+	private void shutdown_async(TgFfiShutdownType shutdownType, String pattern) {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		try (var session = createSession()) {
+			try (var shutdownJob = session.shutdownAsync(context, shutdownType)) {
+				Void value = jobTake(shutdownJob, pattern);
+				assertNull(value);
+			}
+		}
+	}
+
+	@Test
+	void shutdown_async_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = TgFfiShutdownType.GRACEFUL.value();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var session = createSession()) {
+			{
+				var ctx = context.handle();
+				var handle = session.handle();
+				var arg = -1;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = session.handle();
+				var arg = TgFfiShutdownType.GRACEFUL.value();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
+		}
+	}
 }

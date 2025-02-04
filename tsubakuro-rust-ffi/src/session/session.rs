@@ -7,12 +7,13 @@ use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
+    rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
     TsurugiFfiDuration,
 };
 
-use super::option::TsurugiFfiConnectionOptionHandle;
+use super::{option::TsurugiFfiConnectionOptionHandle, r#type::TsurugiFfiShutdownType};
 
 pub(crate) struct TsurugiFfiSession {
     session: Arc<Session>,
@@ -352,6 +353,102 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_async(
         "{FUNCTION_NAME} end. update_expiration_time_job={:?}",
         handle
     );
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_shutdown(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    shutdown_type: TsurugiFfiShutdownType,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_shutdown()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "shutdown_type", "is invalid");
+    }
+
+    let session = unsafe { &*session };
+
+    let runtime = session.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        session.shutdown(shutdown_type.into())
+    );
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_shutdown_for(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    shutdown_type: TsurugiFfiShutdownType,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_shutdown_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "shutdown_type", "is invalid");
+    }
+
+    let session = unsafe { &*session };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = session.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        session.shutdown_for(shutdown_type.into(), timeout)
+    );
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_shutdown_async(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    shutdown_type: TsurugiFfiShutdownType,
+    shutdown_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_shutdown_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_out_initialize!(shutdown_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
+        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "shutdown_type", "is invalid");
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, shutdown_job_out);
+
+    let session = unsafe { &*session };
+
+    let runtime = session.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        session.shutdown_async(shutdown_type.into())
+    );
+    let job = TsurugiFfiJob::new(job, Box::new(VoidJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *shutdown_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!("{FUNCTION_NAME} end. shutdown_job={:?}", handle);
     rc_ok(context)
 }
 
