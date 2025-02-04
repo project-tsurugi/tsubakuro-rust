@@ -853,6 +853,23 @@ TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context
                                                  TsurugiFfiSessionHandle session,
                                                  TsurugiFfiSqlClientHandle *sql_client_out);
 
+TsurugiFfiRc tsurugi_ffi_session_update_expiration_time(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiSessionHandle session,
+                                                        bool expiration_time_exists,
+                                                        TsurugiFfiDuration expiration_time);
+
+TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_for(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiSessionHandle session,
+                                                            bool expiration_time_exists,
+                                                            TsurugiFfiDuration expiration_time,
+                                                            TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_async(TsurugiFfiContextHandle context,
+                                                              TsurugiFfiSessionHandle session,
+                                                              bool expiration_time_exists,
+                                                              TsurugiFfiDuration expiration_time,
+                                                              TsurugiFfiJobHandle *update_expiration_time_job_out);
+
 void tsurugi_ffi_session_dispose(TsurugiFfiSessionHandle session);
 
 TsurugiFfiRc tsurugi_ffi_commit_option_create(TsurugiFfiContextHandle context,

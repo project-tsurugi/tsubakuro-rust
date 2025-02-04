@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
-    job::{TsurugiFfiJob, TsurugiFfiJobHandle},
+    job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
     TsurugiFfiDuration,
@@ -244,6 +244,114 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     }
 
     trace!("{FUNCTION_NAME} end. sql_client={:?}", handle);
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_update_expiration_time(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    expiration_time_exists: bool,
+    expiration_time: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_update_expiration_time()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+
+    let session = unsafe { &*session };
+    let expiration_time = if expiration_time_exists {
+        Some(Duration::from_nanos(expiration_time))
+    } else {
+        None
+    };
+
+    let runtime = session.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        session.update_expiration_time(expiration_time)
+    );
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_update_expiration_time_for(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    expiration_time_exists: bool,
+    expiration_time: TsurugiFfiDuration,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_update_expiration_time_for()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+
+    let session = unsafe { &*session };
+    let expiration_time = if expiration_time_exists {
+        Some(Duration::from_nanos(expiration_time))
+    } else {
+        None
+    };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = session.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        session.update_expiration_time_for(expiration_time, timeout)
+    );
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_update_expiration_time_async(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    expiration_time_exists: bool,
+    expiration_time: TsurugiFfiDuration,
+    update_expiration_time_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_update_expiration_time_async()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_out_initialize!(update_expiration_time_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, update_expiration_time_job_out);
+
+    let session = unsafe { &*session };
+    let expiration_time = if expiration_time_exists {
+        Some(Duration::from_nanos(expiration_time))
+    } else {
+        None
+    };
+
+    let runtime = session.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        session.update_expiration_time_async(expiration_time)
+    );
+    let job = TsurugiFfiJob::new(job, Box::new(VoidJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *update_expiration_time_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    trace!(
+        "{FUNCTION_NAME} end. update_expiration_time_job={:?}",
+        handle
+    );
     rc_ok(context)
 }
 

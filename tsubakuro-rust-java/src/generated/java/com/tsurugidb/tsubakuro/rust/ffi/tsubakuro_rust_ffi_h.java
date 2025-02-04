@@ -23537,6 +23537,191 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_session_update_expiration_time {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_BOOL,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_update_expiration_time");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_update_expiration_time$descriptor() {
+        return tsurugi_ffi_session_update_expiration_time.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_update_expiration_time$handle() {
+        return tsurugi_ffi_session_update_expiration_time.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_update_expiration_time$address() {
+        return tsurugi_ffi_session_update_expiration_time.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time)
+     * }
+     */
+    public static int tsurugi_ffi_session_update_expiration_time(MemorySegment context, MemorySegment session, boolean expiration_time_exists, long expiration_time) {
+        var mh$ = tsurugi_ffi_session_update_expiration_time.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_update_expiration_time", context, session, expiration_time_exists, expiration_time);
+            }
+            return (int)mh$.invokeExact(context, session, expiration_time_exists, expiration_time);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_update_expiration_time_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_BOOL,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_update_expiration_time_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_update_expiration_time_for$descriptor() {
+        return tsurugi_ffi_session_update_expiration_time_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_update_expiration_time_for$handle() {
+        return tsurugi_ffi_session_update_expiration_time_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_update_expiration_time_for$address() {
+        return tsurugi_ffi_session_update_expiration_time_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_for(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static int tsurugi_ffi_session_update_expiration_time_for(MemorySegment context, MemorySegment session, boolean expiration_time_exists, long expiration_time, long timeout) {
+        var mh$ = tsurugi_ffi_session_update_expiration_time_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_update_expiration_time_for", context, session, expiration_time_exists, expiration_time, timeout);
+            }
+            return (int)mh$.invokeExact(context, session, expiration_time_exists, expiration_time, timeout);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_update_expiration_time_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_BOOL,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_update_expiration_time_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiJobHandle *update_expiration_time_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_update_expiration_time_async$descriptor() {
+        return tsurugi_ffi_session_update_expiration_time_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiJobHandle *update_expiration_time_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_update_expiration_time_async$handle() {
+        return tsurugi_ffi_session_update_expiration_time_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiJobHandle *update_expiration_time_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_update_expiration_time_async$address() {
+        return tsurugi_ffi_session_update_expiration_time_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_async(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool expiration_time_exists, TsurugiFfiDuration expiration_time, TsurugiFfiJobHandle *update_expiration_time_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_update_expiration_time_async(MemorySegment context, MemorySegment session, boolean expiration_time_exists, long expiration_time, MemorySegment update_expiration_time_job_out) {
+        var mh$ = tsurugi_ffi_session_update_expiration_time_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_update_expiration_time_async", context, session, expiration_time_exists, expiration_time, update_expiration_time_job_out);
+            }
+            return (int)mh$.invokeExact(context, session, expiration_time_exists, expiration_time, update_expiration_time_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_session_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

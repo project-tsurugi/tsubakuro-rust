@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.session;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
@@ -202,6 +203,108 @@ class TgFfiSessionTest extends TgFfiTester {
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_make_sql_client(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void update_expiration_time(boolean exists) {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		var connectionOption = TgFfiConnectionOption.create(context);
+		connectionOption.setEndpointUrl(context, getEndpoint());
+
+		try (var session = TgFfiSession.connect(context, connectionOption)) {
+			var expirationTime = exists ? Duration.ofMinutes(1) : null;
+			session.updateExpirationTime(context, expirationTime);
+		}
+	}
+
+	@Test
+	void update_expiration_time_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time(ctx, handle, true, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(booleans = { true, false })
+	void update_expiration_time_for(boolean exists) {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		var connectionOption = TgFfiConnectionOption.create(context);
+		connectionOption.setEndpointUrl(context, getEndpoint());
+
+		try (var session = TgFfiSession.connect(context, connectionOption)) {
+			var expirationTime = exists ? Duration.ofMinutes(1) : null;
+			session.updateExpirationTimeFor(context, expirationTime, Duration.ofSeconds(5));
+		}
+	}
+
+	@Test
+	void update_expiration_time_for_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = Duration.ofMinutes(1).toNanos();
+			var t = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_for(ctx, handle, true, arg, t);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+	void update_expiration_time_async(String pattern) {
+		update_expiration_time_async(true, pattern);
+		update_expiration_time_async(false, pattern);
+	}
+
+	private void update_expiration_time_async(boolean exists, String pattern) {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		try (var session = createSession()) {
+			var expirationTime = exists ? Duration.ofMinutes(1) : null;
+			try (var job = session.updateExpirationTimeAsync(context, expirationTime)) {
+				Void value = jobTake(job, pattern);
+				assertNull(value);
+			}
+		}
+	}
+
+	@Test
+	void update_expiration_time_async_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = Duration.ofSeconds(5).toNanos();
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_async(ctx, handle, true, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var session = createSession()) {
+			var ctx = context.handle();
+			var handle = session.handle();
+			var arg = Duration.ofSeconds(5).toNanos();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_async(ctx, handle, true, arg, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
 		}
 	}
 }

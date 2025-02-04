@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
+import com.tsurugidb.tsubakuro.rust.java.job.TgFfiVoidJob;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
@@ -160,6 +161,59 @@ public class TgFfiSession extends TgFfiObject {
 
 		var outHandle = outToHandle(out);
 		return new TgFfiSqlClient(manager(), outHandle);
+	}
+
+	public synchronized void updateExpirationTime(TgFfiContext context, Duration expirationTime) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		boolean exists;
+		long arg;
+		if (expirationTime != null) {
+			exists = true;
+			arg = expirationTime.toNanos();
+		} else {
+			exists = false;
+			arg = 0;
+		}
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time(ctx, handle, exists, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized void updateExpirationTimeFor(TgFfiContext context, Duration expirationTime, Duration timeout) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		boolean exists;
+		long arg;
+		if (expirationTime != null) {
+			exists = true;
+			arg = expirationTime.toNanos();
+		} else {
+			exists = false;
+			arg = 0;
+		}
+		var t = timeout.toNanos();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_for(ctx, handle, exists, arg, t);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized TgFfiVoidJob updateExpirationTimeAsync(TgFfiContext context, Duration expirationTime) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		boolean exists;
+		long arg;
+		if (expirationTime != null) {
+			exists = true;
+			arg = expirationTime.toNanos();
+		} else {
+			exists = false;
+			arg = 0;
+		}
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_async(ctx, handle, exists, arg, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		var outHandle = outToHandle(out);
+		return new TgFfiVoidJob(manager(), outHandle);
 	}
 
 	@Override
