@@ -207,22 +207,24 @@ class TgFfiJobTest extends TgFfiTester {
 				assertEquals("Handshake", job.getName(context));
 
 				for (int i = 0; i < 10; i++) {
-					try (var session = job.takeIfReady(context)) {
-						if (session != null) {
-							assertTrue(job.isDone(context));
-
-							var e = assertThrows(TgFfiRuntimeException.class, () -> {
-								job.takeIfReady(context);
-							});
-							assertTrue(e.getMessage().contains("already taked"));
-
-							return;
-						}
+					var sessionOpt = job.takeIfReady(context);
+					if (sessionOpt == null) {
 						Thread.sleep(200);
+						continue;
+					}
+					try (var session = sessionOpt.get()) {
+						assertTrue(job.isDone(context));
+
+						var e = assertThrows(TgFfiRuntimeException.class, () -> {
+							job.takeIfReady(context);
+						});
+						assertTrue(e.getMessage().contains("already taked"));
+
+						return;
 					}
 				}
-				fail("take_if_ready() was not ready");
 			}
+			fail("take_if_ready() was not ready");
 		}
 	}
 
@@ -234,16 +236,26 @@ class TgFfiJobTest extends TgFfiTester {
 		{
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
+			var isReadyOut = manager.allocatePtr();
 			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
 		{
 			var ctx = context.handle();
 			var handle = job.handle();
+			var isReadyOut = MemorySegment.NULL;
 			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, out);
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = job.handle();
+			var isReadyOut = manager.allocatePtr();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 		}
 	}
 

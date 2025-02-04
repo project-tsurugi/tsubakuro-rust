@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
-import com.tsurugidb.tsubakuro.rust.java.job.TgFfiVoidJob;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiAtomType;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlExecuteResult;
@@ -423,10 +422,7 @@ public class TgFfiExampleMain {
 				}
 				var value = job.takeIfReady(context);
 				if (value != null) {
-					return value;
-				}
-				if (job instanceof TgFfiVoidJob) {
-					return null;
+					return value.orElse(null);
 				}
 				throw new RuntimeException("JOB_TAKE_IF_READY: take_if_ready() fail");
 			default:

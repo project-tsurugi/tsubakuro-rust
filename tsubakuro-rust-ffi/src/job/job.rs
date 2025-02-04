@@ -78,6 +78,7 @@ pub(crate) trait TsurugiFfiJobDelegator {
         &self,
         context: TsurugiFfiContextHandle,
         job: TsurugiFfiJobHandle,
+        is_ready_out: *mut bool,
         value_out: *mut *mut c_void,
     ) -> TsurugiFfiRc;
 }
@@ -119,11 +120,12 @@ macro_rules! impl_job_delegator {
                 &self,
                 context: TsurugiFfiContextHandle,
                 job: TsurugiFfiJobHandle,
+                is_ready_out: *mut bool,
                 value_out: *mut *mut std::ffi::c_void,
             ) -> TsurugiFfiRc {
                 let job = unsafe { &mut *(job as *mut TsurugiFfiJob<$src>) };
                 let value_out = value_out as *mut *mut $ffi;
-                job.take_if_ready(context, $struct_name::convert, value_out)
+                job.take_if_ready(context, $struct_name::convert, is_ready_out, value_out)
             }
         }
     };
@@ -350,18 +352,21 @@ impl<T> TsurugiFfiJob<T> {
 pub extern "C" fn tsurugi_ffi_job_take_if_ready(
     context: TsurugiFfiContextHandle,
     job: TsurugiFfiJobHandle,
+    is_ready_out: *mut bool,
     value_out: *mut *mut c_void, // FFI Handle out
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_if_ready()";
     trace!("{FUNCTION_NAME} start. job={:?}", job);
 
+    ffi_arg_out_initialize!(is_ready_out, false);
     ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, job);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, is_ready_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
 
     unsafe { &mut *unknown_job(job) }
         .delegater
-        .take_if_ready(context, job, value_out)
+        .take_if_ready(context, job, is_ready_out, value_out)
 }
 
 impl<T> TsurugiFfiJob<T> {
@@ -369,6 +374,7 @@ impl<T> TsurugiFfiJob<T> {
         self: &mut Self,
         context: TsurugiFfiContextHandle,
         converter: fn(T, Arc<tokio::runtime::Runtime>) -> Option<FFI>,
+        is_ready_out: *mut bool,
         value_out: *mut *mut FFI,
     ) -> TsurugiFfiRc {
         const FUNCTION_NAME: &str = "tsurugi_ffi_job_take_if_ready()";
@@ -380,9 +386,10 @@ impl<T> TsurugiFfiJob<T> {
             Some(value) => converter(value, runtime),
             None => {
                 unsafe {
+                    *is_ready_out = false;
                     *value_out = std::ptr::null_mut();
                 }
-                trace!("{FUNCTION_NAME} end. {}=null", self.value_name());
+                trace!("{FUNCTION_NAME} end. not ready {}=null", self.value_name());
                 return rc_ok(context);
             }
         };
@@ -392,10 +399,11 @@ impl<T> TsurugiFfiJob<T> {
             None => std::ptr::null_mut(),
         };
         unsafe {
+            *is_ready_out = true;
             *value_out = handle;
         }
 
-        trace!("{FUNCTION_NAME} end. {}={:?}", self.value_name(), handle);
+        trace!("{FUNCTION_NAME} end. ready {}={:?}", self.value_name(), handle);
         rc_ok(context)
     }
 }

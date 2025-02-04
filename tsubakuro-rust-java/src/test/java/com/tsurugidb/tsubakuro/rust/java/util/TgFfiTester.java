@@ -1,5 +1,6 @@
 package com.tsurugidb.tsubakuro.rust.java.util;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Duration;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
-import com.tsurugidb.tsubakuro.rust.java.job.TgFfiVoidJob;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResult;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
@@ -216,14 +216,9 @@ public class TgFfiTester {
 				if (job.wait(context, Duration.ofSeconds(5)) == false) {
 					fail("TAKE_IF_READY: wait() timeout");
 				}
-				var value = job.takeIfReady(context);
-				if (value != null) {
-					return value;
-				}
-				if (job instanceof TgFfiVoidJob) {
-					return null;
-				}
-				fail("Job.take_if_ready() was not ready");
+				var valueOpt = job.takeIfReady(context);
+				assertNotNull(valueOpt);
+				return valueOpt.orElse(null);
 			default:
 				throw new AssertionError("unsupported pattern=" + pattern);
 			}

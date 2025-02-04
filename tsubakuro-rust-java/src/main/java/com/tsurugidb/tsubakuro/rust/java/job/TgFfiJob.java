@@ -2,6 +2,7 @@ package com.tsurugidb.tsubakuro.rust.java.job;
 
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
+import java.util.Optional;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -69,18 +70,25 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
 		return valueToFfiObject(manager(), outHandle);
 	}
 
-	public synchronized T takeIfReady(TgFfiContext context) {
+	public synchronized Optional<T> takeIfReady(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
+		var isReadyOut = allocatePtr();
 		var out = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, out);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
+		var isReady = outToBoolean(isReadyOut);
 		var outHandle = outToHandle(out);
-		if (outHandle.address() == 0) {
+		if (!isReady) {
+			assert outHandle == null;
 			return null;
 		}
-		return valueToFfiObject(manager(), outHandle);
+
+		if (outHandle.address() == 0) {
+			return Optional.empty();
+		}
+		return Optional.ofNullable(valueToFfiObject(manager(), outHandle));
 	}
 
 	public synchronized boolean cancel(TgFfiContext context) {

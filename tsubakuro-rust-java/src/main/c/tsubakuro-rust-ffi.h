@@ -363,6 +363,7 @@ TsurugiFfiRc tsurugi_ffi_job_take_for(TsurugiFfiContextHandle context,
 
 TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context,
                                            TsurugiFfiJobHandle job,
+                                           bool *is_ready_out,
                                            void **value_out);
 
 TsurugiFfiRc tsurugi_ffi_job_cancel(TsurugiFfiContextHandle context,

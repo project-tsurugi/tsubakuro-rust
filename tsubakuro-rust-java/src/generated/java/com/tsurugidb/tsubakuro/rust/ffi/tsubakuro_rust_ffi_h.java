@@ -16960,6 +16960,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT,
             tsubakuro_rust_ffi_h.C_POINTER,
             tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
@@ -16971,7 +16972,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *is_ready_out, void **value_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_job_take_if_ready$descriptor() {
@@ -16981,7 +16982,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *is_ready_out, void **value_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_job_take_if_ready$handle() {
@@ -16991,7 +16992,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *is_ready_out, void **value_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_job_take_if_ready$address() {
@@ -17000,16 +17001,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, void **value_out)
+     * TsurugiFfiRc tsurugi_ffi_job_take_if_ready(TsurugiFfiContextHandle context, TsurugiFfiJobHandle job, _Bool *is_ready_out, void **value_out)
      * }
      */
-    public static int tsurugi_ffi_job_take_if_ready(MemorySegment context, MemorySegment job, MemorySegment value_out) {
+    public static int tsurugi_ffi_job_take_if_ready(MemorySegment context, MemorySegment job, MemorySegment is_ready_out, MemorySegment value_out) {
         var mh$ = tsurugi_ffi_job_take_if_ready.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_job_take_if_ready", context, job, value_out);
+                traceDowncall("tsurugi_ffi_job_take_if_ready", context, job, is_ready_out, value_out);
             }
-            return (int)mh$.invokeExact(context, job, value_out);
+            return (int)mh$.invokeExact(context, job, is_ready_out, value_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
