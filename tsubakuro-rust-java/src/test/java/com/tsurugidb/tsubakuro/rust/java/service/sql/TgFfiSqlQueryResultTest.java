@@ -36,6 +36,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 	}
 
 	private class TestResource implements Closeable {
+		final TgFfiContext context;
 		final TgFfiSqlClient client;
 		final TgFfiSqlPreparedStatement preparedStatement;
 		final TgFfiTransaction transaction;
@@ -48,6 +49,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 		public TestResource(boolean prepare, String pattern, String sql) {
 			var manager = getFfiObjectManager();
 			try (var context = TgFfiContext.create(manager)) {
+				this.context = TgFfiContext.create(manager);
 				this.client = createSqlClient();
 				this.transaction = startOcc(client);
 
@@ -75,10 +77,61 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 
 		@Override
 		public void close() {
-			try (client; preparedStatement; transaction) {
+			try (context; client; preparedStatement; transaction) {
 				try (queryResult) {
 				}
 				commit(client, transaction);
+			}
+		}
+	}
+
+	@Test
+	void set_default_timeout() {
+		try (var resource = new TestResource()) {
+			var context = resource.context;
+			var target = resource.queryResult;
+
+			target.setDefaultTimeout(context, Duration.ofSeconds(5));
+
+			var timeout = target.getDefaultTimeout(context);
+			assertEquals(Duration.ofSeconds(5), timeout);
+		}
+	}
+
+	@Test
+	void set_default_timeout_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var context = TgFfiContext.create(manager)) {
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_set_default_timeout(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void get_default_timeout_argError() {
+		var manager = getFfiObjectManager();
+
+		try (var resource = new TestResource()) {
+			var context = resource.context;
+			var target = resource.queryResult;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_default_timeout(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = target.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_default_timeout(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 			}
 		}
 	}
@@ -96,12 +149,10 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 	}
 
 	private void query(boolean prepare, String pattern) {
-		var manager = getFfiObjectManager();
-
-		var context = TgFfiContext.create(manager);
-
 		var sql = "select * from test order by foo";
 		try (var resource = new TestResource(prepare, pattern, sql)) {
+			var context = resource.context;
+
 			try (var qr = resource.queryResult) {
 				assertTrue(qr.nextRow(context));
 				assertTrue(qr.nextColumn(context));
@@ -146,37 +197,41 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 	@Test
 	void get_metadata_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_metadata(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_metadata(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_metadata(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_metadata(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void next_row_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
 			var ctx = context.handle();
 			var handle = resource.queryResult.handle();
 			var out = MemorySegment.NULL;
@@ -188,308 +243,350 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 	@Test
 	void next_row_for_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row_for(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row_for(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row_for(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row_for(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void next_column_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void next_column_for_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column_for(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column_for(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column_for(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column_for(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void is_null_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_is_null(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_is_null(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_is_null(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_is_null(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_int4_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int4(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int4(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int4(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int4(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_for_int4_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int4(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int4(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int4(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int4(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_int8_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int8(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int8(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int8(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int8(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_for_int8_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int8(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int8(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int8(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int8(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_float4_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float4(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float4(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float4(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float4(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_for_float4_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float4(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float4(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float4(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float4(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_float8_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float8(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float8(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float8(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float8(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_for_float8_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float8(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float8(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float8(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float8(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_character_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_character(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_character(ctx, handle, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_character(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_character(ctx, handle, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+			}
 		}
 	}
 
 	@Test
 	void fetch_for_character_argError() {
 		var manager = getFfiObjectManager();
-		var context = TgFfiContext.create(manager);
 
-		{
-			var ctx = context.handle();
-			var handle = MemorySegment.NULL;
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = manager.allocatePtr();
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_character(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-		}
 		try (var resource = new TestResource()) {
-			var ctx = context.handle();
-			var handle = resource.queryResult.handle();
-			var t = Duration.ofSeconds(5).toNanos();
-			var out = MemorySegment.NULL;
-			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_character(ctx, handle, t, out);
-			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			var context = resource.context;
+
+			{
+				var ctx = context.handle();
+				var handle = MemorySegment.NULL;
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = manager.allocatePtr();
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_character(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+			}
+			{
+				var ctx = context.handle();
+				var handle = resource.queryResult.handle();
+				var t = Duration.ofSeconds(5).toNanos();
+				var out = MemorySegment.NULL;
+				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_character(ctx, handle, t, out);
+				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+			}
 		}
 	}
 }

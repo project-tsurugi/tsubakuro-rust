@@ -61,6 +61,10 @@ impl SqlQueryResult {
         self.default_timeout = timeout;
     }
 
+    pub fn default_timeout(&mut self) -> &Duration {
+        &self.default_timeout
+    }
+
     pub fn get_metadata(&self) -> Option<&SqlQueryResultMetadata> {
         self.metadata.as_ref()
     }

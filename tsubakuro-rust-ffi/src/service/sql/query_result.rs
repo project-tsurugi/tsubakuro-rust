@@ -55,6 +55,52 @@ impl std::ops::DerefMut for TsurugiFfiSqlQueryResult {
 pub type TsurugiFfiSqlQueryResultHandle = *mut TsurugiFfiSqlQueryResult;
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_set_default_timeout(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_set_default_timeout()";
+    trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+
+    let query_result = unsafe { &mut *query_result };
+    let default_timeout = Duration::from_nanos(timeout);
+
+    query_result.set_default_timeout(default_timeout);
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_get_default_timeout(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout_out: *mut TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_get_default_timeout()";
+    trace!("{FUNCTION_NAME} start. query_result={:?}", query_result);
+
+    ffi_arg_out_initialize!(timeout_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, timeout_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let default_timeout = query_result.default_timeout();
+    let default_timeout = default_timeout.as_nanos() as TsurugiFfiDuration;
+
+    unsafe {
+        *timeout_out = default_timeout;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_get_metadata(
     context: TsurugiFfiContextHandle,
     query_result: TsurugiFfiSqlQueryResultHandle,

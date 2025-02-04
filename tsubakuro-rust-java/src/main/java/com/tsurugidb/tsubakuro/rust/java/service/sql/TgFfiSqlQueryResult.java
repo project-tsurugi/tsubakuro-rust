@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.time.Duration;
+import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -14,6 +15,26 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
 
 	TgFfiSqlQueryResult(TgFfiObjectManager manager, MemorySegment handle) {
 		super(manager, handle);
+	}
+
+	public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {
+		Objects.requireNonNull(timeout, "timeout must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateDuration(timeout);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_set_default_timeout(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized Duration getDefaultTimeout(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_default_timeout(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToDuration(out);
 	}
 
 	public synchronized TgFfiSqlQueryResultMetadata getMetadata(TgFfiContext context) {
