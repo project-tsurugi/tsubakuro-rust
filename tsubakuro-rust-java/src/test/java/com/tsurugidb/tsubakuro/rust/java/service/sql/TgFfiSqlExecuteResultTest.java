@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,12 +23,25 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 class TgFfiSqlExecuteResultTest extends TgFfiTester {
 
 	private void before() {
-		dropAndCreateTable("test", """
-				create table test (
-				  foo int primary key,
-				  bar bigint,
-				  zzz varchar(10)
-				)""");
+		dropIfExists("test");
+
+		try (var context = TgFfiContext.create(getFfiObjectManager())) {
+			var sql = """
+					create table test (
+					  foo int primary key,
+					  bar bigint,
+					  zzz varchar(10)
+					)""";
+			try (var er = getExecuteResult(false, DIRECT, sql)) {
+				assertEquals(Map.of(), er.getCounters(context));
+				assertEquals(0, er.getInsertedRows(context));
+				assertEquals(0, er.getUpdatedRows(context));
+				assertEquals(0, er.getMergedRows(context));
+				assertEquals(0, er.getDeletedRows(context));
+				assertEquals(0, er.getRows(context));
+			}
+		}
+
 		executeSql("insert into test values(1, 11, 'aa')");
 		executeSql("insert into test values(2, 22, 'bb')");
 		executeSql("insert into test values(3, 33, 'cc')");
@@ -52,6 +66,7 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
 		var context = TgFfiContext.create(manager);
 
 		try (var executeResult = getExecuteResult(prepare, pattern, "insert into test values(4, 44, 'dd')")) {
+			assertEquals(Map.of(TgFfiSqlCounterType.INSERTED_ROWS, 1L), executeResult.getCounters(context));
 			assertEquals(1, executeResult.getInsertedRows(context));
 			assertEquals(0, executeResult.getUpdatedRows(context));
 			assertEquals(0, executeResult.getMergedRows(context));
@@ -59,6 +74,7 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
 			assertEquals(1, executeResult.getRows(context));
 		}
 		try (var executeResult = getExecuteResult(prepare, pattern, "update test set bar = 99")) {
+			assertEquals(Map.of(TgFfiSqlCounterType.UPDATED_ROWS, 4L), executeResult.getCounters(context));
 			assertEquals(0, executeResult.getInsertedRows(context));
 			assertEquals(4, executeResult.getUpdatedRows(context));
 			assertEquals(0, executeResult.getMergedRows(context));
@@ -67,6 +83,7 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
 		}
 		try (var executeResult = getExecuteResult(prepare, pattern,
 				"insert or replace into test values(2, 222, 'bbb')")) {
+			assertEquals(Map.of(TgFfiSqlCounterType.MERGED_ROWS, 1L), executeResult.getCounters(context));
 			assertEquals(0, executeResult.getInsertedRows(context));
 			assertEquals(0, executeResult.getUpdatedRows(context));
 			assertEquals(1, executeResult.getMergedRows(context));
@@ -74,6 +91,7 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
 			assertEquals(1, executeResult.getRows(context));
 		}
 		try (var executeResult = getExecuteResult(prepare, pattern, "delete from test where foo = 3")) {
+			assertEquals(Map.of(TgFfiSqlCounterType.DELETED_ROWS, 1L), executeResult.getCounters(context));
 			assertEquals(0, executeResult.getInsertedRows(context));
 			assertEquals(0, executeResult.getUpdatedRows(context));
 			assertEquals(0, executeResult.getMergedRows(context));
@@ -81,6 +99,7 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
 			assertEquals(1, executeResult.getRows(context));
 		}
 		try (var executeResult = getExecuteResult(prepare, pattern, "delete from test where foo = 3")) {
+			assertEquals(Map.of(TgFfiSqlCounterType.DELETED_ROWS, 0L), executeResult.getCounters(context));
 			assertEquals(0, executeResult.getInsertedRows(context));
 			assertEquals(0, executeResult.getUpdatedRows(context));
 			assertEquals(0, executeResult.getMergedRows(context));

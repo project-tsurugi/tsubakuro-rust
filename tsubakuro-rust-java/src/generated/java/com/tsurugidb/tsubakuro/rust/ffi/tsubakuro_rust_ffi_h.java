@@ -15683,6 +15683,57 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final OfInt TsurugiFfiShutdownType = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_SQL_COUNTER_TYPE_UNSPECIFIED = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiSqlCounterType.TSURUGI_FFI_SQL_COUNTER_TYPE_UNSPECIFIED = 0
+     * }
+     */
+    public static int TSURUGI_FFI_SQL_COUNTER_TYPE_UNSPECIFIED() {
+        return TSURUGI_FFI_SQL_COUNTER_TYPE_UNSPECIFIED;
+    }
+    private static final int TSURUGI_FFI_SQL_COUNTER_TYPE_INSERTED_ROWS = (int)10L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiSqlCounterType.TSURUGI_FFI_SQL_COUNTER_TYPE_INSERTED_ROWS = 10
+     * }
+     */
+    public static int TSURUGI_FFI_SQL_COUNTER_TYPE_INSERTED_ROWS() {
+        return TSURUGI_FFI_SQL_COUNTER_TYPE_INSERTED_ROWS;
+    }
+    private static final int TSURUGI_FFI_SQL_COUNTER_TYPE_UPDATED_ROWS = (int)20L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiSqlCounterType.TSURUGI_FFI_SQL_COUNTER_TYPE_UPDATED_ROWS = 20
+     * }
+     */
+    public static int TSURUGI_FFI_SQL_COUNTER_TYPE_UPDATED_ROWS() {
+        return TSURUGI_FFI_SQL_COUNTER_TYPE_UPDATED_ROWS;
+    }
+    private static final int TSURUGI_FFI_SQL_COUNTER_TYPE_MERGED_ROWS = (int)30L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiSqlCounterType.TSURUGI_FFI_SQL_COUNTER_TYPE_MERGED_ROWS = 30
+     * }
+     */
+    public static int TSURUGI_FFI_SQL_COUNTER_TYPE_MERGED_ROWS() {
+        return TSURUGI_FFI_SQL_COUNTER_TYPE_MERGED_ROWS;
+    }
+    private static final int TSURUGI_FFI_SQL_COUNTER_TYPE_DELETED_ROWS = (int)40L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiSqlCounterType.TSURUGI_FFI_SQL_COUNTER_TYPE_DELETED_ROWS = 40
+     * }
+     */
+    public static int TSURUGI_FFI_SQL_COUNTER_TYPE_DELETED_ROWS() {
+        return TSURUGI_FFI_SQL_COUNTER_TYPE_DELETED_ROWS;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiSqlCounterType
+     * }
+     */
+    public static final OfInt TsurugiFfiSqlCounterType = tsubakuro_rust_ffi_h.C_INT;
     private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED = (int)0L;
     /**
      * {@snippet lang=c :
@@ -17574,6 +17625,68 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_dispose", sql_column);
             }
             mh$.invokeExact(sql_column);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_execute_result_get_counters {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_get_counters");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_counters(TsurugiFfiContextHandle context, TsurugiFfiSqlExecuteResultHandle execute_result, const TsurugiFfiSqlCounterType **counters_keys_out, const int64_t **counters_rows_out, uint32_t *counters_size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_execute_result_get_counters$descriptor() {
+        return tsurugi_ffi_sql_execute_result_get_counters.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_counters(TsurugiFfiContextHandle context, TsurugiFfiSqlExecuteResultHandle execute_result, const TsurugiFfiSqlCounterType **counters_keys_out, const int64_t **counters_rows_out, uint32_t *counters_size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_execute_result_get_counters$handle() {
+        return tsurugi_ffi_sql_execute_result_get_counters.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_counters(TsurugiFfiContextHandle context, TsurugiFfiSqlExecuteResultHandle execute_result, const TsurugiFfiSqlCounterType **counters_keys_out, const int64_t **counters_rows_out, uint32_t *counters_size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_execute_result_get_counters$address() {
+        return tsurugi_ffi_sql_execute_result_get_counters.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_counters(TsurugiFfiContextHandle context, TsurugiFfiSqlExecuteResultHandle execute_result, const TsurugiFfiSqlCounterType **counters_keys_out, const int64_t **counters_rows_out, uint32_t *counters_size_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_execute_result_get_counters(MemorySegment context, MemorySegment execute_result, MemorySegment counters_keys_out, MemorySegment counters_rows_out, MemorySegment counters_size_out) {
+        var mh$ = tsurugi_ffi_sql_execute_result_get_counters.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_execute_result_get_counters", context, execute_result, counters_keys_out, counters_rows_out, counters_size_out);
+            }
+            return (int)mh$.invokeExact(context, execute_result, counters_keys_out, counters_rows_out, counters_size_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

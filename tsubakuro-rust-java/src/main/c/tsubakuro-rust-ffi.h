@@ -153,6 +153,30 @@ enum TsurugiFfiShutdownType {
 };
 typedef int32_t TsurugiFfiShutdownType;
 
+enum TsurugiFfiSqlCounterType {
+  /**
+   * the un-categorized counter type.
+   */
+  TSURUGI_FFI_SQL_COUNTER_TYPE_UNSPECIFIED = 0,
+  /**
+   * The number of rows inserted in the execution.
+   */
+  TSURUGI_FFI_SQL_COUNTER_TYPE_INSERTED_ROWS = 10,
+  /**
+   * The number of rows updated in the execution.
+   */
+  TSURUGI_FFI_SQL_COUNTER_TYPE_UPDATED_ROWS = 20,
+  /**
+   * The number of rows merged in the execution.
+   */
+  TSURUGI_FFI_SQL_COUNTER_TYPE_MERGED_ROWS = 30,
+  /**
+   * The number of rows deleted in the execution.
+   */
+  TSURUGI_FFI_SQL_COUNTER_TYPE_DELETED_ROWS = 40,
+};
+typedef int32_t TsurugiFfiSqlCounterType;
+
 enum TsurugiFfiTransactionPriority {
   /**
    * use default transaction priority.
@@ -410,6 +434,12 @@ TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle contex
                                                   TsurugiFfiAtomType *atom_type_out);
 
 void tsurugi_ffi_sql_column_dispose(TsurugiFfiSqlColumnHandle sql_column);
+
+TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_counters(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlExecuteResultHandle execute_result,
+                                                         const TsurugiFfiSqlCounterType **counters_keys_out,
+                                                         const int64_t **counters_rows_out,
+                                                         uint32_t *counters_size_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_inserted_rows(TsurugiFfiContextHandle context,
                                                               TsurugiFfiSqlExecuteResultHandle execute_result,
