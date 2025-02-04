@@ -44,7 +44,11 @@ pub extern "C" fn tsurugi_ffi_connection_option_create(
     connection_option_out: *mut TsurugiFfiConnectionOptionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_create()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option_out={:?}",
+        context,
+        connection_option_out
+    );
 
     ffi_arg_out_initialize!(connection_option_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option_out);
@@ -73,8 +77,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_endpoint()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, endpoint={:?}",
+        context,
+        connection_option,
+        endpoint
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -97,8 +103,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_endpoint()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, endpoint={:?}",
+        context,
+        connection_option,
+        endpoint
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -107,6 +115,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
     let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, endpoint);
 
     let connection_option = unsafe { &mut *connection_option };
+
     match connection_option.set_endpoint_url(endpoint) {
         Ok(_) => {}
         Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", e.message()),
@@ -124,8 +133,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_endpoint()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, endpoint_out={:?}",
+        context,
+        connection_option,
+        endpoint_out
     );
 
     ffi_arg_out_initialize!(endpoint_out, std::ptr::null_mut());
@@ -141,11 +152,13 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
         }
         None => cchar_field_clear!(connection_option.endpoint),
     }
+
+    let ptr = cstring_to_cchar!(connection_option.endpoint);
     unsafe {
-        *endpoint_out = cstring_to_cchar!(connection_option.endpoint);
+        *endpoint_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (endpoint={:?})", ptr);
     rc_ok(context)
 }
 
@@ -157,8 +170,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_application_name()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, application_name={:?}",
+        context,
+        connection_option,
+        application_name
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -167,6 +182,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
     let application_name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, application_name);
 
     let connection_option = unsafe { &mut *connection_option };
+
     connection_option.set_application_name(application_name);
 
     trace!("{FUNCTION_NAME} end");
@@ -181,8 +197,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_application_name()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, application_name_out={:?}",
+        context,
+        connection_option,
+        application_name_out
     );
 
     ffi_arg_out_initialize!(application_name_out, std::ptr::null_mut());
@@ -202,11 +220,13 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
         }
         None => cchar_field_clear!(connection_option.application_name),
     }
+
+    let ptr = cstring_to_cchar!(connection_option.application_name);
     unsafe {
-        *application_name_out = cstring_to_cchar!(connection_option.application_name);
+        *application_name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (application_name={:?})", ptr);
     rc_ok(context)
 }
 
@@ -218,8 +238,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_session_label(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_session_label()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, label={:?}",
+        context,
+        connection_option,
+        label
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -228,6 +250,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_session_label(
     let label = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, label);
 
     let connection_option = unsafe { &mut *connection_option };
+
     connection_option.set_session_label(label);
 
     trace!("{FUNCTION_NAME} end");
@@ -242,8 +265,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_session_label(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_session_label()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, label_out={:?}",
+        context,
+        connection_option,
+        label_out
     );
 
     ffi_arg_out_initialize!(label_out, std::ptr::null_mut());
@@ -259,11 +284,13 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_session_label(
         }
         None => cchar_field_clear!(connection_option.session_label),
     }
+
+    let ptr = cstring_to_cchar!(connection_option.session_label);
     unsafe {
-        *label_out = cstring_to_cchar!(connection_option.session_label);
+        *label_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (label={:?})", ptr);
     rc_ok(context)
 }
 
@@ -275,8 +302,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_keep_alive(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_keep_alive()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, keep_alive={:?}",
+        context,
+        connection_option,
+        keep_alive
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -298,8 +327,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_keep_alive(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_keep_alive()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, keep_alive_out={:?}",
+        context,
+        connection_option,
+        keep_alive_out
     );
 
     ffi_arg_out_initialize!(keep_alive_out, 0);
@@ -327,8 +358,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_default_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_default_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, timeout={:?}",
+        context,
+        connection_option,
+        timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -350,8 +383,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_default_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_default_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, timeout_out={:?}",
+        context,
+        connection_option,
+        timeout_out
     );
 
     ffi_arg_out_initialize!(timeout_out, 0);
@@ -379,8 +414,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_send_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_send_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, timeout={:?}",
+        context,
+        connection_option,
+        timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -402,8 +439,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_send_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_send_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, timeout_out={:?}",
+        context,
+        connection_option,
+        timeout_out
     );
 
     ffi_arg_out_initialize!(timeout_out, 0);
@@ -431,8 +470,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_recv_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_recv_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, timeout={:?}",
+        context,
+        connection_option,
+        timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -454,8 +495,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_recv_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_recv_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. connection_option={:?}",
-        connection_option
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, timeout_out={:?}",
+        context,
+        connection_option,
+        timeout_out
     );
 
     ffi_arg_out_initialize!(timeout_out, 0);

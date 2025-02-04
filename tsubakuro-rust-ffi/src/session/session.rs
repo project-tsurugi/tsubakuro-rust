@@ -53,7 +53,12 @@ pub extern "C" fn tsurugi_ffi_session_connect(
     session_out: *mut TsurugiFfiSessionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, session_out={:?}",
+        context,
+        connection_option,
+        session_out
+    );
 
     ffi_arg_out_initialize!(session_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -90,7 +95,13 @@ pub extern "C" fn tsurugi_ffi_session_connect_for(
     session_out: *mut TsurugiFfiSessionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, timeout={:?}, session_out={:?}",
+        context,
+        connection_option,
+        timeout,
+        session_out
+    );
 
     ffi_arg_out_initialize!(session_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -127,7 +138,12 @@ pub extern "C" fn tsurugi_ffi_session_connect_async(
     session_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_connect_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, session_job_out={:?}",
+        context,
+        connection_option,
+        session_job_out
+    );
 
     ffi_arg_out_initialize!(session_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
@@ -181,7 +197,12 @@ pub extern "C" fn tsurugi_ffi_session_set_default_timeout(
     timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_set_default_timeout()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, timeout={:?}",
+        context,
+        session,
+        timeout
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
 
@@ -201,7 +222,12 @@ pub extern "C" fn tsurugi_ffi_session_get_default_timeout(
     default_timeout_out: *mut TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_get_default_timeout()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, default_timeout_out={:?}",
+        context,
+        session,
+        default_timeout_out
+    );
 
     ffi_arg_out_initialize!(default_timeout_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
@@ -226,7 +252,12 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     sql_client_out: *mut TsurugiFfiSqlClientHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_sql_client()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, sql_client_out={:?}",
+        context,
+        session,
+        sql_client_out
+    );
 
     ffi_arg_out_initialize!(sql_client_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
@@ -256,7 +287,13 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time(
     expiration_time: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_update_expiration_time()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, ,expiration_time_exists={:?}, expiration_time={:?}",
+        context,
+        session,
+        expiration_time_exists,
+        expiration_time
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
 
@@ -288,7 +325,14 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_for(
     timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_update_expiration_time_for()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, ,expiration_time_exists={:?}, expiration_time={:?}, timeout={:?}",
+        context,
+        session,
+        expiration_time_exists,
+        expiration_time,
+        timeout
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
 
@@ -321,7 +365,14 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_async(
     update_expiration_time_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_update_expiration_time_async()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, ,expiration_time_exists={:?}, expiration_time={:?}, update_expiration_time_job_out={:?}",
+        context,
+        session,
+        expiration_time_exists,
+        expiration_time,
+        update_expiration_time_job_out
+    );
 
     ffi_arg_out_initialize!(update_expiration_time_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
@@ -363,7 +414,12 @@ pub extern "C" fn tsurugi_ffi_session_shutdown(
     shutdown_type: TsurugiFfiShutdownType,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_shutdown()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, shutdown_type={:?}",
+        context,
+        session,
+        shutdown_type as i32
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
     if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
@@ -392,7 +448,13 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_for(
     timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_shutdown_for()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, shutdown_type={:?}, timeout={:?}",
+        context,
+        session,
+        shutdown_type as i32,
+        timeout
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
     if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
@@ -422,7 +484,13 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_async(
     shutdown_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_shutdown_async()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, shutdown_type={:?}, shutdown_job_out={:?}",
+        context,
+        session,
+        shutdown_type as i32,
+        shutdown_job_out
+    );
 
     ffi_arg_out_initialize!(shutdown_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
@@ -459,7 +527,12 @@ pub extern "C" fn tsurugi_ffi_session_is_shutdowned(
     is_shutdowned_out: *mut bool,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_is_shutdowned()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, is_shutdowned_out={:?}",
+        context,
+        session,
+        is_shutdowned_out
+    );
 
     ffi_arg_out_initialize!(is_shutdowned_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
@@ -483,7 +556,11 @@ pub extern "C" fn tsurugi_ffi_session_close(
     session: TsurugiFfiSessionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_close()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}",
+        context,
+        session
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
 
@@ -503,7 +580,12 @@ pub extern "C" fn tsurugi_ffi_session_is_closed(
     is_closed_out: *mut bool,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_is_closed()";
-    trace!("{FUNCTION_NAME} start. session={:?}", session);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, is_closed_out={:?}",
+        context,
+        session,
+        is_closed_out
+    );
 
     ffi_arg_out_initialize!(is_closed_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);

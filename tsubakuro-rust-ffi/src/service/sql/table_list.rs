@@ -48,7 +48,12 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
     table_names_size_out: *mut u32,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_get_table_names()";
-    trace!("{FUNCTION_NAME} start. table_list={:?}", table_list);
+    trace!("{FUNCTION_NAME} start. context={:?}, table_list={:?}, table_names_out={:?}, table_names_size_out={:?}",
+        context,
+        table_list,
+        table_names_out,
+        table_names_size_out
+    );
 
     ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
     ffi_arg_out_initialize!(table_names_size_out, 0);
@@ -64,12 +69,13 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
     // TODO mutex.lock table_list.table_names
     cstring_array_field_set_if_none!(context, table_list.table_names, table_names);
 
+    let ptr = cstring_array_field_to_ptr!(table_list.table_names);
     unsafe {
-        *table_names_out = cstring_array_field_to_ptr!(table_list.table_names);
+        *table_names_out = ptr;
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (table_names={:?})", ptr);
     rc_ok(context)
 }
 

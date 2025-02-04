@@ -56,8 +56,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_is_normal(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_is_normal()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, is_normal_out={:?}",
+        context,
+        transaction_status,
+        is_normal_out
     );
 
     ffi_arg_out_initialize!(is_normal_out, false);
@@ -83,8 +85,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_is_error(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_is_error()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, is_error_out={:?}",
+        context,
+        transaction_status,
+        is_error_out
     );
 
     ffi_arg_out_initialize!(is_error_out, false);
@@ -110,8 +114,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_name(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_get_server_error_name()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, name_out={:?}",
+        context,
+        transaction_status,
+        name_out
     );
 
     ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
@@ -131,10 +137,12 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_name(
         cchar_field_set!(context, status.error_name, value);
     }
 
+    let ptr = cstring_to_cchar!(status.error_name);
     unsafe {
-        *name_out = cstring_to_cchar!(status.error_name);
+        *name_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
     rc_ok(context)
 }
 
@@ -146,8 +154,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_message(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_get_server_error_message()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, error_message_out={:?}",
+        context,
+        transaction_status,
+        error_message_out
     );
 
     ffi_arg_out_initialize!(error_message_out, std::ptr::null_mut());
@@ -168,10 +178,12 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_message(
         cchar_field_set!(context, status.error_message, value);
     }
 
+    let ptr = cstring_to_cchar!(status.error_message);
     unsafe {
-        *error_message_out = cstring_to_cchar!(status.error_message);
+        *error_message_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end. (error_message={:?})", ptr);
     rc_ok(context)
 }
 
@@ -183,8 +195,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_numbe
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_get_server_error_category_number()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, category_number_out={:?}",
+        context,
+        transaction_status,
+        category_number_out
     );
 
     ffi_arg_out_initialize!(category_number_out, 0);
@@ -204,6 +218,7 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_numbe
     unsafe {
         *category_number_out = value;
     }
+
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)
 }
@@ -216,8 +231,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_str(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_get_server_error_category_str()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, category_str_out={:?}",
+        context,
+        transaction_status,
+        category_str_out
     );
 
     ffi_arg_out_initialize!(category_str_out, std::ptr::null_mut());
@@ -237,10 +254,12 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_str(
         cchar_field_set!(context, status.diagnostic_category_str, value);
     }
 
+    let ptr = cstring_to_cchar!(status.diagnostic_category_str);
     unsafe {
-        *category_str_out = cstring_to_cchar!(status.diagnostic_category_str);
+        *category_str_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end. (category_str={:?})", ptr);
     rc_ok(context)
 }
 
@@ -252,8 +271,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_code_number(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_get_server_error_code_number()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, code_number_out={:?}",
+        context,
+        transaction_status,
+        code_number_out
     );
 
     ffi_arg_out_initialize!(code_number_out, 0);
@@ -273,6 +294,7 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_code_number(
     unsafe {
         *code_number_out = value;
     }
+
     trace!("{FUNCTION_NAME} end");
     rc_ok(context)
 }
@@ -285,8 +307,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_structured_cod
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_get_server_error_structured_code()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_status={:?}",
-        transaction_status
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, structured_code_out={:?}",
+        context,
+        transaction_status,
+        structured_code_out
     );
 
     ffi_arg_out_initialize!(structured_code_out, std::ptr::null_mut());
@@ -306,10 +330,12 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_structured_cod
         cchar_field_set!(context, status.diagnostic_structured_code, value);
     }
 
+    let ptr = cstring_to_cchar!(status.diagnostic_structured_code);
     unsafe {
-        *structured_code_out = cstring_to_cchar!(status.diagnostic_structured_code);
+        *structured_code_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end. (structured_code={:?})", ptr);
     rc_ok(context)
 }
 

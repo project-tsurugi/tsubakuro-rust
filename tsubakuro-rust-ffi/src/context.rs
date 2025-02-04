@@ -60,7 +60,7 @@ pub extern "C" fn tsurugi_ffi_context_create(
     context_out: *mut TsurugiFfiContextHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_create()";
-    trace!("{FUNCTION_NAME} start");
+    trace!("{FUNCTION_NAME} start. context_out={:?}", context_out);
 
     if context_out.is_null() {
         trace!("{FUNCTION_NAME} error. arg[context_out] is null");
@@ -94,7 +94,11 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
     rc_out: *mut TsurugiFfiRc,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_return_code()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, rc_out={:?}",
+        context,
+        rc_out
+    );
 
     ffi_arg_out_initialize!(rc_out, TSURUGI_FFI_RC_FFI_ARG0_ERROR);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
@@ -116,7 +120,11 @@ pub extern "C" fn tsurugi_ffi_context_get_error_name(
     name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_name()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name_out={:?}",
+        context,
+        name_out
+    );
 
     ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
@@ -132,10 +140,12 @@ pub extern "C" fn tsurugi_ffi_context_get_error_name(
         cchar_field_set!(std::ptr::null_mut(), context.error_name, value);
     }
 
+    let ptr = cstring_to_cchar!(context.error_name);
     unsafe {
-        *name_out = cstring_to_cchar!(context.error_name);
+        *name_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
     TSURUGI_FFI_RC_OK
 }
 
@@ -145,15 +155,19 @@ pub extern "C" fn tsurugi_ffi_context_get_error_type(
     error_type_out: *mut TsurugiFfiRcType,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_type()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, error_type_out={:?}",
+        context,
+        error_type_out
+    );
 
     ffi_arg_out_initialize!(error_type_out, TsurugiFfiRcType::FfiError);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, error_type_out);
 
-    unsafe {
-        let context = &*context;
+    let context = unsafe { &*context };
 
+    unsafe {
         *error_type_out = context.rc.into();
     }
 
@@ -167,7 +181,11 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
     error_message_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_message()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, error_message_out={:?}",
+        context,
+        error_message_out
+    );
 
     ffi_arg_out_initialize!(error_message_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
@@ -185,10 +203,12 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
         }
     }
 
+    let ptr = cstring_to_cchar!(context.error_message);
     unsafe {
-        *error_message_out = cstring_to_cchar!(context.error_message);
+        *error_message_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end. (error_message={:?})", ptr);
     TSURUGI_FFI_RC_OK
 }
 
@@ -198,7 +218,11 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_number(
     category_number_out: *mut i32,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_server_error_category_number()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, category_number_out={:?}",
+        context,
+        category_number_out
+    );
 
     ffi_arg_out_initialize!(category_number_out, 0);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
@@ -227,7 +251,11 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_str(
     category_str_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_server_error_category_str()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, category_str_out={:?}",
+        context,
+        category_str_out
+    );
 
     ffi_arg_out_initialize!(category_str_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
@@ -248,10 +276,12 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_str(
         }
     }
 
+    let ptr = cstring_to_cchar!(context.diagnostic_category_str);
     unsafe {
-        *category_str_out = cstring_to_cchar!(context.diagnostic_category_str);
+        *category_str_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end. (category_str={:?})", ptr);
     TSURUGI_FFI_RC_OK
 }
 
@@ -261,7 +291,11 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_code_number(
     code_number_out: *mut i32,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_server_error_code_number()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, code_number_out={:?}",
+        context,
+        code_number_out
+    );
 
     ffi_arg_out_initialize!(code_number_out, 0);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
@@ -290,7 +324,11 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_structured_code(
     structured_code_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_server_error_structured_code()";
-    trace!("{FUNCTION_NAME} start. context={:?}", context);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, structured_code_out={:?}",
+        context,
+        structured_code_out
+    );
 
     ffi_arg_out_initialize!(structured_code_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
@@ -315,10 +353,12 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_structured_code(
         }
     }
 
+    let ptr = cstring_to_cchar!(context.diagnostic_structured_code);
     unsafe {
-        *structured_code_out = cstring_to_cchar!(context.diagnostic_structured_code);
+        *structured_code_out = ptr;
     }
-    trace!("{FUNCTION_NAME} end");
+
+    trace!("{FUNCTION_NAME} end (structured_code={:?})", ptr);
     TSURUGI_FFI_RC_OK
 }
 

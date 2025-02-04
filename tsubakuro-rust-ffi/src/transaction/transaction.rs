@@ -57,7 +57,12 @@ pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
     transaction_id_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_get_transaction_id()";
-    trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction={:?}, transaction_id_out={:?}",
+        context,
+        transaction,
+        transaction_id_out
+    );
 
     ffi_arg_out_initialize!(transaction_id_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
@@ -70,11 +75,12 @@ pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
         cchar_field_set!(context, transaction.transaction_id, transaction_id);
     }
 
+    let ptr = cstring_to_cchar!(transaction.transaction_id);
     unsafe {
-        *transaction_id_out = cstring_to_cchar!(transaction.transaction_id);
+        *transaction_id_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (transaction_id={:?})", ptr);
     rc_ok(context)
 }
 
@@ -85,7 +91,12 @@ pub extern "C" fn tsurugi_ffi_transaction_set_close_timeout(
     timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_set_close_timeout()";
-    trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction={:?}, timeout={:?}",
+        context,
+        transaction,
+        timeout
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
 
@@ -105,7 +116,12 @@ pub extern "C" fn tsurugi_ffi_transaction_get_close_timeout(
     close_timeout_out: *mut TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_get_close_timeout()";
-    trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction={:?}, close_timeout_out={:?}",
+        context,
+        transaction,
+        close_timeout_out
+    );
 
     ffi_arg_out_initialize!(close_timeout_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
@@ -113,11 +129,11 @@ pub extern "C" fn tsurugi_ffi_transaction_get_close_timeout(
 
     let transaction = unsafe { &mut *transaction };
 
-    let timeout = transaction.close_timeout();
-    let timeout = timeout.as_nanos() as TsurugiFfiDuration;
+    let close_timeout = transaction.close_timeout();
+    let close_timeout = close_timeout.as_nanos() as TsurugiFfiDuration;
 
     unsafe {
-        *close_timeout_out = timeout;
+        *close_timeout_out = close_timeout;
     }
 
     trace!("{FUNCTION_NAME} end");
@@ -130,7 +146,11 @@ pub extern "C" fn tsurugi_ffi_transaction_close(
     transaction: TsurugiFfiTransactionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_close()";
-    trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction={:?}",
+        context,
+        transaction
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
 
@@ -150,7 +170,12 @@ pub extern "C" fn tsurugi_ffi_transaction_close_for(
     timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_close_for()";
-    trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction={:?}, timeout={:?}",
+        context,
+        transaction,
+        timeout
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
 
@@ -176,7 +201,12 @@ pub extern "C" fn tsurugi_ffi_transaction_is_closed(
     is_closed_out: *mut bool,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_is_closed()";
-    trace!("{FUNCTION_NAME} start. transaction={:?}", transaction);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction={:?}, is_closed_out={:?}",
+        context,
+        transaction,
+        is_closed_out
+    );
 
     ffi_arg_out_initialize!(is_closed_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);

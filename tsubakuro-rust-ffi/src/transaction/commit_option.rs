@@ -79,7 +79,11 @@ pub extern "C" fn tsurugi_ffi_commit_option_create(
     commit_option_out: *mut TsurugiFfiCommitOptionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_create()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, commit_option_out={:?}",
+        context,
+        commit_option_out
+    );
 
     ffi_arg_out_initialize!(commit_option_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option_out);
@@ -104,7 +108,12 @@ pub extern "C" fn tsurugi_ffi_commit_option_set_commit_type(
     commit_type: TsurugiFfiCommitType,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_set_commit_type()";
-    trace!("{FUNCTION_NAME} start. commit_option={:?}", commit_option);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, commit_option={:?}, commit_type={:?}",
+        context,
+        commit_option,
+        commit_type as i32
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);
     if !TsurugiFfiCommitType::is_valid(commit_type as i32) {
@@ -126,7 +135,12 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_commit_type(
     commit_type_out: *mut TsurugiFfiCommitType,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_get_commit_type()";
-    trace!("{FUNCTION_NAME} start. commit_option={:?}", commit_option);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, commit_option={:?}, commit_type_out={:?}",
+        context,
+        commit_option,
+        commit_type_out
+    );
 
     ffi_arg_out_initialize!(commit_type_out, TsurugiFfiCommitType::Unspecified);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);
@@ -151,7 +165,12 @@ pub extern "C" fn tsurugi_ffi_commit_option_set_auto_dispose(
     auto_dispose: bool,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_set_auto_dispose()";
-    trace!("{FUNCTION_NAME} start. commit_option={:?}", commit_option);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, commit_option={:?}, auto_dispose={:?}",
+        context,
+        commit_option,
+        auto_dispose
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);
 
@@ -170,7 +189,12 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_auto_dispose(
     auto_dispose_out: *mut bool,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_get_auto_dispose()";
-    trace!("{FUNCTION_NAME} start. commit_option={:?}", commit_option);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, commit_option={:?}, auto_dispose_out={:?}",
+        context,
+        commit_option,
+        auto_dispose_out
+    );
 
     ffi_arg_out_initialize!(auto_dispose_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);

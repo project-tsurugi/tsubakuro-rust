@@ -50,7 +50,12 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
     name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_name()";
-    trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_column={:?}, name_out={:?}",
+        context,
+        sql_column,
+        name_out
+    );
 
     ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);
@@ -63,11 +68,12 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
         cchar_field_set!(context, sql_column.name, table_name);
     }
 
+    let ptr = cstring_to_cchar!(sql_column.name);
     unsafe {
-        *name_out = cstring_to_cchar!(sql_column.name);
+        *name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
     rc_ok(context)
 }
 
@@ -78,7 +84,12 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_atom_type(
     atom_type_out: *mut TsurugiFfiAtomType,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_atom_type()";
-    trace!("{FUNCTION_NAME} start. sql_column={:?}", sql_column);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_column={:?}, atom_type_out={:?}",
+        context,
+        sql_column,
+        atom_type_out
+    );
 
     ffi_arg_out_initialize!(atom_type_out, TsurugiFfiAtomType::Unrecognized);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);

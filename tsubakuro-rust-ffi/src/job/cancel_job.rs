@@ -4,7 +4,10 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, return_code::{rc_ok, TsurugiFfiRc}, TsurugiFfiDuration
+    context::TsurugiFfiContextHandle,
+    ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
+    return_code::{rc_ok, TsurugiFfiRc},
+    TsurugiFfiDuration,
 };
 
 pub(crate) struct TsurugiFfiCancelJob {
@@ -52,7 +55,13 @@ pub extern "C" fn tsurugi_ffi_cancel_job_wait(
     done_out: *mut bool,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_cancel_job_wait()";
-    trace!("{FUNCTION_NAME} start. cancel_job={:?}", cancel_job);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, cancel_job={:?}, timeout={:?}, done_out={:?}",
+        context,
+        cancel_job,
+        timeout,
+        done_out
+    );
 
     ffi_arg_out_initialize!(done_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, cancel_job);
@@ -79,7 +88,12 @@ pub extern "C" fn tsurugi_ffi_cancel_job_is_done(
     done_out: *mut bool,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_cancel_job_is_done()";
-    trace!("{FUNCTION_NAME} start. cancel_job={:?}", cancel_job);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, cancel_job={:?}, done_out={:?}",
+        context,
+        cancel_job,
+        done_out
+    );
 
     ffi_arg_out_initialize!(done_out, false);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, cancel_job);

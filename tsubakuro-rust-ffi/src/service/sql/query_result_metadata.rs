@@ -2,7 +2,10 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}, service::sql::column::TsurugiFfiSqlColumn
+    context::TsurugiFfiContextHandle,
+    ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    return_code::{rc_ok, TsurugiFfiRc},
+    service::sql::column::TsurugiFfiSqlColumn,
 };
 
 use super::column::TsurugiFfiSqlColumnHandle;
@@ -107,12 +110,12 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_dispose(
 ) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_metadata_dispose()";
     trace!(
-        "{FUNCTION_NAME} start. sql_query_result_metadata={:?}",
+        "{FUNCTION_NAME} start. query_result_metadata={:?}",
         query_result_metadata
     );
 
     if query_result_metadata.is_null() {
-        trace!("{FUNCTION_NAME} end. arg[sql_query_result_metadata] is null");
+        trace!("{FUNCTION_NAME} end. arg[query_result_metadata] is null");
         return;
     }
 

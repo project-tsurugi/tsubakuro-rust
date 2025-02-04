@@ -49,7 +49,13 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
     placeholder_out: *mut TsurugiFfiSqlPlaceholderHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_of_atom_type()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, atom_type={:?}, placeholder_out={:?}",
+        context,
+        name,
+        atom_type as i32,
+        placeholder_out
+    );
 
     ffi_arg_out_initialize!(placeholder_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
@@ -82,7 +88,12 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
     name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_get_name()";
-    trace!("{FUNCTION_NAME} start. placeholder={:?}", placeholder);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, placeholder={:?}, name_out={:?}",
+        context,
+        placeholder,
+        name_out
+    );
 
     ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, placeholder);
@@ -100,11 +111,12 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
         }
     }
 
+    let ptr = cstring_to_cchar!(placeholder.name);
     unsafe {
-        *name_out = cstring_to_cchar!(placeholder.name);
+        *name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
     rc_ok(context)
 }
 
@@ -115,7 +127,12 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_atom_type(
     atom_type_out: *mut TsurugiFfiAtomType,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_get_atom_type()";
-    trace!("{FUNCTION_NAME} start. placeholder={:?}", placeholder);
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, placeholder={:?}, atom_type_out={:?}",
+        context,
+        placeholder,
+        atom_type_out
+    );
 
     ffi_arg_out_initialize!(atom_type_out, TsurugiFfiAtomType::Unrecognized);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, placeholder);

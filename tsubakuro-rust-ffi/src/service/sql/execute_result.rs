@@ -75,7 +75,13 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_counters(
     counters_size_out: *mut u32,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_execute_result_counters()";
-    trace!("{FUNCTION_NAME} start. execute_result={:?}", execute_result);
+    trace!("{FUNCTION_NAME} start. context={:?}, execute_result={:?}, counters_keys_out={:?}, counters_rows_out={:?}, counters_size_out={:?}",
+        context,
+        execute_result,
+        counters_keys_out,
+        counters_rows_out,
+        counters_size_out
+    );
 
     ffi_arg_out_initialize!(counters_keys_out, std::ptr::null());
     ffi_arg_out_initialize!(counters_rows_out, std::ptr::null());
@@ -101,18 +107,26 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_counters(
         execute_result.counters_rows = Some(rows);
     }
 
+    let keys_ptr;
+    let rows_ptr;
+    if size != 0 {
+        keys_ptr = execute_result.counters_keys.as_ref().unwrap().as_ptr();
+        rows_ptr = execute_result.counters_rows.as_ref().unwrap().as_ptr();
+    } else {
+        keys_ptr = std::ptr::null();
+        rows_ptr = std::ptr::null();
+    }
     unsafe {
-        if size != 0 {
-            *counters_keys_out = execute_result.counters_keys.as_ref().unwrap().as_ptr();
-            *counters_rows_out = execute_result.counters_rows.as_ref().unwrap().as_ptr();
-        } else {
-            *counters_keys_out = std::ptr::null();
-            *counters_rows_out = std::ptr::null();
-        }
+        *counters_keys_out = keys_ptr;
+        *counters_rows_out = rows_ptr;
         *counters_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!(
+        "{FUNCTION_NAME} end. (counters_keys={:?}, counters_rows={:?})",
+        keys_ptr,
+        rows_ptr
+    );
     rc_ok(context)
 }
 
@@ -203,7 +217,12 @@ fn get_rows(
     function_name: &str,
     getter: fn(&SqlExecuteResult) -> i64,
 ) -> TsurugiFfiRc {
-    trace!("{function_name} start. execute_result={:?}", execute_result);
+    trace!(
+        "{function_name} start. context={:?}, execute_result={:?}, rows_out={:?}",
+        context,
+        execute_result,
+        rows_out
+    );
 
     ffi_arg_out_initialize!(rows_out, 0);
     ffi_arg_require_non_null!(context, function_name, 1, execute_result);

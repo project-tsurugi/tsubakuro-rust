@@ -47,7 +47,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_create(
     transaction_option_out: *mut TsurugiFfiTransactionOptionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_create()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction_option_out={:?}",
+        context,
+        transaction_option_out
+    );
 
     ffi_arg_out_initialize!(transaction_option_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option_out);
@@ -77,8 +81,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_type(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_transaction_type()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, transaction_type={:?}",
+        context,
+        transaction_option,
+        transaction_type as i32
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -102,8 +108,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_type(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_transaction_type()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, transaction_type_out={:?}",
+        context,
+        transaction_option,
+        transaction_type_out
     );
 
     ffi_arg_out_initialize!(transaction_type_out, TsurugiFfiTransactionType::Unspecified);
@@ -129,8 +137,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_label(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_transaction_label()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, label={:?}",
+        context,
+        transaction_option,
+        label
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -155,8 +165,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_transaction_label()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, label_out={:?}",
+        context,
+        transaction_option,
+        label_out
     );
 
     ffi_arg_out_initialize!(label_out, std::ptr::null_mut());
@@ -174,11 +186,13 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
             None => {}
         }
     }
+
+    let ptr = cstring_to_cchar!(transaction_option.transaction_label);
     unsafe {
-        *label_out = cstring_to_cchar!(transaction_option.transaction_label);
+        *label_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (label={:?})", ptr);
     rc_ok(context)
 }
 
@@ -190,8 +204,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_modifies_definitions(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_modifies_definitions()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, modifies_definitions={:?}",
+        context,
+        transaction_option,
+        modifies_definitions
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -212,8 +228,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_modifies_definitions(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_modifies_definitions()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, modifies_definitions_out={:?}",
+        context,
+        transaction_option,
+        modifies_definitions_out
     );
 
     ffi_arg_out_initialize!(modifies_definitions_out, false);
@@ -260,8 +278,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_write_preserve(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_write_preserve()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, table_names={:?}, table_names_size={:?}",
+        context,
+        transaction_option,
+        table_names,
+        table_names_size
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -288,8 +309,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_write_preserve_size()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, table_names_out={:?}, table_names_size_out={:?}",
+        context,
+        transaction_option,
+        table_names_out,
+        table_names_size_out
     );
 
     ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
@@ -306,12 +330,13 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
     // TODO mutex.lock transaction_option.write_preserve
     cstring_array_field_set_if_none!(context, transaction_option.write_preserve, table_names);
 
+    let ptr = cstring_array_field_to_ptr!(transaction_option.write_preserve);
     unsafe {
-        *table_names_out = cstring_array_field_to_ptr!(transaction_option.write_preserve);
+        *table_names_out = ptr;
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (tables_names={:?})", ptr);
     rc_ok(context)
 }
 
@@ -324,8 +349,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_inclusive_read_area(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_inclusive_read_area()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, table_names={:?}, table_names_size={:?}",
+        context,
+        transaction_option,
+        table_names,
+        table_names_size
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -352,8 +380,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_inclusive_read_area()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, table_names_out={:?}, table_names_size_out={:?}",
+        context,
+        transaction_option,
+        table_names_out,
+        table_names_size_out
     );
 
     ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
@@ -370,12 +401,13 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
     // TODO mutex.lock transaction_option.inclusive_read_area
     cstring_array_field_set_if_none!(context, transaction_option.inclusive_read_area, table_names);
 
+    let ptr = cstring_array_field_to_ptr!(transaction_option.inclusive_read_area);
     unsafe {
-        *table_names_out = cstring_array_field_to_ptr!(transaction_option.inclusive_read_area);
+        *table_names_out = ptr;
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (table_names={:?})", ptr);
     rc_ok(context)
 }
 
@@ -388,8 +420,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_exclusive_read_area(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_exclusive_read_area()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, table_names={:?}, table_names_size={:?}",
+        context,
+        transaction_option,
+        table_names,
+        table_names_size
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -416,8 +451,11 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_exclusive_read_area()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, table_names_out={:?}, table_names_size_out={:?}",
+        context,
+        transaction_option,
+        table_names_out,
+        table_names_size_out
     );
 
     ffi_arg_out_initialize!(table_names_out, std::ptr::null_mut());
@@ -434,12 +472,13 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
     // TODO mutex.lock transaction_option.exclusive_read_area
     cstring_array_field_set_if_none!(context, transaction_option.exclusive_read_area, table_names);
 
+    let ptr = cstring_array_field_to_ptr!(transaction_option.exclusive_read_area);
     unsafe {
-        *table_names_out = cstring_array_field_to_ptr!(transaction_option.exclusive_read_area);
+        *table_names_out = ptr;
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (table_names={:?})", ptr);
     rc_ok(context)
 }
 
@@ -451,8 +490,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_priority(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_priority()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, priority={:?}",
+        context,
+        transaction_option,
+        priority as i32
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -476,8 +517,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_priority(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_priority()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, priority_out={:?}",
+        context,
+        transaction_option,
+        priority_out
     );
 
     ffi_arg_out_initialize!(priority_out, TsurugiFfiTransactionPriority::Unspecified);
@@ -503,8 +546,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_close_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, timeout={:?}",
+        context,
+        transaction_option,
+        timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
@@ -526,8 +571,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_close_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. transaction_option={:?}",
-        transaction_option
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, close_timeout_out={:?}",
+        context,
+        transaction_option,
+        close_timeout_out
     );
 
     ffi_arg_out_initialize!(close_timeout_out, 0);

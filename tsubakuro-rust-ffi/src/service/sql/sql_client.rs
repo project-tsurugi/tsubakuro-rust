@@ -79,24 +79,31 @@ pub type TsurugiFfiSqlClientHandle = *mut TsurugiFfiSqlClient;
 pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
-    smv_out: *mut TsurugiFfiStringHandle,
+    version_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_service_message_version()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, version_out={:?}",
+        context,
+        sql_client,
+        version_out
+    );
 
-    ffi_arg_out_initialize!(smv_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(version_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, smv_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, version_out);
 
     let client = unsafe { &mut *sql_client };
 
     let smv = SqlClient::service_message_version();
     cchar_field_set!(context, client.service_message_version, smv);
+
+    let ptr = cstring_to_cchar!(client.service_message_version);
     unsafe {
-        *smv_out = cstring_to_cchar!(client.service_message_version);
+        *version_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
+    trace!("{FUNCTION_NAME} end. (version={:?})", ptr);
     rc_ok(context)
 }
 
@@ -107,7 +114,12 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     table_list_out: *mut TsurugiFfiTableListHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, table_list_out={:?}",
+        context,
+        sql_client,
+        table_list_out
+    );
 
     ffi_arg_out_initialize!(table_list_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -137,7 +149,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
     table_list_out: *mut TsurugiFfiTableListHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, timeout={:?}, table_list_out={:?}",
+        context,
+        sql_client,
+        timeout,
+        table_list_out
+    );
 
     ffi_arg_out_initialize!(table_list_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -172,7 +190,12 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
     table_list_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_list_tables_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, table_list_job_out={:?}",
+        context,
+        sql_client,
+        table_list_job_out
+    );
 
     ffi_arg_out_initialize!(table_list_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -218,7 +241,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     table_metadata_out: *mut TsurugiFfiTableMetadataHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, table_name={:?}, table_metadata_out={:?}",
+        context,
+        sql_client,
+        table_name,
+        table_metadata_out
+    );
 
     ffi_arg_out_initialize!(table_metadata_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -256,7 +285,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
     table_metadata_out: *mut TsurugiFfiTableMetadataHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, table_name={:?}, timeout={:?}, table_metadata_out={:?}",
+        context,
+        sql_client,
+        table_name,
+        timeout,
+        table_metadata_out
+    );
 
     ffi_arg_out_initialize!(table_metadata_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -294,7 +330,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_async(
     table_metadata_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_table_metadata_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, table_name={:?}, table_metadata_job_out={:?}",
+        context,
+        sql_client,
+        table_name,
+        table_metadata_job_out
+    );
 
     ffi_arg_out_initialize!(table_metadata_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -367,7 +409,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     prepared_statement_out: *mut TsurugiFfiSqlPreparedStatementHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholder_size={:?}, prepared_statement_out={:?}",
+        context,
+        sql_client,
+        sql,
+        placeholders,
+        placeholder_size,
+        prepared_statement_out
+    );
 
     ffi_arg_out_initialize!(prepared_statement_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -415,7 +465,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     prepared_statement_out: *mut TsurugiFfiSqlPreparedStatementHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholder_size={:?}, timeout={:?}, prepared_statement_out={:?}",
+        context,
+        sql_client,
+        sql,
+        placeholders,
+        placeholder_size,
+        timeout,
+        prepared_statement_out
+    );
 
     ffi_arg_out_initialize!(prepared_statement_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -463,7 +522,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     prepared_statement_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholder_size={:?}, prepared_statement_job_out={:?}",
+        context,
+        sql_client,
+        sql,
+        placeholders,
+        placeholder_size,
+        prepared_statement_job_out
+    );
 
     ffi_arg_out_initialize!(prepared_statement_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -525,7 +592,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     transaction_out: *mut TsurugiFfiTransactionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction_option={:?}, transaction_out={:?}",
+        context,
+        sql_client,
+        transaction_option,
+        transaction_out
+    );
 
     ffi_arg_out_initialize!(transaction_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -563,7 +636,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
     transaction_out: *mut TsurugiFfiTransactionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction_option={:?}, timeout={:?}, transaction_out={:?}",
+        context,
+        sql_client,
+        transaction_option,
+        timeout,
+        transaction_out
+    );
 
     ffi_arg_out_initialize!(transaction_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -601,7 +681,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
     transaction_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_start_transaction_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction_option={:?}, transaction_job_out={:?}",
+        context,
+        sql_client,
+        transaction_option,
+        transaction_job_out
+    );
 
     ffi_arg_out_initialize!(transaction_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -654,7 +740,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
     transaction_status_out: *mut TsurugiFfiTransactionStatusHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_transaction_status()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, transaction_status_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        transaction_status_out
+    );
 
     ffi_arg_out_initialize!(transaction_status_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -692,7 +784,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
     transaction_status_out: *mut TsurugiFfiTransactionStatusHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_transaction_status_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, timeout={:?}, transaction_status_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        timeout,
+        transaction_status_out
+    );
 
     ffi_arg_out_initialize!(transaction_status_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -730,7 +829,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_async(
     transaction_status_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_transaction_status_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, transaction_status_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        transaction_status_job_out
+    );
 
     ffi_arg_out_initialize!(transaction_status_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -788,7 +893,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, sql={:?}, execute_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        sql,
+        execute_result_out
+    );
 
     ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -829,7 +941,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, sql={:?}, timeout={:?}, execute_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        sql,
+        timeout,
+        execute_result_out
+    );
 
     ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -870,7 +990,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_async(
     execute_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_execute_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, sql={:?}, execute_result_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        sql,
+        execute_result_job_out
+    );
 
     ffi_arg_out_initialize!(execute_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -949,7 +1076,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, execute_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        execute_result_out
+    );
 
     ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -997,7 +1133,17 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, timeout={:?}, execute_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        timeout,
+        execute_result_out
+    );
 
     ffi_arg_out_initialize!(execute_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1045,7 +1191,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     execute_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, execute_result_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        execute_result_job_out
+    );
 
     ffi_arg_out_initialize!(execute_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1094,7 +1249,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, sql={:?}, query_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        sql,
+        query_result_out
+    );
 
     ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1135,7 +1297,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_for(
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, sql={:?}, timeout={:?}, query_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        sql,
+        timeout,
+        query_result_out
+    );
 
     ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1176,7 +1346,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_async(
     query_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_query_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, sql={:?}, query_result_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        sql,
+        query_result_job_out
+    );
 
     ffi_arg_out_initialize!(query_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1238,7 +1415,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, query_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        query_result_out
+    );
 
     ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1285,7 +1471,17 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, timeout={:?}, query_result_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        timeout,
+        query_result_out
+    );
 
     ffi_arg_out_initialize!(query_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1332,7 +1528,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     query_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, query_result_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        query_result_job_out
+    );
 
     ffi_arg_out_initialize!(query_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1379,7 +1584,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit(
     commit_option: TsurugiFfiCommitOptionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_commit()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, commit_option={:?}",
+        context,
+        sql_client,
+        transaction,
+        commit_option
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
@@ -1410,7 +1621,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_for(
     timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_commit_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, commit_option={:?}, timeout={:?}",
+        context,
+        sql_client,
+        transaction,
+        commit_option,
+        timeout
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
@@ -1442,7 +1660,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
     commit_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_commit_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, commit_option={:?}, commit_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        commit_option,
+        commit_job_out
+    );
 
     ffi_arg_out_initialize!(commit_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
@@ -1480,7 +1705,12 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback(
     transaction: TsurugiFfiTransactionHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_rollback()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}",
+        context,
+        sql_client,
+        transaction
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
@@ -1508,7 +1738,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_for(
     timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_rollback_for()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, timeout={:?}",
+        context,
+        sql_client,
+        transaction,
+        timeout
+    );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
@@ -1537,7 +1773,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_async(
     rollback_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_rollback_async()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, rollback_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        rollback_job_out
+    );
 
     ffi_arg_out_initialize!(rollback_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);

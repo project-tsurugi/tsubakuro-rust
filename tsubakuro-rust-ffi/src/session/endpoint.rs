@@ -35,7 +35,12 @@ pub extern "C" fn tsurugi_ffi_endpoint_parse(
     endpoint_out: *mut TsurugiFfiEndpointHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_endpoint_parse()";
-    trace!("{FUNCTION_NAME} start");
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, endpoint={:?}, endpoint_out={:?}",
+        context,
+        endpoint,
+        endpoint_out
+    );
 
     ffi_arg_out_initialize!(endpoint_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, endpoint);

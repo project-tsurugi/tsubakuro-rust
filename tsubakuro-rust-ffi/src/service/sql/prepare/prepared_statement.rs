@@ -56,8 +56,10 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_has_result_records(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_has_result_records()";
     trace!(
-        "{FUNCTION_NAME} start. prepared_statement={:?}",
-        prepared_statement
+        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}, has_result_records_out={:?}",
+        context,
+        prepared_statement,
+        has_result_records_out
     );
 
     ffi_arg_out_initialize!(has_result_records_out, false);
@@ -84,8 +86,10 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_set_close_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_set_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. prepared_statement={:?}",
-        prepared_statement
+        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}, timeout={:?}",
+        context,
+        prepared_statement,
+        timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, prepared_statement);
@@ -107,8 +111,10 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_get_close_timeout(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_get_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. prepared_statement={:?}",
-        prepared_statement
+        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}, close_timeout_out={:?}",
+        context,
+        prepared_statement,
+        close_timeout_out
     );
 
     ffi_arg_out_initialize!(close_timeout_out, 0);
@@ -135,7 +141,8 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_close()";
     trace!(
-        "{FUNCTION_NAME} start. prepared_statement={:?}",
+        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}",
+        context,
         prepared_statement
     );
 
@@ -158,8 +165,10 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close_for(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_close_for()";
     trace!(
-        "{FUNCTION_NAME} start. prepared_statement={:?}",
-        prepared_statement
+        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}, timeout={:?}",
+        context,
+        prepared_statement,
+        timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, prepared_statement);
@@ -187,8 +196,10 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_is_closed(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_is_closed()";
     trace!(
-        "{FUNCTION_NAME} start. prepared_statement={:?}",
-        prepared_statement
+        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}, is_closed_out={:?}",
+        context,
+        prepared_statement,
+        is_closed_out
     );
 
     ffi_arg_out_initialize!(is_closed_out, false);
