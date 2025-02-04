@@ -404,10 +404,10 @@ impl TableMetadataJobDelegator {
 }
 
 macro_rules! convert_placeholders {
-    ($context:expr, $function_name:expr, $arg_index:expr, $placeholders:expr, $placeholder_size:expr) => {
-        if $placeholder_size > 0 {
+    ($context:expr, $function_name:expr, $arg_index:expr, $placeholders:expr, $placeholders_size:expr) => {
+        if $placeholders_size > 0 {
             let src =
-                unsafe { std::slice::from_raw_parts($placeholders, $placeholder_size as usize) };
+                unsafe { std::slice::from_raw_parts($placeholders, $placeholders_size as usize) };
             let mut dst = Vec::with_capacity(src.len());
             for &placeholder in src {
                 ffi_arg_require_non_null!($context, $function_name, $arg_index, placeholder);
@@ -427,24 +427,24 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     sql_client: TsurugiFfiSqlClientHandle,
     sql: TsurugiFfiStringHandle,
     placeholders: *const TsurugiFfiSqlPlaceholderHandle,
-    placeholder_size: u32,
+    placeholders_size: u32,
     prepared_statement_out: *mut TsurugiFfiSqlPreparedStatementHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholder_size={:?}, prepared_statement_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholders_size={:?}, prepared_statement_out={:?}",
         context,
         sql_client,
         sql,
         placeholders,
-        placeholder_size,
+        placeholders_size,
         prepared_statement_out
     );
 
     ffi_arg_out_initialize!(prepared_statement_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
-    if placeholder_size > 0 {
+    if placeholders_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_out);
@@ -452,7 +452,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
     let placeholders: Vec<SqlPlaceholder> =
-        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholder_size);
+        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholders_size);
 
     let runtime = client.runtime();
     let prepared_statement = ffi_exec_core_async!(
@@ -487,18 +487,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     sql_client: TsurugiFfiSqlClientHandle,
     sql: TsurugiFfiStringHandle,
     placeholders: *const TsurugiFfiSqlPlaceholderHandle,
-    placeholder_size: u32,
+    placeholders_size: u32,
     timeout: TsurugiFfiDuration,
     prepared_statement_out: *mut TsurugiFfiSqlPreparedStatementHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_for()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholder_size={:?}, timeout={:?}, prepared_statement_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholders_size={:?}, timeout={:?}, prepared_statement_out={:?}",
         context,
         sql_client,
         sql,
         placeholders,
-        placeholder_size,
+        placeholders_size,
         timeout,
         prepared_statement_out
     );
@@ -506,7 +506,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     ffi_arg_out_initialize!(prepared_statement_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
-    if placeholder_size > 0 {
+    if placeholders_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, prepared_statement_out);
@@ -514,7 +514,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
     let placeholders: Vec<SqlPlaceholder> =
-        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholder_size);
+        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholders_size);
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = client.runtime();
@@ -550,24 +550,24 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     sql_client: TsurugiFfiSqlClientHandle,
     sql: TsurugiFfiStringHandle,
     placeholders: *const TsurugiFfiSqlPlaceholderHandle,
-    placeholder_size: u32,
+    placeholders_size: u32,
     prepared_statement_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepare_async()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholder_size={:?}, prepared_statement_job_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, placeholders={:?}, placeholders_size={:?}, prepared_statement_job_out={:?}",
         context,
         sql_client,
         sql,
         placeholders,
-        placeholder_size,
+        placeholders_size,
         prepared_statement_job_out
     );
 
     ffi_arg_out_initialize!(prepared_statement_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
-    if placeholder_size > 0 {
+    if placeholders_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholders);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, prepared_statement_job_out);
@@ -575,7 +575,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     let client = unsafe { &*sql_client };
     let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
     let placeholders: Vec<SqlPlaceholder> =
-        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholder_size);
+        convert_placeholders!(context, FUNCTION_NAME, 3, placeholders, placeholders_size);
 
     let runtime = client.runtime();
     let job = ffi_exec_core_async!(
