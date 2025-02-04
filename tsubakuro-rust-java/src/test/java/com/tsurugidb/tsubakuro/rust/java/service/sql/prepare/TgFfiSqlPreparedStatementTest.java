@@ -1,6 +1,8 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql.prepare;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
@@ -17,25 +19,77 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 class TgFfiSqlPreparedStatementTest extends TgFfiTester {
 
 	@Test
-	void has_result_records_argError() {
+	void argError() {
+		var manager = getFfiObjectManager();
+
+		try (var client = createSqlClient(); //
+				var ps = getSqlPreparedStatement(client, DIRECT); //
+				var context = TgFfiContext.create(manager)) {
+			has_result_records_argError(context, ps);
+			set_close_timeout_argError(context, ps);
+			get_close_timeout_argError(context, ps);
+			is_closed_argError(context, ps);
+		}
+	}
+
+	private void has_result_records_argError(TgFfiContext context, TgFfiSqlPreparedStatement ps) {
+		var manager = getFfiObjectManager();
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_has_result_records(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = ps.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_has_result_records(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void set_close_timeout() {
 		var manager = getFfiObjectManager();
 		try (var client = createSqlClient(); //
 				var context = TgFfiContext.create(manager); //
 				var ps = getSqlPreparedStatement(client, DIRECT)) {
-			{
-				var ctx = context.handle();
-				var handle = MemorySegment.NULL;
-				var out = manager.allocatePtr();
-				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_has_result_records(ctx, handle, out);
-				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-			}
-			{
-				var ctx = context.handle();
-				var handle = ps.handle();
-				var out = MemorySegment.NULL;
-				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_has_result_records(ctx, handle, out);
-				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
-			}
+			ps.setCloseTimeout(context, Duration.ofSeconds(5));
+
+			var timeout = ps.getCloseTimeout(context);
+			assertEquals(Duration.ofSeconds(5), timeout);
+		}
+	}
+
+	private void set_close_timeout_argError(TgFfiContext context, TgFfiSqlPreparedStatement ps) {
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var arg = Duration.ofSeconds(5).toNanos();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_set_close_timeout(ctx, handle, arg);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	private void get_close_timeout_argError(TgFfiContext context, TgFfiSqlPreparedStatement ps) {
+		var manager = getFfiObjectManager();
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_get_close_timeout(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = ps.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_get_close_timeout(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
 
@@ -51,9 +105,11 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
 		try (var client = createSqlClient(); //
 				var context = TgFfiContext.create(manager); //
 				var ps = getSqlPreparedStatement(client, pattern)) {
+			assertFalse(ps.isClosed(context));
 
 			if (close) {
 				doClose(ps, pattern);
+				assertTrue(ps.isClosed(context));
 			}
 		}
 	}
@@ -82,6 +138,25 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
 			var t = Duration.ofSeconds(5).toNanos();
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_close_for(ctx, handle, t);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	private void is_closed_argError(TgFfiContext context, TgFfiSqlPreparedStatement ps) {
+		var manager = getFfiObjectManager();
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_is_closed(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = ps.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_is_closed(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
 

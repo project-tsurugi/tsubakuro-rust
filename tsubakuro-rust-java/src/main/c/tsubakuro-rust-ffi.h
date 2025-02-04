@@ -487,12 +487,24 @@ TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_has_result_records(TsurugiFfiCon
                                                                    TsurugiFfiSqlPreparedStatementHandle prepared_statement,
                                                                    bool *has_result_records_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context,
+                                                                  TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                                  TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_get_close_timeout(TsurugiFfiContextHandle context,
+                                                                  TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                                  TsurugiFfiDuration *close_timeout_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlPreparedStatementHandle prepared_statement);
 
 TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close_for(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlPreparedStatementHandle prepared_statement,
                                                           TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_is_closed(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                          bool *is_closed_out);
 
 void tsurugi_ffi_sql_prepared_statement_dispose(TsurugiFfiSqlPreparedStatementHandle prepared_statement);
 
