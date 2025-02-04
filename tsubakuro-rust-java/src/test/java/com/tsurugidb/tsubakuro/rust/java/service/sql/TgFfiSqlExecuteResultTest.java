@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -33,13 +34,13 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	@ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
 	void get_rows(String pattern) {
 		getRows(false, pattern);
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	@ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
 	void get_rows_fromPs(String pattern) {
 		getRows(true, pattern);
 	}
@@ -127,20 +128,33 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
 				try (var transaction = client.startTransaction(context, transactionOption)) {
 					TgFfiSqlExecuteResult executeResult;
 					if (prepare) {
-						if (pattern.equals(DIRECT)) {
+						switch (pattern) {
+						case DIRECT:
 							executeResult = client.preparedExecute(context, transaction, ps, List.of());
-						} else {
+							break;
+						case DIRECT_FOR:
+							executeResult = client.preparedExecuteFor(context, transaction, ps, List.of(),
+									Duration.ofSeconds(5));
+							break;
+						default:
 							try (var job = client.preparedExecuteAsync(context, transaction, ps, List.of())) {
 								executeResult = jobTake(job, pattern);
 							}
+							break;
 						}
 					} else {
-						if (pattern.equals(DIRECT)) {
+						switch (pattern) {
+						case DIRECT:
 							executeResult = client.execute(context, transaction, sql);
-						} else {
+							break;
+						case DIRECT_FOR:
+							executeResult = client.executeFor(context, transaction, sql, Duration.ofSeconds(5));
+							break;
+						default:
 							try (var job = client.executeAsync(context, transaction, sql)) {
 								executeResult = jobTake(job, pattern);
 							}
+							break;
 						}
 					}
 

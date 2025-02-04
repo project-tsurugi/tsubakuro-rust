@@ -1096,11 +1096,23 @@ TsurugiFfiRc tsurugi_ffi_transaction_get_transaction_id(TsurugiFfiContextHandle 
                                                         TsurugiFfiTransactionHandle transaction,
                                                         TsurugiFfiStringHandle *transaction_id_out);
 
+TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiTransactionHandle transaction,
+                                                       TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_transaction_get_close_timeout(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiTransactionHandle transaction,
+                                                       TsurugiFfiDuration *close_timeout_out);
+
 TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
                                            TsurugiFfiTransactionHandle transaction);
 
 TsurugiFfiRc tsurugi_ffi_transaction_close_for(TsurugiFfiContextHandle context,
                                                TsurugiFfiTransactionHandle transaction,
                                                TsurugiFfiDuration timeout);
+
+TsurugiFfiRc tsurugi_ffi_transaction_is_closed(TsurugiFfiContextHandle context,
+                                               TsurugiFfiTransactionHandle transaction,
+                                               bool *is_closed_out);
 
 void tsurugi_ffi_transaction_dispose(TsurugiFfiTransactionHandle transaction);

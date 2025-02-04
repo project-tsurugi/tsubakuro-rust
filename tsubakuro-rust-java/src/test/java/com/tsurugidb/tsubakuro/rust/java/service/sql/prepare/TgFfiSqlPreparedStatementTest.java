@@ -94,7 +94,7 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	@ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
 	void close(String pattern) {
 		close(pattern, true);
 		close(pattern, false);
@@ -164,9 +164,12 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
 		var manager = getFfiObjectManager();
 		var context = TgFfiContext.create(manager);
 
-		if (pattern.equals(DIRECT)) {
+		switch (pattern) {
+		case DIRECT:
 			return client.prepare(context, "select * from test", null);
-		} else {
+		case DIRECT_FOR:
+			return client.prepareFor(context, "select * from test", null, Duration.ofSeconds(5));
+		default:
 			try (var job = client.prepareAsync(context, "select * from test", null)) {
 				return jobTake(job, pattern);
 			}

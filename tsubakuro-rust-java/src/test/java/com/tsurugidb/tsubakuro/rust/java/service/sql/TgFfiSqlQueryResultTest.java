@@ -55,21 +55,34 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 
 				if (prepare) {
 					this.preparedStatement = client.prepare(context, sql, List.of());
-					if (pattern.equals(DIRECT)) {
+					switch (pattern) {
+					case DIRECT:
 						this.queryResult = client.preparedQuery(context, transaction, preparedStatement, List.of());
-					} else {
+						break;
+					case DIRECT_FOR:
+						this.queryResult = client.preparedQueryFor(context, transaction, preparedStatement, List.of(),
+								Duration.ofSeconds(5));
+						break;
+					default:
 						try (var job = client.preparedQueryAsync(context, transaction, preparedStatement, List.of())) {
 							this.queryResult = jobTake(job, pattern);
 						}
+						break;
 					}
 				} else {
 					this.preparedStatement = null;
-					if (pattern.equals(DIRECT)) {
+					switch (pattern) {
+					case DIRECT:
 						this.queryResult = client.query(context, transaction, sql);
-					} else {
+						break;
+					case DIRECT_FOR:
+						this.queryResult = client.queryFor(context, transaction, sql, Duration.ofSeconds(5));
+						break;
+					default:
 						try (var job = client.queryAsync(context, transaction, sql)) {
 							this.queryResult = jobTake(job, pattern);
 						}
+						break;
 					}
 				}
 			}
@@ -137,13 +150,13 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	@ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
 	void query(String pattern) {
 		query(false, pattern);
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { DIRECT, TAKE, TAKE_FOR, TAKE_IF_READY })
+	@ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
 	void query_fromPs(String pattern) {
 		query(true, pattern);
 	}

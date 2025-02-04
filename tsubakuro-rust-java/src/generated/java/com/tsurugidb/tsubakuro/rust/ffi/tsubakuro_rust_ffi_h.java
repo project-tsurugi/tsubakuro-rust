@@ -26929,6 +26929,126 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_transaction_set_close_timeout {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_set_close_timeout");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_set_close_timeout$descriptor() {
+        return tsurugi_ffi_transaction_set_close_timeout.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_set_close_timeout$handle() {
+        return tsurugi_ffi_transaction_set_close_timeout.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_set_close_timeout$address() {
+        return tsurugi_ffi_transaction_set_close_timeout.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_set_close_timeout(MemorySegment context, MemorySegment transaction, long timeout) {
+        var mh$ = tsurugi_ffi_transaction_set_close_timeout.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_set_close_timeout", context, transaction, timeout);
+            }
+            return (int)mh$.invokeExact(context, transaction, timeout);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_get_close_timeout {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_get_close_timeout");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_get_close_timeout$descriptor() {
+        return tsurugi_ffi_transaction_get_close_timeout.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_get_close_timeout$handle() {
+        return tsurugi_ffi_transaction_get_close_timeout.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_get_close_timeout$address() {
+        return tsurugi_ffi_transaction_get_close_timeout.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_get_close_timeout(MemorySegment context, MemorySegment transaction, MemorySegment close_timeout_out) {
+        var mh$ = tsurugi_ffi_transaction_get_close_timeout.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_get_close_timeout", context, transaction, close_timeout_out);
+            }
+            return (int)mh$.invokeExact(context, transaction, close_timeout_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_transaction_close {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -27043,6 +27163,66 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_close_for", context, transaction, timeout);
             }
             return (int)mh$.invokeExact(context, transaction, timeout);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_is_closed {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_is_closed");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_is_closed(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, _Bool *is_closed_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_is_closed$descriptor() {
+        return tsurugi_ffi_transaction_is_closed.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_is_closed(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, _Bool *is_closed_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_is_closed$handle() {
+        return tsurugi_ffi_transaction_is_closed.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_is_closed(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, _Bool *is_closed_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_is_closed$address() {
+        return tsurugi_ffi_transaction_is_closed.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_is_closed(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, _Bool *is_closed_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_is_closed(MemorySegment context, MemorySegment transaction, MemorySegment is_closed_out) {
+        var mh$ = tsurugi_ffi_transaction_is_closed.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_is_closed", context, transaction, is_closed_out);
+            }
+            return (int)mh$.invokeExact(context, transaction, is_closed_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
