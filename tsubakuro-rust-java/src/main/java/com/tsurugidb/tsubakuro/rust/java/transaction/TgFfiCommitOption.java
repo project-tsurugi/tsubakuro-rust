@@ -67,6 +67,26 @@ public class TgFfiCommitOption extends TgFfiObject {
 		return TgFfiCommitType.forNumber(outInt);
 	}
 
+	public synchronized void setAutoDispose(TgFfiContext context, boolean autoDispose) {
+		Objects.requireNonNull(autoDispose, "autoDispose must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = autoDispose;
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_set_auto_dispose(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized boolean getAutoDispose(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_auto_dispose(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_dispose(handle);

@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
-import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
 class TgFfiTransactionTest extends TgFfiTester {
@@ -183,19 +182,15 @@ class TgFfiTransactionTest extends TgFfiTester {
 		var manager = getFfiObjectManager();
 
 		try (var context = TgFfiContext.create(manager); //
-				var connectionOption = TgFfiConnectionOption.create(context)) {
-			connectionOption.setEndpointUrl(context, getEndpoint());
-
-			try (var transactionOption = TgFfiTransactionOption.create(context)) {
-				switch (pattern) {
-				case DIRECT:
-					return client.startTransaction(context, transactionOption);
-				case DIRECT_FOR:
-					return client.startTransactionFor(context, transactionOption, Duration.ofSeconds(5));
-				default:
-					try (var job = client.startTransactionAsync(context, transactionOption)) {
-						return jobTake(job, pattern);
-					}
+				var transactionOption = TgFfiTransactionOption.create(context)) {
+			switch (pattern) {
+			case DIRECT:
+				return client.startTransaction(context, transactionOption);
+			case DIRECT_FOR:
+				return client.startTransactionFor(context, transactionOption, Duration.ofSeconds(5));
+			default:
+				try (var job = client.startTransactionAsync(context, transactionOption)) {
+					return jobTake(job, pattern);
 				}
 			}
 		}

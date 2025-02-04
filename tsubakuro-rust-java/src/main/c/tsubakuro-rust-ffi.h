@@ -981,6 +981,14 @@ TsurugiFfiRc tsurugi_ffi_commit_option_get_commit_type(TsurugiFfiContextHandle c
                                                        TsurugiFfiCommitOptionHandle commit_option,
                                                        TsurugiFfiCommitType *commit_type_out);
 
+TsurugiFfiRc tsurugi_ffi_commit_option_set_auto_dispose(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiCommitOptionHandle commit_option,
+                                                        bool auto_dispose);
+
+TsurugiFfiRc tsurugi_ffi_commit_option_get_auto_dispose(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiCommitOptionHandle commit_option,
+                                                        bool *auto_dispose_out);
+
 void tsurugi_ffi_commit_option_dispose(TsurugiFfiCommitOptionHandle commit_option);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_create(TsurugiFfiContextHandle context,

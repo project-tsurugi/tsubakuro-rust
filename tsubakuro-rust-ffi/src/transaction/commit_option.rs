@@ -2,7 +2,9 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    context::TsurugiFfiContextHandle, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error, return_code::{rc_ok, TsurugiFfiRc}
+    context::TsurugiFfiContextHandle,
+    ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    return_code::{rc_ok, TsurugiFfiRc},
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -133,6 +135,7 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_commit_type(
     let commit_option = unsafe { &mut *commit_option };
 
     let commit_type = commit_option.commit_type();
+
     unsafe {
         *commit_type_out = commit_type.into();
     }
@@ -141,7 +144,49 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_commit_type(
     rc_ok(context)
 }
 
-// TODO tsurugi_ffi_commit_option_set_auto_dispose()
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_commit_option_set_auto_dispose(
+    context: TsurugiFfiContextHandle,
+    commit_option: TsurugiFfiCommitOptionHandle,
+    auto_dispose: bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_set_auto_dispose()";
+    trace!("{FUNCTION_NAME} start. commit_option={:?}", commit_option);
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);
+
+    let commit_option = unsafe { &mut *commit_option };
+
+    commit_option.set_auto_dispose(auto_dispose);
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_commit_option_get_auto_dispose(
+    context: TsurugiFfiContextHandle,
+    commit_option: TsurugiFfiCommitOptionHandle,
+    auto_dispose_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_get_auto_dispose()";
+    trace!("{FUNCTION_NAME} start. commit_option={:?}", commit_option);
+
+    ffi_arg_out_initialize!(auto_dispose_out, false);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, auto_dispose_out);
+
+    let commit_option = unsafe { &mut *commit_option };
+
+    let auto_dispose = commit_option.auto_dispose();
+
+    unsafe {
+        *auto_dispose_out = auto_dispose;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_dispose(commit_option: TsurugiFfiCommitOptionHandle) {

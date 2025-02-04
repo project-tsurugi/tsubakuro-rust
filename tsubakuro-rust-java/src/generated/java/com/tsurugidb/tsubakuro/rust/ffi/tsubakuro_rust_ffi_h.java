@@ -25193,6 +25193,126 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_commit_option_set_auto_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_BOOL
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_set_auto_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_set_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool auto_dispose)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_commit_option_set_auto_dispose$descriptor() {
+        return tsurugi_ffi_commit_option_set_auto_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_set_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool auto_dispose)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_commit_option_set_auto_dispose$handle() {
+        return tsurugi_ffi_commit_option_set_auto_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_set_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool auto_dispose)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_commit_option_set_auto_dispose$address() {
+        return tsurugi_ffi_commit_option_set_auto_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_set_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool auto_dispose)
+     * }
+     */
+    public static int tsurugi_ffi_commit_option_set_auto_dispose(MemorySegment context, MemorySegment commit_option, boolean auto_dispose) {
+        var mh$ = tsurugi_ffi_commit_option_set_auto_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_commit_option_set_auto_dispose", context, commit_option, auto_dispose);
+            }
+            return (int)mh$.invokeExact(context, commit_option, auto_dispose);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_commit_option_get_auto_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_get_auto_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_get_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool *auto_dispose_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_commit_option_get_auto_dispose$descriptor() {
+        return tsurugi_ffi_commit_option_get_auto_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_get_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool *auto_dispose_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_commit_option_get_auto_dispose$handle() {
+        return tsurugi_ffi_commit_option_get_auto_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_get_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool *auto_dispose_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_commit_option_get_auto_dispose$address() {
+        return tsurugi_ffi_commit_option_get_auto_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_commit_option_get_auto_dispose(TsurugiFfiContextHandle context, TsurugiFfiCommitOptionHandle commit_option, _Bool *auto_dispose_out)
+     * }
+     */
+    public static int tsurugi_ffi_commit_option_get_auto_dispose(MemorySegment context, MemorySegment commit_option, MemorySegment auto_dispose_out) {
+        var mh$ = tsurugi_ffi_commit_option_get_auto_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_commit_option_get_auto_dispose", context, commit_option, auto_dispose_out);
+            }
+            return (int)mh$.invokeExact(context, commit_option, auto_dispose_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_commit_option_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER
