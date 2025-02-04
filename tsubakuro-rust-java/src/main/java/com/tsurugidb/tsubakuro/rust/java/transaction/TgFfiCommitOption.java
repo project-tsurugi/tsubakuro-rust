@@ -11,84 +11,84 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
 public class TgFfiCommitOption extends TgFfiObject {
 
-	public static TgFfiCommitOption create(TgFfiContext context) {
-		Objects.requireNonNull(context, "context must not be null");
-		return create(context.manager(), context);
-	}
+    public static TgFfiCommitOption create(TgFfiContext context) {
+        Objects.requireNonNull(context, "context must not be null");
+        return create(context.manager(), context);
+    }
 
-	public static TgFfiCommitOption create(TgFfiObjectManager manager) {
-		return create(manager, null);
-	}
+    public static TgFfiCommitOption create(TgFfiObjectManager manager) {
+        return create(manager, null);
+    }
 
-	public static TgFfiCommitOption create(TgFfiObjectManager manager, TgFfiContext context) {
-		Objects.requireNonNull(manager, "manager must not be null");
+    public static TgFfiCommitOption create(TgFfiObjectManager manager, TgFfiContext context) {
+        Objects.requireNonNull(manager, "manager must not be null");
 
-		if (context != null) {
-			synchronized (context) {
-				return createMain(manager, context);
-			}
-		} else {
-			return createMain(manager, null);
-		}
-	}
+        if (context != null) {
+            synchronized (context) {
+                return createMain(manager, context);
+            }
+        } else {
+            return createMain(manager, null);
+        }
+    }
 
-	private static TgFfiCommitOption createMain(TgFfiObjectManager manager, TgFfiContext context) {
-		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-		var out = manager.allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_create(ctx, out);
-		TgFfiRcUtil.throwIfError(rc, context);
+    private static TgFfiCommitOption createMain(TgFfiObjectManager manager, TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var out = manager.allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_create(ctx, out);
+        TgFfiRcUtil.throwIfError(rc, context);
 
-		var outHandle = outToHandle(out);
-		return new TgFfiCommitOption(manager, outHandle);
-	}
+        var outHandle = outToHandle(out);
+        return new TgFfiCommitOption(manager, outHandle);
+    }
 
-	TgFfiCommitOption(TgFfiObjectManager manager, MemorySegment handle) {
-		super(manager, handle);
-	}
+    TgFfiCommitOption(TgFfiObjectManager manager, MemorySegment handle) {
+        super(manager, handle);
+    }
 
-	public synchronized void setCommitType(TgFfiContext context, TgFfiCommitType type) {
-		Objects.requireNonNull(type, "type must not be null");
+    public synchronized void setCommitType(TgFfiContext context, TgFfiCommitType type) {
+        Objects.requireNonNull(type, "type must not be null");
 
-		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-		var handle = handle();
-		var arg = type.value();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_set_commit_type(ctx, handle, arg);
-		TgFfiRcUtil.throwIfError(rc, context);
-	}
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = type.value();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_set_commit_type(ctx, handle, arg);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
 
-	public synchronized TgFfiCommitType getCommitType(TgFfiContext context) {
-		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-		var handle = handle();
-		var out = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_commit_type(ctx, handle, out);
-		TgFfiRcUtil.throwIfError(rc, context);
+    public synchronized TgFfiCommitType getCommitType(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_commit_type(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
 
-		int outInt = outToInt(out);
-		return TgFfiCommitType.forNumber(outInt);
-	}
+        int outInt = outToInt(out);
+        return TgFfiCommitType.forNumber(outInt);
+    }
 
-	public synchronized void setAutoDispose(TgFfiContext context, boolean autoDispose) {
-		Objects.requireNonNull(autoDispose, "autoDispose must not be null");
+    public synchronized void setAutoDispose(TgFfiContext context, boolean autoDispose) {
+        Objects.requireNonNull(autoDispose, "autoDispose must not be null");
 
-		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-		var handle = handle();
-		var arg = autoDispose;
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_set_auto_dispose(ctx, handle, arg);
-		TgFfiRcUtil.throwIfError(rc, context);
-	}
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = autoDispose;
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_set_auto_dispose(ctx, handle, arg);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
 
-	public synchronized boolean getAutoDispose(TgFfiContext context) {
-		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-		var handle = handle();
-		var out = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_auto_dispose(ctx, handle, out);
-		TgFfiRcUtil.throwIfError(rc, context);
+    public synchronized boolean getAutoDispose(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_auto_dispose(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
 
-		return outToBoolean(out);
-	}
+        return outToBoolean(out);
+    }
 
-	@Override
-	protected void dispose(MemorySegment handle) {
-		tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_dispose(handle);
-	}
+    @Override
+    protected void dispose(MemorySegment handle) {
+        tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_dispose(handle);
+    }
 }

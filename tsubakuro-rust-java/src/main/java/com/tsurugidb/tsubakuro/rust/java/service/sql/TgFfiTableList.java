@@ -11,33 +11,33 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
 public class TgFfiTableList extends TgFfiObject {
 
-	private List<String> tableNames = null;
+    private List<String> tableNames = null;
 
-	TgFfiTableList(TgFfiObjectManager manager, MemorySegment handle) {
-		super(manager, handle);
-	}
+    TgFfiTableList(TgFfiObjectManager manager, MemorySegment handle) {
+        super(manager, handle);
+    }
 
-	public synchronized List<String> getTableNames(TgFfiContext context) {
-		if (this.tableNames == null) {
-			this.tableNames = createTablesNames(context);
-		}
-		return this.tableNames;
-	}
+    public synchronized List<String> getTableNames(TgFfiContext context) {
+        if (this.tableNames == null) {
+            this.tableNames = createTablesNames(context);
+        }
+        return this.tableNames;
+    }
 
-	private List<String> createTablesNames(TgFfiContext context) {
-		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-		var handle = handle();
+    private List<String> createTablesNames(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
 
-		var out = allocatePtr();
-		var sizeOut = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names(ctx, handle, out, sizeOut);
-		TgFfiRcUtil.throwIfError(rc, context);
+        var out = allocatePtr();
+        var sizeOut = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names(ctx, handle, out, sizeOut);
+        TgFfiRcUtil.throwIfError(rc, context);
 
-		return outToStringList(out, sizeOut);
-	}
+        return outToStringList(out, sizeOut);
+    }
 
-	@Override
-	protected void dispose(MemorySegment handle) {
-		tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_dispose(handle);
-	}
+    @Override
+    protected void dispose(MemorySegment handle) {
+        tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_dispose(handle);
+    }
 }
