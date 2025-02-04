@@ -453,6 +453,31 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_async(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_is_shutdowned(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    is_shutdowned_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_is_shutdowned()";
+    trace!("{FUNCTION_NAME} start");
+
+    ffi_arg_out_initialize!(is_shutdowned_out, false);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, is_shutdowned_out);
+
+    let session = unsafe { &*session };
+
+    let is_shutdowned = session.is_shutdowned();
+
+    unsafe {
+        *is_shutdowned_out = is_shutdowned;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_dispose(session: TsurugiFfiSessionHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_dispose()";
     trace!("{FUNCTION_NAME} start. session={:?}", session);

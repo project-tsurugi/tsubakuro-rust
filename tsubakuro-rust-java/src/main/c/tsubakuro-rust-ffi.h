@@ -901,6 +901,10 @@ TsurugiFfiRc tsurugi_ffi_session_shutdown_async(TsurugiFfiContextHandle context,
                                                 TsurugiFfiShutdownType shutdown_type,
                                                 TsurugiFfiJobHandle *shutdown_job_out);
 
+TsurugiFfiRc tsurugi_ffi_session_is_shutdowned(TsurugiFfiContextHandle context,
+                                               TsurugiFfiSessionHandle session,
+                                               bool *is_shutdowned_out);
+
 void tsurugi_ffi_session_dispose(TsurugiFfiSessionHandle session);
 
 TsurugiFfiRc tsurugi_ffi_commit_option_create(TsurugiFfiContextHandle context,

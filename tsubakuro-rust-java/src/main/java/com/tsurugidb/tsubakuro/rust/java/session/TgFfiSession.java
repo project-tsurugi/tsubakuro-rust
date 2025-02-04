@@ -245,6 +245,16 @@ public class TgFfiSession extends TgFfiObject {
 		return new TgFfiVoidJob(manager(), outHandle);
 	}
 
+	public synchronized boolean isShutdowned(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_shutdowned(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_session_dispose(handle);

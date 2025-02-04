@@ -23938,6 +23938,66 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_session_is_shutdowned {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_is_shutdowned");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_is_shutdowned(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool *is_shutdowned_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_is_shutdowned$descriptor() {
+        return tsurugi_ffi_session_is_shutdowned.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_is_shutdowned(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool *is_shutdowned_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_is_shutdowned$handle() {
+        return tsurugi_ffi_session_is_shutdowned.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_is_shutdowned(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool *is_shutdowned_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_is_shutdowned$address() {
+        return tsurugi_ffi_session_is_shutdowned.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_is_shutdowned(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, _Bool *is_shutdowned_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_is_shutdowned(MemorySegment context, MemorySegment session, MemorySegment is_shutdowned_out) {
+        var mh$ = tsurugi_ffi_session_is_shutdowned.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_is_shutdowned", context, session, is_shutdowned_out);
+            }
+            return (int)mh$.invokeExact(context, session, is_shutdowned_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_session_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

@@ -1,7 +1,9 @@
 package com.tsurugidb.tsubakuro.rust.java.session;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
@@ -315,8 +317,12 @@ class TgFfiSessionTest extends TgFfiTester {
 		var context = TgFfiContext.create(manager);
 
 		try (var session = createSession()) {
+			assertFalse(session.isShutdowned(context));
+
 			var shutdownType = TgFfiShutdownType.valueOf(type);
 			session.shutdown(context, shutdownType);
+
+			assertTrue(session.isShutdowned(context));
 		}
 	}
 
@@ -348,8 +354,12 @@ class TgFfiSessionTest extends TgFfiTester {
 		var context = TgFfiContext.create(manager);
 
 		try (var session = createSession()) {
+			assertFalse(session.isShutdowned(context));
+
 			var shutdownType = TgFfiShutdownType.valueOf(type);
 			session.shutdownFor(context, shutdownType, Duration.ofSeconds(5));
+
+			assertTrue(session.isShutdowned(context));
 		}
 	}
 
@@ -389,7 +399,11 @@ class TgFfiSessionTest extends TgFfiTester {
 		var context = TgFfiContext.create(manager);
 
 		try (var session = createSession()) {
+			assertFalse(session.isShutdowned(context));
+
 			try (var shutdownJob = session.shutdownAsync(context, shutdownType)) {
+				assertTrue(session.isShutdowned(context));
+
 				Void value = jobTake(shutdownJob, pattern);
 				assertNull(value);
 			}
@@ -426,6 +440,27 @@ class TgFfiSessionTest extends TgFfiTester {
 				var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
 				assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
 			}
+		}
+	}
+
+	@Test
+	void is_shutdowned_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_shutdowned(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var session = createSession()) {
+			var ctx = context.handle();
+			var handle = session.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_shutdowned(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
 }
