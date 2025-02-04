@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,10 @@ public abstract class TgFfiObject implements Closeable {
 
 	protected final MemorySegment allocatePtr() {
 		return manager.allocatePtr();
+	}
+
+	protected final static long allocateDuration(Duration duration) {
+		return duration.toNanos();
 	}
 
 	protected final MemorySegment allocateString(String s) {
@@ -69,6 +74,11 @@ public abstract class TgFfiObject implements Closeable {
 
 	protected static long outToLong(MemorySegment out) {
 		return out.get(ValueLayout.JAVA_LONG, 0);
+	}
+
+	protected static Duration outToDuration(MemorySegment out) {
+		long value = outToLong(out);
+		return Duration.ofNanos(value);
 	}
 
 	protected static String outToString(MemorySegment out) {

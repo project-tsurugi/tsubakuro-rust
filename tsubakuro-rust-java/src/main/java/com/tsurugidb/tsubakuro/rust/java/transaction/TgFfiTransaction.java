@@ -35,7 +35,7 @@ public class TgFfiTransaction extends TgFfiObject {
 	public synchronized void closeFor(TgFfiContext context, Duration timeout) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_close_for(ctx, handle, t);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}

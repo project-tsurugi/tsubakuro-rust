@@ -50,7 +50,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 	public synchronized TgFfiTableList listTablesFor(TgFfiContext context, Duration timeout) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_list_tables_for(ctx, handle, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -92,7 +92,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var arg = allocateString(tableName);
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_table_metadata_for(ctx, handle, arg, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -158,7 +158,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 			arg2 = MemorySegment.NULL;
 			size = 0;
 		}
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepare_for(ctx, handle, arg1, arg2, size, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -215,7 +215,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var arg = transactionOption.handle();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_start_transaction_for(ctx, handle, arg, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -260,7 +260,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var arg = transaction.handle();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -306,7 +306,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var handle = handle();
 		var tx = transaction.handle();
 		var arg = allocateString(sql);
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_for(ctx, handle, tx, arg, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -372,7 +372,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 			arg = MemorySegment.NULL;
 			size = 0;
 		}
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_execute_for(ctx, handle, tx, ps, arg, size, t,
 				out);
@@ -431,7 +431,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var handle = handle();
 		var tx = transaction.handle();
 		var arg = allocateString(sql);
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query_for(ctx, handle, tx, arg, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -497,7 +497,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 			arg = MemorySegment.NULL;
 			size = 0;
 		}
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_query_for(ctx, handle, tx, ps, arg, size, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -551,7 +551,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var handle = handle();
 		var tx = transaction.handle();
 		var arg = commitOption.handle();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_commit_for(ctx, handle, tx, arg, t);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
@@ -582,7 +582,7 @@ public class TgFfiSqlClient extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var tx = transaction.handle();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback_for(ctx, handle, tx, t);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}

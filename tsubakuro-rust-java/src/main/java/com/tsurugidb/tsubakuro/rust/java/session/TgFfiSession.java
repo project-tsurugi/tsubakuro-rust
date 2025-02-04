@@ -79,7 +79,7 @@ public class TgFfiSession extends TgFfiObject {
 			TgFfiConnectionOption connectionOption, Duration timeout) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var arg = connectionOption.handle();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var out = manager.allocatePtr();
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_for(ctx, arg, t, out);
 		TgFfiRcUtil.throwIfError(rc, context);
@@ -136,7 +136,7 @@ public class TgFfiSession extends TgFfiObject {
 	public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
-		var arg = timeout.toNanos();
+		var arg = allocateDuration(timeout);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_set_default_timeout(ctx, handle, arg);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
@@ -148,8 +148,7 @@ public class TgFfiSession extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_default_timeout(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		long value = outToLong(out);
-		return Duration.ofNanos(value);
+		return outToDuration(out);
 	}
 
 	public synchronized TgFfiSqlClient makeSqlClient(TgFfiContext context) {
@@ -170,7 +169,7 @@ public class TgFfiSession extends TgFfiObject {
 		long arg;
 		if (expirationTime != null) {
 			exists = true;
-			arg = expirationTime.toNanos();
+			arg = allocateDuration(expirationTime);
 		} else {
 			exists = false;
 			arg = 0;
@@ -186,12 +185,12 @@ public class TgFfiSession extends TgFfiObject {
 		long arg;
 		if (expirationTime != null) {
 			exists = true;
-			arg = expirationTime.toNanos();
+			arg = allocateDuration(expirationTime);
 		} else {
 			exists = false;
 			arg = 0;
 		}
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_for(ctx, handle, exists, arg, t);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
@@ -203,7 +202,7 @@ public class TgFfiSession extends TgFfiObject {
 		long arg;
 		if (expirationTime != null) {
 			exists = true;
-			arg = expirationTime.toNanos();
+			arg = allocateDuration(expirationTime);
 		} else {
 			exists = false;
 			arg = 0;
@@ -228,7 +227,7 @@ public class TgFfiSession extends TgFfiObject {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
 		var arg = shutdownType.value();
-		var t = timeout.toNanos();
+		var t = allocateDuration(timeout);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_for(ctx, handle, arg, t);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}

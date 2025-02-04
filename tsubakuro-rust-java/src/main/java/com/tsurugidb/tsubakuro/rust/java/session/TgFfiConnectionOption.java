@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.session;
 
 import java.lang.foreign.MemorySegment;
+import java.time.Duration;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -114,6 +115,86 @@ public class TgFfiConnectionOption extends TgFfiObject {
 		TgFfiRcUtil.throwIfError(rc, context);
 
 		return outToString(out);
+	}
+
+	public synchronized void setKeepAlive(TgFfiContext context, Duration keepAlive) {
+		Objects.requireNonNull(keepAlive, "keepAlive must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateDuration(keepAlive);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_keep_alive(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized Duration getKeepAlive(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_keep_alive(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToDuration(out);
+	}
+
+	public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {
+		Objects.requireNonNull(timeout, "timeout must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateDuration(timeout);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_default_timeout(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized Duration getDefaultTimeout(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_default_timeout(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToDuration(out);
+	}
+
+	public synchronized void setSendTimeout(TgFfiContext context, Duration timeout) {
+		Objects.requireNonNull(timeout, "timeout must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateDuration(timeout);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_send_timeout(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized Duration getSendTimeout(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_send_timeout(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToDuration(out);
+	}
+
+	public synchronized void setRecvTimeout(TgFfiContext context, Duration timeout) {
+		Objects.requireNonNull(timeout, "timeout must not be null");
+
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var arg = allocateDuration(timeout);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_recv_timeout(ctx, handle, arg);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized Duration getRecvTimeout(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_recv_timeout(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToDuration(out);
 	}
 
 	@Override

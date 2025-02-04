@@ -199,7 +199,7 @@ public class TgFfiTransactionOption extends TgFfiObject {
 
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
-		var arg = timeout.toNanos();
+		var arg = allocateDuration(timeout);
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_close_timeout(ctx, handle, arg);
 		TgFfiRcUtil.throwIfError(rc, context);
 	}
@@ -211,8 +211,7 @@ public class TgFfiTransactionOption extends TgFfiObject {
 		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_close_timeout(ctx, handle, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		long value = outToLong(out);
-		return Duration.ofNanos(value);
+		return outToDuration(out);
 	}
 
 	@Override
