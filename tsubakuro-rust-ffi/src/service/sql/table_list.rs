@@ -75,8 +75,14 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end. (table_names={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (table_names={:?}, table_names_size={:?})",
+        rc,
+        ptr,
+        size as u32
+    );
+    rc
 }
 
 #[no_mangle]

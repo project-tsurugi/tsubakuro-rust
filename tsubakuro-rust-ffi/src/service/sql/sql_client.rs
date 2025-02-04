@@ -103,8 +103,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
         *version_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (version={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (version={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -137,8 +138,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
         *table_list_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. table_list={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. table_list={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -179,8 +181,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
         *table_list_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. table_list={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. table_list={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -212,9 +215,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
     unsafe {
         *table_list_job_out = handle as TsurugiFfiJobHandle;
     }
-
-    trace!("{FUNCTION_NAME} end. table_list_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. table_list_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 impl_job_delegator! {
@@ -272,8 +279,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
         *table_metadata_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. table_metadata={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. table_metadata={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -318,8 +330,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
         *table_metadata_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. table_metadata={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. table_metadata={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -361,8 +378,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_async(
         *table_metadata_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. table_metadata_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. table_metadata_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 impl_job_delegator! {
@@ -450,8 +472,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
         *prepared_statement_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. prepared_statement={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. prepared_statement={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -508,8 +535,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
         *prepared_statement_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. prepared_statement={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. prepared_statement={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -564,8 +596,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
         *prepared_statement_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. prepared_statement_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. prepared_statement_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 impl_job_delegator! {
@@ -623,8 +660,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
         *transaction_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. transaction={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. transaction={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -669,8 +707,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
         *transaction_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. transaction={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. transaction={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -712,8 +751,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
         *transaction_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. transaction_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. transaction_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 impl_job_delegator! {
@@ -771,8 +815,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
         *transaction_status_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. transaction_status={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. transaction_status={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -817,8 +866,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
         *transaction_status_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. transaction_status={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. transaction_status={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -864,8 +918,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_async(
         *transaction_status_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. transaction_status_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. transaction_status_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 impl_job_delegator! {
@@ -927,8 +986,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
         *execute_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. execute_result={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -977,8 +1041,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
         *execute_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. execute_result={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -1028,8 +1097,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_async(
         *execute_result_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. execute_result_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. execute_result_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 impl_job_delegator! {
@@ -1117,8 +1191,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
         *execute_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. execute_result={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -1176,8 +1255,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
         *execute_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. execute_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. execute_result={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -1236,8 +1320,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
         *execute_result_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. execute_result_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. execute_result_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -1283,8 +1372,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
         *query_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. query_result={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -1333,8 +1423,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_for(
         *query_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. query_result={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -1384,8 +1475,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_async(
         *query_result_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. query_result_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. query_result_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 impl_job_delegator! {
@@ -1455,8 +1551,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
         *query_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. query_result={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -1513,8 +1610,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
         *query_result_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. query_result={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. query_result={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -1572,8 +1670,13 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
         *query_result_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. query_result_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. query_result_job={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -1608,8 +1711,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit(
         client.commit(transaction, commit_option)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -1647,8 +1751,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_for(
         client.commit_for(transaction, commit_option, timeout)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -1694,8 +1799,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
         *commit_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. commit_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. commit_job={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -1726,8 +1832,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback(
         client.rollback(transaction)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -1761,8 +1868,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_for(
         client.rollback_for(transaction, timeout)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -1804,8 +1912,9 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_async(
         *rollback_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. rollback_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. rollback_job={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]

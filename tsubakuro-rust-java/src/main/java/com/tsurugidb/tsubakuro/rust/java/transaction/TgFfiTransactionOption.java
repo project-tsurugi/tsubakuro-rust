@@ -207,11 +207,18 @@ public class TgFfiTransactionOption extends TgFfiObject {
 	public synchronized Duration getCloseTimeout(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
+		var existsOut = allocatePtr();
 		var out = allocatePtr();
-		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_close_timeout(ctx, handle, out);
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_close_timeout(ctx, handle, existsOut, out);
 		TgFfiRcUtil.throwIfError(rc, context);
 
-		return outToDuration(out);
+		boolean exists = outToBoolean(existsOut);
+		if (exists) {
+			return outToDuration(out);
+		} else {
+			assert outToHandle(out).address() == 0;
+			return null;
+		}
 	}
 
 	@Override

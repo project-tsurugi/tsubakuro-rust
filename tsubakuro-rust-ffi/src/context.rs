@@ -84,8 +84,9 @@ pub extern "C" fn tsurugi_ffi_context_create(
         *context_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. context={:?}", handle);
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!("{FUNCTION_NAME} end rc={:x}. context={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -104,31 +105,34 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, rc_out);
 
-    unsafe {
-        let context = &*context;
+    let context = unsafe { &*context };
 
-        *rc_out = context.rc;
+    let value = context.rc;
+
+    unsafe {
+        *rc_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!("{FUNCTION_NAME} end rc={:x}. (rc={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_error_name(
     context: TsurugiFfiContextHandle,
-    name_out: *mut TsurugiFfiStringHandle,
+    error_name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_get_error_name()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, name_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, error_name_out={:?}",
         context,
-        name_out
+        error_name_out
     );
 
-    ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(error_name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 0, context);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, name_out);
+    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, error_name_out);
 
     let context = unsafe { &mut *context };
 
@@ -142,11 +146,12 @@ pub extern "C" fn tsurugi_ffi_context_get_error_name(
 
     let ptr = cstring_to_cchar!(context.error_name);
     unsafe {
-        *name_out = ptr;
+        *error_name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!("{FUNCTION_NAME} end rc={:x}. (error_name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -167,12 +172,19 @@ pub extern "C" fn tsurugi_ffi_context_get_error_type(
 
     let context = unsafe { &*context };
 
+    let value = context.rc.into();
+
     unsafe {
-        *error_type_out = context.rc.into();
+        *error_type_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (error_type={:?})",
+        rc,
+        value as i32
+    );
+    rc
 }
 
 #[no_mangle]
@@ -208,8 +220,9 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
         *error_message_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (error_message={:?})", ptr);
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!("{FUNCTION_NAME} end rc={:x}. (error_message={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -241,8 +254,14 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_number(
     unsafe {
         *category_number_out = value;
     }
-    trace!("{FUNCTION_NAME} end");
-    TSURUGI_FFI_RC_OK
+
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (category_number={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -281,8 +300,9 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_str(
         *category_str_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (category_str={:?})", ptr);
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!("{FUNCTION_NAME} end rc={:x}. (category_str={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -314,8 +334,10 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_code_number(
     unsafe {
         *code_number_out = value;
     }
-    trace!("{FUNCTION_NAME} end");
-    TSURUGI_FFI_RC_OK
+
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!("{FUNCTION_NAME} end rc={:x}. (code_number={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -358,8 +380,13 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_structured_code(
         *structured_code_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end (structured_code={:?})", ptr);
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (structured_code={:?})",
+        rc,
+        ptr
+    );
+    rc
 }
 
 #[no_mangle]

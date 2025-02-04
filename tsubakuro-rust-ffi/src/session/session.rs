@@ -83,8 +83,9 @@ pub extern "C" fn tsurugi_ffi_session_connect(
         *session_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. session={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. session={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -127,8 +128,9 @@ pub extern "C" fn tsurugi_ffi_session_connect_for(
         *session_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. session={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. session={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -170,8 +172,9 @@ pub extern "C" fn tsurugi_ffi_session_connect_async(
         *session_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. session_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. session_job={:?}", rc, handle);
+    rc
 }
 
 impl_job_delegator! {
@@ -194,25 +197,26 @@ impl ConnectJobDelegator {
 pub extern "C" fn tsurugi_ffi_session_set_default_timeout(
     context: TsurugiFfiContextHandle,
     session: TsurugiFfiSessionHandle,
-    timeout: TsurugiFfiDuration,
+    default_timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_set_default_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, session={:?}, timeout={:?}",
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, default_timeout={:?}",
         context,
         session,
-        timeout
+        default_timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
 
     let session = unsafe { &mut *session };
-    let timeout = Duration::from_nanos(timeout);
+    let default_timeout = Duration::from_nanos(default_timeout);
 
-    session.set_default_timeout(timeout);
+    session.set_default_timeout(default_timeout);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -235,14 +239,20 @@ pub extern "C" fn tsurugi_ffi_session_get_default_timeout(
 
     let session = unsafe { &mut *session };
 
-    let timeout = session.default_timeout();
+    let default_timeout = session.default_timeout();
 
+    let value = default_timeout.as_nanos() as TsurugiFfiDuration;
     unsafe {
-        *default_timeout_out = timeout.as_nanos() as TsurugiFfiDuration;
+        *default_timeout_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (default_timeout={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -275,8 +285,9 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
         *sql_client_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. sql_client={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. sql_client={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -312,8 +323,9 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time(
         session.update_expiration_time(expiration_time)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -352,8 +364,9 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_for(
         session.update_expiration_time_for(expiration_time, timeout)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -400,11 +413,13 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_async(
         *update_expiration_time_job_out = handle as TsurugiFfiJobHandle;
     }
 
+    let rc = rc_ok(context);
     trace!(
-        "{FUNCTION_NAME} end. update_expiration_time_job={:?}",
+        "{FUNCTION_NAME} end rc={:x}. update_expiration_time_job={:?}",
+        rc,
         handle
     );
-    rc_ok(context)
+    rc
 }
 
 #[no_mangle]
@@ -436,8 +451,9 @@ pub extern "C" fn tsurugi_ffi_session_shutdown(
         session.shutdown(shutdown_type.into())
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -472,8 +488,9 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_for(
         session.shutdown_for(shutdown_type.into(), timeout)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -516,8 +533,9 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_async(
         *shutdown_job_out = handle as TsurugiFfiJobHandle;
     }
 
-    trace!("{FUNCTION_NAME} end. shutdown_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. shutdown_job={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -540,14 +558,19 @@ pub extern "C" fn tsurugi_ffi_session_is_shutdowned(
 
     let session = unsafe { &*session };
 
-    let is_shutdowned = session.is_shutdowned();
+    let value = session.is_shutdowned();
 
     unsafe {
-        *is_shutdowned_out = is_shutdowned;
+        *is_shutdowned_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (is_shutdowned={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -569,8 +592,9 @@ pub extern "C" fn tsurugi_ffi_session_close(
     let runtime = session.runtime();
     ffi_exec_core_async!(context, FUNCTION_NAME, runtime, session.close());
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -593,14 +617,15 @@ pub extern "C" fn tsurugi_ffi_session_is_closed(
 
     let session = unsafe { &*session };
 
-    let is_closed = session.is_closed();
+    let value = session.is_closed();
 
     unsafe {
-        *is_closed_out = is_closed;
+        *is_closed_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (is_closed={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]

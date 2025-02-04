@@ -78,8 +78,9 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_database_name(
         *database_name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (database_name={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (database_name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -112,8 +113,9 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_schema_name(
         *schema_name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (schema_name={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (schema_name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -146,8 +148,9 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
         *table_name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (table_name={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (table_name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -171,12 +174,14 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_size(
     let table_metadata = unsafe { &*table_metadata };
     let columns = table_metadata.columns();
 
+    let value = columns.len() as u32;
     unsafe {
-        *size_out = columns.len() as u32;
+        *size_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (size={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -215,8 +220,9 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_value(
         *sql_column_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. sql_column={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. sql_column={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]

@@ -75,39 +75,45 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_set_default_timeout(
 
     query_result.set_default_timeout(default_timeout);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_get_default_timeout(
     context: TsurugiFfiContextHandle,
     query_result: TsurugiFfiSqlQueryResultHandle,
-    timeout_out: *mut TsurugiFfiDuration,
+    default_timeout_out: *mut TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_get_default_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, default_timeout_out={:?}",
         context,
         query_result,
-        timeout_out
+        default_timeout_out
     );
 
-    ffi_arg_out_initialize!(timeout_out, 0);
+    ffi_arg_out_initialize!(default_timeout_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, timeout_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, default_timeout_out);
 
     let query_result = unsafe { &mut *query_result };
 
     let default_timeout = query_result.default_timeout();
-    let default_timeout = default_timeout.as_nanos() as TsurugiFfiDuration;
 
+    let value = default_timeout.as_nanos() as TsurugiFfiDuration;
     unsafe {
-        *timeout_out = default_timeout;
+        *default_timeout_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (default_timeout={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -145,8 +151,13 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_get_metadata(
         *query_result_metadata_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. query_result_metadata={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. query_result_metadata={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -170,14 +181,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let has_next = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.next_row());
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.next_row());
 
     unsafe {
-        *has_row_out = has_next;
+        *has_row_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (has_row={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -204,7 +216,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row_for(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let has_next = ffi_exec_core_async!(
+    let value = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
@@ -212,11 +224,12 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row_for(
     );
 
     unsafe {
-        *has_row_out = has_next;
+        *has_row_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (has_row={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -240,15 +253,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let has_next =
-        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.next_column());
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.next_column());
 
     unsafe {
-        *has_column_out = has_next;
+        *has_column_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (has_column={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -275,7 +288,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column_for(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let has_next = ffi_exec_core_async!(
+    let value = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
@@ -283,11 +296,12 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column_for(
     );
 
     unsafe {
-        *has_column_out = has_next;
+        *has_column_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (has_column={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -309,14 +323,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, is_null_out);
 
     let query_result = unsafe { &mut *query_result };
-    let is_null = ffi_exec_core!(context, FUNCTION_NAME, query_result.is_null());
+    let value = ffi_exec_core!(context, FUNCTION_NAME, query_result.is_null());
 
     unsafe {
-        *is_null_out = is_null;
+        *is_null_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (is_null={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -346,8 +361,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -385,8 +401,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -416,8 +433,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -455,8 +473,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -486,8 +505,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -525,8 +545,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -556,8 +577,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -595,8 +617,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
         *value_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
 }
 
 // TODO tsurugi_ffi_sql_query_result_fetch_decimal()
@@ -625,12 +648,14 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
     let value: String = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
     cchar_field_set!(context, query_result.character_value, value);
 
+    let ptr = cstring_to_cchar!(query_result.character_value);
     unsafe {
-        *value_out = cstring_to_cchar!(query_result.character_value);
+        *value_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -665,12 +690,14 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     );
     cchar_field_set!(context, query_result.character_value, value);
 
+    let ptr = cstring_to_cchar!(query_result.character_value);
     unsafe {
-        *value_out = cstring_to_cchar!(query_result.character_value);
+        *value_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, ptr);
+    rc
 }
 
 // TODO tsurugi_ffi_sql_query_result_fetch_octet(), etc

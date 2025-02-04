@@ -58,8 +58,9 @@ pub extern "C" fn tsurugi_ffi_endpoint_parse(
         *endpoint_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. endpoint={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. endpoint={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]

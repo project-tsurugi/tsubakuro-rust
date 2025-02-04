@@ -80,33 +80,39 @@ pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
         *transaction_id_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (transaction_id={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (transaction_id={:?})",
+        rc,
+        ptr
+    );
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_set_close_timeout(
     context: TsurugiFfiContextHandle,
     transaction: TsurugiFfiTransactionHandle,
-    timeout: TsurugiFfiDuration,
+    closetimeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_set_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, transaction={:?}, timeout={:?}",
+        "{FUNCTION_NAME} start. context={:?}, transaction={:?}, close_timeout={:?}",
         context,
         transaction,
-        timeout
+        closetimeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
 
     let transaction = unsafe { &mut *transaction };
-    let timeout = Duration::from_nanos(timeout);
+    let close_timeout = Duration::from_nanos(closetimeout);
 
-    transaction.set_close_timeout(timeout);
+    transaction.set_close_timeout(close_timeout);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -130,14 +136,19 @@ pub extern "C" fn tsurugi_ffi_transaction_get_close_timeout(
     let transaction = unsafe { &mut *transaction };
 
     let close_timeout = transaction.close_timeout();
-    let close_timeout = close_timeout.as_nanos() as TsurugiFfiDuration;
 
+    let value = close_timeout.as_nanos() as TsurugiFfiDuration;
     unsafe {
-        *close_timeout_out = close_timeout;
+        *close_timeout_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (close_timeout={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -159,8 +170,9 @@ pub extern "C" fn tsurugi_ffi_transaction_close(
     let runtime = transaction.runtime();
     ffi_exec_core_async!(context, FUNCTION_NAME, runtime, transaction.close());
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -190,8 +202,9 @@ pub extern "C" fn tsurugi_ffi_transaction_close_for(
         transaction.close_for(timeout)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -214,14 +227,15 @@ pub extern "C" fn tsurugi_ffi_transaction_is_closed(
 
     let transaction = unsafe { &*transaction };
 
-    let is_closed = transaction.is_closed();
+    let value = transaction.is_closed();
 
     unsafe {
-        *is_closed_out = is_closed;
+        *is_closed_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (is_closed={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]

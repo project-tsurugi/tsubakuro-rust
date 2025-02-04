@@ -19261,7 +19261,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *default_timeout_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_query_result_get_default_timeout$descriptor() {
@@ -19271,7 +19271,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *default_timeout_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_query_result_get_default_timeout$handle() {
@@ -19281,7 +19281,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *default_timeout_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_query_result_get_default_timeout$address() {
@@ -19290,16 +19290,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *default_timeout_out)
      * }
      */
-    public static int tsurugi_ffi_sql_query_result_get_default_timeout(MemorySegment context, MemorySegment query_result, MemorySegment timeout_out) {
+    public static int tsurugi_ffi_sql_query_result_get_default_timeout(MemorySegment context, MemorySegment query_result, MemorySegment default_timeout_out) {
         var mh$ = tsurugi_ffi_sql_query_result_get_default_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_query_result_get_default_timeout", context, query_result, timeout_out);
+                traceDowncall("tsurugi_ffi_sql_query_result_get_default_timeout", context, query_result, default_timeout_out);
             }
-            return (int)mh$.invokeExact(context, query_result, timeout_out);
+            return (int)mh$.invokeExact(context, query_result, default_timeout_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19321,7 +19321,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *query_result_metadata_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_query_result_get_metadata$descriptor() {
@@ -19331,7 +19331,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *query_result_metadata_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_query_result_get_metadata$handle() {
@@ -19341,7 +19341,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *query_result_metadata_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_query_result_get_metadata$address() {
@@ -19350,16 +19350,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *metadata_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiSqlQueryResultMetadataHandle *query_result_metadata_out)
      * }
      */
-    public static int tsurugi_ffi_sql_query_result_get_metadata(MemorySegment context, MemorySegment query_result, MemorySegment metadata_out) {
+    public static int tsurugi_ffi_sql_query_result_get_metadata(MemorySegment context, MemorySegment query_result, MemorySegment query_result_metadata_out) {
         var mh$ = tsurugi_ffi_sql_query_result_get_metadata.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_query_result_get_metadata", context, query_result, metadata_out);
+                traceDowncall("tsurugi_ffi_sql_query_result_get_metadata", context, query_result, query_result_metadata_out);
             }
-            return (int)mh$.invokeExact(context, query_result, metadata_out);
+            return (int)mh$.invokeExact(context, query_result, query_result_metadata_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20523,7 +20523,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *version_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_get_service_message_version$descriptor() {
@@ -20533,7 +20533,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *version_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_get_service_message_version$handle() {
@@ -20543,7 +20543,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *version_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_get_service_message_version$address() {
@@ -20552,16 +20552,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *smv_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle *version_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_get_service_message_version(MemorySegment context, MemorySegment sql_client, MemorySegment smv_out) {
+    public static int tsurugi_ffi_sql_client_get_service_message_version(MemorySegment context, MemorySegment sql_client, MemorySegment version_out) {
         var mh$ = tsurugi_ffi_sql_client_get_service_message_version.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_get_service_message_version", context, sql_client, smv_out);
+                traceDowncall("tsurugi_ffi_sql_client_get_service_message_version", context, sql_client, version_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, smv_out);
+            return (int)mh$.invokeExact(context, sql_client, version_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23642,7 +23642,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle session_label)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_session_label$descriptor() {
@@ -23652,7 +23652,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle session_label)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_session_label$handle() {
@@ -23662,7 +23662,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle session_label)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_session_label$address() {
@@ -23671,16 +23671,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle session_label)
      * }
      */
-    public static int tsurugi_ffi_connection_option_set_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment label) {
+    public static int tsurugi_ffi_connection_option_set_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment session_label) {
         var mh$ = tsurugi_ffi_connection_option_set_session_label.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_set_session_label", context, connection_option, label);
+                traceDowncall("tsurugi_ffi_connection_option_set_session_label", context, connection_option, session_label);
             }
-            return (int)mh$.invokeExact(context, connection_option, label);
+            return (int)mh$.invokeExact(context, connection_option, session_label);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23702,7 +23702,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *session_label_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_session_label$descriptor() {
@@ -23712,7 +23712,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *session_label_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_session_label$handle() {
@@ -23722,7 +23722,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *session_label_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_session_label$address() {
@@ -23731,16 +23731,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *session_label_out)
      * }
      */
-    public static int tsurugi_ffi_connection_option_get_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment label_out) {
+    public static int tsurugi_ffi_connection_option_get_session_label(MemorySegment context, MemorySegment connection_option, MemorySegment session_label_out) {
         var mh$ = tsurugi_ffi_connection_option_get_session_label.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_get_session_label", context, connection_option, label_out);
+                traceDowncall("tsurugi_ffi_connection_option_get_session_label", context, connection_option, session_label_out);
             }
-            return (int)mh$.invokeExact(context, connection_option, label_out);
+            return (int)mh$.invokeExact(context, connection_option, session_label_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23882,7 +23882,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration default_timeout)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_default_timeout$descriptor() {
@@ -23892,7 +23892,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration default_timeout)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_default_timeout$handle() {
@@ -23902,7 +23902,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration default_timeout)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_default_timeout$address() {
@@ -23911,16 +23911,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration default_timeout)
      * }
      */
-    public static int tsurugi_ffi_connection_option_set_default_timeout(MemorySegment context, MemorySegment connection_option, long timeout) {
+    public static int tsurugi_ffi_connection_option_set_default_timeout(MemorySegment context, MemorySegment connection_option, long default_timeout) {
         var mh$ = tsurugi_ffi_connection_option_set_default_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_set_default_timeout", context, connection_option, timeout);
+                traceDowncall("tsurugi_ffi_connection_option_set_default_timeout", context, connection_option, default_timeout);
             }
-            return (int)mh$.invokeExact(context, connection_option, timeout);
+            return (int)mh$.invokeExact(context, connection_option, default_timeout);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23942,7 +23942,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *default_timeout_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_default_timeout$descriptor() {
@@ -23952,7 +23952,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *default_timeout_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_default_timeout$handle() {
@@ -23962,7 +23962,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *default_timeout_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_default_timeout$address() {
@@ -23971,16 +23971,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *default_timeout_out)
      * }
      */
-    public static int tsurugi_ffi_connection_option_get_default_timeout(MemorySegment context, MemorySegment connection_option, MemorySegment timeout_out) {
+    public static int tsurugi_ffi_connection_option_get_default_timeout(MemorySegment context, MemorySegment connection_option, MemorySegment default_timeout_out) {
         var mh$ = tsurugi_ffi_connection_option_get_default_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_get_default_timeout", context, connection_option, timeout_out);
+                traceDowncall("tsurugi_ffi_connection_option_get_default_timeout", context, connection_option, default_timeout_out);
             }
-            return (int)mh$.invokeExact(context, connection_option, timeout_out);
+            return (int)mh$.invokeExact(context, connection_option, default_timeout_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24002,7 +24002,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration send_timeout)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_send_timeout$descriptor() {
@@ -24012,7 +24012,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration send_timeout)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_send_timeout$handle() {
@@ -24022,7 +24022,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration send_timeout)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_send_timeout$address() {
@@ -24031,16 +24031,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration send_timeout)
      * }
      */
-    public static int tsurugi_ffi_connection_option_set_send_timeout(MemorySegment context, MemorySegment connection_option, long timeout) {
+    public static int tsurugi_ffi_connection_option_set_send_timeout(MemorySegment context, MemorySegment connection_option, long send_timeout) {
         var mh$ = tsurugi_ffi_connection_option_set_send_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_set_send_timeout", context, connection_option, timeout);
+                traceDowncall("tsurugi_ffi_connection_option_set_send_timeout", context, connection_option, send_timeout);
             }
-            return (int)mh$.invokeExact(context, connection_option, timeout);
+            return (int)mh$.invokeExact(context, connection_option, send_timeout);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24062,7 +24062,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *send_timeout_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_send_timeout$descriptor() {
@@ -24072,7 +24072,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *send_timeout_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_send_timeout$handle() {
@@ -24082,7 +24082,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *send_timeout_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_send_timeout$address() {
@@ -24091,16 +24091,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *send_timeout_out)
      * }
      */
-    public static int tsurugi_ffi_connection_option_get_send_timeout(MemorySegment context, MemorySegment connection_option, MemorySegment timeout_out) {
+    public static int tsurugi_ffi_connection_option_get_send_timeout(MemorySegment context, MemorySegment connection_option, MemorySegment send_timeout_out) {
         var mh$ = tsurugi_ffi_connection_option_get_send_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_get_send_timeout", context, connection_option, timeout_out);
+                traceDowncall("tsurugi_ffi_connection_option_get_send_timeout", context, connection_option, send_timeout_out);
             }
-            return (int)mh$.invokeExact(context, connection_option, timeout_out);
+            return (int)mh$.invokeExact(context, connection_option, send_timeout_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24122,7 +24122,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration recv_timeout)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_recv_timeout$descriptor() {
@@ -24132,7 +24132,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration recv_timeout)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_recv_timeout$handle() {
@@ -24142,7 +24142,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration recv_timeout)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_recv_timeout$address() {
@@ -24151,16 +24151,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration recv_timeout)
      * }
      */
-    public static int tsurugi_ffi_connection_option_set_recv_timeout(MemorySegment context, MemorySegment connection_option, long timeout) {
+    public static int tsurugi_ffi_connection_option_set_recv_timeout(MemorySegment context, MemorySegment connection_option, long recv_timeout) {
         var mh$ = tsurugi_ffi_connection_option_set_recv_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_set_recv_timeout", context, connection_option, timeout);
+                traceDowncall("tsurugi_ffi_connection_option_set_recv_timeout", context, connection_option, recv_timeout);
             }
-            return (int)mh$.invokeExact(context, connection_option, timeout);
+            return (int)mh$.invokeExact(context, connection_option, recv_timeout);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24182,7 +24182,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *recv_timeout_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_recv_timeout$descriptor() {
@@ -24192,7 +24192,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *recv_timeout_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_recv_timeout$handle() {
@@ -24202,7 +24202,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *recv_timeout_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_recv_timeout$address() {
@@ -24211,16 +24211,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiDuration *recv_timeout_out)
      * }
      */
-    public static int tsurugi_ffi_connection_option_get_recv_timeout(MemorySegment context, MemorySegment connection_option, MemorySegment timeout_out) {
+    public static int tsurugi_ffi_connection_option_get_recv_timeout(MemorySegment context, MemorySegment connection_option, MemorySegment recv_timeout_out) {
         var mh$ = tsurugi_ffi_connection_option_get_recv_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_get_recv_timeout", context, connection_option, timeout_out);
+                traceDowncall("tsurugi_ffi_connection_option_get_recv_timeout", context, connection_option, recv_timeout_out);
             }
-            return (int)mh$.invokeExact(context, connection_option, timeout_out);
+            return (int)mh$.invokeExact(context, connection_option, recv_timeout_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24480,7 +24480,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration default_timeout)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_session_set_default_timeout$descriptor() {
@@ -24490,7 +24490,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration default_timeout)
      * }
      */
     public static MethodHandle tsurugi_ffi_session_set_default_timeout$handle() {
@@ -24500,7 +24500,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration default_timeout)
      * }
      */
     public static MemorySegment tsurugi_ffi_session_set_default_timeout$address() {
@@ -24509,16 +24509,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiDuration default_timeout)
      * }
      */
-    public static int tsurugi_ffi_session_set_default_timeout(MemorySegment context, MemorySegment session, long timeout) {
+    public static int tsurugi_ffi_session_set_default_timeout(MemorySegment context, MemorySegment session, long default_timeout) {
         var mh$ = tsurugi_ffi_session_set_default_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_session_set_default_timeout", context, session, timeout);
+                traceDowncall("tsurugi_ffi_session_set_default_timeout", context, session, default_timeout);
             }
-            return (int)mh$.invokeExact(context, session, timeout);
+            return (int)mh$.invokeExact(context, session, default_timeout);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25798,7 +25798,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle transaction_label)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_set_transaction_label$descriptor() {
@@ -25808,7 +25808,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle transaction_label)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_set_transaction_label$handle() {
@@ -25818,7 +25818,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle transaction_label)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_set_transaction_label$address() {
@@ -25827,16 +25827,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle label)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle transaction_label)
      * }
      */
-    public static int tsurugi_ffi_transaction_option_set_transaction_label(MemorySegment context, MemorySegment transaction_option, MemorySegment label) {
+    public static int tsurugi_ffi_transaction_option_set_transaction_label(MemorySegment context, MemorySegment transaction_option, MemorySegment transaction_label) {
         var mh$ = tsurugi_ffi_transaction_option_set_transaction_label.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_transaction_option_set_transaction_label", context, transaction_option, label);
+                traceDowncall("tsurugi_ffi_transaction_option_set_transaction_label", context, transaction_option, transaction_label);
             }
-            return (int)mh$.invokeExact(context, transaction_option, label);
+            return (int)mh$.invokeExact(context, transaction_option, transaction_label);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25858,7 +25858,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *transaction_label_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_get_transaction_label$descriptor() {
@@ -25868,7 +25868,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *transaction_label_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_get_transaction_label$handle() {
@@ -25878,7 +25878,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *transaction_label_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_get_transaction_label$address() {
@@ -25887,16 +25887,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *label_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiStringHandle *transaction_label_out)
      * }
      */
-    public static int tsurugi_ffi_transaction_option_get_transaction_label(MemorySegment context, MemorySegment transaction_option, MemorySegment label_out) {
+    public static int tsurugi_ffi_transaction_option_get_transaction_label(MemorySegment context, MemorySegment transaction_option, MemorySegment transaction_label_out) {
         var mh$ = tsurugi_ffi_transaction_option_get_transaction_label.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_transaction_option_get_transaction_label", context, transaction_option, label_out);
+                traceDowncall("tsurugi_ffi_transaction_option_get_transaction_label", context, transaction_option, transaction_label_out);
             }
-            return (int)mh$.invokeExact(context, transaction_option, label_out);
+            return (int)mh$.invokeExact(context, transaction_option, transaction_label_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26524,7 +26524,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration close_timeout)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_set_close_timeout$descriptor() {
@@ -26534,7 +26534,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration close_timeout)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_set_close_timeout$handle() {
@@ -26544,7 +26544,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration close_timeout)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_set_close_timeout$address() {
@@ -26553,16 +26553,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration close_timeout)
      * }
      */
-    public static int tsurugi_ffi_transaction_option_set_close_timeout(MemorySegment context, MemorySegment transaction_option, long timeout) {
+    public static int tsurugi_ffi_transaction_option_set_close_timeout(MemorySegment context, MemorySegment transaction_option, long close_timeout) {
         var mh$ = tsurugi_ffi_transaction_option_set_close_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_transaction_option_set_close_timeout", context, transaction_option, timeout);
+                traceDowncall("tsurugi_ffi_transaction_option_set_close_timeout", context, transaction_option, close_timeout);
             }
-            return (int)mh$.invokeExact(context, transaction_option, timeout);
+            return (int)mh$.invokeExact(context, transaction_option, close_timeout);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26571,6 +26571,7 @@ public class tsubakuro_rust_ffi_h {
     private static class tsurugi_ffi_transaction_option_get_close_timeout {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
             tsubakuro_rust_ffi_h.C_POINTER,
             tsubakuro_rust_ffi_h.C_POINTER,
             tsubakuro_rust_ffi_h.C_POINTER
@@ -26584,7 +26585,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration *close_timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *close_timeout_exists_out, TsurugiFfiDuration *close_timeout_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_option_get_close_timeout$descriptor() {
@@ -26594,7 +26595,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration *close_timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *close_timeout_exists_out, TsurugiFfiDuration *close_timeout_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_option_get_close_timeout$handle() {
@@ -26604,7 +26605,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration *close_timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *close_timeout_exists_out, TsurugiFfiDuration *close_timeout_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_option_get_close_timeout$address() {
@@ -26613,16 +26614,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, TsurugiFfiDuration *close_timeout_out)
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *close_timeout_exists_out, TsurugiFfiDuration *close_timeout_out)
      * }
      */
-    public static int tsurugi_ffi_transaction_option_get_close_timeout(MemorySegment context, MemorySegment transaction_option, MemorySegment close_timeout_out) {
+    public static int tsurugi_ffi_transaction_option_get_close_timeout(MemorySegment context, MemorySegment transaction_option, MemorySegment close_timeout_exists_out, MemorySegment close_timeout_out) {
         var mh$ = tsurugi_ffi_transaction_option_get_close_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_transaction_option_get_close_timeout", context, transaction_option, close_timeout_out);
+                traceDowncall("tsurugi_ffi_transaction_option_get_close_timeout", context, transaction_option, close_timeout_exists_out, close_timeout_out);
             }
-            return (int)mh$.invokeExact(context, transaction_option, close_timeout_out);
+            return (int)mh$.invokeExact(context, transaction_option, close_timeout_exists_out, close_timeout_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

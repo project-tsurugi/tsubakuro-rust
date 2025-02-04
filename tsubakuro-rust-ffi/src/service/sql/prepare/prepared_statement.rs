@@ -68,14 +68,19 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_has_result_records(
 
     let prepared_statement = unsafe { &*prepared_statement };
 
-    let has_result_records = prepared_statement.has_result_records();
+    let value = prepared_statement.has_result_records();
 
     unsafe {
-        *has_result_records_out = has_result_records;
+        *has_result_records_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (has_result_records={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -99,8 +104,9 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_set_close_timeout(
 
     prepared_statement.set_close_timeout(timeout);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -123,15 +129,20 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_get_close_timeout(
 
     let prepared_statement = unsafe { &mut *prepared_statement };
 
-    let timeout = prepared_statement.close_timeout();
-    let timeout = timeout.as_nanos() as TsurugiFfiDuration;
+    let close_timeout = prepared_statement.close_timeout();
+    let close_timeout = close_timeout.as_nanos() as TsurugiFfiDuration;
 
     unsafe {
-        *close_timeout_out = timeout;
+        *close_timeout_out = close_timeout;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (close_timeout={:?})",
+        rc,
+        close_timeout
+    );
+    rc
 }
 
 #[no_mangle]
@@ -153,8 +164,9 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(
     let runtime = prepared_statement.runtime();
     ffi_exec_core_async!(context, FUNCTION_NAME, runtime, prepared_statement.close());
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -184,8 +196,9 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close_for(
         prepared_statement.close_for(timeout)
     );
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -214,8 +227,13 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_is_closed(
         *is_closed_out = is_closed;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (is_closed={:?})",
+        rc,
+        is_closed
+    );
+    rc
 }
 
 #[no_mangle]

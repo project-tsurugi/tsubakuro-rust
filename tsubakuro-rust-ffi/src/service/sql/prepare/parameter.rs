@@ -74,8 +74,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_null(
         *parameter_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. parameter={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -108,8 +109,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int4(
         *parameter_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. parameter={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -142,8 +144,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int8(
         *parameter_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. parameter={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -176,8 +179,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float4(
         *parameter_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. parameter={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -210,8 +214,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float8(
         *parameter_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. parameter={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -246,8 +251,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
         *parameter_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. parameter={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -280,12 +286,14 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
         }
     }
 
+    let ptr = cstring_to_cchar!(parameter.name);
     unsafe {
-        *name_out = cstring_to_cchar!(parameter.name);
+        *name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]

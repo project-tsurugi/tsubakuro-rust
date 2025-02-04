@@ -68,13 +68,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_is_normal(
 
     let status = unsafe { &mut *transaction_status };
 
-    let is_normal = status.is_normal();
+    let value = status.is_normal();
+
     unsafe {
-        *is_normal_out = is_normal;
+        *is_normal_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (is_normal={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -97,32 +99,34 @@ pub extern "C" fn tsurugi_ffi_transaction_status_is_error(
 
     let status = unsafe { &mut *transaction_status };
 
-    let is_error = status.is_error();
+    let value = status.is_error();
+
     unsafe {
-        *is_error_out = is_error;
+        *is_error_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (is_error={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_name(
     context: TsurugiFfiContextHandle,
     transaction_status: TsurugiFfiTransactionStatusHandle,
-    name_out: *mut TsurugiFfiStringHandle,
+    error_name_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_status_get_server_error_name()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, name_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, transaction_status={:?}, error_name_out={:?}",
         context,
         transaction_status,
-        name_out
+        error_name_out
     );
 
-    ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(error_name_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_status);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, error_name_out);
 
     let status = unsafe { &mut *transaction_status };
 
@@ -139,11 +143,12 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_name(
 
     let ptr = cstring_to_cchar!(status.error_name);
     unsafe {
-        *name_out = ptr;
+        *error_name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (error_name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -183,8 +188,9 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_message(
         *error_message_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (error_message={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (error_message={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -219,8 +225,13 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_numbe
         *category_number_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (category_number={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -259,8 +270,9 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_str(
         *category_str_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (category_str={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (category_str={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -295,8 +307,9 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_code_number(
         *code_number_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (code_number={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -335,8 +348,13 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_structured_cod
         *structured_code_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (structured_code={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (structured_code={:?})",
+        rc,
+        ptr
+    );
+    rc
 }
 
 #[no_mangle]

@@ -71,14 +71,15 @@ pub extern "C" fn tsurugi_ffi_cancel_job_wait(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = cancel_job.runtime().clone();
-    let done = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, cancel_job.wait(timeout));
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, cancel_job.wait(timeout));
 
     unsafe {
-        *done_out = done;
+        *done_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (done={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -102,14 +103,15 @@ pub extern "C" fn tsurugi_ffi_cancel_job_is_done(
     let cancel_job = unsafe { &mut *cancel_job };
 
     let runtime = cancel_job.runtime().clone();
-    let done = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, cancel_job.is_done());
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, cancel_job.is_done());
 
     unsafe {
-        *done_out = done;
+        *done_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (done={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]

@@ -97,8 +97,13 @@ pub extern "C" fn tsurugi_ffi_commit_option_create(
         *commit_option_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. commit_option={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. commit_option={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -124,8 +129,9 @@ pub extern "C" fn tsurugi_ffi_commit_option_set_commit_type(
 
     commit_option.set_commit_type(commit_type.into());
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -150,12 +156,18 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_commit_type(
 
     let commit_type = commit_option.commit_type();
 
+    let value = commit_type.into();
     unsafe {
-        *commit_type_out = commit_type.into();
+        *commit_type_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (commit_type={:?})",
+        rc,
+        value as i32
+    );
+    rc
 }
 
 #[no_mangle]
@@ -178,8 +190,9 @@ pub extern "C" fn tsurugi_ffi_commit_option_set_auto_dispose(
 
     commit_option.set_auto_dispose(auto_dispose);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -202,14 +215,19 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_auto_dispose(
 
     let commit_option = unsafe { &mut *commit_option };
 
-    let auto_dispose = commit_option.auto_dispose();
+    let value = commit_option.auto_dispose();
 
     unsafe {
-        *auto_dispose_out = auto_dispose;
+        *auto_dispose_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (auto_dispose={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]

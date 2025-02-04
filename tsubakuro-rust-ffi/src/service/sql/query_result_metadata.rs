@@ -59,12 +59,14 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_size(
     let sql_query_result_metadata = unsafe { &*query_result_metadata };
     let columns = sql_query_result_metadata.columns();
 
+    let value = columns.len() as u32;
     unsafe {
-        *size_out = columns.len() as u32;
+        *size_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (size={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -100,8 +102,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_value(
         *sql_column_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. sql_column={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. sql_column={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]

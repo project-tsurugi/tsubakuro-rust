@@ -73,8 +73,9 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
         *name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -106,8 +107,13 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_atom_type(
         *atom_type_out = atom_type;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (atom_type={:?})",
+        rc,
+        atom_type as i32
+    );
+    rc
 }
 
 #[no_mangle]

@@ -66,13 +66,19 @@ pub(crate) fn rc_ok(context: TsurugiFfiContextHandle) -> TsurugiFfiRc {
 #[macro_export]
 macro_rules! rc_ffi_arg_error {
     ($context:expr, $function_name:expr, $arg_index:expr, $arg_name:expr, $fail_message:expr) => {{
+        let rc = $crate::return_code::TSURUGI_FFI_RC_FFI_ARG_ERROR | $arg_index;
+        log::trace!(
+            "{} error rc={:x}. arg[{}] {}",
+            $function_name,
+            rc,
+            $arg_name,
+            $fail_message
+        );
+
         let message = format!(
             "{} error. arg[{}] {}",
             $function_name, $arg_name, $fail_message
         );
-        log::trace!("{message}");
-
-        let rc = $crate::return_code::TSURUGI_FFI_RC_FFI_ARG_ERROR | $arg_index;
         let error = $crate::error::TsurugiFfiError::FfiError(rc, message);
         $crate::context::TsurugiFfiContext::set_error($context, rc, error)
     }};
@@ -81,9 +87,9 @@ macro_rules! rc_ffi_arg_error {
 #[macro_export]
 macro_rules! rc_core_error {
     ($context:expr, $function_name:expr, $error:expr) => {{
-        log::trace!("{} error. {}", $function_name, $error.message());
-
         let rc = $crate::return_code::get_rc_from_core_error(&$error);
+        log::trace!("{} error rc={:x}. {}", $function_name, rc, $error.message());
+
         let error = $crate::error::TsurugiFfiError::CoreError(rc, $error);
         $crate::context::TsurugiFfiContext::set_error($context, rc, error)
     }};

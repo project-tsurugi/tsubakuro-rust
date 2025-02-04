@@ -199,8 +199,9 @@ pub extern "C" fn tsurugi_ffi_job_get_name(
         *name_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (name={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (name={:?})", rc, ptr);
+    rc
 }
 
 #[no_mangle]
@@ -228,14 +229,15 @@ pub extern "C" fn tsurugi_ffi_job_wait(
 
     let runtime = job.runtime().clone();
     let raw_job = get_raw_job!(context, FUNCTION_NAME, job.raw_job());
-    let done = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.wait(timeout));
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.wait(timeout));
 
     unsafe {
-        *done_out = done;
+        *done_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (done={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -260,14 +262,15 @@ pub extern "C" fn tsurugi_ffi_job_is_done(
 
     let runtime = job.runtime().clone();
     let raw_job = get_raw_job!(context, FUNCTION_NAME, job.raw_job());
-    let done = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.is_done());
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.is_done());
 
     unsafe {
-        *done_out = done;
+        *done_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (done={:?})", rc, value);
+    rc
 }
 
 #[no_mangle]
@@ -315,8 +318,14 @@ impl<T> TsurugiFfiJob<T> {
             *value_out = handle;
         }
 
-        trace!("{FUNCTION_NAME} end. {}={:?}", self.value_name(), handle);
-        rc_ok(context)
+        let rc = rc_ok(context);
+        trace!(
+            "{FUNCTION_NAME} end rc={:x}. {}={:?}",
+            rc,
+            self.value_name(),
+            handle
+        );
+        rc
     }
 }
 
@@ -371,8 +380,14 @@ impl<T> TsurugiFfiJob<T> {
             *value_out = handle;
         }
 
-        trace!("{FUNCTION_NAME} end. {}={:?}", self.value_name(), handle);
-        rc_ok(context)
+        let rc = rc_ok(context);
+        trace!(
+            "{FUNCTION_NAME} end rc={:x}. {}={:?}",
+            rc,
+            self.value_name(),
+            handle
+        );
+        rc
     }
 }
 
@@ -416,33 +431,37 @@ impl<T> TsurugiFfiJob<T> {
         let runtime = self.runtime().clone();
         let raw_job = get_raw_job!(context, FUNCTION_NAME, self.raw_job());
         let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.take_if_ready());
-        let value = match value {
-            Some(value) => converter(value, runtime),
-            None => {
-                unsafe {
-                    *is_ready_out = false;
-                    *value_out = std::ptr::null_mut();
-                }
-                trace!("{FUNCTION_NAME} end. not ready {}=null", self.value_name());
-                return rc_ok(context);
-            }
-        };
 
-        let handle = match value {
-            Some(value) => Box::into_raw(Box::new(value)),
-            None => std::ptr::null_mut(),
-        };
+        let is_ready;
+        let handle;
+        match value {
+            Some(value) => {
+                is_ready = true;
+                handle = match converter(value, runtime) {
+                    Some(value) => Box::into_raw(Box::new(value)),
+                    None => std::ptr::null_mut(),
+                };
+            }
+            None => {
+                is_ready = false;
+                handle = std::ptr::null_mut();
+            }
+        }
+
         unsafe {
-            *is_ready_out = true;
+            *is_ready_out = is_ready;
             *value_out = handle;
         }
 
+        let rc = rc_ok(context);
         trace!(
-            "{FUNCTION_NAME} end. ready {}={:?}",
+            "{FUNCTION_NAME} end rc={:x}. (is_ready={:?}), {}={:?}",
+            rc,
+            is_ready,
             self.value_name(),
             handle
         );
-        rc_ok(context)
+        rc
     }
 }
 
@@ -468,14 +487,19 @@ pub extern "C" fn tsurugi_ffi_job_cancel(
 
     let runtime = job.runtime().clone();
     let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
-    let cancel_done = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel());
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel());
 
     unsafe {
-        *cancell_done_out = cancel_done;
+        *cancell_done_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (cancell_done={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -503,15 +527,19 @@ pub extern "C" fn tsurugi_ffi_job_cancel_for(
 
     let runtime = job.runtime().clone();
     let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
-    let cancel_done =
-        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel_for(timeout));
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel_for(timeout));
 
     unsafe {
-        *cancell_done_out = cancel_done;
+        *cancell_done_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (cancell_done={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 #[no_mangle]
@@ -536,27 +564,23 @@ pub extern "C" fn tsurugi_ffi_job_cancel_async(
 
     let runtime = job.runtime().clone();
     let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
-    let cancel_job =
-        match ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel_async()) {
-            Some(value) => value,
-            None => {
-                unsafe {
-                    *cancel_job_out = std::ptr::null_mut();
-                }
-                trace!("{FUNCTION_NAME} end. cancel_job=null");
-                return rc_ok(context);
-            }
-        };
-    let cancel_job = TsurugiFfiCancelJob::new(cancel_job, runtime.clone());
-    let cancel_job = Box::new(cancel_job);
 
-    let handle = Box::into_raw(cancel_job);
+    let handle = match ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.cancel_async())
+    {
+        Some(value) => {
+            let cancel_job = TsurugiFfiCancelJob::new(value, runtime.clone());
+            Box::into_raw(Box::new(cancel_job))
+        }
+        None => std::ptr::null_mut(),
+    };
+
     unsafe {
         *cancel_job_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. cancel_job={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. cancel_job={:?}", rc, handle);
+    rc
 }
 
 #[no_mangle]
@@ -579,8 +603,9 @@ pub extern "C" fn tsurugi_ffi_job_close(
     let raw_job = get_raw_job!(context, FUNCTION_NAME, job.take_raw_job());
     ffi_exec_core_async!(context, FUNCTION_NAME, runtime, raw_job.close());
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]

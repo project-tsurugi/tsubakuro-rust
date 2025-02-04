@@ -544,11 +544,11 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_set_default_timeout(TsurugiFfiContextH
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextHandle context,
                                                               TsurugiFfiSqlQueryResultHandle query_result,
-                                                              TsurugiFfiDuration *timeout_out);
+                                                              TsurugiFfiDuration *default_timeout_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
-                                                       TsurugiFfiSqlQueryResultMetadataHandle *metadata_out);
+                                                       TsurugiFfiSqlQueryResultMetadataHandle *query_result_metadata_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_next_row(TsurugiFfiContextHandle context,
                                                    TsurugiFfiSqlQueryResultHandle query_result,
@@ -632,7 +632,7 @@ void tsurugi_ffi_sql_query_result_metadata_dispose(TsurugiFfiSqlQueryResultMetad
 
 TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContextHandle context,
                                                                 TsurugiFfiSqlClientHandle sql_client,
-                                                                TsurugiFfiStringHandle *smv_out);
+                                                                TsurugiFfiStringHandle *version_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -899,11 +899,11 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_application_name(TsurugiFfiContex
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_session_label(TsurugiFfiContextHandle context,
                                                              TsurugiFfiConnectionOptionHandle connection_option,
-                                                             TsurugiFfiStringHandle label);
+                                                             TsurugiFfiStringHandle session_label);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_get_session_label(TsurugiFfiContextHandle context,
                                                              TsurugiFfiConnectionOptionHandle connection_option,
-                                                             TsurugiFfiStringHandle *label_out);
+                                                             TsurugiFfiStringHandle *session_label_out);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_keep_alive(TsurugiFfiContextHandle context,
                                                           TsurugiFfiConnectionOptionHandle connection_option,
@@ -915,27 +915,27 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_keep_alive(TsurugiFfiContextHandl
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_default_timeout(TsurugiFfiContextHandle context,
                                                                TsurugiFfiConnectionOptionHandle connection_option,
-                                                               TsurugiFfiDuration timeout);
+                                                               TsurugiFfiDuration default_timeout);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_get_default_timeout(TsurugiFfiContextHandle context,
                                                                TsurugiFfiConnectionOptionHandle connection_option,
-                                                               TsurugiFfiDuration *timeout_out);
+                                                               TsurugiFfiDuration *default_timeout_out);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_send_timeout(TsurugiFfiContextHandle context,
                                                             TsurugiFfiConnectionOptionHandle connection_option,
-                                                            TsurugiFfiDuration timeout);
+                                                            TsurugiFfiDuration send_timeout);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_get_send_timeout(TsurugiFfiContextHandle context,
                                                             TsurugiFfiConnectionOptionHandle connection_option,
-                                                            TsurugiFfiDuration *timeout_out);
+                                                            TsurugiFfiDuration *send_timeout_out);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_recv_timeout(TsurugiFfiContextHandle context,
                                                             TsurugiFfiConnectionOptionHandle connection_option,
-                                                            TsurugiFfiDuration timeout);
+                                                            TsurugiFfiDuration recv_timeout);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_get_recv_timeout(TsurugiFfiContextHandle context,
                                                             TsurugiFfiConnectionOptionHandle connection_option,
-                                                            TsurugiFfiDuration *timeout_out);
+                                                            TsurugiFfiDuration *recv_timeout_out);
 
 void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle connection_option);
 
@@ -954,7 +954,7 @@ TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context,
 
 TsurugiFfiRc tsurugi_ffi_session_set_default_timeout(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSessionHandle session,
-                                                     TsurugiFfiDuration timeout);
+                                                     TsurugiFfiDuration default_timeout);
 
 TsurugiFfiRc tsurugi_ffi_session_get_default_timeout(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSessionHandle session,
@@ -1042,11 +1042,11 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_type(TsurugiFfiConte
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_transaction_label(TsurugiFfiContextHandle context,
                                                                   TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                  TsurugiFfiStringHandle label);
+                                                                  TsurugiFfiStringHandle transaction_label);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_get_transaction_label(TsurugiFfiContextHandle context,
                                                                   TsurugiFfiTransactionOptionHandle transaction_option,
-                                                                  TsurugiFfiStringHandle *label_out);
+                                                                  TsurugiFfiStringHandle *transaction_label_out);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_modifies_definitions(TsurugiFfiContextHandle context,
                                                                      TsurugiFfiTransactionOptionHandle transaction_option,
@@ -1096,10 +1096,11 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_priority(TsurugiFfiContextHandle
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextHandle context,
                                                               TsurugiFfiTransactionOptionHandle transaction_option,
-                                                              TsurugiFfiDuration timeout);
+                                                              TsurugiFfiDuration close_timeout);
 
 TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context,
                                                               TsurugiFfiTransactionOptionHandle transaction_option,
+                                                              bool *close_timeout_exists_out,
                                                               TsurugiFfiDuration *close_timeout_out);
 
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);

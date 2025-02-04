@@ -69,8 +69,13 @@ pub extern "C" fn tsurugi_ffi_transaction_option_create(
         *transaction_option_out = handle;
     }
 
-    trace!("{FUNCTION_NAME} end. transaction_option={:?}", handle);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. transaction_option={:?}",
+        rc,
+        handle
+    );
+    rc
 }
 
 #[no_mangle]
@@ -96,8 +101,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_type(
 
     transaction_option.set_transaction_type(transaction_type.into());
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -121,59 +127,67 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_type(
     let transaction_option = unsafe { &mut *transaction_option };
 
     let transaction_type = transaction_option.transaction_type();
+
+    let value = transaction_type.into();
     unsafe {
-        *transaction_type_out = transaction_type.into();
+        *transaction_type_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (transaction_type={:?})",
+        rc,
+        value as i32
+    );
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_label(
     context: TsurugiFfiContextHandle,
     transaction_option: TsurugiFfiTransactionOptionHandle,
-    label: TsurugiFfiStringHandle,
+    transaction_label: TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_transaction_label()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, label={:?}",
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, transaction_label={:?}",
         context,
         transaction_option,
-        label
+        transaction_label
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_label);
 
     let transaction_option = unsafe { &mut *transaction_option };
-    let label = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, label);
+    let label = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, transaction_label);
 
     transaction_option.set_transaction_label(label);
 
     cchar_field_clear!(transaction_option.transaction_label);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
     context: TsurugiFfiContextHandle,
     transaction_option: TsurugiFfiTransactionOptionHandle,
-    label_out: *mut TsurugiFfiStringHandle,
+    transaction_label_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_transaction_label()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, label_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, transaction_label_out={:?}",
         context,
         transaction_option,
-        label_out
+        transaction_label_out
     );
 
-    ffi_arg_out_initialize!(label_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(transaction_label_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, label_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction_label_out);
 
     let transaction_option = unsafe { &mut *transaction_option };
 
@@ -189,11 +203,16 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
 
     let ptr = cstring_to_cchar!(transaction_option.transaction_label);
     unsafe {
-        *label_out = ptr;
+        *transaction_label_out = ptr;
     }
 
-    trace!("{FUNCTION_NAME} end. (label={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (transaction_label={:?})",
+        rc,
+        ptr
+    );
+    rc
 }
 
 #[no_mangle]
@@ -216,8 +235,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_modifies_definitions(
 
     transaction_option.set_modifies_definitions(modifies_definitions);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -240,13 +260,19 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_modifies_definitions(
 
     let transaction_option = unsafe { &mut *transaction_option };
 
-    let modifies_definitions = transaction_option.modifies_definitions();
+    let value = transaction_option.modifies_definitions();
+
     unsafe {
-        *modifies_definitions_out = modifies_definitions;
+        *modifies_definitions_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (modifies_definitions={:?})",
+        rc,
+        value
+    );
+    rc
 }
 
 macro_rules! convert_table_names {
@@ -296,8 +322,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_write_preserve(
 
     cstring_array_field_clear!(transaction_option.write_preserve);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -336,8 +363,14 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end. (tables_names={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (table_names={:?}, table_names_size={:?})",
+        rc,
+        ptr,
+        size as u32
+    );
+    rc
 }
 
 #[no_mangle]
@@ -367,8 +400,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_inclusive_read_area(
 
     cstring_array_field_clear!(transaction_option.inclusive_read_area);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -407,8 +441,14 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end. (table_names={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (table_names={:?}, table_names_size={:?})",
+        rc,
+        ptr,
+        size as u32
+    );
+    rc
 }
 
 #[no_mangle]
@@ -438,8 +478,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_exclusive_read_area(
 
     cstring_array_field_clear!(transaction_option.exclusive_read_area);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -478,8 +519,14 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
         *table_names_size_out = size as u32;
     }
 
-    trace!("{FUNCTION_NAME} end. (table_names={:?})", ptr);
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (table_names={:?}, table_names_size={:?})",
+        rc,
+        ptr,
+        size as u32
+    );
+    rc
 }
 
 #[no_mangle]
@@ -505,8 +552,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_priority(
 
     transaction_option.set_priority(priority.into());
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
@@ -530,70 +578,90 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_priority(
     let transaction_option = unsafe { &mut *transaction_option };
 
     let priority = transaction_option.priority();
+
+    let value = priority.into();
     unsafe {
-        *priority_out = priority.into();
+        *priority_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (priority={:?})",
+        rc,
+        value as i32
+    );
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_close_timeout(
     context: TsurugiFfiContextHandle,
     transaction_option: TsurugiFfiTransactionOptionHandle,
-    timeout: TsurugiFfiDuration,
+    close_timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, timeout={:?}",
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, close_timeout={:?}",
         context,
         transaction_option,
-        timeout
+        close_timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
 
     let transaction_option = unsafe { &mut *transaction_option };
-    let timeout = Duration::from_nanos(timeout);
+    let close_timeout = Duration::from_nanos(close_timeout);
 
-    transaction_option.set_close_timeout(timeout);
+    transaction_option.set_close_timeout(close_timeout);
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_close_timeout(
     context: TsurugiFfiContextHandle,
     transaction_option: TsurugiFfiTransactionOptionHandle,
+    close_timeout_exists_out: *mut bool,
     close_timeout_out: *mut TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, close_timeout_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, close_timeout_exists_out={:?}, close_timeout_out={:?}",
         context,
         transaction_option,
+        close_timeout_exists_out,
         close_timeout_out
     );
 
+    ffi_arg_out_initialize!(close_timeout_exists_out, false);
     ffi_arg_out_initialize!(close_timeout_out, 0);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
-    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, close_timeout_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, close_timeout_exists_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, close_timeout_out);
 
     let transaction_option = unsafe { &mut *transaction_option };
 
-    let timeout = match transaction_option.close_timeout() {
-        Some(value) => value.as_nanos() as TsurugiFfiDuration,
-        None => 0, // FIXME close_timeout None
+    let (exists, close_timeout) = match transaction_option.close_timeout() {
+        Some(value) => (true, value),
+        None => (false, Duration::ZERO),
     };
 
+    let value = close_timeout.as_nanos() as TsurugiFfiDuration;
     unsafe {
-        *close_timeout_out = timeout;
+        *close_timeout_exists_out = exists;
+        *close_timeout_out = value;
     }
 
-    trace!("{FUNCTION_NAME} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (close_timeout_exists={:?}, close_timeout={:?})",
+        rc,
+        exists,
+        value
+    );
+    rc
 }
 
 #[no_mangle]

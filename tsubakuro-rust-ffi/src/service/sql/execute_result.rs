@@ -122,12 +122,15 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_counters(
         *counters_size_out = size as u32;
     }
 
+    let rc = rc_ok(context);
     trace!(
-        "{FUNCTION_NAME} end. (counters_keys={:?}, counters_rows={:?})",
+        "{FUNCTION_NAME} end rc={:x}. (counters_keys={:?}, counters_rows={:?}, counters_size={:?})",
+        rc,
         keys_ptr,
-        rows_ptr
+        rows_ptr,
+        size as u32
     );
-    rc_ok(context)
+    rc
 }
 
 #[no_mangle]
@@ -235,8 +238,9 @@ fn get_rows(
         *rows_out = rows;
     }
 
-    trace!("{function_name} end");
-    rc_ok(context)
+    let rc = rc_ok(context);
+    trace!("{function_name} end rc={:x}. (rows={:?})", rc, rows);
+    rc
 }
 
 #[no_mangle]
