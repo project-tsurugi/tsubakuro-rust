@@ -115,8 +115,8 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_name(
     );
 
     ffi_arg_out_initialize!(name_out, std::ptr::null_mut());
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, transaction_status);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 2, name_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_status);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, name_out);
 
     let status = unsafe { &mut *transaction_status };
 
@@ -151,8 +151,8 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_message(
     );
 
     ffi_arg_out_initialize!(error_message_out, std::ptr::null_mut());
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, transaction_status);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 2, error_message_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_status);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, error_message_out);
 
     let status = unsafe { &mut *transaction_status };
 
@@ -188,8 +188,8 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_numbe
     );
 
     ffi_arg_out_initialize!(category_number_out, 0);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, transaction_status);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 2, category_number_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_status);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, category_number_out);
 
     let status = unsafe { &mut *transaction_status };
 
@@ -221,8 +221,8 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_str(
     );
 
     ffi_arg_out_initialize!(category_str_out, std::ptr::null_mut());
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, transaction_status);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 2, category_str_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_status);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, category_str_out);
 
     let status = unsafe { &mut *transaction_status };
 
@@ -257,8 +257,8 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_code_number(
     );
 
     ffi_arg_out_initialize!(code_number_out, 0);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, transaction_status);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 2, code_number_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_status);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, code_number_out);
 
     let status = unsafe { &mut *transaction_status };
 
@@ -290,8 +290,8 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_structured_cod
     );
 
     ffi_arg_out_initialize!(structured_code_out, std::ptr::null_mut());
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 1, transaction_status);
-    ffi_arg_require_non_null!(std::ptr::null_mut(), FUNCTION_NAME, 2, structured_code_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_status);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, structured_code_out);
 
     let status = unsafe { &mut *transaction_status };
 
