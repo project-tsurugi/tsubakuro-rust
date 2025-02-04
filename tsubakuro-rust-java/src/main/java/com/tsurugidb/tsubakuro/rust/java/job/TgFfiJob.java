@@ -81,7 +81,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
 		var isReady = outToBoolean(isReadyOut);
 		var outHandle = outToHandle(out);
 		if (!isReady) {
-			assert outHandle == null;
+			assert outHandle.address() == 0;
 			return null;
 		}
 

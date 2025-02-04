@@ -15,6 +15,16 @@ public class TgFfiSqlPreparedStatement extends TgFfiObject {
 		super(manager, handle);
 	}
 
+	public synchronized boolean hasResultRecords(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_has_result_records(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
 	public synchronized void close(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();

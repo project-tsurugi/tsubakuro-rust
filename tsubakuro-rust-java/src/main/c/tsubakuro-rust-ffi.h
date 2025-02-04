@@ -483,6 +483,10 @@ TsurugiFfiRc tsurugi_ffi_sql_placeholder_get_atom_type(TsurugiFfiContextHandle c
 
 void tsurugi_ffi_sql_placeholder_dispose(TsurugiFfiSqlPlaceholderHandle placeholder);
 
+TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_has_result_records(TsurugiFfiContextHandle context,
+                                                                   TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                                   bool *has_result_records_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlPreparedStatementHandle prepared_statement);
 

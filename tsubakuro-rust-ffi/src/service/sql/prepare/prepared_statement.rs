@@ -5,7 +5,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_require_non_null, ffi_exec_core_async,
+    ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc, TSURUGI_FFI_RC_OK},
     TsurugiFfiDuration,
 };
@@ -47,6 +47,34 @@ impl std::ops::DerefMut for TsurugiFfiSqlPreparedStatement {
 }
 
 pub type TsurugiFfiSqlPreparedStatementHandle = *mut TsurugiFfiSqlPreparedStatement;
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_prepared_statement_has_result_records(
+    context: TsurugiFfiContextHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    has_result_records_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_has_result_records()";
+    trace!(
+        "{FUNCTION_NAME} start. prepared_statement={:?}",
+        prepared_statement
+    );
+
+    ffi_arg_out_initialize!(has_result_records_out, false);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, prepared_statement);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, has_result_records_out);
+
+    let prepared_statement = unsafe { &*prepared_statement };
+
+    let has_result_records = prepared_statement.has_result_records();
+
+    unsafe {
+        *has_result_records_out = has_result_records;
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(

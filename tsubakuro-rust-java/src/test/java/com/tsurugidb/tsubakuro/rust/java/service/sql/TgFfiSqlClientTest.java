@@ -1182,6 +1182,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 					TgFfiSqlPlaceholder.ofAtomType(context, "zzz", TgFfiAtomType.CHARACTER) //
 			);
 			try (var ps = client.prepare(context, sql, placeholders)) {
+				assertFalse(ps.hasResultRecords(context));
+
 				try (var transaction = startOcc(client)) {
 					var parameters = List.of( //
 							TgFfiSqlParameter.ofInt4(context, "foo", 4), //
@@ -1854,6 +1856,8 @@ class TgFfiSqlClientTest extends TgFfiTester {
 			var sql = "select * from test where foo=:foo";
 			var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4));
 			try (var ps = client.prepare(context, sql, placeholders)) {
+				assertTrue(ps.hasResultRecords(context));
+
 				try (var transaction = startOcc(client)) {
 					var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "foo", 2));
 					try (var qr = client.preparedQuery(context, transaction, ps, parameters)) {
