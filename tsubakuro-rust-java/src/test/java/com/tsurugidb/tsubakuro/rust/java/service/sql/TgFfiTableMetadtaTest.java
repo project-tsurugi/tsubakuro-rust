@@ -35,6 +35,10 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 
 		try (var metadata = getTableMetadata(pattern, "test"); //
 				var context = TgFfiContext.create(manager)) {
+			var databaseName = metadata.getDatabaseName(context);
+			assertEquals("", databaseName);
+			var schemaName = metadata.getSchemaName(context);
+			assertEquals("", schemaName);
 			var tableName = metadata.getTableName(context);
 			assertEquals("test", tableName);
 
@@ -61,31 +65,98 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 	}
 
 	@Test
-	void get_columns_size_argError() {
+	void argError() {
+		var manager = getFfiObjectManager();
+		try (var metadata = getTableMetadata(DIRECT, "test"); //
+				var context = TgFfiContext.create(manager)) {
+			get_database_name_argError(context, metadata);
+			get_schema_name_argError(context, metadata);
+			get_table_name_argError(context, metadata);
+			get_columns_size_argError(context, metadata);
+			get_columns_value_argError(context, metadata);
+		}
+	}
+
+	private void get_database_name_argError(TgFfiContext context, TgFfiTableMetadata metadata) {
 		var manager = getFfiObjectManager();
 
-		try (var context = TgFfiContext.create(manager)) {
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_database_name(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = metadata.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_database_name(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	private void get_schema_name_argError(TgFfiContext context, TgFfiTableMetadata metadata) {
+		var manager = getFfiObjectManager();
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_schema_name(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = metadata.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_schema_name(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	private void get_table_name_argError(TgFfiContext context, TgFfiTableMetadata metadata) {
+		var manager = getFfiObjectManager();
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_table_name(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		{
+			var ctx = context.handle();
+			var handle = metadata.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_table_name(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
+
+	private void get_columns_size_argError(TgFfiContext context, TgFfiTableMetadata metadata) {
+		var manager = getFfiObjectManager();
+
+		{
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
 			var out = manager.allocatePtr();
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_size(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata(DIRECT, "test")) {
+		{
 			var ctx = context.handle();
-			var handle = tableMetadata.handle();
+			var handle = metadata.handle();
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_size(ctx, handle, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
 
-	@Test
-	void get_columns_value_argError() {
+	private void get_columns_value_argError(TgFfiContext context, TgFfiTableMetadata metadata) {
 		var manager = getFfiObjectManager();
 
-		try (var context = TgFfiContext.create(manager)) {
+		{
 			var ctx = context.handle();
 			var handle = MemorySegment.NULL;
 			int index = 0;
@@ -93,19 +164,17 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, index, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
 		}
-		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata(DIRECT, "test")) {
+		{
 			var ctx = context.handle();
-			var handle = tableMetadata.handle();
+			var handle = metadata.handle();
 			int index = -1;
 			var out = manager.allocatePtr();
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, index, out);
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
-		try (var context = TgFfiContext.create(manager); //
-				var tableMetadata = getTableMetadata(DIRECT, "test")) {
+		{
 			var ctx = context.handle();
-			var handle = tableMetadata.handle();
+			var handle = metadata.handle();
 			int index = 0;
 			var out = MemorySegment.NULL;
 			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, index, out);

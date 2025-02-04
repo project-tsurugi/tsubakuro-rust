@@ -815,6 +815,14 @@ TsurugiFfiRc tsurugi_ffi_table_list_get_table_names(TsurugiFfiContextHandle cont
 
 void tsurugi_ffi_table_list_dispose(TsurugiFfiTableListHandle table_list);
 
+TsurugiFfiRc tsurugi_ffi_table_metadata_get_database_name(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiTableMetadataHandle table_metadata,
+                                                          TsurugiFfiStringHandle *database_name_out);
+
+TsurugiFfiRc tsurugi_ffi_table_metadata_get_schema_name(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiTableMetadataHandle table_metadata,
+                                                        TsurugiFfiStringHandle *schema_name_out);
+
 TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context,
                                                        TsurugiFfiTableMetadataHandle table_metadata,
                                                        TsurugiFfiStringHandle *table_name_out);

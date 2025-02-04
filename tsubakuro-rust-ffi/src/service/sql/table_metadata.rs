@@ -16,6 +16,8 @@ use super::column::TsurugiFfiSqlColumnHandle;
 
 pub(crate) struct TsurugiFfiTableMetadata {
     table_metadata: TableMetadata,
+    database_name: Option<CString>,
+    schema_name: Option<CString>,
     table_name: Option<CString>,
 }
 
@@ -23,6 +25,8 @@ impl TsurugiFfiTableMetadata {
     pub(crate) fn new(table_metadata: TableMetadata) -> TsurugiFfiTableMetadata {
         TsurugiFfiTableMetadata {
             table_metadata,
+            database_name: None,
+            schema_name: None,
             table_name: None,
         }
     }
@@ -44,8 +48,61 @@ impl std::ops::DerefMut for TsurugiFfiTableMetadata {
 
 pub type TsurugiFfiTableMetadataHandle = *mut TsurugiFfiTableMetadata;
 
-// TODO tsurugi_ffi_table_metadata_get_database_name
-// TODO tsurugi_ffi_table_metadata_get_schema_name
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_table_metadata_get_database_name(
+    context: TsurugiFfiContextHandle,
+    table_metadata: TsurugiFfiTableMetadataHandle,
+    database_name_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_database_name()";
+    trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
+
+    ffi_arg_out_initialize!(database_name_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, database_name_out);
+
+    let table_metadata = unsafe { &mut *table_metadata };
+
+    if table_metadata.database_name.is_none() {
+        let database_name = table_metadata.database_name().clone();
+        cchar_field_set!(context, table_metadata.database_name, database_name);
+    }
+
+    unsafe {
+        *database_name_out = cstring_to_cchar!(table_metadata.database_name);
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_table_metadata_get_schema_name(
+    context: TsurugiFfiContextHandle,
+    table_metadata: TsurugiFfiTableMetadataHandle,
+    schema_name_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_schema_name()";
+    trace!("{FUNCTION_NAME} start. table_metadata={:?}", table_metadata);
+
+    ffi_arg_out_initialize!(schema_name_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, schema_name_out);
+
+    let table_metadata = unsafe { &mut *table_metadata };
+
+    if table_metadata.schema_name.is_none() {
+        let schema_name = table_metadata.schema_name().clone();
+        cchar_field_set!(context, table_metadata.schema_name, schema_name);
+    }
+
+    unsafe {
+        *schema_name_out = cstring_to_cchar!(table_metadata.schema_name);
+    }
+
+    trace!("{FUNCTION_NAME} end");
+    rc_ok(context)
+}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(

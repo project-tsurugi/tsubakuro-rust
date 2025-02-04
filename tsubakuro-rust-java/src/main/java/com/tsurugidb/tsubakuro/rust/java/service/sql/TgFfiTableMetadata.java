@@ -19,6 +19,26 @@ public class TgFfiTableMetadata extends TgFfiObject {
 		super(manager, handle);
 	}
 
+	public synchronized String getDatabaseName(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_database_name(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToString(out);
+	}
+
+	public synchronized String getSchemaName(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_schema_name(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToString(out);
+	}
+
 	public synchronized String getTableName(TgFfiContext context) {
 		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
 		var handle = handle();
