@@ -255,6 +255,23 @@ public class TgFfiSession extends TgFfiObject {
 		return outToBoolean(out);
 	}
 
+	public synchronized void close(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_close(ctx, handle);
+		TgFfiRcUtil.throwIfError(rc, context);
+	}
+
+	public synchronized boolean isClosed(TgFfiContext context) {
+		var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+		var handle = handle();
+		var out = allocatePtr();
+		var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_closed(ctx, handle, out);
+		TgFfiRcUtil.throwIfError(rc, context);
+
+		return outToBoolean(out);
+	}
+
 	@Override
 	protected void dispose(MemorySegment handle) {
 		tsubakuro_rust_ffi_h.tsurugi_ffi_session_dispose(handle);

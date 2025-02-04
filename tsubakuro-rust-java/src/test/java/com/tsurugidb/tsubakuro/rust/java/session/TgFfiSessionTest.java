@@ -463,4 +463,52 @@ class TgFfiSessionTest extends TgFfiTester {
 			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
 		}
 	}
+
+	@Test
+	void close() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		try (var session = createSession()) {
+			assertFalse(session.isClosed(context));
+
+			session.close(context);
+
+			assertTrue(session.isClosed(context));
+		}
+	}
+
+	@Test
+	void close_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_close(ctx, handle);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+	}
+
+	@Test
+	void is_closed_argError() {
+		var manager = getFfiObjectManager();
+		var context = TgFfiContext.create(manager);
+
+		{
+			var ctx = context.handle();
+			var handle = MemorySegment.NULL;
+			var out = manager.allocatePtr();
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_closed(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+		}
+		try (var session = createSession()) {
+			var ctx = context.handle();
+			var handle = session.handle();
+			var out = MemorySegment.NULL;
+			var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_closed(ctx, handle, out);
+			assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+		}
+	}
 }

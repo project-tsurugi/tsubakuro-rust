@@ -905,6 +905,13 @@ TsurugiFfiRc tsurugi_ffi_session_is_shutdowned(TsurugiFfiContextHandle context,
                                                TsurugiFfiSessionHandle session,
                                                bool *is_shutdowned_out);
 
+TsurugiFfiRc tsurugi_ffi_session_close(TsurugiFfiContextHandle context,
+                                       TsurugiFfiSessionHandle session);
+
+TsurugiFfiRc tsurugi_ffi_session_is_closed(TsurugiFfiContextHandle context,
+                                           TsurugiFfiSessionHandle session,
+                                           bool *is_closed_out);
+
 void tsurugi_ffi_session_dispose(TsurugiFfiSessionHandle session);
 
 TsurugiFfiRc tsurugi_ffi_commit_option_create(TsurugiFfiContextHandle context,
