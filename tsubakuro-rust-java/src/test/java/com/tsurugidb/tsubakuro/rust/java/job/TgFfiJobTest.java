@@ -51,7 +51,7 @@ class TgFfiJobTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_get_name(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -72,7 +72,7 @@ class TgFfiJobTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var t = 10;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, t, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
@@ -95,7 +95,7 @@ class TgFfiJobTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_is_done(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -140,7 +140,7 @@ class TgFfiJobTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -181,7 +181,7 @@ class TgFfiJobTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             var t = Duration.ofSeconds(5).toNanos();
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, t, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -236,8 +236,8 @@ class TgFfiJobTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var isReadyOut = manager.allocatePtr();
-            var out = manager.allocatePtr();
+            var isReadyOut = manager.allocateBooleanOut();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -245,14 +245,14 @@ class TgFfiJobTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = job.handle();
             var isReadyOut = MemorySegment.NULL;
-            var out = MemorySegment.NULL;
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
         {
             var ctx = context.handle();
             var handle = job.handle();
-            var isReadyOut = manager.allocatePtr();
+            var isReadyOut = manager.allocateBooleanOut();
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
@@ -281,7 +281,7 @@ class TgFfiJobTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -318,7 +318,7 @@ class TgFfiJobTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             var t = Duration.ofSeconds(5).toNanos();
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel_for(ctx, handle, t, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -342,7 +342,7 @@ class TgFfiJobTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel_async(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

@@ -48,8 +48,8 @@ class TgFfiTableListTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
-                var sout = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
+                var sout = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names(ctx, handle, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -57,14 +57,14 @@ class TgFfiTableListTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = tableList.handle();
                 var out = MemorySegment.NULL;
-                var sout = manager.allocatePtr();
+                var sout = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names(ctx, handle, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
             {
                 var ctx = context.handle();
                 var handle = tableList.handle();
-                var out = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
                 var sout = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names(ctx, handle, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);

@@ -40,7 +40,7 @@ public class TgFfiSession extends TgFfiObject {
     private static TgFfiSession connectMain(TgFfiObjectManager manager, TgFfiContext context, TgFfiConnectionOption connectionOption) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg = connectionOption.handle();
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect(ctx, arg, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -74,7 +74,7 @@ public class TgFfiSession extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg = connectionOption.handle();
         var t = allocateDuration(timeout);
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_for(ctx, arg, t, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -107,7 +107,7 @@ public class TgFfiSession extends TgFfiObject {
     private static TgFfiJob<TgFfiSession> connectAsyncMain(TgFfiObjectManager manager, TgFfiContext context, TgFfiConnectionOption connectionOption) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg = connectionOption.handle();
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_async(ctx, arg, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -135,7 +135,7 @@ public class TgFfiSession extends TgFfiObject {
     public synchronized Duration getDefaultTimeout(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_default_timeout(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -145,7 +145,7 @@ public class TgFfiSession extends TgFfiObject {
     public synchronized TgFfiSqlClient makeSqlClient(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_make_sql_client(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -198,7 +198,7 @@ public class TgFfiSession extends TgFfiObject {
             exists = false;
             arg = 0;
         }
-        var out = allocatePtr();
+        var out = allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_async(ctx, handle, exists, arg, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -227,7 +227,7 @@ public class TgFfiSession extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
         var arg = shutdownType.value();
-        var out = allocatePtr();
+        var out = allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -238,7 +238,7 @@ public class TgFfiSession extends TgFfiObject {
     public synchronized boolean isShutdowned(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_shutdowned(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -255,7 +255,7 @@ public class TgFfiSession extends TgFfiObject {
     public synchronized boolean isClosed(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_closed(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

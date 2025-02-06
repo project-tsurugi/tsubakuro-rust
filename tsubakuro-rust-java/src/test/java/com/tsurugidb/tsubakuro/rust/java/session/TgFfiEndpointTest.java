@@ -34,7 +34,7 @@ class TgFfiEndpointTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var arg = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(ctx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

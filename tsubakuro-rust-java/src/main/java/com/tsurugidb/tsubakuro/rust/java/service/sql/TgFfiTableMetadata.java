@@ -22,7 +22,7 @@ public class TgFfiTableMetadata extends TgFfiObject {
     public synchronized String getDatabaseName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_database_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -32,7 +32,7 @@ public class TgFfiTableMetadata extends TgFfiObject {
     public synchronized String getSchemaName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_schema_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -42,7 +42,7 @@ public class TgFfiTableMetadata extends TgFfiObject {
     public synchronized String getTableName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_table_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -62,7 +62,7 @@ public class TgFfiTableMetadata extends TgFfiObject {
 
         int size;
         {
-            var out = allocatePtr();
+            var out = allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_size(ctx, handle, out);
             TgFfiRcUtil.throwIfError(rc, context);
 
@@ -71,7 +71,7 @@ public class TgFfiTableMetadata extends TgFfiObject {
 
         var list = new ArrayList<TgFfiSqlColumn>(size);
         for (int i = 0; i < size; i++) {
-            var out = allocatePtr();
+            var out = allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_columns_value(ctx, handle, i, out);
             TgFfiRcUtil.throwIfError(rc, context);
 

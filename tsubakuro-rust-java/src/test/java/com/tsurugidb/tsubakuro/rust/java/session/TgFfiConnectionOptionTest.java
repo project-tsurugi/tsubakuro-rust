@@ -118,7 +118,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -175,7 +175,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_application_name(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -232,7 +232,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_session_label(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -279,7 +279,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateLongOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_keep_alive(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -326,7 +326,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateLongOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_default_timeout(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -373,7 +373,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateLongOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_send_timeout(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -420,7 +420,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateLongOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_recv_timeout(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

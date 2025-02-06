@@ -83,7 +83,7 @@ class TgFfiCommitOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_commit_type(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -134,7 +134,7 @@ class TgFfiCommitOptionTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_auto_dispose(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

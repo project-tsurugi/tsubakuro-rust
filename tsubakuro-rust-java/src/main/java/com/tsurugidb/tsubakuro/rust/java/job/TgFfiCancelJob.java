@@ -17,7 +17,7 @@ public class TgFfiCancelJob extends TgFfiObject {
     public synchronized boolean wait(TgFfiContext context, long timeoutNanos) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var arg = timeoutNanos;
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_cancel_job_wait(ctx, handle, arg, out);
         TgFfiRcUtil.throwIfError(rc, context);
@@ -28,7 +28,7 @@ public class TgFfiCancelJob extends TgFfiObject {
     public synchronized boolean isDone(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_cancel_job_is_done(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

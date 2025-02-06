@@ -36,7 +36,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
     private static TgFfiSqlParameter ofNullMain(TgFfiObjectManager manager, TgFfiContext context, String name) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg1 = manager.allocateString(name);
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_null(ctx, arg1, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -69,7 +69,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg1 = manager.allocateString(name);
         var arg2 = value;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_int4(ctx, arg1, arg2, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -102,7 +102,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg1 = manager.allocateString(name);
         var arg2 = value;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_int8(ctx, arg1, arg2, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -135,7 +135,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg1 = manager.allocateString(name);
         var arg2 = value;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_float4(ctx, arg1, arg2, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -168,7 +168,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg1 = manager.allocateString(name);
         var arg2 = value;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_float8(ctx, arg1, arg2, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -206,7 +206,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         int size = unscaledValue.length;
         int exponent = -value.scale();
 
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal(ctx, arg1, arg2, size, exponent, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -244,7 +244,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         long low = unscaledValue.longValue();
         int exponent = -value.scale();
 
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal_i128(ctx, arg1, high, low, exponent, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -277,7 +277,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg1 = manager.allocateString(name);
         var arg2 = manager.allocateString(value);
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_character(ctx, arg1, arg2, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -311,7 +311,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var arg1 = manager.allocateString(name);
         var arg2 = manager.allocateBytes(value);
         long size = value.length;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -326,7 +326,7 @@ public class TgFfiSqlParameter extends TgFfiObject {
     public synchronized String getName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_get_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

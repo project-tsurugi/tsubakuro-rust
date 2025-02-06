@@ -67,7 +67,7 @@ class TgFfiCancelJobTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             long arg = 10;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_cancel_job_wait(ctx, handle, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -87,7 +87,7 @@ class TgFfiCancelJobTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_cancel_job_is_done(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

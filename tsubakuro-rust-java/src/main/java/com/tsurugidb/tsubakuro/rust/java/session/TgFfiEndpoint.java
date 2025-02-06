@@ -36,7 +36,7 @@ public class TgFfiEndpoint extends TgFfiObject {
     private static TgFfiEndpoint parseMain(TgFfiObjectManager manager, TgFfiContext context, String endpoint) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg = manager.allocateString(endpoint);
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_endpoint_parse(ctx, arg, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

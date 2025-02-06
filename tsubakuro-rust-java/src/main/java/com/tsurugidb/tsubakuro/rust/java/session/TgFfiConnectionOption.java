@@ -35,7 +35,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
 
     private static TgFfiConnectionOption createMain(TgFfiObjectManager manager, TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_create(ctx, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -70,7 +70,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
     public synchronized String getEndpoint(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -90,7 +90,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
     public synchronized String getApplicationName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_application_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -110,7 +110,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
     public synchronized String getSessionLabel(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_session_label(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -130,7 +130,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
     public synchronized Duration getKeepAlive(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_keep_alive(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -150,7 +150,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
     public synchronized Duration getDefaultTimeout(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_default_timeout(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -170,7 +170,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
     public synchronized Duration getSendTimeout(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_send_timeout(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -190,7 +190,7 @@ public class TgFfiConnectionOption extends TgFfiObject {
     public synchronized Duration getRecvTimeout(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_recv_timeout(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

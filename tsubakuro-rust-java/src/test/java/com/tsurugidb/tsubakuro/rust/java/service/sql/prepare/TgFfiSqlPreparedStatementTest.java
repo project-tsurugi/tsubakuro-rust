@@ -38,7 +38,7 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_has_result_records(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -80,7 +80,7 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateLongOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_get_close_timeout(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -147,7 +147,7 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_is_closed(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

@@ -19,7 +19,7 @@ public class TgFfiTransaction extends TgFfiObject {
     public synchronized String getTransactionId(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_get_transaction_id(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -39,7 +39,7 @@ public class TgFfiTransaction extends TgFfiObject {
     public synchronized Duration getCloseTimeout(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_get_close_timeout(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -64,7 +64,7 @@ public class TgFfiTransaction extends TgFfiObject {
     public synchronized boolean isClosed(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_is_closed(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

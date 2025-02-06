@@ -32,7 +32,7 @@ class TgFfiSqlPlaceholderTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
             var arg2 = TgFfiAtomType.INT4.value();
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_of_atom_type(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -40,7 +40,7 @@ class TgFfiSqlPlaceholderTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = manager.allocateString("test");
             var arg2 = -1;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_of_atom_type(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
@@ -61,7 +61,7 @@ class TgFfiSqlPlaceholderTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var arg = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_get_name(ctx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -82,7 +82,7 @@ class TgFfiSqlPlaceholderTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var arg = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_get_atom_type(ctx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

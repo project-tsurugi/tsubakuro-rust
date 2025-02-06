@@ -17,7 +17,7 @@ public class TgFfiSqlColumn extends TgFfiObject {
     public synchronized String getName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -27,12 +27,12 @@ public class TgFfiSqlColumn extends TgFfiObject {
     public synchronized TgFfiAtomType getAtomType(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_atom_type(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
-        int outInt = outToInt(out);
-        return TgFfiAtomType.forNumber(outInt);
+        int value = outToInt(out);
+        return TgFfiAtomType.forNumber(value);
     }
 
     @Override

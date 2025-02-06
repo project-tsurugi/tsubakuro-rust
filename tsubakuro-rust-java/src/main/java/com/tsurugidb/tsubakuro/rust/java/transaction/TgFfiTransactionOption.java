@@ -36,7 +36,7 @@ public class TgFfiTransactionOption extends TgFfiObject {
 
     private static TgFfiTransactionOption createMain(TgFfiObjectManager manager, TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_create(ctx, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -61,7 +61,7 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized TgFfiTransactionType getTransactionType(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_type(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -82,7 +82,7 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized String getTransactionLabel(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_transaction_label(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -100,7 +100,7 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized boolean getModifiesDefinitions(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_modifies_definitions(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -121,8 +121,8 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized List<String> getWritePreserve(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
-        var sizeOut = allocatePtr();
+        var out = allocatePtrOut();
+        var sizeOut = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_write_preserve(ctx, handle, out, sizeOut);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -143,8 +143,8 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized List<String> getInclusiveReadArea(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
-        var sizeOut = allocatePtr();
+        var out = allocatePtrOut();
+        var sizeOut = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_inclusive_read_area(ctx, handle, out, sizeOut);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -165,8 +165,8 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized List<String> getExclusiveReadArea(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
-        var sizeOut = allocatePtr();
+        var out = allocatePtrOut();
+        var sizeOut = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_exclusive_read_area(ctx, handle, out, sizeOut);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -186,7 +186,7 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized TgFfiTransactionPriority getPriority(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_priority(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -207,8 +207,8 @@ public class TgFfiTransactionOption extends TgFfiObject {
     public synchronized Duration getCloseTimeout(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var existsOut = allocatePtr();
-        var out = allocatePtr();
+        var existsOut = allocateBooleanOut();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_close_timeout(ctx, handle, existsOut, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

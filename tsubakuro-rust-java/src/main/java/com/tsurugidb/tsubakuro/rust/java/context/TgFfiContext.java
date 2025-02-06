@@ -14,7 +14,7 @@ public class TgFfiContext extends TgFfiObject {
     public static TgFfiContext create(TgFfiObjectManager manager) {
         Objects.requireNonNull(manager, "manager must not be null");
 
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_create(out);
         TgFfiRcUtil.throwIfError(rc);
 
@@ -28,7 +28,7 @@ public class TgFfiContext extends TgFfiObject {
 
     public synchronized int getReturnCode() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_return_code(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 
@@ -37,7 +37,7 @@ public class TgFfiContext extends TgFfiObject {
 
     public synchronized String getErrorName() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_name(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 
@@ -46,17 +46,17 @@ public class TgFfiContext extends TgFfiObject {
 
     public synchronized TgFfiRcType getErrorType() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_type(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 
-        int outInt = outToInt(out);
-        return TgFfiRcType.of(outInt);
+        int value = outToInt(out);
+        return TgFfiRcType.of(value);
     }
 
     public synchronized String getErrorMessage() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_message(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 
@@ -65,7 +65,7 @@ public class TgFfiContext extends TgFfiObject {
 
     public synchronized int getServerErrorCategoryNumber() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_category_number(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 
@@ -74,7 +74,7 @@ public class TgFfiContext extends TgFfiObject {
 
     public synchronized String getServerErrorCategoryStr() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_category_str(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 
@@ -83,7 +83,7 @@ public class TgFfiContext extends TgFfiObject {
 
     public synchronized int getServerErrorCodeNumber() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_code_number(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 
@@ -92,7 +92,7 @@ public class TgFfiContext extends TgFfiObject {
 
     public synchronized String getServerErrorStructuredCode() {
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_structured_code(handle, out);
         TgFfiRcUtil.throwIfError(rc);
 

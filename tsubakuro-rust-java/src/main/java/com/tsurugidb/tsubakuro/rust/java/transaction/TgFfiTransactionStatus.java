@@ -17,7 +17,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized boolean isNormal(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_is_normal(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -27,7 +27,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized boolean isError(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_is_error(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -37,7 +37,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized String getServerErrorName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -47,7 +47,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized String getServerErrorMessage(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_message(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -57,7 +57,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized int getServerErrorCategoryNumber(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_category_number(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -67,7 +67,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized String getServerErrorCategoryStr(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_category_str(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -77,7 +77,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized int getServerErrorCodeNumber(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_code_number(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -87,7 +87,7 @@ public class TgFfiTransactionStatus extends TgFfiObject {
     public synchronized String getServerErrorStructuredCode(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_structured_code(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

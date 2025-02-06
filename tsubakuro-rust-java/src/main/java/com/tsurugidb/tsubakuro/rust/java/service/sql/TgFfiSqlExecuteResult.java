@@ -20,9 +20,9 @@ public class TgFfiSqlExecuteResult extends TgFfiObject {
     public synchronized Map<TgFfiSqlCounterType, Long> getCounters(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var keysOut = allocatePtr();
-        var rowsOut = allocatePtr();
-        var sizeOut = allocatePtr();
+        var keysOut = allocatePtrOut();
+        var rowsOut = allocatePtrOut();
+        var sizeOut = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_execute_result_get_counters(ctx, handle, keysOut, rowsOut, sizeOut);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -60,7 +60,7 @@ public class TgFfiSqlExecuteResult extends TgFfiObject {
     public synchronized long getInsertedRows(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_execute_result_get_inserted_rows(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -70,7 +70,7 @@ public class TgFfiSqlExecuteResult extends TgFfiObject {
     public synchronized long getUpdatedRows(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_execute_result_get_updated_rows(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -80,7 +80,7 @@ public class TgFfiSqlExecuteResult extends TgFfiObject {
     public synchronized long getMergedRows(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_execute_result_get_merged_rows(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -90,7 +90,7 @@ public class TgFfiSqlExecuteResult extends TgFfiObject {
     public synchronized long getDeletedRows(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_execute_result_get_deleted_rows(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -100,7 +100,7 @@ public class TgFfiSqlExecuteResult extends TgFfiObject {
     public synchronized long getRows(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateLongOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_execute_result_get_rows(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

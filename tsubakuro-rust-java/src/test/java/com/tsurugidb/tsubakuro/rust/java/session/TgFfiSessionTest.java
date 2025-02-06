@@ -38,7 +38,7 @@ class TgFfiSessionTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var arg = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect(ctx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -74,7 +74,7 @@ class TgFfiSessionTest extends TgFfiTester {
             var ctx = context.handle();
             var arg = MemorySegment.NULL;
             var t = Duration.ofSeconds(5).toNanos();
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_for(ctx, arg, t, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -110,7 +110,7 @@ class TgFfiSessionTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var arg = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_connect_async(ctx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -161,7 +161,7 @@ class TgFfiSessionTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateLongOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_default_timeout(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -195,7 +195,7 @@ class TgFfiSessionTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_make_sql_client(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -296,7 +296,7 @@ class TgFfiSessionTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             var arg = Duration.ofSeconds(5).toNanos();
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_update_expiration_time_async(ctx, handle, true, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -419,7 +419,7 @@ class TgFfiSessionTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             var arg = TgFfiShutdownType.GRACEFUL.value();
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -428,7 +428,7 @@ class TgFfiSessionTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = session.handle();
                 var arg = -1;
-                var out = manager.allocatePtr();
+                var out = manager.allocateHandleOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
@@ -451,7 +451,7 @@ class TgFfiSessionTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_shutdowned(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -499,7 +499,7 @@ class TgFfiSessionTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_is_closed(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

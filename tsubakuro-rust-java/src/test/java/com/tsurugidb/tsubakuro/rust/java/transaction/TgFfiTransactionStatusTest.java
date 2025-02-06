@@ -130,7 +130,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_is_normal(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -149,7 +149,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateBooleanOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_is_error(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -168,7 +168,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_name(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -187,7 +187,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_message(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -206,7 +206,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_category_number(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -225,7 +225,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_category_str(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -244,7 +244,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_code_number(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -263,7 +263,7 @@ class TgFfiTransactionStatusTest extends TgFfiTester {
         {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_status_get_server_error_structured_code(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

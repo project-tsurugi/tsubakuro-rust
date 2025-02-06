@@ -37,7 +37,7 @@ public class TgFfiSqlPlaceholder extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var arg1 = manager.allocateString(name);
         var arg2 = atomType.value();
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_of_atom_type(ctx, arg1, arg2, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -52,7 +52,7 @@ public class TgFfiSqlPlaceholder extends TgFfiObject {
     public synchronized String getName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_get_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -62,12 +62,12 @@ public class TgFfiSqlPlaceholder extends TgFfiObject {
     public synchronized TgFfiAtomType getAtomType(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_get_atom_type(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
-        var outInt = outToInt(out);
-        return TgFfiAtomType.forNumber(outInt);
+        var value = outToInt(out);
+        return TgFfiAtomType.forNumber(value);
     }
 
     @Override

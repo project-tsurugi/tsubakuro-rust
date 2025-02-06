@@ -28,8 +28,8 @@ public class TgFfiTableList extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
 
-        var out = allocatePtr();
-        var sizeOut = allocatePtr();
+        var out = allocatePtrOut();
+        var sizeOut = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_list_get_table_names(ctx, handle, out, sizeOut);
         TgFfiRcUtil.throwIfError(rc, context);
 

@@ -88,7 +88,7 @@ class TgFfiSqlQueryResultMetadtaTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_size(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -110,7 +110,7 @@ class TgFfiSqlQueryResultMetadtaTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             int index = 0;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_value(ctx, handle, index, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -119,7 +119,7 @@ class TgFfiSqlQueryResultMetadtaTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = resource.metadata.handle();
             int index = -1;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_value(ctx, handle, index, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }

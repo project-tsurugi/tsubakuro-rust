@@ -30,10 +30,6 @@ public abstract class TgFfiObject implements Closeable {
         return this.manager;
     }
 
-    protected final MemorySegment allocatePtr() {
-        return manager.allocatePtr();
-    }
-
     protected final static long allocateDuration(Duration duration) {
         return duration.toNanos();
     }
@@ -58,6 +54,26 @@ public abstract class TgFfiObject implements Closeable {
         }
 
         return handle;
+    }
+
+    protected final MemorySegment allocateHandleOut() {
+        return manager.allocateHandleOut();
+    }
+
+    protected final MemorySegment allocateBooleanOut() {
+        return manager.allocateBooleanOut();
+    }
+
+    protected final MemorySegment allocateIntOut() {
+        return manager.allocateIntOut();
+    }
+
+    protected final MemorySegment allocateLongOut() {
+        return manager.allocateLongOut();
+    }
+
+    protected final MemorySegment allocatePtrOut() {
+        return manager.allocatePtrOut();
     }
 
     protected static MemorySegment outToHandle(MemorySegment out) {

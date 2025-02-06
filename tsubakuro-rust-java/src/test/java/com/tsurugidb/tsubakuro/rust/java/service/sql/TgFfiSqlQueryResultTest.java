@@ -134,7 +134,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateLongOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_default_timeout(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -216,7 +216,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateHandleOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_metadata(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -240,7 +240,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateBooleanOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -263,7 +263,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocateBooleanOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_row_for(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -288,7 +288,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateBooleanOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -313,7 +313,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocateBooleanOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_next_column_for(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -338,7 +338,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateBooleanOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_is_null(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -362,7 +362,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int4(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -387,7 +387,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int4(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -412,7 +412,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateLongOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_int8(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -437,7 +437,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocateLongOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_int8(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -462,7 +462,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateFloatOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float4(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -487,7 +487,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocateFloatOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float4(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -512,7 +512,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocateDoubleOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_float8(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -537,7 +537,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocateDoubleOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_float8(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -562,10 +562,10 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var bytesOut = manager.allocatePtr();
-                var sizeOut = manager.allocatePtr();
-                var valueOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
+                var sizeOut = manager.allocateIntOut();
+                var valueOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -573,38 +573,38 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var bytesOut = MemorySegment.NULL;
-                var sizeOut = manager.allocatePtr();
-                var valueOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var sizeOut = manager.allocateIntOut();
+                var valueOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
             {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
-                var bytesOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
                 var sizeOut = MemorySegment.NULL;
-                var valueOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var valueOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
             {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
-                var bytesOut = manager.allocatePtr();
-                var sizeOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
+                var sizeOut = manager.allocateIntOut();
                 var valueOut = MemorySegment.NULL;
-                var exponentOut = manager.allocatePtr();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
             }
             {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
-                var bytesOut = manager.allocatePtr();
-                var sizeOut = manager.allocatePtr();
-                var valueOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
+                var sizeOut = manager.allocateIntOut();
+                var valueOut = manager.allocateLongOut();
                 var exponentOut = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
@@ -623,10 +623,10 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var bytesOut = manager.allocatePtr();
-                var sizeOut = manager.allocatePtr();
-                var valueOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
+                var sizeOut = manager.allocateIntOut();
+                var valueOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -635,9 +635,9 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
                 var bytesOut = MemorySegment.NULL;
-                var sizeOut = manager.allocatePtr();
-                var valueOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var sizeOut = manager.allocateIntOut();
+                var valueOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
@@ -645,10 +645,10 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
-                var bytesOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
                 var sizeOut = MemorySegment.NULL;
-                var valueOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var valueOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
             }
@@ -656,10 +656,10 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
-                var bytesOut = manager.allocatePtr();
-                var sizeOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
+                var sizeOut = manager.allocateIntOut();
                 var valueOut = MemorySegment.NULL;
-                var exponentOut = manager.allocatePtr();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
             }
@@ -667,9 +667,9 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
-                var bytesOut = manager.allocatePtr();
-                var sizeOut = manager.allocatePtr();
-                var valueOut = manager.allocatePtr();
+                var bytesOut = manager.allocatePtrOut();
+                var sizeOut = manager.allocateIntOut();
+                var valueOut = manager.allocateLongOut();
                 var exponentOut = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG6_ERROR(), rc);
@@ -687,9 +687,9 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var highOut = manager.allocatePtr();
-                var lowOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var highOut = manager.allocateLongOut();
+                var lowOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -697,25 +697,25 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var highOut = MemorySegment.NULL;
-                var lowOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var lowOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
             {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
-                var highOut = manager.allocatePtr();
+                var highOut = manager.allocateLongOut();
                 var lowOut = MemorySegment.NULL;
-                var exponentOut = manager.allocatePtr();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
             {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
-                var highOut = manager.allocatePtr();
-                var lowOut = manager.allocatePtr();
+                var highOut = manager.allocateLongOut();
+                var lowOut = manager.allocateLongOut();
                 var exponentOut = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
@@ -734,9 +734,9 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var highOut = manager.allocatePtr();
-                var lowOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var highOut = manager.allocateLongOut();
+                var lowOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -745,8 +745,8 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
                 var highOut = MemorySegment.NULL;
-                var lowOut = manager.allocatePtr();
-                var exponentOut = manager.allocatePtr();
+                var lowOut = manager.allocateLongOut();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
@@ -754,9 +754,9 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
-                var highOut = manager.allocatePtr();
+                var highOut = manager.allocateLongOut();
                 var lowOut = MemorySegment.NULL;
-                var exponentOut = manager.allocatePtr();
+                var exponentOut = manager.allocateIntOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
             }
@@ -764,8 +764,8 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
-                var highOut = manager.allocatePtr();
-                var lowOut = manager.allocatePtr();
+                var highOut = manager.allocateLongOut();
+                var lowOut = manager.allocateLongOut();
                 var exponentOut = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
@@ -783,7 +783,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_character(ctx, handle, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -808,7 +808,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_character(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -833,8 +833,8 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
-                var out = manager.allocatePtr();
-                var sout = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
+                var sout = manager.allocateLongOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -842,14 +842,14 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var out = MemorySegment.NULL;
-                var sout = manager.allocatePtr();
+                var sout = manager.allocateLongOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
             {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
-                var out = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
                 var sout = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
@@ -868,8 +868,8 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
-                var sout = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
+                var sout = manager.allocateLongOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
@@ -878,7 +878,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
                 var out = MemorySegment.NULL;
-                var sout = manager.allocatePtr();
+                var sout = manager.allocateLongOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
@@ -886,7 +886,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var ctx = context.handle();
                 var handle = resource.queryResult.handle();
                 var t = Duration.ofSeconds(5).toNanos();
-                var out = manager.allocatePtr();
+                var out = manager.allocatePtrOut();
                 var sout = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);

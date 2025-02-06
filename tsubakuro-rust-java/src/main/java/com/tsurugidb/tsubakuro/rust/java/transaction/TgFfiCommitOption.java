@@ -34,7 +34,7 @@ public class TgFfiCommitOption extends TgFfiObject {
 
     private static TgFfiCommitOption createMain(TgFfiObjectManager manager, TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-        var out = manager.allocatePtr();
+        var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_create(ctx, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -59,12 +59,12 @@ public class TgFfiCommitOption extends TgFfiObject {
     public synchronized TgFfiCommitType getCommitType(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateIntOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_commit_type(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
-        int outInt = outToInt(out);
-        return TgFfiCommitType.forNumber(outInt);
+        int value = outToInt(out);
+        return TgFfiCommitType.forNumber(value);
     }
 
     public synchronized void setAutoDispose(TgFfiContext context, boolean autoDispose) {
@@ -80,7 +80,7 @@ public class TgFfiCommitOption extends TgFfiObject {
     public synchronized boolean getAutoDispose(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_get_auto_dispose(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

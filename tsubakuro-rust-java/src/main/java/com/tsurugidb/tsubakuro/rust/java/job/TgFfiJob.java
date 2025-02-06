@@ -19,7 +19,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized String getName(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocatePtrOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_get_name(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -29,7 +29,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized boolean wait(TgFfiContext context, Duration timeout) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var t = allocateDuration(timeout);
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_wait(ctx, handle, t, out);
         TgFfiRcUtil.throwIfError(rc, context);
@@ -40,7 +40,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized boolean isDone(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_is_done(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -50,7 +50,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized T take(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -61,7 +61,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized T takeFor(TgFfiContext context, Duration timeout) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateHandleOut();
         var t = allocateDuration(timeout);
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_for(ctx, handle, t, out);
         TgFfiRcUtil.throwIfError(rc, context);
@@ -73,8 +73,8 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized Optional<T> takeIfReady(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var isReadyOut = allocatePtr();
-        var out = allocatePtr();
+        var isReadyOut = allocateBooleanOut();
+        var out = allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_take_if_ready(ctx, handle, isReadyOut, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -94,7 +94,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized boolean cancel(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -105,7 +105,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
         var t = allocateDuration(timeout);
-        var out = allocatePtr();
+        var out = allocateBooleanOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel_for(ctx, handle, t, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
@@ -115,7 +115,7 @@ public abstract class TgFfiJob<T> extends TgFfiObject {
     public synchronized TgFfiCancelJob cancelAsync(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
-        var out = allocatePtr();
+        var out = allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_job_cancel_async(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 

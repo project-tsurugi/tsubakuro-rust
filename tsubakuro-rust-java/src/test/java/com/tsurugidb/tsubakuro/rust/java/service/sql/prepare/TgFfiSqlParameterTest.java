@@ -30,7 +30,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_null(ctx, arg1, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -51,7 +51,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
             var arg2 = 123;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_int4(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -73,7 +73,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
             var arg2 = 123;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_int8(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -95,7 +95,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
             var arg2 = 123;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_float4(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -117,7 +117,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
             var arg2 = 123;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_float8(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -144,7 +144,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
             var arg2 = manager.allocateBytes(unscaledValue);
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal(ctx, arg1, arg2, size, exponent, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -152,7 +152,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = manager.allocateString("test");
             var arg2 = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal(ctx, arg1, arg2, size, exponent, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
@@ -177,7 +177,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal_i128(ctx, arg1, high, low, exponent, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -198,7 +198,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = MemorySegment.NULL;
             var arg2 = manager.allocateString("abc");
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_character(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -206,7 +206,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var ctx = context.handle();
             var arg1 = manager.allocateString("test");
             var arg2 = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_character(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
@@ -229,7 +229,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var arg1 = MemorySegment.NULL;
             var arg2 = manager.allocateBytes(new byte[0]);
             var size = 0;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
@@ -238,7 +238,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var arg1 = manager.allocateString("test");
             var arg2 = MemorySegment.NULL;
             var size = 0;
-            var out = manager.allocatePtr();
+            var out = manager.allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
@@ -260,7 +260,7 @@ class TgFfiSqlParameterTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var arg = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_get_name(ctx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }

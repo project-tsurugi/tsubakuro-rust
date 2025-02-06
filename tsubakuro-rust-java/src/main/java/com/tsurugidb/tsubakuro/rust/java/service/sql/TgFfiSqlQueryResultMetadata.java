@@ -32,7 +32,7 @@ public class TgFfiSqlQueryResultMetadata extends TgFfiObject {
 
         int size;
         {
-            var out = allocatePtr();
+            var out = allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_size(ctx, handle, out);
             TgFfiRcUtil.throwIfError(rc, context);
 
@@ -41,7 +41,7 @@ public class TgFfiSqlQueryResultMetadata extends TgFfiObject {
 
         var list = new ArrayList<TgFfiSqlColumn>(size);
         for (int i = 0; i < size; i++) {
-            var out = allocatePtr();
+            var out = allocateHandleOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_metadata_get_columns_value(ctx, handle, i, out);
             TgFfiRcUtil.throwIfError(rc, context);
 

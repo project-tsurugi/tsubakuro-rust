@@ -25,10 +25,6 @@ public class TgFfiObjectManager implements AutoCloseable {
         return this.arena;
     }
 
-    public MemorySegment allocatePtr() {
-        return arena.allocate(ValueLayout.ADDRESS);
-    }
-
     public MemorySegment allocateString(String s) {
         return arena.allocateFrom(s);
     }
@@ -75,6 +71,34 @@ public class TgFfiObjectManager implements AutoCloseable {
         }
 
         return array;
+    }
+
+    public MemorySegment allocateHandleOut() {
+        return arena.allocate(ValueLayout.ADDRESS);
+    }
+
+    public MemorySegment allocatePtrOut() {
+        return arena.allocate(ValueLayout.ADDRESS);
+    }
+
+    public MemorySegment allocateIntOut() {
+        return arena.allocate(ValueLayout.JAVA_INT);
+    }
+
+    public MemorySegment allocateLongOut() {
+        return arena.allocate(ValueLayout.JAVA_LONG);
+    }
+
+    public MemorySegment allocateFloatOut() {
+        return arena.allocate(ValueLayout.JAVA_FLOAT);
+    }
+
+    public MemorySegment allocateDoubleOut() {
+        return arena.allocate(ValueLayout.JAVA_DOUBLE);
+    }
+
+    public MemorySegment allocateBooleanOut() {
+        return arena.allocate(ValueLayout.JAVA_BOOLEAN);
     }
 
     public void add(TgFfiObject object) {

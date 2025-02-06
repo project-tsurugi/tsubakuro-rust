@@ -102,7 +102,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_return_code(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
@@ -120,7 +120,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_name(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
@@ -138,7 +138,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_type(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
@@ -156,7 +156,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_error_message(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
@@ -174,7 +174,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_category_number(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
@@ -192,7 +192,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_category_str(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
@@ -210,7 +210,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocateIntOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_code_number(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
@@ -228,7 +228,7 @@ class TgFfiContextTest extends TgFfiTester {
 
         {
             var context = MemorySegment.NULL;
-            var out = manager.allocatePtr();
+            var out = manager.allocatePtrOut();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_context_get_server_error_structured_code(context, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG0_ERROR(), rc);
         }
