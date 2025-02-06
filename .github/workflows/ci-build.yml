@@ -28,6 +28,8 @@ jobs:
     timeout-minutes: 30
     container:
       image: ghcr.io/project-tsurugi/tsurugi-ci:${{ matrix.os }}
+      volumes:
+        - ${{ vars.gradle_cache_dir }}:/root/.gradle
     defaults:
       run:
         shell: bash
@@ -62,7 +64,22 @@ jobs:
           cargo run tcp://tsurugi:12345
           cargo test "" -- --test-threads=1 endpoint=tcp://tsurugi:12345
 
+      - name: Build_FFI
+        run: |
+          cd tsubakuro-rust-ffi
+          cargo build --release
+
+      - name: Test_Java
+        run: |
+          cd tsubakuro-rust-java
+          ./gradlew -i test -Pffi.library.path=${GITHUB_WORKSPACE}/tsubakuro-rust-ffi/target/release/libtsubakuro_rust_ffi.so -Pdbtest.endpoint=tcp://tsurugi:12345
+
       - name: Lint_Core
         run: |
           cd tsubakuro-rust-core
+          cargo clippy
+
+      - name: Lint_FFI
+        run: |
+          cd tsubakuro-rust-ffi
           cargo clippy
