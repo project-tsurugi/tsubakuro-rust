@@ -246,7 +246,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_decimal(
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let unscaled_value = bytes_to_vec_u8!(unscaled_value, unscaled_value_size);
-    let parameter = SqlParameter::of_decimal(name, unscaled_value, exponent);
+    let parameter = SqlParameter::of_decimal(name, (unscaled_value, exponent));
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
 

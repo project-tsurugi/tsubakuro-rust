@@ -78,10 +78,10 @@ impl SqlParameterOf<f64> for SqlParameter {
 }
 
 impl SqlParameter {
-    pub fn of_decimal(name: &str, unscaled_value: Vec<u8>, exponent: i32) -> SqlParameter {
+    pub fn of_decimal(name: &str, value: (Vec<u8>, i32)) -> SqlParameter {
         let value = ProtoDecimal {
-            unscaled_value,
-            exponent,
+            unscaled_value: value.0,
+            exponent: value.1,
         };
         let value = Value::DecimalValue(value);
         SqlParameter::new(name, Some(value))
@@ -90,7 +90,7 @@ impl SqlParameter {
     pub fn of_decimal_i128(name: &str, value: (i128, i32)) -> SqlParameter {
         let unscaled_value = value.0.to_be_bytes().to_vec();
         let exponent = value.1;
-        Self::of_decimal(name, unscaled_value, exponent)
+        Self::of_decimal(name, (unscaled_value, exponent))
     }
 
     pub fn of_decimal_i128_opt(name: &str, value: Option<(i128, i32)>) -> SqlParameter {
@@ -608,7 +608,7 @@ mod test {
 
     #[test]
     fn decimal() {
-        let target0 = SqlParameter::of_decimal("test", vec![4, 0xd2], -1);
+        let target0 = SqlParameter::of_decimal("test", (vec![4, 0xd2], -1));
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(
             &Value::DecimalValue(ProtoDecimal {
