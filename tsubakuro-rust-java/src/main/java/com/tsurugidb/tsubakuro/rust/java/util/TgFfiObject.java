@@ -110,7 +110,16 @@ public abstract class TgFfiObject implements Closeable {
             list.add(s);
         }
         return list;
+    }
 
+    protected static byte[] outToBytes(MemorySegment out, MemorySegment sizeOut) {
+        long size = outToLong(sizeOut);
+        if (size == 0) {
+            return new byte[0];
+        }
+
+        var array = outToHandle(out).reinterpret(size);
+        return array.toArray(ValueLayout.JAVA_BYTE);
     }
 
     @Override

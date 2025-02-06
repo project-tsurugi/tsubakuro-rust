@@ -43,16 +43,6 @@ class TgFfiSqlParameterTest extends TgFfiTester {
     }
 
     @Test
-    void of_int4() {
-        var manager = getFfiObjectManager();
-        var context = TgFfiContext.create(manager);
-
-        try (var placeholder = TgFfiSqlParameter.ofInt4(context, "test", 123)) {
-            assertEquals("test", placeholder.getName(context));
-        }
-    }
-
-    @Test
     void of_int4_argError() {
         var manager = getFfiObjectManager();
 
@@ -71,16 +61,6 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_int4(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
-        }
-    }
-
-    @Test
-    void of_int8() {
-        var manager = getFfiObjectManager();
-        var context = TgFfiContext.create(manager);
-
-        try (var placeholder = TgFfiSqlParameter.ofInt8(context, "test", 123)) {
-            assertEquals("test", placeholder.getName(context));
         }
     }
 
@@ -107,16 +87,6 @@ class TgFfiSqlParameterTest extends TgFfiTester {
     }
 
     @Test
-    void of_float4() {
-        var manager = getFfiObjectManager();
-        var context = TgFfiContext.create(manager);
-
-        try (var placeholder = TgFfiSqlParameter.ofFloat4(context, "test", 123)) {
-            assertEquals("test", placeholder.getName(context));
-        }
-    }
-
-    @Test
     void of_float4_argError() {
         var manager = getFfiObjectManager();
 
@@ -139,16 +109,6 @@ class TgFfiSqlParameterTest extends TgFfiTester {
     }
 
     @Test
-    void of_float8() {
-        var manager = getFfiObjectManager();
-        var context = TgFfiContext.create(manager);
-
-        try (var placeholder = TgFfiSqlParameter.ofFloat8(context, "test", 123)) {
-            assertEquals("test", placeholder.getName(context));
-        }
-    }
-
-    @Test
     void of_float8_argError() {
         var manager = getFfiObjectManager();
 
@@ -167,16 +127,6 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_float8(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
-        }
-    }
-
-    @Test
-    void of_character() {
-        var manager = getFfiObjectManager();
-        var context = TgFfiContext.create(manager);
-
-        try (var placeholder = TgFfiSqlParameter.ofCharacter(context, "test", "abc")) {
-            assertEquals("test", placeholder.getName(context));
         }
     }
 
@@ -207,6 +157,39 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_character(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_octet_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = manager.allocateBytes(new byte[0]);
+            var size = 0;
+            var out = manager.allocatePtr();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = MemorySegment.NULL;
+            var size = 0;
+            var out = manager.allocatePtr();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = manager.allocateString("abc");
+            var size = 0;
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
         }
     }
 

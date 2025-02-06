@@ -208,6 +208,40 @@ public class TgFfiSqlParameter extends TgFfiObject {
         return new TgFfiSqlParameter(manager, outHandle);
     }
 
+    public static TgFfiSqlParameter ofOctet(TgFfiContext context, String name, byte[] value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofOctet(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofOctet(TgFfiObjectManager manager, String name, byte[] value) {
+        return ofOctet(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofOctet(TgFfiObjectManager manager, TgFfiContext context, String name, byte[] value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofOctetMain(manager, context, name, value);
+            }
+        } else {
+            return ofOctetMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofOctetMain(TgFfiObjectManager manager, TgFfiContext context, String name, byte[] value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = manager.allocateBytes(value);
+        long size = value.length;
+        var out = manager.allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
     TgFfiSqlParameter(TgFfiObjectManager manager, MemorySegment handle) {
         super(manager, handle);
     }

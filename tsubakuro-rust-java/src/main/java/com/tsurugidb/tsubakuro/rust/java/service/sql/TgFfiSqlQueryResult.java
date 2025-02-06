@@ -205,6 +205,29 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
         return outToString(out);
     }
 
+    public synchronized byte[] fetchOctet(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocatePtr();
+        var sizeOut = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sizeOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToBytes(out, sizeOut);
+    }
+
+    public synchronized byte[] fetchForOctet(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocatePtr();
+        var sizeOut = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sizeOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToBytes(out, sizeOut);
+    }
+
     @Override
     protected void dispose(MemorySegment handle) {
         tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_dispose(handle);

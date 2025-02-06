@@ -601,4 +601,75 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             }
         }
     }
+
+    @Test
+    void fetch_octet_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocatePtr();
+                var sout = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sout);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var sout = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sout);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = manager.allocatePtr();
+                var sout = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sout);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_octet_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocatePtr();
+                var sout = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sout);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var sout = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sout);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocatePtr();
+                var sout = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sout);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+    }
 }

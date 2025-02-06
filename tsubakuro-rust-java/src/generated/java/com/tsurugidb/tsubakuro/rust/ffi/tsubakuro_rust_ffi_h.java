@@ -15883,6 +15883,12 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiSqlParameterHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef const uint8_t *TsurugiFfiByteArrayHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiByteArrayHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiSqlPlaceholder *TsurugiFfiSqlPlaceholderHandle
      * }
      */
@@ -18414,6 +18420,68 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_parameter_of_octet {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_octet");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_octet$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_octet.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_octet$handle() {
+        return tsurugi_ffi_sql_parameter_of_octet.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_octet$address() {
+        return tsurugi_ffi_sql_parameter_of_octet.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_octet(MemorySegment context, MemorySegment name, MemorySegment value, long size, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_octet.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_octet", context, name, value, size, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, value, size, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_parameter_get_name {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -20267,6 +20335,129 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_character", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_octet {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_octet");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_octet$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_octet.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_octet$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_octet.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_octet$address() {
+        return tsurugi_ffi_sql_query_result_fetch_octet.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_octet(MemorySegment context, MemorySegment query_result, MemorySegment value_out, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_octet.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_octet", context, query_result, value_out, size_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, value_out, size_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_octet {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_octet");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_octet$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_octet.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_octet$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_octet.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_octet$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_octet.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_octet(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_octet.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_octet", context, query_result, timeout, value_out, size_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, value_out, size_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

@@ -10,7 +10,7 @@ use crate::{
     ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::query_result_metadata::TsurugiFfiSqlQueryResultMetadata,
-    TsurugiFfiDuration, TsurugiFfiStringHandle,
+    TsurugiFfiByteArrayHandle, TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
 use super::query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle;
@@ -19,6 +19,7 @@ pub(crate) struct TsurugiFfiSqlQueryResult {
     query_result: SqlQueryResult,
     runtime: Arc<tokio::runtime::Runtime>,
     character_value: Option<CString>,
+    octet_value: Option<Vec<u8>>,
 }
 
 impl TsurugiFfiSqlQueryResult {
@@ -30,6 +31,7 @@ impl TsurugiFfiSqlQueryResult {
             query_result,
             runtime,
             character_value: None,
+            octet_value: None,
         }
     }
 
@@ -700,7 +702,113 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     rc
 }
 
-// TODO tsurugi_ffi_sql_query_result_fetch_octet(), etc
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    value_out: *mut TsurugiFfiByteArrayHandle,
+    size_out: *mut u64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_octet()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, value_out={:?}, size_out={:?}",
+        context,
+        query_result,
+        value_out,
+        size_out
+    );
+
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(size_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, size_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value: Vec<u8> =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
+    let size = value.len();
+    query_result.octet_value = Some(value);
+
+    let ptr = if size != 0 {
+        query_result.octet_value.as_ref().unwrap().as_ptr()
+    } else {
+        std::ptr::null()
+    };
+    unsafe {
+        *value_out = ptr;
+        *size_out = size as u64;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, size={:?})",
+        rc,
+        ptr,
+        size as u64
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut TsurugiFfiByteArrayHandle,
+    size_out: *mut u64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_octet()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, value_out={:?}",
+        context,
+        query_result,
+        timeout,
+        value_out
+    );
+
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(size_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, size_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value: Vec<u8> = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for(timeout)
+    );
+    let size = value.len();
+    query_result.octet_value = Some(value);
+
+    let ptr = if size != 0 {
+        query_result.octet_value.as_ref().unwrap().as_ptr()
+    } else {
+        std::ptr::null()
+    };
+    unsafe {
+        *value_out = ptr;
+        *size_out = size as u64;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, size={:?})",
+        rc,
+        ptr,
+        size as u64
+    );
+    rc
+}
+
+// TODO tsurugi_ffi_sql_query_result_fetch_date(), etc
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_dispose(

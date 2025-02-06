@@ -10,8 +10,10 @@ mod session;
 mod transaction;
 mod util;
 
+/// nanosecond
+pub type TsurugiFfiDuration = u64;
+
 pub type TsurugiFfiStringHandle = *const c_char;
 pub type TsurugiFfiStringArrayHandle = *const TsurugiFfiStringHandle;
 
-/// nanosecond
-pub type TsurugiFfiDuration = u64;
+pub type TsurugiFfiByteArrayHandle = *const u8;

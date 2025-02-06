@@ -76,7 +76,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
         insertJava(values);
         var actual = selectFfi(pattern);
 
-        assertIterableEquals(values, actual);
+        assertValueList(values, actual);
     }
 
     private void insertJava(List<T> values) throws IOException, InterruptedException {
@@ -164,7 +164,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
         insertFfi(values);
         var actual = selectJava();
 
-        assertIterableEquals(values, actual);
+        assertValueList(values, actual);
     }
 
     private void insertFfi(List<T> values) {
@@ -245,4 +245,8 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
     protected abstract T fetch(TgFfiContext context, TgFfiSqlQueryResult qr);
 
     protected abstract T fetchFor(TgFfiContext context, TgFfiSqlQueryResult qr, Duration timeout);
+
+    protected void assertValueList(List<T> expected, List<T> actual) {
+        assertIterableEquals(expected, actual);
+    }
 }

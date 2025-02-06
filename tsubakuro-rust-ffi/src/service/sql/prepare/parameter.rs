@@ -8,7 +8,7 @@ use crate::{
     context::TsurugiFfiContextHandle,
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
     return_code::{rc_ok, TsurugiFfiRc},
-    TsurugiFfiStringHandle,
+    TsurugiFfiByteArrayHandle, TsurugiFfiStringHandle,
 };
 
 #[derive(Debug)]
@@ -242,6 +242,45 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let value = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, value);
+    let parameter = SqlParameter::of(name, value);
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_octet(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    value: TsurugiFfiByteArrayHandle,
+    size: u64,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_octet()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, size={:?}, parameter_out={:?}",
+        context,
+        name,
+        value,
+        size,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let value = unsafe { std::slice::from_raw_parts(value, size as usize) }.to_vec();
     let parameter = SqlParameter::of(name, value);
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));

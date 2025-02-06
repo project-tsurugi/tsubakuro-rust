@@ -280,6 +280,8 @@ typedef struct TsurugiFfiSqlExecuteResult *TsurugiFfiSqlExecuteResultHandle;
 
 typedef struct TsurugiFfiSqlParameter *TsurugiFfiSqlParameterHandle;
 
+typedef const uint8_t *TsurugiFfiByteArrayHandle;
+
 typedef struct TsurugiFfiSqlPlaceholder *TsurugiFfiSqlPlaceholderHandle;
 
 typedef struct TsurugiFfiSqlPreparedStatement *TsurugiFfiSqlPreparedStatementHandle;
@@ -492,6 +494,12 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle cont
                                                     TsurugiFfiStringHandle value,
                                                     TsurugiFfiSqlParameterHandle *parameter_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context,
+                                                TsurugiFfiStringHandle name,
+                                                TsurugiFfiByteArrayHandle value,
+                                                uint64_t size,
+                                                TsurugiFfiSqlParameterHandle *parameter_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlParameterHandle parameter,
                                                 TsurugiFfiStringHandle *name_out);
@@ -616,6 +624,17 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextH
                                                               TsurugiFfiSqlQueryResultHandle query_result,
                                                               TsurugiFfiDuration timeout,
                                                               TsurugiFfiStringHandle *value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle context,
+                                                      TsurugiFfiSqlQueryResultHandle query_result,
+                                                      TsurugiFfiByteArrayHandle *value_out,
+                                                      uint64_t *size_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiSqlQueryResultHandle query_result,
+                                                          TsurugiFfiDuration timeout,
+                                                          TsurugiFfiByteArrayHandle *value_out,
+                                                          uint64_t *size_out);
 
 void tsurugi_ffi_sql_query_result_dispose(TsurugiFfiSqlQueryResultHandle query_result);
 
