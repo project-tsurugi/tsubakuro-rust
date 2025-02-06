@@ -87,6 +87,13 @@ impl SqlParameter {
         SqlParameter::new(name, Some(value))
     }
 
+    pub fn of_decimal_opt(name: &str, value: Option<(Vec<u8>, i32)>) -> SqlParameter {
+        match value {
+            Some(value) => Self::of_decimal(name, value),
+            None => Self::null(name),
+        }
+    }
+
     pub fn of_decimal_i128(name: &str, value: (i128, i32)) -> SqlParameter {
         let unscaled_value = value.0.to_be_bytes().to_vec();
         let exponent = value.1;
@@ -617,6 +624,12 @@ mod test {
             }),
             target0.value().unwrap()
         );
+
+        let target = SqlParameter::of_decimal_opt("test", Some((vec![4, 0xd2], -1)));
+        assert_eq!(target0, target);
+
+        let target1 = SqlParameter::of_decimal_opt("test", None);
+        assert_eq!(SqlParameter::null("test"), target1);
 
         let target = SqlParameter::of_decimal_i128("test", (1234, -1));
         assert_eq!(target0.name(), target.name());
