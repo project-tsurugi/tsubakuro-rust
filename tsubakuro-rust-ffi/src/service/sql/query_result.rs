@@ -10,7 +10,7 @@ use crate::{
     ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::query_result_metadata::TsurugiFfiSqlQueryResultMetadata,
-    TsurugiFfiByteArrayHandle, TsurugiFfiDuration, TsurugiFfiStringHandle,
+    vec_u8_to_field, TsurugiFfiByteArrayHandle, TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
 use super::query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle;
@@ -18,6 +18,7 @@ use super::query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle;
 pub(crate) struct TsurugiFfiSqlQueryResult {
     query_result: SqlQueryResult,
     runtime: Arc<tokio::runtime::Runtime>,
+    unscaled_value_bytes: Option<Vec<u8>>,
     character_value: Option<CString>,
     octet_value: Option<Vec<u8>>,
 }
@@ -30,6 +31,7 @@ impl TsurugiFfiSqlQueryResult {
         TsurugiFfiSqlQueryResult {
             query_result,
             runtime,
+            unscaled_value_bytes: None,
             character_value: None,
             octet_value: None,
         }
@@ -624,7 +626,263 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
     rc
 }
 
-// TODO tsurugi_ffi_sql_query_result_fetch_decimal()
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    unscaled_value_bytes_out: *mut TsurugiFfiByteArrayHandle,
+    unscaled_value_bytes_size_out: *mut u32,
+    unscaled_value_out: *mut i64,
+    exponent_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_decimal()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, unscaled_value_bytes_out={:?}, unscaled_value_bytes_size_out={:?}, unscaled_value_out={:?}, exponent_out={:?}",
+        context,
+        query_result,
+        unscaled_value_bytes_out,
+        unscaled_value_bytes_size_out,
+        unscaled_value_out,
+        exponent_out,
+    );
+
+    ffi_arg_out_initialize!(unscaled_value_bytes_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(unscaled_value_bytes_size_out, 0);
+    ffi_arg_out_initialize!(unscaled_value_out, 0);
+    ffi_arg_out_initialize!(exponent_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, unscaled_value_bytes_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, unscaled_value_bytes_size_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, unscaled_value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, exponent_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_decimal()
+    );
+
+    let (ptr, size) = if let Some(vec) = value.0 {
+        vec_u8_to_field!(query_result.unscaled_value_bytes, vec)
+    } else {
+        (std::ptr::null(), 0)
+    };
+    let unscaled_value_bytes_size = size as u32;
+    let unscaled_value = value.1;
+    let exponent = value.2;
+
+    unsafe {
+        *unscaled_value_bytes_out = ptr;
+        *unscaled_value_bytes_size_out = unscaled_value_bytes_size;
+        *unscaled_value_out = unscaled_value;
+        *exponent_out = exponent;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (unscaled_value_bytes={:?}, unscaled_value_bytes_size={:?}, unscaled_value={:?}, exponent={:?})",
+        rc,
+        ptr,
+        unscaled_value_bytes_size_out,
+        unscaled_value,
+        exponent
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    unscaled_value_bytes_out: *mut TsurugiFfiByteArrayHandle,
+    unscaled_value_bytes_size_out: *mut u32,
+    unscaled_value_out: *mut i64,
+    exponent_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_decimal()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, unscaled_value_bytes_out={:?}, unscaled_value_bytes_size_out={:?}, unscaled_value_out={:?}, exponent_out={:?}",
+        context,
+        query_result,
+        timeout,
+        unscaled_value_bytes_out,
+        unscaled_value_bytes_size_out,
+        unscaled_value_out,
+        exponent_out,
+    );
+
+    ffi_arg_out_initialize!(unscaled_value_bytes_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(unscaled_value_bytes_size_out, 0);
+    ffi_arg_out_initialize!(unscaled_value_out, 0);
+    ffi_arg_out_initialize!(exponent_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, unscaled_value_bytes_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, unscaled_value_bytes_size_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, unscaled_value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, exponent_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for_decimal(timeout)
+    );
+
+    let (ptr, size) = if let Some(vec) = value.0 {
+        vec_u8_to_field!(query_result.unscaled_value_bytes, vec)
+    } else {
+        (std::ptr::null(), 0)
+    };
+    let unscaled_value_bytes_size = size as u32;
+    let unscaled_value = value.1;
+    let exponent = value.2;
+
+    unsafe {
+        *unscaled_value_bytes_out = ptr;
+        *unscaled_value_bytes_size_out = unscaled_value_bytes_size;
+        *unscaled_value_out = unscaled_value;
+        *exponent_out = exponent;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (unscaled_value_bytes={:?}, unscaled_value_bytes_size={:?}, unscaled_value={:?}, exponent={:?})",
+        rc,
+        ptr,
+        unscaled_value_bytes_size_out,
+        unscaled_value,
+        exponent
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    unscaled_value_high_out: *mut i64,
+    unscaled_value_low_out: *mut u64,
+    exponent_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_decimal_i128()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, unscaled_value_high_out={:?}, unscaled_value_low_out={:?}, exponent_out={:?}",
+        context,
+        query_result,
+        unscaled_value_high_out,
+        unscaled_value_low_out,
+        exponent_out,
+    );
+
+    ffi_arg_out_initialize!(unscaled_value_high_out, 0);
+    ffi_arg_out_initialize!(unscaled_value_low_out, 0);
+    ffi_arg_out_initialize!(exponent_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, unscaled_value_high_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, unscaled_value_low_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, exponent_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_decimal_i128()
+    );
+
+    let unscaled_value = value.0;
+    let high_value = (unscaled_value >> 64) as i64;
+    let low_value = unscaled_value as u64;
+    let exponent = value.1;
+
+    unsafe {
+        *unscaled_value_high_out = high_value;
+        *unscaled_value_low_out = low_value;
+        *exponent_out = exponent;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (unscaled_value_high={:?}, unscaled_value_low={:?}, exponent={:?})",
+        rc,
+        high_value,
+        low_value,
+        exponent
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    unscaled_value_high_out: *mut i64,
+    unscaled_value_low_out: *mut u64,
+    exponent_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_decimal_i128()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, unscaled_value_high_out={:?}, unscaled_value_low_out={:?}, exponent_out={:?}",
+        context,
+        query_result,
+        timeout,
+        unscaled_value_high_out,
+        unscaled_value_low_out,
+        exponent_out,
+    );
+
+    ffi_arg_out_initialize!(unscaled_value_high_out, 0);
+    ffi_arg_out_initialize!(unscaled_value_low_out, 0);
+    ffi_arg_out_initialize!(exponent_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, unscaled_value_high_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, unscaled_value_low_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, exponent_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for_decimal_i128(timeout)
+    );
+
+    let unscaled_value = value.0;
+    let high_value = (unscaled_value >> 64) as i64;
+    let low_value = unscaled_value as u64;
+    let exponent = value.1;
+
+    unsafe {
+        *unscaled_value_high_out = high_value;
+        *unscaled_value_low_out = low_value;
+        *exponent_out = exponent;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (unscaled_value_high={:?}, unscaled_value_low={:?}, exponent={:?})",
+        rc,
+        high_value,
+        low_value,
+        exponent
+    );
+    rc
+}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
@@ -729,17 +987,11 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
     let runtime = query_result.runtime().clone();
     let value: Vec<u8> =
         ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
-    let size = value.len();
-    query_result.octet_value = Some(value);
 
-    let ptr = if size != 0 {
-        query_result.octet_value.as_ref().unwrap().as_ptr()
-    } else {
-        std::ptr::null()
-    };
+    let (ptr, size) = vec_u8_to_field!(query_result.octet_value, value);
     unsafe {
         *value_out = ptr;
-        *size_out = size as u64;
+        *size_out = size;
     }
 
     let rc = rc_ok(context);
@@ -747,7 +999,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
         "{FUNCTION_NAME} end rc={:x}. (value={:?}, size={:?})",
         rc,
         ptr,
-        size as u64
+        size
     );
     rc
 }

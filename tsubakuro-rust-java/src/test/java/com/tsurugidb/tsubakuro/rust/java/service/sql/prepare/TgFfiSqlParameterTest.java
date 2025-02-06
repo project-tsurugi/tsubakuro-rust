@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql.prepare;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.foreign.MemorySegment;
+import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 
@@ -127,6 +128,65 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_float8(ctx, arg1, arg2, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_decimal_argError() {
+        var manager = getFfiObjectManager();
+
+        var value = new BigDecimal("1234.56");
+        byte[] unscaledValue = value.unscaledValue().toByteArray();
+        int size = unscaledValue.length;
+        int exponent = -value.scale();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = manager.allocateBytes(unscaledValue);
+            var out = manager.allocatePtr();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal(ctx, arg1, arg2, size, exponent, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = MemorySegment.NULL;
+            var out = manager.allocatePtr();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal(ctx, arg1, arg2, size, exponent, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = manager.allocateBytes(unscaledValue);
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal(ctx, arg1, arg2, size, exponent, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_decimal_i128_argError() {
+        var manager = getFfiObjectManager();
+
+        long high = 123;
+        long low = 456;
+        int exponent = -2;
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var out = manager.allocatePtr();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal_i128(ctx, arg1, high, low, exponent, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal_i128(ctx, arg1, high, low, exponent, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
         }
     }
 

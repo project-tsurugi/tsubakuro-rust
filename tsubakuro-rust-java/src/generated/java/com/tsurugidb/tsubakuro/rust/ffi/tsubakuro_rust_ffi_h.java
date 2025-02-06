@@ -18359,6 +18359,132 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_parameter_of_decimal {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_decimal");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle unscaled_value, uint32_t unscaled_value_size, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_decimal$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_decimal.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle unscaled_value, uint32_t unscaled_value_size, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_decimal$handle() {
+        return tsurugi_ffi_sql_parameter_of_decimal.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle unscaled_value, uint32_t unscaled_value_size, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_decimal$address() {
+        return tsurugi_ffi_sql_parameter_of_decimal.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle unscaled_value, uint32_t unscaled_value_size, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_decimal(MemorySegment context, MemorySegment name, MemorySegment unscaled_value, int unscaled_value_size, int exponent, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_decimal.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_decimal", context, name, unscaled_value, unscaled_value_size, exponent, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, unscaled_value, unscaled_value_size, exponent, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_parameter_of_decimal_i128 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_decimal_i128");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t unscaled_value_high, uint64_t unscaled_value_low, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_decimal_i128$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_decimal_i128.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t unscaled_value_high, uint64_t unscaled_value_low, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_decimal_i128$handle() {
+        return tsurugi_ffi_sql_parameter_of_decimal_i128.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t unscaled_value_high, uint64_t unscaled_value_low, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_decimal_i128$address() {
+        return tsurugi_ffi_sql_parameter_of_decimal_i128.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t unscaled_value_high, uint64_t unscaled_value_low, int32_t exponent, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_decimal_i128(MemorySegment context, MemorySegment name, long unscaled_value_high, long unscaled_value_low, int exponent, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_decimal_i128.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_decimal_i128", context, name, unscaled_value_high, unscaled_value_low, exponent, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, unscaled_value_high, unscaled_value_low, exponent, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_parameter_of_character {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -18438,7 +18564,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t value_size, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_octet$descriptor() {
@@ -18448,7 +18574,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t value_size, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_parameter_of_octet$handle() {
@@ -18458,7 +18584,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t value_size, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_parameter_of_octet$address() {
@@ -18467,16 +18593,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiSqlParameterHandle *parameter_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiByteArrayHandle value, uint64_t value_size, TsurugiFfiSqlParameterHandle *parameter_out)
      * }
      */
-    public static int tsurugi_ffi_sql_parameter_of_octet(MemorySegment context, MemorySegment name, MemorySegment value, long size, MemorySegment parameter_out) {
+    public static int tsurugi_ffi_sql_parameter_of_octet(MemorySegment context, MemorySegment name, MemorySegment value, long value_size, MemorySegment parameter_out) {
         var mh$ = tsurugi_ffi_sql_parameter_of_octet.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_parameter_of_octet", context, name, value, size, parameter_out);
+                traceDowncall("tsurugi_ffi_sql_parameter_of_octet", context, name, value, value_size, parameter_out);
             }
-            return (int)mh$.invokeExact(context, name, value, size, parameter_out);
+            return (int)mh$.invokeExact(context, name, value, value_size, parameter_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20214,6 +20340,258 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_float8", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_decimal {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_decimal");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_decimal$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_decimal.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_decimal$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_decimal.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_decimal$address() {
+        return tsurugi_ffi_sql_query_result_fetch_decimal.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_decimal(MemorySegment context, MemorySegment query_result, MemorySegment unscaled_value_bytes_out, MemorySegment unscaled_value_bytes_size_out, MemorySegment unscaled_value_out, MemorySegment exponent_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_decimal.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_decimal", context, query_result, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_decimal {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_decimal");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_decimal$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_decimal.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_decimal$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_decimal.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_decimal$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_decimal.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *unscaled_value_bytes_out, uint32_t *unscaled_value_bytes_size_out, int64_t *unscaled_value_out, int32_t *exponent_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_decimal(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment unscaled_value_bytes_out, MemorySegment unscaled_value_bytes_size_out, MemorySegment unscaled_value_out, MemorySegment exponent_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_decimal.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_decimal", context, query_result, timeout, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_decimal_i128 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_decimal_i128");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_decimal_i128$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_decimal_i128.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_decimal_i128$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_decimal_i128.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_decimal_i128$address() {
+        return tsurugi_ffi_sql_query_result_fetch_decimal_i128.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_decimal_i128(MemorySegment context, MemorySegment query_result, MemorySegment unscaled_value_high_out, MemorySegment unscaled_value_low_out, MemorySegment exponent_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_decimal_i128.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_decimal_i128", context, query_result, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_decimal_i128 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_decimal_i128");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_decimal_i128$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_decimal_i128.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_decimal_i128$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_decimal_i128.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_decimal_i128$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_decimal_i128.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *unscaled_value_high_out, uint64_t *unscaled_value_low_out, int32_t *exponent_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment unscaled_value_high_out, MemorySegment unscaled_value_low_out, MemorySegment exponent_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_decimal_i128.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_decimal_i128", context, query_result, timeout, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

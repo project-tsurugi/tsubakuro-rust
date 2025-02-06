@@ -1,3 +1,4 @@
+pub(crate) mod bytes;
 pub(crate) mod cchar;
 
 #[macro_export]

@@ -489,6 +489,20 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context
                                                  double value,
                                                  TsurugiFfiSqlParameterHandle *parameter_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiStringHandle name,
+                                                  TsurugiFfiByteArrayHandle unscaled_value,
+                                                  uint32_t unscaled_value_size,
+                                                  int32_t exponent,
+                                                  TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal_i128(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiStringHandle name,
+                                                       int64_t unscaled_value_high,
+                                                       uint64_t unscaled_value_low,
+                                                       int32_t exponent,
+                                                       TsurugiFfiSqlParameterHandle *parameter_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context,
                                                     TsurugiFfiStringHandle name,
                                                     TsurugiFfiStringHandle value,
@@ -497,7 +511,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle cont
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context,
                                                 TsurugiFfiStringHandle name,
                                                 TsurugiFfiByteArrayHandle value,
-                                                uint64_t size,
+                                                uint64_t value_size,
                                                 TsurugiFfiSqlParameterHandle *parameter_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context,
@@ -615,6 +629,34 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float8(TsurugiFfiContextHand
                                                            TsurugiFfiSqlQueryResultHandle query_result,
                                                            TsurugiFfiDuration timeout,
                                                            double *value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiSqlQueryResultHandle query_result,
+                                                        TsurugiFfiByteArrayHandle *unscaled_value_bytes_out,
+                                                        uint32_t *unscaled_value_bytes_size_out,
+                                                        int64_t *unscaled_value_out,
+                                                        int32_t *exponent_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiSqlQueryResultHandle query_result,
+                                                            TsurugiFfiDuration timeout,
+                                                            TsurugiFfiByteArrayHandle *unscaled_value_bytes_out,
+                                                            uint32_t *unscaled_value_bytes_size_out,
+                                                            int64_t *unscaled_value_out,
+                                                            int32_t *exponent_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHandle context,
+                                                             TsurugiFfiSqlQueryResultHandle query_result,
+                                                             int64_t *unscaled_value_high_out,
+                                                             uint64_t *unscaled_value_low_out,
+                                                             int32_t *exponent_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiContextHandle context,
+                                                                 TsurugiFfiSqlQueryResultHandle query_result,
+                                                                 TsurugiFfiDuration timeout,
+                                                                 int64_t *unscaled_value_high_out,
+                                                                 uint64_t *unscaled_value_low_out,
+                                                                 int32_t *exponent_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlQueryResultHandle query_result,

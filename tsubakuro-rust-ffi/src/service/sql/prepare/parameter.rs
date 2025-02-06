@@ -4,7 +4,7 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    cchar_field_set,
+    bytes_to_vec_u8, cchar_field_set,
     context::TsurugiFfiContextHandle,
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
     return_code::{rc_ok, TsurugiFfiRc},
@@ -220,6 +220,87 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float8(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_decimal(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    unscaled_value: TsurugiFfiByteArrayHandle,
+    unscaled_value_size: u32,
+    exponent: i32,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_decimal()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, unscaled_value={:?}, unscaled_value_size={:?}, exponent={:?}, parameter_out={:?}",
+        context,
+        name,
+        unscaled_value,
+        unscaled_value_size,
+        exponent,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, unscaled_value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let unscaled_value = bytes_to_vec_u8!(unscaled_value, unscaled_value_size);
+    let parameter = SqlParameter::of_decimal(name, unscaled_value, exponent);
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_decimal_i128(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    unscaled_value_high: i64,
+    unscaled_value_low: u64,
+    exponent: i32,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_decimal_i128()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, unscaled_value_high={:?}, unscaled_value_low={:?}, exponent={:?}, parameter_out={:?}",
+        context,
+        name,
+        unscaled_value_high,
+        unscaled_value_low,
+        exponent,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let unscaled_value = ((unscaled_value_high as i128) << 64) | (unscaled_value_low as i128);
+    let parameter = SqlParameter::of_decimal_i128(name, (unscaled_value, exponent));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
     context: TsurugiFfiContextHandle,
     name: TsurugiFfiStringHandle,
@@ -261,16 +342,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_octet(
     context: TsurugiFfiContextHandle,
     name: TsurugiFfiStringHandle,
     value: TsurugiFfiByteArrayHandle,
-    size: u64,
+    value_size: u64,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_octet()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, size={:?}, parameter_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, value_size={:?}, parameter_out={:?}",
         context,
         name,
         value,
-        size,
+        value_size,
         parameter_out
     );
 
@@ -280,7 +361,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_octet(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
-    let value = unsafe { std::slice::from_raw_parts(value, size as usize) }.to_vec();
+    let value = bytes_to_vec_u8!(value, value_size);
     let parameter = SqlParameter::of(name, value);
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));

@@ -9,6 +9,8 @@ mod chrono_naive_date;
 mod chrono_naive_date_time;
 mod chrono_naive_time;
 mod chrono_naive_time_with_offset;
+mod decimal0;
+mod decimal1;
 mod float4;
 mod float8;
 mod int4;

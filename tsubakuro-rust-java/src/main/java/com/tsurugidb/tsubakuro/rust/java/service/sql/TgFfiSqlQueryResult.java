@@ -2,7 +2,10 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -184,6 +187,97 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
         return out.get(ValueLayout.JAVA_DOUBLE, 0);
     }
 
+    public synchronized BigDecimal fetchDecimal(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var bytesOut = allocatePtr();
+        var sizeOut = allocatePtr();
+        var valueOut = allocatePtr();
+        var exponentOut = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        int scale = -outToInt(exponentOut);
+
+        if (outToHandle(bytesOut).address() == 0 || outToInt(sizeOut) == 0) {
+            long unscaledValue = outToLong(valueOut);
+            return BigDecimal.valueOf(unscaledValue, scale);
+        } else {
+            var bytes = outToBytesInt(bytesOut, sizeOut);
+            var unscaledValue = new BigInteger(bytes);
+            return new BigDecimal(unscaledValue, scale);
+        }
+    }
+
+    public synchronized BigDecimal fetchForDecimal(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var bytesOut = allocatePtr();
+        var sizeOut = allocatePtr();
+        var valueOut = allocatePtr();
+        var exponentOut = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        int scale = -outToInt(exponentOut);
+
+        if (outToHandle(bytesOut).address() == 0 || outToInt(sizeOut) == 0) {
+            long unscaledValue = outToLong(valueOut);
+            return BigDecimal.valueOf(unscaledValue, scale);
+        } else {
+            var bytes = outToBytesInt(bytesOut, sizeOut);
+            var unscaledValue = new BigInteger(bytes);
+            return new BigDecimal(unscaledValue, scale);
+        }
+    }
+
+    private static final BigInteger MASK;
+    static {
+        var buf = new byte[Long.BYTES + 1];
+        Arrays.fill(buf, 1, buf.length, (byte) 0xff);
+        MASK = new BigInteger(buf);
+    }
+
+    public synchronized BigDecimal fetchDecimalI128(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var highOut = allocatePtr();
+        var lowOut = allocatePtr();
+        var exponentOut = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long high = outToLong(highOut);
+        long low = outToLong(lowOut);
+        int scale = -outToInt(exponentOut);
+
+        var h = BigInteger.valueOf(high).shiftLeft(64);
+        var l = BigInteger.valueOf(low).and(MASK);
+        var unscaledValue = h.or(l);
+        return new BigDecimal(unscaledValue, scale);
+    }
+
+    public synchronized BigDecimal fetchForDecimalI128(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var highOut = allocatePtr();
+        var lowOut = allocatePtr();
+        var exponentOut = allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long high = outToLong(highOut);
+        long low = outToLong(lowOut);
+        int scale = -outToInt(exponentOut);
+
+        var h = BigInteger.valueOf(high).shiftLeft(64);
+        var l = BigInteger.valueOf(low).and(MASK);
+        var unscaledValue = h.or(l);
+        return new BigDecimal(unscaledValue, scale);
+    }
+
     public synchronized String fetchCharacter(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
@@ -213,7 +307,7 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_octet(ctx, handle, out, sizeOut);
         TgFfiRcUtil.throwIfError(rc, context);
 
-        return outToBytes(out, sizeOut);
+        return outToBytesLong(out, sizeOut);
     }
 
     public synchronized byte[] fetchForOctet(TgFfiContext context, Duration timeout) {
@@ -225,7 +319,7 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_octet(ctx, handle, t, out, sizeOut);
         TgFfiRcUtil.throwIfError(rc, context);
 
-        return outToBytes(out, sizeOut);
+        return outToBytesLong(out, sizeOut);
     }
 
     @Override

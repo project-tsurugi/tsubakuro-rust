@@ -553,6 +553,227 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
     }
 
     @Test
+    void fetch_decimal_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = manager.allocatePtr();
+                var valueOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var bytesOut = MemorySegment.NULL;
+                var sizeOut = manager.allocatePtr();
+                var valueOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = MemorySegment.NULL;
+                var valueOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = manager.allocatePtr();
+                var valueOut = MemorySegment.NULL;
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = manager.allocatePtr();
+                var valueOut = manager.allocatePtr();
+                var exponentOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal(ctx, handle, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_decimal_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = manager.allocatePtr();
+                var valueOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var bytesOut = MemorySegment.NULL;
+                var sizeOut = manager.allocatePtr();
+                var valueOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = MemorySegment.NULL;
+                var valueOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = manager.allocatePtr();
+                var valueOut = MemorySegment.NULL;
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var bytesOut = manager.allocatePtr();
+                var sizeOut = manager.allocatePtr();
+                var valueOut = manager.allocatePtr();
+                var exponentOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal(ctx, handle, t, bytesOut, sizeOut, valueOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG6_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_decimal_i128_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var highOut = manager.allocatePtr();
+                var lowOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var highOut = MemorySegment.NULL;
+                var lowOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var highOut = manager.allocatePtr();
+                var lowOut = MemorySegment.NULL;
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var highOut = manager.allocatePtr();
+                var lowOut = manager.allocatePtr();
+                var exponentOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_decimal_i128(ctx, handle, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_decimal_i128_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var highOut = manager.allocatePtr();
+                var lowOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var highOut = MemorySegment.NULL;
+                var lowOut = manager.allocatePtr();
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var highOut = manager.allocatePtr();
+                var lowOut = MemorySegment.NULL;
+                var exponentOut = manager.allocatePtr();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var highOut = manager.allocatePtr();
+                var lowOut = manager.allocatePtr();
+                var exponentOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(ctx, handle, t, highOut, lowOut, exponentOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
     void fetch_character_argError() {
         var manager = getFfiObjectManager();
 

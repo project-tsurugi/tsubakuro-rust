@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql.prepare;
 
 import java.lang.foreign.MemorySegment;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -169,6 +170,82 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var arg2 = value;
         var out = manager.allocatePtr();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_float8(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofDecimal(TgFfiContext context, String name, BigDecimal value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofDecimal(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofDecimal(TgFfiObjectManager manager, String name, BigDecimal value) {
+        return ofDecimal(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofDecimal(TgFfiObjectManager manager, TgFfiContext context, String name, BigDecimal value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofDecimalMain(manager, context, name, value);
+            }
+        } else {
+            return ofDecimalMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofDecimalMain(TgFfiObjectManager manager, TgFfiContext context, String name, BigDecimal value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+
+        byte[] unscaledValue = value.unscaledValue().toByteArray();
+        var arg2 = manager.allocateBytes(unscaledValue);
+        int size = unscaledValue.length;
+        int exponent = -value.scale();
+
+        var out = manager.allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal(ctx, arg1, arg2, size, exponent, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofDecimalI128(TgFfiContext context, String name, BigDecimal value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofDecimalI128(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofDecimalI128(TgFfiObjectManager manager, String name, BigDecimal value) {
+        return ofDecimalI128(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofDecimalI128(TgFfiObjectManager manager, TgFfiContext context, String name, BigDecimal value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofDecimalI128Main(manager, context, name, value);
+            }
+        } else {
+            return ofDecimalI128Main(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofDecimalI128Main(TgFfiObjectManager manager, TgFfiContext context, String name, BigDecimal value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+
+        var unscaledValue = value.unscaledValue();
+        long high = unscaledValue.shiftRight(64).longValueExact();
+        long low = unscaledValue.longValue();
+        int exponent = -value.scale();
+
+        var out = manager.allocatePtr();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_decimal_i128(ctx, arg1, high, low, exponent, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
         var outHandle = outToHandle(out);
