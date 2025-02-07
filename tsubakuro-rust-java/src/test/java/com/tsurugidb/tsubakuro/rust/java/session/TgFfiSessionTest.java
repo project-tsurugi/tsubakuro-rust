@@ -338,13 +338,6 @@ class TgFfiSessionTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown(ctx, handle, arg);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var session = createSession()) {
-            var ctx = context.handle();
-            var handle = session.handle();
-            var arg = -1;
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown(ctx, handle, arg);
-            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
-        }
     }
 
     @ParameterizedTest
@@ -375,14 +368,6 @@ class TgFfiSessionTest extends TgFfiTester {
             var t = Duration.ofSeconds(5).toNanos();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_for(ctx, handle, arg, t);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-        }
-        try (var session = createSession()) {
-            var ctx = context.handle();
-            var handle = session.handle();
-            var arg = -1;
-            var t = Duration.ofSeconds(5).toNanos();
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_for(ctx, handle, arg, t);
-            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
     }
 
@@ -424,14 +409,6 @@ class TgFfiSessionTest extends TgFfiTester {
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
         try (var session = createSession()) {
-            {
-                var ctx = context.handle();
-                var handle = session.handle();
-                var arg = -1;
-                var out = manager.allocateHandleOut();
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_shutdown_async(ctx, handle, arg, out);
-                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
-            }
             {
                 var ctx = context.handle();
                 var handle = session.handle();

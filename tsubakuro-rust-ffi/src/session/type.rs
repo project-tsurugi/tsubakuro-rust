@@ -11,12 +11,6 @@ pub enum TsurugiFfiShutdownType {
     Forceful = 2,
 }
 
-impl TsurugiFfiShutdownType {
-    pub(crate) fn is_valid(value: i32) -> bool {
-        matches!(value, 0 | 1 | 2)
-    }
-}
-
 impl From<TsurugiFfiShutdownType> for ShutdownType {
     fn from(value: TsurugiFfiShutdownType) -> Self {
         match value {

@@ -66,14 +66,6 @@ class TgFfiCommitOptionTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_set_commit_type(ctx, handle, arg);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var target = TgFfiCommitOption.create(context)) {
-            var ctx = context.handle();
-            var handle = target.handle();
-            var arg = -1;
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_commit_option_set_commit_type(ctx, handle, arg);
-            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
-        }
     }
 
     @Test

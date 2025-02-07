@@ -13,12 +13,6 @@ pub enum TsurugiFfiTransactionType {
     ReadOnly = 3,
 }
 
-impl TsurugiFfiTransactionType {
-    pub(crate) fn is_valid(value: i32) -> bool {
-        matches!(value, 0 | 1 | 2 | 3)
-    }
-}
-
 impl From<TransactionType> for TsurugiFfiTransactionType {
     fn from(value: TransactionType) -> Self {
         match value {
@@ -54,12 +48,6 @@ pub enum TsurugiFfiTransactionPriority {
     InterruptExclude = 3,
     /// prevents new transactions and waits for the running transactions will end, and keep lock-out until its end.
     WaitExclude = 4,
-}
-
-impl TsurugiFfiTransactionPriority {
-    pub(crate) fn is_valid(value: i32) -> bool {
-        matches!(value, 0 | 1 | 2 | 3 | 4)
-    }
 }
 
 impl From<TransactionPriority> for TsurugiFfiTransactionPriority {

@@ -46,15 +46,6 @@ pub enum TsurugiFfiAtomType {
     Unrecognized = -1,
 }
 
-impl TsurugiFfiAtomType {
-    pub fn is_valid(value: i32) -> bool {
-        matches!(
-            value,
-            0 | 1 | 4 | 5 | 6 | 7 | 8 | 9 | 11 | 13 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 31
-        )
-    }
-}
-
 macro_rules! impl_from_for_enum {
     ($from:ident, $to:ident { $($variant:ident),*$(,)? }) => {
         impl From<$from> for $to {

@@ -39,14 +39,6 @@ class TgFfiSqlPlaceholderTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var arg1 = manager.allocateString("test");
-            var arg2 = -1;
-            var out = manager.allocateHandleOut();
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_of_atom_type(ctx, arg1, arg2, out);
-            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
-        }
-        try (var context = TgFfiContext.create(manager)) {
-            var ctx = context.handle();
-            var arg1 = manager.allocateString("test");
             var arg2 = TgFfiAtomType.INT4.value();
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_placeholder_of_atom_type(ctx, arg1, arg2, out);

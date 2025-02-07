@@ -3,7 +3,7 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     context::TsurugiFfiContextHandle,
-    ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    ffi_arg_out_initialize, ffi_arg_require_non_null,
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
@@ -20,12 +20,6 @@ pub enum TsurugiFfiCommitType {
     Stored = 30,
     /// commit data has been propagated to the all suitable nodes.
     Propagated = 40,
-}
-
-impl TsurugiFfiCommitType {
-    fn is_valid(value: i32) -> bool {
-        matches!(value, 0 | 10 | 20 | 30 | 40)
-    }
 }
 
 impl From<CommitType> for TsurugiFfiCommitType {
@@ -121,9 +115,6 @@ pub extern "C" fn tsurugi_ffi_commit_option_set_commit_type(
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, commit_option);
-    if !TsurugiFfiCommitType::is_valid(commit_type as i32) {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "commit_type", "is invalid");
-    }
 
     let commit_option = unsafe { &mut *commit_option };
 

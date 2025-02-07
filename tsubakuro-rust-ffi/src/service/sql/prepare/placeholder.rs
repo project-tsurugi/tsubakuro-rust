@@ -7,7 +7,6 @@ use crate::{
     cchar_field_set,
     context::TsurugiFfiContextHandle,
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
-    rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::atom_type::TsurugiFfiAtomType,
     TsurugiFfiStringHandle,
@@ -59,9 +58,6 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
 
     ffi_arg_out_initialize!(placeholder_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
-    if !TsurugiFfiAtomType::is_valid(atom_type as i32) {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "atom_type", "is invalid");
-    }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, placeholder_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);

@@ -8,7 +8,6 @@ use crate::{
     context::TsurugiFfiContextHandle,
     cstring_array_field_clear, cstring_array_field_set_if_none, cstring_array_field_to_ptr,
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
-    rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     util::cchar::TsurugiFfiCStringArray,
     TsurugiFfiDuration, TsurugiFfiStringArrayHandle, TsurugiFfiStringHandle,
@@ -93,9 +92,6 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_type(
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
-    if !TsurugiFfiTransactionType::is_valid(transaction_type as i32) {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "transaction_type", "is invalid");
-    }
 
     let transaction_option = unsafe { &mut *transaction_option };
 
@@ -544,9 +540,6 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_priority(
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
-    if !TsurugiFfiTransactionPriority::is_valid(priority as i32) {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "priority", "is invalid");
-    }
 
     let transaction_option = unsafe { &mut *transaction_option };
 

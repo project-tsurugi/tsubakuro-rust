@@ -67,14 +67,6 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_type(ctx, handle, arg);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var target = TgFfiTransactionOption.create(context)) {
-            var ctx = context.handle();
-            var handle = target.handle();
-            var arg = -1;
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_transaction_type(ctx, handle, arg);
-            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
-        }
     }
 
     @Test
@@ -441,14 +433,6 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
             var arg = TgFfiTransactionType.LONG.value();
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_priority(ctx, handle, arg);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
-        }
-        try (var context = TgFfiContext.create(manager); //
-                var target = TgFfiTransactionOption.create(context)) {
-            var ctx = context.handle();
-            var handle = target.handle();
-            var arg = -1;
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_priority(ctx, handle, arg);
-            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
     }
 

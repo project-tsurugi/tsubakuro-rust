@@ -7,7 +7,6 @@ use crate::{
     context::TsurugiFfiContextHandle,
     ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
-    rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
     TsurugiFfiDuration,
@@ -437,9 +436,6 @@ pub extern "C" fn tsurugi_ffi_session_shutdown(
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
-    if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "shutdown_type", "is invalid");
-    }
 
     let session = unsafe { &*session };
 
@@ -473,9 +469,6 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_for(
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
-    if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "shutdown_type", "is invalid");
-    }
 
     let session = unsafe { &*session };
     let timeout = Duration::from_nanos(timeout);
@@ -511,9 +504,6 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_async(
 
     ffi_arg_out_initialize!(shutdown_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
-    if !TsurugiFfiShutdownType::is_valid(shutdown_type as i32) {
-        return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "shutdown_type", "is invalid");
-    }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, shutdown_job_out);
 
     let session = unsafe { &*session };
