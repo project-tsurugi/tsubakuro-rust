@@ -42,7 +42,7 @@ pub enum TsurugiFfiAtomType {
     Blob = 22,
     /// unknown type.
     Unknown = 31,
-    ///
+    /// unrecognized.
     Unrecognized = -1,
 }
 

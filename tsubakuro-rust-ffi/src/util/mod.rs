@@ -5,6 +5,7 @@ pub(crate) mod cchar;
 macro_rules! ffi_arg_out_initialize {
     ($arg:expr, $value:expr) => {
         if (!$arg.is_null()) {
+            #[allow(clippy::macro_metavars_in_unsafe)]
             unsafe {
                 *$arg = $value;
             }

@@ -188,12 +188,9 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
     let transaction_option = unsafe { &mut *transaction_option };
 
     if transaction_option.transaction_label.is_none() {
-        match transaction_option.transaction_label() {
-            Some(value) => {
-                let label = value.clone();
-                cchar_field_set!(context, transaction_option.transaction_label, label);
-            }
-            None => {}
+        if let Some(value) = transaction_option.transaction_label() {
+            let label = value.clone();
+            cchar_field_set!(context, transaction_option.transaction_label, label);
         }
     }
 

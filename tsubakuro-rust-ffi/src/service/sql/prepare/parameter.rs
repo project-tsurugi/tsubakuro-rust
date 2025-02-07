@@ -582,12 +582,9 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
     let parameter = unsafe { &mut *parameter };
 
     if parameter.name.is_none() {
-        match parameter.name() {
-            Some(name) => {
-                let name = name.clone();
-                cchar_field_set!(context, parameter.name, name);
-            }
-            None => {}
+        if let Some(name) = parameter.name() {
+            let name = name.clone();
+            cchar_field_set!(context, parameter.name, name);
         }
     }
 

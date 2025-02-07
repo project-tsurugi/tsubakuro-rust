@@ -99,12 +99,9 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
     let placeholder = unsafe { &mut *placeholder };
 
     if placeholder.name.is_none() {
-        match placeholder.name() {
-            Some(name) => {
-                let name = name.clone();
-                cchar_field_set!(context, placeholder.name, name);
-            }
-            None => {}
+        if let Some(name) = placeholder.name() {
+            let name = name.clone();
+            cchar_field_set!(context, placeholder.name, name);
         }
     }
 

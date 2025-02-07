@@ -5,6 +5,7 @@ use crate::{TsurugiFfiStringArrayHandle, TsurugiFfiStringHandle};
 #[macro_export]
 macro_rules! ffi_arg_cchar_to_str {
     ($context:expr, $function_name:expr, $arg_index:expr, $arg:expr) => {{
+        #[allow(clippy::macro_metavars_in_unsafe)]
         let s = unsafe { std::ffi::CStr::from_ptr($arg) };
         match s.to_str() {
             Ok(value) => value,

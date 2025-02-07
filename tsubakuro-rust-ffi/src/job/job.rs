@@ -356,7 +356,7 @@ pub extern "C" fn tsurugi_ffi_job_take_for(
 
 impl<T> TsurugiFfiJob<T> {
     pub(crate) fn take_for<FFI>(
-        self: &mut Self,
+        &mut self,
         context: TsurugiFfiContextHandle,
         timeout: TsurugiFfiDuration,
         converter: fn(T, Arc<tokio::runtime::Runtime>) -> Option<FFI>,
@@ -420,7 +420,7 @@ pub extern "C" fn tsurugi_ffi_job_take_if_ready(
 
 impl<T> TsurugiFfiJob<T> {
     pub(crate) fn take_if_ready<FFI>(
-        self: &mut Self,
+        &mut self,
         context: TsurugiFfiContextHandle,
         converter: fn(T, Arc<tokio::runtime::Runtime>) -> Option<FFI>,
         is_ready_out: *mut bool,

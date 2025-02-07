@@ -99,7 +99,7 @@ enum TsurugiFfiAtomType {
    */
   TSURUGI_FFI_ATOM_TYPE_UNKNOWN = 31,
   /**
-   *
+   * unrecognized.
    */
   TSURUGI_FFI_ATOM_TYPE_UNRECOGNIZED = -1,
 };
