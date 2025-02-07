@@ -5,6 +5,12 @@ import java.lang.foreign.ValueLayout;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -320,6 +326,137 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
         TgFfiRcUtil.throwIfError(rc, context);
 
         return outToBytesLong(out, sizeOut);
+    }
+
+    public synchronized LocalDate fetchDate(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateLongOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_date(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        return LocalDate.ofEpochDay(value);
+    }
+
+    public synchronized LocalDate fetchForDate(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateLongOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_date(ctx, handle, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        return LocalDate.ofEpochDay(value);
+    }
+
+    public synchronized LocalTime fetchTimeOfDay(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateLongOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_of_day(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        return LocalTime.ofNanoOfDay(value);
+    }
+
+    public synchronized LocalTime fetchForTimeOfDay(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateLongOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_of_day(ctx, handle, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        return LocalTime.ofNanoOfDay(value);
+    }
+
+    public synchronized LocalDateTime fetchTimePoint(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateLongOut();
+        var nanosOut = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point(ctx, handle, out, nanosOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long seconds = outToLong(out);
+        int nanos = outToInt(nanosOut);
+        return LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
+    }
+
+    public synchronized LocalDateTime fetchForTimePoint(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateLongOut();
+        var nanosOut = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point(ctx, handle, t, out, nanosOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long seconds = outToLong(out);
+        int nanos = outToInt(nanosOut);
+        return LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
+    }
+
+    public synchronized OffsetTime fetchTimeOfDayWithTimeZone(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateLongOut();
+        var offsetOut = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(ctx, handle, out, offsetOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        int offset = outToInt(offsetOut);
+        return OffsetTime.of(LocalTime.ofNanoOfDay(value), ZoneOffset.ofTotalSeconds(offset * 60));
+    }
+
+    public synchronized OffsetTime fetchForTimeOfDayWithTimeZone(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateLongOut();
+        var offsetOut = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(ctx, handle, t, out, offsetOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        int offset = outToInt(offsetOut);
+        return OffsetTime.of(LocalTime.ofNanoOfDay(value), ZoneOffset.ofTotalSeconds(offset * 60));
+    }
+
+    public synchronized OffsetDateTime fetchTimePointWithTimeZone(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateLongOut();
+        var nanosOut = allocateIntOut();
+        var offsetOut = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(ctx, handle, out, nanosOut, offsetOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        int nanos = outToInt(nanosOut);
+        int offset = outToInt(offsetOut);
+        return OffsetDateTime.of(LocalDateTime.ofEpochSecond(value, nanos, ZoneOffset.UTC), ZoneOffset.ofTotalSeconds(offset * 60));
+    }
+
+    public synchronized OffsetDateTime fetchForTimePointWithTimeZone(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateLongOut();
+        var nanosOut = allocateIntOut();
+        var offsetOut = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(ctx, handle, t, out, nanosOut, offsetOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        long value = outToLong(out);
+        int nanos = outToInt(nanosOut);
+        int offset = outToInt(offsetOut);
+        return OffsetDateTime.of(LocalDateTime.ofEpochSecond(value, nanos, ZoneOffset.UTC), ZoneOffset.ofTotalSeconds(offset * 60));
     }
 
     @Override

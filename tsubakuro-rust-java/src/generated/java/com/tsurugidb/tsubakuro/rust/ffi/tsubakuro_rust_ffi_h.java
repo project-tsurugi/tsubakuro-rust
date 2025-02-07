@@ -18608,6 +18608,315 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_parameter_of_date {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_date");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_date(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_days, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_date$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_date.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_date(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_days, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_date$handle() {
+        return tsurugi_ffi_sql_parameter_of_date.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_date(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_days, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_date$address() {
+        return tsurugi_ffi_sql_parameter_of_date.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_date(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_days, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_date(MemorySegment context, MemorySegment name, long epoch_days, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_date.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_date", context, name, epoch_days, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, epoch_days, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_parameter_of_time_of_day {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_of_day");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_time_of_day$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_time_of_day.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_time_of_day$handle() {
+        return tsurugi_ffi_sql_parameter_of_time_of_day.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_time_of_day$address() {
+        return tsurugi_ffi_sql_parameter_of_time_of_day.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_time_of_day(MemorySegment context, MemorySegment name, long nanoseconds_of_day, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_time_of_day.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_time_of_day", context, name, nanoseconds_of_day, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, nanoseconds_of_day, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_parameter_of_time_point {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_point");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_time_point$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_time_point.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_time_point$handle() {
+        return tsurugi_ffi_sql_parameter_of_time_point.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_time_point$address() {
+        return tsurugi_ffi_sql_parameter_of_time_point.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_time_point(MemorySegment context, MemorySegment name, long epoch_seconds, int nanos, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_time_point.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_time_point", context, name, epoch_seconds, nanos, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, epoch_seconds, nanos, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone$handle() {
+        return tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone$address() {
+        return tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, uint64_t nanoseconds_of_day, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(MemorySegment context, MemorySegment name, long nanoseconds_of_day, int time_zone_offset, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone", context, name, nanoseconds_of_day, time_zone_offset, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, nanoseconds_of_day, time_zone_offset, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_parameter_of_time_point_with_time_zone {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_point_with_time_zone");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_time_point_with_time_zone$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_time_point_with_time_zone.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_time_point_with_time_zone$handle() {
+        return tsurugi_ffi_sql_parameter_of_time_point_with_time_zone.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_time_point_with_time_zone$address() {
+        return tsurugi_ffi_sql_parameter_of_time_point_with_time_zone.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, int64_t epoch_seconds, uint32_t nanos, int32_t time_zone_offset, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(MemorySegment context, MemorySegment name, long epoch_seconds, int nanos, int time_zone_offset, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_time_point_with_time_zone.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_time_point_with_time_zone", context, name, epoch_seconds, nanos, time_zone_offset, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, epoch_seconds, nanos, time_zone_offset, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_parameter_get_name {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -20836,6 +21145,619 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_octet", context, query_result, timeout, value_out, size_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out, size_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_date {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_date");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_date$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_date.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_date$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_date.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_date$address() {
+        return tsurugi_ffi_sql_query_result_fetch_date.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_date(MemorySegment context, MemorySegment query_result, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_date.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_date", context, query_result, value_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_date {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_date");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_date$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_date.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_date$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_date.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_date$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_date.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_date(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_date.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_date", context, query_result, timeout, value_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_time_of_day {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_of_day");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_time_of_day$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_time_of_day.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_time_of_day$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_time_of_day.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_time_of_day$address() {
+        return tsurugi_ffi_sql_query_result_fetch_time_of_day.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_time_of_day(MemorySegment context, MemorySegment query_result, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_time_of_day.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_of_day", context, query_result, value_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_time_of_day {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_of_day");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_time_of_day$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_of_day.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_time_of_day$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_of_day.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_time_of_day$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_of_day.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_time_of_day(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_time_of_day.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_of_day", context, query_result, timeout, value_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_time_point {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_point");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_time_point$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_time_point.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_time_point$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_time_point.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_time_point$address() {
+        return tsurugi_ffi_sql_query_result_fetch_time_point.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_time_point(MemorySegment context, MemorySegment query_result, MemorySegment value_out, MemorySegment nanos_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_time_point.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_point", context, query_result, value_out, nanos_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, value_out, nanos_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_time_point {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_point");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_time_point$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_point.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_time_point$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_point.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_time_point$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_point.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_time_point(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out, MemorySegment nanos_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_time_point.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_point", context, query_result, timeout, value_out, nanos_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, value_out, nanos_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone$address() {
+        return tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(MemorySegment context, MemorySegment query_result, MemorySegment value_out, MemorySegment time_zone_offset_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone", context, query_result, value_out, time_zone_offset_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, value_out, time_zone_offset_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, uint64_t *value_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out, MemorySegment time_zone_offset_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone", context, query_result, timeout, value_out, time_zone_offset_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, value_out, time_zone_offset_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone$address() {
+        return tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(MemorySegment context, MemorySegment query_result, MemorySegment value_out, MemorySegment nanos_out, MemorySegment time_zone_offset_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone", context, query_result, value_out, nanos_out, time_zone_offset_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, value_out, nanos_out, time_zone_offset_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, int64_t *value_out, uint32_t *nanos_out, int32_t *time_zone_offset_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out, MemorySegment nanos_out, MemorySegment time_zone_offset_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone", context, query_result, timeout, value_out, nanos_out, time_zone_offset_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, value_out, nanos_out, time_zone_offset_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

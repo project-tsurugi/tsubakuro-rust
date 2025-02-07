@@ -514,6 +514,35 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context,
                                                 uint64_t value_size,
                                                 TsurugiFfiSqlParameterHandle *parameter_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_date(TsurugiFfiContextHandle context,
+                                               TsurugiFfiStringHandle name,
+                                               int64_t epoch_days,
+                                               TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day(TsurugiFfiContextHandle context,
+                                                      TsurugiFfiStringHandle name,
+                                                      uint64_t nanoseconds_of_day,
+                                                      TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiStringHandle name,
+                                                     int64_t epoch_seconds,
+                                                     uint32_t nanos,
+                                                     TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(TsurugiFfiContextHandle context,
+                                                                     TsurugiFfiStringHandle name,
+                                                                     uint64_t nanoseconds_of_day,
+                                                                     int32_t time_zone_offset,
+                                                                     TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiContextHandle context,
+                                                                    TsurugiFfiStringHandle name,
+                                                                    int64_t epoch_seconds,
+                                                                    uint32_t nanos,
+                                                                    int32_t time_zone_offset,
+                                                                    TsurugiFfiSqlParameterHandle *parameter_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlParameterHandle parameter,
                                                 TsurugiFfiStringHandle *name_out);
@@ -677,6 +706,59 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandl
                                                           TsurugiFfiDuration timeout,
                                                           TsurugiFfiByteArrayHandle *value_out,
                                                           uint64_t *size_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlQueryResultHandle query_result,
+                                                     int64_t *value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlQueryResultHandle query_result,
+                                                         TsurugiFfiDuration timeout,
+                                                         int64_t *value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiSqlQueryResultHandle query_result,
+                                                            uint64_t *value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContextHandle context,
+                                                                TsurugiFfiSqlQueryResultHandle query_result,
+                                                                TsurugiFfiDuration timeout,
+                                                                uint64_t *value_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlQueryResultHandle query_result,
+                                                           int64_t *value_out,
+                                                           uint32_t *nanos_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContextHandle context,
+                                                               TsurugiFfiSqlQueryResultHandle query_result,
+                                                               TsurugiFfiDuration timeout,
+                                                               int64_t *value_out,
+                                                               uint32_t *nanos_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(TsurugiFfiContextHandle context,
+                                                                           TsurugiFfiSqlQueryResultHandle query_result,
+                                                                           uint64_t *value_out,
+                                                                           int32_t *time_zone_offset_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(TsurugiFfiContextHandle context,
+                                                                               TsurugiFfiSqlQueryResultHandle query_result,
+                                                                               TsurugiFfiDuration timeout,
+                                                                               uint64_t *value_out,
+                                                                               int32_t *time_zone_offset_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(TsurugiFfiContextHandle context,
+                                                                          TsurugiFfiSqlQueryResultHandle query_result,
+                                                                          int64_t *value_out,
+                                                                          uint32_t *nanos_out,
+                                                                          int32_t *time_zone_offset_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(TsurugiFfiContextHandle context,
+                                                                              TsurugiFfiSqlQueryResultHandle query_result,
+                                                                              TsurugiFfiDuration timeout,
+                                                                              int64_t *value_out,
+                                                                              uint32_t *nanos_out,
+                                                                              int32_t *time_zone_offset_out);
 
 void tsurugi_ffi_sql_query_result_dispose(TsurugiFfiSqlQueryResultHandle query_result);
 

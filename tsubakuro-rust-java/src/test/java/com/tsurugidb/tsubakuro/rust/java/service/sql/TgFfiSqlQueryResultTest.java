@@ -893,4 +893,342 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             }
         }
     }
+
+    @Test
+    void fetch_date_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_date(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_date(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_date_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_date(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_date(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_time_of_day_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_of_day(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_of_day(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_time_of_day_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_of_day(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_of_day(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_time_point_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var nanosOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point(ctx, handle, out, nanosOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var nanosOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point(ctx, handle, out, nanosOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = manager.allocateLongOut();
+                var nanosOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point(ctx, handle, out, nanosOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_time_point_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var nanosOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point(ctx, handle, t, out, nanosOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var nanosOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point(ctx, handle, t, out, nanosOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var nanosOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point(ctx, handle, t, out, nanosOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_time_of_day_with_time_zone_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(ctx, handle, out, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(ctx, handle, out, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = manager.allocateLongOut();
+                var offsetOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(ctx, handle, out, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_time_of_day_with_time_zone_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(ctx, handle, t, out, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(ctx, handle, t, out, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var offsetOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(ctx, handle, t, out, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_time_point_with_time_zone_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var nanosOut = manager.allocateIntOut();
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(ctx, handle, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var nanosOut = manager.allocateIntOut();
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(ctx, handle, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = manager.allocateLongOut();
+                var nanosOut = MemorySegment.NULL;
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(ctx, handle, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = manager.allocateLongOut();
+                var nanosOut = manager.allocateIntOut();
+                var offsetOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(ctx, handle, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_time_point_with_time_zone_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var nanosOut = manager.allocateIntOut();
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(ctx, handle, t, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var nanosOut = manager.allocateIntOut();
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(ctx, handle, t, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var nanosOut = MemorySegment.NULL;
+                var offsetOut = manager.allocateIntOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(ctx, handle, t, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var nanosOut = manager.allocateIntOut();
+                var offsetOut = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(ctx, handle, t, out, nanosOut, offsetOut);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+            }
+        }
+    }
 }

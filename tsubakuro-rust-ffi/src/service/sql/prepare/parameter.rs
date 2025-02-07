@@ -377,6 +377,191 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_octet(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_date(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    epoch_days: i64,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_date()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, epoch_days={:?}, parameter_out={:?}",
+        context,
+        name,
+        epoch_days,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let parameter = SqlParameter::of_date(name, epoch_days);
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    nanoseconds_of_day: u64,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_time_of_day()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, seconds={:?}, parameter_out={:?}",
+        context,
+        name,
+        nanoseconds_of_day,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let parameter = SqlParameter::of_time_of_day(name, nanoseconds_of_day);
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    epoch_seconds: i64,
+    nanos: u32,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_time_point()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, epoch_seconds={:?}, nanos={:?}, parameter_out={:?}",
+        context,
+        name,
+        epoch_seconds,
+        nanos,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let parameter = SqlParameter::of_time_point(name, (epoch_seconds, nanos));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    nanoseconds_of_day: u64,
+    time_zone_offset: i32,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, nanoseconds_of_day={:?}, time_zone_offset={:?}, parameter_out={:?}",
+        context,
+        name,
+        nanoseconds_of_day,
+        time_zone_offset,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let parameter =
+        SqlParameter::of_time_of_day_with_time_zone(name, (nanoseconds_of_day, time_zone_offset));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    epoch_seconds: i64,
+    nanos: u32,
+    time_zone_offset: i32,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_time_point_with_time_zone()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, epoch_seconds={:?}, nanos={:?}, time_zone_offset={:?}, parameter_out={:?}",
+        context,
+        name,
+        epoch_seconds,
+        nanos,
+        time_zone_offset,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let parameter =
+        SqlParameter::of_time_point_with_time_zone(name, (epoch_seconds, nanos, time_zone_offset));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
     context: TsurugiFfiContextHandle,
     parameter: TsurugiFfiSqlParameterHandle,

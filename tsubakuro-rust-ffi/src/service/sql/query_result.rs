@@ -1060,7 +1060,451 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
     rc
 }
 
-// TODO tsurugi_ffi_sql_query_result_fetch_date(), etc
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    value_out: *mut i64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_date()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, value_out={:?}",
+        context,
+        query_result,
+        value_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch_date());
+
+    unsafe {
+        *value_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut i64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_date()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, value_out={:?}",
+        context,
+        query_result,
+        timeout,
+        value_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for_date(timeout)
+    );
+
+    unsafe {
+        *value_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    value_out: *mut u64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_time_of_day()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, value_out={:?}",
+        context,
+        query_result,
+        value_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_time_of_day()
+    );
+
+    unsafe {
+        *value_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut u64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_time_of_day()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, value_out={:?}",
+        context,
+        query_result,
+        timeout,
+        value_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for_time_of_day(timeout)
+    );
+
+    unsafe {
+        *value_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    value_out: *mut i64,
+    nanos_out: *mut u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_time_point()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, value_out={:?}, nanos_out={:?}",
+        context,
+        query_result,
+        value_out,
+        nanos_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, nanos_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_time_point()
+    );
+
+    unsafe {
+        *value_out = value.0;
+        *nanos_out = value.1;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?})",
+        rc,
+        value.0,
+        value.1
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut i64,
+    nanos_out: *mut u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_time_point()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, value_out={:?}, nanos_out={:?}",
+        context,
+        query_result,
+        timeout,
+        value_out,
+        nanos_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, nanos_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for_time_point(timeout)
+    );
+
+    unsafe {
+        *value_out = value.0;
+        *nanos_out = value.1;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?})",
+        rc,
+        value.0,
+        value.1
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    value_out: *mut u64,
+    time_zone_offset_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, value_out={:?}, time_zone_offset_out={:?}",
+        context,
+        query_result,
+        value_out,
+        time_zone_offset_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, time_zone_offset_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_time_of_day_with_time_zone()
+    );
+
+    unsafe {
+        *value_out = value.0;
+        *time_zone_offset_out = value.1;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, time_zone_offset={:?})",
+        rc,
+        value.0,
+        value.1
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut u64,
+    time_zone_offset_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str =
+        "tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, value_out={:?}, time_zone_offset_out={:?}",
+        context,
+        query_result,
+        timeout,
+        value_out,
+        time_zone_offset_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, time_zone_offset_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for_time_of_day_with_time_zone(timeout)
+    );
+
+    unsafe {
+        *value_out = value.0;
+        *time_zone_offset_out = value.1;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, time_zone_offset={:?})",
+        rc,
+        value.0,
+        value.1
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    value_out: *mut i64,
+    nanos_out: *mut u32,
+    time_zone_offset_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, value_out={:?}, nanos_out={:?}, time_zone_offset_out={:?}",
+        context,
+        query_result,
+        value_out,
+        nanos_out,
+        time_zone_offset_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, nanos_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, time_zone_offset_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_time_point_with_time_zone()
+    );
+
+    unsafe {
+        *value_out = value.0;
+        *nanos_out = value.1;
+        *time_zone_offset_out = value.2;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?}, time_zone_offset={:?})",
+        rc,
+        value.0,
+        value.1,
+        value.2
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut i64,
+    nanos_out: *mut u32,
+    time_zone_offset_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str =
+        "tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, value_out={:?}, nanos_out={:?}, time_zone_offset_out={:?}",
+        context,
+        query_result,
+        timeout,
+        value_out,
+        nanos_out,
+        time_zone_offset_out,
+    );
+
+    ffi_arg_out_initialize!(value_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, nanos_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, time_zone_offset_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for_time_point_with_time_zone(timeout)
+    );
+
+    unsafe {
+        *value_out = value.0;
+        *nanos_out = value.1;
+        *time_zone_offset_out = value.2;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?}, time_zone_offset={:?})",
+        rc,
+        value.0,
+        value.1,
+        value.2
+    );
+    rc
+}
 
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_dispose(

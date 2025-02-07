@@ -2,6 +2,12 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql.prepare;
 
 import java.lang.foreign.MemorySegment;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -313,6 +319,175 @@ public class TgFfiSqlParameter extends TgFfiObject {
         long size = value.length;
         var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofDate(TgFfiContext context, String name, LocalDate value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofDate(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofDate(TgFfiObjectManager manager, String name, LocalDate value) {
+        return ofDate(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofDate(TgFfiObjectManager manager, TgFfiContext context, String name, LocalDate value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofDateMain(manager, context, name, value);
+            }
+        } else {
+            return ofDateMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofDateMain(TgFfiObjectManager manager, TgFfiContext context, String name, LocalDate value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = value.toEpochDay();
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_date(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofTimeOfDay(TgFfiContext context, String name, LocalTime value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofTimeOfDay(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimeOfDay(TgFfiObjectManager manager, String name, LocalTime value) {
+        return ofTimeOfDay(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimeOfDay(TgFfiObjectManager manager, TgFfiContext context, String name, LocalTime value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofTimeOfDayMain(manager, context, name, value);
+            }
+        } else {
+            return ofTimeOfDayMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofTimeOfDayMain(TgFfiObjectManager manager, TgFfiContext context, String name, LocalTime value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = value.toNanoOfDay();
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_of_day(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofTimePoint(TgFfiContext context, String name, LocalDateTime value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofTimePoint(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimePoint(TgFfiObjectManager manager, String name, LocalDateTime value) {
+        return ofTimePoint(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimePoint(TgFfiObjectManager manager, TgFfiContext context, String name, LocalDateTime value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofTimePointMain(manager, context, name, value);
+            }
+        } else {
+            return ofTimePointMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofTimePointMain(TgFfiObjectManager manager, TgFfiContext context, String name, LocalDateTime value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = value.toEpochSecond(ZoneOffset.UTC);
+        var nanos = value.getNano();
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_point(ctx, arg1, arg2, nanos, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofTimeOfDayWithTimeZone(TgFfiContext context, String name, OffsetTime value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofTimeOfDayWithTimeZone(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimeOfDayWithTimeZone(TgFfiObjectManager manager, String name, OffsetTime value) {
+        return ofTimeOfDayWithTimeZone(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimeOfDayWithTimeZone(TgFfiObjectManager manager, TgFfiContext context, String name, OffsetTime value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofTimeOfDayWithTimeZoneMain(manager, context, name, value);
+            }
+        } else {
+            return ofTimeOfDayWithTimeZoneMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofTimeOfDayWithTimeZoneMain(TgFfiObjectManager manager, TgFfiContext context, String name, OffsetTime value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = value.toLocalTime().toNanoOfDay();
+        var offset = value.getOffset().getTotalSeconds() / 60;
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(ctx, arg1, arg2, offset, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofTimePointWithTimeZone(TgFfiContext context, String name, OffsetDateTime value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofTimePointWithTimeZone(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimePointWithTimeZone(TgFfiObjectManager manager, String name, OffsetDateTime value) {
+        return ofTimePointWithTimeZone(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofTimePointWithTimeZone(TgFfiObjectManager manager, TgFfiContext context, String name, OffsetDateTime value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofTimePointWithTimeZoneMain(manager, context, name, value);
+            }
+        } else {
+            return ofTimePointWithTimeZoneMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofTimePointWithTimeZoneMain(TgFfiObjectManager manager, TgFfiContext context, String name, OffsetDateTime value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = value.toLocalDateTime().toEpochSecond(ZoneOffset.UTC);
+        var nanos = value.toLocalDateTime().getNano();
+        var offset = value.getOffset().getTotalSeconds() / 60;
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(ctx, arg1, arg2, nanos, offset, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
         var outHandle = outToHandle(out);

@@ -4,6 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.foreign.MemorySegment;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
 
 import org.junit.jupiter.api.Test;
 
@@ -250,6 +256,129 @@ class TgFfiSqlParameterTest extends TgFfiTester {
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_octet(ctx, arg1, arg2, size, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_date_argError() {
+        var manager = getFfiObjectManager();
+        var value = LocalDate.now();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = value.toEpochDay();
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_date(ctx, arg1, arg2, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = value.toEpochDay();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_date(ctx, arg1, arg2, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_time_of_day_argError() {
+        var manager = getFfiObjectManager();
+        var value = LocalTime.now();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = value.toNanoOfDay();
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_of_day(ctx, arg1, arg2, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = value.toNanoOfDay();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_of_day(ctx, arg1, arg2, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_time_point_argError() {
+        var manager = getFfiObjectManager();
+        var value = LocalDateTime.now();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = value.toEpochSecond(ZoneOffset.UTC);
+            var nanos = value.getNano();
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_point(ctx, arg1, arg2, nanos, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = value.toEpochSecond(ZoneOffset.UTC);
+            var nanos = value.getNano();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_point(ctx, arg1, arg2, nanos, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_time_of_day_with_time_zone_argError() {
+        var manager = getFfiObjectManager();
+        var value = OffsetTime.now();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = value.toLocalTime().toNanoOfDay();
+            var offset = value.getOffset().getTotalSeconds() / 60;
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(ctx, arg1, arg2, offset, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = value.toLocalTime().toNanoOfDay();
+            var offset = value.getOffset().getTotalSeconds() / 60;
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(ctx, arg1, arg2, offset, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void of_time_point_with_time_zone_argError() {
+        var manager = getFfiObjectManager();
+        var value = OffsetDateTime.now();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = value.toLocalDateTime().toEpochSecond(ZoneOffset.UTC);
+            var nanos = value.toLocalDateTime().getNano();
+            var offset = value.getOffset().getTotalSeconds() / 60;
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(ctx, arg1, arg2, nanos, offset, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = value.toLocalDateTime().toEpochSecond(ZoneOffset.UTC);
+            var nanos = value.toLocalDateTime().getNano();
+            var offset = value.getOffset().getTotalSeconds() / 60;
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(ctx, arg1, arg2, nanos, offset, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
         }
     }
 
