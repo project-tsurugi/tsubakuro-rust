@@ -523,6 +523,208 @@ impl SqlQueryResultFetch<Vec<u8>> for SqlQueryResult {
     }
 }
 
+impl SqlQueryResult {
+    /// Retrieves a `DATE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_date(&mut self) -> Result<i64, TgError> {
+        self.fetch_for_date(self.default_timeout).await
+    }
+
+    /// Retrieves a `DATE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_date(&mut self, timeout: Duration) -> Result<i64, TgError> {
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_date_value(&timeout).await
+    }
+
+    /// Retrieves a `DATE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_date_opt(&mut self) -> Result<Option<i64>, TgError> {
+        self.fetch_for_date_opt(self.default_timeout).await
+    }
+
+    /// Retrieves a `DATE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_date_opt(&mut self, timeout: Duration) -> Result<Option<i64>, TgError> {
+        if self.is_null()? {
+            Ok(None)
+        } else {
+            let value = self.fetch_for_date(timeout).await?;
+            Ok(Some(value))
+        }
+    }
+
+    /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_of_day(&mut self) -> Result<u64, TgError> {
+        self.fetch_for_time_of_day(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_of_day(&mut self, timeout: Duration) -> Result<u64, TgError> {
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_time_of_day_value(&timeout).await
+    }
+
+    /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_of_day_opt(&mut self) -> Result<Option<u64>, TgError> {
+        self.fetch_for_time_of_day_opt(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_of_day_opt(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<Option<u64>, TgError> {
+        if self.is_null()? {
+            Ok(None)
+        } else {
+            let value = self.fetch_for_time_of_day(timeout).await?;
+            Ok(Some(value))
+        }
+    }
+
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_point(&mut self) -> Result<(i64, u32), TgError> {
+        self.fetch_for_time_point(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_point(&mut self, timeout: Duration) -> Result<(i64, u32), TgError> {
+        let timeout = Timeout::new(timeout);
+        self.value_stream.fetch_time_point_value(&timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_point_opt(&mut self) -> Result<Option<(i64, u32)>, TgError> {
+        self.fetch_for_time_point_opt(self.default_timeout).await
+    }
+
+    /// Retrieves a `TIME_POINT` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_point_opt(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<Option<(i64, u32)>, TgError> {
+        if self.is_null()? {
+            Ok(None)
+        } else {
+            let value = self.fetch_for_time_point(timeout).await?;
+            Ok(Some(value))
+        }
+    }
+
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_of_day_with_time_zone(&mut self) -> Result<(u64, i32), TgError> {
+        self.fetch_for_time_of_day_with_time_zone(self.default_timeout)
+            .await
+    }
+
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_of_day_with_time_zone(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<(u64, i32), TgError> {
+        let timeout = Timeout::new(timeout);
+        self.value_stream
+            .fetch_time_of_day_with_time_zone_value(&timeout)
+            .await
+    }
+
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_of_day_with_time_zone_opt(
+        &mut self,
+    ) -> Result<Option<(u64, i32)>, TgError> {
+        self.fetch_for_time_of_day_with_time_zone_opt(self.default_timeout)
+            .await
+    }
+
+    /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_of_day_with_time_zone_opt(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<Option<(u64, i32)>, TgError> {
+        if self.is_null()? {
+            Ok(None)
+        } else {
+            let value = self.fetch_for_time_of_day_with_time_zone(timeout).await?;
+            Ok(Some(value))
+        }
+    }
+
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_point_with_time_zone(&mut self) -> Result<(i64, u32, i32), TgError> {
+        self.fetch_for_time_point_with_time_zone(self.default_timeout)
+            .await
+    }
+
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_point_with_time_zone(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<(i64, u32, i32), TgError> {
+        let timeout = Timeout::new(timeout);
+        self.value_stream
+            .fetch_time_point_with_time_zone_value(&timeout)
+            .await
+    }
+
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_time_point_with_time_zone_opt(
+        &mut self,
+    ) -> Result<Option<(i64, u32, i32)>, TgError> {
+        self.fetch_for_time_point_with_time_zone_opt(self.default_timeout)
+            .await
+    }
+
+    /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    pub async fn fetch_for_time_point_with_time_zone_opt(
+        &mut self,
+        timeout: Duration,
+    ) -> Result<Option<(i64, u32, i32)>, TgError> {
+        if self.is_null()? {
+            Ok(None)
+        } else {
+            let value = self.fetch_for_time_point_with_time_zone(timeout).await?;
+            Ok(Some(value))
+        }
+    }
+}
+
 #[cfg(feature = "with_chrono")]
 #[async_trait(?Send)] // thread unsafe
 impl SqlQueryResultFetch<chrono::NaiveDate> for SqlQueryResult {

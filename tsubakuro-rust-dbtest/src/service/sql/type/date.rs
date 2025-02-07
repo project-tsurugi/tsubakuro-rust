@@ -1,7 +1,9 @@
 #[cfg(test)]
 mod test {
-    use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use time::PrimitiveDateTime;
+    use crate::{
+        service::sql::r#type::{epoch_days, epoch_days_to_string},
+        test::{commit_and_close, create_table, create_test_sql_client, start_occ},
+    };
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
@@ -35,7 +37,7 @@ mod test {
         create_table(
             &client,
             "test",
-            "create table test (pk int primary key, v timestamp, r int default 999)",
+            "create table test (pk int primary key, v date, r int default 999)",
         )
         .await;
 
@@ -44,51 +46,37 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::TimePoint), c.atom_type());
+        assert_eq!(Some(AtomType::Date), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<PrimitiveDateTime>)> {
+    fn generate_values(minus: bool) -> Vec<(i32, Option<i64>)> {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, Some(date_time(2025, 1, 16, 18, 9, 30, 123456789))));
-        values.push((2, Some(date_time(1970, 1, 1, 0, 0, 0, 0))));
-        values.push((3, Some(date_time(1969, 12, 31, 23, 59, 59, 999999999))));
-        values.push((4, Some(date_time(1, 1, 1, 0, 0, 0, 0))));
-        values.push((5, Some(date_time(9999, 12, 31, 23, 59, 59, 999999999))));
+        values.push((1, Some(date(2025, 1, 16))));
+        values.push((2, Some(date(1970, 1, 1))));
+        values.push((3, Some(date(1969, 12, 31))));
+        values.push((4, Some(date(1, 1, 1))));
+        values.push((5, Some(date(9999, 12, 31))));
         if minus {
-            values.push((10, Some(date_time(0, 1, 1, 0, 0, 0, 0))));
-            values.push((11, Some(date_time(-1, 1, 1, 0, 0, 0, 0))));
+            values.push((10, Some(date(0, 1, 1))));
+            values.push((11, Some(date(-1, 1, 1))));
         }
 
         values
     }
 
-    fn date_time(
-        year: i32,
-        month: u8,
-        day: u8,
-        hour: u8,
-        min: u8,
-        sec: u8,
-        nanos: u32,
-    ) -> PrimitiveDateTime {
-        PrimitiveDateTime::new(
-            time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
-                .unwrap(),
-            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
-        )
+    fn date(year: i32, month: u8, day: u8) -> i64 {
+        epoch_days(year, month, day)
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<i64>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
             let sql = if let Some(v) = &value.1 {
-                format!(
-                    "insert into test (pk, v) values({}, timestamp'{}')",
-                    value.0, v
-                )
+                let s = epoch_days_to_string(*v);
+                format!("insert into test (pk, v) values({}, date'{}')", value.0, s)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
             };
@@ -98,20 +86,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<i64>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<PrimitiveDateTime>("value"),
+            SqlPlaceholder::of_atom_type("value", AtomType::Date),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of("value", value.1.as_ref()),
+                SqlParameter::of_date_opt("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -124,11 +112,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(
-        client: &SqlClient,
-        expected: &Vec<(i32, Option<PrimitiveDateTime>)>,
-        skip: bool,
-    ) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<i64>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -139,7 +123,7 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::TimePoint), c.atom_type());
+        assert_eq!(Some(AtomType::Date), c.atom_type());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {
@@ -151,7 +135,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result.fetch().await.unwrap();
+                let v = query_result.fetch_date_opt().await.unwrap();
                 assert_eq!(expected.1, v);
             }
 

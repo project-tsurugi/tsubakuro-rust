@@ -71,13 +71,13 @@ mod test {
         hour: u8,
         min: u8,
         sec: u8,
-        nano: u32,
+        nanos: u32,
         offset_hour: i32,
     ) -> OffsetDateTime {
         OffsetDateTime::new_in_offset(
             time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
                 .unwrap(),
-            time::Time::from_hms_nano(hour, min, sec, nano).unwrap(),
+            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
             UtcOffset::from_whole_seconds(offset_hour * 60 * 60).unwrap(),
         )
     }

@@ -65,10 +65,10 @@ mod test {
         hour: u32,
         min: u32,
         sec: u32,
-        nano: u32,
+        nanos: u32,
         offset_hour: i32,
     ) -> (NaiveTime, FixedOffset) {
-        let time = NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap();
+        let time = NaiveTime::from_hms_nano_opt(hour, min, sec, nanos).unwrap();
         let offset_seconds = offset_hour * 60 * 60;
         let offset = FixedOffset::east_opt(offset_seconds).unwrap();
         (time, offset)

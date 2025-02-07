@@ -1,11 +1,15 @@
 #[cfg(test)]
 mod test {
-    use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use time::PrimitiveDateTime;
+    use crate::{
+        service::sql::r#type::{
+            epoch_days, epoch_days_to_string, seconds_of_day, seconds_of_day_to_string,
+        },
+        test::{commit_and_close, create_table, create_test_sql_client, start_occ},
+    };
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
-
     #[test]
+
     async fn literal() {
         let client = create_test_sql_client().await;
 
@@ -47,7 +51,7 @@ mod test {
         assert_eq!(Some(AtomType::TimePoint), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<PrimitiveDateTime>)> {
+    fn generate_values(minus: bool) -> Vec<(i32, Option<(i64, u32)>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -72,22 +76,21 @@ mod test {
         min: u8,
         sec: u8,
         nanos: u32,
-    ) -> PrimitiveDateTime {
-        PrimitiveDateTime::new(
-            time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
-                .unwrap(),
-            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
-        )
+    ) -> (i64, u32) {
+        let days = epoch_days(year, month, day);
+        let seconds = seconds_of_day(hour, min, sec) as i64;
+        (days * 86400 + seconds, nanos)
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<(i64, u32)>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
             let sql = if let Some(v) = &value.1 {
+                let s = date_time_to_string(*v);
                 format!(
                     "insert into test (pk, v) values({}, timestamp'{}')",
-                    value.0, v
+                    value.0, s
                 )
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
@@ -98,20 +101,34 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
+    fn date_time_to_string(value: (i64, u32)) -> String {
+        let mut days = value.0 / 86400;
+        let mut seconds = value.0 % 86400;
+        if seconds < 0 {
+            seconds += 86400;
+            days -= 1;
+        }
+        format!(
+            "{} {}",
+            epoch_days_to_string(days),
+            seconds_of_day_to_string(seconds as u32, value.1)
+        )
+    }
+
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<(i64, u32)>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<PrimitiveDateTime>("value"),
+            SqlPlaceholder::of_atom_type("value", AtomType::TimePoint),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of("value", value.1.as_ref()),
+                SqlParameter::of_time_point_opt("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -124,11 +141,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(
-        client: &SqlClient,
-        expected: &Vec<(i32, Option<PrimitiveDateTime>)>,
-        skip: bool,
-    ) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<(i64, u32)>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -151,7 +164,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result.fetch().await.unwrap();
+                let v = query_result.fetch_time_point_opt().await.unwrap();
                 assert_eq!(expected.1, v);
             }
 

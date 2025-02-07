@@ -59,8 +59,8 @@ mod test {
         values
     }
 
-    fn time(hour: u32, min: u32, sec: u32, nano: u32) -> NaiveTime {
-        NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap()
+    fn time(hour: u32, min: u32, sec: u32, nanos: u32) -> NaiveTime {
+        NaiveTime::from_hms_nano_opt(hour, min, sec, nanos).unwrap()
     }
 
     async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<NaiveTime>)>) {

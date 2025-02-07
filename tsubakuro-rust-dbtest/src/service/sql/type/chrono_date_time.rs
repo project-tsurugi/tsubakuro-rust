@@ -73,10 +73,10 @@ mod test {
         hour: u32,
         min: u32,
         sec: u32,
-        nano: u32,
+        nanos: u32,
         offset_hour: i32,
     ) -> DateTime<FixedOffset> {
-        let s=format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nano:09} +{offset_hour:02}:00");
+        let s=format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nanos:09} +{offset_hour:02}:00");
         DateTime::from_str(&s).unwrap()
     }
 

@@ -71,11 +71,11 @@ mod test {
         hour: u32,
         min: u32,
         sec: u32,
-        nano: u32,
+        nanos: u32,
     ) -> NaiveDateTime {
         NaiveDateTime::new(
             chrono::NaiveDate::from_ymd_opt(year, month, day).unwrap(),
-            chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap(),
+            chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nanos).unwrap(),
         )
     }
 

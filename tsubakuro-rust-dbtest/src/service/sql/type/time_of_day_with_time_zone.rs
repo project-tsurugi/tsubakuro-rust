@@ -1,19 +1,21 @@
 #[cfg(test)]
 mod test {
-    use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
-    use time::PrimitiveDateTime;
+    use crate::{
+        service::sql::r#type::{seconds_of_day, seconds_of_day_to_hms},
+        test::{commit_and_close, create_table, create_test_sql_client, start_occ},
+    };
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
-    #[test]
-    async fn literal() {
+    // #[test] // TODO 'time with time zone' literal
+    async fn _literal() {
         let client = create_test_sql_client().await;
 
         create_test_table(&client).await;
 
-        let values = generate_values(false);
+        let values = generate_values();
 
-        insert_literal(&client, &values).await;
+        _insert_literal(&client, &values).await;
         select(&client, &values, false).await;
         select(&client, &values, true).await;
     }
@@ -24,7 +26,7 @@ mod test {
 
         create_test_table(&client).await;
 
-        let values = generate_values(true);
+        let values = generate_values();
 
         insert_prepared(&client, &values).await;
         select(&client, &values, false).await;
@@ -35,7 +37,7 @@ mod test {
         create_table(
             &client,
             "test",
-            "create table test (pk int primary key, v timestamp, r int default 999)",
+            "create table test (pk int primary key, v time with time zone, r int default 999)",
         )
         .await;
 
@@ -44,50 +46,36 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::TimePoint), c.atom_type());
+        assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<PrimitiveDateTime>)> {
+    fn generate_values() -> Vec<(i32, Option<(u64, i32)>)> {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, Some(date_time(2025, 1, 16, 18, 9, 30, 123456789))));
-        values.push((2, Some(date_time(1970, 1, 1, 0, 0, 0, 0))));
-        values.push((3, Some(date_time(1969, 12, 31, 23, 59, 59, 999999999))));
-        values.push((4, Some(date_time(1, 1, 1, 0, 0, 0, 0))));
-        values.push((5, Some(date_time(9999, 12, 31, 23, 59, 59, 999999999))));
-        if minus {
-            values.push((10, Some(date_time(0, 1, 1, 0, 0, 0, 0))));
-            values.push((11, Some(date_time(-1, 1, 1, 0, 0, 0, 0))));
-        }
+        values.push((1, Some(time_with_offset(0, 0, 0, 0, 0))));
+        values.push((2, Some(time_with_offset(0, 0, 0, 0, 9))));
+        values.push((3, Some(time_with_offset(0, 0, 0, 0, -9))));
+        values.push((4, Some(time_with_offset(23, 59, 59, 999_999_999, 0))));
+        values.push((5, Some(time_with_offset(23, 59, 59, 999_999_999, 9))));
+        values.push((6, Some(time_with_offset(23, 59, 59, 999_999_999, -9))));
 
         values
     }
 
-    fn date_time(
-        year: i32,
-        month: u8,
-        day: u8,
-        hour: u8,
-        min: u8,
-        sec: u8,
-        nanos: u32,
-    ) -> PrimitiveDateTime {
-        PrimitiveDateTime::new(
-            time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
-                .unwrap(),
-            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
-        )
+    fn time_with_offset(hour: u8, min: u8, sec: u8, nanos: u64, offset_hour: i32) -> (u64, i32) {
+        let value = seconds_of_day(hour, min, sec) as u64 * 1_000_000_000 + nanos;
+        (value, offset_hour * 60)
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
+    async fn _insert_literal(client: &SqlClient, values: &Vec<(i32, Option<(u64, i32)>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
-            let sql = if let Some(v) = &value.1 {
+            let sql = if let Some((v, offset)) = &value.1 {
                 format!(
-                    "insert into test (pk, v) values({}, timestamp'{}')",
-                    value.0, v
+                    "insert into test (pk, v) values({}, time with time zone'{}{}')",
+                    value.0, v, offset
                 )
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
@@ -98,20 +86,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<PrimitiveDateTime>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<(u64, i32)>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<PrimitiveDateTime>("value"),
+            SqlPlaceholder::of_atom_type("value", AtomType::TimeOfDayWithTimeZone),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of("value", value.1.as_ref()),
+                SqlParameter::of_time_of_day_with_time_zone_opt("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -124,11 +112,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(
-        client: &SqlClient,
-        expected: &Vec<(i32, Option<PrimitiveDateTime>)>,
-        skip: bool,
-    ) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<(u64, i32)>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -139,7 +123,7 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::TimePoint), c.atom_type());
+        assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {
@@ -151,8 +135,11 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result.fetch().await.unwrap();
-                assert_eq!(expected.1, v);
+                let v = query_result
+                    .fetch_time_of_day_with_time_zone_opt()
+                    .await
+                    .unwrap();
+                assert_eq!(to_z(expected.1), v);
             }
 
             assert_eq!(true, query_result.next_column().await.unwrap());
@@ -164,5 +151,29 @@ mod test {
         assert_eq!(expected.len(), i);
 
         commit_and_close(client, &transaction).await;
+    }
+
+    fn to_z(value: Option<(u64, i32)>) -> Option<(u64, i32)> {
+        if value.is_none() {
+            return None;
+        }
+        let (time, offset) = value.unwrap();
+
+        if offset == 0 {
+            return value;
+        }
+
+        let nanos = time % 1_000_000_000;
+        let seconds = time / 1_000_000_000;
+        let (hour, min, sec) = seconds_of_day_to_hms(seconds as u32);
+        let mut hour = hour as i32;
+        hour -= offset / 60;
+        if hour < 0 {
+            hour += 24;
+        } else if hour >= 24 {
+            hour -= 24;
+        }
+
+        Some(time_with_offset(hour as u8, min, sec, nanos, 0))
     }
 }

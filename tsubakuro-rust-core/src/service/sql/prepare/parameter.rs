@@ -1168,12 +1168,12 @@ mod test {
         hour: u32,
         min: u32,
         sec: u32,
-        nano: u32,
+        nanos: u32,
         expected_sec: i64,
     ) {
         let value = chrono::NaiveDateTime::new(
             chrono::NaiveDate::from_ymd_opt(year, month, day).unwrap(),
-            chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap(),
+            chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nanos).unwrap(),
         );
 
         let target0 = SqlParameter::of("test", &value);
@@ -1181,7 +1181,7 @@ mod test {
         assert_eq!(
             &Value::TimePointValue(ProtoTimePoint {
                 offset_seconds: expected_sec,
-                nano_adjustment: nano
+                nano_adjustment: nanos
             }),
             target0.value().unwrap()
         );
@@ -1239,12 +1239,12 @@ mod test {
         hour: u32,
         min: u32,
         sec: u32,
-        nano: u32,
+        nanos: u32,
         offset_hour: i32,
     ) {
         use std::str::FromStr;
 
-        let time = chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nano).unwrap();
+        let time = chrono::NaiveTime::from_hms_nano_opt(hour, min, sec, nanos).unwrap();
         let offset = if offset_hour >= 0 {
             format!("+{:02}:00", offset_hour)
         } else {
@@ -1259,7 +1259,7 @@ mod test {
             &Value::TimeOfDayWithTimeZoneValue(ProtoTimeOfDayWithTimeZone {
                 offset_nanoseconds: (((hour as u64 * 60) + min as u64) * 60 + sec as u64)
                     * 1_000_000_000
-                    + nano as u64,
+                    + nanos as u64,
                 time_zone_offset: offset_hour * 60
             }),
             target0.value().unwrap()
@@ -1335,12 +1335,12 @@ mod test {
         hour: u32,
         min: u32,
         sec: u32,
-        nano: u32,
+        nanos: u32,
         offset_hour: i32,
     ) -> chrono::DateTime<chrono::FixedOffset> {
         use std::str::FromStr;
 
-        let s = format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nano:09} +{offset_hour:02}:00");
+        let s = format!("{year:04}-{month:02}-{day:02} {hour:02}:{min:02}:{sec:02}.{nanos:09} +{offset_hour:02}:00");
         chrono::DateTime::from_str(&s).unwrap()
     }
 
@@ -1487,20 +1487,20 @@ mod test {
         hour: u8,
         min: u8,
         sec: u8,
-        nano: u32,
+        nanos: u32,
         expected: i64,
     ) {
         let value = time::PrimitiveDateTime::new(
             time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
                 .unwrap(),
-            time::Time::from_hms_nano(hour, min, sec, nano).unwrap(),
+            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
         );
         let target0 = SqlParameter::of("test", &value);
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(
             &Value::TimePointValue(ProtoTimePoint {
                 offset_seconds: expected,
-                nano_adjustment: nano
+                nano_adjustment: nanos
             }),
             target0.value().unwrap()
         );
@@ -1552,8 +1552,8 @@ mod test {
     }
 
     #[cfg(feature = "with_time")]
-    fn time_time_with_offset_ref_test(hour: u8, min: u8, sec: u8, nano: u32, offset_hour: i8) {
-        let time = time::Time::from_hms_nano(hour, min, sec, nano).unwrap();
+    fn time_time_with_offset_ref_test(hour: u8, min: u8, sec: u8, nanos: u32, offset_hour: i8) {
+        let time = time::Time::from_hms_nano(hour, min, sec, nanos).unwrap();
         let offset = time::UtcOffset::from_hms(offset_hour, 0, 0).unwrap();
         let value = (time, offset);
 
@@ -1563,7 +1563,7 @@ mod test {
             &Value::TimeOfDayWithTimeZoneValue(ProtoTimeOfDayWithTimeZone {
                 offset_nanoseconds: (((hour as u64 * 60) + min as u64) * 60 + sec as u64)
                     * 1_000_000_000
-                    + nano as u64,
+                    + nanos as u64,
                 time_zone_offset: offset_hour as i32 * 60
             }),
             target0.value().unwrap()
@@ -1639,13 +1639,13 @@ mod test {
         hour: u8,
         min: u8,
         sec: u8,
-        nano: u32,
+        nanos: u32,
         offset_hour: i32,
     ) -> time::OffsetDateTime {
         time::OffsetDateTime::new_in_offset(
             time::Date::from_calendar_date(year, time::Month::try_from(month).unwrap(), day)
                 .unwrap(),
-            time::Time::from_hms_nano(hour, min, sec, nano).unwrap(),
+            time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
             time::UtcOffset::from_whole_seconds(offset_hour * 60 * 60).unwrap(),
         )
     }
