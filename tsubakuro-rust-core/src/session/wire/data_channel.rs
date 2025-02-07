@@ -141,7 +141,7 @@ impl DataChannel {
 
             return_err_if_timeout!(timeout, "DataChannel::pull()");
 
-            self.dc_wire.pull1(&self, timeout).await?;
+            self.dc_wire.pull1(self, timeout).await?;
         }
     }
 

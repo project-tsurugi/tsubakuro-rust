@@ -19,10 +19,8 @@ impl TableList {
         success: crate::jogasaki::proto::sql::response::list_tables::Success,
     ) -> TableList {
         let table_names: Vec<Name> = success.table_path_names;
-        let table_names: Vec<TName> = table_names.iter().map(|name| TName::from(name)).collect();
-        TableList {
-            table_names: table_names,
-        }
+        let table_names: Vec<TName> = table_names.iter().map(TName::from).collect();
+        TableList { table_names }
     }
 
     pub fn table_names(&self) -> &Vec<TName> {

@@ -4,16 +4,17 @@ pub(crate) enum TcpRequestInfo {
     RequestResultSetByeOk,
 }
 
-impl Into<u8> for TcpRequestInfo {
-    fn into(self) -> u8 {
-        match self {
-            Self::RequestSessionPayload => 2,
-            Self::RequestResultSetByeOk => 3,
+impl From<TcpRequestInfo> for u8 {
+    fn from(value: TcpRequestInfo) -> Self {
+        match value {
+            TcpRequestInfo::RequestSessionPayload => 2,
+            TcpRequestInfo::RequestResultSetByeOk => 3,
         }
     }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
+#[allow(clippy::enum_variant_names)]
 pub(crate) enum TcpResponseInfo {
     ResponseSessionPayload,
     ResponseResultSetPayload,

@@ -307,7 +307,7 @@ impl SqlQueryResult {
         match value {
             (Some(coefficient), _, exponent) => {
                 let size = coefficient.len();
-                if size <= 0 || 16 < size {
+                if size == 0 || 16 < size {
                     return Err(client_error!("unsupported decimal.coefficient size"));
                 }
                 if (coefficient[0] as i8) >= 0 {
@@ -1028,8 +1028,8 @@ impl SqlQueryResultFetch<time::Time> for SqlQueryResult {
 
 #[cfg(feature = "with_time")]
 fn time_time(value: u64) -> Result<time::Time, TgError> {
-    let nanos = value % 1000_000_000;
-    let value = value / 1000_000_000;
+    let nanos = value % 1_000_000_000;
+    let value = value / 1_000_000_000;
     time_time_nanos(value, nanos as u32)
 }
 

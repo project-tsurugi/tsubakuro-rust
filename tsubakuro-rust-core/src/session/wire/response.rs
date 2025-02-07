@@ -6,6 +6,7 @@ use crate::{
 };
 
 #[derive(Debug)]
+#[allow(clippy::enum_variant_names)]
 pub(crate) enum WireResponse {
     ResponseSessionPayload(
         /* slot */ i32,

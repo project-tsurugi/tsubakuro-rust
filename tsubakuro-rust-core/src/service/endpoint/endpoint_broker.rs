@@ -76,8 +76,7 @@ impl EndpointBroker {
                 request,
                 Box::new(move |response| {
                     let session_id = handshake_processor(response)?;
-                    let result = converter(session_id);
-                    result
+                    converter(session_id)
                 }),
                 default_timeout,
                 fail_on_drop_error,

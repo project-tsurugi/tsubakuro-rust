@@ -50,12 +50,16 @@ impl TcpWire {
 // impl DelegateWire for TcpWire
 impl TcpWire {
     pub(crate) fn set_session_id(&self, session_id: i64) -> Result<(), TgError> {
-        if let Err(_) = self.session_id.compare_exchange(
-            SESSION_ID_IS_NOT_ASSIGNED,
-            session_id,
-            std::sync::atomic::Ordering::SeqCst,
-            std::sync::atomic::Ordering::SeqCst,
-        ) {
+        if self
+            .session_id
+            .compare_exchange(
+                SESSION_ID_IS_NOT_ASSIGNED,
+                session_id,
+                std::sync::atomic::Ordering::SeqCst,
+                std::sync::atomic::Ordering::SeqCst,
+            )
+            .is_err()
+        {
             return Err(client_error!("Wire: session ID is already assigned"));
         }
 
@@ -73,8 +77,8 @@ impl TcpWire {
     pub(crate) async fn send(
         &self,
         slot: i32,
-        frame_header: &Vec<u8>,
-        payload: &Vec<u8>,
+        frame_header: &[u8],
+        payload: &[u8],
     ) -> Result<(), TgError> {
         // let _lock = self.send_lock.lock().await;
         self.link.send(slot, frame_header, payload).await
@@ -138,12 +142,12 @@ impl TcpWire {
 
 impl TcpWire {
     fn is_result_set_response(info: TcpResponseInfo) -> bool {
-        match info {
-            TcpResponseInfo::ResponseResultSetHello => true,
-            TcpResponseInfo::ResponseResultSetPayload => true,
-            TcpResponseInfo::ResponseResultSetBye => true,
-            _ => false,
-        }
+        matches!(
+            info,
+            TcpResponseInfo::ResponseResultSetHello
+                | TcpResponseInfo::ResponseResultSetPayload
+                | TcpResponseInfo::ResponseResultSetBye
+        )
     }
 
     fn is_slot_end(info: TcpResponseInfo) -> bool {

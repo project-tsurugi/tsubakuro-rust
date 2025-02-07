@@ -297,12 +297,7 @@ impl DelegateWire {
         }
     }
 
-    async fn send(
-        &self,
-        slot: i32,
-        frame_header: &Vec<u8>,
-        payload: &Vec<u8>,
-    ) -> Result<(), TgError> {
+    async fn send(&self, slot: i32, frame_header: &[u8], payload: &[u8]) -> Result<(), TgError> {
         match self {
             DelegateWire::Tcp(wire) => wire.send(slot, frame_header, payload).await,
             _ => todo!("DelegateWire"),

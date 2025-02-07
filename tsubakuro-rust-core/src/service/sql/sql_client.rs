@@ -694,7 +694,7 @@ impl SqlClient {
 
         let command = Self::commit_command(tx_handle, commit_option);
         let response = self.send_and_pull_response(command, timeout).await?;
-        let _ = transaction_commit_processor(response)?;
+        transaction_commit_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
@@ -749,7 +749,7 @@ impl SqlClient {
 
         let command = Self::rollback_command(tx_handle);
         let response = self.send_and_pull_response(command, timeout).await?;
-        let _ = transaction_rollback_processor(response)?;
+        transaction_rollback_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
@@ -795,7 +795,7 @@ impl SqlClient {
 
         let command = Self::dispose_transaction_command(transaction_handle);
         let response = self.send_and_pull_response(command, timeout).await?;
-        let _ = transaction_dispose_processor(response)?;
+        transaction_dispose_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())

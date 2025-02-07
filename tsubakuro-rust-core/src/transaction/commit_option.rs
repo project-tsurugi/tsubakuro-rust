@@ -6,6 +6,12 @@ pub struct CommitOption {
     auto_dispose: bool,
 }
 
+impl Default for CommitOption {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CommitOption {
     pub fn new() -> CommitOption {
         CommitOption {

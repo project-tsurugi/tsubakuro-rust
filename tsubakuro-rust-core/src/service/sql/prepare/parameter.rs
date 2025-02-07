@@ -276,7 +276,7 @@ impl SqlParameterOf<chrono::NaiveDate> for SqlParameter {
 #[cfg(feature = "with_chrono")]
 impl SqlParameterOf<&chrono::NaiveDate> for SqlParameter {
     fn of(name: &str, value: &chrono::NaiveDate) -> SqlParameter {
-        let days = chrono_naive_date_to_days(&value);
+        let days = chrono_naive_date_to_days(value);
 
         let value = Value::DateValue(days);
         SqlParameter::new(name, Some(value))
@@ -475,8 +475,8 @@ impl SqlParameterOf<&time::PrimitiveDateTime> for SqlParameter {
 
 #[cfg(feature = "with_time")]
 fn time_date_time_to_seconds(date: &time::Date, time: &time::Time) -> (i64, u32) {
-    let days = time_date_to_days(&date);
-    let (seconds, nanos) = time_time_to_seconds(&time);
+    let days = time_date_to_days(date);
+    let (seconds, nanos) = time_time_to_seconds(time);
     let seconds = days * 24 * 60 * 60 + seconds as i64;
 
     (seconds, nanos)

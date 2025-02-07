@@ -244,7 +244,7 @@ const INDEPENDENT_ENTRY_TYPE: [EntryType; 24] = [
 
 const HEADER_HARD_EOF: i32 = -1;
 const HEADER_UNGAINED: i32 = -2;
-const OFFSET_INDEPENDENT_ENTRY_TYPE: i32 = -(HEADER_UNKNOWN as i32);
+const OFFSET_INDEPENDENT_ENTRY_TYPE: i32 = -HEADER_UNKNOWN;
 
 #[derive(Debug)]
 pub(crate) struct ResultSetValueStream {
@@ -344,7 +344,7 @@ impl ResultSetValueStream {
     }
 
     async fn discard_current_column_if_exists(&mut self, timeout: &Timeout) -> Result<(), TgError> {
-        debug_assert_eq!(false, self.kind_stack_is_empty());
+        debug_assert!(!self.kind_stack_is_empty());
         if self.current_column_type != EntryType::Nothing {
             self.force_discard_current_entry(timeout).await?;
             self.column_consumed()?;

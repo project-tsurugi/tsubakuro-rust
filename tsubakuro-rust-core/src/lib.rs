@@ -6,6 +6,7 @@ pub mod session;
 pub mod transaction;
 pub(crate) mod util;
 
+#[allow(clippy::enum_variant_names, clippy::module_inception)]
 pub(crate) mod jogasaki {
     pub(crate) mod proto {
         pub(crate) mod sql {
@@ -25,6 +26,7 @@ pub(crate) mod jogasaki {
     }
 }
 
+#[allow(clippy::module_inception)]
 pub(crate) mod tateyama {
     pub(crate) mod proto {
         pub(crate) mod core {

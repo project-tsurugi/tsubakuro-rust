@@ -19,6 +19,12 @@ pub struct TransactionOption {
     close_timeout: Option<Duration>,
 }
 
+impl Default for TransactionOption {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TransactionOption {
     pub fn new() -> TransactionOption {
         TransactionOption {
@@ -94,9 +100,9 @@ impl TransactionOption {
 
 pub trait TransactionOptionSetter<T> {
     fn set_transaction_label(&mut self, transaction_label: T);
-    fn set_write_preserve(&mut self, table_names: &Vec<T>);
-    fn set_inclusive_read_area(&mut self, table_names: &Vec<T>);
-    fn set_exclusive_read_area(&mut self, table_names: &Vec<T>);
+    fn set_write_preserve(&mut self, table_names: &[T]);
+    fn set_inclusive_read_area(&mut self, table_names: &[T]);
+    fn set_exclusive_read_area(&mut self, table_names: &[T]);
 }
 
 impl TransactionOptionSetter<&str> for TransactionOption {
@@ -104,15 +110,15 @@ impl TransactionOptionSetter<&str> for TransactionOption {
         self.transaction_label = Some(transaction_label.to_string());
     }
 
-    fn set_write_preserve(&mut self, table_names: &Vec<&str>) {
+    fn set_write_preserve(&mut self, table_names: &[&str]) {
         self.write_preserve = table_names.iter().map(|s| s.to_string()).collect()
     }
 
-    fn set_inclusive_read_area(&mut self, table_names: &Vec<&str>) {
+    fn set_inclusive_read_area(&mut self, table_names: &[&str]) {
         self.inclusive_read_area = table_names.iter().map(|s| s.to_string()).collect()
     }
 
-    fn set_exclusive_read_area(&mut self, table_names: &Vec<&str>) {
+    fn set_exclusive_read_area(&mut self, table_names: &[&str]) {
         self.exclusive_read_area = table_names.iter().map(|s| s.to_string()).collect()
     }
 }
@@ -122,15 +128,15 @@ impl TransactionOptionSetter<String> for TransactionOption {
         self.transaction_label = Some(transaction_label);
     }
 
-    fn set_write_preserve(&mut self, table_names: &Vec<String>) {
+    fn set_write_preserve(&mut self, table_names: &[String]) {
         self.write_preserve = table_names.iter().map(|s| s.to_string()).collect()
     }
 
-    fn set_inclusive_read_area(&mut self, table_names: &Vec<String>) {
+    fn set_inclusive_read_area(&mut self, table_names: &[String]) {
         self.inclusive_read_area = table_names.iter().map(|s| s.to_string()).collect()
     }
 
-    fn set_exclusive_read_area(&mut self, table_names: &Vec<String>) {
+    fn set_exclusive_read_area(&mut self, table_names: &[String]) {
         self.exclusive_read_area = table_names.iter().map(|s| s.to_string()).collect()
     }
 }
@@ -150,7 +156,7 @@ impl TransactionOption {
         }
     }
 
-    fn to_write_preserve(table_names: &Vec<String>) -> Vec<WritePreserve> {
+    fn to_write_preserve(table_names: &[String]) -> Vec<WritePreserve> {
         table_names
             .iter()
             .map(|s| WritePreserve {
@@ -159,7 +165,7 @@ impl TransactionOption {
             .collect()
     }
 
-    fn to_read_area(table_names: &Vec<String>) -> Vec<ReadArea> {
+    fn to_read_area(table_names: &[String]) -> Vec<ReadArea> {
         table_names
             .iter()
             .map(|s| ReadArea {

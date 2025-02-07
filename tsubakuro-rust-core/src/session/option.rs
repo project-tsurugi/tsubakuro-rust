@@ -16,6 +16,12 @@ pub struct ConnectionOption {
     recv_timeout: Duration,
 }
 
+impl Default for ConnectionOption {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ConnectionOption {
     pub fn new() -> ConnectionOption {
         ConnectionOption {

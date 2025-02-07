@@ -74,8 +74,8 @@ impl TcpLink {
     pub(crate) async fn send(
         &self,
         slot: i32,
-        frame_header: &Vec<u8>,
-        payload: &Vec<u8>,
+        frame_header: &[u8],
+        payload: &[u8],
     ) -> Result<(), TgError> {
         self.check_close()?;
 
@@ -118,8 +118,8 @@ impl TcpLink {
     async fn send_body(
         writer: &mut WriteHalf<TcpStream>,
         tcp_header: &[u8],
-        frame_header: &Vec<u8>,
-        payload: &Vec<u8>,
+        frame_header: &[u8],
+        payload: &[u8],
     ) -> Result<(), TgError> {
         writer
             .write_all(tcp_header)
@@ -261,6 +261,7 @@ impl TcpLink {
                 .map_err(|e| io_error!("TcpLink.recv(): read[length] error", e))?;
 
             let mut length = 0_usize;
+            #[allow(clippy::needless_range_loop)]
             for i in 0..4 {
                 length |= (buffer[i] as usize) << (i * 8);
             }
@@ -306,12 +307,16 @@ impl TcpLink {
     }
 
     pub(crate) async fn close(&self) -> Result<(), TgError> {
-        if let Ok(_) = self.closed.compare_exchange(
-            false,
-            true,
-            std::sync::atomic::Ordering::SeqCst,
-            std::sync::atomic::Ordering::SeqCst,
-        ) {
+        if self
+            .closed
+            .compare_exchange(
+                false,
+                true,
+                std::sync::atomic::Ordering::SeqCst,
+                std::sync::atomic::Ordering::SeqCst,
+            )
+            .is_ok()
+        {
             // FIXME send()/recv()の終了を待たずにNoneにする方法
             {
                 let mut writer = self.writer.lock().await;

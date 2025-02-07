@@ -64,12 +64,16 @@ impl SqlPreparedStatement {
     }
 
     pub async fn close_for(&self, timeout: Duration) -> Result<(), TgError> {
-        if let Ok(_) = self.closed.compare_exchange(
-            false,
-            true,
-            std::sync::atomic::Ordering::SeqCst,
-            std::sync::atomic::Ordering::SeqCst,
-        ) {
+        if self
+            .closed
+            .compare_exchange(
+                false,
+                true,
+                std::sync::atomic::Ordering::SeqCst,
+                std::sync::atomic::Ordering::SeqCst,
+            )
+            .is_ok()
+        {
             let sql_client = SqlClient::new(self.session.clone());
             sql_client
                 .dispose_prepare(self.prepare_handle, self.has_result_records, timeout)
