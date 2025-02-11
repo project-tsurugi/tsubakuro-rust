@@ -52,7 +52,7 @@ mod test {
         assert_eq!(Some(AtomType::TimePointWithTimeZone), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<(i64, u32, i32)>)> {
+    fn generate_values(minus: bool) -> Vec<(i32, Option<TgTimePointWithTimeZone>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -78,13 +78,16 @@ mod test {
         sec: u8,
         nanos: u32,
         offset_hour: i32,
-    ) -> (i64, u32, i32) {
+    ) -> TgTimePointWithTimeZone {
         let days = epoch_days(year, month, day);
         let seconds = seconds_of_day(hour, min, sec) as i64;
-        (days * 86400 + seconds, nanos, offset_hour * 60)
+        TgTimePointWithTimeZone::new(days * 86400 + seconds, nanos, offset_hour * 60)
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<(i64, u32, i32)>)>) {
+    async fn insert_literal(
+        client: &SqlClient,
+        values: &Vec<(i32, Option<TgTimePointWithTimeZone>)>,
+    ) {
         let transaction = start_occ(&client).await;
 
         for value in values {
@@ -103,36 +106,39 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    fn date_time_to_string(value: (i64, u32, i32)) -> String {
-        let mut days = value.0 / 86400;
-        let mut seconds = value.0 % 86400;
+    fn date_time_to_string(value: TgTimePointWithTimeZone) -> String {
+        let mut days = value.offset_seconds / 86400;
+        let mut seconds = value.offset_seconds % 86400;
         if seconds < 0 {
             seconds += 86400;
             days -= 1;
         }
-        let offset_hour = value.2 / 60;
+        let offset_hour = value.time_zone_offset / 60;
         format!(
             "{} {}+{:02}:00",
             epoch_days_to_string(days),
-            seconds_of_day_to_string(seconds as u32, value.1),
+            seconds_of_day_to_string(seconds as u32, value.nano_adjustment),
             offset_hour
         )
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<(i64, u32, i32)>)>) {
+    async fn insert_prepared(
+        client: &SqlClient,
+        values: &Vec<(i32, Option<TgTimePointWithTimeZone>)>,
+    ) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of_atom_type("value", AtomType::TimePointWithTimeZone),
+            SqlPlaceholder::of::<TgTimePointWithTimeZone>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of_time_point_with_time_zone_opt("value", value.1),
+                SqlParameter::of("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -147,7 +153,7 @@ mod test {
 
     async fn select(
         client: &SqlClient,
-        expected: &Vec<(i32, Option<(i64, u32, i32)>)>,
+        expected: &Vec<(i32, Option<TgTimePointWithTimeZone>)>,
         skip: bool,
     ) {
         let sql = "select * from test order by pk";
@@ -172,10 +178,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result
-                    .fetch_time_point_with_time_zone_opt()
-                    .await
-                    .unwrap();
+                let v = query_result.fetch().await.unwrap();
                 assert_eq!(to_z(expected.1), v);
             }
 
@@ -190,18 +193,21 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    fn to_z(value: Option<(i64, u32, i32)>) -> Option<(i64, u32, i32)> {
+    fn to_z(value: Option<TgTimePointWithTimeZone>) -> Option<TgTimePointWithTimeZone> {
         if value.is_none() {
             return None;
         }
-        let (eopch_seconds, nanos, offset) = value.unwrap();
+        let v = value.unwrap();
+        let epoch_seconds = v.offset_seconds;
+        let nanos = v.nano_adjustment;
+        let offset = v.time_zone_offset;
 
         if offset == 0 {
             return value;
         }
 
-        let mut seconds = eopch_seconds % 86400;
-        let mut days = eopch_seconds / 86400;
+        let mut seconds = epoch_seconds % 86400;
+        let mut days = epoch_seconds / 86400;
         if seconds < 0 {
             seconds += 86400;
             days -= 1;
@@ -218,6 +224,10 @@ mod test {
         }
 
         let seconds = seconds_of_day(hour as u8, min, sec) as i64;
-        Some((days * 86400 + seconds, nanos, 0))
+        Some(TgTimePointWithTimeZone::new(
+            days * 86400 + seconds,
+            nanos,
+            0,
+        ))
     }
 }

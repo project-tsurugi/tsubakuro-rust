@@ -51,7 +51,7 @@ mod test {
         assert_eq!(Some(AtomType::TimePoint), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<(i64, u32)>)> {
+    fn generate_values(minus: bool) -> Vec<(i32, Option<TgTimePoint>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -76,13 +76,13 @@ mod test {
         min: u8,
         sec: u8,
         nanos: u32,
-    ) -> (i64, u32) {
+    ) -> TgTimePoint {
         let days = epoch_days(year, month, day);
         let seconds = seconds_of_day(hour, min, sec) as i64;
-        (days * 86400 + seconds, nanos)
+        TgTimePoint::new(days * 86400 + seconds, nanos)
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<(i64, u32)>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<TgTimePoint>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
@@ -101,9 +101,9 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    fn date_time_to_string(value: (i64, u32)) -> String {
-        let mut days = value.0 / 86400;
-        let mut seconds = value.0 % 86400;
+    fn date_time_to_string(value: TgTimePoint) -> String {
+        let mut days = value.offset_seconds / 86400;
+        let mut seconds = value.offset_seconds % 86400;
         if seconds < 0 {
             seconds += 86400;
             days -= 1;
@@ -111,24 +111,24 @@ mod test {
         format!(
             "{} {}",
             epoch_days_to_string(days),
-            seconds_of_day_to_string(seconds as u32, value.1)
+            seconds_of_day_to_string(seconds as u32, value.nano_adjustment)
         )
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<(i64, u32)>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<TgTimePoint>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of_atom_type("value", AtomType::TimePoint),
+            SqlPlaceholder::of::<TgTimePoint>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of_time_point_opt("value", value.1),
+                SqlParameter::of("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -141,7 +141,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<(i64, u32)>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<TgTimePoint>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -164,7 +164,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result.fetch_time_point_opt().await.unwrap();
+                let v = query_result.fetch().await.unwrap();
                 assert_eq!(expected.1, v);
             }
 

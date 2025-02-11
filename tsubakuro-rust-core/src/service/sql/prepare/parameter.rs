@@ -7,8 +7,10 @@ use crate::jogasaki::proto::sql::common::TimePoint as ProtoTimePoint;
 use crate::jogasaki::proto::sql::common::TimePointWithTimeZone as ProtoTimePointWithTimeZone;
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
-use crate::prelude::TgDecimal;
-use crate::prelude::TgDecimalI128;
+use crate::prelude::{
+    TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone, TgTimePoint,
+    TgTimePointWithTimeZone,
+};
 
 impl SqlParameter {
     fn new(name: &str, value: Option<Value>) -> SqlParameter {
@@ -170,84 +172,38 @@ impl SqlParameterOf<&Vec<u8>> for SqlParameter {
     }
 }
 
-impl SqlParameter {
-    pub fn of_date(name: &str, value: i64) -> SqlParameter {
-        let value = Value::DateValue(value);
+impl SqlParameterOf<TgDate> for SqlParameter {
+    fn of(name: &str, value: TgDate) -> SqlParameter {
+        let value = Value::DateValue(value.epoch_days);
         SqlParameter::new(name, Some(value))
     }
+}
 
-    pub fn of_date_opt(name: &str, value: Option<i64>) -> SqlParameter {
-        match value {
-            Some(value) => Self::of_date(name, value),
-            None => Self::null(name),
-        }
-    }
-
-    pub fn of_time_of_day(name: &str, value: u64) -> SqlParameter {
-        let value = Value::TimeOfDayValue(value);
+impl SqlParameterOf<TgTimeOfDay> for SqlParameter {
+    fn of(name: &str, value: TgTimeOfDay) -> SqlParameter {
+        let value = Value::TimeOfDayValue(value.offset_nanoseconds);
         SqlParameter::new(name, Some(value))
     }
+}
 
-    pub fn of_time_of_day_opt(name: &str, value: Option<u64>) -> SqlParameter {
-        match value {
-            Some(value) => Self::of_time_of_day(name, value),
-            None => Self::null(name),
-        }
-    }
-
-    pub fn of_time_point(name: &str, value: (i64, u32)) -> SqlParameter {
-        let value = ProtoTimePoint {
-            offset_seconds: value.0,
-            nano_adjustment: value.1,
-        };
+impl SqlParameterOf<TgTimePoint> for SqlParameter {
+    fn of(name: &str, value: TgTimePoint) -> SqlParameter {
         let value = Value::TimePointValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
 
-    pub fn of_time_point_opt(name: &str, value: Option<(i64, u32)>) -> SqlParameter {
-        match value {
-            Some(value) => Self::of_time_point(name, value),
-            None => Self::null(name),
-        }
-    }
-
-    pub fn of_time_of_day_with_time_zone(name: &str, value: (u64, i32)) -> SqlParameter {
-        let value = ProtoTimeOfDayWithTimeZone {
-            offset_nanoseconds: value.0,
-            time_zone_offset: value.1,
-        };
+impl SqlParameterOf<TgTimeOfDayWithTimeZone> for SqlParameter {
+    fn of(name: &str, value: TgTimeOfDayWithTimeZone) -> SqlParameter {
         let value = Value::TimeOfDayWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
 
-    pub fn of_time_of_day_with_time_zone_opt(
-        name: &str,
-        value: Option<(u64, i32)>,
-    ) -> SqlParameter {
-        match value {
-            Some(value) => Self::of_time_of_day_with_time_zone(name, value),
-            None => Self::null(name),
-        }
-    }
-
-    pub fn of_time_point_with_time_zone(name: &str, value: (i64, u32, i32)) -> SqlParameter {
-        let value = ProtoTimePointWithTimeZone {
-            offset_seconds: value.0,
-            nano_adjustment: value.1,
-            time_zone_offset: value.2,
-        };
+impl SqlParameterOf<TgTimePointWithTimeZone> for SqlParameter {
+    fn of(name: &str, value: TgTimePointWithTimeZone) -> SqlParameter {
         let value = Value::TimePointWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
-    }
-
-    pub fn of_time_point_with_time_zone_opt(
-        name: &str,
-        value: Option<(i64, u32, i32)>,
-    ) -> SqlParameter {
-        match value {
-            Some(value) => Self::of_time_point_with_time_zone(name, value),
-            None => Self::null(name),
-        }
     }
 }
 
@@ -926,91 +882,72 @@ mod test {
 
     #[test]
     fn date() {
-        let value = 20126;
-        let target0 = SqlParameter::of_date("test", value);
+        let value = TgDate::new(20126);
+        let target0 = SqlParameter::of("test", value);
         assert_eq!("test", target0.name().unwrap());
-        assert_eq!(&Value::DateValue(value), target0.value().unwrap());
+        assert_eq!(
+            &Value::DateValue(value.epoch_days),
+            target0.value().unwrap()
+        );
 
-        let target = SqlParameter::of_date_opt("test", Some(value));
+        let target = SqlParameter::of("test", Some(value));
         assert_eq!(target0, target);
-
-        let target = SqlParameter::of_date_opt("test", None);
-        assert_eq!(SqlParameter::null("test"), target);
     }
 
     #[test]
     fn time_of_day() {
-        let value = 30551971944200;
-        let target0 = SqlParameter::of_time_of_day("test", value);
+        let value = TgTimeOfDay::new(30551971944200);
+        let target0 = SqlParameter::of("test", value);
         assert_eq!("test", target0.name().unwrap());
-        assert_eq!(&Value::TimeOfDayValue(value), target0.value().unwrap());
+        assert_eq!(
+            &Value::TimeOfDayValue(value.offset_nanoseconds),
+            target0.value().unwrap()
+        );
 
-        let target = SqlParameter::of_time_of_day_opt("test", Some(value));
+        let target = SqlParameter::of("test", Some(value));
         assert_eq!(target0, target);
-
-        let target = SqlParameter::of_time_of_day_opt("test", None);
-        assert_eq!(SqlParameter::null("test"), target);
     }
 
     #[test]
     fn time_point() {
-        let value = (1738917213, 123456789);
-        let target0 = SqlParameter::of_time_point("test", value);
+        let value = TgTimePoint::new(1738917213, 123456789);
+        let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(
-            &Value::TimePointValue(ProtoTimePoint {
-                offset_seconds: value.0,
-                nano_adjustment: value.1
-            }),
+            &Value::TimePointValue(value.clone()),
             target0.value().unwrap()
         );
 
-        let target = SqlParameter::of_time_point_opt("test", Some(value));
+        let target = SqlParameter::of("test", Some(value.clone()));
         assert_eq!(target0, target);
-
-        let target = SqlParameter::of_time_point_opt("test", None);
-        assert_eq!(SqlParameter::null("test"), target);
     }
 
     #[test]
     fn time_of_day_with_time_zone() {
-        let value = (30551971944200, 9 * 60);
-        let target0 = SqlParameter::of_time_of_day_with_time_zone("test", value);
+        let value = TgTimeOfDayWithTimeZone::new(30551971944200, 9 * 60);
+        let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(
-            &Value::TimeOfDayWithTimeZoneValue(ProtoTimeOfDayWithTimeZone {
-                offset_nanoseconds: value.0,
-                time_zone_offset: value.1
-            }),
+            &Value::TimeOfDayWithTimeZoneValue(value.clone()),
             target0.value().unwrap()
         );
 
-        let target = SqlParameter::of_time_of_day_with_time_zone_opt("test", Some(value));
+        let target = SqlParameter::of("test", Some(value.clone()));
         assert_eq!(target0, target);
-
-        let target = SqlParameter::of_time_of_day_with_time_zone_opt("test", None);
-        assert_eq!(SqlParameter::null("test"), target);
     }
 
     #[test]
     fn time_point_with_time_zone() {
-        let value = (1738917213, 123456789, 9 * 60);
-        let target0 = SqlParameter::of_time_point_with_time_zone("test", value);
+        let value = TgTimePointWithTimeZone::new(1738917213, 123456789, 9 * 60);
+        let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(
-            &Value::TimePointWithTimeZoneValue(ProtoTimePointWithTimeZone {
-                offset_seconds: value.0,
-                nano_adjustment: value.1,
-                time_zone_offset: value.2
-            }),
+            &Value::TimePointWithTimeZoneValue(value.clone()),
             target0.value().unwrap()
         );
 
-        let target = SqlParameter::of_time_point_with_time_zone_opt("test", Some(value));
+        let target = SqlParameter::of("test", Some(value.clone()));
         assert_eq!(target0, target);
-
-        let target = SqlParameter::of_time_point_with_time_zone_opt("test", None);
-        assert_eq!(SqlParameter::null("test"), target);
     }
 
     #[cfg(feature = "with_chrono")]

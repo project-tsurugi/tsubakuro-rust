@@ -1,9 +1,6 @@
 #[cfg(test)]
 mod test {
-    use crate::{
-        service::sql::r#type::seconds_of_day,
-        test::{commit_and_close, create_table, create_test_sql_client, start_occ},
-    };
+    use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
@@ -49,7 +46,7 @@ mod test {
         assert_eq!(Some(AtomType::TimeOfDay), c.atom_type());
     }
 
-    fn generate_values() -> Vec<(i32, Option<u64>)> {
+    fn generate_values() -> Vec<(i32, Option<TgTimeOfDay>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -61,17 +58,16 @@ mod test {
         values
     }
 
-    fn time(hour: u8, min: u8, sec: u8, nanos: u64) -> u64 {
-        (seconds_of_day(hour, min, sec) as u64) * 1_000_000_000 + nanos
+    fn time(hour: u8, min: u8, sec: u8, nanos: u32) -> TgTimeOfDay {
+        TgTimeOfDay::from(hour, min, sec, nanos)
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<u64>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<TgTimeOfDay>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
             let sql = if let Some(v) = &value.1 {
-                let s = time_to_string(*v);
-                format!("insert into test (pk, v) values({}, time'{}')", value.0, s)
+                format!("insert into test (pk, v) values({}, time'{}')", value.0, v)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
             };
@@ -81,30 +77,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    fn time_to_string(value: u64) -> String {
-        let nanos = value % 1_000_000_000;
-        let value = value / 1_000_000_000;
-        let sec = value % 60;
-        let value = value / 60;
-        let min = value % 60;
-        let hour = value / 60;
-        format!("{hour:02}:{min:02}:{sec:02}.{nanos:09}")
-    }
-
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<u64>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<TgTimeOfDay>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of_atom_type("value", AtomType::TimeOfDay),
+            SqlPlaceholder::of::<TgTimeOfDay>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of_time_of_day_opt("value", value.1),
+                SqlParameter::of("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -117,7 +103,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<u64>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<TgTimeOfDay>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -140,7 +126,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result.fetch_time_of_day_opt().await.unwrap();
+                let v = query_result.fetch().await.unwrap();
                 assert_eq!(expected.1, v);
             }
 

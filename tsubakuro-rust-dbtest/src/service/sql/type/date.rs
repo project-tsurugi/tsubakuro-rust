@@ -49,7 +49,7 @@ mod test {
         assert_eq!(Some(AtomType::Date), c.atom_type());
     }
 
-    fn generate_values(minus: bool) -> Vec<(i32, Option<i64>)> {
+    fn generate_values(minus: bool) -> Vec<(i32, Option<TgDate>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -66,16 +66,16 @@ mod test {
         values
     }
 
-    fn date(year: i32, month: u8, day: u8) -> i64 {
-        epoch_days(year, month, day)
+    fn date(year: i32, month: u8, day: u8) -> TgDate {
+        TgDate::new(epoch_days(year, month, day))
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<i64>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<TgDate>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
             let sql = if let Some(v) = &value.1 {
-                let s = epoch_days_to_string(*v);
+                let s = epoch_days_to_string(v.epoch_days);
                 format!("insert into test (pk, v) values({}, date'{}')", value.0, s)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
@@ -86,20 +86,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<i64>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<TgDate>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of_atom_type("value", AtomType::Date),
+            SqlPlaceholder::of::<TgDate>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of_date_opt("value", value.1),
+                SqlParameter::of("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -112,7 +112,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<i64>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<TgDate>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -135,7 +135,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result.fetch_date_opt().await.unwrap();
+                let v = query_result.fetch().await.unwrap();
                 assert_eq!(expected.1, v);
             }
 

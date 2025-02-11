@@ -1073,8 +1073,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch_date());
+    let value: TgDate = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
 
+    let value = value.epoch_days;
     unsafe {
         *value_out = value;
     }
@@ -1108,13 +1109,14 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
+    let value: TgDate = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
-        query_result.fetch_for_date(timeout)
+        query_result.fetch_for(timeout)
     );
 
+    let value = value.epoch_days;
     unsafe {
         *value_out = value;
     }
@@ -1145,13 +1147,10 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
-        context,
-        FUNCTION_NAME,
-        runtime,
-        query_result.fetch_time_of_day()
-    );
+    let value: TgTimeOfDay =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
 
+    let value = value.offset_nanoseconds;
     unsafe {
         *value_out = value;
     }
@@ -1185,13 +1184,14 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
+    let value: TgTimeOfDay = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
-        query_result.fetch_for_time_of_day(timeout)
+        query_result.fetch_for(timeout)
     );
 
+    let value = value.offset_nanoseconds;
     unsafe {
         *value_out = value;
     }
@@ -1225,24 +1225,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
-        context,
-        FUNCTION_NAME,
-        runtime,
-        query_result.fetch_time_point()
-    );
+    let value: TgTimePoint =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
 
     unsafe {
-        *value_out = value.0;
-        *nanos_out = value.1;
+        *value_out = value.offset_seconds;
+        *nanos_out = value.nano_adjustment;
     }
 
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?})",
         rc,
-        value.0,
-        value.1
+        value.offset_seconds,
+        value.nano_adjustment
     );
     rc
 }
@@ -1274,24 +1270,24 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
+    let value: TgTimePoint = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
-        query_result.fetch_for_time_point(timeout)
+        query_result.fetch_for(timeout)
     );
 
     unsafe {
-        *value_out = value.0;
-        *nanos_out = value.1;
+        *value_out = value.offset_seconds;
+        *nanos_out = value.nano_adjustment;
     }
 
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?})",
         rc,
-        value.0,
-        value.1
+        value.offset_seconds,
+        value.nano_adjustment
     );
     rc
 }
@@ -1320,24 +1316,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
-        context,
-        FUNCTION_NAME,
-        runtime,
-        query_result.fetch_time_of_day_with_time_zone()
-    );
+    let value: TgTimeOfDayWithTimeZone =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
 
     unsafe {
-        *value_out = value.0;
-        *time_zone_offset_out = value.1;
+        *value_out = value.offset_nanoseconds;
+        *time_zone_offset_out = value.time_zone_offset;
     }
 
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. (value={:?}, time_zone_offset={:?})",
         rc,
-        value.0,
-        value.1
+        value.offset_nanoseconds,
+        value.time_zone_offset
     );
     rc
 }
@@ -1370,24 +1362,24 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_z
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
+    let value: TgTimeOfDayWithTimeZone = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
-        query_result.fetch_for_time_of_day_with_time_zone(timeout)
+        query_result.fetch_for(timeout)
     );
 
     unsafe {
-        *value_out = value.0;
-        *time_zone_offset_out = value.1;
+        *value_out = value.offset_nanoseconds;
+        *time_zone_offset_out = value.time_zone_offset;
     }
 
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. (value={:?}, time_zone_offset={:?})",
         rc,
-        value.0,
-        value.1
+        value.offset_nanoseconds,
+        value.time_zone_offset
     );
     rc
 }
@@ -1419,26 +1411,22 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
-        context,
-        FUNCTION_NAME,
-        runtime,
-        query_result.fetch_time_point_with_time_zone()
-    );
+    let value: TgTimePointWithTimeZone =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
 
     unsafe {
-        *value_out = value.0;
-        *nanos_out = value.1;
-        *time_zone_offset_out = value.2;
+        *value_out = value.offset_seconds;
+        *nanos_out = value.nano_adjustment;
+        *time_zone_offset_out = value.time_zone_offset;
     }
 
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?}, time_zone_offset={:?})",
         rc,
-        value.0,
-        value.1,
-        value.2
+        value.offset_seconds,
+        value.nano_adjustment,
+        value.time_zone_offset
     );
     rc
 }
@@ -1474,26 +1462,26 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
+    let value: TgTimePointWithTimeZone = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
-        query_result.fetch_for_time_point_with_time_zone(timeout)
+        query_result.fetch_for(timeout)
     );
 
     unsafe {
-        *value_out = value.0;
-        *nanos_out = value.1;
-        *time_zone_offset_out = value.2;
+        *value_out = value.offset_seconds;
+        *nanos_out = value.nano_adjustment;
+        *time_zone_offset_out = value.time_zone_offset;
     }
 
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. (value={:?}, nanos={:?}, time_zone_offset={:?})",
         rc,
-        value.0,
-        value.1,
-        value.2
+        value.offset_seconds,
+        value.nano_adjustment,
+        value.time_zone_offset
     );
     rc
 }

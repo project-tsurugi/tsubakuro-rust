@@ -397,7 +397,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_date(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
-    let parameter = SqlParameter::of_date(name, epoch_days);
+    let parameter = SqlParameter::of(name, TgDate::new(epoch_days));
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
 
@@ -432,7 +432,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
-    let parameter = SqlParameter::of_time_of_day(name, nanoseconds_of_day);
+    let parameter = SqlParameter::of(name, TgTimeOfDay::new(nanoseconds_of_day));
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
 
@@ -469,7 +469,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
-    let parameter = SqlParameter::of_time_point(name, (epoch_seconds, nanos));
+    let parameter = SqlParameter::of(name, TgTimePoint::new(epoch_seconds, nanos));
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
 
@@ -506,8 +506,10 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
-    let parameter =
-        SqlParameter::of_time_of_day_with_time_zone(name, (nanoseconds_of_day, time_zone_offset));
+    let parameter = SqlParameter::of(
+        name,
+        TgTimeOfDayWithTimeZone::new(nanoseconds_of_day, time_zone_offset),
+    );
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
 
@@ -546,8 +548,10 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, parameter_out);
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
-    let parameter =
-        SqlParameter::of_time_point_with_time_zone(name, (epoch_seconds, nanos, time_zone_offset));
+    let parameter = SqlParameter::of(
+        name,
+        TgTimePointWithTimeZone::new(epoch_seconds, nanos, time_zone_offset),
+    );
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
 

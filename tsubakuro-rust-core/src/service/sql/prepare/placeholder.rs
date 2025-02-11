@@ -1,7 +1,10 @@
 use crate::jogasaki::proto::sql::common::AtomType;
 use crate::jogasaki::proto::sql::request::placeholder::{Placement, TypeInfo};
 use crate::jogasaki::proto::sql::request::Placeholder as SqlPlaceholder;
-use crate::prelude::{TgDecimal, TgDecimalI128};
+use crate::prelude::{
+    TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone, TgTimePoint,
+    TgTimePointWithTimeZone,
+};
 
 impl SqlPlaceholder {
     fn new(name: &str, type_info: TypeInfo, dimension: u32) -> SqlPlaceholder {
@@ -122,6 +125,36 @@ impl AtomTypeProvider for &[u8] {
 impl AtomTypeProvider for Vec<u8> {
     fn atom_type() -> AtomType {
         AtomType::Octet
+    }
+}
+
+impl AtomTypeProvider for TgDate {
+    fn atom_type() -> AtomType {
+        AtomType::Date
+    }
+}
+
+impl AtomTypeProvider for TgTimeOfDay {
+    fn atom_type() -> AtomType {
+        AtomType::TimeOfDay
+    }
+}
+
+impl AtomTypeProvider for TgTimePoint {
+    fn atom_type() -> AtomType {
+        AtomType::TimePoint
+    }
+}
+
+impl AtomTypeProvider for TgTimeOfDayWithTimeZone {
+    fn atom_type() -> AtomType {
+        AtomType::TimeOfDayWithTimeZone
+    }
+}
+
+impl AtomTypeProvider for TgTimePointWithTimeZone {
+    fn atom_type() -> AtomType {
+        AtomType::TimePointWithTimeZone
     }
 }
 
@@ -378,6 +411,77 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<Vec<u8>>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn date() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Date);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Date, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<TgDate>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgDate>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn time_of_day() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimeOfDay);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::TimeOfDay, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<TgTimeOfDay>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgTimeOfDay>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn time_point() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimePoint);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::TimePoint, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<TgTimePoint>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgTimePoint>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn time_of_day_with_time_zone() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimeOfDayWithTimeZone);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            AtomType::TimeOfDayWithTimeZone,
+            target0.atom_type().unwrap()
+        );
+
+        let target = SqlPlaceholder::of::<TgTimeOfDayWithTimeZone>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgTimeOfDayWithTimeZone>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn time_point_with_time_zone() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::TimePointWithTimeZone);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(
+            AtomType::TimePointWithTimeZone,
+            target0.atom_type().unwrap()
+        );
+
+        let target = SqlPlaceholder::of::<TgTimePointWithTimeZone>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgTimePointWithTimeZone>();
         assert_eq!(target0, target);
     }
 

@@ -49,7 +49,7 @@ mod test {
         assert_eq!(Some(AtomType::TimeOfDayWithTimeZone), c.atom_type());
     }
 
-    fn generate_values() -> Vec<(i32, Option<(u64, i32)>)> {
+    fn generate_values() -> Vec<(i32, Option<TgTimeOfDayWithTimeZone>)> {
         let mut values = vec![];
 
         values.push((0, None));
@@ -63,19 +63,28 @@ mod test {
         values
     }
 
-    fn time_with_offset(hour: u8, min: u8, sec: u8, nanos: u64, offset_hour: i32) -> (u64, i32) {
+    fn time_with_offset(
+        hour: u8,
+        min: u8,
+        sec: u8,
+        nanos: u64,
+        offset_hour: i32,
+    ) -> TgTimeOfDayWithTimeZone {
         let value = seconds_of_day(hour, min, sec) as u64 * 1_000_000_000 + nanos;
-        (value, offset_hour * 60)
+        TgTimeOfDayWithTimeZone::new(value, offset_hour * 60)
     }
 
-    async fn _insert_literal(client: &SqlClient, values: &Vec<(i32, Option<(u64, i32)>)>) {
+    async fn _insert_literal(
+        client: &SqlClient,
+        values: &Vec<(i32, Option<TgTimeOfDayWithTimeZone>)>,
+    ) {
         let transaction = start_occ(&client).await;
 
         for value in values {
-            let sql = if let Some((v, offset)) = &value.1 {
+            let sql = if let Some(v) = &value.1 {
                 format!(
-                    "insert into test (pk, v) values({}, time with time zone'{}{}')",
-                    value.0, v, offset
+                    "insert into test (pk, v) values({}, time with time zone'{}')",
+                    value.0, v
                 )
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
@@ -86,20 +95,23 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<(u64, i32)>)>) {
+    async fn insert_prepared(
+        client: &SqlClient,
+        values: &Vec<(i32, Option<TgTimeOfDayWithTimeZone>)>,
+    ) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of_atom_type("value", AtomType::TimeOfDayWithTimeZone),
+            SqlPlaceholder::of::<TgTimeOfDayWithTimeZone>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of_time_of_day_with_time_zone_opt("value", value.1),
+                SqlParameter::of("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -112,7 +124,11 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<(u64, i32)>)>, skip: bool) {
+    async fn select(
+        client: &SqlClient,
+        expected: &Vec<(i32, Option<TgTimeOfDayWithTimeZone>)>,
+        skip: bool,
+    ) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -135,10 +151,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result
-                    .fetch_time_of_day_with_time_zone_opt()
-                    .await
-                    .unwrap();
+                let v = query_result.fetch().await.unwrap();
                 assert_eq!(to_z(expected.1), v);
             }
 
@@ -153,18 +166,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    fn to_z(value: Option<(u64, i32)>) -> Option<(u64, i32)> {
+    fn to_z(value: Option<TgTimeOfDayWithTimeZone>) -> Option<TgTimeOfDayWithTimeZone> {
         if value.is_none() {
             return None;
         }
-        let (time, offset) = value.unwrap();
+        let v = value.unwrap();
+        let nanoseconds_of_day = v.offset_nanoseconds;
+        let offset = v.time_zone_offset;
 
         if offset == 0 {
             return value;
         }
 
-        let nanos = time % 1_000_000_000;
-        let seconds = time / 1_000_000_000;
+        let nanos = nanoseconds_of_day % 1_000_000_000;
+        let seconds = nanoseconds_of_day / 1_000_000_000;
         let (hour, min, sec) = seconds_of_day_to_hms(seconds as u32);
         let mut hour = hour as i32;
         hour -= offset / 60;
