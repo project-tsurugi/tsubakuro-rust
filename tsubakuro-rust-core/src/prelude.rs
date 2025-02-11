@@ -16,6 +16,7 @@ pub use crate::service::sql::prepare::parameter::*;
 pub use crate::service::sql::prepare::placeholder::*;
 pub use crate::service::sql::prepare::*;
 pub use crate::service::sql::query_result::*;
+pub use crate::service::sql::r#type::decimal::*;
 pub use crate::service::sql::table_list::*;
 pub use crate::service::sql::table_metadata::*;
 pub use crate::service::sql::*;

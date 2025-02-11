@@ -1,6 +1,7 @@
 use crate::jogasaki::proto::sql::common::AtomType;
 use crate::jogasaki::proto::sql::request::placeholder::{Placement, TypeInfo};
 use crate::jogasaki::proto::sql::request::Placeholder as SqlPlaceholder;
+use crate::prelude::{TgDecimal, TgDecimalI128};
 
 impl SqlPlaceholder {
     fn new(name: &str, type_info: TypeInfo, dimension: u32) -> SqlPlaceholder {
@@ -71,6 +72,18 @@ impl AtomTypeProvider for f32 {
 impl AtomTypeProvider for f64 {
     fn atom_type() -> AtomType {
         AtomType::Float8
+    }
+}
+
+impl AtomTypeProvider for TgDecimal {
+    fn atom_type() -> AtomType {
+        AtomType::Decimal
+    }
+}
+
+impl AtomTypeProvider for TgDecimalI128 {
+    fn atom_type() -> AtomType {
+        AtomType::Decimal
     }
 }
 
@@ -266,6 +279,25 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<f64>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn decimal() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Decimal);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Decimal, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<TgDecimal>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgDecimal>();
+        assert_eq!(target0, target);
+
+        let target = SqlPlaceholder::of::<TgDecimalI128>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgDecimalI128>();
         assert_eq!(target0, target);
     }
 

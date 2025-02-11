@@ -2,7 +2,7 @@ use crate::{
     error::TgError,
     invalid_response_error,
     jogasaki::proto::sql::response::ResultSetMetadata as SqlQueryResultMetadata,
-    prelude::convert_sql_response,
+    prelude::{convert_sql_response, TgDecimalI128, TgDecimalResult},
     session::wire::{response::WireResponse, Wire},
     util::Timeout,
 };
@@ -263,94 +263,46 @@ impl SqlQueryResultFetch<f64> for SqlQueryResult {
     }
 }
 
-impl SqlQueryResult {
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<TgDecimalResult> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
-    pub async fn fetch_decimal(&mut self) -> Result<(Option<Vec<u8>>, i64, i32), TgError> {
-        self.fetch_for_decimal(self.default_timeout).await
+    async fn fetch(&mut self) -> Result<TgDecimalResult, TgError> {
+        self.fetch_for(self.default_timeout).await
     }
 
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
-    pub async fn fetch_for_decimal(
-        &mut self,
-        timeout: Duration,
-    ) -> Result<(Option<Vec<u8>>, i64, i32), TgError> {
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<TgDecimalResult, TgError> {
         let timeout = Timeout::new(timeout);
         let (coefficient_bytes, coefficient, exponent) =
             self.value_stream.fetch_decimal_value(&timeout).await?;
 
-        Ok((
+        Ok(TgDecimalResult::new(
             coefficient_bytes.as_deref().map(<[u8]>::to_vec),
             coefficient,
             exponent,
         ))
     }
+}
 
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<TgDecimalI128> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
-    pub async fn fetch_decimal_i128(&mut self) -> Result<(i128, i32), TgError> {
-        self.fetch_for_decimal_i128(self.default_timeout).await
+    async fn fetch(&mut self) -> Result<TgDecimalI128, TgError> {
+        self.fetch_for(self.default_timeout).await
     }
 
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
-    pub async fn fetch_for_decimal_i128(
-        &mut self,
-        timeout: Duration,
-    ) -> Result<(i128, i32), TgError> {
-        let value = self.fetch_for_decimal(timeout).await?;
-        match value {
-            (Some(coefficient), _, exponent) => {
-                let size = coefficient.len();
-                if size == 0 || 16 < size {
-                    return Err(client_error!("unsupported decimal.coefficient size"));
-                }
-                if (coefficient[0] as i8) >= 0 {
-                    let mut array = [0u8; 16];
-                    array[16 - size..].copy_from_slice(&coefficient);
-                    let unscaled_value = i128::from_be_bytes(array);
-                    Ok((unscaled_value, exponent))
-                } else {
-                    let mut array = [0xffu8; 16];
-                    array[16 - size..].copy_from_slice(&coefficient);
-                    let unscaled_value = i128::from_be_bytes(array);
-                    Ok((unscaled_value, exponent))
-                }
-            }
-            (None, coefficient, exponent) => Ok((coefficient as i128, exponent)),
-        }
-    }
-
-    /// Retrieves a `DECIMAL` value on the column of the cursor position.
-    ///
-    /// You can only take once to retrieve the value on the column.
-    pub async fn fetch_decimal_i128_opt(&mut self) -> Result<Option<(i128, i32)>, TgError> {
-        if self.is_null()? {
-            Ok(None)
-        } else {
-            let value = self.fetch_decimal_i128().await?;
-            Ok(Some(value))
-        }
-    }
-
-    /// Retrieves a `DECIMAL` value on the column of the cursor position.
-    ///
-    /// You can only take once to retrieve the value on the column.
-    pub async fn fetch_for_decimal_i128_opt(
-        &mut self,
-        timeout: Duration,
-    ) -> Result<Option<(i128, i32)>, TgError> {
-        if self.is_null()? {
-            Ok(None)
-        } else {
-            let value = self.fetch_for_decimal_i128(timeout).await?;
-            Ok(Some(value))
-        }
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<TgDecimalI128, TgError> {
+        let value: TgDecimalResult = self.fetch_for(timeout).await?;
+        TgDecimalI128::try_from(value)
     }
 }
 

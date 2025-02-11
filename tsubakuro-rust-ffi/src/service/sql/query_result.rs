@@ -659,21 +659,17 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
-        context,
-        FUNCTION_NAME,
-        runtime,
-        query_result.fetch_decimal()
-    );
+    let value: TgDecimalResult =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
 
-    let (ptr, size) = if let Some(vec) = value.0 {
+    let (ptr, size) = if let Some(vec) = value.unscaled_value_bytes {
         vec_u8_to_field!(query_result.unscaled_value_bytes, vec)
     } else {
         (std::ptr::null(), 0)
     };
     let unscaled_value_bytes_size = size as u32;
-    let unscaled_value = value.1;
-    let exponent = value.2;
+    let unscaled_value = value.unscaled_value;
+    let exponent = value.exponent;
 
     unsafe {
         *unscaled_value_bytes_out = ptr;
@@ -730,21 +726,21 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
+    let value: TgDecimalResult = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
-        query_result.fetch_for_decimal(timeout)
+        query_result.fetch_for(timeout)
     );
 
-    let (ptr, size) = if let Some(vec) = value.0 {
+    let (ptr, size) = if let Some(vec) = value.unscaled_value_bytes {
         vec_u8_to_field!(query_result.unscaled_value_bytes, vec)
     } else {
         (std::ptr::null(), 0)
     };
     let unscaled_value_bytes_size = size as u32;
-    let unscaled_value = value.1;
-    let exponent = value.2;
+    let unscaled_value = value.unscaled_value;
+    let exponent = value.exponent;
 
     unsafe {
         *unscaled_value_bytes_out = ptr;
@@ -794,17 +790,13 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
     let query_result = unsafe { &mut *query_result };
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
-        context,
-        FUNCTION_NAME,
-        runtime,
-        query_result.fetch_decimal_i128()
-    );
+    let value: TgDecimalI128 =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
 
-    let unscaled_value = value.0;
+    let unscaled_value = value.unscaled_value;
     let high_value = (unscaled_value >> 64) as i64;
     let low_value = unscaled_value as u64;
-    let exponent = value.1;
+    let exponent = value.exponent;
 
     unsafe {
         *unscaled_value_high_out = high_value;
@@ -855,17 +847,17 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = query_result.runtime().clone();
-    let value = ffi_exec_core_async!(
+    let value: TgDecimalI128 = ffi_exec_core_async!(
         context,
         FUNCTION_NAME,
         runtime,
-        query_result.fetch_for_decimal_i128(timeout)
+        query_result.fetch_for(timeout)
     );
 
-    let unscaled_value = value.0;
+    let unscaled_value = value.unscaled_value;
     let high_value = (unscaled_value >> 64) as i64;
     let low_value = unscaled_value as u64;
-    let exponent = value.1;
+    let exponent = value.exponent;
 
     unsafe {
         *unscaled_value_high_out = high_value;

@@ -1,7 +1,5 @@
 #[cfg(test)]
 mod test {
-    use std::i128;
-
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
@@ -53,22 +51,22 @@ mod test {
         assert_eq!(Some(AtomType::Decimal), c.atom_type());
     }
 
-    fn generate_values() -> Vec<(i32, Option<(i128, i32)>)> {
+    fn generate_values() -> Vec<(i32, Option<TgDecimalI128>)> {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, Some((0, 0))));
-        values.push((2, Some((10, 0))));
-        values.push((3, Some((-10, 0))));
-        values.push((4, Some((1, 0))));
-        values.push((5, Some((-1, 0))));
+        values.push((1, Some(TgDecimalI128::new(0, 0))));
+        values.push((2, Some(TgDecimalI128::new(10, 0))));
+        values.push((3, Some(TgDecimalI128::new(-10, 0))));
+        values.push((4, Some(TgDecimalI128::new(1, 0))));
+        values.push((5, Some(TgDecimalI128::new(-1, 0))));
 
         let mut i = 10;
         let max = 10i128.pow(DECIMAL_SIZE) - 1;
         let mut v = -max;
         let step = max / 50 * 2;
         loop {
-            values.push((i, Some((v, 0))));
+            values.push((i, Some(TgDecimalI128::new(v, 0))));
 
             if v > max - step {
                 break;
@@ -80,11 +78,11 @@ mod test {
         values
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<(i128, i32)>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<TgDecimalI128>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
-            let sql = if let Some((v, _)) = &value.1 {
+            let sql = if let Some(v) = &value.1 {
                 format!("insert into test (pk, v) values({}, {})", value.0, v)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
@@ -95,20 +93,20 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<(i128, i32)>)>) {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<TgDecimalI128>)>) {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of_atom_type("value", AtomType::Decimal),
+            SqlPlaceholder::of::<TgDecimalI128>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of_decimal_i128_opt("value", value.1),
+                SqlParameter::of("value", value.1),
             ];
             client
                 .prepared_execute(&transaction, &ps, parameters)
@@ -121,7 +119,7 @@ mod test {
         ps.close().await.unwrap();
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<(i128, i32)>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<TgDecimalI128>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -144,7 +142,7 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v = query_result.fetch_decimal_i128_opt().await.unwrap();
+                let v = query_result.fetch().await.unwrap();
                 assert_eq!(expected.1, v);
             }
 

@@ -7,6 +7,8 @@ use crate::jogasaki::proto::sql::common::TimePoint as ProtoTimePoint;
 use crate::jogasaki::proto::sql::common::TimePointWithTimeZone as ProtoTimePointWithTimeZone;
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
+use crate::prelude::TgDecimal;
+use crate::prelude::TgDecimalI128;
 
 impl SqlParameter {
     fn new(name: &str, value: Option<Value>) -> SqlParameter {
@@ -73,34 +75,17 @@ impl SqlParameterOf<f64> for SqlParameter {
     }
 }
 
-impl SqlParameter {
-    pub fn of_decimal(name: &str, value: (Vec<u8>, i32)) -> SqlParameter {
-        let value = ProtoDecimal {
-            unscaled_value: value.0,
-            exponent: value.1,
-        };
+impl SqlParameterOf<TgDecimal> for SqlParameter {
+    fn of(name: &str, value: TgDecimal) -> SqlParameter {
         let value = Value::DecimalValue(value);
         SqlParameter::new(name, Some(value))
     }
+}
 
-    pub fn of_decimal_opt(name: &str, value: Option<(Vec<u8>, i32)>) -> SqlParameter {
-        match value {
-            Some(value) => Self::of_decimal(name, value),
-            None => Self::null(name),
-        }
-    }
-
-    pub fn of_decimal_i128(name: &str, value: (i128, i32)) -> SqlParameter {
-        let unscaled_value = value.0.to_be_bytes().to_vec();
-        let exponent = value.1;
-        Self::of_decimal(name, (unscaled_value, exponent))
-    }
-
-    pub fn of_decimal_i128_opt(name: &str, value: Option<(i128, i32)>) -> SqlParameter {
-        match value {
-            Some(value) => Self::of_decimal_i128(name, value),
-            None => Self::null(name),
-        }
+impl SqlParameterOf<TgDecimalI128> for SqlParameter {
+    fn of(name: &str, value: TgDecimalI128) -> SqlParameter {
+        let value = TgDecimal::from(value);
+        Self::of(name, value)
     }
 }
 
@@ -692,7 +677,8 @@ mod test {
 
     #[test]
     fn decimal() {
-        let target0 = SqlParameter::of_decimal("test", (vec![4, 0xd2], -1));
+        let value = TgDecimal::new(vec![4, 0xd2], -1);
+        let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
         assert_eq!(
             &Value::DecimalValue(ProtoDecimal {
@@ -702,13 +688,11 @@ mod test {
             target0.value().unwrap()
         );
 
-        let target = SqlParameter::of_decimal_opt("test", Some((vec![4, 0xd2], -1)));
+        let target = SqlParameter::of("test", Some(value.clone()));
         assert_eq!(target0, target);
 
-        let target1 = SqlParameter::of_decimal_opt("test", None);
-        assert_eq!(SqlParameter::null("test"), target1);
-
-        let target = SqlParameter::of_decimal_i128("test", (1234, -1));
+        let value = TgDecimalI128::new(1234, -1);
+        let target = SqlParameter::of("test", value.clone());
         assert_eq!(target0.name(), target.name());
         assert_eq!(
             &Value::DecimalValue(ProtoDecimal {
@@ -718,11 +702,8 @@ mod test {
             target.value().unwrap()
         );
 
-        let target1 = SqlParameter::of_decimal_i128_opt("test", Some((1234, -1)));
+        let target1 = SqlParameter::of("test", Some(value.clone()));
         assert_eq!(target1, target);
-
-        let target1 = SqlParameter::of_decimal_i128_opt("test", None);
-        assert_eq!(SqlParameter::null("test"), target1);
     }
 
     #[cfg(feature = "with_bigdecimal")]
