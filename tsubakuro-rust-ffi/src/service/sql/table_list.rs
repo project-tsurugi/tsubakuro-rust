@@ -66,7 +66,6 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
 
     let size = table_names.len();
 
-    // TODO mutex.lock table_list.table_names
     cstring_array_field_set_if_none!(context, table_list.table_names, table_names);
 
     let ptr = cstring_array_field_to_ptr!(table_list.table_names);

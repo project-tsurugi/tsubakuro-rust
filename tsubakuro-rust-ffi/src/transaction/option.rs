@@ -347,7 +347,6 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
 
     let size = table_names.len();
 
-    // TODO mutex.lock transaction_option.write_preserve
     cstring_array_field_set_if_none!(context, transaction_option.write_preserve, table_names);
 
     let ptr = cstring_array_field_to_ptr!(transaction_option.write_preserve);
@@ -425,7 +424,6 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
 
     let size = table_names.len();
 
-    // TODO mutex.lock transaction_option.inclusive_read_area
     cstring_array_field_set_if_none!(context, transaction_option.inclusive_read_area, table_names);
 
     let ptr = cstring_array_field_to_ptr!(transaction_option.inclusive_read_area);
@@ -503,7 +501,6 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
 
     let size = table_names.len();
 
-    // TODO mutex.lock transaction_option.exclusive_read_area
     cstring_array_field_set_if_none!(context, transaction_option.exclusive_read_area, table_names);
 
     let ptr = cstring_array_field_to_ptr!(transaction_option.exclusive_read_area);
