@@ -1,22 +1,12 @@
-# tsubakuro-rust-core
-
-tsubakuro-rust-core is the core library to access Tsurugi written in Rust.
-
-## How to use
-
-```toml
-[dependencies]
-tsubakuro-rust-core = { path = "/path/to/tsubakuro-rust-core" }
-```
-
-## Example
-
-### connect example
-
-```rust
 use std::time::Duration;
+
 use log::warn;
 use tsubakuro_rust_core::prelude::*;
+
+#[tokio::main]
+async fn main() -> Result<(), TgError> {
+    example().await
+}
 
 async fn example() -> Result<(), TgError> {
     let endpoint = Endpoint::parse("tcp://localhost:12345")?;
@@ -43,11 +33,7 @@ async fn example() -> Result<(), TgError> {
 
     result
 }
-```
 
-### transaction example
-
-```rust
 async fn example_transaction(client: &SqlClient) -> Result<(), TgError> {
     // transaction start
     let mut transaction_option = TransactionOption::new();
@@ -74,11 +60,15 @@ async fn example_transaction(client: &SqlClient) -> Result<(), TgError> {
 
     result
 }
-```
 
-### execute SQL(update) example
+async fn example_sql(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+    example_statement(client, transaction).await?;
+    example_query(client, transaction).await?;
+    example_prepared_statement_insert(client, transaction).await?;
+    example_prepared_statement_query(client, transaction).await?;
+    Ok(())
+}
 
-```rust
 async fn example_statement(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
     let sql = "update customer set c_age = 2 where c_id = 3";
     let execute_result = client.execute(&transaction, sql).await?;
@@ -86,11 +76,7 @@ async fn example_statement(client: &SqlClient, transaction: &Transaction) -> Res
 
     Ok(())
 }
-```
 
-### execute SQL(select) example
-
-```rust
 async fn example_query(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
     let sql = "select c_id, c_name, c_age from customer order by c_id";
     let mut query_result = client.query(&transaction, sql).await?;
@@ -110,11 +96,7 @@ async fn example_query(client: &SqlClient, transaction: &Transaction) -> Result<
 
     Ok(())
 }
-```
 
-### prepared statement(insert) example
-
-```rust
 async fn example_prepared_statement_insert(
     client: &SqlClient,
     transaction: &Transaction,
@@ -151,11 +133,7 @@ async fn example_prepared_execute(
 
     Ok(())
 }
-```
 
-### prepared statement(select) example
-
-```rust
 async fn example_prepared_statement_query(
     client: &SqlClient,
     transaction: &Transaction,
@@ -196,31 +174,3 @@ async fn example_prepared_query(
 
     Ok(())
 }
-```
-
-
-
-## How to build
-
-First, copy the proto files from [tsubakuro-proto](https://github.com/project-tsurugi/tsubakuro/tree/master/modules/proto).
-
-```bash
-cd tsubakuro-rust-core
-cp -rp tsubakuro/modules/proto/src/main/protos .
-```
-
-Then build with `cargo`.
-
-```bash
-cd tsubakuro-rust-core
-cargo build
-```
-
-## How to test
-
-```bash
-cd tsubakuro-rust-core
-cargo test
-```
-
-See also [tsubakuro-rust-dbtest](../tsubakuro-rust-dbtest).

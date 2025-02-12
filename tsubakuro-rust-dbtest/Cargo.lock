@@ -1268,6 +1268,7 @@ dependencies = [
  "bigdecimal",
  "chrono",
  "env_logger",
+ "log",
  "rust_decimal",
  "time",
  "tokio",
