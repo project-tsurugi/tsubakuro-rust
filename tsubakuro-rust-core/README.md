@@ -58,13 +58,9 @@ async fn example_transaction(client: &SqlClient) -> Result<(), TgError> {
     let mut result = example_sql(&client, &transaction).await;
 
     // transaction commit
-    let commit_option = CommitOption::default();
-    if let Err(e) = client.commit(&transaction, &commit_option).await {
-        if result.is_ok() {
-            result = Err(e);
-        } else {
-            warn!("transaction commit error. {}", e);
-        }
+    if result.is_ok() {
+        let commit_option = CommitOption::default();
+        result = client.commit(&transaction, &commit_option).await;
     }
 
     // transaction close
