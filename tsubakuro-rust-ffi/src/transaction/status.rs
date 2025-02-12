@@ -173,7 +173,7 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_message(
 
     if status.error_message.is_none() {
         let value = match status.server_error() {
-            Some(TgError::ServerError(_, _, server_message)) => server_message.clone(),
+            Some(TgError::ServerError(_, _, _, server_message)) => server_message.clone(),
             Some(e) => e.message().clone(),
             None => {
                 trace!("{FUNCTION_NAME} end");

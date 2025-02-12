@@ -276,7 +276,7 @@ mod test {
         ];
         let error = client.prepare(sql, placeholders).await.unwrap_err();
         match error {
-            TgError::ServerError(_message, code, _server_message) => {
+            TgError::ServerError(_, _message, code, _server_message) => {
                 assert_eq!("SYMBOL_ANALYZE_EXCEPTION", code.name());
             }
             _ => panic!("{:?}", error),

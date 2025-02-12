@@ -11,7 +11,7 @@ mod test {
 
         {
             let error = client.get_table_metadata("test").await.unwrap_err();
-            if let TgError::ServerError(_message, code, _server_message) = error {
+            if let TgError::ServerError(_, _message, code, _server_message) = error {
                 assert_eq!("TARGET_NOT_FOUND_EXCEPTION", code.name())
             } else {
                 panic!("{:?}", error);
@@ -58,7 +58,7 @@ mod test {
             let mut job = client.get_table_metadata_async("test").await.unwrap();
             assert_eq!("TableMetadata", job.name());
             let error = job.take().await.unwrap_err();
-            if let TgError::ServerError(_message, code, _server_message) = error {
+            if let TgError::ServerError(_, _message, code, _server_message) = error {
                 assert_eq!("TARGET_NOT_FOUND_EXCEPTION", code.name())
             } else {
                 panic!("{:?}", error);

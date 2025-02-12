@@ -7,7 +7,8 @@ macro_rules! sql_service_error {
     ($function_name:expr, $cause:expr) => {{
         let server_message = format!("{} ({})", $cause.detail, $cause.supplemental_text);
         $crate::error::TgError::ServerError(
-            format!("{}: SQL service error", $function_name),
+            format!("{}", $function_name),
+            "SQL service error".to_string(),
             $crate::error::DiagnosticCode::from($cause),
             server_message,
         )

@@ -45,7 +45,7 @@ mod test {
         let error = client.execute(&transaction, "").await.unwrap_err();
         let error_code;
         let error_message;
-        if let TgError::ServerError(_, code, message) = &error {
+        if let TgError::ServerError(_, _, code, message) = &error {
             error_code = code;
             error_message = message;
         } else {
@@ -53,7 +53,7 @@ mod test {
         }
 
         let status = client.get_transaction_status(&transaction).await.unwrap();
-        if let Some(TgError::ServerError(_, code, message)) = status.server_error() {
+        if let Some(TgError::ServerError(_, _, code, message)) = status.server_error() {
             assert_eq!(error_code, code);
             assert_eq!(error_message, message);
         } else {
@@ -74,7 +74,7 @@ mod test {
         let error = client.execute(&transaction, "").await.unwrap_err();
         let error_code;
         let error_message;
-        if let TgError::ServerError(_, code, message) = &error {
+        if let TgError::ServerError(_, _, code, message) = &error {
             error_code = code;
             error_message = message;
         } else {
@@ -86,7 +86,7 @@ mod test {
             .await
             .unwrap();
         let status = job.take().await.unwrap();
-        if let Some(TgError::ServerError(_, code, message)) = status.server_error() {
+        if let Some(TgError::ServerError(_, _, code, message)) = status.server_error() {
             assert_eq!(error_code, code);
             assert_eq!(error_message, message);
         } else {

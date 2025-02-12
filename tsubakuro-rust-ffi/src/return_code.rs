@@ -102,7 +102,7 @@ pub(crate) fn get_rc_from_core_error(error: &TgError) -> TsurugiFfiRc {
         TgError::ClientError(_, _) => TSURUGI_FFI_RC_CORE_CLIENT_CLIENT_ERROR,
         TgError::TimeoutError(_) => TSURUGI_FFI_RC_CORE_CLIENT_TIMEOUT_ERROR,
         TgError::IoError(_, _) => TSURUGI_FFI_RC_CORE_CLIENT_IO_ERROR,
-        TgError::ServerError(_, code, _) => {
+        TgError::ServerError(_, _, code, _) => {
             TSURUGI_FFI_RC_CORE_SERVER_ERROR
                 | ((code.category_number() as TsurugiFfiRc) << 20)
                 | (code.code_number() as TsurugiFfiRc)

@@ -48,7 +48,7 @@ mod test {
             f(&mut option);
 
             let error = client.start_transaction(&option).await.unwrap_err();
-            if let TgError::ServerError(_message, code, _server_message) = error {
+            if let TgError::ServerError(_, _message, code, _server_message) = error {
                 assert_eq!("SQL-02014", code.structured_code());
                 assert_eq!("TARGET_NOT_FOUND_EXCEPTION", code.name());
             } else {

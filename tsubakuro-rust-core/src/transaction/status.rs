@@ -31,7 +31,7 @@ impl TransactionStatus {
 
     pub fn diagnostic_code(&self) -> Option<&DiagnosticCode> {
         match &self.server_error {
-            Some(TgError::ServerError(_, code, _)) => Some(code),
+            Some(TgError::ServerError(_, _, code, _)) => Some(code),
             _ => None,
         }
     }

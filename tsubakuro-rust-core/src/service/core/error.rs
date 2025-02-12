@@ -5,14 +5,16 @@ macro_rules! core_service_error {
     ($function_name:expr, $cause:expr) => {{
         let server_message = format!("{}", $cause.message);
         $crate::error::TgError::ServerError(
-            format!("{}: core service error", $function_name),
+            format!("{}", $function_name),
+            "core service error".to_string(),
             $crate::error::DiagnosticCode::from($cause),
             server_message,
         )
     }};
     ($function_name:expr, $cause:expr, $server_message:expr) => {{
         $crate::error::TgError::ServerError(
-            format!("{}: core service error", $function_name),
+            format!("{}", $function_name),
+            "core service error".to_string(),
             $crate::error::DiagnosticCode::from($cause),
             $server_message,
         )

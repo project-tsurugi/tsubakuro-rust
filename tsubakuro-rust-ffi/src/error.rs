@@ -16,7 +16,7 @@ impl TsurugiFfiError {
                 TgError::ClientError(_, _error) => "TSURUGI_CORE_CLIENT_ERROR".to_string(),
                 TgError::TimeoutError(_) => "TSURUGI_CORE_CLIENT_TIMEOUT_ERROR".to_string(),
                 TgError::IoError(_, _error) => "TSURUGI_CORE_CLIENT_IO_ERROR".to_string(),
-                TgError::ServerError(_, code, _) => code.name().clone(),
+                TgError::ServerError(_, _, code, _) => code.name().clone(),
             },
         }
     }

@@ -10,29 +10,11 @@ pub enum TgError {
     ),
 
     ServerError(
+        /*function_name*/ String,
         /*message*/ String,
         /*code*/ DiagnosticCode,
         /*server_message*/ String,
     ),
-}
-
-impl std::fmt::Display for TgError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TgError::ClientError(message, cause) => match cause {
-                Some(cause) => write!(f, "{message} ({cause})"),
-                _ => write!(f, "{message}"),
-            },
-            TgError::TimeoutError(message) => write!(f, "{message}"),
-            TgError::IoError(message, cause) => match cause {
-                Some(cause) => write!(f, "{message} ({cause})"),
-                _ => write!(f, "{message}"),
-            },
-            TgError::ServerError(message, code, server_message) => {
-                write!(f, "{message} ({code:?}) {server_message}")
-            }
-        }
-    }
 }
 
 impl std::fmt::Debug for TgError {
@@ -49,12 +31,32 @@ impl std::fmt::Debug for TgError {
                 .field(message)
                 .field(cause)
                 .finish(),
-            Self::ServerError(message, code, server_message) => f
+            Self::ServerError(function_name, message, code, server_message) => f
                 .debug_tuple("ServerError")
+                .field(function_name)
                 .field(message)
                 .field(&code.to_string())
                 .field(server_message)
                 .finish(),
+        }
+    }
+}
+
+impl std::fmt::Display for TgError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TgError::ClientError(message, cause) => match cause {
+                Some(cause) => write!(f, "{message} ({cause})"),
+                _ => write!(f, "{message}"),
+            },
+            TgError::TimeoutError(message) => write!(f, "{message}"),
+            TgError::IoError(message, cause) => match cause {
+                Some(cause) => write!(f, "{message} ({cause})"),
+                _ => write!(f, "{message}"),
+            },
+            TgError::ServerError(_function_name, message, code, server_message) => {
+                write!(f, "{message} ({code:?}) {server_message}")
+            }
         }
     }
 }
@@ -65,7 +67,7 @@ impl std::error::Error for TgError {
             TgError::ClientError(_, cause) => cause.as_deref(),
             TgError::TimeoutError(_) => None,
             TgError::IoError(_, cause) => cause.as_deref(),
-            TgError::ServerError(_, _, _) => None,
+            TgError::ServerError(_, _, _, _) => None,
         }
     }
 }
@@ -76,7 +78,7 @@ impl TgError {
             TgError::ClientError(message, _cause) => message,
             TgError::TimeoutError(message) => message,
             TgError::IoError(message, _cause) => message,
-            TgError::ServerError(message, _code, _server_message) => message,
+            TgError::ServerError(_function_name, message, _code, _server_message) => message,
         }
     }
 
@@ -85,7 +87,7 @@ impl TgError {
             TgError::ClientError(_, _) => None,
             TgError::TimeoutError(_) => None,
             TgError::IoError(_, _) => None,
-            TgError::ServerError(_, code, _) => Some(code),
+            TgError::ServerError(_, _, code, _) => Some(code),
         }
     }
 }

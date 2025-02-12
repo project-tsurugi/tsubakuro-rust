@@ -7,7 +7,8 @@ macro_rules! endpoint_service_error {
     ($function_name:expr, $cause:expr) => {{
         let server_message = format!("{} ({})", $cause.message, $cause.supplemental_text);
         $crate::error::TgError::ServerError(
-            format!("{}: endpoint service error", $function_name),
+            format!("{}", $function_name),
+            "endpoint service error".to_string(),
             $crate::error::DiagnosticCode::from($cause),
             server_message,
         )
