@@ -1,4 +1,3 @@
-#[derive(Debug)]
 pub enum TgError {
     ClientError(
         /*message*/ String,
@@ -32,6 +31,30 @@ impl std::fmt::Display for TgError {
             TgError::ServerError(message, code, server_message) => {
                 write!(f, "{message} ({code:?}) {server_message}")
             }
+        }
+    }
+}
+
+impl std::fmt::Debug for TgError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::ClientError(message, cause) => f
+                .debug_tuple("ClientError")
+                .field(message)
+                .field(cause)
+                .finish(),
+            Self::TimeoutError(message) => f.debug_tuple("TimeoutError").field(message).finish(),
+            Self::IoError(message, cause) => f
+                .debug_tuple("IoError")
+                .field(message)
+                .field(cause)
+                .finish(),
+            Self::ServerError(message, code, server_message) => f
+                .debug_tuple("ServerError")
+                .field(message)
+                .field(&code.to_string())
+                .field(server_message)
+                .finish(),
         }
     }
 }
