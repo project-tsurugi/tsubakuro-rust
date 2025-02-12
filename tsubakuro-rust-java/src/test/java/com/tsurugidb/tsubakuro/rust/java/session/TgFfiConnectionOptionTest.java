@@ -109,6 +109,14 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(ctx, handle, arg);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg = manager.allocateString("ipc:tsurugi");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_endpoint_url(ctx, handle, arg);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
     }
 
     @Test

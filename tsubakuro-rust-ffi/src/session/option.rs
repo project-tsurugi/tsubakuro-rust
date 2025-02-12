@@ -107,7 +107,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
     connection_option: TsurugiFfiConnectionOptionHandle,
     endpoint: TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_endpoint()";
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_endpoint_url()";
     trace!(
         "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, endpoint={:?}",
         context,
@@ -118,13 +118,13 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint);
 
-    let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, endpoint);
+    let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, endpoint);
 
     let connection_option = unsafe { &mut *connection_option };
 
     match connection_option.set_endpoint_url(endpoint) {
         Ok(_) => {}
-        Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 1, "endpoint", e.message()),
+        Err(e) => return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "endpoint", e.message()),
     }
 
     let rc = rc_ok(context);
