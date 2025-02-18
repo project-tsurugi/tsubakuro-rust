@@ -3,7 +3,7 @@ use std::{
     sync::{atomic::AtomicI32, Arc, Mutex},
 };
 
-use log::debug;
+use log::error;
 
 use super::response::WireResponse;
 
@@ -169,7 +169,7 @@ impl ResponseBox {
             } {
                 slot_handle.set_wire_response(response);
             } else {
-                debug!(
+                error!(
                     "{FUNCTION_NAME} error. slot_handle {slot} not found. response={response:?}"
                 );
             }
@@ -178,7 +178,7 @@ impl ResponseBox {
             if let Some(Some(slot_handle)) = recv_wait_pool.get_mut(index) {
                 slot_handle.set_wire_response(response);
             } else {
-                debug!(
+                error!(
                     "{FUNCTION_NAME} error. slot_handle {slot} not found. response={response:?}"
                 );
             }

@@ -1,7 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
 use super::cancel_job::CancelJob;
-use log::debug;
+use log::{error, warn};
 
 use crate::{
     client_error,
@@ -229,7 +229,7 @@ impl<T> Drop for Job<T> {
                     match tokio::runtime::Runtime::new() {
                         Ok(runtime) => runtime,
                         Err(e) => {
-                            debug!("Job<{}>.drop() runtime::new error. {}", self.name, e);
+                            error!("Job<{}>.drop() runtime::new error. {}", self.name, e);
                             if self.fail_on_drop_error() {
                                 panic!("Job<{}>.drop() runtime::new error. {}", self.name, e);
                             }
@@ -240,7 +240,7 @@ impl<T> Drop for Job<T> {
                 runtime.block_on(async {
                     let result = self.send_cancel().await; // send only (do not check response)
                     if let Err(e) = result {
-                        debug!("Job<{}>.drop() close error. {}", self.name, e);
+                        warn!("Job<{}>.drop() close error. {}", self.name, e);
                         if self.fail_on_drop_error() {
                             panic!("Job<{}>.drop() close error. {}", self.name, e);
                         }

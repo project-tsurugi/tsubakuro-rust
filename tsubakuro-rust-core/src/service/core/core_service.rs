@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use log::{debug, trace};
+use log::{error, trace, warn};
 use prost::Message;
 
 use crate::{
@@ -237,14 +237,14 @@ fn shutdown_processor_for_job(
                 match tokio::runtime::Runtime::new() {
                     Ok(runtime) => runtime,
                     Err(e) => {
-                        debug!("{FUNCTION_NAME}() runtime::new error. {}", e);
+                        error!("{FUNCTION_NAME}() runtime::new error. {}", e);
                         return;
                     }
                 }
             };
             runtime.block_on(async {
                 if let Err(e) = wire.close().await {
-                    debug!("{FUNCTION_NAME}() wire.close error. {}", e);
+                    warn!("{FUNCTION_NAME}() wire.close error. {}", e);
                 }
             })
         });

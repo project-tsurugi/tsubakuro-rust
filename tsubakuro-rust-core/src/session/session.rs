@@ -3,7 +3,7 @@ use std::{
     time::Duration,
 };
 
-use log::{debug, trace};
+use log::{error, trace, warn};
 
 use crate::{
     error::TgError,
@@ -216,7 +216,7 @@ impl Session {
                     let result =
                         CoreService::update_expiration_time(&wire, None, default_timeout).await;
                     if let Err(error) = result {
-                        trace!("session.keep_alive end. {}", error);
+                        error!("session.keep_alive end. {}", error);
                         break;
                     }
                 }
@@ -244,7 +244,7 @@ impl Drop for Session {
                     match tokio::runtime::Runtime::new() {
                         Ok(runtime) => runtime,
                         Err(e) => {
-                            debug!("Session.drop() runtime::new error. {}", e);
+                            error!("Session.drop() runtime::new error. {}", e);
                             if self.fail_on_drop_error() {
                                 panic!("Session.drop() runtime::new error. {}", e);
                             }
@@ -254,7 +254,7 @@ impl Drop for Session {
                 };
                 runtime.block_on(async {
                     if let Err(e) = self.close().await {
-                        debug!("Session.drop() close error. {}", e);
+                        warn!("Session.drop() close error. {}", e);
                         if self.fail_on_drop_error() {
                             panic!("Session.drop() close error. {}", e);
                         }

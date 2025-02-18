@@ -3,7 +3,7 @@ use std::{
     time::Duration,
 };
 
-use log::{debug, trace};
+use log::{error, trace, warn};
 
 use crate::{
     error::TgError,
@@ -111,7 +111,7 @@ impl Drop for SqlPreparedStatement {
                     match tokio::runtime::Runtime::new() {
                         Ok(runtime) => runtime,
                         Err(e) => {
-                            debug!("SqlPreparedStatement.drop() runtime::new error. {}", e);
+                            error!("SqlPreparedStatement.drop() runtime::new error. {}", e);
                             if self.fail_on_drop_error() {
                                 panic!("SqlPreparedStatement.drop() runtime::new error. {}", e);
                             }
@@ -125,7 +125,7 @@ impl Drop for SqlPreparedStatement {
                         .dispose_prepare_send_only(self.prepare_handle, self.has_result_records)
                         .await
                     {
-                        debug!("SqlPreparedStatement.drop() dispose error. {}", e);
+                        warn!("SqlPreparedStatement.drop() dispose error. {}", e);
                         if self.fail_on_drop_error() {
                             panic!("SqlPreparedStatement.drop() dispose error. {}", e);
                         }

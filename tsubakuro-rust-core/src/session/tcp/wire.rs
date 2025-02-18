@@ -1,6 +1,6 @@
 use std::sync::{atomic::AtomicI64, Arc};
 
-use log::{debug, trace};
+use log::{error, trace};
 use tokio::sync::Mutex;
 
 use crate::{
@@ -158,7 +158,7 @@ impl TcpWire {
             TcpResponseInfo::ResponseResultSetPayload => false,
             TcpResponseInfo::ResponseResultSetBye => true,
             _ => {
-                debug!("is_slot_end() error: unknown info({info:?})");
+                error!("is_slot_end() error: unknown info({info:?})");
                 false
             }
         }

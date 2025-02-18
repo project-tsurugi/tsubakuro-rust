@@ -3,7 +3,7 @@ use std::{
     time::Duration,
 };
 
-use log::debug;
+use log::{error, warn};
 
 use crate::{
     client_error,
@@ -116,7 +116,7 @@ impl Drop for Transaction {
                     match tokio::runtime::Runtime::new() {
                         Ok(runtime) => runtime,
                         Err(e) => {
-                            debug!("Transaction.drop() runtime::new error. {}", e);
+                            error!("Transaction.drop() runtime::new error. {}", e);
                             if self.fail_on_drop_error() {
                                 panic!("Transaction.drop() runtime::new error. {}", e);
                             }
@@ -128,7 +128,7 @@ impl Drop for Transaction {
                     let sql_client = SqlClient::new(self.session.clone());
                     let tx_handle = self.transaction_handle;
                     if let Err(e) = sql_client.dispose_transaction_send_only(tx_handle).await {
-                        debug!("Transaction.drop() dispose error. {}", e);
+                        warn!("Transaction.drop() dispose error. {}", e);
                         if self.fail_on_drop_error() {
                             panic!("Transaction.drop() dispose error. {}", e);
                         }
