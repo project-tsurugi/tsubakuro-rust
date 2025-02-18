@@ -165,7 +165,7 @@ RUST_LOGでトレースレベルのログを出力するよう設定してtsurug
 $ export RUST_LOG=tsubakuro_rust_ffi=trace
 $ # execute application using tsubakuro-rust-ffi
 ～
-[2025-02-12T09:01:56.966Z TRACE tsubakuro_rust_ffi::logger] tsurugi_ffi_env_logger_init() end
+[2025-02-12T09:01:56.966Z TRACE tsubakuro_rust_ffi::logger] tsurugi_ffi_env_logger_init() end rc=0
 ```
 
 ### コンテキスト構造体（TsurugiFfiContextHandle）

@@ -9,6 +9,7 @@ pub extern "C" fn tsurugi_ffi_env_logger_init() -> TsurugiFfiRc {
 
     env_logger::builder().format_timestamp_millis().init();
 
-    trace!("{FUNCTION_NAME} end");
-    TSURUGI_FFI_RC_OK
+    let rc = TSURUGI_FFI_RC_OK;
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
 }
