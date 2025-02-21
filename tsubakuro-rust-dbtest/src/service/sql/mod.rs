@@ -1,3 +1,4 @@
+mod explain;
 mod prepare;
 mod table_list;
 mod table_metadata;

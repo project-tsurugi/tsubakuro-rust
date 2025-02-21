@@ -12,6 +12,7 @@ pub use crate::jogasaki::proto::sql::response::execute_result::CounterType as Sq
 pub use crate::jogasaki::proto::sql::response::ResultSetMetadata as SqlQueryResultMetadata;
 // pub use crate::service::sql::column::*;
 pub use crate::service::sql::execute_result::*;
+pub use crate::service::sql::explain::SqlExplainResult;
 pub use crate::service::sql::prepare::parameter::*;
 pub use crate::service::sql::prepare::placeholder::*;
 pub use crate::service::sql::prepare::*;

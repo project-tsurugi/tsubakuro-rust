@@ -1,6 +1,7 @@
 pub mod column;
 pub(crate) mod error;
 pub mod execute_result;
+pub mod explain;
 pub mod name;
 pub mod prepare;
 pub mod query_result;

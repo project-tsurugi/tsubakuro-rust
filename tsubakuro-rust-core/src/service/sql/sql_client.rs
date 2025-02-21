@@ -11,8 +11,10 @@ use crate::{
         response::{response::Response as SqlResponseType, Response as SqlResponse},
     },
     prelude::{
-        execute_result_processor, list_tables_processor, prepare_dispose_processor,
-        prepare_processor, query_result_processor,
+        execute_result_processor,
+        explain::explain_processor,
+        list_tables_processor, prepare_dispose_processor, prepare_processor,
+        query_result_processor,
         status::{transaction_status_processor, TransactionStatus},
         table_metadata_processor, CommitOption, ServiceClient, SqlExecuteResult, SqlParameter,
         SqlPlaceholder, SqlQueryResult, TableList, TableMetadata,
@@ -31,7 +33,7 @@ use crate::{
 
 use prost::{alloc::string::String as ProstString, Message};
 
-use super::prepare::SqlPreparedStatement;
+use super::{explain::SqlExplainResult, prepare::SqlPreparedStatement};
 
 /// The symbolic ID of the destination service.
 const SERVICE_SYMBOLIC_ID: &str = "sql";
@@ -263,6 +265,48 @@ impl SqlClient {
             prepared_statement_handle: Some(ps),
         };
         SqlCommand::DisposePreparedStatement(request)
+    }
+
+    pub async fn explain(&self, sql: &str) -> Result<SqlExplainResult, TgError> {
+        let timeout = self.default_timeout;
+        self.explain_for(sql, timeout).await
+    }
+
+    pub async fn explain_for(
+        &self,
+        sql: &str,
+        timeout: Duration,
+    ) -> Result<SqlExplainResult, TgError> {
+        const FUNCTION_NAME: &str = "explain()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::explain_text_command(sql);
+        let response = self.send_and_pull_response(command, timeout).await?;
+
+        let explain_result = explain_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(explain_result)
+    }
+
+    pub async fn explain_async(&self, sql: &str) -> Result<Job<SqlExplainResult>, TgError> {
+        const FUNCTION_NAME: &str = "explain_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::explain_text_command(sql);
+        let job = self
+            .send_and_pull_async("Explain", command, Box::new(explain_processor))
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn explain_text_command(sql: &str) -> SqlCommand {
+        let request = crate::jogasaki::proto::sql::request::ExplainByText {
+            sql: sql.to_string(),
+        };
+        SqlCommand::ExplainByText(request)
     }
 
     pub async fn start_transaction(
