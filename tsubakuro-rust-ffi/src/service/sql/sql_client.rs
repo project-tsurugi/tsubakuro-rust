@@ -11,7 +11,7 @@ use crate::{
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
-        execute_result::TsurugiFfiSqlExecuteResult,
+        execute_result::TsurugiFfiSqlExecuteResult, explain::TsurugiFfiSqlExplainResult,
         prepare::prepared_statement::TsurugiFfiSqlPreparedStatement,
         query_result::TsurugiFfiSqlQueryResult, table_list::TsurugiFfiTableList,
         table_metadata::TsurugiFfiTableMetadata,
@@ -27,6 +27,7 @@ use crate::{
 
 use super::{
     execute_result::TsurugiFfiSqlExecuteResultHandle,
+    explain::TsurugiFfiSqlExplainResultHandle,
     prepare::{
         parameter::TsurugiFfiSqlParameterHandle, placeholder::TsurugiFfiSqlPlaceholderHandle,
         prepared_statement::TsurugiFfiSqlPreparedStatementHandle,
@@ -622,6 +623,358 @@ impl SqlPreparedStatementJobDelegator {
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_explain(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    sql: TsurugiFfiStringHandle,
+    explain_result_out: *mut TsurugiFfiSqlExplainResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_explain()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, explain_result_out={:?}",
+        context,
+        sql_client,
+        sql,
+        explain_result_out
+    );
+
+    ffi_arg_out_initialize!(explain_result_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, explain_result_out);
+
+    let client = unsafe { &*sql_client };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
+
+    let runtime = client.runtime();
+    let explain_result = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.explain(sql));
+
+    let explain_result = Box::new(TsurugiFfiSqlExplainResult::new(explain_result));
+
+    let handle = Box::into_raw(explain_result);
+    unsafe {
+        *explain_result_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. explain_result={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_explain_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    sql: TsurugiFfiStringHandle,
+    timeout: TsurugiFfiDuration,
+    explain_result_out: *mut TsurugiFfiSqlExplainResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_explain_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, timeout={:?}, explain_result_out={:?}",
+        context,
+        sql_client,
+        sql,
+        timeout,
+        explain_result_out
+    );
+
+    ffi_arg_out_initialize!(explain_result_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, explain_result_out);
+
+    let client = unsafe { &*sql_client };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let explain_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.explain_for(sql, timeout)
+    );
+
+    let explain_result = Box::new(TsurugiFfiSqlExplainResult::new(explain_result));
+
+    let handle = Box::into_raw(explain_result);
+    unsafe {
+        *explain_result_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. explain_result={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_explain_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    sql: TsurugiFfiStringHandle,
+    explain_result_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_explain_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, sql={:?}, explain_result_job_out={:?}",
+        context,
+        sql_client,
+        sql,
+        explain_result_job_out
+    );
+
+    ffi_arg_out_initialize!(explain_result_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, explain_result_job_out);
+
+    let client = unsafe { &*sql_client };
+    let sql = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, sql);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.explain_async(sql));
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(SqlExplainResultJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *explain_result_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. explain_result_job={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+impl_job_delegator! {
+    SqlExplainResultJobDelegator,
+    SqlExplainResult,
+    TsurugiFfiSqlExplainResult,
+    "explain_result",
+}
+
+impl SqlExplainResultJobDelegator {
+    fn convert(
+        value: SqlExplainResult,
+        _runtime: Arc<tokio::runtime::Runtime>,
+    ) -> Option<TsurugiFfiSqlExplainResult> {
+        Some(TsurugiFfiSqlExplainResult::new(value))
+    }
+}
+
+macro_rules! convert_parameters {
+    ($context:expr, $function_name:expr, $arg_index:expr, $parameters:expr, $parameter_size:expr) => {
+        if $parameter_size > 0 {
+            let src = unsafe { std::slice::from_raw_parts($parameters, $parameter_size as usize) };
+            let mut dst = Vec::with_capacity(src.len());
+            for &parameter in src {
+                ffi_arg_require_non_null!($context, $function_name, $arg_index, parameter);
+                let parameter = unsafe { &*parameter }.raw_clone();
+                dst.push(parameter);
+            }
+            dst
+        } else {
+            vec![]
+        }
+    };
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    explain_result_out: *mut TsurugiFfiSqlExplainResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_explain()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, explain_result_out={:?}",
+        context,
+        sql_client,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        explain_result_out
+    );
+
+    ffi_arg_out_initialize!(explain_result_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameters);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, explain_result_out);
+
+    let client = unsafe { &*sql_client };
+    let prepared_statement = unsafe { &*prepared_statement };
+    let parameters: Vec<SqlParameter> =
+        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameter_size);
+
+    let runtime = client.runtime();
+    let explain_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_explain(prepared_statement, parameters)
+    );
+
+    let explain_result = Box::new(TsurugiFfiSqlExplainResult::new(explain_result));
+
+    let handle = Box::into_raw(explain_result);
+    unsafe {
+        *explain_result_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. explain_result={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    timeout: TsurugiFfiDuration,
+    explain_result_out: *mut TsurugiFfiSqlExplainResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_explain_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, timeout={:?}, explain_result_out={:?}",
+        context,
+        sql_client,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        timeout,
+        explain_result_out
+    );
+
+    ffi_arg_out_initialize!(explain_result_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameters);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, explain_result_out);
+
+    let client = unsafe { &*sql_client };
+    let prepared_statement = unsafe { &*prepared_statement };
+    let parameters: Vec<SqlParameter> =
+        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameter_size);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let explain_result = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_explain_for(prepared_statement, parameters, timeout)
+    );
+
+    let explain_result = Box::new(TsurugiFfiSqlExplainResult::new(explain_result));
+
+    let handle = Box::into_raw(explain_result);
+    unsafe {
+        *explain_result_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. explain_result={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
+    parameters: *const TsurugiFfiSqlParameterHandle,
+    parameter_size: u32,
+    explain_result_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_explain_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, explain_result_job_out={:?}",
+        context,
+        sql_client,
+        prepared_statement,
+        parameters,
+        parameter_size,
+        explain_result_job_out
+    );
+
+    ffi_arg_out_initialize!(explain_result_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, prepared_statement);
+    if parameter_size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameters);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, explain_result_job_out);
+
+    let client = unsafe { &*sql_client };
+    let prepared_statement = unsafe { &*prepared_statement };
+    let parameters: Vec<SqlParameter> =
+        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameter_size);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.prepared_explain_async(prepared_statement, parameters)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(SqlExplainResultJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *explain_result_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. explain_result_job={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     context: TsurugiFfiContextHandle,
     sql_client: TsurugiFfiSqlClientHandle,
@@ -1120,23 +1473,6 @@ impl SqlExecuteResultJobDelegator {
     ) -> Option<TsurugiFfiSqlExecuteResult> {
         Some(TsurugiFfiSqlExecuteResult::new(value))
     }
-}
-
-macro_rules! convert_parameters {
-    ($context:expr, $function_name:expr, $arg_index:expr, $parameters:expr, $parameter_size:expr) => {
-        if $parameter_size > 0 {
-            let src = unsafe { std::slice::from_raw_parts($parameters, $parameter_size as usize) };
-            let mut dst = Vec::with_capacity(src.len());
-            for &parameter in src {
-                ffi_arg_require_non_null!($context, $function_name, $arg_index, parameter);
-                let parameter = unsafe { &*parameter }.raw_clone();
-                dst.push(parameter);
-            }
-            dst
-        } else {
-            vec![]
-        }
-    };
 }
 
 #[no_mangle]

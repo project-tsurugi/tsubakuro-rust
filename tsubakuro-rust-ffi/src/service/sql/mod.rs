@@ -1,6 +1,7 @@
 mod atom_type;
 mod column;
 mod execute_result;
+mod explain;
 mod prepare;
 mod query_result;
 mod query_result_metadata;

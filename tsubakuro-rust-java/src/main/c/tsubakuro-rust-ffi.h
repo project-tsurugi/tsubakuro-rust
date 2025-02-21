@@ -239,6 +239,8 @@ typedef struct TsurugiFfiSqlColumn TsurugiFfiSqlColumn;
 
 typedef struct TsurugiFfiSqlExecuteResult TsurugiFfiSqlExecuteResult;
 
+typedef struct TsurugiFfiSqlExplainResult TsurugiFfiSqlExplainResult;
+
 typedef struct TsurugiFfiSqlParameter TsurugiFfiSqlParameter;
 
 typedef struct TsurugiFfiSqlPlaceholder TsurugiFfiSqlPlaceholder;
@@ -277,6 +279,8 @@ typedef void *TsurugiFfiJobHandle;
 typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
 
 typedef struct TsurugiFfiSqlExecuteResult *TsurugiFfiSqlExecuteResultHandle;
+
+typedef struct TsurugiFfiSqlExplainResult *TsurugiFfiSqlExplainResultHandle;
 
 typedef struct TsurugiFfiSqlParameter *TsurugiFfiSqlParameterHandle;
 
@@ -464,6 +468,29 @@ TsurugiFfiRc tsurugi_ffi_sql_execute_result_get_rows(TsurugiFfiContextHandle con
                                                      int64_t *rows_out);
 
 void tsurugi_ffi_sql_execute_result_dispose(TsurugiFfiSqlExecuteResultHandle execute_result);
+
+TsurugiFfiRc tsurugi_ffi_sql_explain_result_get_format_id(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiSqlExplainResultHandle explain_result,
+                                                          TsurugiFfiStringHandle *format_id_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_explain_result_get_format_version(TsurugiFfiContextHandle context,
+                                                               TsurugiFfiSqlExplainResultHandle explain_result,
+                                                               uint64_t *format_version_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_explain_result_get_contents(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlExplainResultHandle explain_result,
+                                                         TsurugiFfiStringHandle *contents_out);
+
+TsurugiFfiRc tsurugi_ffi_explain_result_get_columns_size(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlExplainResultHandle explain_result,
+                                                         uint32_t *size_out);
+
+TsurugiFfiRc tsurugi_ffi_explain_result_get_columns_value(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiSqlExplainResultHandle explain_result,
+                                                          uint32_t index,
+                                                          TsurugiFfiSqlColumnHandle *sql_column_out);
+
+void tsurugi_ffi_sql_explain_result_dispose(TsurugiFfiSqlExplainResultHandle explain_result);
 
 TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context,
                                             TsurugiFfiStringHandle name,
@@ -827,6 +854,44 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle contex
                                                   const TsurugiFfiSqlPlaceholderHandle *placeholders,
                                                   uint32_t placeholders_size,
                                                   TsurugiFfiJobHandle *prepared_statement_job_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_explain(TsurugiFfiContextHandle context,
+                                            TsurugiFfiSqlClientHandle sql_client,
+                                            TsurugiFfiStringHandle sql,
+                                            TsurugiFfiSqlExplainResultHandle *explain_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_explain_for(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlClientHandle sql_client,
+                                                TsurugiFfiStringHandle sql,
+                                                TsurugiFfiDuration timeout,
+                                                TsurugiFfiSqlExplainResultHandle *explain_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_explain_async(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlClientHandle sql_client,
+                                                  TsurugiFfiStringHandle sql,
+                                                  TsurugiFfiJobHandle *explain_result_job_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlClientHandle sql_client,
+                                                     TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                     const TsurugiFfiSqlParameterHandle *parameters,
+                                                     uint32_t parameter_size,
+                                                     TsurugiFfiSqlExplainResultHandle *explain_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlClientHandle sql_client,
+                                                         TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                         const TsurugiFfiSqlParameterHandle *parameters,
+                                                         uint32_t parameter_size,
+                                                         TsurugiFfiDuration timeout,
+                                                         TsurugiFfiSqlExplainResultHandle *explain_result_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlClientHandle sql_client,
+                                                           TsurugiFfiSqlPreparedStatementHandle prepared_statement,
+                                                           const TsurugiFfiSqlParameterHandle *parameters,
+                                                           uint32_t parameter_size,
+                                                           TsurugiFfiJobHandle *explain_result_job_out);
 
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,

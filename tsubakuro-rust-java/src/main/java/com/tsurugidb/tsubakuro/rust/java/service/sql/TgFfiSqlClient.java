@@ -192,6 +192,117 @@ public class TgFfiSqlClient extends TgFfiObject {
         };
     }
 
+    public synchronized TgFfiSqlExplainResult explain(TgFfiContext context, String sql) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = allocateString(sql);
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain(ctx, handle, arg, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlExplainResult(manager(), outHandle);
+    }
+
+    public synchronized TgFfiSqlExplainResult explainFor(TgFfiContext context, String sql, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = allocateString(sql);
+        var t = allocateDuration(timeout);
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_for(ctx, handle, arg, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlExplainResult(manager(), outHandle);
+    }
+
+    public synchronized TgFfiJob<TgFfiSqlExplainResult> explainAsync(TgFfiContext context, String sql) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = allocateString(sql);
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_async(ctx, handle, arg, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiJob<>(manager(), outHandle) {
+            @Override
+            protected TgFfiSqlExplainResult valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+                return new TgFfiSqlExplainResult(manager, valueHandle);
+            }
+        };
+    }
+
+    public synchronized TgFfiSqlExplainResult preparedExplain(TgFfiContext context, TgFfiSqlPreparedStatement preparedStatement, List<TgFfiSqlParameter> parameters) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var ps = preparedStatement.handle();
+        MemorySegment arg;
+        int size;
+        if (parameters != null) {
+            arg = allocateArray(parameters);
+            size = parameters.size();
+        } else {
+            arg = MemorySegment.NULL;
+            size = 0;
+        }
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain(ctx, handle, ps, arg, size, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlExplainResult(manager(), outHandle);
+    }
+
+    public synchronized TgFfiSqlExplainResult preparedExplainFor(TgFfiContext context, TgFfiSqlPreparedStatement preparedStatement, List<TgFfiSqlParameter> parameters, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var ps = preparedStatement.handle();
+        MemorySegment arg;
+        int size;
+        if (parameters != null) {
+            arg = allocateArray(parameters);
+            size = parameters.size();
+        } else {
+            arg = MemorySegment.NULL;
+            size = 0;
+        }
+        var t = allocateDuration(timeout);
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_for(ctx, handle, ps, arg, size, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlExplainResult(manager(), outHandle);
+    }
+
+    public synchronized TgFfiJob<TgFfiSqlExplainResult> preparedExplainAsync(TgFfiContext context, TgFfiSqlPreparedStatement preparedStatement, List<TgFfiSqlParameter> parameters) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var ps = preparedStatement.handle();
+        MemorySegment arg;
+        int size;
+        if (parameters != null) {
+            arg = allocateArray(parameters);
+            size = parameters.size();
+        } else {
+            arg = MemorySegment.NULL;
+            size = 0;
+        }
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_async(ctx, handle, ps, arg, size, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiJob<>(manager(), outHandle) {
+            @Override
+            protected TgFfiSqlExplainResult valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+                return new TgFfiSqlExplainResult(manager, valueHandle);
+            }
+        };
+    }
+
     public synchronized TgFfiTransaction startTransaction(TgFfiContext context, TgFfiTransactionOption transactionOption) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();

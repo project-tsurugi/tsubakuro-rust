@@ -7,6 +7,7 @@ use crate::{
     sql_service_error,
 };
 
+#[derive(Debug)]
 pub struct SqlExplainResult {
     /// the content format ID.
     format_id: String,

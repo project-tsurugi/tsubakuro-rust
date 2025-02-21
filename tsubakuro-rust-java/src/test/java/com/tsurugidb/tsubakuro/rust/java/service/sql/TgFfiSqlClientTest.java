@@ -671,6 +671,498 @@ class TgFfiSqlClientTest extends TgFfiTester {
     }
 
     @Test
+    void explain() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var context = TgFfiContext.create(manager);
+
+        {
+            var sql = "insert into test values(1, 1, 'a')";
+            try (var er = client.explain(context, sql)) {
+                assertEquals(0, er.getColumns(context).size());
+            }
+        }
+        {
+            var sql = "select * from test";
+            try (var er = client.explain(context, sql)) {
+                assertEquals(3, er.getColumns(context).size());
+            }
+        }
+    }
+
+    @Test
+    void explain_argError() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg = manager.allocateString("select * from test");
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain(ctx, handle, arg, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = client.handle();
+            var arg = MemorySegment.NULL;
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain(ctx, handle, arg, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = client.handle();
+            var arg = manager.allocateString("select * from test");
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain(ctx, handle, arg, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void explain_for() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var context = TgFfiContext.create(manager);
+
+        {
+            var sql = "insert into test values(1, 1, 'a')";
+            var timeout = Duration.ofSeconds(5);
+            try (var er = client.explainFor(context, sql, timeout)) {
+                assertEquals(0, er.getColumns(context).size());
+            }
+        }
+        {
+            var sql = "select * from test";
+            var timeout = Duration.ofSeconds(5);
+            try (var er = client.explainFor(context, sql, timeout)) {
+                assertEquals(3, er.getColumns(context).size());
+            }
+        }
+    }
+
+    @Test
+    void explain_for_argError() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg = manager.allocateString("select * from test");
+            var t = Duration.ofSeconds(5).toNanos();
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_for(ctx, handle, arg, t, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = client.handle();
+            var arg = MemorySegment.NULL;
+            var t = Duration.ofSeconds(5).toNanos();
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_for(ctx, handle, arg, t, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = client.handle();
+            var arg = manager.allocateString("select * from test");
+            var t = Duration.ofSeconds(5).toNanos();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_for(ctx, handle, arg, t, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+    void explain_async(String pattern) {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var context = TgFfiContext.create(manager);
+
+        {
+            var sql = "insert into test values(1, 1, 'a')";
+            try (var erJob = client.explainAsync(context, sql); //
+                    var er = jobTake(erJob, pattern)) {
+                assertEquals(0, er.getColumns(context).size());
+            }
+        }
+        {
+            var sql = "select * from test";
+            try (var erJob = client.explainAsync(context, sql); //
+                    var er = jobTake(erJob, pattern)) {
+                assertEquals(3, er.getColumns(context).size());
+            }
+        }
+    }
+
+    @Test
+    void explain_async_argError() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg = manager.allocateString("select * from test");
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_async(ctx, handle, arg, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = client.handle();
+            var arg = MemorySegment.NULL;
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_async(ctx, handle, arg, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = client.handle();
+            var arg = manager.allocateString("select * from test");
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_explain_async(ctx, handle, arg, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void prepared_explain() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var context = TgFfiContext.create(manager);
+
+        {
+            var sql = "insert into test values(:foo, :bar, :zzz)";
+            var placeholders = List.of( //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4), //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "bar", TgFfiAtomType.INT8), //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "zzz", TgFfiAtomType.CHARACTER) //
+            );
+            try (var ps = client.prepare(context, sql, placeholders)) {
+                var parameters = List.of( //
+                        TgFfiSqlParameter.ofInt4(context, "foo", 4), //
+                        TgFfiSqlParameter.ofInt8(context, "bar", 44), //
+                        TgFfiSqlParameter.ofCharacter(context, "zzz", "ddd") //
+                );
+                try (var er = client.preparedExplain(context, ps, parameters)) {
+                    assertEquals(0, er.getColumns(context).size());
+                }
+
+                ps.close(context);
+            }
+        }
+        {
+            var sql = "select * from test";
+            var placeholders = List.<TgFfiSqlPlaceholder>of();
+            try (var ps = client.prepare(context, sql, placeholders)) {
+                var parameters = List.<TgFfiSqlParameter>of();
+                try (var er = client.preparedExplain(context, ps, parameters)) {
+                    assertEquals(3, er.getColumns(context).size());
+                }
+
+                ps.close(context);
+            }
+        }
+    }
+
+    @Test
+    void prepared_explain_argError() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var sql = "delete from test where foo=:foo";
+        var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(manager, "foo", TgFfiAtomType.INT4));
+        var parameters = List.of(TgFfiSqlParameter.ofInt4(manager, "foo", 9));
+
+        try (var context = TgFfiContext.create(manager); //
+                var preparedStatement = client.prepare(context, sql, placeholders)) {
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var ps = preparedStatement.handle();
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = MemorySegment.NULL;
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                var arg = MemorySegment.NULL;
+                int size = parameters.size();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                int size = 1;
+                var arg = manager.arena().allocate(ValueLayout.ADDRESS, size);
+                arg.setAtIndex(ValueLayout.ADDRESS, 0, MemorySegment.NULL);
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void prepared_explain_for() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var context = TgFfiContext.create(manager);
+
+        {
+            var sql = "insert into test values(:foo, :bar, :zzz)";
+            var placeholders = List.of( //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4), //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "bar", TgFfiAtomType.INT8), //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "zzz", TgFfiAtomType.CHARACTER) //
+            );
+            try (var ps = client.prepare(context, sql, placeholders)) {
+                var parameters = List.of( //
+                        TgFfiSqlParameter.ofInt4(context, "foo", 4), //
+                        TgFfiSqlParameter.ofInt8(context, "bar", 44), //
+                        TgFfiSqlParameter.ofCharacter(context, "zzz", "ddd") //
+                );
+                var timeout = Duration.ofSeconds(5);
+                try (var er = client.preparedExplainFor(context, ps, parameters, timeout)) {
+                    assertEquals(0, er.getColumns(context).size());
+                }
+
+                ps.close(context);
+            }
+        }
+        {
+            var sql = "select * from test";
+            var placeholders = List.<TgFfiSqlPlaceholder>of();
+            try (var ps = client.prepare(context, sql, placeholders)) {
+                var parameters = List.<TgFfiSqlParameter>of();
+                var timeout = Duration.ofSeconds(5);
+                try (var er = client.preparedExplainFor(context, ps, parameters, timeout)) {
+                    assertEquals(3, er.getColumns(context).size());
+                }
+
+                ps.close(context);
+            }
+        }
+    }
+
+    @Test
+    void prepared_explain_for_argError() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var sql = "delete from test where foo=:foo";
+        var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(manager, "foo", TgFfiAtomType.INT4));
+        var parameters = List.of(TgFfiSqlParameter.ofInt4(manager, "foo", 9));
+
+        try (var context = TgFfiContext.create(manager); //
+                var preparedStatement = client.prepare(context, sql, placeholders)) {
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var ps = preparedStatement.handle();
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_for(ctx, handle, ps, arg, size, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = MemorySegment.NULL;
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_for(ctx, handle, ps, arg, size, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                var arg = MemorySegment.NULL;
+                int size = parameters.size();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_for(ctx, handle, ps, arg, size, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                int size = 1;
+                var arg = manager.arena().allocate(ValueLayout.ADDRESS, size);
+                arg.setAtIndex(ValueLayout.ADDRESS, 0, MemorySegment.NULL);
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_for(ctx, handle, ps, arg, size, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_for(ctx, handle, ps, arg, size, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG6_ERROR(), rc);
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { TAKE, TAKE_FOR, TAKE_IF_READY })
+    void prepared_explain_async(String pattern) {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var context = TgFfiContext.create(manager);
+
+        {
+            var sql = "insert into test values(:foo, :bar, :zzz)";
+            var placeholders = List.of( //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "foo", TgFfiAtomType.INT4), //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "bar", TgFfiAtomType.INT8), //
+                    TgFfiSqlPlaceholder.ofAtomType(context, "zzz", TgFfiAtomType.CHARACTER) //
+            );
+            try (var ps = client.prepare(context, sql, placeholders)) {
+                var parameters = List.of( //
+                        TgFfiSqlParameter.ofInt4(context, "foo", 4), //
+                        TgFfiSqlParameter.ofInt8(context, "bar", 44), //
+                        TgFfiSqlParameter.ofCharacter(context, "zzz", "ddd") //
+                );
+                try (var erJob = client.preparedExplainAsync(context, ps, parameters); //
+                        var er = jobTake(erJob, pattern)) {
+                    assertEquals(0, er.getColumns(context).size());
+                }
+
+                ps.close(context);
+            }
+        }
+        {
+            var sql = "select * from test";
+            var placeholders = List.<TgFfiSqlPlaceholder>of();
+            try (var ps = client.prepare(context, sql, placeholders)) {
+                var parameters = List.<TgFfiSqlParameter>of();
+                try (var erJob = client.preparedExplainAsync(context, ps, parameters); //
+                        var er = jobTake(erJob, pattern)) {
+                    assertEquals(3, er.getColumns(context).size());
+                }
+
+                ps.close(context);
+            }
+        }
+    }
+
+    @Test
+    void prepared_explain_async_argError() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        var sql = "delete from test where foo=:foo";
+        var placeholders = List.of(TgFfiSqlPlaceholder.ofAtomType(manager, "foo", TgFfiAtomType.INT4));
+        var parameters = List.of(TgFfiSqlParameter.ofInt4(manager, "foo", 9));
+
+        try (var context = TgFfiContext.create(manager); //
+                var preparedStatement = client.prepare(context, sql, placeholders)) {
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var ps = preparedStatement.handle();
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_async(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = MemorySegment.NULL;
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_async(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                var arg = MemorySegment.NULL;
+                int size = parameters.size();
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_async(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                int size = 1;
+                var arg = manager.arena().allocate(ValueLayout.ADDRESS, size);
+                arg.setAtIndex(ValueLayout.ADDRESS, 0, MemorySegment.NULL);
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_async(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var ps = preparedStatement.handle();
+                var arg = manager.allocateArray(parameters);
+                int size = parameters.size();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_prepared_explain_async(ctx, handle, ps, arg, size, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
     void start_transaction() {
         var manager = getFfiObjectManager();
         var client = createSqlClient();
