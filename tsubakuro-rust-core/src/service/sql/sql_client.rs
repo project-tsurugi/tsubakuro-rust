@@ -309,6 +309,65 @@ impl SqlClient {
         SqlCommand::ExplainByText(request)
     }
 
+    pub async fn prepared_explain(
+        &self,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> Result<SqlExplainResult, TgError> {
+        let timeout = self.default_timeout;
+        self.prepared_explain_for(prepared_statement, parameters, timeout)
+            .await
+    }
+
+    pub async fn prepared_explain_for(
+        &self,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+        timeout: Duration,
+    ) -> Result<SqlExplainResult, TgError> {
+        const FUNCTION_NAME: &str = "prepared_explain()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::explain_prepared_command(prepared_statement, parameters);
+        let response = self.send_and_pull_response(command, timeout).await?;
+        let explain_result = explain_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(explain_result)
+    }
+
+    pub async fn prepared_explain_async(
+        &self,
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> Result<Job<SqlExplainResult>, TgError> {
+        const FUNCTION_NAME: &str = "prepared_explain_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::explain_prepared_command(prepared_statement, parameters);
+        let job = self
+            .send_and_pull_async("Explain", command, Box::new(explain_processor))
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn explain_prepared_command(
+        prepared_statement: &SqlPreparedStatement,
+        parameters: Vec<SqlParameter>,
+    ) -> SqlCommand {
+        let ps_handle = crate::jogasaki::proto::sql::common::PreparedStatement {
+            handle: prepared_statement.prepare_handle(),
+            has_result_records: prepared_statement.has_result_records(),
+        };
+        let request = crate::jogasaki::proto::sql::request::Explain {
+            prepared_statement_handle: Some(ps_handle),
+            parameters,
+        };
+        SqlCommand::Explain(request)
+    }
+
     pub async fn start_transaction(
         &self,
         transaction_option: &TransactionOption,
@@ -524,7 +583,7 @@ impl SqlClient {
         prepared_statement: &SqlPreparedStatement,
         parameters: Vec<SqlParameter>,
     ) -> Result<Job<SqlExecuteResult>, TgError> {
-        const FUNCTION_NAME: &str = "execute_async()";
+        const FUNCTION_NAME: &str = "prepared_execute_async()";
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
@@ -532,11 +591,7 @@ impl SqlClient {
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
         let job = self
-            .send_and_pull_async(
-                "PreparedExecute",
-                command,
-                Box::new(execute_result_processor),
-            )
+            .send_and_pull_async("Execute", command, Box::new(execute_result_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -684,7 +739,7 @@ impl SqlClient {
         let default_timeout = self.default_timeout;
         let job = self
             .send_and_pull_async(
-                "PreparedQuery",
+                "Query",
                 command,
                 Box::new(move |response| {
                     query_result_processor(wire.clone(), response, default_timeout)
