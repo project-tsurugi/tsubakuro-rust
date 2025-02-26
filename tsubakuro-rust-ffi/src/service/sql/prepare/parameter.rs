@@ -566,6 +566,156 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(
 }
 
 #[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    path: TsurugiFfiStringHandle,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_blob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, path={:?}, parameter_out={:?}",
+        context,
+        name,
+        path,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+    let parameter = SqlParameter::of(name, TgBlob::new(path));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob_contents(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    value: TsurugiFfiByteArrayHandle,
+    value_size: u64,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_blob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, value_size={:?}, parameter_out={:?}",
+        context,
+        name,
+        value,
+        value_size,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let value = bytes_to_vec_u8!(value, value_size);
+    let parameter = SqlParameter::of(name, TgBlob::from(value));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    path: TsurugiFfiStringHandle,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_clob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, path={:?}, parameter_out={:?}",
+        context,
+        name,
+        path,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+    let parameter = SqlParameter::of(name, TgClob::new(path));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob_contents(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    value: TsurugiFfiStringHandle,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_clob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, parameter_out={:?}",
+        context,
+        name,
+        value,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let value = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, value);
+    let parameter = SqlParameter::of(name, TgClob::from(value));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+#[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
     context: TsurugiFfiContextHandle,
     parameter: TsurugiFfiSqlParameterHandle,

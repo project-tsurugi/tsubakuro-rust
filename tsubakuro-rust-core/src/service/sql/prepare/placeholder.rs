@@ -2,8 +2,8 @@ use crate::jogasaki::proto::sql::common::AtomType;
 use crate::jogasaki::proto::sql::request::placeholder::{Placement, TypeInfo};
 use crate::jogasaki::proto::sql::request::Placeholder as SqlPlaceholder;
 use crate::prelude::{
-    TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone, TgTimePoint,
-    TgTimePointWithTimeZone,
+    TgBlob, TgClob, TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone,
+    TgTimePoint, TgTimePointWithTimeZone,
 };
 
 impl SqlPlaceholder {
@@ -225,6 +225,18 @@ impl AtomTypeProvider for (time::Time, time::UtcOffset) {
 impl AtomTypeProvider for time::OffsetDateTime {
     fn atom_type() -> AtomType {
         AtomType::TimePointWithTimeZone
+    }
+}
+
+impl AtomTypeProvider for TgBlob {
+    fn atom_type() -> AtomType {
+        AtomType::Blob
+    }
+}
+
+impl AtomTypeProvider for TgClob {
+    fn atom_type() -> AtomType {
+        AtomType::Clob
     }
 }
 
@@ -634,6 +646,32 @@ mod test {
         assert_eq!(target0, target);
 
         let target = "test".placeholder::<time::OffsetDateTime>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn blob() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Blob);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Blob, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<TgBlob>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgBlob>();
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn clob() {
+        let target0 = SqlPlaceholder::of_atom_type("test", AtomType::Clob);
+        assert_eq!("test", target0.name().unwrap());
+        assert_eq!(AtomType::Clob, target0.atom_type().unwrap());
+
+        let target = SqlPlaceholder::of::<TgClob>("test");
+        assert_eq!(target0, target);
+
+        let target = "test".placeholder::<TgClob>();
         assert_eq!(target0, target);
     }
 }

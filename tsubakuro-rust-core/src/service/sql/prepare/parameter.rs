@@ -8,8 +8,8 @@ use crate::jogasaki::proto::sql::common::TimePointWithTimeZone as ProtoTimePoint
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
 use crate::prelude::{
-    TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone, TgTimePoint,
-    TgTimePointWithTimeZone,
+    TgBlob, TgClob, TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone,
+    TgTimePoint, TgTimePointWithTimeZone,
 };
 
 impl SqlParameter {
@@ -472,6 +472,32 @@ impl SqlParameterOf<&time::OffsetDateTime> for SqlParameter {
             time_zone_offset: offset_minutes,
         };
         let value = Value::TimePointWithTimeZoneValue(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+impl SqlParameterOf<TgBlob> for SqlParameter {
+    fn of(name: &str, value: TgBlob) -> SqlParameter {
+        use crate::jogasaki::proto::sql::common::blob::Data;
+        let data = match value {
+            TgBlob::Path(path) => Data::LocalPath(path),
+            TgBlob::Contents(value) => Data::Contents(value),
+        };
+        let value = crate::jogasaki::proto::sql::common::Blob { data: Some(data) };
+        let value = Value::Blob(value);
+        SqlParameter::new(name, Some(value))
+    }
+}
+
+impl SqlParameterOf<TgClob> for SqlParameter {
+    fn of(name: &str, value: TgClob) -> SqlParameter {
+        use crate::jogasaki::proto::sql::common::clob::Data;
+        let data = match value {
+            TgClob::Path(path) => Data::LocalPath(path),
+            TgClob::Contents(value) => Data::Contents(value),
+        };
+        let value = crate::jogasaki::proto::sql::common::Clob { data: Some(data) };
+        let value = Value::Clob(value);
         SqlParameter::new(name, Some(value))
     }
 }
@@ -1566,5 +1592,74 @@ mod test {
             time::Time::from_hms_nano(hour, min, sec, nanos).unwrap(),
             time::UtcOffset::from_whole_seconds(offset_hour * 60 * 60).unwrap(),
         )
+    }
+
+    #[test]
+    fn blob_path() {
+        let value = TgBlob::new("/path/to/file");
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        let data =
+            crate::jogasaki::proto::sql::common::blob::Data::LocalPath("/path/to/file".to_string());
+        assert_eq!(
+            &Value::Blob(crate::jogasaki::proto::sql::common::Blob { data: Some(data) }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn blob_contents() {
+        let contents = vec![1, 2, 3];
+        let value = TgBlob::from(contents.clone());
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        let data = crate::jogasaki::proto::sql::common::blob::Data::Contents(contents);
+        assert_eq!(
+            &Value::Blob(crate::jogasaki::proto::sql::common::Blob { data: Some(data) }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn clob_path() {
+        let value = TgClob::new("/path/to/file");
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        let data =
+            crate::jogasaki::proto::sql::common::clob::Data::LocalPath("/path/to/file".to_string());
+        assert_eq!(
+            &Value::Clob(crate::jogasaki::proto::sql::common::Clob { data: Some(data) }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+    }
+
+    #[test]
+    fn clob_contents() {
+        let contents = "abc";
+        let value = TgClob::from(contents);
+        let target0 = SqlParameter::of("test", value.clone());
+        assert_eq!("test", target0.name().unwrap());
+        let data =
+            crate::jogasaki::proto::sql::common::clob::Data::Contents(contents.as_bytes().to_vec());
+        assert_eq!(
+            &Value::Clob(crate::jogasaki::proto::sql::common::Clob { data: Some(data) }),
+            target0.value().unwrap()
+        );
+
+        let target = SqlParameter::of("test", Some(value.clone()));
+        assert_eq!(target0, target);
+
+        let value = TgClob::from(contents.to_string());
+        let target = SqlParameter::of("test", value);
+        assert_eq!(target0, target);
     }
 }

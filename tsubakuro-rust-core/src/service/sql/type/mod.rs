@@ -1,3 +1,5 @@
+pub mod blob;
+pub mod clob;
 pub mod date;
 pub mod decimal;
 pub mod time_of_day;

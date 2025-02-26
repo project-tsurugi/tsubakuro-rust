@@ -9,11 +9,17 @@ use crate::{
     cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core,
     ffi_exec_core_async,
     return_code::{rc_ok, TsurugiFfiRc},
-    service::sql::query_result_metadata::TsurugiFfiSqlQueryResultMetadata,
+    service::sql::{
+        query_result_metadata::TsurugiFfiSqlQueryResultMetadata,
+        r#type::{blob::TsurugiFfiTgBlobReference, clob::TsurugiFfiTgClobReference},
+    },
     vec_u8_to_field, TsurugiFfiByteArrayHandle, TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
-use super::query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle;
+use super::{
+    query_result_metadata::TsurugiFfiSqlQueryResultMetadataHandle,
+    r#type::{blob::TsurugiFfiBlobReferenceHandle, clob::TsurugiFfiClobReferenceHandle},
+};
 
 pub(crate) struct TsurugiFfiSqlQueryResult {
     query_result: SqlQueryResult,
@@ -1483,6 +1489,160 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
         value.nano_adjustment,
         value.time_zone_offset
     );
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    blob_reference_out: *mut TsurugiFfiBlobReferenceHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_blob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, blob_reference_out={:?}",
+        context,
+        query_result,
+        blob_reference_out,
+    );
+
+    ffi_arg_out_initialize!(blob_reference_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, blob_reference_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value: TgBlobReference =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
+    let value = Box::new(TsurugiFfiTgBlobReference::new(value));
+
+    let ptr = Box::into_raw(value);
+    unsafe {
+        *blob_reference_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob_reference={:?}", rc, ptr);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    blob_reference_out: *mut TsurugiFfiBlobReferenceHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_blob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, blob_reference_out={:?}",
+        context,
+        query_result,
+        timeout,
+        blob_reference_out,
+    );
+
+    ffi_arg_out_initialize!(blob_reference_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob_reference_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value: TgBlobReference = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for(timeout)
+    );
+    let value = Box::new(TsurugiFfiTgBlobReference::new(value));
+
+    let ptr = Box::into_raw(value);
+    unsafe {
+        *blob_reference_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob_reference={:?}", rc, ptr);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    clob_reference_out: *mut TsurugiFfiClobReferenceHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_clob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, clob_reference_out={:?}",
+        context,
+        query_result,
+        clob_reference_out,
+    );
+
+    ffi_arg_out_initialize!(clob_reference_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, clob_reference_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value: TgClobReference =
+        ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
+    let value = Box::new(TsurugiFfiTgClobReference::new(value));
+
+    let ptr = Box::into_raw(value);
+    unsafe {
+        *clob_reference_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob_reference={:?}", rc, ptr);
+    rc
+}
+
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_clob(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    clob_reference_out: *mut TsurugiFfiClobReferenceHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_clob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, clob_reference_out={:?}",
+        context,
+        query_result,
+        timeout,
+        clob_reference_out,
+    );
+
+    ffi_arg_out_initialize!(clob_reference_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob_reference_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value: TgClobReference = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for(timeout)
+    );
+    let value = Box::new(TsurugiFfiTgClobReference::new(value));
+
+    let ptr = Box::into_raw(value);
+    unsafe {
+        *clob_reference_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob_reference={:?}", rc, ptr);
     rc
 }
 

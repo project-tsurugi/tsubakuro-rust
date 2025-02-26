@@ -39,7 +39,6 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
                 )
                 """.formatted(sqlType());
         dropAndCreateTable("test", sql);
-
     }
 
     protected abstract String sqlType();
@@ -83,7 +82,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
         var sql = "insert into test values(:pk, :value)";
         var mapping = TgParameterMapping.of(TgBindVariable.ofInt("pk"), bindVariable("value"));
 
-        var connector = TsurugiConnector.of(getEndpoint());
+        var connector = TsurugiConnector.of(getEndpointJava());
         try (var session = connector.createSession(); //
                 var ps = session.createStatement(sql, mapping)) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());
@@ -140,7 +139,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
     private void queryResultMetadata(TgFfiSqlQueryResultMetadata metadata) {
         var manager = getFfiObjectManager();
 
-        try (var context = TgFfiContext.create(manager)) {
+        try (metadata; var context = TgFfiContext.create(manager)) {
             var columns = metadata.getColumns(context);
             assertEquals(2, columns.size());
             {
@@ -194,7 +193,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
     private List<T> selectJava() throws IOException, InterruptedException {
         var actual = new ArrayList<T>();
 
-        var connector = TsurugiConnector.of(getEndpoint());
+        var connector = TsurugiConnector.of(getEndpointJava());
         try (var session = connector.createSession()) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());
 

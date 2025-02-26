@@ -9,6 +9,7 @@ group = 'com.tsurugidb.tsubakuro.rust.java'
 version = '0.1.0-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -75,7 +76,7 @@ licenseFormat.dependsOn licenseFormatDist
 dependencies {
   testImplementation platform('org.junit:junit-bom:5.10.1')
   testImplementation 'org.junit.jupiter:junit-jupiter'
-  testImplementation 'com.tsurugidb.iceaxe:iceaxe-core:1.7.0'
+  testImplementation 'com.tsurugidb.iceaxe:iceaxe-core:1.8.0-SNAPSHOT'
 
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -90,6 +91,7 @@ tasks.named('test') {
     }
 
     systemProperty 'tsurugi.dbtest.endpoint', findProperty('dbtest.endpoint') ?: 'tcp://localhost:12345'
+    systemProperty 'tsurugi.dbtest.endpoint.java', findProperty('dbtest.endpoint.java') ?: 'tcp://localhost:12345'
     systemProperty 'tsurugi.ffi.library.path', findProperty('ffi.library.path')
 }
 

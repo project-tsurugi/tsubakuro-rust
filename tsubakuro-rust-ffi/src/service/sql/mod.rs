@@ -8,5 +8,6 @@ mod query_result_metadata;
 mod sql_client;
 mod table_list;
 mod table_metadata;
+mod r#type;
 
 pub(crate) use sql_client::*;

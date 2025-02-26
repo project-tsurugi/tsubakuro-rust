@@ -17,6 +17,8 @@ import java.util.Objects;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiBlobReference;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiClobReference;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
@@ -457,6 +459,52 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
         int nanos = outToInt(nanosOut);
         int offset = outToInt(offsetOut);
         return OffsetDateTime.of(LocalDateTime.ofEpochSecond(value, nanos, ZoneOffset.UTC), ZoneOffset.ofTotalSeconds(offset * 60));
+    }
+
+    public synchronized TgFfiBlobReference fetchBlob(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_blob(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiBlobReference(manager(), outHandle);
+    }
+
+    public synchronized TgFfiBlobReference fetchForBlob(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_blob(ctx, handle, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiBlobReference(manager(), outHandle);
+    }
+
+    public synchronized TgFfiClobReference fetchClob(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_clob(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiClobReference(manager(), outHandle);
+    }
+
+    public synchronized TgFfiClobReference fetchForClob(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_clob(ctx, handle, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiClobReference(manager(), outHandle);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql.prepare;
 
 import java.lang.foreign.MemorySegment;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -493,6 +494,141 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var outHandle = outToHandle(out);
         return new TgFfiSqlParameter(manager, outHandle);
     }
+
+    public static TgFfiSqlParameter ofBlob(TgFfiContext context, String name, Path path) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofBlob(context.manager(), context, name, path);
+    }
+
+    public static TgFfiSqlParameter ofBlob(TgFfiObjectManager manager, String name, Path path) {
+        return ofBlob(manager, null, name, path);
+    }
+
+    public static TgFfiSqlParameter ofBlob(TgFfiObjectManager manager, TgFfiContext context, String name, Path path) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofBlobMain(manager, context, name, path);
+            }
+        } else {
+            return ofBlobMain(manager, null, name, path);
+        }
+    }
+
+    private static TgFfiSqlParameter ofBlobMain(TgFfiObjectManager manager, TgFfiContext context, String name, Path path) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = manager.allocateString(path.toString());
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_blob(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofBlobContents(TgFfiContext context, String name, byte[] value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofBlobContents(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofBlobContents(TgFfiObjectManager manager, String name, byte[] value) {
+        return ofBlobContents(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofBlobContents(TgFfiObjectManager manager, TgFfiContext context, String name, byte[] value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofBlobContentsMain(manager, context, name, value);
+            }
+        } else {
+            return ofBlobContentsMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofBlobContentsMain(TgFfiObjectManager manager, TgFfiContext context, String name, byte[] value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = manager.allocateBytes(value);
+        long size = value.length;
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_blob_contents(ctx, arg1, arg2, size, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofClob(TgFfiContext context, String name, Path path) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofClob(context.manager(), context, name, path);
+    }
+
+    public static TgFfiSqlParameter ofClob(TgFfiObjectManager manager, String name, Path path) {
+        return ofClob(manager, null, name, path);
+    }
+
+    public static TgFfiSqlParameter ofClob(TgFfiObjectManager manager, TgFfiContext context, String name, Path path) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofClobMain(manager, context, name, path);
+            }
+        } else {
+            return ofClobMain(manager, null, name, path);
+        }
+    }
+
+    private static TgFfiSqlParameter ofClobMain(TgFfiObjectManager manager, TgFfiContext context, String name, Path path) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = manager.allocateString(path.toString());
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_clob(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofClobContents(TgFfiContext context, String name, String value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofClobContents(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofClobContents(TgFfiObjectManager manager, String name, String value) {
+        return ofClobContents(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofClobContents(TgFfiObjectManager manager, TgFfiContext context, String name, String value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofClobContentsMain(manager, context, name, value);
+            }
+        } else {
+            return ofClobContentsMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofClobContentsMain(TgFfiObjectManager manager, TgFfiContext context, String name, String value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = manager.allocateString(value);
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_clob_contents(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    //
 
     TgFfiSqlParameter(TgFfiObjectManager manager, MemorySegment handle) {
         super(manager, handle);

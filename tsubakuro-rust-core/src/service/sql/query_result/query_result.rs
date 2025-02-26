@@ -1,19 +1,18 @@
 use crate::{
     error::TgError,
     invalid_response_error,
-    jogasaki::proto::sql::response::ResultSetMetadata as SqlQueryResultMetadata,
-    prelude::{
-        convert_sql_response, TgDate, TgDecimalI128, TgDecimalResult, TgTimeOfDay,
-        TgTimeOfDayWithTimeZone, TgTimePoint, TgTimePointWithTimeZone,
-    },
-    session::wire::{response::WireResponse, Wire},
-    util::Timeout,
-};
-use crate::{
     jogasaki::proto::sql::response::{
         response::Response as SqlResponseType, Response as SqlResponse,
+        ResultSetMetadata as SqlQueryResultMetadata,
+    },
+    prelude::{
+        convert_sql_response, TgBlobReference, TgClobReference, TgDate, TgDecimalI128,
+        TgDecimalResult, TgTimeOfDay, TgTimeOfDayWithTimeZone, TgTimePoint,
+        TgTimePointWithTimeZone,
     },
     prost_decode_error,
+    session::wire::{response::WireResponse, Wire},
+    util::Timeout,
 };
 use async_trait::async_trait;
 use prost::{bytes::BytesMut, Message};
@@ -1040,6 +1039,44 @@ fn time_offset_date_time(
     let offset = time_utc_offset(offset_minutes)?;
     let value = time::OffsetDateTime::new_in_offset(date, time, offset);
     Ok(value)
+}
+
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<TgBlobReference> for SqlQueryResult {
+    /// Retrieves a `BLOB` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<TgBlobReference, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `BLOB` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<TgBlobReference, TgError> {
+        let timeout = Timeout::new(timeout);
+        let (provider, object_id) = self.value_stream.fetch_blob(&timeout).await?;
+        Ok(TgBlobReference::new(provider, object_id))
+    }
+}
+
+#[async_trait(?Send)] // thread unsafe
+impl SqlQueryResultFetch<TgClobReference> for SqlQueryResult {
+    /// Retrieves a `CLOB` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch(&mut self) -> Result<TgClobReference, TgError> {
+        self.fetch_for(self.default_timeout).await
+    }
+
+    /// Retrieves a `CLOB` value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
+    async fn fetch_for(&mut self, timeout: Duration) -> Result<TgClobReference, TgError> {
+        let timeout = Timeout::new(timeout);
+        let (provider, object_id) = self.value_stream.fetch_clob(&timeout).await?;
+        Ok(TgClobReference::new(provider, object_id))
+    }
 }
 
 #[async_trait(?Send)] // thread unsafe

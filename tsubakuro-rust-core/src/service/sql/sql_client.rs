@@ -42,7 +42,7 @@ const SERVICE_SYMBOLIC_ID: &str = "sql";
 const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 1;
 
 /// The minor service message version which this client requests.
-const SERVICE_MESSAGE_VERSION_MINOR: u64 = 3;
+const SERVICE_MESSAGE_VERSION_MINOR: u64 = 4;
 
 pub(crate) const SERVICE_ID_SQL: i32 = 3;
 
@@ -1043,6 +1043,6 @@ mod test {
     #[test]
     fn service_message_version() {
         let smv = SqlClient::service_message_version();
-        assert_eq!("sql-1.3", smv);
+        assert_eq!("sql-1.4", smv);
     }
 }

@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.util;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,28 @@ public class TgFfiTester {
     }
 
     private static final String SYSPROP_DBTEST_ENDPOINT = "tsurugi.dbtest.endpoint";
+    private static final String SYSPROP_DBTEST_ENDPOINT_JAVA = "tsurugi.dbtest.endpoint.java";
     private static String staticEndpoint;
+    private static String staticEndpointJava;
 
     protected static String getEndpoint() {
         if (staticEndpoint == null) {
             staticEndpoint = System.getProperty(SYSPROP_DBTEST_ENDPOINT, "tcp://localhost:12345");
         }
         return staticEndpoint;
+    }
+
+    protected static String getEndpointJava() {
+        if (staticEndpointJava == null) {
+            staticEndpointJava = System.getProperty(SYSPROP_DBTEST_ENDPOINT_JAVA, getEndpoint());
+        }
+        return staticEndpointJava;
+    }
+
+    protected static boolean isIpc(String endpoint) {
+        var uri = URI.create(endpoint);
+        String scheme = uri.getScheme();
+        return "ipc".equals(scheme);
     }
 
     private TgFfiObjectManager manager;

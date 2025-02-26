@@ -1231,4 +1231,104 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             }
         }
     }
+
+    @Test
+    void fetch_blob_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_blob(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_blob(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_blob_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_blob(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_blob(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_clob_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_clob(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_clob(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+        }
+    }
+
+    @Test
+    void fetch_for_clob_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_clob(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = resource.queryResult.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_clob(ctx, handle, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
 }

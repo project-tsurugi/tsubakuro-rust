@@ -255,6 +255,10 @@ typedef struct TsurugiFfiTableList TsurugiFfiTableList;
 
 typedef struct TsurugiFfiTableMetadata TsurugiFfiTableMetadata;
 
+typedef struct TsurugiFfiTgBlobReference TsurugiFfiTgBlobReference;
+
+typedef struct TsurugiFfiTgClobReference TsurugiFfiTgClobReference;
+
 typedef struct TsurugiFfiTransaction TsurugiFfiTransaction;
 
 typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
@@ -293,6 +297,10 @@ typedef struct TsurugiFfiSqlPreparedStatement *TsurugiFfiSqlPreparedStatementHan
 typedef struct TsurugiFfiSqlQueryResult *TsurugiFfiSqlQueryResultHandle;
 
 typedef struct TsurugiFfiSqlQueryResultMetadata *TsurugiFfiSqlQueryResultMetadataHandle;
+
+typedef struct TsurugiFfiTgBlobReference *TsurugiFfiBlobReferenceHandle;
+
+typedef struct TsurugiFfiTgClobReference *TsurugiFfiClobReferenceHandle;
 
 typedef struct TsurugiFfiSqlClient *TsurugiFfiSqlClientHandle;
 
@@ -570,6 +578,27 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiCo
                                                                     int32_t time_zone_offset,
                                                                     TsurugiFfiSqlParameterHandle *parameter_out);
 
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob(TsurugiFfiContextHandle context,
+                                               TsurugiFfiStringHandle name,
+                                               TsurugiFfiStringHandle path,
+                                               TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob_contents(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiStringHandle name,
+                                                        TsurugiFfiByteArrayHandle value,
+                                                        uint64_t value_size,
+                                                        TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob(TsurugiFfiContextHandle context,
+                                               TsurugiFfiStringHandle name,
+                                               TsurugiFfiStringHandle path,
+                                               TsurugiFfiSqlParameterHandle *parameter_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob_contents(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiStringHandle name,
+                                                        TsurugiFfiStringHandle value,
+                                                        TsurugiFfiSqlParameterHandle *parameter_out);
+
 TsurugiFfiRc tsurugi_ffi_sql_parameter_get_name(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlParameterHandle parameter,
                                                 TsurugiFfiStringHandle *name_out);
@@ -786,6 +815,24 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(Ts
                                                                               int64_t *value_out,
                                                                               uint32_t *nanos_out,
                                                                               int32_t *time_zone_offset_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_blob(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlQueryResultHandle query_result,
+                                                     TsurugiFfiBlobReferenceHandle *blob_reference_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_blob(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlQueryResultHandle query_result,
+                                                         TsurugiFfiDuration timeout,
+                                                         TsurugiFfiBlobReferenceHandle *blob_reference_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_clob(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlQueryResultHandle query_result,
+                                                     TsurugiFfiClobReferenceHandle *clob_reference_out);
+
+TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_clob(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlQueryResultHandle query_result,
+                                                         TsurugiFfiDuration timeout,
+                                                         TsurugiFfiClobReferenceHandle *clob_reference_out);
 
 void tsurugi_ffi_sql_query_result_dispose(TsurugiFfiSqlQueryResultHandle query_result);
 
@@ -1075,6 +1122,10 @@ TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_value(TsurugiFfiContextHandl
                                                           TsurugiFfiSqlColumnHandle *sql_column_out);
 
 void tsurugi_ffi_table_metadata_dispose(TsurugiFfiTableMetadataHandle table_metadata);
+
+void tsurugi_ffi_blob_reference_dispose(TsurugiFfiBlobReferenceHandle blob_reference);
+
+void tsurugi_ffi_clob_reference_dispose(TsurugiFfiClobReferenceHandle clob_reference);
 
 TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context,
                                         TsurugiFfiStringHandle endpoint,

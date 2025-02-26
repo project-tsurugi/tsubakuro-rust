@@ -55,7 +55,7 @@ impl std::fmt::Display for TgError {
                 _ => write!(f, "{message}"),
             },
             TgError::ServerError(_function_name, message, code, server_message) => {
-                write!(f, "{message} ({code:?}) {server_message}")
+                write!(f, "{message} ({code}) {server_message}")
             }
         }
     }

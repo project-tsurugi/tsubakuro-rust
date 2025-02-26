@@ -3,8 +3,9 @@ use std::collections::VecDeque;
 use prost::bytes::BytesMut;
 
 use crate::{
-    broken_encoding_error, broken_relation_error, client_error, error::TgError,
-    session::wire::data_channel::DataChannel, util::Timeout,
+    broken_encoding_error, broken_relation_error, client_error, error::TgError, io_error,
+    jogasaki::proto::sql::common::LargeObjectProvider, session::wire::data_channel::DataChannel,
+    util::Timeout,
 };
 
 use super::variant::Base128Variant;
@@ -75,10 +76,10 @@ pub(crate) enum EntryType {
     Array,
 
     /// Character large objects.
-    _Clob,
+    Clob,
 
     /// Binary large objects.
-    _Blob,
+    Blob,
 }
 
 // https://github.com/project-tsurugi/tsubakuro/blob/master/modules/session/src/main/java/com/tsurugidb/tsubakuro/sql/io/Constants.java
@@ -229,9 +230,9 @@ const INDEPENDENT_ENTRY_TYPE: [EntryType; 24] = [
     // 0xf9
     EntryType::Array,
     // 0xfa
-    EntryType::Nothing, // EntryType.CLOB,
+    EntryType::Clob,
     // 0xfb
-    EntryType::Nothing, // EntryType.BLOB,
+    EntryType::Blob,
     // 0xfc
     EntryType::Nothing,
     // 0xfd
@@ -484,6 +485,26 @@ impl ResultSetValueStream {
         Ok(value)
     }
 
+    pub(crate) async fn fetch_blob(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(LargeObjectProvider, i64), TgError> {
+        self.require_column_type(EntryType::Blob)?;
+        let value = self.read_blob(timeout).await?;
+        self.column_consumed()?;
+        Ok(value)
+    }
+
+    pub(crate) async fn fetch_clob(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(LargeObjectProvider, i64), TgError> {
+        self.require_column_type(EntryType::Clob)?;
+        let value = self.read_clob(timeout).await?;
+        self.column_consumed()?;
+        Ok(value)
+    }
+
     fn require_column_type(&self, expected: EntryType) -> Result<(), TgError> {
         let found = self.current_column_type;
         if found == EntryType::Nothing {
@@ -591,6 +612,14 @@ impl ResultSetValueStream {
             // case DATETIME_INTERVAL:
             //     readDateTimeInterval();
             //     return true;
+            EntryType::Blob => {
+                self.read_blob(timeout).await?;
+                Ok(true)
+            }
+            EntryType::Clob => {
+                self.read_clob(timeout).await?;
+                Ok(true)
+            }
 
             // case ROW: {
             //     int count = readRowBegin();
@@ -797,6 +826,34 @@ impl ResultSetValueStream {
         let nanos = Base128Variant::read_unsigned(&mut self.data_channel, timeout).await?;
         let offset_minutes = Base128Variant::read_signed(&mut self.data_channel, timeout).await?;
         Ok((epoch_seconds, nanos as u32, offset_minutes as i32))
+    }
+
+    async fn read_blob(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(LargeObjectProvider, i64), TgError> {
+        self.require(EntryType::Blob)?;
+        self.clear_header_info();
+        let provider = self.read8(timeout).await? as i32;
+        let object_id = self.read8(timeout).await? as i64;
+
+        let provider = LargeObjectProvider::try_from(provider)
+            .map_err(|e| io_error!("invalid BLOB provider", e))?;
+        Ok((provider, object_id))
+    }
+
+    async fn read_clob(
+        &mut self,
+        timeout: &Timeout,
+    ) -> Result<(LargeObjectProvider, i64), TgError> {
+        self.require(EntryType::Clob)?;
+        self.clear_header_info();
+        let provider = self.read8(timeout).await? as i32;
+        let object_id = self.read8(timeout).await? as i64;
+
+        let provider = LargeObjectProvider::try_from(provider)
+            .map_err(|e| io_error!("invalid CLOB provider", e))?;
+        Ok((provider, object_id))
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<usize, TgError> {
