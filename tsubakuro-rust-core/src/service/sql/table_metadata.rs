@@ -7,6 +7,7 @@ use crate::{
     sql_service_error,
 };
 
+/// Represents metadata of tables.
 pub struct TableMetadata {
     describe_table: crate::jogasaki::proto::sql::response::describe_table::Success,
 }
@@ -28,22 +29,22 @@ impl TableMetadata {
         TableMetadata { describe_table }
     }
 
-    /// the database name.
+    /// Returns the database name where the table defined.
     pub fn database_name(&self) -> &String {
         &self.describe_table.database_name
     }
 
-    /// the schema name.
+    /// Returns the schema name where the table defined.
     pub fn schema_name(&self) -> &String {
         &self.describe_table.schema_name
     }
 
-    /// the table name.
+    /// Returns simple name of the table.
     pub fn table_name(&self) -> &String {
         &self.describe_table.table_name
     }
 
-    /// the table column information.
+    /// Returns the column information of the table.
     pub fn columns(&self) -> &Vec<SqlColumn> {
         &self.describe_table.columns
     }

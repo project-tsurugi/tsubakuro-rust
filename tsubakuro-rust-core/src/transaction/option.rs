@@ -7,6 +7,7 @@ use crate::jogasaki::proto::sql::request::TransactionType;
 use crate::jogasaki::proto::sql::request::WritePreserve;
 use crate::util::string_to_prost_string;
 
+/// Transaction option.
 #[derive(Debug, Clone)]
 pub struct TransactionOption {
     transaction_type: TransactionType,
@@ -26,6 +27,7 @@ impl Default for TransactionOption {
 }
 
 impl TransactionOption {
+    // Creates a new instance.
     pub fn new() -> TransactionOption {
         TransactionOption {
             transaction_type: TransactionType::Short,
@@ -49,59 +51,79 @@ impl From<TransactionType> for TransactionOption {
 }
 
 impl TransactionOption {
+    /// set transaction type.
     pub fn set_transaction_type(&mut self, transaction_type: TransactionType) {
         self.transaction_type = transaction_type;
     }
 
+    /// get transaction type.
     pub fn transaction_type(&self) -> TransactionType {
         self.transaction_type
     }
 
+    /// get transaction label.
     pub fn transaction_label(&self) -> Option<&String> {
         self.transaction_label.as_ref()
     }
 
+    /// set modifies definitions.
     pub fn set_modifies_definitions(&mut self, modifies_definitions: bool) {
         self.modifies_definitions = modifies_definitions;
     }
 
+    /// get modifies definitions.
     pub fn modifies_definitions(&self) -> bool {
         self.modifies_definitions
     }
 
+    /// get write preserve.
     pub fn write_preserve(&self) -> &Vec<String> {
         &self.write_preserve
     }
 
+    /// get inclusive read area.
     pub fn inclusive_read_area(&self) -> &Vec<String> {
         &self.inclusive_read_area
     }
 
+    /// get exclusive read area.
     pub fn exclusive_read_area(&self) -> &Vec<String> {
         &self.exclusive_read_area
     }
 
+    /// set priority.
     pub fn set_priority(&mut self, priority: TransactionPriority) {
         self.priority = priority;
     }
 
+    /// get priority.
     pub fn priority(&self) -> TransactionPriority {
         self.priority
     }
 
+    /// set close timeout.
     pub fn set_close_timeout(&mut self, timeout: Duration) {
         self.close_timeout = Some(timeout);
     }
 
+    /// get close timeout.
     pub fn close_timeout(&self) -> Option<Duration> {
         self.close_timeout
     }
 }
 
+/// Transaction option setter for String.
 pub trait TransactionOptionSetter<T> {
+    /// set transaction label.
     fn set_transaction_label(&mut self, transaction_label: T);
+
+    /// set write preserve.
     fn set_write_preserve(&mut self, table_names: &[T]);
+
+    /// set inclusive read area.
     fn set_inclusive_read_area(&mut self, table_names: &[T]);
+
+    /// set exclusive read area.
     fn set_exclusive_read_area(&mut self, table_names: &[T]);
 }
 

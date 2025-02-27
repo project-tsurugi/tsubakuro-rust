@@ -7,6 +7,7 @@ use crate::{
     sql_service_error,
 };
 
+/// Transaction status.
 #[derive(Debug)]
 pub struct TransactionStatus {
     server_error: Option<TgError>,
@@ -17,18 +18,22 @@ impl TransactionStatus {
         TransactionStatus { server_error }
     }
 
+    /// Returns occurred error in the target transaction, only if the transaction has been accidentally aborted.
     pub fn server_error(&self) -> Option<&TgError> {
         self.server_error.as_ref()
     }
 
+    /// Whether the status is normal.
     pub fn is_normal(&self) -> bool {
         self.server_error.is_none()
     }
 
+    /// Whether the status is error.
     pub fn is_error(&self) -> bool {
         self.server_error.is_some()
     }
 
+    /// Returns diagnostic code if error occurred in the target transaction.
     pub fn diagnostic_code(&self) -> Option<&DiagnosticCode> {
         match &self.server_error {
             Some(TgError::ServerError(_, _, code, _)) => Some(code),

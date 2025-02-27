@@ -1,14 +1,19 @@
+/// Error for tsubakuro-rust-core.
 pub enum TgError {
+    /// Client error.
     ClientError(
         /*message*/ String,
         /*cause*/ Option<Box<dyn std::error::Error>>,
     ),
+    /// Timeout error.
     TimeoutError(/*message*/ String),
+    /// I/O error.
     IoError(
         /*message*/ String,
         /*cause*/ Option<Box<dyn std::error::Error>>,
     ),
 
+    /// Server error.
     ServerError(
         /*function_name*/ String,
         /*message*/ String,
@@ -73,6 +78,7 @@ impl std::error::Error for TgError {
 }
 
 impl TgError {
+    /// get error message.
     pub fn message(&self) -> &String {
         match self {
             TgError::ClientError(message, _cause) => message,
@@ -82,6 +88,7 @@ impl TgError {
         }
     }
 
+    /// get diagnostic code of ServerError.
     pub fn diagnostic_code(&self) -> Option<&DiagnosticCode> {
         match self {
             TgError::ClientError(_, _) => None,
@@ -92,6 +99,7 @@ impl TgError {
     }
 }
 
+/// Diagnostic code of ServerError.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiagnosticCode {
     category_number: i32,
@@ -115,22 +123,27 @@ impl DiagnosticCode {
         }
     }
 
+    /// get error category.
     pub fn category_number(&self) -> i32 {
         self.category_number
     }
 
+    /// get error category.
     pub fn category_str(&self) -> &String {
         &self.category_str
     }
 
+    /// get error code.
     pub fn code_number(&self) -> i32 {
         self.code_number
     }
 
+    /// get structured error code.
     pub fn structured_code(&self) -> String {
         format!("{}-{:05}", self.category_str, self.code_number)
     }
 
+    /// get error name.
     pub fn name(&self) -> &String {
         &self.name
     }

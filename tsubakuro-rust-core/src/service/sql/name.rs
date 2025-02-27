@@ -1,16 +1,18 @@
 use crate::jogasaki::proto::sql::response::Name as ProtoName;
 
-#[derive(PartialEq)]
+/// Table name.
+#[derive(Clone, PartialEq)]
 pub struct TName {
     identifiers: Vec<String>,
 }
 
 impl TName {
+    /// Creates a new instance.
     pub fn new(identifiers: Vec<String>) -> TName {
         TName { identifiers }
     }
 
-    pub fn from(proto_name: &ProtoName) -> TName {
+    pub(crate) fn from(proto_name: &ProtoName) -> TName {
         let identifiers = proto_name
             .identifiers
             .iter()
@@ -19,6 +21,7 @@ impl TName {
         TName { identifiers }
     }
 
+    /// get identifiers.
     pub fn identifiers(&self) -> &Vec<String> {
         &self.identifiers
     }

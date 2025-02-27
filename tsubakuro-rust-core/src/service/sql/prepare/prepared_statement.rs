@@ -15,6 +15,25 @@ use crate::{
     sql_service_error,
 };
 
+/// Prepared statement.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<SqlExecuteResult, TgError> {
+///     let sql = "insert into tb values(:pk, :value)";
+///     let placeholders = vec![SqlPlaceholder::of::<i32>("pk"), SqlPlaceholder::of::<String>("value")];
+///     let prepared_statement = client.prepare(sql, placeholders).await?;
+///
+///     let parameters = vec![SqlParameter::of("pk", 1), SqlParameter::of("value", "abc")];
+///     let result = client.prepared_execute(transaction, &prepared_statement, parameters).await;
+///
+///     prepared_statement.close().await?;
+///
+///     result
+/// }
+/// ```
 #[derive(Debug)]
 pub struct SqlPreparedStatement {
     session: Arc<Session>,
@@ -47,22 +66,27 @@ impl SqlPreparedStatement {
         self.prepare_handle
     }
 
+    /// Check whether ResultRecords are returned as a result of executing this statement.
     pub fn has_result_records(&self) -> bool {
         self.has_result_records
     }
 
+    /// set close timeout.
     pub fn set_close_timeout(&mut self, timeout: Duration) {
         self.close_timeout = timeout;
     }
 
+    /// get close timeout.
     pub fn close_timeout(&self) -> Duration {
         self.close_timeout
     }
 
+    /// Disposes this resource.
     pub async fn close(&self) -> Result<(), TgError> {
         self.close_for(self.close_timeout).await
     }
 
+    /// Disposes this resource.
     pub async fn close_for(&self, timeout: Duration) -> Result<(), TgError> {
         if self
             .closed
@@ -82,11 +106,12 @@ impl SqlPreparedStatement {
         Ok(())
     }
 
+    /// Check if this resource is closed.
     pub fn is_closed(&self) -> bool {
         self.closed.load(std::sync::atomic::Ordering::SeqCst)
     }
 
-    // for debug
+    /// for debug
     pub fn set_fail_on_drop_error(&self, value: bool) {
         self.fail_on_drop_error
             .store(value, std::sync::atomic::Ordering::SeqCst);

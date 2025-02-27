@@ -4,7 +4,22 @@ use crate::error::TgError;
 
 use super::endpoint::Endpoint;
 
-/// connection option.
+/// Option to connect to Tsurugi server.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example() {
+///     let mut connection_option = ConnectionOption::new();
+///     connection_option.set_endpoint_url("tcp://localhost:12345");
+///     connection_option.set_application_name("Tsubakuro/Rust example");
+///     connection_option.set_session_label("example session");
+///     connection_option.set_default_timeout(std::time::Duration::from_secs(10));
+///
+///     let session = Session::connect(&connection_option).await.unwrap();
+/// }
+/// ```
 #[derive(Debug, Clone)]
 pub struct ConnectionOption {
     endpoint: Option<Endpoint>,
@@ -23,6 +38,7 @@ impl Default for ConnectionOption {
 }
 
 impl ConnectionOption {
+    /// Creates a new instance.
     pub fn new() -> ConnectionOption {
         ConnectionOption {
             endpoint: None,
@@ -35,65 +51,81 @@ impl ConnectionOption {
         }
     }
 
+    /// set endpoint.
     pub fn set_endpoint(&mut self, endpoint: Endpoint) {
         self.endpoint = Some(endpoint);
     }
 
+    /// set endpoint.
     pub fn set_endpoint_url(&mut self, endpoint: &str) -> Result<(), TgError> {
         let endpoint = Endpoint::parse(endpoint)?;
         self.set_endpoint(endpoint);
         Ok(())
     }
 
+    /// get endpoint.
     pub fn endpoint(&self) -> Option<&Endpoint> {
         self.endpoint.as_ref()
     }
 
+    /// set application name.
     pub fn set_application_name(&mut self, name: &str) {
         self.application_name = Some(name.to_string());
     }
 
+    /// get application name.
     pub fn application_name(&self) -> Option<&String> {
         self.application_name.as_ref()
     }
 
+    /// set session label.
     pub fn set_session_label(&mut self, label: &str) {
         self.session_label = Some(label.to_string());
     }
 
+    /// get session label
     pub fn session_label(&self) -> Option<&String> {
         self.session_label.as_ref()
     }
 
-    // ZEROのときはキープアライブしない
+    /// set keep alive interval.
+    ///
+    /// Do not keep alive when `keep_alive` is 0.
     pub fn set_keep_alive(&mut self, keep_alive: Duration) {
         self.keep_alive = keep_alive;
     }
 
+    /// get keep alive interval.
     pub fn keep_alive(&self) -> Duration {
         self.keep_alive
     }
 
+    /// set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }
 
+    /// get default timeout.
     pub fn default_timeout(&self) -> Duration {
         self.default_timeout
     }
 
+    /// set communication send timeout.
     pub fn set_send_timeout(&mut self, timeout: Duration) {
         self.send_timeout = timeout;
     }
 
+    /// get communication send timeout.
     pub fn send_timeout(&self) -> Duration {
         self.send_timeout
     }
 
+    /// set communication recv timeout.
     pub fn set_recv_timeout(&mut self, timeout: Duration) {
         self.recv_timeout = timeout;
     }
 
+    /// get communication recv timeout.
     pub fn recv_timeout(&self) -> Duration {
         self.recv_timeout
     }

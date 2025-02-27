@@ -11,6 +11,7 @@ use crate::{
     sql_service_error,
 };
 
+/// Represents an execution result of SQL statement.
 #[derive(Debug)]
 pub struct SqlExecuteResult {
     counters: HashMap<CounterType, i64>,
@@ -28,26 +29,32 @@ impl SqlExecuteResult {
         SqlExecuteResult { counters }
     }
 
+    /// Returns the all available counter entries in this result.
     pub fn counters(&self) -> &HashMap<CounterType, i64> {
         &self.counters
     }
 
+    /// get inserted rows.
     pub fn inserted_rows(&self) -> i64 {
         *self.counters.get(&CounterType::InsertedRows).unwrap_or(&0)
     }
 
+    /// get updated rows.
     pub fn updated_rows(&self) -> i64 {
         *self.counters.get(&CounterType::UpdatedRows).unwrap_or(&0)
     }
 
+    /// get merged rows.
     pub fn merged_rows(&self) -> i64 {
         *self.counters.get(&CounterType::MergedRows).unwrap_or(&0)
     }
 
+    /// get deleted rows.
     pub fn deleted_rows(&self) -> i64 {
         *self.counters.get(&CounterType::DeletedRows).unwrap_or(&0)
     }
 
+    /// get total rows.
     pub fn rows(&self) -> i64 {
         self.counters.values().sum()
     }

@@ -17,6 +17,7 @@ impl SqlPlaceholder {
         }
     }
 
+    /// get name.
     pub fn name(&self) -> Option<&String> {
         match self.placement {
             Some(Placement::Name(ref name)) => Some(name),
@@ -24,6 +25,7 @@ impl SqlPlaceholder {
         }
     }
 
+    /// get AtomType.
     pub fn atom_type(&self) -> Option<AtomType> {
         match self.type_info {
             Some(TypeInfo::AtomType(atom_type)) => AtomType::try_from(atom_type).ok(),
@@ -33,18 +35,22 @@ impl SqlPlaceholder {
 }
 
 impl SqlPlaceholder {
+    /// Creates a new instance.
     pub fn of_atom_type(name: &str, atom_type: AtomType) -> SqlPlaceholder {
         let type_info = TypeInfo::AtomType(atom_type.into());
         SqlPlaceholder::new(name, type_info, 0)
     }
 
+    /// Creates a new instance.
     pub fn of<T: AtomTypeProvider>(name: &str) -> Self {
         let atom_type = T::atom_type();
         SqlPlaceholder::of_atom_type(name, atom_type)
     }
 }
 
+/// AtomType provider for [SqlPlaceholder].
 pub trait AtomTypeProvider {
+    /// get Atomtype.
     fn atom_type() -> AtomType;
 }
 
@@ -240,7 +246,9 @@ impl AtomTypeProvider for TgClob {
     }
 }
 
+/// `placeholder` method for [SqlPlaceholder].
 pub trait SqlPlaceholderBind {
+    /// Creates a new instance.
     fn placeholder<A: AtomTypeProvider>(self) -> SqlPlaceholder;
 }
 

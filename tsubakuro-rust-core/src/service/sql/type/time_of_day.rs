@@ -1,3 +1,4 @@
+/// the time-of-day value.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TgTimeOfDay {
     /// time of day (nano-seconds since 00:00:00).
@@ -5,12 +6,14 @@ pub struct TgTimeOfDay {
 }
 
 impl TgTimeOfDay {
+    /// Creates a new instance.
     pub fn new(nanoseconds_of_day: u64) -> TgTimeOfDay {
         TgTimeOfDay {
             offset_nanoseconds: nanoseconds_of_day,
         }
     }
 
+    /// Creates a new instance.
     pub fn from(hour: u8, min: u8, sec: u8, nanoseconds: u32) -> TgTimeOfDay {
         let value = (((hour as u64) * 60 + min as u64) * 60 + sec as u64) * 1_000_000_000
             + nanoseconds as u64;

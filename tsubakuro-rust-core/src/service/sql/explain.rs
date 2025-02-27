@@ -7,6 +7,7 @@ use crate::{
     sql_service_error,
 };
 
+/// Represents an explain result of SQL statement.
 #[derive(Debug)]
 pub struct SqlExplainResult {
     /// the content format ID.
@@ -34,18 +35,22 @@ impl SqlExplainResult {
         }
     }
 
+    /// Returns the content format ID.
     pub fn format_id(&self) -> &String {
         &self.format_id
     }
 
+    /// Returns the content format version.
     pub fn format_version(&self) -> u64 {
         self.format_version
     }
 
+    /// Returns the explain result contents.
     pub fn contents(&self) -> &String {
         &self.contents
     }
 
+    /// Returns the column information, or empty if it does not provided.
     pub fn columns(&self) -> &Vec<SqlColumn> {
         &self.columns
     }

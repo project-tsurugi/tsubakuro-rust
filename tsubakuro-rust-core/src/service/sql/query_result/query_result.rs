@@ -27,7 +27,32 @@ use {crate::client_error, log::trace};
 
 use super::value_stream::ResultSetValueStream;
 
-/// thread unsafe
+/// Represents a server side SQL result set.
+///
+/// **thread unsafe**
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+///     let sql = "select pk, value from tb order by pk";
+///     let mut query_result = client.query(transaction, sql).await?;
+///
+///     while query_result.next_row().await? {
+///         if query_result.next_column().await? {
+///             let pk: i32 = query_result.fetch().await?;
+///             println!("pk={}", pk);
+///         }
+///         if query_result.next_column().await? {
+///             let value: String = query_result.fetch().await?;
+///             println!("value={}", value);
+///         }
+///     }
+///
+///     Ok(())
+/// }
+/// ```
 pub struct SqlQueryResult {
     name: String,
     metadata: Option<SqlQueryResultMetadata>,
@@ -59,14 +84,17 @@ impl SqlQueryResult {
         }
     }
 
+    /// set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }
 
+    /// get default timeout.
     pub fn default_timeout(&mut self) -> &Duration {
         &self.default_timeout
     }
 
+    /// Returns the metadata of this query result.
     pub fn get_metadata(&self) -> Option<&SqlQueryResultMetadata> {
         self.metadata.as_ref()
     }
@@ -164,9 +192,17 @@ impl SqlQueryResult {
     }
 }
 
+/// `fetch` method for [SqlQueryResult].
 #[async_trait(?Send)] // thread unsafe
 pub trait SqlQueryResultFetch<T> {
+    /// Retrieves a value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
     async fn fetch(&mut self) -> Result<T, TgError>;
+
+    /// Retrieves a value on the column of the cursor position.
+    ///
+    /// You can only take once to retrieve the value on the column.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<T, TgError>;
 }
 

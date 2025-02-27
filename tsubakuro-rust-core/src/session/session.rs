@@ -17,6 +17,26 @@ use crate::{
 
 use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
 
+/// Represents a connection to Tsurugi server.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example() -> Result<(), TgError> {
+///     let mut connection_option = ConnectionOption::new();
+///     connection_option.set_endpoint_url("tcp://localhost:12345");
+///     connection_option.set_application_name("Tsubakuro/Rust example");
+///     connection_option.set_session_label("example session");
+///     connection_option.set_default_timeout(std::time::Duration::from_secs(10));
+///
+///     let session = Session::connect(&connection_option).await?;
+///     let client: SqlClient = session.make_client();
+///
+///     session.close().await;
+///     Ok(())
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Session {
     wire: Arc<Wire>,
@@ -26,11 +46,13 @@ pub struct Session {
 }
 
 impl Session {
+    /// Establishes a connection to the Tsurugi server.
     pub async fn connect(connection_option: &ConnectionOption) -> Result<Arc<Session>, TgError> {
         let timeout = connection_option.default_timeout();
         Self::connect_for(connection_option, timeout).await
     }
 
+    /// Establishes a connection to the Tsurugi server.
     pub async fn connect_for(
         connection_option: &ConnectionOption,
         timeout: Duration,
@@ -53,6 +75,7 @@ impl Session {
         }
     }
 
+    /// Establishes a connection to the Tsurugi server.
     pub async fn connect_async(
         connection_option: &ConnectionOption,
     ) -> Result<Job<Arc<Session>>, TgError> {
@@ -90,20 +113,40 @@ impl Session {
         Ok((endpoint, client_information))
     }
 
+    /// set default timeout.
     pub fn set_default_timeout(&self, timeout: Duration) {
         let mut default_timeout = self.default_timeout.write().unwrap();
         *default_timeout = timeout;
     }
 
+    /// get default timeout.
     pub fn default_timeout(&self) -> Duration {
         let default_timeout = self.default_timeout.read().unwrap();
         *default_timeout
     }
 
+    /// Creates a service client.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::sync::Arc;
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// fn example(session: &Arc<Session>) {
+    ///     let client: SqlClient = session.make_client();
+    /// }
+    /// ```
     pub fn make_client<T: ServiceClient>(self: &Arc<Session>) -> T {
         T::new(self.clone())
     }
 
+    /// Requests to update the session expiration time.
+    ///
+    /// The resources underlying this session will be disposed after this session was expired.
+    /// To extend the expiration time, clients should continue to send requests in this session, or update expiration time explicitly by using this method.
+    ///
+    /// If the specified expiration time is too long, the server will automatically shorten it to its limit.
+    /// Or, if the time is too short or less than zero, the server sometimes omits the request.
     pub async fn update_expiration_time(
         &self,
         expiration_time: Option<Duration>,
@@ -113,6 +156,13 @@ impl Session {
             .await
     }
 
+    /// Requests to update the session expiration time.
+    ///
+    /// The resources underlying this session will be disposed after this session was expired.
+    /// To extend the expiration time, clients should continue to send requests in this session, or update expiration time explicitly by using this method.
+    ///
+    /// If the specified expiration time is too long, the server will automatically shorten it to its limit.
+    /// Or, if the time is too short or less than zero, the server sometimes omits the request.
     pub async fn update_expiration_time_for(
         &self,
         expiration_time: Option<Duration>,
@@ -121,6 +171,13 @@ impl Session {
         CoreService::update_expiration_time(&self.wire, expiration_time, timeout).await
     }
 
+    /// Requests to update the session expiration time.
+    ///
+    /// The resources underlying this session will be disposed after this session was expired.
+    /// To extend the expiration time, clients should continue to send requests in this session, or update expiration time explicitly by using this method.
+    ///
+    /// If the specified expiration time is too long, the server will automatically shorten it to its limit.
+    /// Or, if the time is too short or less than zero, the server sometimes omits the request.
     pub async fn update_expiration_time_async(
         &self,
         expiration_time: Option<Duration>,
@@ -134,11 +191,13 @@ impl Session {
         .await
     }
 
+    /// Request to shutdown the current session and wait for the running requests were finished.
     pub async fn shutdown(&self, shutdown_type: ShutdownType) -> Result<(), TgError> {
         let timeout = self.default_timeout();
         self.shutdown_for(shutdown_type, timeout).await
     }
 
+    /// Request to shutdown the current session and wait for the running requests were finished.
     pub async fn shutdown_for(
         &self,
         shutdown_type: ShutdownType,
@@ -148,6 +207,7 @@ impl Session {
         CoreService::shutdown(&self.wire, shutdown_type, timeout).await
     }
 
+    /// Request to shutdown the current session and wait for the running requests were finished.
     pub async fn shutdown_async(&self, shutdown_type: ShutdownType) -> Result<Job<()>, TgError> {
         self.set_shutdown();
         CoreService::shutdown_async(
@@ -164,19 +224,25 @@ impl Session {
             .store(true, std::sync::atomic::Ordering::SeqCst);
     }
 
+    /// Check if the session is shut down.
     pub fn is_shutdowned(&self) -> bool {
         self.shutdowned.load(std::sync::atomic::Ordering::SeqCst)
     }
 
+    /// Disposes the current session.
+    ///
+    /// This may not wait for complete the ongoing requests, and it may cause the requests may still be in progress after disconnected from the session.
+    /// You can use [Self::shutdown] to safely close this session with waiting for complete the ongoing requests, if any.
     pub async fn close(&self) -> Result<(), TgError> {
         self.wire.close().await
     }
 
+    /// Check if the session is closed.
     pub fn is_closed(&self) -> bool {
         self.wire.is_closed()
     }
 
-    // for debug
+    /// for debug
     pub fn set_fail_on_drop_error(&self, value: bool) {
         self.fail_on_drop_error
             .store(value, std::sync::atomic::Ordering::SeqCst);

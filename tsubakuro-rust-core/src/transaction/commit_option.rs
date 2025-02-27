@@ -1,5 +1,6 @@
 use crate::jogasaki::proto::sql::request::CommitStatus as CommitType;
 
+/// Commit option.
 #[derive(Debug, Clone)]
 pub struct CommitOption {
     commit_type: CommitType,
@@ -13,6 +14,7 @@ impl Default for CommitOption {
 }
 
 impl CommitOption {
+    /// Creates a new instance.
     pub fn new() -> CommitOption {
         CommitOption {
             commit_type: CommitType::Unspecified,
@@ -20,18 +22,22 @@ impl CommitOption {
         }
     }
 
+    /// set commit type.
     pub fn set_commit_type(&mut self, commit_type: CommitType) {
         self.commit_type = commit_type;
     }
 
+    /// get commit type.
     pub fn commit_type(&self) -> CommitType {
         self.commit_type
     }
 
+    /// set auto dispose.
     pub fn set_auto_dispose(&mut self, auto_dispose: bool) {
         self.auto_dispose = auto_dispose;
     }
 
+    /// get auto dispose.
     pub fn auto_dispose(&self) -> bool {
         self.auto_dispose
     }

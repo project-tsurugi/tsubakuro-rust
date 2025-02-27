@@ -18,6 +18,28 @@ use crate::{
     sql_service_error,
 };
 
+/// Transaction.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example(client: &SqlClient) -> Result<(), TgError> {
+///     let mut tx_option = TransactionOption::new();
+///     tx_option.set_transaction_type(TransactionType::Short); // OCC
+///     let transaction = client.start_transaction(&tx_option).await?;
+///
+///     let mut result: Result<(), TgError> = todo!(); // execute SQL using transaction
+///
+///     if result.is_ok() {
+///         let commit_option = CommitOption::default();
+///         result = client.commit(&transaction, &commit_option).await;
+///     }
+///     transaction.close().await?;
+///
+///     result
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Transaction {
     session: Arc<Session>,
@@ -54,22 +76,27 @@ impl Transaction {
         }
     }
 
+    /// Provides transaction id that is unique to for the duration of the database server's lifetime.
     pub fn transaction_id(&self) -> &String {
         &self.transaction_id
     }
 
+    /// set close timeout.
     pub fn set_close_timeout(&mut self, timeout: Duration) {
         self.close_timeout = timeout;
     }
 
+    /// get close timeout.
     pub fn close_timeout(&self) -> Duration {
         self.close_timeout
     }
 
+    /// Disposes this resource.
     pub async fn close(&self) -> Result<(), TgError> {
         self.close_for(self.close_timeout).await
     }
 
+    /// Disposes this resource.
     pub async fn close_for(&self, timeout: Duration) -> Result<(), TgError> {
         if self
             .closed
@@ -88,11 +115,12 @@ impl Transaction {
         Ok(())
     }
 
+    /// Check if this resource is closed.
     pub fn is_closed(&self) -> bool {
         self.closed.load(std::sync::atomic::Ordering::SeqCst)
     }
 
-    // for debug
+    /// for debug
     pub fn set_fail_on_drop_error(&self, value: bool) {
         self.fail_on_drop_error
             .store(value, std::sync::atomic::Ordering::SeqCst);

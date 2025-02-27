@@ -1,6 +1,7 @@
 pub use crate::jogasaki::proto::sql::common::TimeOfDayWithTimeZone as TgTimeOfDayWithTimeZone;
 
 impl TgTimeOfDayWithTimeZone {
+    /// Creates a new instance.
     pub fn new(nanoseconds_of_day: u64, time_zone_offset: i32) -> TgTimeOfDayWithTimeZone {
         TgTimeOfDayWithTimeZone {
             offset_nanoseconds: nanoseconds_of_day,
@@ -8,6 +9,7 @@ impl TgTimeOfDayWithTimeZone {
         }
     }
 
+    /// Creates a new instance.
     pub fn from(
         hour: u8,
         min: u8,

@@ -3,6 +3,20 @@ use url::Url;
 use crate::{client_error, error::TgError};
 
 /// endpoint.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example() -> Result<(), TgError> {
+///     let endpoint = Endpoint::parse("tcp://localhost:12345")?;
+///
+///     let mut connection_option = ConnectionOption::new();
+///     connection_option.set_endpoint(endpoint);
+///
+///     Ok(())
+/// }
+/// ```
 #[derive(PartialEq, Clone)]
 pub enum Endpoint {
     Tcp(/*host*/ String, /*port*/ u16),

@@ -1,12 +1,16 @@
 use crate::jogasaki::proto::sql::common::LargeObjectProvider;
 
+/// CLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TgClob {
+    /// CLOB with path.
     Path(String),
+    /// CLOB with bytes.
     Contents(Vec<u8>),
 }
 
 impl TgClob {
+    /// Creates a new instance.
     pub fn new(path: &str) -> TgClob {
         TgClob::Path(path.to_string())
     }
@@ -24,6 +28,7 @@ impl From<String> for TgClob {
     }
 }
 
+/// CLOB for [SqlQueryResult].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TgClobReference {
     provider: LargeObjectProvider,

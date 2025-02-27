@@ -47,6 +47,28 @@ const SERVICE_MESSAGE_VERSION_MINOR: u64 = 4;
 
 pub(crate) const SERVICE_ID_SQL: i32 = 3;
 
+/// A SQL service client.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example() -> Result<(), TgError> {
+///     let mut connection_option = ConnectionOption::new();
+///     connection_option.set_endpoint_url("tcp://localhost:12345");
+///     connection_option.set_application_name("Tsubakuro/Rust example");
+///     connection_option.set_session_label("example session");
+///     connection_option.set_default_timeout(std::time::Duration::from_secs(10));
+///
+///     let session = Session::connect(&connection_option).await?;
+///     let client: SqlClient = session.make_client();
+///
+///     let table_list = client.list_tables().await?;
+///
+///     session.close().await;
+///     Ok(())
+/// }
+/// ```
 pub struct SqlClient {
     session: Arc<Session>,
     default_timeout: Duration,
@@ -63,6 +85,7 @@ impl ServiceClient for SqlClient {
 }
 
 impl SqlClient {
+    /// get service message version.
     pub fn service_message_version() -> String {
         format!(
             "{}-{}.{}",
@@ -70,21 +93,31 @@ impl SqlClient {
         )
     }
 
+    /// set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }
 
+    /// get default timeout.
     pub fn default_timeout(&self) -> Duration {
         self.default_timeout
     }
 }
 
 impl SqlClient {
+    /// Returns the list of available table names in the database, except system tables.
+    ///
+    /// The table names are each fully qualified (maybe with a schema name).
+    /// To retrieve more details for the individual tables, you can use [Self::get_table_metadata].
     pub async fn list_tables(&self) -> Result<TableList, TgError> {
         let timeout = self.default_timeout;
         self.list_tables_for(timeout).await
     }
 
+    /// Returns the list of available table names in the database, except system tables.
+    ///
+    /// The table names are each fully qualified (maybe with a schema name).
+    /// To retrieve more details for the individual tables, you can use [Self::get_table_metadata_for].
     pub async fn list_tables_for(&self, timeout: Duration) -> Result<TableList, TgError> {
         const FUNCTION_NAME: &str = "list_tables()";
         trace!("{} start", FUNCTION_NAME);
@@ -97,6 +130,10 @@ impl SqlClient {
         Ok(table_list)
     }
 
+    /// Returns the list of available table names in the database, except system tables.
+    ///
+    /// The table names are each fully qualified (maybe with a schema name).
+    /// To retrieve more details for the individual tables, you can use [Self::get_table_metadata_async].
     pub async fn list_tables_async(&self) -> Result<Job<TableList>, TgError> {
         const FUNCTION_NAME: &str = "list_tables_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -115,11 +152,13 @@ impl SqlClient {
         SqlCommand::ListTables(request)
     }
 
+    /// Retrieves metadata for a table.
     pub async fn get_table_metadata(&self, table_name: &str) -> Result<TableMetadata, TgError> {
         let timeout = self.default_timeout;
         self.get_table_metadata_for(table_name, timeout).await
     }
 
+    /// Retrieves metadata for a table.
     pub async fn get_table_metadata_for(
         &self,
         table_name: &str,
@@ -136,6 +175,7 @@ impl SqlClient {
         Ok(metadata)
     }
 
+    /// Retrieves metadata for a table.
     pub async fn get_table_metadata_async(
         &self,
         table_name: &str,
@@ -164,6 +204,7 @@ impl SqlClient {
         SqlCommand::DescribeTable(request)
     }
 
+    /// Prepares a SQL statement.
     pub async fn prepare(
         &self,
         sql: &str,
@@ -173,6 +214,7 @@ impl SqlClient {
         self.prepare_for(sql, placeholders, timeout).await
     }
 
+    /// Prepares a SQL statement.
     pub async fn prepare_for(
         &self,
         sql: &str,
@@ -193,6 +235,7 @@ impl SqlClient {
         Ok(ps)
     }
 
+    /// Prepares a SQL statement.
     pub async fn prepare_async(
         &self,
         sql: &str,
@@ -274,11 +317,13 @@ impl SqlClient {
         SqlCommand::DisposePreparedStatement(request)
     }
 
+    /// Retrieves execution plan of the statement.
     pub async fn explain(&self, sql: &str) -> Result<SqlExplainResult, TgError> {
         let timeout = self.default_timeout;
         self.explain_for(sql, timeout).await
     }
 
+    /// Retrieves execution plan of the statement.
     pub async fn explain_for(
         &self,
         sql: &str,
@@ -296,6 +341,7 @@ impl SqlClient {
         Ok(explain_result)
     }
 
+    /// Retrieves execution plan of the statement.
     pub async fn explain_async(&self, sql: &str) -> Result<Job<SqlExplainResult>, TgError> {
         const FUNCTION_NAME: &str = "explain_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -316,6 +362,7 @@ impl SqlClient {
         SqlCommand::ExplainByText(request)
     }
 
+    /// Retrieves execution plan of the statement.
     pub async fn prepared_explain(
         &self,
         prepared_statement: &SqlPreparedStatement,
@@ -326,6 +373,7 @@ impl SqlClient {
             .await
     }
 
+    /// Retrieves execution plan of the statement.
     pub async fn prepared_explain_for(
         &self,
         prepared_statement: &SqlPreparedStatement,
@@ -344,6 +392,7 @@ impl SqlClient {
         Ok(explain_result)
     }
 
+    /// Retrieves execution plan of the statement.
     pub async fn prepared_explain_async(
         &self,
         prepared_statement: &SqlPreparedStatement,
@@ -377,6 +426,7 @@ impl SqlClient {
         SqlCommand::Explain(request)
     }
 
+    /// Starts a new transaction.
     pub async fn start_transaction(
         &self,
         transaction_option: &TransactionOption,
@@ -386,6 +436,7 @@ impl SqlClient {
             .await
     }
 
+    /// Starts a new transaction.
     pub async fn start_transaction_for(
         &self,
         transaction_option: &TransactionOption,
@@ -407,6 +458,7 @@ impl SqlClient {
         Ok(transaction)
     }
 
+    /// Starts a new transaction.
     pub async fn start_transaction_async(
         &self,
         transaction_option: &TransactionOption,
@@ -443,6 +495,7 @@ impl SqlClient {
         SqlCommand::Begin(request)
     }
 
+    /// Returns occurred error in the target transaction.
     pub async fn get_transaction_status(
         &self,
         transaction: &Transaction,
@@ -451,6 +504,7 @@ impl SqlClient {
         self.get_transaction_status_for(transaction, timeout).await
     }
 
+    /// Returns occurred error in the target transaction.
     pub async fn get_transaction_status_for(
         &self,
         transaction: &Transaction,
@@ -467,6 +521,7 @@ impl SqlClient {
         Ok(status)
     }
 
+    /// Returns occurred error in the target transaction.
     pub async fn get_transaction_status_async(
         &self,
         transaction: &Transaction,
@@ -498,6 +553,7 @@ impl SqlClient {
         SqlCommand::GetErrorInfo(request)
     }
 
+    /// Executes a SQL statement.
     pub async fn execute(
         &self,
         transaction: &Transaction,
@@ -507,6 +563,7 @@ impl SqlClient {
         self.execute_for(transaction, sql, timeout).await
     }
 
+    /// Executes a SQL statement.
     pub async fn execute_for(
         &self,
         transaction: &Transaction,
@@ -526,6 +583,7 @@ impl SqlClient {
         Ok(execute_result)
     }
 
+    /// Executes a SQL statement.
     pub async fn execute_async(
         &self,
         transaction: &Transaction,
@@ -556,6 +614,7 @@ impl SqlClient {
         SqlCommand::ExecuteStatement(request)
     }
 
+    /// Executes a SQL statement.
     pub async fn prepared_execute(
         &self,
         transaction: &Transaction,
@@ -567,6 +626,7 @@ impl SqlClient {
             .await
     }
 
+    /// Executes a SQL statement.
     pub async fn prepared_execute_for(
         &self,
         transaction: &Transaction,
@@ -589,6 +649,7 @@ impl SqlClient {
         Ok(execute_result)
     }
 
+    /// Executes a SQL statement.
     pub async fn prepared_execute_async(
         &self,
         transaction: &Transaction,
@@ -631,6 +692,7 @@ impl SqlClient {
         SqlCommand::ExecutePreparedStatement(request)
     }
 
+    /// Executes a SQL statement and retrieve its result.
     pub async fn query(
         &self,
         transaction: &Transaction,
@@ -640,6 +702,7 @@ impl SqlClient {
         self.query_for(transaction, sql, timeout).await
     }
 
+    /// Executes a SQL statement and retrieve its result.
     pub async fn query_for(
         &self,
         transaction: &Transaction,
@@ -662,6 +725,7 @@ impl SqlClient {
         Ok(query_result)
     }
 
+    /// Executes a SQL statement and retrieve its result.
     pub async fn query_async(
         &self,
         transaction: &Transaction,
@@ -701,6 +765,7 @@ impl SqlClient {
         SqlCommand::ExecuteQuery(request)
     }
 
+    /// Executes a SQL statement and retrieve its result.
     pub async fn prepared_query(
         &self,
         transaction: &Transaction,
@@ -712,6 +777,7 @@ impl SqlClient {
             .await
     }
 
+    /// Executes a SQL statement and retrieve its result.
     pub async fn prepared_query_for(
         &self,
         transaction: &Transaction,
@@ -737,6 +803,7 @@ impl SqlClient {
         Ok(query_result)
     }
 
+    /// Executes a SQL statement and retrieve its result.
     pub async fn prepared_query_async(
         &self,
         transaction: &Transaction,
@@ -788,6 +855,7 @@ impl SqlClient {
         SqlCommand::ExecutePreparedQuery(request)
     }
 
+    /// Request commit to the SQL service.
     pub async fn commit(
         &self,
         transaction: &Transaction,
@@ -797,6 +865,7 @@ impl SqlClient {
         self.commit_for(transaction, commit_option, timeout).await
     }
 
+    /// Request commit to the SQL service.
     pub async fn commit_for(
         &self,
         transaction: &Transaction,
@@ -816,6 +885,7 @@ impl SqlClient {
         Ok(())
     }
 
+    /// Request commit to the SQL service.
     pub async fn commit_async(
         &self,
         transaction: &Transaction,
@@ -853,11 +923,13 @@ impl SqlClient {
         SqlCommand::Commit(request)
     }
 
+    /// Request rollback to the SQL service.
     pub async fn rollback(&self, transaction: &Transaction) -> Result<(), TgError> {
         let timeout = self.default_timeout;
         self.rollback_for(transaction, timeout).await
     }
 
+    /// Request rollback to the SQL service.
     pub async fn rollback_for(
         &self,
         transaction: &Transaction,
@@ -876,6 +948,7 @@ impl SqlClient {
         Ok(())
     }
 
+    /// Request rollback to the SQL service.
     pub async fn rollback_async(&self, transaction: &Transaction) -> Result<Job<()>, TgError> {
         const FUNCTION_NAME: &str = "rollback_async()";
         trace!("{} start", FUNCTION_NAME);

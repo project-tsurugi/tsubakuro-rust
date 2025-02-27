@@ -9,6 +9,7 @@ use crate::{
 
 use super::name::TName;
 
+/// Represents table list.
 #[derive(Debug)]
 pub struct TableList {
     table_names: Vec<TName>,
@@ -23,6 +24,7 @@ impl TableList {
         TableList { table_names }
     }
 
+    /// Returns a list of the available table names in the database, except system tables.
     pub fn table_names(&self) -> &Vec<TName> {
         &self.table_names
     }

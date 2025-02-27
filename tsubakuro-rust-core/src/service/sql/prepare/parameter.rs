@@ -25,10 +25,12 @@ impl SqlParameter {
         }
     }
 
+    /// Creates a null parameter.
     pub fn null(name: &str) -> SqlParameter {
         SqlParameter::new(name, None)
     }
 
+    /// get name.
     pub fn name(&self) -> Option<&String> {
         match self.placement {
             Some(Placement::Name(ref name)) => Some(name),
@@ -36,12 +38,15 @@ impl SqlParameter {
         }
     }
 
+    /// get value.
     pub fn value(&self) -> Option<&Value> {
         self.value.as_ref()
     }
 }
 
+/// `of` method for [SqlParameter].
 pub trait SqlParameterOf<T> {
+    /// Creates a new instance.
     fn of(name: &str, value: T) -> SqlParameter;
 }
 
@@ -517,7 +522,9 @@ where
     }
 }
 
+/// `parameter` method for [SqlParameter].
 pub trait SqlParameterBind<T> {
+    /// Creates a new instance.
     fn parameter(&self, value: T) -> SqlParameter;
 }
 
@@ -539,7 +546,9 @@ where
     }
 }
 
+/// `parameter_null` method for [SqlParameter].
 pub trait SqlParameterBindNull {
+    /// Creates a null parameter.
     fn parameter_null(&self) -> SqlParameter;
 }
 
@@ -601,7 +610,8 @@ pub(crate) fn convert_lob_parameters(
                     })),
             } => {
                 let channel_name = create_channel_name("Clob", &CLOB_NUMBER);
-                let lob_info = BlobInfo { // not ClobInfo
+                // not ClobInfo
+                let lob_info = BlobInfo {
                     channel_name: channel_name.clone(),
                     path,
                     temporary: false,

@@ -2,6 +2,7 @@ pub use crate::jogasaki::proto::sql::common::Decimal as TgDecimal;
 use crate::{client_error, error::TgError};
 
 impl TgDecimal {
+    /// Creates a new instance.
     pub fn new(unscaled_value: Vec<u8>, exponent: i32) -> TgDecimal {
         TgDecimal {
             unscaled_value,
@@ -10,14 +11,19 @@ impl TgDecimal {
     }
 }
 
+/// Decimal for [SqlQueryResult].
 #[derive(Debug, Clone)]
 pub struct TgDecimalResult {
+    /// unscaled value
     pub unscaled_value_bytes: Option<Vec<u8>>,
+    /// unscaled value
     pub unscaled_value: i64,
+    /// exponent
     pub exponent: i32,
 }
 
 impl TgDecimalResult {
+    /// Creates a new instance.
     pub fn new(
         unscaled_value_bytes: Option<Vec<u8>>,
         unscaled_value: i64,
@@ -31,13 +37,17 @@ impl TgDecimalResult {
     }
 }
 
+/// Decimal of i128.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TgDecimalI128 {
+    /// unscaled value
     pub unscaled_value: i128,
+    /// exponent
     pub exponent: i32,
 }
 
 impl TgDecimalI128 {
+    /// Creates a new instance.
     pub fn new(unscaled_value: i128, exponent: i32) -> TgDecimalI128 {
         TgDecimalI128 {
             unscaled_value,

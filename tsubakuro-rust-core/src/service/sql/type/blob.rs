@@ -1,8 +1,11 @@
 use crate::jogasaki::proto::sql::common::LargeObjectProvider;
 
+/// BLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TgBlob {
+    /// BLOB with path.
     Path(String),
+    /// BLOB with bytes.
     Contents(Vec<u8>),
 }
 
@@ -18,6 +21,7 @@ impl From<Vec<u8>> for TgBlob {
     }
 }
 
+/// BLOB for [SqlQueryResult].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TgBlobReference {
     provider: LargeObjectProvider,
