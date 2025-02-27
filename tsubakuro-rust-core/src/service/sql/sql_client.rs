@@ -11,7 +11,7 @@ use crate::{
         response::{response::Response as SqlResponseType, Response as SqlResponse},
     },
     prelude::{
-        execute_result_processor,
+        convert_lob_parameters, execute_result_processor,
         explain::explain_processor,
         list_tables_processor, prepare_dispose_processor, prepare_processor,
         query_result_processor,
@@ -25,6 +25,7 @@ use crate::{
         Session,
     },
     sql_service_error,
+    tateyama::proto::framework::common::BlobInfo,
     transaction::{
         option::TransactionOption, transaction_begin_processor, transaction_commit_processor,
         transaction_dispose_processor, transaction_rollback_processor, Transaction,
@@ -89,7 +90,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::list_tables_command();
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         let table_list = list_tables_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -102,7 +103,7 @@ impl SqlClient {
 
         let command = Self::list_tables_command();
         let job = self
-            .send_and_pull_async("ListTables", command, Box::new(list_tables_processor))
+            .send_and_pull_async("ListTables", command, None, Box::new(list_tables_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -128,7 +129,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::table_metadata_command(table_name);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         let metadata = table_metadata_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -144,7 +145,12 @@ impl SqlClient {
 
         let command = Self::table_metadata_command(table_name);
         let job = self
-            .send_and_pull_async("TableMetadata", command, Box::new(table_metadata_processor))
+            .send_and_pull_async(
+                "TableMetadata",
+                command,
+                None,
+                Box::new(table_metadata_processor),
+            )
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -177,7 +183,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::prepare_command(sql, placeholders);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
 
         let session = self.session.clone();
         let close_timeout = self.default_timeout;
@@ -202,6 +208,7 @@ impl SqlClient {
             .send_and_pull_async(
                 "Prepare",
                 command,
+                None,
                 Box::new(move |response| {
                     prepare_processor(session.clone(), response, close_timeout)
                 }),
@@ -230,7 +237,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::dispose_prepare_statement_command(prepare_handle, has_result_records);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         prepare_dispose_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -281,7 +288,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::explain_text_command(sql);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
 
         let explain_result = explain_processor(response)?;
 
@@ -295,7 +302,7 @@ impl SqlClient {
 
         let command = Self::explain_text_command(sql);
         let job = self
-            .send_and_pull_async("Explain", command, Box::new(explain_processor))
+            .send_and_pull_async("Explain", command, None, Box::new(explain_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -328,8 +335,9 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "prepared_explain()";
         trace!("{} start", FUNCTION_NAME);
 
+        let (parameters, lobs) = convert_lob_parameters(parameters);
         let command = Self::explain_prepared_command(prepared_statement, parameters);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, lobs, timeout).await?;
         let explain_result = explain_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -344,9 +352,10 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "prepared_explain_async()";
         trace!("{} start", FUNCTION_NAME);
 
+        let (parameters, lobs) = convert_lob_parameters(parameters);
         let command = Self::explain_prepared_command(prepared_statement, parameters);
         let job = self
-            .send_and_pull_async("Explain", command, Box::new(explain_processor))
+            .send_and_pull_async("Explain", command, lobs, Box::new(explain_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -386,7 +395,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::begin_transaction_command(transaction_option);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
 
         let session = self.session.clone();
         let close_timeout = transaction_option
@@ -414,6 +423,7 @@ impl SqlClient {
             .send_and_pull_async(
                 "StartTransaction",
                 command,
+                None,
                 Box::new(move |response| {
                     transaction_begin_processor(session.clone(), response, close_timeout)
                 }),
@@ -450,7 +460,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::transaction_status_command(transaction.transaction_handle()?);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         let status = transaction_status_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -469,6 +479,7 @@ impl SqlClient {
             .send_and_pull_async(
                 "TransactionStatus",
                 command,
+                None,
                 Box::new(transaction_status_processor),
             )
             .await?;
@@ -508,7 +519,7 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::execute_statement_command(tx_handle, sql);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         let execute_result = execute_result_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -527,7 +538,7 @@ impl SqlClient {
 
         let command = Self::execute_statement_command(tx_handle, sql);
         let job = self
-            .send_and_pull_async("Execute", command, Box::new(execute_result_processor))
+            .send_and_pull_async("Execute", command, None, Box::new(execute_result_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -567,10 +578,11 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
+        let (parameters, lobs) = convert_lob_parameters(parameters);
 
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, lobs, timeout).await?;
         let execute_result = execute_result_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -587,11 +599,12 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
+        let (parameters, lobs) = convert_lob_parameters(parameters);
 
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
         let job = self
-            .send_and_pull_async("Execute", command, Box::new(execute_result_processor))
+            .send_and_pull_async("Execute", command, lobs, Box::new(execute_result_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -639,7 +652,7 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::execute_query_command(tx_handle, sql);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
 
         let wire = self.wire().clone();
         let default_timeout = self.default_timeout;
@@ -666,6 +679,7 @@ impl SqlClient {
             .send_and_pull_async(
                 "Query",
                 command,
+                None,
                 Box::new(move |response| {
                     query_result_processor(wire.clone(), response, default_timeout)
                 }),
@@ -709,10 +723,11 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
+        let (parameters, lobs) = convert_lob_parameters(parameters);
 
         let command =
             Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, lobs, timeout).await?;
 
         let wire = self.wire().clone();
         let default_timeout = self.default_timeout;
@@ -732,6 +747,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
+        let (parameters, lobs) = convert_lob_parameters(parameters);
 
         let command =
             Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
@@ -741,6 +757,7 @@ impl SqlClient {
             .send_and_pull_async(
                 "Query",
                 command,
+                lobs,
                 Box::new(move |response| {
                     query_result_processor(wire.clone(), response, default_timeout)
                 }),
@@ -792,7 +809,7 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::commit_command(tx_handle, commit_option);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         transaction_commit_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -811,7 +828,12 @@ impl SqlClient {
 
         let command = Self::commit_command(tx_handle, commit_option);
         let job = self
-            .send_and_pull_async("Commit", command, Box::new(transaction_commit_processor))
+            .send_and_pull_async(
+                "Commit",
+                command,
+                None,
+                Box::new(transaction_commit_processor),
+            )
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -847,7 +869,7 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::rollback_command(tx_handle);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         transaction_rollback_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -865,6 +887,7 @@ impl SqlClient {
             .send_and_pull_async(
                 "Rollback",
                 command,
+                None,
                 Box::new(transaction_rollback_processor),
             )
             .await?;
@@ -893,7 +916,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let command = Self::dispose_transaction_command(transaction_handle);
-        let response = self.send_and_pull_response(command, timeout).await?;
+        let response = self.send_and_pull_response(command, None, timeout).await?;
         transaction_dispose_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -933,17 +956,18 @@ impl SqlClient {
 
     async fn send_only(&self, command: SqlCommand) -> Result<Arc<SlotEntryHandle>, TgError> {
         let request = Self::new_request(command);
-        self.wire().send_only(SERVICE_ID_SQL, request).await
+        self.wire().send_only(SERVICE_ID_SQL, request, None).await
     }
 
     async fn send_and_pull_response(
         &self,
         command: SqlCommand,
+        lobs: Option<Vec<BlobInfo>>,
         timeout: Duration,
     ) -> Result<WireResponse, TgError> {
         let request = Self::new_request(command);
         self.wire()
-            .send_and_pull_response(SERVICE_ID_SQL, request, timeout)
+            .send_and_pull_response(SERVICE_ID_SQL, request, lobs, timeout)
             .await
     }
 
@@ -951,6 +975,7 @@ impl SqlClient {
         &self,
         job_name: &str,
         command: SqlCommand,
+        lobs: Option<Vec<BlobInfo>>,
         converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
     ) -> Result<Job<T>, TgError> {
         let request = Self::new_request(command);
@@ -959,6 +984,7 @@ impl SqlClient {
                 job_name,
                 SERVICE_ID_SQL,
                 request,
+                lobs,
                 converter,
                 self.default_timeout,
                 self.session.fail_on_drop_error(),

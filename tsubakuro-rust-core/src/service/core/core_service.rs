@@ -39,7 +39,7 @@ impl CoreService {
         let request = Self::new_request(command);
 
         let response = wire
-            .send_and_pull_response(SERVICE_ID_ROUTING, request, timeout)
+            .send_and_pull_response(SERVICE_ID_ROUTING, request, None, timeout)
             .await?;
         update_expiration_time_processor(response)?;
 
@@ -64,6 +64,7 @@ impl CoreService {
                 "updateExpirationTime",
                 SERVICE_ID_ROUTING,
                 request,
+                None,
                 Box::new(update_expiration_time_processor),
                 default_timeout,
                 fail_on_drop_error,
@@ -96,7 +97,7 @@ impl CoreService {
         let request = Self::new_request(command);
 
         let response = wire
-            .send_and_pull_response(SERVICE_ID_ROUTING, request, timeout)
+            .send_and_pull_response(SERVICE_ID_ROUTING, request, None, timeout)
             .await?;
         shutdown_processor(wire, response).await?;
 
@@ -122,6 +123,7 @@ impl CoreService {
                 "Shutdown",
                 SERVICE_ID_ROUTING,
                 request,
+                None,
                 Box::new(move |response| shutdown_processor_for_job(&wire_clone, response)),
                 default_timeout,
                 fail_on_drop_error,

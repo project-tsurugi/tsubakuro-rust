@@ -15,7 +15,9 @@ use crate::{
     tateyama::proto::{
         diagnostics::Record as DiagnosticsRecord,
         framework::{
-            request::Header as FrameworkRequestHeader, response::Header as FrameworkResponseHeader,
+            common::{BlobInfo, RepeatedBlobInfo},
+            request::Header as FrameworkRequestHeader,
+            response::Header as FrameworkResponseHeader,
         },
     },
     util::Timeout,
@@ -64,8 +66,9 @@ impl Wire {
         &self,
         service_id: i32,
         request: R,
+        lobs: Option<Vec<BlobInfo>>,
     ) -> Result<Arc<SlotEntryHandle>, TgError> {
-        let slot_handle = self.send_internal(service_id, request).await?;
+        let slot_handle = self.send_internal(service_id, request, lobs).await?;
         Ok(slot_handle)
     }
 
@@ -73,24 +76,27 @@ impl Wire {
         &self,
         service_id: i32,
         request: R,
+        lobs: Option<Vec<BlobInfo>>,
         timeout: Duration,
     ) -> Result<WireResponse, TgError> {
         let timeout = Timeout::new(timeout);
-        let slot_handle = self.send_internal(service_id, request).await?;
+        let slot_handle = self.send_internal(service_id, request, lobs).await?;
         let response = self.pull_response(&slot_handle, &timeout).await?;
         Ok(response)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(crate) async fn send_and_pull_async<R: ProstMessage, T: 'static>(
         self: &Arc<Wire>,
         job_name: &str,
         service_id: i32,
         request: R,
+        lobs: Option<Vec<BlobInfo>>,
         converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
         default_timeout: Duration,
         fail_on_drop_error: bool,
     ) -> Result<Job<T>, TgError> {
-        let slot_handle = self.send_internal(service_id, request).await?;
+        let slot_handle = self.send_internal(service_id, request, lobs).await?;
 
         let wire = self.clone();
         let job = Job::new(
@@ -108,13 +114,19 @@ impl Wire {
         &self,
         service_id: i32,
         request: T,
+        lobs: Option<Vec<BlobInfo>>,
     ) -> Result<Arc<SlotEntryHandle>, TgError> {
+        let blob_opt = lobs.map(|blobs| {
+            crate::tateyama::proto::framework::request::header::BlobOpt::Blobs(RepeatedBlobInfo {
+                blobs,
+            })
+        });
         let header = FrameworkRequestHeader {
             service_message_version_major: SERVICE_MESSAGE_VERSION_MAJOR,
             service_message_version_minor: SERVICE_MESSAGE_VERSION_MINOR,
             service_id: service_id as u64,
             session_id: self.session_id() as u64,
-            blob_opt: None,
+            blob_opt,
         };
         let header = header.encode_length_delimited_to_vec();
 

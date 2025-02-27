@@ -1,3 +1,5 @@
+use std::sync::atomic::AtomicI64;
+
 #[cfg(feature = "with_chrono")]
 use {chrono::Datelike, chrono::Offset};
 
@@ -11,6 +13,7 @@ use crate::prelude::{
     TgBlob, TgClob, TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone,
     TgTimePoint, TgTimePointWithTimeZone,
 };
+use crate::tateyama::proto::framework::common::BlobInfo;
 
 impl SqlParameter {
     fn new(name: &str, value: Option<Value>) -> SqlParameter {
@@ -550,6 +553,85 @@ impl SqlParameterBindNull for String {
     fn parameter_null(&self) -> SqlParameter {
         SqlParameter::null(self)
     }
+}
+
+static BLOB_NUMBER: AtomicI64 = AtomicI64::new(0);
+static CLOB_NUMBER: AtomicI64 = AtomicI64::new(0);
+
+pub(crate) fn convert_lob_parameters(
+    parameters: Vec<SqlParameter>,
+) -> (Vec<SqlParameter>, Option<Vec<BlobInfo>>) {
+    use crate::jogasaki::proto::sql::common::blob::Data as BlobData;
+    use crate::jogasaki::proto::sql::common::clob::Data as ClobData;
+    use crate::jogasaki::proto::sql::common::Blob;
+    use crate::jogasaki::proto::sql::common::Clob;
+
+    let mut parameters_result = Vec::with_capacity(parameters.len());
+    let mut lobs = Vec::new();
+    for parameter in parameters {
+        let parameter = match parameter {
+            SqlParameter {
+                placement,
+                value:
+                    Some(Value::Blob(Blob {
+                        data: Some(BlobData::LocalPath(path)),
+                    })),
+            } => {
+                let channel_name = create_channel_name("Blob", &BLOB_NUMBER);
+                let lob_info = BlobInfo {
+                    channel_name: channel_name.clone(),
+                    path,
+                    temporary: false,
+                };
+                lobs.push(lob_info);
+
+                let data = BlobData::ChannelName(channel_name);
+                let value = Blob { data: Some(data) };
+                let value = Value::Blob(value);
+                SqlParameter {
+                    placement,
+                    value: Some(value),
+                }
+            }
+            SqlParameter {
+                placement,
+                value:
+                    Some(Value::Clob(Clob {
+                        data: Some(ClobData::LocalPath(path)),
+                    })),
+            } => {
+                let channel_name = create_channel_name("Clob", &CLOB_NUMBER);
+                let lob_info = BlobInfo { // not ClobInfo
+                    channel_name: channel_name.clone(),
+                    path,
+                    temporary: false,
+                };
+                lobs.push(lob_info);
+
+                let data = ClobData::ChannelName(channel_name);
+                let value = Clob { data: Some(data) };
+                let value = Value::Clob(value);
+                SqlParameter {
+                    placement,
+                    value: Some(value),
+                }
+            }
+            parameter => parameter,
+        };
+        parameters_result.push(parameter);
+    }
+
+    if lobs.is_empty() {
+        (parameters_result, None)
+    } else {
+        (parameters_result, Some(lobs))
+    }
+}
+
+fn create_channel_name(prefix: &str, number: &AtomicI64) -> String {
+    let pid = std::process::id();
+    let n = number.fetch_add(1, std::sync::atomic::Ordering::SeqCst) + 1;
+    format!("Rust{prefix}Channel-{pid}-{n}")
 }
 
 #[cfg(test)]
