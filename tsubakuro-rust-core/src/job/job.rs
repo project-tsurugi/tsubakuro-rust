@@ -11,7 +11,26 @@ use crate::{
     util::Timeout,
 };
 
-/// thread unsafe
+/// Job.
+///
+/// An object that provides asynchronous response data,
+/// and it may be canceled before the underlying task was done.
+///
+/// **thread unsafe**
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+///     let sql = "insert into tb values(1, 'abc')";
+///     let mut job = client.execute_async(transaction, sql).await?;
+///
+///     let execute_result = job.take_for(std::time::Duration::from_secs(10)).await?;
+///
+///     Ok(())
+/// }
+/// ```
 pub struct Job<T> {
     name: String,
     wire: Arc<Wire>,
@@ -66,14 +85,35 @@ impl<T> Job<T> {
         }
     }
 
+    /// get job name.
     pub fn name(&self) -> &String {
         &self.name
     }
 
+    /// set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }
 
+    /// Wait for response.
+    ///
+    /// # Returns
+    /// - `Ok(true)` - Response received.
+    /// - `Ok(false)` - Timed out.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut job: Job<SqlExecuteResult>) -> Result<(), TgError> {
+    ///     let done = job.wait(std::time::Duration::from_secs(10)).await?;
+    ///     if done {
+    ///         let execute_result = job.take().await?;
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn wait(&mut self, timeout: Duration) -> Result<bool, TgError> {
         // self.check_cancel()?;
         // self.check_close()?;
@@ -90,6 +130,28 @@ impl<T> Job<T> {
         result
     }
 
+    /// Whether a response has been received.
+    ///
+    /// # Returns
+    /// - `Ok(true)` - Response received.
+    /// - `Ok(false)` - No response received.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut job: Job<SqlExecuteResult>) -> Result<(), TgError> {
+    ///     loop {
+    ///         let done = job.is_done().await?;
+    ///         if done {
+    ///             let execute_result = job.take().await?;
+    ///             break;
+    ///         }
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn is_done(&mut self) -> Result<bool, TgError> {
         if self.done {
             return Ok(true);
@@ -109,11 +171,39 @@ impl<T> Job<T> {
         result
     }
 
+    /// Retrieves the result value, or wait until response has been received.
+    ///
+    /// You can only take once to retrieve the value.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut job: Job<SqlExecuteResult>) -> Result<(), TgError> {
+    ///     let execute_result = job.take().await?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn take(&mut self) -> Result<T, TgError> {
         let timeout = self.default_timeout;
         self.take_for(timeout).await
     }
 
+    /// Retrieves the result value, or wait until response has been received.
+    ///
+    /// You can only take once to retrieve the value.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut job: Job<SqlExecuteResult>) -> Result<(), TgError> {
+    ///     let execute_result = job.take_for(std::time::Duration::from_secs(10)).await?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn take_for(&mut self, timeout: Duration) -> Result<T, TgError> {
         if self.taked {
             return Err(client_error!(format!("Job<{}> already taked", self.name)));
@@ -129,21 +219,69 @@ impl<T> Job<T> {
         (self.converter)(response)
     }
 
+    /// Retrieves the result value if a response has been received.
+    ///
+    /// You can only take once to retrieve the value.
+    ///
+    /// # Returns
+    /// - `Ok(Some(value))` - result value
+    /// - `Ok(None)` - No response received.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut job: Job<SqlExecuteResult>) -> Result<(), TgError> {
+    ///     loop {
+    ///         if let Some(execute_result) = job.take_if_ready().await? {
+    ///             break;
+    ///         }
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn take_if_ready(&mut self) -> Result<Option<T>, TgError> {
         if self.is_done().await? {
-            let t = self.take_for(Duration::ZERO).await?;
-            Ok(Some(t))
+            let value = self.take_for(Duration::ZERO).await?;
+            Ok(Some(value))
         } else {
             Ok(None)
         }
     }
 
+    /// Cancel job.
+    ///
+    /// # Returns
+    /// - `Ok(true)` - Response received.
+    /// - `Ok(false)` - Timed out.
+    ///
+    /// The response is not necessarily OPERATION_CANCELED.
+    /// Depending on the timing, it may be a normal processing result.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut job: Job<SqlExecuteResult>) -> Result<(), TgError> {
+    ///     job.cancel().await?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn cancel(self) -> Result<bool, TgError> {
         let timeout = self.default_timeout;
         self.cancel_for(timeout).await
     }
 
-    // 戻り値は、タイムアウトしたときfalse, レスポンスが来たらtrue（レスポンスはOPERATION_CANCELEDとは限らない。タイミングによっては正常な処理結果であることもある）
+    /// Cancel job.
+    ///
+    /// # Returns
+    /// - `Ok(true)` - Response already received, or cancel already started.
+    /// - `Ok(false)` - Timed out.
+    ///
+    /// The response is not necessarily OPERATION_CANCELED.
+    /// Depending on the timing, it may be a normal processing result.
     pub async fn cancel_for(self, timeout: Duration) -> Result<bool, TgError> {
         let job = self.cancel_async().await?;
         match job {
@@ -155,6 +293,24 @@ impl<T> Job<T> {
         }
     }
 
+    /// Cancel job.
+    ///
+    /// # Returns
+    /// - `Ok(Some(CancelJob))` - Cancellation started.
+    /// - `Ok(None)` - Not canceled. (response already received, or cancel already started)
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut job: Job<SqlExecuteResult>) -> Result<(), TgError> {
+    ///     if let Some(mut cancel_job) = job.cancel_async().await? {
+    ///         cancel_job.wait(std::time::Duration::from_secs(10)).await?;
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn cancel_async(mut self) -> Result<Option<CancelJob>, TgError> {
         // self.check_close()?;
         if self.done {
@@ -177,6 +333,9 @@ impl<T> Job<T> {
     //     Ok(())
     // }
 
+    /// Disposes this resource.
+    ///
+    /// If no response is received and no cancellation is made, then execute cancel.
     pub async fn close(mut self) -> Result<(), TgError> {
         if self.closed {
             return Ok(());
@@ -204,7 +363,7 @@ impl<T> Job<T> {
         Ok(())
     }
 
-    // for debug
+    /// for debug
     pub fn set_fail_on_drop_error(&mut self, value: bool) {
         self.fail_on_drop_error = value;
     }

@@ -6,7 +6,11 @@ use crate::{
     util::Timeout,
 };
 
-/// thread unsafe
+/// Cancel Job.
+///
+/// Wait for cancellation process to complete.
+///
+/// **thread unsafe**
 pub struct CancelJob {
     wire: Arc<Wire>,
     slot_handle: Arc<SlotEntryHandle>,
@@ -22,6 +26,11 @@ impl CancelJob {
         }
     }
 
+    /// Wait for response.
+    ///
+    /// # Returns
+    /// - `Ok(true)` - Response received.
+    /// - `Ok(false)` - Timed out.
     pub async fn wait(&mut self, timeout: Duration) -> Result<bool, TgError> {
         if self.done {
             return Ok(true);
@@ -36,6 +45,11 @@ impl CancelJob {
         result
     }
 
+    /// Whether a response has been received.
+    ///
+    /// # Returns
+    /// - `Ok(true)` - Response received.
+    /// - `Ok(false)` - No response received.
     pub async fn is_done(&mut self) -> Result<bool, TgError> {
         if self.done {
             return Ok(true);
