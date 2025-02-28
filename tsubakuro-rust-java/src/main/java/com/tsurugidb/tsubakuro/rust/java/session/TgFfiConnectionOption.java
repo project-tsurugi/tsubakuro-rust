@@ -67,11 +67,11 @@ public class TgFfiConnectionOption extends TgFfiObject {
         TgFfiRcUtil.throwIfError(rc, context);
     }
 
-    public synchronized String getEndpoint(TgFfiContext context) {
+    public synchronized String getEndpointUrl(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
         var out = allocatePtrOut();
-        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint_url(ctx, handle, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
         return outToString(out);

@@ -26288,7 +26288,7 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
-    private static class tsurugi_ffi_connection_option_get_endpoint {
+    private static class tsurugi_ffi_connection_option_get_endpoint_url {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
             tsubakuro_rust_ffi_h.C_POINTER,
@@ -26296,7 +26296,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_endpoint");
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_endpoint_url");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26304,43 +26304,43 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
-    public static FunctionDescriptor tsurugi_ffi_connection_option_get_endpoint$descriptor() {
-        return tsurugi_ffi_connection_option_get_endpoint.DESC;
+    public static FunctionDescriptor tsurugi_ffi_connection_option_get_endpoint_url$descriptor() {
+        return tsurugi_ffi_connection_option_get_endpoint_url.DESC;
     }
 
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
-    public static MethodHandle tsurugi_ffi_connection_option_get_endpoint$handle() {
-        return tsurugi_ffi_connection_option_get_endpoint.HANDLE;
+    public static MethodHandle tsurugi_ffi_connection_option_get_endpoint_url$handle() {
+        return tsurugi_ffi_connection_option_get_endpoint_url.HANDLE;
     }
 
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
-    public static MemorySegment tsurugi_ffi_connection_option_get_endpoint$address() {
-        return tsurugi_ffi_connection_option_get_endpoint.ADDR;
+    public static MemorySegment tsurugi_ffi_connection_option_get_endpoint_url$address() {
+        return tsurugi_ffi_connection_option_get_endpoint_url.ADDR;
     }
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
      * }
      */
-    public static int tsurugi_ffi_connection_option_get_endpoint(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint_out) {
-        var mh$ = tsurugi_ffi_connection_option_get_endpoint.HANDLE;
+    public static int tsurugi_ffi_connection_option_get_endpoint_url(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint_out) {
+        var mh$ = tsurugi_ffi_connection_option_get_endpoint_url.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_get_endpoint", context, connection_option, endpoint_out);
+                traceDowncall("tsurugi_ffi_connection_option_get_endpoint_url", context, connection_option, endpoint_out);
             }
             return (int)mh$.invokeExact(context, connection_option, endpoint_out);
         } catch (Throwable ex$) {

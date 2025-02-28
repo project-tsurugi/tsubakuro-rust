@@ -267,6 +267,11 @@ typedef struct TsurugiFfiTransactionStatus TsurugiFfiTransactionStatus;
 
 typedef uint32_t TsurugiFfiRc;
 
+/**
+ * Context object.
+ *
+ * Context object holds error information when an error occurs.
+ */
 typedef struct TsurugiFfiContext *TsurugiFfiContextHandle;
 
 typedef const char *TsurugiFfiStringHandle;
@@ -318,8 +323,14 @@ typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
 
 typedef const TsurugiFfiStringHandle *TsurugiFfiStringArrayHandle;
 
+/**
+ * Endpoint.
+ */
 typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle;
 
+/**
+ * Connection option.
+ */
 typedef struct TsurugiFfiConnectionOption *TsurugiFfiConnectionOptionHandle;
 
 typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
@@ -354,32 +365,91 @@ typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
 
 #define TSURUGI_FFI_RC_CORE_CLIENT_IO_ERROR (TSURUGI_FFI_RC_CORE_CLIENT_ERROR | (3 << 16))
 
+/**
+ * Creates a new context object.
+ *
+ * # Returns
+ * - `context_out` - context object. To dispose, call `tsurugi_ffi_context_dispose()`.
+ */
 TsurugiFfiRc tsurugi_ffi_context_create(TsurugiFfiContextHandle *context_out);
 
+/**
+ * get return code.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_return_code(TsurugiFfiContextHandle context,
                                                  TsurugiFfiRc *rc_out);
 
+/**
+ * get error name.
+ *
+ * # Returns
+ * - `error_name_out` - error name. `null` if no error occurs.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_error_name(TsurugiFfiContextHandle context,
                                                 TsurugiFfiStringHandle *error_name_out);
 
+/**
+ * get RcType.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_error_type(TsurugiFfiContextHandle context,
                                                 TsurugiFfiRcType *error_type_out);
 
+/**
+ * get error message.
+ *
+ * # Returns
+ * - `error_message_out` - error message. `null` if no error occurs.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_error_message(TsurugiFfiContextHandle context,
                                                    TsurugiFfiStringHandle *error_message_out);
 
+/**
+ * get error category.
+ *
+ * Available only if a server error has occurred.
+ *
+ * # Returns
+ * - `category_number_out` - category number.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_number(TsurugiFfiContextHandle context,
                                                                   int32_t *category_number_out);
 
+/**
+ * get error category.
+ *
+ * Available only if a server error has occurred.
+ *
+ * # Returns
+ * - `category_str_out` - category name.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_category_str(TsurugiFfiContextHandle context,
                                                                TsurugiFfiStringHandle *category_str_out);
 
+/**
+ * get error code.
+ *
+ * Available only if a server error has occurred.
+ *
+ * # Returns
+ * - `code_number_out` - error code.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_code_number(TsurugiFfiContextHandle context,
                                                               int32_t *code_number_out);
 
+/**
+ * get structured error code.
+ *
+ * Available only if a server error has occurred.
+ *
+ * # Returns
+ * - `structured_code_out` - structured error code.
+ */
 TsurugiFfiRc tsurugi_ffi_context_get_server_error_structured_code(TsurugiFfiContextHandle context,
                                                                   TsurugiFfiStringHandle *structured_code_out);
 
+/**
+ * Dispose context object.
+ */
 void tsurugi_ffi_context_dispose(TsurugiFfiContextHandle context);
 
 TsurugiFfiRc tsurugi_ffi_cancel_job_wait(TsurugiFfiContextHandle context,
@@ -1127,26 +1197,56 @@ void tsurugi_ffi_blob_reference_dispose(TsurugiFfiBlobReferenceHandle blob_refer
 
 void tsurugi_ffi_clob_reference_dispose(TsurugiFfiClobReferenceHandle clob_reference);
 
+/**
+ * Creates a new endpoint instance.
+ *
+ * # Parameters
+ * - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
+ *
+ * # Returns
+ * - `endpoint_out` - endpoint. To dispose, call `tsurugi_ffi_endpoint_dispose()`.
+ */
 TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context,
                                         TsurugiFfiStringHandle endpoint,
                                         TsurugiFfiEndpointHandle *endpoint_out);
 
+/**
+ * Dispose endpoint.
+ */
 void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint);
 
+/**
+ * Creates a new connection option instance.
+ *
+ * # Returns
+ * - `connection_option_out` - connection option. To dispose, call `tsurugi_ffi_connection_option_dispose()`.
+ */
 TsurugiFfiRc tsurugi_ffi_connection_option_create(TsurugiFfiContextHandle context,
                                                   TsurugiFfiConnectionOptionHandle *connection_option_out);
 
+/**
+ * set endpoint.
+ */
 TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint(TsurugiFfiContextHandle context,
                                                         TsurugiFfiConnectionOptionHandle connection_option,
                                                         TsurugiFfiEndpointHandle endpoint);
 
+/**
+ * set endpoint.
+ *
+ * # Parameters
+ * - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
+ */
 TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context,
                                                             TsurugiFfiConnectionOptionHandle connection_option,
                                                             TsurugiFfiStringHandle endpoint);
 
-TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint(TsurugiFfiContextHandle context,
-                                                        TsurugiFfiConnectionOptionHandle connection_option,
-                                                        TsurugiFfiStringHandle *endpoint_out);
+/**
+ * get endpoint.
+ */
+TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiConnectionOptionHandle connection_option,
+                                                            TsurugiFfiStringHandle *endpoint_out);
 
 TsurugiFfiRc tsurugi_ffi_connection_option_set_application_name(TsurugiFfiContextHandle context,
                                                                 TsurugiFfiConnectionOptionHandle connection_option,

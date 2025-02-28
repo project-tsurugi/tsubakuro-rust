@@ -44,12 +44,12 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 
         try (var context = TgFfiContext.create(manager); //
                 var target = TgFfiConnectionOption.create(context)) {
-            assertNull(target.getEndpoint(context));
+            assertNull(target.getEndpointUrl(context));
 
             var endpoint = TgFfiEndpoint.parse(context, "tcp://localhost:12345");
             target.setEndpoint(context, endpoint);
 
-            String s = target.getEndpoint(context);
+            String s = target.getEndpointUrl(context);
             assertEquals("tcp://localhost:12345", s);
         }
     }
@@ -81,11 +81,11 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 
         try (var context = TgFfiContext.create(manager); //
                 var target = TgFfiConnectionOption.create(context)) {
-            assertNull(target.getEndpoint(context));
+            assertNull(target.getEndpointUrl(context));
 
             target.setEndpointUrl(context, "tcp://localhost:12345");
 
-            String s = target.getEndpoint(context);
+            String s = target.getEndpointUrl(context);
             assertEquals("tcp://localhost:12345", s);
         }
     }
@@ -120,14 +120,14 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
     }
 
     @Test
-    void get_endpoint_argError() {
+    void get_endpoint_url_argError() {
         var manager = getFfiObjectManager();
 
         try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             var out = manager.allocatePtrOut();
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint_url(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
         try (var context = TgFfiContext.create(manager); //
@@ -135,7 +135,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
             var ctx = context.handle();
             var handle = target.handle();
             var out = MemorySegment.NULL;
-            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint(ctx, handle, out);
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_endpoint_url(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
     }
@@ -146,7 +146,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 
         try (var context = TgFfiContext.create(manager); //
                 var target = TgFfiConnectionOption.create(context)) {
-            assertNull(target.getEndpoint(context));
+            assertNull(target.getEndpointUrl(context));
 
             target.setApplicationName(context, "tsubakuro-rust-java/test");
 
@@ -203,7 +203,7 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
 
         try (var context = TgFfiContext.create(manager); //
                 var target = TgFfiConnectionOption.create(context)) {
-            assertNull(target.getEndpoint(context));
+            assertNull(target.getEndpointUrl(context));
 
             target.setSessionLabel(context, "tsubakuro-rust-java/test");
 

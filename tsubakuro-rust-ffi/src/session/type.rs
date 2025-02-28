@@ -1,5 +1,6 @@
 use tsubakuro_rust_core::prelude::*;
 
+/// kind of shutdown type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub enum TsurugiFfiShutdownType {

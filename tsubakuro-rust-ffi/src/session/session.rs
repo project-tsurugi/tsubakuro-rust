@@ -43,8 +43,13 @@ impl std::ops::DerefMut for TsurugiFfiSession {
     }
 }
 
+/// Session.
 pub type TsurugiFfiSessionHandle = *mut TsurugiFfiSession;
 
+/// Establishes a connection to the Tsurugi server.
+///
+/// # Returns
+/// - `session_out` - session. To dispose, call `tsurugi_ffi_session_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_connect(
     context: TsurugiFfiContextHandle,
@@ -87,6 +92,10 @@ pub extern "C" fn tsurugi_ffi_session_connect(
     rc
 }
 
+/// Establishes a connection to the Tsurugi server.
+///
+/// # Returns
+/// - `session_out` - session. To dispose, call `tsurugi_ffi_session_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_connect_for(
     context: TsurugiFfiContextHandle,
@@ -132,6 +141,10 @@ pub extern "C" fn tsurugi_ffi_session_connect_for(
     rc
 }
 
+/// Establishes a connection to the Tsurugi server.
+///
+/// # Returns
+/// - `session_job_out` - Job for `TsurugiFfiSessionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_connect_async(
     context: TsurugiFfiContextHandle,
@@ -192,6 +205,7 @@ impl ConnectJobDelegator {
     }
 }
 
+/// Session: set default timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_set_default_timeout(
     context: TsurugiFfiContextHandle,
@@ -218,6 +232,7 @@ pub extern "C" fn tsurugi_ffi_session_set_default_timeout(
     rc
 }
 
+/// Session: get default timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_get_default_timeout(
     context: TsurugiFfiContextHandle,
@@ -254,6 +269,10 @@ pub extern "C" fn tsurugi_ffi_session_get_default_timeout(
     rc
 }
 
+/// Session: make SqlClient.
+///
+/// # Returns
+/// - `sql_client_out` - SqlClient. To dispose, call `tsurugi_ffi_sql_client_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     context: TsurugiFfiContextHandle,
@@ -289,6 +308,11 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     rc
 }
 
+/// Session: update expiration time.
+///
+/// # Parameters
+/// When specifying `expiration_time`, set `expiration_time_exists` to `true`.
+/// If `expiration_time_exists` is `false`, the server's default value is used.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_update_expiration_time(
     context: TsurugiFfiContextHandle,
@@ -327,6 +351,11 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time(
     rc
 }
 
+/// Session: update expiration time.
+///
+/// # Parameters
+/// When specifying `expiration_time`, set `expiration_time_exists` to `true`.
+/// If `expiration_time_exists` is `false`, the server's default value is used.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_update_expiration_time_for(
     context: TsurugiFfiContextHandle,
@@ -368,6 +397,14 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_for(
     rc
 }
 
+/// Session: update expiration time.
+///
+/// # Parameters
+/// When specifying `expiration_time`, set `expiration_time_exists` to `true`.
+/// If `expiration_time_exists` is `false`, the server's default value is used.
+///
+/// # Returns
+/// - `update_expiration_time_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_update_expiration_time_async(
     context: TsurugiFfiContextHandle,
@@ -421,6 +458,7 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_async(
     rc
 }
 
+/// Session: shutdown.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_shutdown(
     context: TsurugiFfiContextHandle,
@@ -452,6 +490,7 @@ pub extern "C" fn tsurugi_ffi_session_shutdown(
     rc
 }
 
+/// Session: shutdown.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_shutdown_for(
     context: TsurugiFfiContextHandle,
@@ -486,6 +525,10 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_for(
     rc
 }
 
+/// Session: shutdown.
+///
+/// # Returns
+/// - `shutdown_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_shutdown_async(
     context: TsurugiFfiContextHandle,
@@ -528,6 +571,7 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_async(
     rc
 }
 
+/// Session: Check if the session is shut down.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_is_shutdowned(
     context: TsurugiFfiContextHandle,
@@ -563,6 +607,7 @@ pub extern "C" fn tsurugi_ffi_session_is_shutdowned(
     rc
 }
 
+/// Session: close.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_close(
     context: TsurugiFfiContextHandle,
@@ -587,6 +632,7 @@ pub extern "C" fn tsurugi_ffi_session_close(
     rc
 }
 
+/// Session: Check if the session is closed.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_is_closed(
     context: TsurugiFfiContextHandle,
@@ -618,6 +664,7 @@ pub extern "C" fn tsurugi_ffi_session_is_closed(
     rc
 }
 
+/// Dispose session instance.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_dispose(session: TsurugiFfiSessionHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_session_dispose()";

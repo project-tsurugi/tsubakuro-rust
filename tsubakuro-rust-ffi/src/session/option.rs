@@ -36,8 +36,13 @@ impl std::ops::DerefMut for TsurugiFfiConnectionOption {
     }
 }
 
+/// Connection option.
 pub type TsurugiFfiConnectionOptionHandle = *mut TsurugiFfiConnectionOption;
 
+/// Creates a new connection option instance.
+///
+/// # Returns
+/// - `connection_option_out` - connection option. To dispose, call `tsurugi_ffi_connection_option_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_create(
     context: TsurugiFfiContextHandle,
@@ -74,6 +79,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_create(
     rc
 }
 
+/// ConnectionOption: set endpoint.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint(
     context: TsurugiFfiContextHandle,
@@ -101,6 +107,10 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint(
     rc
 }
 
+/// ConnectionOption: set endpoint.
+///
+/// # Parameters
+/// - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
     context: TsurugiFfiContextHandle,
@@ -132,13 +142,14 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_endpoint_url(
     rc
 }
 
+/// ConnectionOption: get endpoint.
 #[no_mangle]
-pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
+pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint_url(
     context: TsurugiFfiContextHandle,
     connection_option: TsurugiFfiConnectionOptionHandle,
     endpoint_out: *mut TsurugiFfiStringHandle,
 ) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_endpoint()";
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_endpoint_url()";
     trace!(
         "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, endpoint_out={:?}",
         context,
@@ -170,6 +181,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint(
     rc
 }
 
+/// ConnectionOption: set application name.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
     context: TsurugiFfiContextHandle,
@@ -198,6 +210,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_application_name(
     rc
 }
 
+/// ConnectionOption: get application name.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
     context: TsurugiFfiContextHandle,
@@ -244,6 +257,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_application_name(
     rc
 }
 
+/// ConnectionOption: set session label.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_session_label(
     context: TsurugiFfiContextHandle,
@@ -272,6 +286,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_session_label(
     rc
 }
 
+/// ConnectionOption: get session label.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_get_session_label(
     context: TsurugiFfiContextHandle,
@@ -310,6 +325,9 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_session_label(
     rc
 }
 
+/// ConnectionOption: set keep alive interval.
+///
+/// Do not keep alive when `keep_alive` is 0.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_keep_alive(
     context: TsurugiFfiContextHandle,
@@ -336,6 +354,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_keep_alive(
     rc
 }
 
+/// ConnectionOption: get keep alive interval.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_get_keep_alive(
     context: TsurugiFfiContextHandle,
@@ -368,6 +387,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_keep_alive(
     rc
 }
 
+/// ConnectionOption: set default timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_default_timeout(
     context: TsurugiFfiContextHandle,
@@ -394,6 +414,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_default_timeout(
     rc
 }
 
+/// ConnectionOption: get default timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_get_default_timeout(
     context: TsurugiFfiContextHandle,
@@ -430,6 +451,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_default_timeout(
     rc
 }
 
+/// ConnectionOption: set communication send timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_send_timeout(
     context: TsurugiFfiContextHandle,
@@ -456,6 +478,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_send_timeout(
     rc
 }
 
+/// ConnectionOption: get communication send timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_get_send_timeout(
     context: TsurugiFfiContextHandle,
@@ -492,6 +515,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_send_timeout(
     rc
 }
 
+/// ConnectionOption: set communication recv timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_set_recv_timeout(
     context: TsurugiFfiContextHandle,
@@ -518,6 +542,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_set_recv_timeout(
     rc
 }
 
+/// ConnectionOption: get communication recv timeout.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_get_recv_timeout(
     context: TsurugiFfiContextHandle,
@@ -554,6 +579,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_recv_timeout(
     rc
 }
 
+/// Dispose connection option instance.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_dispose(
     connection_option: TsurugiFfiConnectionOptionHandle,

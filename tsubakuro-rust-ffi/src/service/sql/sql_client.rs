@@ -74,8 +74,10 @@ impl std::ops::DerefMut for TsurugiFfiSqlClient {
     }
 }
 
+/// SqlClient.
 pub type TsurugiFfiSqlClientHandle = *mut TsurugiFfiSqlClient;
 
+/// SqlClient: get service message version.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
     context: TsurugiFfiContextHandle,
@@ -109,6 +111,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
     rc
 }
 
+/// SqlClient: list tables.
+///
+/// # Returns
+/// - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     context: TsurugiFfiContextHandle,
@@ -144,6 +150,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     rc
 }
 
+/// SqlClient: list tables.
+///
+/// # Returns
+/// - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
     context: TsurugiFfiContextHandle,
@@ -187,6 +197,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
     rc
 }
 
+/// SqlClient: list tables.
+///
+/// # Returns
+/// - `table_list_job_out` - Job for `TsurugiFfiTableListHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
     context: TsurugiFfiContextHandle,
@@ -241,6 +255,10 @@ impl TableListJobDelegator {
     }
 }
 
+/// SqlClient: get table metadata.
+///
+/// # Returns
+/// - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     context: TsurugiFfiContextHandle,
@@ -289,6 +307,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     rc
 }
 
+/// SqlClient: get table metadata.
+///
+/// # Returns
+/// - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
     context: TsurugiFfiContextHandle,
@@ -340,6 +362,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
     rc
 }
 
+/// SqlClient: get table metadata.
+///
+/// # Returns
+/// - `table_metadata_job_out` - Job for `TsurugiFfiTableMetadataHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_async(
     context: TsurugiFfiContextHandle,
@@ -422,6 +448,10 @@ macro_rules! convert_placeholders {
     };
 }
 
+/// SqlClient: create prepared statement.
+///
+/// # Returns
+/// - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     context: TsurugiFfiContextHandle,
@@ -482,6 +512,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     rc
 }
 
+/// SqlClient: create prepared statement.
+///
+/// # Returns
+/// - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     context: TsurugiFfiContextHandle,
@@ -545,6 +579,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     rc
 }
 
+/// SqlClient: create prepared statement.
+///
+/// # Returns
+/// - `prepared_statement_job_out` - Job for `TsurugiFfiSqlPreparedStatementHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     context: TsurugiFfiContextHandle,
@@ -622,6 +660,10 @@ impl SqlPreparedStatementJobDelegator {
     }
 }
 
+/// SqlClient: Retrieves execution plan of the statement.
+///
+/// # Returns
+/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_explain(
     context: TsurugiFfiContextHandle,
@@ -665,6 +707,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_explain(
     rc
 }
 
+/// SqlClient: Retrieves execution plan of the statement.
+///
+/// # Returns
+/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_explain_for(
     context: TsurugiFfiContextHandle,
@@ -716,6 +762,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_explain_for(
     rc
 }
 
+/// SqlClient: Retrieves execution plan of the statement.
+///
+/// # Returns
+/// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_explain_async(
     context: TsurugiFfiContextHandle,
@@ -796,6 +846,10 @@ macro_rules! convert_parameters {
     };
 }
 
+/// SqlClient: Retrieves execution plan of the statement.
+///
+/// # Returns
+/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
     context: TsurugiFfiContextHandle,
@@ -853,6 +907,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
     rc
 }
 
+/// SqlClient: Retrieves execution plan of the statement.
+///
+/// # Returns
+/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
     context: TsurugiFfiContextHandle,
@@ -913,6 +971,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
     rc
 }
 
+/// SqlClient: Retrieves execution plan of the statement.
+///
+/// # Returns
+/// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
     context: TsurugiFfiContextHandle,
@@ -974,6 +1036,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
     rc
 }
 
+/// SqlClient: start transaction.
+///
+/// # Returns
+/// - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     context: TsurugiFfiContextHandle,
@@ -1018,6 +1084,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     rc
 }
 
+/// SqlClient: start transaction.
+///
+/// # Returns
+/// - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
     context: TsurugiFfiContextHandle,
@@ -1065,6 +1135,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
     rc
 }
 
+/// SqlClient: start transaction.
+///
+/// # Returns
+/// - `transaction_job_out` - Job for `TsurugiFfiTransactionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
     context: TsurugiFfiContextHandle,
@@ -1129,6 +1203,10 @@ impl TransactionJobDelegator {
     }
 }
 
+/// SqlClient: get transaction status.
+///
+/// # Returns
+/// - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
     context: TsurugiFfiContextHandle,
@@ -1177,6 +1255,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
     rc
 }
 
+/// SqlClient: get transaction status.
+///
+/// # Returns
+/// - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
     context: TsurugiFfiContextHandle,
@@ -1228,6 +1310,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
     rc
 }
 
+/// SqlClient: get transaction status.
+///
+/// # Returns
+/// - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_async(
     context: TsurugiFfiContextHandle,
