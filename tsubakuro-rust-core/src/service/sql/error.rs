@@ -2,6 +2,7 @@ use crate::error::DiagnosticCode;
 
 use super::SERVICE_ID_SQL;
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! sql_service_error {
     ($function_name:expr, $cause:expr) => {{
@@ -95,6 +96,7 @@ fn to_sql_service_diagnostic_code_number(code: crate::jogasaki::proto::sql::erro
     }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! broken_relation_error {
     ($function_name:expr, $message:expr) => {
@@ -102,6 +104,7 @@ macro_rules! broken_relation_error {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! broken_encoding_error {
     ($function_name:expr, $message:expr) => {

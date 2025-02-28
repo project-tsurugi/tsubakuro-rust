@@ -36,6 +36,7 @@ impl Timeout {
     }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! return_err_if_timeout {
     ($timeout:expr, $function_name:expr) => {

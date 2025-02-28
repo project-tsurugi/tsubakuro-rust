@@ -28,7 +28,7 @@ impl From<String> for TgClob {
     }
 }
 
-/// CLOB for [SqlQueryResult].
+/// CLOB for [SqlQueryResult](crate::prelude::SqlQueryResult).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TgClobReference {
     provider: LargeObjectProvider,

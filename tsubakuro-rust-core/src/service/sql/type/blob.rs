@@ -21,7 +21,7 @@ impl From<Vec<u8>> for TgBlob {
     }
 }
 
-/// BLOB for [SqlQueryResult].
+/// BLOB for [SqlQueryResult](crate::prelude::SqlQueryResult).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TgBlobReference {
     provider: LargeObjectProvider,

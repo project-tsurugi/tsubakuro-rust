@@ -364,6 +364,7 @@ impl<T> Job<T> {
     }
 
     /// for debug
+    #[doc(hidden)]
     pub fn set_fail_on_drop_error(&mut self, value: bool) {
         self.fail_on_drop_error = value;
     }

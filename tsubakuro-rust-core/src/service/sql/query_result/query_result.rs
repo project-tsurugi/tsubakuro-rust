@@ -155,7 +155,7 @@ impl SqlQueryResult {
     /// Advances the cursor to the head of the next row.
     ///
     /// If this operation was succeeded (returns `true`), this cursor points the head of the next row.
-    /// After this operation, you need to invoke [`next_column`] to retrieve the first column data of the next row.
+    /// After this operation, you need to invoke [`Self::next_column`] to retrieve the first column data of the next row.
     pub async fn next_row(&mut self) -> Result<bool, TgError> {
         self.next_row_for(self.default_timeout).await
     }
@@ -163,7 +163,7 @@ impl SqlQueryResult {
     /// Advances the cursor to the head of the next row.
     ///
     /// If this operation was succeeded (returns `true`), this cursor points the head of the next row.
-    /// After this operation, you need to invoke [`next_column`] to retrieve the first column data of the next row.
+    /// After this operation, you need to invoke [`Self::next_column`] to retrieve the first column data of the next row.
     pub async fn next_row_for(&mut self, timeout: Duration) -> Result<bool, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.next_row(&timeout).await
@@ -172,7 +172,7 @@ impl SqlQueryResult {
     /// Advances the cursor to the next column in the current row.
     ///
     /// If this operation was succeeded (returns `true`), this cursor will point to the next column of the row.
-    /// You can invoke [`fetch`] method to obtain the column value.
+    /// You can invoke [`Self::fetch`] method to obtain the column value.
     pub async fn next_column(&mut self) -> Result<bool, TgError> {
         self.next_column_for(self.default_timeout).await
     }
@@ -180,7 +180,7 @@ impl SqlQueryResult {
     /// Advances the cursor to the next column in the current row.
     ///
     /// If this operation was succeeded (returns `true`), this cursor will point to the next column of the row.
-    /// You can invoke [`fetch`] method to obtain the column value.
+    /// You can invoke [`Self::fetch`] method to obtain the column value.
     pub async fn next_column_for(&mut self, timeout: Duration) -> Result<bool, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.next_column(&timeout).await

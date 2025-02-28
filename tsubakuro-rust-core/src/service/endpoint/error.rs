@@ -2,6 +2,7 @@ use crate::{error::DiagnosticCode, service::core::error::to_core_service_diagnos
 
 use super::endpoint_broker::SERVICE_ID_ENDPOINT_BROKER;
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! endpoint_service_error {
     ($function_name:expr, $cause:expr) => {{

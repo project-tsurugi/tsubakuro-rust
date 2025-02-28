@@ -155,6 +155,7 @@ impl std::fmt::Display for DiagnosticCode {
     }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! client_error {
     ($message:expr) => {
@@ -165,6 +166,7 @@ macro_rules! client_error {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! illegal_argument_error {
     ($message:expr) => {
@@ -172,6 +174,7 @@ macro_rules! illegal_argument_error {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! io_error {
     ($message:expr) => {
@@ -182,6 +185,7 @@ macro_rules! io_error {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! timeout_error {
     ($function_name:expr) => {
@@ -189,6 +193,7 @@ macro_rules! timeout_error {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! invalid_response_error {
     ($function_name:expr, $message:expr $(,)?) => {
@@ -196,6 +201,7 @@ macro_rules! invalid_response_error {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! prost_decode_error {
     ($function_name:expr, $data_name:expr, $cause:expr) => {

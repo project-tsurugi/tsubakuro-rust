@@ -25,6 +25,9 @@ pub enum Endpoint {
 
 impl Endpoint {
     /// parse endoint url.
+    ///
+    /// # Parameters
+    /// - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
     pub fn parse(endoint: &str) -> Result<Endpoint, TgError> {
         let url = Url::parse(endoint).map_err(|e| client_error!("endpoint parse error", e))?;
         let scheme = url.scheme();

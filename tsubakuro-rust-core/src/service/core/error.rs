@@ -1,5 +1,6 @@
 use crate::error::DiagnosticCode;
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! core_service_error {
     ($function_name:expr, $cause:expr) => {{

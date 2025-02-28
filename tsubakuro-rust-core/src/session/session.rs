@@ -243,6 +243,7 @@ impl Session {
     }
 
     /// for debug
+    #[doc(hidden)]
     pub fn set_fail_on_drop_error(&self, value: bool) {
         self.fail_on_drop_error
             .store(value, std::sync::atomic::Ordering::SeqCst);

@@ -57,6 +57,9 @@ impl ConnectionOption {
     }
 
     /// set endpoint.
+    ///
+    /// # Parameters
+    /// - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
     pub fn set_endpoint_url(&mut self, endpoint: &str) -> Result<(), TgError> {
         let endpoint = Endpoint::parse(endpoint)?;
         self.set_endpoint(endpoint);

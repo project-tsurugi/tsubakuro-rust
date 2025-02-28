@@ -53,6 +53,7 @@ impl WireResponseError {
     }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! prost_decode_wire_response_error {
     ($function_name:expr, $data_name:expr, $cause:expr) => {
@@ -64,6 +65,7 @@ macro_rules! prost_decode_wire_response_error {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! core_service_wire_response_error {
     ($function_name:expr, $cause:expr) => {

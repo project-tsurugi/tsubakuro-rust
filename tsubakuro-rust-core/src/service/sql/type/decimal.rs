@@ -11,7 +11,7 @@ impl TgDecimal {
     }
 }
 
-/// Decimal for [SqlQueryResult].
+/// Decimal for [SqlQueryResult](crate::prelude::SqlQueryResult).
 #[derive(Debug, Clone)]
 pub struct TgDecimalResult {
     /// unscaled value
