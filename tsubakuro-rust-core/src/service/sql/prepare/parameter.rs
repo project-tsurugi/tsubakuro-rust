@@ -30,7 +30,7 @@ impl SqlParameter {
         SqlParameter::new(name, None)
     }
 
-    /// get name.
+    /// Get name.
     pub fn name(&self) -> Option<&String> {
         match self.placement {
             Some(Placement::Name(ref name)) => Some(name),
@@ -38,7 +38,7 @@ impl SqlParameter {
         }
     }
 
-    /// get value.
+    /// Get value.
     pub fn value(&self) -> Option<&Value> {
         self.value.as_ref()
     }

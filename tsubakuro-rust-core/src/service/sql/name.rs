@@ -21,7 +21,7 @@ impl TName {
         TName { identifiers }
     }
 
-    /// get identifiers.
+    /// Get identifiers.
     pub fn identifiers(&self) -> &Vec<String> {
         &self.identifiers
     }

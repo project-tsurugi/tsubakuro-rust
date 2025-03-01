@@ -10,6 +10,6 @@ pub mod sql;
 pub trait ServiceClient {
     /// Creates a new instance.
     ///
-    /// see [Session::make_client]
+    /// See [Session::make_client]
     fn new(session: Arc<Session>) -> Self;
 }

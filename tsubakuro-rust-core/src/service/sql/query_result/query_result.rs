@@ -84,12 +84,12 @@ impl SqlQueryResult {
         }
     }
 
-    /// set default timeout.
+    /// Set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }
 
-    /// get default timeout.
+    /// Get default timeout.
     pub fn default_timeout(&mut self) -> &Duration {
         &self.default_timeout
     }

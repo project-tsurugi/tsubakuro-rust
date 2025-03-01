@@ -78,7 +78,7 @@ impl std::error::Error for TgError {
 }
 
 impl TgError {
-    /// get error message.
+    /// Get error message.
     pub fn message(&self) -> &String {
         match self {
             TgError::ClientError(message, _cause) => message,
@@ -88,7 +88,7 @@ impl TgError {
         }
     }
 
-    /// get diagnostic code of ServerError.
+    /// Get diagnostic code of ServerError.
     pub fn diagnostic_code(&self) -> Option<&DiagnosticCode> {
         match self {
             TgError::ClientError(_, _) => None,
@@ -123,27 +123,27 @@ impl DiagnosticCode {
         }
     }
 
-    /// get error category.
+    /// Get error category.
     pub fn category_number(&self) -> i32 {
         self.category_number
     }
 
-    /// get error category.
+    /// Get error category.
     pub fn category_str(&self) -> &String {
         &self.category_str
     }
 
-    /// get error code.
+    /// Get error code.
     pub fn code_number(&self) -> i32 {
         self.code_number
     }
 
-    /// get structured error code.
+    /// Get structured error code.
     pub fn structured_code(&self) -> String {
         format!("{}-{:05}", self.category_str, self.code_number)
     }
 
-    /// get error name.
+    /// Get error name.
     pub fn name(&self) -> &String {
         &self.name
     }

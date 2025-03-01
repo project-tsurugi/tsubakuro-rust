@@ -31,7 +31,7 @@
 //!
 //! # Examples
 //!
-//! see [Example](https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core#example).
+//! See <https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core#example>.
 //!
 #![allow(clippy::result_large_err)]
 pub mod error;

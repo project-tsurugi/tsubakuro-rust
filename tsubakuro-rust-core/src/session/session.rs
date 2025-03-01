@@ -19,6 +19,8 @@ use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
 
 /// Represents a connection to Tsurugi server.
 ///
+/// Note: Should invoke [`Self::close`] before [`Self::drop`] to dispose the session.
+///
 /// # Examples
 /// ```
 /// use tsubakuro_rust_core::prelude::*;
@@ -37,6 +39,8 @@ use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
 ///     Ok(())
 /// }
 /// ```
+///
+/// See [SqlClient](crate::prelude::SqlClient).
 #[derive(Debug)]
 pub struct Session {
     wire: Arc<Wire>,
@@ -47,12 +51,29 @@ pub struct Session {
 
 impl Session {
     /// Establishes a connection to the Tsurugi server.
+    ///
+    /// Note: Should invoke [`Self::close`] before [`Self::drop`] to dispose the session.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(connection_option: ConnectionOption) -> Result<(), TgError> {
+    ///     let session = Session::connect(&connection_option).await?;
+    ///     let client: SqlClient = session.make_client();
+    ///
+    ///     session.close().await;
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn connect(connection_option: &ConnectionOption) -> Result<Arc<Session>, TgError> {
         let timeout = connection_option.default_timeout();
         Self::connect_for(connection_option, timeout).await
     }
 
     /// Establishes a connection to the Tsurugi server.
+    ///
+    /// Note: Should invoke [`Self::close`] before [`Self::drop`] to dispose the session.
     pub async fn connect_for(
         connection_option: &ConnectionOption,
         timeout: Duration,
@@ -76,6 +97,8 @@ impl Session {
     }
 
     /// Establishes a connection to the Tsurugi server.
+    ///
+    /// Note: Should invoke [`Self::close`] before [`Self::drop`] to dispose the session.
     pub async fn connect_async(
         connection_option: &ConnectionOption,
     ) -> Result<Job<Arc<Session>>, TgError> {
@@ -113,13 +136,13 @@ impl Session {
         Ok((endpoint, client_information))
     }
 
-    /// set default timeout.
+    /// Set default timeout.
     pub fn set_default_timeout(&self, timeout: Duration) {
         let mut default_timeout = self.default_timeout.write().unwrap();
         *default_timeout = timeout;
     }
 
-    /// get default timeout.
+    /// Get default timeout.
     pub fn default_timeout(&self) -> Duration {
         let default_timeout = self.default_timeout.read().unwrap();
         *default_timeout
@@ -233,6 +256,8 @@ impl Session {
     ///
     /// This may not wait for complete the ongoing requests, and it may cause the requests may still be in progress after disconnected from the session.
     /// You can use [Self::shutdown] to safely close this session with waiting for complete the ongoing requests, if any.
+    ///
+    /// Note: Should invoke `close` before [`Self::drop`] to dispose the session.
     pub async fn close(&self) -> Result<(), TgError> {
         self.wire.close().await
     }

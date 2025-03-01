@@ -1,6 +1,44 @@
 use crate::jogasaki::proto::sql::request::CommitStatus as CommitType;
 
 /// Commit option.
+///
+/// See [SqlClient::commit()](crate::prelude::SqlClient::commit).
+///
+/// # Examples
+///
+/// ## Stored
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut commit_option = CommitOption::new();
+/// commit_option.set_commit_type(CommitType::Stored);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let commit_option = CommitOption::from(CommitType::Stored);
+/// ```
+///
+/// ## Default
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut commit_option = CommitOption::new();
+/// commit_option.set_commit_type(CommitType::Unspecified);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let commit_option = CommitOption::from(CommitType::Unspecified);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let transaction_option = TransactionOption::default();
+/// ```
 #[derive(Debug, Clone)]
 pub struct CommitOption {
     commit_type: CommitType,
@@ -22,22 +60,22 @@ impl CommitOption {
         }
     }
 
-    /// set commit type.
+    /// Set commit type.
     pub fn set_commit_type(&mut self, commit_type: CommitType) {
         self.commit_type = commit_type;
     }
 
-    /// get commit type.
+    /// Get commit type.
     pub fn commit_type(&self) -> CommitType {
         self.commit_type
     }
 
-    /// set auto dispose.
+    /// Set auto dispose.
     pub fn set_auto_dispose(&mut self, auto_dispose: bool) {
         self.auto_dispose = auto_dispose;
     }
 
-    /// get auto dispose.
+    /// Get auto dispose.
     pub fn auto_dispose(&self) -> bool {
         self.auto_dispose
     }

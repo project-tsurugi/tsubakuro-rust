@@ -8,6 +8,76 @@ use crate::jogasaki::proto::sql::request::WritePreserve;
 use crate::util::string_to_prost_string;
 
 /// Transaction option.
+///
+/// See [SqlClient::start_transaction()](crate::prelude::SqlClient::start_transaction).
+///
+/// # Examples
+///
+/// ## OCC
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut transaction_option = TransactionOption::new();
+/// transaction_option.set_transaction_type(TransactionType::Short);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let transaction_option = TransactionOption::from(TransactionType::Short);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let transaction_option = TransactionOption::default();
+/// ```
+///
+/// # LTX
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut transaction_option = TransactionOption::new();
+/// transaction_option.set_transaction_type(TransactionType::Long);
+/// transaction_option.set_write_preserve(&["table1", "table2"]);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut transaction_option = TransactionOption::from(TransactionType::Long);
+/// transaction_option.set_write_preserve(&["table1", "table2"]);
+/// ```
+///
+/// ## DDL(LTX)
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut transaction_option = TransactionOption::new();
+/// transaction_option.set_transaction_type(TransactionType::Long);
+/// transaction_option.set_modifies_definitions(true);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut transaction_option = TransactionOption::from(TransactionType::Long);
+/// transaction_option.set_modifies_definitions(true);
+/// ```
+///
+/// ## RTX
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let mut transaction_option = TransactionOption::new();
+/// transaction_option.set_transaction_type(TransactionType::ReadOnly);
+/// ```
+///
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// let transaction_option = TransactionOption::from(TransactionType::ReadOnly);
+/// ```
 #[derive(Debug, Clone)]
 pub struct TransactionOption {
     transaction_type: TransactionType,
@@ -51,62 +121,62 @@ impl From<TransactionType> for TransactionOption {
 }
 
 impl TransactionOption {
-    /// set transaction type.
+    /// Set transaction type.
     pub fn set_transaction_type(&mut self, transaction_type: TransactionType) {
         self.transaction_type = transaction_type;
     }
 
-    /// get transaction type.
+    /// Get transaction type.
     pub fn transaction_type(&self) -> TransactionType {
         self.transaction_type
     }
 
-    /// get transaction label.
+    /// Get transaction label.
     pub fn transaction_label(&self) -> Option<&String> {
         self.transaction_label.as_ref()
     }
 
-    /// set modifies definitions.
+    /// Set modifies definitions.
     pub fn set_modifies_definitions(&mut self, modifies_definitions: bool) {
         self.modifies_definitions = modifies_definitions;
     }
 
-    /// get modifies definitions.
+    /// Get modifies definitions.
     pub fn modifies_definitions(&self) -> bool {
         self.modifies_definitions
     }
 
-    /// get write preserve.
+    /// Get write preserve.
     pub fn write_preserve(&self) -> &Vec<String> {
         &self.write_preserve
     }
 
-    /// get inclusive read area.
+    /// Get inclusive read area.
     pub fn inclusive_read_area(&self) -> &Vec<String> {
         &self.inclusive_read_area
     }
 
-    /// get exclusive read area.
+    /// Get exclusive read area.
     pub fn exclusive_read_area(&self) -> &Vec<String> {
         &self.exclusive_read_area
     }
 
-    /// set priority.
+    /// Set priority.
     pub fn set_priority(&mut self, priority: TransactionPriority) {
         self.priority = priority;
     }
 
-    /// get priority.
+    /// Get priority.
     pub fn priority(&self) -> TransactionPriority {
         self.priority
     }
 
-    /// set close timeout.
+    /// Set close timeout.
     pub fn set_close_timeout(&mut self, timeout: Duration) {
         self.close_timeout = Some(timeout);
     }
 
-    /// get close timeout.
+    /// Get close timeout.
     pub fn close_timeout(&self) -> Option<Duration> {
         self.close_timeout
     }
@@ -114,16 +184,16 @@ impl TransactionOption {
 
 /// Transaction option setter for String.
 pub trait TransactionOptionSetter<T> {
-    /// set transaction label.
+    /// Set transaction label.
     fn set_transaction_label(&mut self, transaction_label: T);
 
-    /// set write preserve.
+    /// Set write preserve.
     fn set_write_preserve(&mut self, table_names: &[T]);
 
-    /// set inclusive read area.
+    /// Set inclusive read area.
     fn set_inclusive_read_area(&mut self, table_names: &[T]);
 
-    /// set exclusive read area.
+    /// Set exclusive read area.
     fn set_exclusive_read_area(&mut self, table_names: &[T]);
 }
 

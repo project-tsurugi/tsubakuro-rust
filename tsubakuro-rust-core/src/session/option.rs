@@ -6,6 +6,8 @@ use super::endpoint::Endpoint;
 
 /// Option to connect to Tsurugi server.
 ///
+/// See [Session::connect()](crate::prelude::Session::connect).
+///
 /// # Examples
 /// ```
 /// use tsubakuro_rust_core::prelude::*;
@@ -51,12 +53,12 @@ impl ConnectionOption {
         }
     }
 
-    /// set endpoint.
+    /// Set endpoint.
     pub fn set_endpoint(&mut self, endpoint: Endpoint) {
         self.endpoint = Some(endpoint);
     }
 
-    /// set endpoint.
+    /// Set endpoint.
     ///
     /// # Parameters
     /// - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
@@ -66,69 +68,69 @@ impl ConnectionOption {
         Ok(())
     }
 
-    /// get endpoint.
+    /// Get endpoint.
     pub fn endpoint(&self) -> Option<&Endpoint> {
         self.endpoint.as_ref()
     }
 
-    /// set application name.
+    /// Set application name.
     pub fn set_application_name(&mut self, name: &str) {
         self.application_name = Some(name.to_string());
     }
 
-    /// get application name.
+    /// Get application name.
     pub fn application_name(&self) -> Option<&String> {
         self.application_name.as_ref()
     }
 
-    /// set session label.
+    /// Set session label.
     pub fn set_session_label(&mut self, label: &str) {
         self.session_label = Some(label.to_string());
     }
 
-    /// get session label
+    /// Get session label
     pub fn session_label(&self) -> Option<&String> {
         self.session_label.as_ref()
     }
 
-    /// set keep alive interval.
+    /// Set keep alive interval.
     ///
     /// Do not keep alive when `keep_alive` is 0.
     pub fn set_keep_alive(&mut self, keep_alive: Duration) {
         self.keep_alive = keep_alive;
     }
 
-    /// get keep alive interval.
+    /// Get keep alive interval.
     pub fn keep_alive(&self) -> Duration {
         self.keep_alive
     }
 
-    /// set default timeout.
+    /// Set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }
 
-    /// get default timeout.
+    /// Get default timeout.
     pub fn default_timeout(&self) -> Duration {
         self.default_timeout
     }
 
-    /// set communication send timeout.
+    /// Set communication send timeout.
     pub fn set_send_timeout(&mut self, timeout: Duration) {
         self.send_timeout = timeout;
     }
 
-    /// get communication send timeout.
+    /// Get communication send timeout.
     pub fn send_timeout(&self) -> Duration {
         self.send_timeout
     }
 
-    /// set communication recv timeout.
+    /// Set communication recv timeout.
     pub fn set_recv_timeout(&mut self, timeout: Duration) {
         self.recv_timeout = timeout;
     }
 
-    /// get communication recv timeout.
+    /// Get communication recv timeout.
     pub fn recv_timeout(&self) -> Duration {
         self.recv_timeout
     }

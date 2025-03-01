@@ -20,14 +20,22 @@ use crate::{
 
 /// Transaction.
 ///
+/// See [SqlClient::start_transaction()](crate::prelude::SqlClient::start_transaction),
+/// [execute()](crate::prelude::SqlClient::execute),
+/// [query()](crate::prelude::SqlClient::query),
+/// [commit()](crate::prelude::SqlClient::commit),
+/// [rollback()](crate::prelude::SqlClient::rollback).
+///
+/// Note: Should invoke [`Self::close`] before [`Self::drop`] to dispose the transaction.
+///
 /// # Examples
 /// ```
 /// use tsubakuro_rust_core::prelude::*;
 ///
 /// async fn example(client: &SqlClient) -> Result<(), TgError> {
-///     let mut tx_option = TransactionOption::new();
-///     tx_option.set_transaction_type(TransactionType::Short); // OCC
-///     let transaction = client.start_transaction(&tx_option).await?;
+///     let mut transaction_option = TransactionOption::new();
+///     transaction_option.set_transaction_type(TransactionType::Short); // OCC
+///     let transaction = client.start_transaction(&transaction_option).await?;
 ///
 ///     let mut result: Result<(), TgError> = todo!(); // execute SQL using transaction
 ///
@@ -81,22 +89,26 @@ impl Transaction {
         &self.transaction_id
     }
 
-    /// set close timeout.
+    /// Set close timeout.
     pub fn set_close_timeout(&mut self, timeout: Duration) {
         self.close_timeout = timeout;
     }
 
-    /// get close timeout.
+    /// Get close timeout.
     pub fn close_timeout(&self) -> Duration {
         self.close_timeout
     }
 
     /// Disposes this resource.
+    ///
+    /// Note: Should invoke `close` before [`Self::drop`] to dispose the transaction.
     pub async fn close(&self) -> Result<(), TgError> {
         self.close_for(self.close_timeout).await
     }
 
     /// Disposes this resource.
+    ///
+    /// Note: Should invoke `close_for` before [`Self::drop`] to dispose the transaction.
     pub async fn close_for(&self, timeout: Duration) -> Result<(), TgError> {
         if self
             .closed

@@ -85,12 +85,12 @@ impl<T> Job<T> {
         }
     }
 
-    /// get job name.
+    /// Get job name.
     pub fn name(&self) -> &String {
         &self.name
     }
 
-    /// set default timeout.
+    /// Set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }

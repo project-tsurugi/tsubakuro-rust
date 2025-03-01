@@ -17,6 +17,12 @@ use crate::{
 
 /// Prepared statement.
 ///
+/// See [SqlClient::prepare()](crate::prelude::SqlClient::prepare),
+/// [prepared_execute()](crate::prelude::SqlClient::prepared_execute),
+/// [prepared_query()](crate::prelude::SqlClient::prepared_query).
+///
+/// Note: Should invoke [`Self::close`] before [`Self::drop`] to dispose the prepared statement.
+///
 /// # Examples
 /// ```
 /// use tsubakuro_rust_core::prelude::*;
@@ -71,22 +77,26 @@ impl SqlPreparedStatement {
         self.has_result_records
     }
 
-    /// set close timeout.
+    /// Set close timeout.
     pub fn set_close_timeout(&mut self, timeout: Duration) {
         self.close_timeout = timeout;
     }
 
-    /// get close timeout.
+    /// Set close timeout.
     pub fn close_timeout(&self) -> Duration {
         self.close_timeout
     }
 
     /// Disposes this resource.
+    ///
+    /// Note: Should invoke `close` before [`Self::drop`] to dispose the prepared statement.
     pub async fn close(&self) -> Result<(), TgError> {
         self.close_for(self.close_timeout).await
     }
 
     /// Disposes this resource.
+    ///
+    /// Note: Should invoke `close_for` before [`Self::drop`] to dispose the prepared statement.
     pub async fn close_for(&self, timeout: Duration) -> Result<(), TgError> {
         if self
             .closed

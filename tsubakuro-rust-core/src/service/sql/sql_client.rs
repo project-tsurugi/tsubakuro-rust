@@ -51,21 +51,35 @@ pub(crate) const SERVICE_ID_SQL: i32 = 3;
 ///
 /// # Examples
 /// ```
+/// use std::sync::Arc;
 /// use tsubakuro_rust_core::prelude::*;
 ///
-/// async fn example() -> Result<(), TgError> {
-///     let mut connection_option = ConnectionOption::new();
-///     connection_option.set_endpoint_url("tcp://localhost:12345");
-///     connection_option.set_application_name("Tsubakuro/Rust example");
-///     connection_option.set_session_label("example session");
-///     connection_option.set_default_timeout(std::time::Duration::from_secs(10));
-///
-///     let session = Session::connect(&connection_option).await?;
+/// async fn example(session: &Arc<Session>) -> Result<(), TgError> {
 ///     let client: SqlClient = session.make_client();
 ///
-///     let table_list = client.list_tables().await?;
+///     // In Tsurugi, DDL is also executed in a transaction.
+///     // (DDL and DML must not be executed in the same transaction)
+///     let transaction = client.start_transaction(&TransactionOption::default()).await?;
+///     let result = {
+///         let sql = "
+///           create table customer (
+///             c_id bigint primary key,
+///             c_name varchar(30) not null,
+///             c_age int
+///           )
+///         ";
+///         let result = client.execute(&transaction, sql).await;
+///         match result {
+///            Ok(_) => client.commit(&transaction, &CommitOption::default()).await,
+///            Err(e) => Err(e)
+///         }
+///     };
+///     transaction.close().await?;
+///     result?;
 ///
-///     session.close().await;
+///     let table_list = client.list_tables().await?;
+///     let table_metadata = client.get_table_metadata("customer").await?;
+///
 ///     Ok(())
 /// }
 /// ```
@@ -85,7 +99,7 @@ impl ServiceClient for SqlClient {
 }
 
 impl SqlClient {
-    /// get service message version.
+    /// Get service message version.
     pub fn service_message_version() -> String {
         format!(
             "{}-{}.{}",
@@ -93,12 +107,12 @@ impl SqlClient {
         )
     }
 
-    /// set default timeout.
+    /// Set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
     }
 
-    /// get default timeout.
+    /// Get default timeout.
     pub fn default_timeout(&self) -> Duration {
         self.default_timeout
     }
@@ -109,6 +123,22 @@ impl SqlClient {
     ///
     /// The table names are each fully qualified (maybe with a schema name).
     /// To retrieve more details for the individual tables, you can use [Self::get_table_metadata].
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient) -> Result<(), TgError> {
+    ///     let table_list = client.list_tables().await?;
+    ///
+    ///     let table_names = table_list.table_names();
+    ///     for table_name in table_names {
+    ///         println!("{}", table_name);
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn list_tables(&self) -> Result<TableList, TgError> {
         let timeout = self.default_timeout;
         self.list_tables_for(timeout).await
@@ -153,6 +183,23 @@ impl SqlClient {
     }
 
     /// Retrieves metadata for a table.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient) -> Result<(), TgError> {
+    ///     let table_metadata = client.get_table_metadata("customer").await?;
+    ///     println!("table name={}", table_metadata.table_name());
+    ///
+    ///     let columns = table_metadata.columns();
+    ///     for column in columns {
+    ///         println!("column name={}", column.name());
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn get_table_metadata(&self, table_name: &str) -> Result<TableMetadata, TgError> {
         let timeout = self.default_timeout;
         self.get_table_metadata_for(table_name, timeout).await
@@ -205,6 +252,26 @@ impl SqlClient {
     }
 
     /// Prepares a SQL statement.
+    ///
+    /// Note: Should invoke [`SqlPreparedStatement::close`] before [`SqlPreparedStatement::drop`] to dispose the prepared statement.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient) -> Result<(), TgError> {
+    ///     let sql = "insert into customer values(:id, :name, :age)";
+    ///     let placeholders = vec![
+    ///         SqlPlaceholder::of::<i64>("id"),
+    ///         SqlPlaceholder::of::<String>("name"),
+    ///         SqlPlaceholder::of::<i32>("age"),
+    ///     ];
+    ///     let prepared_statement = client.prepare(sql, placeholders).await?;
+    ///
+    ///     prepared_statement.close().await?;
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn prepare(
         &self,
         sql: &str,
@@ -215,6 +282,8 @@ impl SqlClient {
     }
 
     /// Prepares a SQL statement.
+    ///
+    /// Note: Should invoke [`SqlPreparedStatement::close`] before [`SqlPreparedStatement::drop`] to dispose the prepared statement.
     pub async fn prepare_for(
         &self,
         sql: &str,
@@ -236,6 +305,8 @@ impl SqlClient {
     }
 
     /// Prepares a SQL statement.
+    ///
+    /// Note: Should invoke [`SqlPreparedStatement::close`] before [`SqlPreparedStatement::drop`] to dispose the prepared statement.
     pub async fn prepare_async(
         &self,
         sql: &str,
@@ -318,6 +389,19 @@ impl SqlClient {
     }
 
     /// Retrieves execution plan of the statement.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient) -> Result<(), TgError> {
+    ///     let sql = "select * from customer oder by c_id";
+    ///     let explain_result = client.explain(sql).await?;
+    ///     println!("json={}", explain_result.contents());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn explain(&self, sql: &str) -> Result<SqlExplainResult, TgError> {
         let timeout = self.default_timeout;
         self.explain_for(sql, timeout).await
@@ -363,6 +447,20 @@ impl SqlClient {
     }
 
     /// Retrieves execution plan of the statement.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, prepared_statement: &SqlPreparedStatement) -> Result<(), TgError> {
+    ///     // prepared_statement: "select * from customer where c_id = :id"
+    ///     let parameters = vec![SqlParameter::of("id", 3_i64)];
+    ///     let explain_result = client.prepared_explain(prepared_statement, parameters).await?;
+    ///     println!("json={}", explain_result.contents());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn prepared_explain(
         &self,
         prepared_statement: &SqlPreparedStatement,
@@ -427,6 +525,23 @@ impl SqlClient {
     }
 
     /// Starts a new transaction.
+    ///
+    /// Note: Should invoke [`Transaction::close`] before [`Transaction::drop`] to dispose the transaction.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction_option: &TransactionOption) -> Result<(), TgError> {
+    ///     let transaction = client.start_transaction(transaction_option).await?;
+    ///
+    ///     let result = client.commit(&transaction, &CommitOption::default()).await;
+    ///
+    ///     transaction.close().await?;
+    ///
+    ///     result
+    /// }
+    /// ```
     pub async fn start_transaction(
         &self,
         transaction_option: &TransactionOption,
@@ -437,6 +552,8 @@ impl SqlClient {
     }
 
     /// Starts a new transaction.
+    ///
+    /// Note: Should invoke [`Transaction::close`] before [`Transaction::drop`] to dispose the transaction.
     pub async fn start_transaction_for(
         &self,
         transaction_option: &TransactionOption,
@@ -459,6 +576,8 @@ impl SqlClient {
     }
 
     /// Starts a new transaction.
+    ///
+    /// Note: Should invoke [`Transaction::close`] before [`Transaction::drop`] to dispose the transaction.
     pub async fn start_transaction_async(
         &self,
         transaction_option: &TransactionOption,
@@ -496,6 +615,22 @@ impl SqlClient {
     }
 
     /// Returns occurred error in the target transaction.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+    ///     let status = client.get_transaction_status(transaction).await?;
+    ///     println!("is_error={}", status.is_error());
+    ///
+    ///     if let Some(code) = status.diagnostic_code() {
+    ///         println!("diagnostic_code={}", code);
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn get_transaction_status(
         &self,
         transaction: &Transaction,
@@ -554,6 +689,19 @@ impl SqlClient {
     }
 
     /// Executes a SQL statement.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+    ///     let sql = "insert into customer values(4, 'example', 20)";
+    ///     let execute_result = client.execute(&transaction, sql).await?;
+    ///     println!("inserted rows={}", execute_result.inserted_rows());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn execute(
         &self,
         transaction: &Transaction,
@@ -615,6 +763,24 @@ impl SqlClient {
     }
 
     /// Executes a SQL statement.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, prepared_statement: &SqlPreparedStatement) -> Result<(), TgError> {
+    ///     // prepared_statement: "insert into customer values(:id, :name, :age)"
+    ///     let parameters = vec![
+    ///         SqlParameter::of("id", 4_i64),
+    ///         SqlParameter::of("name", "example"),
+    ///         SqlParameter::of("age", 20),
+    ///     ];
+    ///     let execute_result = client.prepared_execute(&transaction, prepared_statement, parameters).await?;
+    ///     println!("inserted rows={}", execute_result.inserted_rows());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn prepared_execute(
         &self,
         transaction: &Transaction,
@@ -693,6 +859,30 @@ impl SqlClient {
     }
 
     /// Executes a SQL statement and retrieve its result.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+    ///     let sql = "select c_id, c_name, c_age from customer order by c_id";
+    ///     let mut query_result = client.query(&transaction, sql).await?;
+    ///
+    ///     while query_result.next_row().await? {
+    ///         if query_result.next_column().await? {
+    ///             let id: i64 = query_result.fetch().await?;
+    ///         }
+    ///         if query_result.next_column().await? {
+    ///             let name: String = query_result.fetch().await?;
+    ///         }
+    ///         if query_result.next_column().await? {
+    ///             let age: i32 = query_result.fetch().await?;
+    ///         }
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn query(
         &self,
         transaction: &Transaction,
@@ -766,6 +956,31 @@ impl SqlClient {
     }
 
     /// Executes a SQL statement and retrieve its result.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, prepared_statement: &SqlPreparedStatement) -> Result<(), TgError> {
+    ///     // prepared_statement: "select c_id, c_name, c_age from customer where c_id = :id"
+    ///     let parameters = vec![SqlParameter::of("id", 3_i64)];
+    ///     let mut query_result = client.prepared_query(&transaction, prepared_statement, parameters).await?;
+    ///
+    ///     while query_result.next_row().await? {
+    ///         if query_result.next_column().await? {
+    ///             let id: i64 = query_result.fetch().await?;
+    ///         }
+    ///         if query_result.next_column().await? {
+    ///             let name: String = query_result.fetch().await?;
+    ///         }
+    ///         if query_result.next_column().await? {
+    ///             let age: i32 = query_result.fetch().await?;
+    ///         }
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn prepared_query(
         &self,
         transaction: &Transaction,
@@ -856,6 +1071,18 @@ impl SqlClient {
     }
 
     /// Request commit to the SQL service.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+    ///     let commit_option = CommitOption::default();
+    ///     client.commit(transaction, &commit_option).await?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn commit(
         &self,
         transaction: &Transaction,
@@ -924,6 +1151,17 @@ impl SqlClient {
     }
 
     /// Request rollback to the SQL service.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+    ///     client.rollback(transaction).await?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub async fn rollback(&self, transaction: &Transaction) -> Result<(), TgError> {
         let timeout = self.default_timeout;
         self.rollback_for(transaction, timeout).await

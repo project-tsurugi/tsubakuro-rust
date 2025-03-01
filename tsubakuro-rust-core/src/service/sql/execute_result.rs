@@ -34,27 +34,27 @@ impl SqlExecuteResult {
         &self.counters
     }
 
-    /// get inserted rows.
+    /// Get inserted rows.
     pub fn inserted_rows(&self) -> i64 {
         *self.counters.get(&CounterType::InsertedRows).unwrap_or(&0)
     }
 
-    /// get updated rows.
+    /// Get updated rows.
     pub fn updated_rows(&self) -> i64 {
         *self.counters.get(&CounterType::UpdatedRows).unwrap_or(&0)
     }
 
-    /// get merged rows.
+    /// Get merged rows.
     pub fn merged_rows(&self) -> i64 {
         *self.counters.get(&CounterType::MergedRows).unwrap_or(&0)
     }
 
-    /// get deleted rows.
+    /// Get deleted rows.
     pub fn deleted_rows(&self) -> i64 {
         *self.counters.get(&CounterType::DeletedRows).unwrap_or(&0)
     }
 
-    /// get total rows.
+    /// Get total rows.
     pub fn rows(&self) -> i64 {
         self.counters.values().sum()
     }

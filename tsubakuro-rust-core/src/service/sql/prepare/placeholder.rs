@@ -17,7 +17,7 @@ impl SqlPlaceholder {
         }
     }
 
-    /// get name.
+    /// Get name.
     pub fn name(&self) -> Option<&String> {
         match self.placement {
             Some(Placement::Name(ref name)) => Some(name),
@@ -25,7 +25,7 @@ impl SqlPlaceholder {
         }
     }
 
-    /// get AtomType.
+    /// Get AtomType.
     pub fn atom_type(&self) -> Option<AtomType> {
         match self.type_info {
             Some(TypeInfo::AtomType(atom_type)) => AtomType::try_from(atom_type).ok(),
@@ -50,7 +50,7 @@ impl SqlPlaceholder {
 
 /// AtomType provider for [SqlPlaceholder].
 pub trait AtomTypeProvider {
-    /// get Atomtype.
+    /// Get Atomtype.
     fn atom_type() -> AtomType;
 }
 
