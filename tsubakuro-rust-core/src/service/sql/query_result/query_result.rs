@@ -95,6 +95,38 @@ impl SqlQueryResult {
     }
 
     /// Returns the metadata of this query result.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(mut query_result: SqlQueryResult) -> Result<(), TgError> {
+    ///     let metadata = query_result.get_metadata().unwrap().clone();
+    ///     let columns = metadata.columns();
+    ///
+    ///     while query_result.next_row().await? {
+    ///         for column in columns {
+    ///             let column_name = column.name();
+    ///
+    ///             assert!(query_result.next_column().await?);
+    ///             match column.atom_type().unwrap() {
+    ///                 AtomType::Int4 => { // int
+    ///                     let value: i32 = query_result.fetch().await?;
+    ///                 }
+    ///                 AtomType::Int8 => { // bigint
+    ///                     let value: i64 = query_result.fetch().await?;
+    ///                 }
+    ///                 AtomType::Character => { // char, varchar
+    ///                     let value: String = query_result.fetch().await?;
+    ///                 }
+    ///                 _ => panic!(),
+    ///             };
+    ///         }
+    ///     }
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
     pub fn get_metadata(&self) -> Option<&SqlQueryResultMetadata> {
         self.metadata.as_ref()
     }
