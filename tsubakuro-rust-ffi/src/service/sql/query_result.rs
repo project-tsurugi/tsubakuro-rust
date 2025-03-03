@@ -62,8 +62,18 @@ impl std::ops::DerefMut for TsurugiFfiSqlQueryResult {
     }
 }
 
+/// Sql query result (sql result set).
 pub type TsurugiFfiSqlQueryResultHandle = *mut TsurugiFfiSqlQueryResult;
 
+/// SqlQueryResult: Set default timeout.
+///
+/// See [`SqlQueryResult::set_default_timeout`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_set_default_timeout(
     context: TsurugiFfiContextHandle,
@@ -90,6 +100,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_set_default_timeout(
     rc
 }
 
+/// SqlQueryResult: Get default timeout.
+///
+/// See [`SqlQueryResult::default_timeout`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `default_timeout_out` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_get_default_timeout(
     context: TsurugiFfiContextHandle,
@@ -126,6 +145,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_get_default_timeout(
     rc
 }
 
+/// SqlQueryResult: Get metadata.
+///
+/// See [`SqlQueryResult::get_metadata`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `query_result_metadata_out` - metadata. To dispose, call `tsurugi_ffi_sql_query_result_metadata_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_get_metadata(
     context: TsurugiFfiContextHandle,
@@ -170,6 +198,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_get_metadata(
     rc
 }
 
+/// SqlQueryResult: Next row.
+///
+/// See [`SqlQueryResult::next_row`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `has_row_out` - `true`: Has next row / `false`: No next row.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_next_row(
     context: TsurugiFfiContextHandle,
@@ -202,6 +239,18 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row(
     rc
 }
 
+/// SqlQueryResult: Next row.
+///
+/// See [`SqlQueryResult::next_row_for`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `has_row_out` - `true`: Has next row / `false`: No next row.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_next_row_for(
     context: TsurugiFfiContextHandle,
@@ -242,6 +291,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row_for(
     rc
 }
 
+/// SqlQueryResult: Next column.
+///
+/// See [`SqlQueryResult::next_column`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `has_column_out` - `true`: Has next column / `false`: No next column.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_next_column(
     context: TsurugiFfiContextHandle,
@@ -274,6 +332,18 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column(
     rc
 }
 
+/// SqlQueryResult: Next column.
+///
+/// See [`SqlQueryResult::next_column_for`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `has_column_out` - `true`: Has next column / `false`: No next column.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_next_column_for(
     context: TsurugiFfiContextHandle,
@@ -314,6 +384,15 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column_for(
     rc
 }
 
+/// SqlQueryResult: Whether the column on this cursor is `NULL` or not.
+///
+/// See [`SqlQueryResult::is_null`].
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `is_null_out` - `true`: Is null / `false`: Not null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
     context: TsurugiFfiContextHandle,
@@ -344,6 +423,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
     rc
 }
 
+/// SqlQueryResult: fetch int4 (int).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
     context: TsurugiFfiContextHandle,
@@ -376,6 +469,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
     rc
 }
 
+/// SqlQueryResult: fetch int4 (int).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
     context: TsurugiFfiContextHandle,
@@ -416,6 +526,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
     rc
 }
 
+/// SqlQueryResult: fetch int8 (bigint).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
     context: TsurugiFfiContextHandle,
@@ -448,6 +572,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
     rc
 }
 
+/// SqlQueryResult: fetch int8 (bigint).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
     context: TsurugiFfiContextHandle,
@@ -488,6 +629,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
     rc
 }
 
+/// SqlQueryResult: fetch float4 (real).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
     context: TsurugiFfiContextHandle,
@@ -520,6 +675,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
     rc
 }
 
+/// SqlQueryResult: fetch float4 (real).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
     context: TsurugiFfiContextHandle,
@@ -560,6 +732,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
     rc
 }
 
+/// SqlQueryResult: fetch float8 (double).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
     context: TsurugiFfiContextHandle,
@@ -592,6 +778,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
     rc
 }
 
+/// SqlQueryResult: fetch float8 (double).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
     context: TsurugiFfiContextHandle,
@@ -632,6 +835,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
     rc
 }
 
+/// SqlQueryResult: fetch decimal.
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `unscaled_value_bytes_out` - unscaled value of decimal.
+/// - `unscaled_value_bytes_size_out` - `unscaled_value_bytes_out` size \[byte\].
+/// - `unscaled_value_out` - unscaled value of decimal if `unscaled_value_bytes_out` is null (`unscaled_value_bytes_size_out` = 0).
+/// - `exponent_out` - exponent of decimal.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
     context: TsurugiFfiContextHandle,
@@ -696,6 +916,26 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
     rc
 }
 
+/// SqlQueryResult: fetch decimal.
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `unscaled_value_bytes_out` - unscaled value of decimal.
+/// - `unscaled_value_bytes_size_out` - `unscaled_value_bytes_out` size \[byte\].
+/// - `unscaled_value_out` - unscaled value of decimal if `unscaled_value_bytes_out` is null (`unscaled_value_bytes_size_out` = 0).
+/// - `exponent_out` - exponent of decimal.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
     context: TsurugiFfiContextHandle,
@@ -767,6 +1007,22 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
     rc
 }
 
+/// SqlQueryResult: fetch decimal.
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `unscaled_value_high_out` - unscaled value of decimal (high 64bit).
+/// - `unscaled_value_low_out` - unscaled value of decimal (low 64bit).
+/// - `exponent_out` - exponent of decimal.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
     context: TsurugiFfiContextHandle,
@@ -821,6 +1077,25 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
     rc
 }
 
+/// SqlQueryResult: fetch decimal.
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `unscaled_value_high_out` - unscaled value of decimal (high 64bit).
+/// - `unscaled_value_low_out` - unscaled value of decimal (low 64bit).
+/// - `exponent_out` - exponent of decimal.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
     context: TsurugiFfiContextHandle,
@@ -882,6 +1157,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
     rc
 }
 
+/// SqlQueryResult: fetch character (char/varchar).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
     context: TsurugiFfiContextHandle,
@@ -916,6 +1205,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
     rc
 }
 
+/// SqlQueryResult: fetch character (char/varchar).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     context: TsurugiFfiContextHandle,
@@ -958,6 +1264,21 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     rc
 }
 
+/// SqlQueryResult: fetch octet.
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - value.
+/// - `size_out` - `value_out` size \[byte\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
     context: TsurugiFfiContextHandle,
@@ -1002,6 +1323,24 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
     rc
 }
 
+/// SqlQueryResult: fetch octet.
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
+/// - `size_out` - `value_out` size \[byte\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
     context: TsurugiFfiContextHandle,
@@ -1058,6 +1397,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
     rc
 }
 
+/// SqlQueryResult: fetch date.
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - number of days offset of epoch 1970-01-01.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
     context: TsurugiFfiContextHandle,
@@ -1091,6 +1444,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
     rc
 }
 
+/// SqlQueryResult: fetch date.
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - number of days offset of epoch 1970-01-01.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
     context: TsurugiFfiContextHandle,
@@ -1132,6 +1502,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
     rc
 }
 
+/// SqlQueryResult: fetch time of day (time).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - nanoseconds since 00:00:00.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
     context: TsurugiFfiContextHandle,
@@ -1166,6 +1550,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
     rc
 }
 
+/// SqlQueryResult: fetch time of day (time).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - nanoseconds since 00:00:00.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
     context: TsurugiFfiContextHandle,
@@ -1207,6 +1608,21 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
     rc
 }
 
+/// SqlQueryResult: fetch time point (timestamp).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - number of seconds offset of epoch 1970-01-01.
+/// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
     context: TsurugiFfiContextHandle,
@@ -1249,6 +1665,24 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
     rc
 }
 
+/// SqlQueryResult: fetch time point (timestamp).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - number of seconds offset of epoch 1970-01-01.
+/// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
     context: TsurugiFfiContextHandle,
@@ -1298,6 +1732,21 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
     rc
 }
 
+/// SqlQueryResult: fetch time of day with time zone (time with time zone).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - nanoseconds since 00:00:00.
+/// - `time_zone_offset_out` - timezone offset in minute.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -1340,6 +1789,24 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
     rc
 }
 
+/// SqlQueryResult: fetch time of day with time zone (time with time zone).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - nanoseconds since 00:00:00.
+/// - `time_zone_offset_out` - timezone offset in minute.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -1390,6 +1857,22 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_z
     rc
 }
 
+/// SqlQueryResult: fetch time point with time zone (timestamp with time zone).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - number of seconds offset of epoch 1970-01-01.
+/// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
+/// - `time_zone_offset_out` - timezone offset in minute.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -1437,6 +1920,25 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
     rc
 }
 
+/// SqlQueryResult: fetch time point with time zone (timestamp with time zone).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - number of seconds offset of epoch 1970-01-01.
+/// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
+/// - `time_zone_offset_out` - timezone offset in minute.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -1492,6 +1994,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
     rc
 }
 
+/// SqlQueryResult: fetch blob.
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `blob_reference_out` - blob reference.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
     context: TsurugiFfiContextHandle,
@@ -1527,6 +2043,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
     rc
 }
 
+/// SqlQueryResult: fetch blob.
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `blob_reference_out` - blob reference.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
     context: TsurugiFfiContextHandle,
@@ -1569,6 +2102,20 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
     rc
 }
 
+/// SqlQueryResult: fetch clob.
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `clob_reference_out` - clob reference.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
     context: TsurugiFfiContextHandle,
@@ -1604,6 +2151,23 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
     rc
 }
 
+/// SqlQueryResult: fetch clob.
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `clob_reference_out` - clob reference.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_clob(
     context: TsurugiFfiContextHandle,
@@ -1646,6 +2210,10 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_clob(
     rc
 }
 
+/// SqlQueryResult: Dispose.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_dispose(
     query_result: TsurugiFfiSqlQueryResultHandle,

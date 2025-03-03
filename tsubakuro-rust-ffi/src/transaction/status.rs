@@ -46,8 +46,18 @@ impl std::ops::DerefMut for TsurugiFfiTransactionStatus {
     }
 }
 
+/// Transaction status.
 pub type TsurugiFfiTransactionStatusHandle = *mut TsurugiFfiTransactionStatus;
 
+/// TransactionStatus: Whether the status is normal.
+///
+/// See [`TransactionStatus::is_normal`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `is_normal_out` - `true`: No error / `false`: Error occurred in transaction.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_is_normal(
     context: TsurugiFfiContextHandle,
@@ -79,6 +89,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_is_normal(
     rc
 }
 
+/// TransactionStatus: Whether the status is error.
+///
+/// See [`TransactionStatus::is_error`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `is_error_out` - `true`: Error occurred in transaction / `false`: No error.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_is_error(
     context: TsurugiFfiContextHandle,
@@ -110,6 +129,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_is_error(
     rc
 }
 
+/// TransactionStatus: Get server error name.
+///
+/// See [`TransactionStatus::server_error`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `error_name_out` - error name (`null` if no error).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_name(
     context: TsurugiFfiContextHandle,
@@ -151,6 +179,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_name(
     rc
 }
 
+/// TransactionStatus: Get server error message.
+///
+/// See [`TransactionStatus::server_error`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `error_message_out` - error message (`null` if no error).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_message(
     context: TsurugiFfiContextHandle,
@@ -193,6 +230,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_message(
     rc
 }
 
+/// TransactionStatus: Get server error category.
+///
+/// See [`TransactionStatus::server_error`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `category_number_out` - error category (0 if no error).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_number(
     context: TsurugiFfiContextHandle,
@@ -234,6 +280,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_numbe
     rc
 }
 
+/// TransactionStatus: Get server error category.
+///
+/// See [`TransactionStatus::server_error`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `category_str_out` - error category (`null` if no error).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_str(
     context: TsurugiFfiContextHandle,
@@ -275,6 +330,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_category_str(
     rc
 }
 
+/// TransactionStatus: Get server error code.
+///
+/// See [`TransactionStatus::server_error`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `code_number_out` - error code (0 if no error).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_code_number(
     context: TsurugiFfiContextHandle,
@@ -312,6 +376,15 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_code_number(
     rc
 }
 
+/// TransactionStatus: Get server error structured code.
+///
+/// See [`TransactionStatus::server_error`].
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
+///
+/// # Returns
+/// - `structured_code_out` - structured error code (`null` if no error).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_structured_code(
     context: TsurugiFfiContextHandle,
@@ -357,6 +430,10 @@ pub extern "C" fn tsurugi_ffi_transaction_status_get_server_error_structured_cod
     rc
 }
 
+/// TransactionStatus: Dispose.
+///
+/// # Receiver
+/// - `transaction_status` - Transaction status.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_status_dispose(
     transaction_status: TsurugiFfiTransactionStatusHandle,

@@ -38,8 +38,18 @@ impl std::ops::DerefMut for TsurugiFfiSqlQueryResultMetadata {
     }
 }
 
+/// Sql query result metadata.
 pub type TsurugiFfiSqlQueryResultMetadataHandle = *mut TsurugiFfiSqlQueryResultMetadata;
 
+/// SqlQueryResultMetadata: get columns size.
+///
+/// See [`SqlQueryResultMetadata::columns`].
+///
+/// # Receiver
+/// - `query_result_metadata` - Sql query result metadata.
+///
+/// # Returns
+/// - `size_out` - number of columns \[number of columns\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_size(
     context: TsurugiFfiContextHandle,
@@ -69,6 +79,18 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_size(
     rc
 }
 
+/// SqlQueryResultMetadata: get columns value.
+///
+/// See [`SqlQueryResultMetadata::columns`].
+///
+/// # Receiver
+/// - `query_result_metadata` - Sql query result metadata.
+///
+/// # Parameters
+/// - `index` - column index \[0..tsurugi_ffi_table_metadata_get_columns_size()-1\].
+///
+/// # Returns
+/// - `sql_column_out` - column. To dispose, call `tsurugi_ffi_sql_column_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_value(
     context: TsurugiFfiContextHandle,
@@ -107,6 +129,10 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_get_columns_value(
     rc
 }
 
+/// SqlQueryResultMetadata: Dispose.
+///
+/// # Receiver
+/// - `query_result_metadata` - Sql query result metadata.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_metadata_dispose(
     query_result_metadata: TsurugiFfiSqlQueryResultMetadataHandle,

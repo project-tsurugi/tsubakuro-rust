@@ -1,6 +1,7 @@
 use tsubakuro_rust_core::prelude::AtomType;
 
 // copy from AtomType
+/// Atom type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub enum TsurugiFfiAtomType {

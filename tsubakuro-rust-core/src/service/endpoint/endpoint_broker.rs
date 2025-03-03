@@ -12,7 +12,7 @@ use crate::{
     session::wire::{response::WireResponse, Wire},
     tateyama::proto::endpoint::{
         request::{
-            request::Command as EndointCommand, Cancel as CancelRequest, ClientInformation,
+            request::Command as EndpointCommand, Cancel as CancelRequest, ClientInformation,
             Handshake as HandshakeRequest, Request as EndpointRequest, WireInformation,
         },
         response::{handshake::Result as HandshakeResult, Handshake as HandshakeResponse},
@@ -91,12 +91,12 @@ impl EndpointBroker {
     fn handshake_command(
         client_information: ClientInformation,
         wire_information: WireInformation,
-    ) -> EndointCommand {
+    ) -> EndpointCommand {
         let handshake = HandshakeRequest {
             client_information: Some(client_information),
             wire_information: Some(wire_information),
         };
-        EndointCommand::Handshake(handshake)
+        EndpointCommand::Handshake(handshake)
     }
 
     pub(crate) async fn cancel(wire: &Arc<Wire>, slot: i32) -> Result<(), TgError> {
@@ -113,12 +113,12 @@ impl EndpointBroker {
         Ok(())
     }
 
-    fn cancel_command() -> EndointCommand {
+    fn cancel_command() -> EndpointCommand {
         let cancel = CancelRequest {};
-        EndointCommand::Cancel(cancel)
+        EndpointCommand::Cancel(cancel)
     }
 
-    fn new_request(command: EndointCommand) -> EndpointRequest {
+    fn new_request(command: EndpointCommand) -> EndpointRequest {
         EndpointRequest {
             service_message_version_major: ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR,
             service_message_version_minor: ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR,

@@ -48,8 +48,18 @@ impl std::ops::DerefMut for TsurugiFfiTransaction {
     }
 }
 
+/// Transaction.
 pub type TsurugiFfiTransactionHandle = *mut TsurugiFfiTransaction;
 
+/// Transaction: Get transaction id.
+///
+/// See [`Transaction::transaction_id`].
+///
+/// # Receiver
+/// - `transaction` - Transaction.
+///
+/// # Returns
+/// - `transaction_id_out` - transaction id.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
     context: TsurugiFfiContextHandle,
@@ -89,24 +99,33 @@ pub extern "C" fn tsurugi_ffi_transaction_get_transaction_id(
     rc
 }
 
+/// Transaction: Set close timeout.
+///
+/// See [`Transaction::set_close_timeout`].
+///
+/// # Receiver
+/// - `transaction` - Transaction.
+///
+/// # Parameters
+/// - `close_timeout` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_set_close_timeout(
     context: TsurugiFfiContextHandle,
     transaction: TsurugiFfiTransactionHandle,
-    closetimeout: TsurugiFfiDuration,
+    close_timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_set_close_timeout()";
     trace!(
         "{FUNCTION_NAME} start. context={:?}, transaction={:?}, close_timeout={:?}",
         context,
         transaction,
-        closetimeout
+        close_timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction);
 
     let transaction = unsafe { &mut *transaction };
-    let close_timeout = Duration::from_nanos(closetimeout);
+    let close_timeout = Duration::from_nanos(close_timeout);
 
     transaction.set_close_timeout(close_timeout);
 
@@ -115,6 +134,15 @@ pub extern "C" fn tsurugi_ffi_transaction_set_close_timeout(
     rc
 }
 
+/// Transaction: Get close timeout.
+///
+/// See [`Transaction::close_timeout`].
+///
+/// # Receiver
+/// - `transaction` - Transaction.
+///
+/// # Returns
+/// - `close_timeout_out` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_get_close_timeout(
     context: TsurugiFfiContextHandle,
@@ -151,6 +179,14 @@ pub extern "C" fn tsurugi_ffi_transaction_get_close_timeout(
     rc
 }
 
+/// Transaction: Close.
+///
+/// See [`Transaction::close`].
+///
+/// Note: Close is called in `tsurugi_ffi_transaction_dispose()`.
+///
+/// # Receiver
+/// - `transaction` - Transaction.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_close(
     context: TsurugiFfiContextHandle,
@@ -175,6 +211,17 @@ pub extern "C" fn tsurugi_ffi_transaction_close(
     rc
 }
 
+/// Transaction: Close.
+///
+/// See [`Transaction::close_for`].
+///
+/// Note: Close is called in `tsurugi_ffi_transaction_dispose()`.
+///
+/// # Receiver
+/// - `transaction` - Transaction.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_close_for(
     context: TsurugiFfiContextHandle,
@@ -207,6 +254,15 @@ pub extern "C" fn tsurugi_ffi_transaction_close_for(
     rc
 }
 
+/// Transaction: Check if the session is closed.
+///
+/// See [`Transaction::is_closed`].
+///
+/// # Receiver
+/// - `transaction` - Transaction.
+///
+/// # Returns
+/// - `is_closed_out` - `true`: Already closed / `false`: Not closed.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_is_closed(
     context: TsurugiFfiContextHandle,
@@ -238,6 +294,10 @@ pub extern "C" fn tsurugi_ffi_transaction_is_closed(
     rc
 }
 
+/// Transaction: Dispose.
+///
+/// # Receiver
+/// - `transaction` - Transaction.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_dispose(transaction: TsurugiFfiTransactionHandle) {
     transaction_dispose(transaction);

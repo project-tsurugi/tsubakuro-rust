@@ -7,6 +7,7 @@ use crate::{
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
+/// Sql counter type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub enum TsurugiFfiSqlCounterType {
@@ -64,8 +65,20 @@ impl std::ops::DerefMut for TsurugiFfiSqlExecuteResult {
     }
 }
 
+/// Execute result of SQL statement.
 pub type TsurugiFfiSqlExecuteResultHandle = *mut TsurugiFfiSqlExecuteResult;
 
+/// SqlExecuteResult: Get counters.
+///
+/// See [`SqlExecuteResult::counters`].
+///
+/// # Receiver
+/// - `execute_result` - Execute result of SQL statement.
+///
+/// # Returns
+/// - `counters_keys_out` - counters key (int array).
+/// - `counters_rows_out` - counters rows (long array).
+/// - `counters_size_out` - `counters_keys_out`, `counters_rows_out` size \[number of counters\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_execute_result_get_counters(
     context: TsurugiFfiContextHandle,
@@ -133,6 +146,15 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_counters(
     rc
 }
 
+/// SqlExecuteResult: Get inserted rows.
+///
+/// See [`SqlExecuteResult::inserted_rows`].
+///
+/// # Receiver
+/// - `execute_result` - Execute result of SQL statement.
+///
+/// # Returns
+/// - `rows_out` - rows.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_execute_result_get_inserted_rows(
     context: TsurugiFfiContextHandle,
@@ -149,6 +171,15 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_inserted_rows(
     )
 }
 
+/// SqlExecuteResult: Get updated rows.
+///
+/// See [`SqlExecuteResult::updated_rows`].
+///
+/// # Receiver
+/// - `execute_result` - Execute result of SQL statement.
+///
+/// # Returns
+/// - `rows_out` - rows.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_execute_result_get_updated_rows(
     context: TsurugiFfiContextHandle,
@@ -165,6 +196,15 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_updated_rows(
     )
 }
 
+/// SqlExecuteResult: Get merged rows.
+///
+/// See [`SqlExecuteResult::merged_rows`].
+///
+/// # Receiver
+/// - `execute_result` - Execute result of SQL statement.
+///
+/// # Returns
+/// - `rows_out` - rows.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_execute_result_get_merged_rows(
     context: TsurugiFfiContextHandle,
@@ -181,6 +221,15 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_merged_rows(
     )
 }
 
+/// SqlExecuteResult: Get deleted rows.
+///
+/// See [`SqlExecuteResult::deleted_rows`].
+///
+/// # Receiver
+/// - `execute_result` - Execute result of SQL statement.
+///
+/// # Returns
+/// - `rows_out` - rows.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_execute_result_get_deleted_rows(
     context: TsurugiFfiContextHandle,
@@ -197,6 +246,15 @@ pub extern "C" fn tsurugi_ffi_sql_execute_result_get_deleted_rows(
     )
 }
 
+/// SqlExecuteResult: Get total rows.
+///
+/// See [`SqlExecuteResult::rows`].
+///
+/// # Receiver
+/// - `execute_result` - Execute result of SQL statement.
+///
+/// # Returns
+/// - `rows_out` - rows.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_execute_result_get_rows(
     context: TsurugiFfiContextHandle,
@@ -243,6 +301,10 @@ fn get_rows(
     rc
 }
 
+/// SqlExecuteResult: Dispose.
+///
+/// # Receiver
+/// - `execute_result` - Execute result of SQL statement.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_execute_result_dispose(
     execute_result: TsurugiFfiSqlExecuteResultHandle,

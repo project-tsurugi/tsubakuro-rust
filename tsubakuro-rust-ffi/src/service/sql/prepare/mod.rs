@@ -1,3 +1,3 @@
-pub(crate) mod parameter;
-pub(crate) mod placeholder;
-pub(crate) mod prepared_statement;
+pub mod parameter;
+pub mod placeholder;
+pub mod prepared_statement;

@@ -45,8 +45,21 @@ impl std::ops::DerefMut for TsurugiFfiCancelJob {
     }
 }
 
+/// Cancel job.
 pub type TsurugiFfiCancelJobHandle = *mut TsurugiFfiCancelJob;
 
+/// CancelJob: Wait.
+///
+/// See [`CancelJob::wait`].
+///
+/// # Receiver
+/// - `cancel_job` - canel job.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `done_out` - `true`: Response received / `false`: Timed out.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_cancel_job_wait(
     context: TsurugiFfiContextHandle,
@@ -82,6 +95,15 @@ pub extern "C" fn tsurugi_ffi_cancel_job_wait(
     rc
 }
 
+/// CancelJob: Is done.
+///
+/// See [`CancelJob::is_done`].
+///
+/// # Receiver
+/// - `cancel_job` - canel job.
+///
+/// # Returns
+/// - `done_out` - `true`: Response received / `false`: No response received.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_cancel_job_is_done(
     context: TsurugiFfiContextHandle,
@@ -114,6 +136,10 @@ pub extern "C" fn tsurugi_ffi_cancel_job_is_done(
     rc
 }
 
+/// CancelJob: Dispose.
+///
+/// # Receiver
+/// - `cancel_job` - canel job.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_cancel_job_dispose(cancel_job: TsurugiFfiCancelJobHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_cancel_job_dispose()";

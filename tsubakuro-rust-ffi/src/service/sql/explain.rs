@@ -39,8 +39,18 @@ impl std::ops::Deref for TsurugiFfiSqlExplainResult {
     }
 }
 
+/// Explain result of SQL statement.
 pub type TsurugiFfiSqlExplainResultHandle = *mut TsurugiFfiSqlExplainResult;
 
+/// SqlExplainResult: Get format id.
+///
+/// See [`SqlExplainResult::format_id`].
+///
+/// # Receiver
+/// - `explain_result` - Explain result of SQL statement.
+///
+/// # Returns
+/// - `format_id_out` - format id.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_explain_result_get_format_id(
     context: TsurugiFfiContextHandle,
@@ -76,6 +86,15 @@ pub extern "C" fn tsurugi_ffi_sql_explain_result_get_format_id(
     rc
 }
 
+/// SqlExplainResult: Get format version.
+///
+/// See [`SqlExplainResult::format_version`].
+///
+/// # Receiver
+/// - `explain_result` - Explain result of SQL statement.
+///
+/// # Returns
+/// - `format_version_out` - format version.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_explain_result_get_format_version(
     context: TsurugiFfiContextHandle,
@@ -111,6 +130,15 @@ pub extern "C" fn tsurugi_ffi_sql_explain_result_get_format_version(
     rc
 }
 
+/// SqlExplainResult: Get contents.
+///
+/// See [`SqlExplainResult::contents`].
+///
+/// # Receiver
+/// - `explain_result` - Explain result of SQL statement.
+///
+/// # Returns
+/// - `contents_out` - contents.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_explain_result_get_contents(
     context: TsurugiFfiContextHandle,
@@ -146,6 +174,15 @@ pub extern "C" fn tsurugi_ffi_sql_explain_result_get_contents(
     rc
 }
 
+/// SqlExplainResult: Get columns size.
+///
+/// See [`SqlExplainResult::columns`].
+///
+/// # Receiver
+/// - `explain_result` - Explain result of SQL statement.
+///
+/// # Returns
+/// - `size_out` - number of columns \[number of columns\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_explain_result_get_columns_size(
     context: TsurugiFfiContextHandle,
@@ -177,6 +214,18 @@ pub extern "C" fn tsurugi_ffi_explain_result_get_columns_size(
     rc
 }
 
+/// SqlExplainResult: Get columns value.
+///
+/// See [`SqlExplainResult::columns`].
+///
+/// # Receiver
+/// - `explain_result` - Explain result of SQL statement.
+///
+/// # Parameters
+/// - `index` - column index \[0..tsurugi_ffi_table_metadata_get_columns_size()-1\].
+///
+/// # Returns
+/// - `sql_column_out` - column. To dispose, call `tsurugi_ffi_sql_column_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_explain_result_get_columns_value(
     context: TsurugiFfiContextHandle,
@@ -218,6 +267,10 @@ pub extern "C" fn tsurugi_ffi_explain_result_get_columns_value(
     rc
 }
 
+/// SqlExplainResult: Dispose.
+///
+/// # Receiver
+/// - `explain_result` - Explain result of SQL statement.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_explain_result_dispose(
     explain_result: TsurugiFfiSqlExplainResultHandle,

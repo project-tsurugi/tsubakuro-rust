@@ -74,10 +74,18 @@ impl std::ops::DerefMut for TsurugiFfiSqlClient {
     }
 }
 
-/// SqlClient.
+/// Sql client.
 pub type TsurugiFfiSqlClientHandle = *mut TsurugiFfiSqlClient;
 
-/// SqlClient: get service message version.
+/// SqlClient: Get service message version.
+///
+/// See [`SqlClient::service_message_version`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Returns
+/// - `version_out` - service message version.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
     context: TsurugiFfiContextHandle,
@@ -111,7 +119,12 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
     rc
 }
 
-/// SqlClient: list tables.
+/// SqlClient: List tables.
+///
+/// See [`SqlClient::list_tables`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
 ///
 /// # Returns
 /// - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
@@ -150,7 +163,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     rc
 }
 
-/// SqlClient: list tables.
+/// SqlClient: List tables.
+///
+/// See [`SqlClient::list_tables_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
 /// - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
@@ -197,7 +218,12 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
     rc
 }
 
-/// SqlClient: list tables.
+/// SqlClient: List tables.
+///
+/// See [`SqlClient::list_tables_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
 ///
 /// # Returns
 /// - `table_list_job_out` - Job for `TsurugiFfiTableListHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
@@ -255,7 +281,15 @@ impl TableListJobDelegator {
     }
 }
 
-/// SqlClient: get table metadata.
+/// SqlClient: Get table metadata.
+///
+/// See [`SqlClient::get_table_metadata`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `table_name` - table name.
 ///
 /// # Returns
 /// - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
@@ -307,7 +341,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     rc
 }
 
-/// SqlClient: get table metadata.
+/// SqlClient: Get table metadata.
+///
+/// See [`SqlClient::get_table_metadata_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `table_name` - table name.
+/// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
 /// - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
@@ -362,7 +405,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
     rc
 }
 
-/// SqlClient: get table metadata.
+/// SqlClient: Get table metadata.
+///
+/// See [`SqlClient::get_table_metadata_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `table_name` - table name.
 ///
 /// # Returns
 /// - `table_metadata_job_out` - Job for `TsurugiFfiTableMetadataHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
@@ -448,7 +499,17 @@ macro_rules! convert_placeholders {
     };
 }
 
-/// SqlClient: create prepared statement.
+/// SqlClient: Create prepared statement.
+///
+/// See [`SqlClient::prepare`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `sql` - SQL satement.
+/// - `placeholders` - placeholders (TsurugiFfiSqlPlaceholderHandle array).
+/// - `placeholders_size` - `placeholders` size \[number of placeholders\].
 ///
 /// # Returns
 /// - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
@@ -512,7 +573,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     rc
 }
 
-/// SqlClient: create prepared statement.
+/// SqlClient: Create prepared statement.
+///
+/// See [`SqlClient::prepare_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `sql` - SQL satement.
+/// - `placeholders` - placeholders (TsurugiFfiSqlPlaceholderHandle array).
+/// - `placeholders_size` - `placeholders` size \[number of placeholders\].
+/// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
 /// - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
@@ -579,7 +651,17 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     rc
 }
 
-/// SqlClient: create prepared statement.
+/// SqlClient: Create prepared statement.
+///
+/// See [`SqlClient::prepare_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `sql` - SQL satement.
+/// - `placeholders` - placeholders (TsurugiFfiSqlPlaceholderHandle array).
+/// - `placeholders_size` - `placeholders` size \[number of placeholders\].
 ///
 /// # Returns
 /// - `prepared_statement_job_out` - Job for `TsurugiFfiSqlPreparedStatementHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
@@ -662,6 +744,14 @@ impl SqlPreparedStatementJobDelegator {
 
 /// SqlClient: Retrieves execution plan of the statement.
 ///
+/// See [`SqlClient::explain`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `sql` - SQL satement.
+///
 /// # Returns
 /// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
 #[no_mangle]
@@ -708,6 +798,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_explain(
 }
 
 /// SqlClient: Retrieves execution plan of the statement.
+///
+/// See [`SqlClient::explain_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `sql` - SQL satement.
+/// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
 /// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
@@ -763,6 +862,14 @@ pub extern "C" fn tsurugi_ffi_sql_client_explain_for(
 }
 
 /// SqlClient: Retrieves execution plan of the statement.
+///
+/// See [`SqlClient::explain_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `sql` - SQL satement.
 ///
 /// # Returns
 /// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
@@ -830,9 +937,9 @@ impl SqlExplainResultJobDelegator {
 }
 
 macro_rules! convert_parameters {
-    ($context:expr, $function_name:expr, $arg_index:expr, $parameters:expr, $parameter_size:expr) => {
-        if $parameter_size > 0 {
-            let src = unsafe { std::slice::from_raw_parts($parameters, $parameter_size as usize) };
+    ($context:expr, $function_name:expr, $arg_index:expr, $parameters:expr, $parameters_size:expr) => {
+        if $parameters_size > 0 {
+            let src = unsafe { std::slice::from_raw_parts($parameters, $parameters_size as usize) };
             let mut dst = Vec::with_capacity(src.len());
             for &parameter in src {
                 ffi_arg_require_non_null!($context, $function_name, $arg_index, parameter);
@@ -848,6 +955,16 @@ macro_rules! convert_parameters {
 
 /// SqlClient: Retrieves execution plan of the statement.
 ///
+/// See [`SqlClient::prepared_explain`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+///
 /// # Returns
 /// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
 #[no_mangle]
@@ -856,24 +973,24 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
     sql_client: TsurugiFfiSqlClientHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     explain_result_out: *mut TsurugiFfiSqlExplainResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_explain()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, explain_result_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, explain_result_out={:?}",
         context,
         sql_client,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         explain_result_out
     );
 
     ffi_arg_out_initialize!(explain_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, explain_result_out);
@@ -881,7 +998,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
     let client = unsafe { &*sql_client };
     let prepared_statement = unsafe { &*prepared_statement };
     let parameters: Vec<SqlParameter> =
-        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameter_size);
+        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameters_size);
 
     let runtime = client.runtime();
     let explain_result = ffi_exec_core_async!(
@@ -909,6 +1026,17 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
 
 /// SqlClient: Retrieves execution plan of the statement.
 ///
+/// See [`SqlClient::prepared_explain_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+/// - `timeout` - timeout time \[nanoseconds\].
+///
 /// # Returns
 /// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
 #[no_mangle]
@@ -917,18 +1045,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
     sql_client: TsurugiFfiSqlClientHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     timeout: TsurugiFfiDuration,
     explain_result_out: *mut TsurugiFfiSqlExplainResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_explain_for()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, timeout={:?}, explain_result_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, timeout={:?}, explain_result_out={:?}",
         context,
         sql_client,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         timeout,
         explain_result_out
     );
@@ -936,7 +1064,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
     ffi_arg_out_initialize!(explain_result_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, explain_result_out);
@@ -944,7 +1072,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
     let client = unsafe { &*sql_client };
     let prepared_statement = unsafe { &*prepared_statement };
     let parameters: Vec<SqlParameter> =
-        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameter_size);
+        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameters_size);
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = client.runtime();
@@ -973,6 +1101,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
 
 /// SqlClient: Retrieves execution plan of the statement.
 ///
+/// See [`SqlClient::prepared_explain_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+///
 /// # Returns
 /// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
@@ -981,24 +1119,24 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
     sql_client: TsurugiFfiSqlClientHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     explain_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_explain_async()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, explain_result_job_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, explain_result_job_out={:?}",
         context,
         sql_client,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         explain_result_job_out
     );
 
     ffi_arg_out_initialize!(explain_result_job_out, std::ptr::null_mut());
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, explain_result_job_out);
@@ -1006,7 +1144,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
     let client = unsafe { &*sql_client };
     let prepared_statement = unsafe { &*prepared_statement };
     let parameters: Vec<SqlParameter> =
-        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameter_size);
+        convert_parameters!(context, FUNCTION_NAME, 3, parameters, parameters_size);
 
     let runtime = client.runtime();
     let job = ffi_exec_core_async!(
@@ -1036,7 +1174,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
     rc
 }
 
-/// SqlClient: start transaction.
+/// SqlClient: Start transaction.
+///
+/// See [`SqlClient::start_transaction`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction_option` - transaction option.
 ///
 /// # Returns
 /// - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
@@ -1084,7 +1230,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     rc
 }
 
-/// SqlClient: start transaction.
+/// SqlClient: Start transaction.
+///
+/// See [`SqlClient::start_transaction_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction_option` - transaction option.
+/// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
 /// - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
@@ -1135,7 +1290,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
     rc
 }
 
-/// SqlClient: start transaction.
+/// SqlClient: Start transaction.
+///
+/// See [`SqlClient::start_transaction_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction_option` - transaction option.
 ///
 /// # Returns
 /// - `transaction_job_out` - Job for `TsurugiFfiTransactionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
@@ -1203,7 +1366,15 @@ impl TransactionJobDelegator {
     }
 }
 
-/// SqlClient: get transaction status.
+/// SqlClient: Get transaction status.
+///
+/// See [`SqlClient::get_transaction_status`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
 ///
 /// # Returns
 /// - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
@@ -1255,7 +1426,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
     rc
 }
 
-/// SqlClient: get transaction status.
+/// SqlClient: Get transaction status.
+///
+/// See [`SqlClient::get_transaction_status_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
 /// - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
@@ -1310,7 +1490,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
     rc
 }
 
-/// SqlClient: get transaction status.
+/// SqlClient: Get transaction status.
+///
+/// See [`SqlClient::get_transaction_status_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
 ///
 /// # Returns
 /// - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
@@ -1382,6 +1570,19 @@ impl TransactionStatusJobDelegator {
     }
 }
 
+/// SqlClient: Executes a SQL statement.
+///
+/// See [`SqlClient::execute`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `sql` - SQL statement.
+///
+/// # Returns
+/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_execute(
     context: TsurugiFfiContextHandle,
@@ -1434,6 +1635,20 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
     rc
 }
 
+/// SqlClient: Executes a SQL statement.
+///
+/// See [`SqlClient::execute_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `sql` - SQL statement.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
     context: TsurugiFfiContextHandle,
@@ -1489,6 +1704,19 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
     rc
 }
 
+/// SqlClient: Executes a SQL statement.
+///
+/// See [`SqlClient::execute_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `sql` - SQL statement.
+///
+/// # Returns
+/// - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_execute_async(
     context: TsurugiFfiContextHandle,
@@ -1561,6 +1789,21 @@ impl SqlExecuteResultJobDelegator {
     }
 }
 
+/// SqlClient: Executes a SQL statement.
+///
+/// See [`SqlClient::prepared_execute`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+///
+/// # Returns
+/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     context: TsurugiFfiContextHandle,
@@ -1568,18 +1811,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     transaction: TsurugiFfiTransactionHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, execute_result_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, execute_result_out={:?}",
         context,
         sql_client,
         transaction,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         execute_result_out
     );
 
@@ -1587,7 +1830,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_out);
@@ -1596,7 +1839,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
     let parameters: Vec<SqlParameter> =
-        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameters_size);
 
     let runtime = client.runtime();
     let execute_result = ffi_exec_core_async!(
@@ -1622,6 +1865,22 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     rc
 }
 
+/// SqlClient: Executes a SQL statement.
+///
+/// See [`SqlClient::prepared_execute_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     context: TsurugiFfiContextHandle,
@@ -1629,19 +1888,19 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     transaction: TsurugiFfiTransactionHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     timeout: TsurugiFfiDuration,
     execute_result_out: *mut TsurugiFfiSqlExecuteResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_for()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, timeout={:?}, execute_result_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, timeout={:?}, execute_result_out={:?}",
         context,
         sql_client,
         transaction,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         timeout,
         execute_result_out
     );
@@ -1650,7 +1909,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, execute_result_out);
@@ -1659,7 +1918,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
     let parameters: Vec<SqlParameter> =
-        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameters_size);
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = client.runtime();
@@ -1686,6 +1945,21 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     rc
 }
 
+/// SqlClient: Executes a SQL statement.
+///
+/// See [`SqlClient::prepared_execute_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+///
+/// # Returns
+/// - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     context: TsurugiFfiContextHandle,
@@ -1693,18 +1967,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     transaction: TsurugiFfiTransactionHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     execute_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_execute_async()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, execute_result_job_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, execute_result_job_out={:?}",
         context,
         sql_client,
         transaction,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         execute_result_job_out
     );
 
@@ -1712,7 +1986,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, execute_result_job_out);
@@ -1721,7 +1995,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
     let parameters: Vec<SqlParameter> =
-        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+        convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameters_size);
 
     let runtime = client.runtime();
     let job = ffi_exec_core_async!(
@@ -1751,6 +2025,19 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     rc
 }
 
+/// SqlClient: Executes a SQL statement and retrieve its result.
+///
+/// See [`SqlClient::query`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `sql` - SQL satement.
+///
+/// # Returns
+/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query(
     context: TsurugiFfiContextHandle,
@@ -1799,6 +2086,20 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
     rc
 }
 
+/// SqlClient: Executes a SQL statement and retrieve its result.
+///
+/// See [`SqlClient::query_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `sql` - SQL satement.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query_for(
     context: TsurugiFfiContextHandle,
@@ -1850,6 +2151,19 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_for(
     rc
 }
 
+/// SqlClient: Executes a SQL statement and retrieve its result.
+///
+/// See [`SqlClient::query_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `sql` - SQL satement.
+///
+/// # Returns
+/// - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query_async(
     context: TsurugiFfiContextHandle,
@@ -1922,6 +2236,21 @@ impl SqlQueryResultJobDelegator {
     }
 }
 
+/// SqlClient: Executes a SQL statement and retrieve its result.
+///
+/// See [`SqlClient::prepared_query`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+///
+/// # Returns
+/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     context: TsurugiFfiContextHandle,
@@ -1929,18 +2258,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     transaction: TsurugiFfiTransactionHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, query_result_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, query_result_out={:?}",
         context,
         sql_client,
         transaction,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         query_result_out
     );
 
@@ -1948,7 +2277,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, query_result_out);
@@ -1956,7 +2285,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
-    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameters_size);
 
     let runtime = client.runtime();
     let query_result = ffi_exec_core_async!(
@@ -1978,6 +2307,22 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     rc
 }
 
+/// SqlClient: Executes a SQL statement and retrieve its result.
+///
+/// See [`SqlClient::prepared_query_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     context: TsurugiFfiContextHandle,
@@ -1985,19 +2330,19 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     transaction: TsurugiFfiTransactionHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     timeout: TsurugiFfiDuration,
     query_result_out: *mut TsurugiFfiSqlQueryResultHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query_for()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, timeout={:?}, query_result_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, timeout={:?}, query_result_out={:?}",
         context,
         sql_client,
         transaction,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         timeout,
         query_result_out
     );
@@ -2006,7 +2351,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 7, query_result_out);
@@ -2014,7 +2359,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
-    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameters_size);
     let timeout = Duration::from_nanos(timeout);
 
     let runtime = client.runtime();
@@ -2037,6 +2382,21 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     rc
 }
 
+/// SqlClient: Executes a SQL statement and retrieve its result.
+///
+/// See [`SqlClient::prepared_query_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `prepared_statement` - prepared satement.
+/// - `parameters` - parameters (TsurugiFfiSqlParameterHandle array).
+/// - `parameters_size` - `parameters` size \[number of parameters\].
+///
+/// # Returns
+/// - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     context: TsurugiFfiContextHandle,
@@ -2044,18 +2404,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     transaction: TsurugiFfiTransactionHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
     parameters: *const TsurugiFfiSqlParameterHandle,
-    parameter_size: u32,
+    parameters_size: u32,
     query_result_job_out: *mut TsurugiFfiJobHandle,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_prepared_query_async()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameter_size={:?}, query_result_job_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, prepared_statement={:?}, parameters={:?}, parameters_size={:?}, query_result_job_out={:?}",
         context,
         sql_client,
         transaction,
         prepared_statement,
         parameters,
-        parameter_size,
+        parameters_size,
         query_result_job_out
     );
 
@@ -2063,7 +2423,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, prepared_statement);
-    if parameter_size > 0 {
+    if parameters_size > 0 {
         ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, parameters);
     }
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, query_result_job_out);
@@ -2071,7 +2431,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     let client = unsafe { &*sql_client };
     let transaction = unsafe { &*transaction };
     let prepared_statement = unsafe { &*prepared_statement };
-    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameter_size);
+    let parameters = convert_parameters!(context, FUNCTION_NAME, 4, parameters, parameters_size);
 
     let runtime = client.runtime();
     let job = ffi_exec_core_async!(
@@ -2101,6 +2461,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     rc
 }
 
+/// SqlClient: Request commit to the SQL service.
+///
+/// See [`SqlClient::commit`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `commit_option` - commit option.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_commit(
     context: TsurugiFfiContextHandle,
@@ -2138,6 +2508,17 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit(
     rc
 }
 
+/// SqlClient: Request commit to the SQL service.
+///
+/// See [`SqlClient::commit_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `commit_option` - commit option.
+/// - `timeout` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_commit_for(
     context: TsurugiFfiContextHandle,
@@ -2178,6 +2559,19 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_for(
     rc
 }
 
+/// SqlClient: Request commit to the SQL service.
+///
+/// See [`SqlClient::commit_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `commit_option` - commit option.
+///
+/// # Returns
+/// - `commit_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
     context: TsurugiFfiContextHandle,
@@ -2226,6 +2620,15 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
     rc
 }
 
+/// SqlClient: Request rollback to the SQL service.
+///
+/// See [`SqlClient::rollback`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_rollback(
     context: TsurugiFfiContextHandle,
@@ -2259,6 +2662,16 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback(
     rc
 }
 
+/// SqlClient: Request rollback to the SQL service.
+///
+/// See [`SqlClient::rollback_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `timeout` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_rollback_for(
     context: TsurugiFfiContextHandle,
@@ -2295,6 +2708,18 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_for(
     rc
 }
 
+/// SqlClient: Request rollback to the SQL service.
+///
+/// See [`SqlClient::rollback_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+///
+/// # Returns
+/// - `rollback_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_rollback_async(
     context: TsurugiFfiContextHandle,
@@ -2339,6 +2764,10 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_async(
     rc
 }
 
+/// SqlClient: Dispose.
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_dispose(sql_client: TsurugiFfiSqlClientHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_dispose()";

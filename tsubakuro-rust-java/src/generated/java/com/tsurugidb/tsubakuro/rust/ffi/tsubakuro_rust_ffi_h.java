@@ -19969,7 +19969,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration close_timeout)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_prepared_statement_set_close_timeout$descriptor() {
@@ -19979,7 +19979,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration close_timeout)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_prepared_statement_set_close_timeout$handle() {
@@ -19989,7 +19989,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration close_timeout)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_prepared_statement_set_close_timeout$address() {
@@ -19998,16 +19998,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration timeout)
+     * TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlPreparedStatementHandle prepared_statement, TsurugiFfiDuration close_timeout)
      * }
      */
-    public static int tsurugi_ffi_sql_prepared_statement_set_close_timeout(MemorySegment context, MemorySegment prepared_statement, long timeout) {
+    public static int tsurugi_ffi_sql_prepared_statement_set_close_timeout(MemorySegment context, MemorySegment prepared_statement, long close_timeout) {
         var mh$ = tsurugi_ffi_sql_prepared_statement_set_close_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_prepared_statement_set_close_timeout", context, prepared_statement, timeout);
+                traceDowncall("tsurugi_ffi_sql_prepared_statement_set_close_timeout", context, prepared_statement, close_timeout);
             }
-            return (int)mh$.invokeExact(context, prepared_statement, timeout);
+            return (int)mh$.invokeExact(context, prepared_statement, close_timeout);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23679,7 +23679,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_explain$descriptor() {
@@ -23689,7 +23689,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_explain$handle() {
@@ -23699,7 +23699,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_explain$address() {
@@ -23708,16 +23708,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_explain(MemorySegment context, MemorySegment sql_client, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, MemorySegment explain_result_out) {
+    public static int tsurugi_ffi_sql_client_prepared_explain(MemorySegment context, MemorySegment sql_client, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, MemorySegment explain_result_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_explain.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_explain", context, sql_client, prepared_statement, parameters, parameter_size, explain_result_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_explain", context, sql_client, prepared_statement, parameters, parameters_size, explain_result_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameter_size, explain_result_out);
+            return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameters_size, explain_result_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23743,7 +23743,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_explain_for$descriptor() {
@@ -23753,7 +23753,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_explain_for$handle() {
@@ -23763,7 +23763,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_explain_for$address() {
@@ -23772,16 +23772,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExplainResultHandle *explain_result_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_explain_for(MemorySegment context, MemorySegment sql_client, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, long timeout, MemorySegment explain_result_out) {
+    public static int tsurugi_ffi_sql_client_prepared_explain_for(MemorySegment context, MemorySegment sql_client, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, long timeout, MemorySegment explain_result_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_explain_for.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_explain_for", context, sql_client, prepared_statement, parameters, parameter_size, timeout, explain_result_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_explain_for", context, sql_client, prepared_statement, parameters, parameters_size, timeout, explain_result_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameter_size, timeout, explain_result_out);
+            return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameters_size, timeout, explain_result_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23806,7 +23806,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *explain_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *explain_result_job_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_explain_async$descriptor() {
@@ -23816,7 +23816,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *explain_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *explain_result_job_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_explain_async$handle() {
@@ -23826,7 +23826,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *explain_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *explain_result_job_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_explain_async$address() {
@@ -23835,16 +23835,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *explain_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *explain_result_job_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_explain_async(MemorySegment context, MemorySegment sql_client, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, MemorySegment explain_result_job_out) {
+    public static int tsurugi_ffi_sql_client_prepared_explain_async(MemorySegment context, MemorySegment sql_client, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, MemorySegment explain_result_job_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_explain_async.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_explain_async", context, sql_client, prepared_statement, parameters, parameter_size, explain_result_job_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_explain_async", context, sql_client, prepared_statement, parameters, parameters_size, explain_result_job_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameter_size, explain_result_job_out);
+            return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameters_size, explain_result_job_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24425,7 +24425,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_execute$descriptor() {
@@ -24435,7 +24435,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_execute$handle() {
@@ -24445,7 +24445,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_execute$address() {
@@ -24454,16 +24454,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_execute(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, MemorySegment execute_result_out) {
+    public static int tsurugi_ffi_sql_client_prepared_execute(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, MemorySegment execute_result_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_execute.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_execute", context, sql_client, transaction, prepared_statement, parameters, parameter_size, execute_result_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_execute", context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameter_size, execute_result_out);
+            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24490,7 +24490,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_execute_for$descriptor() {
@@ -24500,7 +24500,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_execute_for$handle() {
@@ -24510,7 +24510,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_execute_for$address() {
@@ -24519,16 +24519,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlExecuteResultHandle *execute_result_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_execute_for(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, long timeout, MemorySegment execute_result_out) {
+    public static int tsurugi_ffi_sql_client_prepared_execute_for(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, long timeout, MemorySegment execute_result_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_execute_for.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_execute_for", context, sql_client, transaction, prepared_statement, parameters, parameter_size, timeout, execute_result_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_execute_for", context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, execute_result_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameter_size, timeout, execute_result_out);
+            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, execute_result_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24554,7 +24554,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_execute_async$descriptor() {
@@ -24564,7 +24564,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_execute_async$handle() {
@@ -24574,7 +24574,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_execute_async$address() {
@@ -24583,16 +24583,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *execute_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *execute_result_job_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_execute_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, MemorySegment execute_result_job_out) {
+    public static int tsurugi_ffi_sql_client_prepared_execute_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, MemorySegment execute_result_job_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_execute_async.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_execute_async", context, sql_client, transaction, prepared_statement, parameters, parameter_size, execute_result_job_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_execute_async", context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_job_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameter_size, execute_result_job_out);
+            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_job_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24805,7 +24805,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_query$descriptor() {
@@ -24815,7 +24815,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_query$handle() {
@@ -24825,7 +24825,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_query$address() {
@@ -24834,16 +24834,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_query(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, MemorySegment query_result_out) {
+    public static int tsurugi_ffi_sql_client_prepared_query(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, MemorySegment query_result_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_query.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_query", context, sql_client, transaction, prepared_statement, parameters, parameter_size, query_result_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_query", context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameter_size, query_result_out);
+            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24870,7 +24870,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_query_for$descriptor() {
@@ -24880,7 +24880,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_query_for$handle() {
@@ -24890,7 +24890,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_query_for$address() {
@@ -24899,16 +24899,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiDuration timeout, TsurugiFfiSqlQueryResultHandle *query_result_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_query_for(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, long timeout, MemorySegment query_result_out) {
+    public static int tsurugi_ffi_sql_client_prepared_query_for(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, long timeout, MemorySegment query_result_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_query_for.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_query_for", context, sql_client, transaction, prepared_statement, parameters, parameter_size, timeout, query_result_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_query_for", context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, query_result_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameter_size, timeout, query_result_out);
+            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, query_result_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24934,7 +24934,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_sql_client_prepared_query_async$descriptor() {
@@ -24944,7 +24944,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_sql_client_prepared_query_async$handle() {
@@ -24954,7 +24954,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_sql_client_prepared_query_async$address() {
@@ -24963,16 +24963,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameter_size, TsurugiFfiJobHandle *query_result_job_out)
+     * TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement, const TsurugiFfiSqlParameterHandle *parameters, uint32_t parameters_size, TsurugiFfiJobHandle *query_result_job_out)
      * }
      */
-    public static int tsurugi_ffi_sql_client_prepared_query_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameter_size, MemorySegment query_result_job_out) {
+    public static int tsurugi_ffi_sql_client_prepared_query_async(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment prepared_statement, MemorySegment parameters, int parameters_size, MemorySegment query_result_job_out) {
         var mh$ = tsurugi_ffi_sql_client_prepared_query_async.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_sql_client_prepared_query_async", context, sql_client, transaction, prepared_statement, parameters, parameter_size, query_result_job_out);
+                traceDowncall("tsurugi_ffi_sql_client_prepared_query_async", context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_job_out);
             }
-            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameter_size, query_result_job_out);
+            return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_job_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26244,7 +26244,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint_url)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_set_endpoint_url$descriptor() {
@@ -26254,7 +26254,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint_url)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_set_endpoint_url$handle() {
@@ -26264,7 +26264,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint_url)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_set_endpoint_url$address() {
@@ -26273,16 +26273,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint_url)
      * }
      */
-    public static int tsurugi_ffi_connection_option_set_endpoint_url(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint) {
+    public static int tsurugi_ffi_connection_option_set_endpoint_url(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint_url) {
         var mh$ = tsurugi_ffi_connection_option_set_endpoint_url.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_set_endpoint_url", context, connection_option, endpoint);
+                traceDowncall("tsurugi_ffi_connection_option_set_endpoint_url", context, connection_option, endpoint_url);
             }
-            return (int)mh$.invokeExact(context, connection_option, endpoint);
+            return (int)mh$.invokeExact(context, connection_option, endpoint_url);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26304,7 +26304,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_url_out)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_connection_option_get_endpoint_url$descriptor() {
@@ -26314,7 +26314,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_url_out)
      * }
      */
     public static MethodHandle tsurugi_ffi_connection_option_get_endpoint_url$handle() {
@@ -26324,7 +26324,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_url_out)
      * }
      */
     public static MemorySegment tsurugi_ffi_connection_option_get_endpoint_url$address() {
@@ -26333,16 +26333,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_url_out)
      * }
      */
-    public static int tsurugi_ffi_connection_option_get_endpoint_url(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint_out) {
+    public static int tsurugi_ffi_connection_option_get_endpoint_url(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint_url_out) {
         var mh$ = tsurugi_ffi_connection_option_get_endpoint_url.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_connection_option_get_endpoint_url", context, connection_option, endpoint_out);
+                traceDowncall("tsurugi_ffi_connection_option_get_endpoint_url", context, connection_option, endpoint_url_out);
             }
-            return (int)mh$.invokeExact(context, connection_option, endpoint_out);
+            return (int)mh$.invokeExact(context, connection_option, endpoint_url_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30141,7 +30141,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Function descriptor for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration closetimeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration close_timeout)
      * }
      */
     public static FunctionDescriptor tsurugi_ffi_transaction_set_close_timeout$descriptor() {
@@ -30151,7 +30151,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Downcall method handle for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration closetimeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration close_timeout)
      * }
      */
     public static MethodHandle tsurugi_ffi_transaction_set_close_timeout$handle() {
@@ -30161,7 +30161,7 @@ public class tsubakuro_rust_ffi_h {
     /**
      * Address for:
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration closetimeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration close_timeout)
      * }
      */
     public static MemorySegment tsurugi_ffi_transaction_set_close_timeout$address() {
@@ -30170,16 +30170,16 @@ public class tsubakuro_rust_ffi_h {
 
     /**
      * {@snippet lang=c :
-     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration closetimeout)
+     * TsurugiFfiRc tsurugi_ffi_transaction_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiTransactionHandle transaction, TsurugiFfiDuration close_timeout)
      * }
      */
-    public static int tsurugi_ffi_transaction_set_close_timeout(MemorySegment context, MemorySegment transaction, long closetimeout) {
+    public static int tsurugi_ffi_transaction_set_close_timeout(MemorySegment context, MemorySegment transaction, long close_timeout) {
         var mh$ = tsurugi_ffi_transaction_set_close_timeout.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("tsurugi_ffi_transaction_set_close_timeout", context, transaction, closetimeout);
+                traceDowncall("tsurugi_ffi_transaction_set_close_timeout", context, transaction, close_timeout);
             }
-            return (int)mh$.invokeExact(context, transaction, closetimeout);
+            return (int)mh$.invokeExact(context, transaction, close_timeout);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

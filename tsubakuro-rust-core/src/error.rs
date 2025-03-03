@@ -2,23 +2,34 @@
 pub enum TgError {
     /// Client error.
     ClientError(
-        /*message*/ String,
-        /*cause*/ Option<Box<dyn std::error::Error>>,
+        /// message
+        String,
+        /// cause
+        Option<Box<dyn std::error::Error>>,
     ),
     /// Timeout error.
-    TimeoutError(/*message*/ String),
+    TimeoutError(
+        /// message
+        String,
+    ),
     /// I/O error.
     IoError(
-        /*message*/ String,
-        /*cause*/ Option<Box<dyn std::error::Error>>,
+        /// message
+        String,
+        /// cause
+        Option<Box<dyn std::error::Error>>,
     ),
 
     /// Server error.
     ServerError(
-        /*function_name*/ String,
-        /*message*/ String,
-        /*code*/ DiagnosticCode,
-        /*server_message*/ String,
+        /// function name
+        String,
+        /// message
+        String,
+        /// diagnostic code
+        DiagnosticCode,
+        /// server message
+        String,
     ),
 }
 

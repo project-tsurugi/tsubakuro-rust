@@ -1,5 +1,7 @@
-mod endpoint;
-mod option;
+pub mod endpoint;
+pub mod option;
 #[allow(clippy::module_inception)]
 mod session;
-mod r#type;
+pub mod r#type;
+
+pub use session::*;

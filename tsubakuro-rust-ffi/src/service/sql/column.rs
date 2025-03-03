@@ -41,8 +41,18 @@ impl std::ops::DerefMut for TsurugiFfiSqlColumn {
     }
 }
 
+/// Sql column.
 pub type TsurugiFfiSqlColumnHandle = *mut TsurugiFfiSqlColumn;
 
+/// SqlColumn: Get name.
+///
+/// See [`SqlColumn::name`].
+///
+/// # Receiver
+/// - `sql_column` - Sql column.
+///
+/// # Returns
+/// - `name_out` - column name.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_column_get_name(
     context: TsurugiFfiContextHandle,
@@ -78,6 +88,15 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
     rc
 }
 
+/// SqlColumn: Get AtomType.
+///
+/// See [`SqlColumn::atom_type`].
+///
+/// # Receiver
+/// - `sql_column` - Sql column.
+///
+/// # Returns
+/// - `atom_type_out` - column type.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_column_get_atom_type(
     context: TsurugiFfiContextHandle,
@@ -116,6 +135,10 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_atom_type(
     rc
 }
 
+/// SqlColumn: Dispose.
+///
+/// # Receiver
+/// - `sql_column` - Sql column.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_column_dispose(sql_column: TsurugiFfiSqlColumnHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_dispose()";

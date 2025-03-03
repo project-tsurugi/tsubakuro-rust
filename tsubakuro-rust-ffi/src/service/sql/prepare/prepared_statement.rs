@@ -46,8 +46,18 @@ impl std::ops::DerefMut for TsurugiFfiSqlPreparedStatement {
     }
 }
 
+/// Sql prepared statement.
 pub type TsurugiFfiSqlPreparedStatementHandle = *mut TsurugiFfiSqlPreparedStatement;
 
+/// SqlPreparedStatement: Has result records.
+///
+/// See [`SqlPreparedStatement::has_result_records`].
+///
+/// # Receiver
+/// - `prepared_statement` - Sql prepared statement.
+///
+/// # Returns
+/// - `has_result_records_out` - `true`: Has result records (query) / `false`: No result records.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_has_result_records(
     context: TsurugiFfiContextHandle,
@@ -83,24 +93,33 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_has_result_records(
     rc
 }
 
+/// SqlPreparedStatement: Set close timeout.
+///
+/// See [`SqlPreparedStatement::set_close_timeout`].
+///
+/// # Receiver
+/// - `prepared_statement` - Sql prepared statement.
+///
+/// # Parameters
+/// - `close_timeout` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_set_close_timeout(
     context: TsurugiFfiContextHandle,
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,
-    timeout: TsurugiFfiDuration,
+    close_timeout: TsurugiFfiDuration,
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_prepared_statement_set_close_timeout()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}, timeout={:?}",
+        "{FUNCTION_NAME} start. context={:?}, prepared_statement={:?}, close_timeout={:?}",
         context,
         prepared_statement,
-        timeout
+        close_timeout
     );
 
     ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, prepared_statement);
 
     let prepared_statement = unsafe { &mut *prepared_statement };
-    let timeout = Duration::from_nanos(timeout);
+    let timeout = Duration::from_nanos(close_timeout);
 
     prepared_statement.set_close_timeout(timeout);
 
@@ -109,6 +128,15 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_set_close_timeout(
     rc
 }
 
+/// SqlPreparedStatement: Get close timeout.
+///
+/// See [`SqlPreparedStatement::close_timeout`].
+///
+/// # Receiver
+/// - `prepared_statement` - Sql prepared statement.
+///
+/// # Returns
+/// - `close_timeout_out` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_get_close_timeout(
     context: TsurugiFfiContextHandle,
@@ -145,6 +173,14 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_get_close_timeout(
     rc
 }
 
+/// SqlPreparedStatement: Close.
+///
+/// See [`SqlPreparedStatement::close`].
+///
+/// Note: Close is called in `tsurugi_ffi_sql_prepared_statement_dispose()`.
+///
+/// # Receiver
+/// - `prepared_statement` - Sql prepared statement.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(
     context: TsurugiFfiContextHandle,
@@ -169,6 +205,17 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(
     rc
 }
 
+/// SqlPreparedStatement: Close.
+///
+/// See [`SqlPreparedStatement::close_for`].
+///
+/// Note: Close is called in `tsurugi_ffi_sql_prepared_statement_dispose()`.
+///
+/// # Receiver
+/// - `prepared_statement` - Sql prepared statement.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close_for(
     context: TsurugiFfiContextHandle,
@@ -201,6 +248,15 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close_for(
     rc
 }
 
+/// SqlPreparedStatement: Check if the session is closed.
+///
+/// See [`SqlPreparedStatement::is_closed`].
+///
+/// # Receiver
+/// - `prepared_statement` - Sql prepared statement.
+///
+/// # Returns
+/// - `is_closed_out` - `true`: Already closed / `false`: Not closed.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_is_closed(
     context: TsurugiFfiContextHandle,
@@ -236,6 +292,10 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_is_closed(
     rc
 }
 
+/// SqlPreparedStatement: Dispose.
+///
+/// # Receiver
+/// - `prepared_statement` - Sql prepared statement.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_prepared_statement_dispose(
     prepared_statement: TsurugiFfiSqlPreparedStatementHandle,

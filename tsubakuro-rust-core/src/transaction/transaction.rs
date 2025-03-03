@@ -23,6 +23,7 @@ use crate::{
 /// See [SqlClient::start_transaction()](crate::prelude::SqlClient::start_transaction),
 /// [execute()](crate::prelude::SqlClient::execute),
 /// [query()](crate::prelude::SqlClient::query),
+/// [get_transaction_status()](crate::prelude::SqlClient::get_transaction_status),
 /// [commit()](crate::prelude::SqlClient::commit),
 /// [rollback()](crate::prelude::SqlClient::rollback).
 ///

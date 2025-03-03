@@ -1,21 +1,21 @@
+#![allow(private_interfaces)]
+
 use std::ffi::c_char;
 
-mod context;
+pub mod context;
 mod error;
-mod job;
-mod logger;
-mod return_code;
-mod service;
-mod session;
-mod transaction;
+pub mod job;
+pub mod logger;
+pub mod return_code;
+pub mod service;
+pub mod session;
+pub mod transaction;
 mod util;
 
 /// Nanosecond.
 pub type TsurugiFfiDuration = u64;
 
-/// String.
-///
-/// UTF-8 with `nul` termination.
+/// String (UTF-8 with `nul` termination).
 pub type TsurugiFfiStringHandle = *const c_char;
 
 /// String array.

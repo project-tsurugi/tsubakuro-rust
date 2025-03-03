@@ -29,7 +29,9 @@ impl std::ops::DerefMut for TsurugiFfiEndpoint {
 /// Endpoint.
 pub type TsurugiFfiEndpointHandle = *mut TsurugiFfiEndpoint;
 
-/// Creates a new endpoint instance.
+/// Endpoint: Creates a new instance.
+///
+/// See [`Endpoint::parse`].
 ///
 /// # Parameters
 /// - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
@@ -71,7 +73,10 @@ pub extern "C" fn tsurugi_ffi_endpoint_parse(
     rc
 }
 
-/// Dispose endpoint instance.
+/// Endpoint: Dispose.
+///
+/// # Receiver
+/// - `endpoint` - endpoint.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_endpoint_dispose(endpoint: TsurugiFfiEndpointHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_endpoint_dispose()";

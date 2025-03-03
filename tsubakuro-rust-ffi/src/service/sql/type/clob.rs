@@ -14,8 +14,13 @@ impl TsurugiFfiTgClobReference {
     }
 }
 
+/// Clob.
 pub type TsurugiFfiClobReferenceHandle = *mut TsurugiFfiTgClobReference;
 
+/// ClobReference: Dispose.
+///
+/// # Receiver
+/// - `clob_reference` - clob reference.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_clob_reference_dispose(
     clob_reference: TsurugiFfiClobReferenceHandle,

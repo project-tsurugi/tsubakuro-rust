@@ -44,8 +44,18 @@ impl std::ops::DerefMut for TsurugiFfiSqlParameter {
     }
 }
 
+/// Sql parameter.
 pub type TsurugiFfiSqlParameterHandle = *mut TsurugiFfiSqlParameter;
 
+/// SqlParameter: Creates a null parameter.
+///
+/// See [`SqlParameter::null`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_null(
     context: TsurugiFfiContextHandle,
@@ -79,6 +89,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_null(
     rc
 }
 
+/// SqlParameter: Creates a parameter of int4 (int).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_int4(
     context: TsurugiFfiContextHandle,
@@ -114,6 +134,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int4(
     rc
 }
 
+/// SqlParameter: Creates a parameter of int8 (bigint).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_int8(
     context: TsurugiFfiContextHandle,
@@ -149,6 +179,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_int8(
     rc
 }
 
+/// SqlParameter: Creates a parameter of float4 (real).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_float4(
     context: TsurugiFfiContextHandle,
@@ -184,6 +224,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float4(
     rc
 }
 
+/// SqlParameter: Creates a parameter of float8 (double).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_float8(
     context: TsurugiFfiContextHandle,
@@ -219,6 +269,18 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_float8(
     rc
 }
 
+/// SqlParameter: Creates a parameter of decimal.
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `unscaled_value` - unscaled value of decimal.
+/// - `unscaled_value_size` - `unscaled_value` size \[byte\].
+/// - `exponent` - exponent of decimal.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_decimal(
     context: TsurugiFfiContextHandle,
@@ -260,6 +322,18 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_decimal(
     rc
 }
 
+/// SqlParameter: Creates a parameter of decimal.
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `unscaled_value_high` - unscaled value of decimal (high 64 bit).
+/// - `unscaled_value_low` - unscaled value of decimal (low 64 bit).
+/// - `exponent` - exponent of decimal.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_decimal_i128(
     context: TsurugiFfiContextHandle,
@@ -300,6 +374,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_decimal_i128(
     rc
 }
 
+/// SqlParameter: Creates a parameter of character (char/varchar).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
     context: TsurugiFfiContextHandle,
@@ -337,6 +421,17 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_character(
     rc
 }
 
+/// SqlParameter: Creates a parameter of octet (binary/varbinary).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+/// - `value_size` - `value` size \[byte\].
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_octet(
     context: TsurugiFfiContextHandle,
@@ -376,6 +471,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_octet(
     rc
 }
 
+/// SqlParameter: Creates a parameter of date.
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `epoch_days` - parameter value (number of days offset of epoch 1970-01-01).
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_date(
     context: TsurugiFfiContextHandle,
@@ -411,6 +516,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_date(
     rc
 }
 
+/// SqlParameter: Creates a parameter of time of day (time).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `nanoseconds_of_day` - parameter value (nanoseconds since 00:00:00).
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day(
     context: TsurugiFfiContextHandle,
@@ -420,7 +535,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day(
 ) -> TsurugiFfiRc {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_time_of_day()";
     trace!(
-        "{FUNCTION_NAME} start. context={:?}, name={:?}, seconds={:?}, parameter_out={:?}",
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, nanoseconds_of_day={:?}, parameter_out={:?}",
         context,
         name,
         nanoseconds_of_day,
@@ -446,6 +561,17 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day(
     rc
 }
 
+/// SqlParameter: Creates a parameter of time point (timestamp).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `epoch_seconds` - parameter value (number of seconds offset of epoch 1970-01-01).
+/// - `nanos` - parameter value (nanoseconds adjustment \[0, 10^9-1\]).
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point(
     context: TsurugiFfiContextHandle,
@@ -483,6 +609,17 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point(
     rc
 }
 
+/// SqlParameter: Creates a parameter of time of day with time zone (time with time zone).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `nanoseconds_of_day` - parameter value (nanoseconds since 00:00:00).
+/// - `time_zone_offset` - parameter value (timezone offset in minute).
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -523,6 +660,18 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(
     rc
 }
 
+/// SqlParameter: Creates a parameter of time point with time zone (timestamp with time zone).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `epoch_seconds` - parameter value (number of seconds offset of epoch 1970-01-01).
+/// - `nanos` - parameter value (nanoseconds adjustment \[0, 10^9-1\]).
+/// - `time_zone_offset` - parameter value (timezone offset in minute).
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -565,6 +714,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(
     rc
 }
 
+/// SqlParameter: Creates a parameter of blob.
+///
+/// See [`TgBlob::new`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `path` - parameter value (path of file).
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob(
     context: TsurugiFfiContextHandle,
@@ -602,6 +761,17 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob(
     rc
 }
 
+/// SqlParameter: Creates a parameter of blob.
+///
+/// See [`TgBlob::from`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+/// - `value_size` - `value` size \[byte\].
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob_contents(
     context: TsurugiFfiContextHandle,
@@ -641,6 +811,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob_contents(
     rc
 }
 
+/// SqlParameter: Creates a parameter of clob.
+///
+/// See [`TgClob::new`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `path` - parameter value (path of file).
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob(
     context: TsurugiFfiContextHandle,
@@ -678,6 +858,16 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob(
     rc
 }
 
+/// SqlParameter: Creates a parameter of clob.
+///
+/// See [`TgClob::from`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob_contents(
     context: TsurugiFfiContextHandle,
@@ -715,6 +905,15 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob_contents(
     rc
 }
 
+/// SqlParameter: Get name.
+///
+/// See [`SqlParameter::name`].
+///
+/// # Receiver
+/// - `parameter` - Sql parameter.
+///
+/// # Returns
+/// - `name_out` - parameter name.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
     context: TsurugiFfiContextHandle,
@@ -752,6 +951,10 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_get_name(
     rc
 }
 
+/// SqlParameter: Dispose.
+///
+/// # Receiver
+/// - `parameter` - Sql parameter.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_parameter_dispose(parameter: TsurugiFfiSqlParameterHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_dispose()";

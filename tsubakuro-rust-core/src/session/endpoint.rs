@@ -8,28 +8,38 @@ use crate::{client_error, error::TgError};
 /// ```
 /// use tsubakuro_rust_core::prelude::*;
 ///
-/// async fn example() -> Result<(), TgError> {
+/// fn example() -> Result<ConnectionOption, TgError> {
 ///     let endpoint = Endpoint::parse("tcp://localhost:12345")?;
 ///
 ///     let mut connection_option = ConnectionOption::new();
 ///     connection_option.set_endpoint(endpoint);
 ///
-///     Ok(())
+///     Ok(connection_option)
 /// }
 /// ```
+///
+/// See [ConnectionOption::set_endpoint()](crate::prelude::ConnectionOption::set_endpoint).
 #[derive(PartialEq, Clone)]
 pub enum Endpoint {
-    Tcp(/*host*/ String, /*port*/ u16),
+    /// TCP endpoint.
+    Tcp(
+        /// host
+        String,
+        /// port
+        u16,
+    ),
+    /// dummy.
+    #[doc(hidden)]
     Other,
 }
 
 impl Endpoint {
-    /// parse endoint url.
+    /// parse endpoint url.
     ///
     /// # Parameters
     /// - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
-    pub fn parse(endoint: &str) -> Result<Endpoint, TgError> {
-        let url = Url::parse(endoint).map_err(|e| client_error!("endpoint parse error", e))?;
+    pub fn parse(endpoint: &str) -> Result<Endpoint, TgError> {
+        let url = Url::parse(endpoint).map_err(|e| client_error!("endpoint parse error", e))?;
         let scheme = url.scheme();
         match scheme {
             "tcp" => {

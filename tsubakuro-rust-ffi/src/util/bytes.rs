@@ -1,3 +1,4 @@
+#[doc(hidden)]
 #[macro_export]
 macro_rules! bytes_to_vec_u8 {
     ($value:expr, $size:expr) => {
@@ -5,6 +6,7 @@ macro_rules! bytes_to_vec_u8 {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! vec_u8_to_field {
     ($field:expr, $vec:expr) => {{

@@ -83,6 +83,7 @@ pub(crate) trait TsurugiFfiJobDelegator {
     ) -> TsurugiFfiRc;
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! impl_job_delegator {
     ( $struct_name:ident, $src:ty, $ffi:ty, $value_name:expr $(,)?) => {
@@ -144,6 +145,7 @@ impl VoidJobDelegator {
     }
 }
 
+/// Job.
 pub type TsurugiFfiJobHandle = *mut c_void; // *mut TsurugiFfiJob<T>
 
 fn unknown_job(job: TsurugiFfiJobHandle) -> *mut TsurugiFfiJob<c_void> {
@@ -168,6 +170,15 @@ macro_rules! get_raw_job {
     }};
 }
 
+/// Job: Get name.
+///
+/// See [`Job::name`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Returns
+/// - `name_out` - job name.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_get_name(
     context: TsurugiFfiContextHandle,
@@ -204,6 +215,18 @@ pub extern "C" fn tsurugi_ffi_job_get_name(
     rc
 }
 
+/// Job: Wait.
+///
+/// See [`Job::wait`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `done_out` - `true`: Response received / `false`: Timed out.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_wait(
     context: TsurugiFfiContextHandle,
@@ -240,6 +263,15 @@ pub extern "C" fn tsurugi_ffi_job_wait(
     rc
 }
 
+/// Job: Is done.
+///
+/// See [`Job::is_done`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Returns
+/// - `done_out` - `true`: Response received / `false`: No response received.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_is_done(
     context: TsurugiFfiContextHandle,
@@ -273,6 +305,17 @@ pub extern "C" fn tsurugi_ffi_job_is_done(
     rc
 }
 
+/// Job: Take result.
+///
+/// See [`Job::take`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Returns
+/// - `value_out` - result value (`null` if job type is `void`).
+///   The value must be cast to the appropriate type according to the function that generated this Job.
+///   And, call `tsurugi_ffi_XXX_dispose()` to dispose if value is not null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_take(
     context: TsurugiFfiContextHandle,
@@ -329,6 +372,20 @@ impl<T> TsurugiFfiJob<T> {
     }
 }
 
+/// Job: Take result.
+///
+/// See [`Job::take_for`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - result value (`null` if job type is `void`).
+///   The value must be cast to the appropriate type according to the function that generated this Job.
+///   And, call `tsurugi_ffi_XXX_dispose()` to dispose if value is not null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_take_for(
     context: TsurugiFfiContextHandle,
@@ -391,6 +448,18 @@ impl<T> TsurugiFfiJob<T> {
     }
 }
 
+/// Job: Take result if ready.
+///
+/// See [`Job::take_if_ready`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Returns
+/// - `is_ready_out` - `true`: Response received / `false`: No response received.
+/// - `value_out` - result value (`null` if no response received or job type is `void`).
+///   The value must be cast to the appropriate type according to the function that generated this Job.
+///   And, call `tsurugi_ffi_XXX_dispose()` to dispose if value is not null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_take_if_ready(
     context: TsurugiFfiContextHandle,
@@ -465,6 +534,15 @@ impl<T> TsurugiFfiJob<T> {
     }
 }
 
+/// Job: Cancel.
+///
+/// See [`Job::cancel`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Returns
+/// - `cancell_done_out` - `true`: Response received / `false`: Timed out.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_cancel(
     context: TsurugiFfiContextHandle,
@@ -502,6 +580,18 @@ pub extern "C" fn tsurugi_ffi_job_cancel(
     rc
 }
 
+/// Job: Cancel.
+///
+/// See [`Job::cancel_for`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `cancell_done_out` - `true`: Response received / `false`: Timed out.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_cancel_for(
     context: TsurugiFfiContextHandle,
@@ -542,6 +632,15 @@ pub extern "C" fn tsurugi_ffi_job_cancel_for(
     rc
 }
 
+/// Job: Cancel.
+///
+/// See [`Job::cancel_async`].
+///
+/// # Receiver
+/// - `job` - job.
+///
+/// # Returns
+/// - `cancel_job_out` - cancel job. To dispose, call `tsurugi_ffi_cancel_job_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_cancel_async(
     context: TsurugiFfiContextHandle,
@@ -583,6 +682,14 @@ pub extern "C" fn tsurugi_ffi_job_cancel_async(
     rc
 }
 
+/// Job: Close.
+///
+/// See [`Job::close`].
+///
+/// Note: Close is called in `tsurugi_ffi_job_dispose()`.
+///
+/// # Receiver
+/// - `job` - job.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_close(
     context: TsurugiFfiContextHandle,
@@ -608,6 +715,10 @@ pub extern "C" fn tsurugi_ffi_job_close(
     rc
 }
 
+/// Job: Dispose.
+///
+/// # Receiver
+/// - `job` - job.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_dispose(job: TsurugiFfiJobHandle) {
     job_dispose(job);

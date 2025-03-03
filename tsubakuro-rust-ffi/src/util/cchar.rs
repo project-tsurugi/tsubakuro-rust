@@ -2,6 +2,7 @@ use std::ffi::CString;
 
 use crate::{TsurugiFfiStringArrayHandle, TsurugiFfiStringHandle};
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! ffi_arg_cchar_to_str {
     ($context:expr, $function_name:expr, $arg_index:expr, $arg:expr) => {{
@@ -22,6 +23,7 @@ macro_rules! ffi_arg_cchar_to_str {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! ffi_str_to_cstring {
     ($context:expr, $value:expr) => {{
@@ -39,6 +41,7 @@ macro_rules! ffi_str_to_cstring {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! ffi_str_to_cchar {
     ($context:expr, $value:expr) => {{
@@ -56,6 +59,7 @@ macro_rules! ffi_str_to_cchar {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! cstring_to_cchar {
     ($value:expr) => {
@@ -66,6 +70,7 @@ macro_rules! cstring_to_cchar {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! cchar_field_set {
     ($context:expr, $field:expr, $value:expr) => {{
@@ -73,6 +78,7 @@ macro_rules! cchar_field_set {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! cchar_field_clear {
     ($field:expr) => {{
@@ -104,6 +110,7 @@ impl TsurugiFfiCStringArray {
     }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! cstring_array_field_set_if_none {
     ($context:expr, $field:expr, $values:expr) => {{
@@ -119,6 +126,7 @@ macro_rules! cstring_array_field_set_if_none {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! cstring_array_field_clear {
     ($field:expr) => {{
@@ -126,6 +134,7 @@ macro_rules! cstring_array_field_clear {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! cstring_array_field_to_ptr {
     ($field:expr) => {

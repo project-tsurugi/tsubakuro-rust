@@ -46,8 +46,18 @@ impl std::ops::DerefMut for TsurugiFfiTableMetadata {
     }
 }
 
+/// Table metadata.
 pub type TsurugiFfiTableMetadataHandle = *mut TsurugiFfiTableMetadata;
 
+/// TableMetadata: Get database name.
+///
+/// See [`TableMetadata::database_name`].
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
+///
+/// # Returns
+/// - `database_name_out` - database name (nullable).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_metadata_get_database_name(
     context: TsurugiFfiContextHandle,
@@ -83,6 +93,15 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_database_name(
     rc
 }
 
+/// TableMetadata: Get schema name.
+///
+/// See [`TableMetadata::schema_name`].
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
+///
+/// # Returns
+/// - `schema_name_out` - schema name (nullable).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_metadata_get_schema_name(
     context: TsurugiFfiContextHandle,
@@ -118,6 +137,15 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_schema_name(
     rc
 }
 
+/// TableMetadata: Get table name.
+///
+/// See [`TableMetadata::table_name`].
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
+///
+/// # Returns
+/// - `table_name_out` - table name.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
     context: TsurugiFfiContextHandle,
@@ -153,6 +181,15 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
     rc
 }
 
+/// TableMetadata: Get columns size.
+///
+/// See [`TableMetadata::columns`].
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
+///
+/// # Returns
+/// - `size_out` - number of columns \[number of columns\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_size(
     context: TsurugiFfiContextHandle,
@@ -184,6 +221,18 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_size(
     rc
 }
 
+/// TableMetadata: Get columns value.
+///
+/// See [`TableMetadata::columns`].
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
+///
+/// # Parameters
+/// - `index` - column index \[0..tsurugi_ffi_table_metadata_get_columns_size()-1\].
+///
+/// # Returns
+/// - `sql_column_out` - column. To dispose, call `tsurugi_ffi_sql_column_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_value(
     context: TsurugiFfiContextHandle,
@@ -225,6 +274,10 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_value(
     rc
 }
 
+/// TableMetadata: Dispose.
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_metadata_dispose(
     table_metadata: TsurugiFfiTableMetadataHandle,

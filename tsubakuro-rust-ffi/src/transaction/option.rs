@@ -38,8 +38,15 @@ impl std::ops::DerefMut for TsurugiFfiTransactionOption {
     }
 }
 
+/// Transaction option.
 pub type TsurugiFfiTransactionOptionHandle = *mut TsurugiFfiTransactionOption;
 
+/// TransactionOption: Creates a new instance.
+///
+/// See [`TransactionOption::new`].
+///
+/// # Returns
+/// - `transaction_option_out` - transaction option. To dispose, call `tsurugi_ffi_transaction_option_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_create(
     context: TsurugiFfiContextHandle,
@@ -77,6 +84,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_create(
     rc
 }
 
+/// TransactionOption: Set transaction type.
+///
+/// See [`TransactionOption::set_transaction_type`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `transaction_type` - transaction type.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_type(
     context: TsurugiFfiContextHandle,
@@ -102,6 +118,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_type(
     rc
 }
 
+/// TransactionOption: Get transaction type.
+///
+/// See [`TransactionOption::transaction_type`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `transaction_type_out` - transaction type.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_type(
     context: TsurugiFfiContextHandle,
@@ -138,6 +163,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_type(
     rc
 }
 
+/// TransactionOption: Set transaction label.
+///
+/// See [`TransactionOption::set_transaction_label`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `transaction_label` - transaction label.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_label(
     context: TsurugiFfiContextHandle,
@@ -167,6 +201,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_transaction_label(
     rc
 }
 
+/// TransactionOption: Get transaction label.
+///
+/// See [`TransactionOption::transaction_label`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `transaction_label_out` - transaction label.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
     context: TsurugiFfiContextHandle,
@@ -208,6 +251,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_transaction_label(
     rc
 }
 
+/// TransactionOption: Set modifies definitions.
+///
+/// See [`TransactionOption::set_modifies_definitions`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `modifies_definitions` - modifies definitions.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_modifies_definitions(
     context: TsurugiFfiContextHandle,
@@ -233,6 +285,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_modifies_definitions(
     rc
 }
 
+/// TransactionOption: Get modifies definitions.
+///
+/// See [`TransactionOption::modifies_definitions`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `modifies_definitions_out` - modifies definitions.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_modifies_definitions(
     context: TsurugiFfiContextHandle,
@@ -288,6 +349,16 @@ macro_rules! convert_table_names {
     };
 }
 
+/// TransactionOption: Set write preserve.
+///
+/// See [`TransactionOption::set_write_preserve`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `table_names` - table names (String array).
+/// - `table_names_size` - `table_names` size \[number of tables\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_write_preserve(
     context: TsurugiFfiContextHandle,
@@ -320,6 +391,16 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_write_preserve(
     rc
 }
 
+/// TransactionOption: Get write preserve.
+///
+/// See [`TransactionOption::write_preserve`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `table_names_out` - table names (String array).
+/// - `table_names_size_out` - `table_names_out` size \[number of tables\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
     context: TsurugiFfiContextHandle,
@@ -365,6 +446,16 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_write_preserve(
     rc
 }
 
+/// TransactionOption: Set inclusive read area.
+///
+/// See [`TransactionOption::set_inclusive_read_area`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `table_names` - table names (String array).
+/// - `table_names_size` - `table_names` size \[number of tables\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_inclusive_read_area(
     context: TsurugiFfiContextHandle,
@@ -397,6 +488,16 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_inclusive_read_area(
     rc
 }
 
+/// TransactionOption: Get inclusive read area.
+///
+/// See [`TransactionOption::inclusive_read_area`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `table_names_out` - table names (String array).
+/// - `table_names_size_out` - `table_names_out` size \[number of tables\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
     context: TsurugiFfiContextHandle,
@@ -442,6 +543,16 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_inclusive_read_area(
     rc
 }
 
+/// TransactionOption: Set exclusive read area.
+///
+/// See [`TransactionOption::set_exclusive_read_area`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `table_names` - table names (String array).
+/// - `table_names_size` - `table_names` size \[number of tables\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_exclusive_read_area(
     context: TsurugiFfiContextHandle,
@@ -474,6 +585,16 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_exclusive_read_area(
     rc
 }
 
+/// TransactionOption: Get exclusive read area.
+///
+/// See [`TransactionOption::exclusive_read_area`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `table_names_out` - table names (String array).
+/// - `table_names_size_out` - `table_names_out` size \[number of tables\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
     context: TsurugiFfiContextHandle,
@@ -519,6 +640,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
     rc
 }
 
+/// TransactionOption: Set priority.
+///
+/// See [`TransactionOption::set_priority`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `priority` - priority.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_priority(
     context: TsurugiFfiContextHandle,
@@ -544,6 +674,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_priority(
     rc
 }
 
+/// TransactionOption: Get priority.
+///
+/// See [`TransactionOption::priority`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `priority_out` - priority.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_priority(
     context: TsurugiFfiContextHandle,
@@ -580,6 +719,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_priority(
     rc
 }
 
+/// TransactionOption: Set close timeout.
+///
+/// See [`TransactionOption::set_close_timeout`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `close_timeout` - close timeout \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_set_close_timeout(
     context: TsurugiFfiContextHandle,
@@ -606,6 +754,15 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_close_timeout(
     rc
 }
 
+/// TransactionOption: Get close timeout.
+///
+/// See [`TransactionOption::close_timeout`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `close_timeout_out` - close timeout \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_close_timeout(
     context: TsurugiFfiContextHandle,
@@ -651,6 +808,10 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_close_timeout(
     rc
 }
 
+/// TransactionOption: Dispose.
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_dispose(
     transaction_option: TsurugiFfiTransactionOptionHandle,

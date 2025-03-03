@@ -7,6 +7,7 @@ use crate::{
     return_code::{rc_ok, TsurugiFfiRc},
 };
 
+/// Commit type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub enum TsurugiFfiCommitType {
@@ -65,8 +66,15 @@ impl std::ops::DerefMut for TsurugiFfiCommitOption {
     }
 }
 
+/// Commit option.
 pub type TsurugiFfiCommitOptionHandle = *mut TsurugiFfiCommitOption;
 
+/// CommitOption: Creates a new instance.
+///
+/// See [`CommitOption::new`].
+///
+/// # Returns
+/// - `commit_option_out` - commit option. To dispose, call `tsurugi_ffi_commit_option_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_create(
     context: TsurugiFfiContextHandle,
@@ -100,6 +108,15 @@ pub extern "C" fn tsurugi_ffi_commit_option_create(
     rc
 }
 
+/// CommitOption: Set commit type.
+///
+/// See [`CommitOption::set_commit_type`].
+///
+/// # Receiver
+/// - `commit_option` - Commit option.
+///
+/// # Parameters
+/// - `commit_type` - commit type.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_set_commit_type(
     context: TsurugiFfiContextHandle,
@@ -125,6 +142,15 @@ pub extern "C" fn tsurugi_ffi_commit_option_set_commit_type(
     rc
 }
 
+/// CommitOption: Get commit type.
+///
+/// See [`CommitOption::commit_type`].
+///
+/// # Receiver
+/// - `commit_option` - Commit option.
+///
+/// # Returns
+/// - `commit_type_out` - commit type.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_get_commit_type(
     context: TsurugiFfiContextHandle,
@@ -161,6 +187,15 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_commit_type(
     rc
 }
 
+/// CommitOption: Set auto dispose.
+///
+/// See [`CommitOption::set_auto_dispose`].
+///
+/// # Receiver
+/// - `commit_option` - Commit option.
+///
+/// # Parameters
+/// - `auto_dispose` - auto dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_set_auto_dispose(
     context: TsurugiFfiContextHandle,
@@ -186,6 +221,15 @@ pub extern "C" fn tsurugi_ffi_commit_option_set_auto_dispose(
     rc
 }
 
+/// CommitOption: Get auto dispose.
+///
+/// See [`CommitOption::auto_dispose`].
+///
+/// # Receiver
+/// - `commit_option` - Commit option.
+///
+/// # Returns
+/// - `auto_dispose_out` - auto dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_get_auto_dispose(
     context: TsurugiFfiContextHandle,
@@ -221,6 +265,10 @@ pub extern "C" fn tsurugi_ffi_commit_option_get_auto_dispose(
     rc
 }
 
+/// CommitOption: Dispose.
+///
+/// # Receiver
+/// - `commit_option` - Commit option.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_dispose(commit_option: TsurugiFfiCommitOptionHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_commit_option_dispose()";

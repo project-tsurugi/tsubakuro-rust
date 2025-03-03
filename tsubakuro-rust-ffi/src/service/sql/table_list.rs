@@ -38,8 +38,19 @@ impl std::ops::DerefMut for TsurugiFfiTableList {
     }
 }
 
+/// Table list.
 pub type TsurugiFfiTableListHandle = *mut TsurugiFfiTableList;
 
+/// TableList: Get table names.
+///
+/// See [`TableList::table_names`].
+///
+/// # Receiver
+/// - `table_list` - Table list.
+///
+/// # Returns
+/// - `table_names_out` - table names (string array).
+/// - `table_names_size_out` - `table_names_out` size (number of tables).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
     context: TsurugiFfiContextHandle,
@@ -84,6 +95,10 @@ pub extern "C" fn tsurugi_ffi_table_list_get_table_names(
     rc
 }
 
+/// TableList: Dispose.
+///
+/// # Receiver
+/// - `table_list` - Table list.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_table_list_dispose(table_list: TsurugiFfiTableListHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_table_list_dispose()";

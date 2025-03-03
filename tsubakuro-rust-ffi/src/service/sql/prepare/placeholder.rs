@@ -38,8 +38,19 @@ impl std::ops::DerefMut for TsurugiFfiSqlPlaceholder {
     }
 }
 
+/// Sql placeholder.
 pub type TsurugiFfiSqlPlaceholderHandle = *mut TsurugiFfiSqlPlaceholder;
 
+/// SqlPlaceholder: Creates a placeholder.
+///
+/// See [`SqlPlaceholder::of_atom_type`].
+///
+/// # Parameters
+/// - `name` - placeholder name.
+/// - `atom_type` - parameter type.
+///
+/// # Returns
+/// - `placeholder_out` - placeholder. To dispose, call `tsurugi_ffi_sql_placeholder_dispose()`.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
     context: TsurugiFfiContextHandle,
@@ -78,6 +89,15 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
     rc
 }
 
+/// SqlPlaceholder: Get name.
+///
+/// See [`SqlPlaceholder::name`].
+///
+/// # Receiver
+/// - `placeholder` - Sql placeholder.
+///
+/// # Returns
+/// - `name_out` - placeholder name.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
     context: TsurugiFfiContextHandle,
@@ -115,6 +135,15 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_name(
     rc
 }
 
+/// SqlPlaceholder: Get AtomType.
+///
+/// See [`SqlPlaceholder::atom_type`].
+///
+/// # Receiver
+/// - `placeholder` - Sql placeholder.
+///
+/// # Returns
+/// - `atom_type_out` - placeholder type.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_placeholder_get_atom_type(
     context: TsurugiFfiContextHandle,
@@ -153,6 +182,10 @@ pub extern "C" fn tsurugi_ffi_sql_placeholder_get_atom_type(
     rc
 }
 
+/// SqlPlaceholder: Dispose.
+///
+/// # Receiver
+/// - `placeholder` - Sql placeholder.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_placeholder_dispose(placeholder: TsurugiFfiSqlPlaceholderHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_sql_placeholder_dispose()";

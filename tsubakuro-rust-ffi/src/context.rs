@@ -58,7 +58,7 @@ impl TsurugiFfiContext {
 /// Context object holds error information when an error occurs.
 pub type TsurugiFfiContextHandle = *mut TsurugiFfiContext;
 
-/// Creates a new context object.
+/// Context: Creates a new instance.
 ///
 /// # Returns
 /// - `context_out` - context object. To dispose, call `tsurugi_ffi_context_dispose()`.
@@ -96,7 +96,13 @@ pub extern "C" fn tsurugi_ffi_context_create(
     rc
 }
 
-/// Context: get return code.
+/// Context: Get return code.
+///
+/// # Receiver
+/// - `context` - Context object.
+///
+/// # Returns
+/// - `rc_out` - return code.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_return_code(
     context: TsurugiFfiContextHandle,
@@ -126,7 +132,10 @@ pub extern "C" fn tsurugi_ffi_context_get_return_code(
     rc
 }
 
-/// Context: get error name.
+/// Context: Get error name.
+///
+/// # Receiver
+/// - `context` - Context object.
 ///
 /// # Returns
 /// - `error_name_out` - error name. `null` if no error occurs.
@@ -166,7 +175,13 @@ pub extern "C" fn tsurugi_ffi_context_get_error_name(
     rc
 }
 
-/// Context: get RcType.
+/// Context: Get RcType.
+///
+/// # Receiver
+/// - `context` - Context object.
+///
+/// # Returns
+/// - `error_type_out` - type of return code.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_get_error_type(
     context: TsurugiFfiContextHandle,
@@ -200,7 +215,10 @@ pub extern "C" fn tsurugi_ffi_context_get_error_type(
     rc
 }
 
-/// Context: get error message.
+/// Context: Get error message.
+///
+/// # Receiver
+/// - `context` - Context object.
 ///
 /// # Returns
 /// - `error_message_out` - error message. `null` if no error occurs.
@@ -242,9 +260,12 @@ pub extern "C" fn tsurugi_ffi_context_get_error_message(
     rc
 }
 
-/// Context: get error category.
+/// Context: Get error category.
 ///
 /// Available only if a server error has occurred.
+///
+/// # Receiver
+/// - `context` - Context object.
 ///
 /// # Returns
 /// - `category_number_out` - category number.
@@ -287,9 +308,12 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_number(
     rc
 }
 
-/// Context: get error category.
+/// Context: Get error category.
 ///
 /// Available only if a server error has occurred.
+///
+/// # Receiver
+/// - `context` - Context object.
 ///
 /// # Returns
 /// - `category_str_out` - category name.
@@ -334,9 +358,12 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_category_str(
     rc
 }
 
-/// Context: get error code.
+/// Context: Get error code.
 ///
 /// Available only if a server error has occurred.
+///
+/// # Receiver
+/// - `context` - Context object.
 ///
 /// # Returns
 /// - `code_number_out` - error code.
@@ -375,9 +402,12 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_code_number(
     rc
 }
 
-/// Context: get structured error code.
+/// Context: Get structured error code.
 ///
 /// Available only if a server error has occurred.
+///
+/// # Receiver
+/// - `context` - Context object.
 ///
 /// # Returns
 /// - `structured_code_out` - structured error code.
@@ -430,7 +460,10 @@ pub extern "C" fn tsurugi_ffi_context_get_server_error_structured_code(
     rc
 }
 
-/// Dispose context object.
+/// Context: Dispose.
+///
+/// # Receiver
+/// - `context` - Context object.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_dispose(context: TsurugiFfiContextHandle) {
     const FUNCTION_NAME: &str = "tsurugi_ffi_context_dispose()";

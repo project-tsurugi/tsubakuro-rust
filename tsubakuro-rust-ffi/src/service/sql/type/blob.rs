@@ -14,8 +14,13 @@ impl TsurugiFfiTgBlobReference {
     }
 }
 
+/// Blob.
 pub type TsurugiFfiBlobReferenceHandle = *mut TsurugiFfiTgBlobReference;
 
+/// BlobReference: Dispose.
+///
+/// # Receiver
+/// - `blob_reference` - blob reference.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_blob_reference_dispose(
     blob_reference: TsurugiFfiBlobReferenceHandle,
