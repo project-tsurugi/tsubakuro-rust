@@ -34,11 +34,17 @@
 //! See <https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core#example>.
 //!
 #![allow(clippy::result_large_err)]
+
+#[doc(hidden)]
 pub mod error;
+#[doc(hidden)]
 pub mod job;
 pub mod prelude;
+#[doc(hidden)]
 pub mod service;
+#[doc(hidden)]
 pub mod session;
+#[doc(hidden)]
 pub mod transaction;
 pub(crate) mod util;
 
