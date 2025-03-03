@@ -1,3 +1,5 @@
+//! return code module.
+
 use tsubakuro_rust_core::error::TgError;
 
 use crate::context::{TsurugiFfiContext, TsurugiFfiContextHandle};

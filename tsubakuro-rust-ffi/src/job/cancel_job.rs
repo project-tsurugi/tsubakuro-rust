@@ -1,3 +1,5 @@
+//! cancel job.
+
 use std::{sync::Arc, time::Duration};
 
 use log::trace;

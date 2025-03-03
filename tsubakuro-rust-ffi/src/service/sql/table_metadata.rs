@@ -1,3 +1,5 @@
+//! table metadata.
+
 use std::ffi::CString;
 
 use log::trace;

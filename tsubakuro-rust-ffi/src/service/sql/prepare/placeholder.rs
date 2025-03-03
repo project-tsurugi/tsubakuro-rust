@@ -1,3 +1,5 @@
+//! Sql placeholder.
+
 use std::ffi::CString;
 
 use log::trace;

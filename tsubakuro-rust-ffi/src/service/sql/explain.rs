@@ -1,3 +1,5 @@
+//! Sql explain result.
+
 use std::ffi::CString;
 
 use log::trace;

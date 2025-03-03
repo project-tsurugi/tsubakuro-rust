@@ -1,3 +1,5 @@
+//! Sql query result metadata.
+
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 

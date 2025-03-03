@@ -1,3 +1,5 @@
+//! atom type.
+
 use tsubakuro_rust_core::prelude::AtomType;
 
 // copy from AtomType

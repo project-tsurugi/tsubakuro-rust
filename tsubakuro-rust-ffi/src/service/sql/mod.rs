@@ -1,3 +1,5 @@
+//! Sql client module.
+
 pub mod atom_type;
 pub mod column;
 pub mod execute_result;

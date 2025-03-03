@@ -1,3 +1,5 @@
+//! transaction option.
+
 use std::{ffi::CString, time::Duration};
 
 use log::trace;

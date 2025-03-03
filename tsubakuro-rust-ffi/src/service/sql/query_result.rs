@@ -1,3 +1,5 @@
+//! Sql query result.
+
 use std::{ffi::CString, sync::Arc, time::Duration};
 
 use log::trace;

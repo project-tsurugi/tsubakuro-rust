@@ -1,3 +1,5 @@
+//! context object module.
+
 use std::ffi::CString;
 
 use log::trace;

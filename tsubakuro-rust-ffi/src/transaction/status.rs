@@ -1,3 +1,5 @@
+//! transaction status.
+
 use std::ffi::CString;
 
 use log::trace;

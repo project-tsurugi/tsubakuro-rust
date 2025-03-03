@@ -1,3 +1,5 @@
+//! transaction type.
+
 use tsubakuro_rust_core::prelude::*;
 
 /// Transaction type.

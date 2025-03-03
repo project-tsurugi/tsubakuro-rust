@@ -1,3 +1,5 @@
+//! commit option.
+
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 

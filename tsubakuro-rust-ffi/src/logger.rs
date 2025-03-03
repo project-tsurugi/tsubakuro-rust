@@ -1,3 +1,5 @@
+//! logger module.
+
 use log::trace;
 
 use crate::return_code::{TsurugiFfiRc, TSURUGI_FFI_RC_OK};

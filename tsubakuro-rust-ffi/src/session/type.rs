@@ -1,3 +1,5 @@
+//! shutdown type.
+
 use tsubakuro_rust_core::prelude::*;
 
 /// Shutdown type.

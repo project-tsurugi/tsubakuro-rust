@@ -1,3 +1,5 @@
+//! Sql parameter.
+
 use std::ffi::CString;
 
 use log::trace;

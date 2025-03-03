@@ -1,3 +1,5 @@
+//! connection option.
+
 use std::{ffi::CString, ops::Deref, time::Duration};
 
 use log::trace;
