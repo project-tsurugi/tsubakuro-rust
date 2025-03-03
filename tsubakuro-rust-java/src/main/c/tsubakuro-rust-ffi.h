@@ -2500,6 +2500,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_for(TsurugiFfiContextHandle cont
  *
  * # Returns
  * - `table_list_job_out` - Job for `TsurugiFfiTableListHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiTableListHandle` and call `tsurugi_ffi_table_list_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_async(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,
@@ -2558,6 +2559,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHand
  *
  * # Returns
  * - `table_metadata_job_out` - Job for `TsurugiFfiTableMetadataHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiTableMetadataHandle` and call `tsurugi_ffi_table_metadata_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context,
                                                              TsurugiFfiSqlClientHandle sql_client,
@@ -2627,6 +2629,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context,
  *
  * # Returns
  * - `prepared_statement_job_out` - Job for `TsurugiFfiSqlPreparedStatementHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSqlPreparedStatementHandle` and call `tsurugi_ffi_sql_prepared_statement_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
@@ -2688,6 +2691,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_explain_for(TsurugiFfiContextHandle context,
  *
  * # Returns
  * - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call `tsurugi_ffi_sql_explain_result_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_explain_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
@@ -2757,6 +2761,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle
  *
  * # Returns
  * - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call `tsurugi_ffi_sql_explain_result_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
@@ -2818,6 +2823,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_for(TsurugiFfiContextHandl
  *
  * # Returns
  * - `transaction_job_out` - Job for `TsurugiFfiTransactionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiTransactionHandle` and call `tsurugi_ffi_transaction_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHandle context,
                                                             TsurugiFfiSqlClientHandle sql_client,
@@ -2877,6 +2883,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContext
  *
  * # Returns
  * - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiTransactionStatusHandle` and call `tsurugi_ffi_transaction_status_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context,
                                                                  TsurugiFfiSqlClientHandle sql_client,
@@ -2941,6 +2948,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context,
  *
  * # Returns
  * - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call `tsurugi_ffi_sql_execute_result_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
@@ -3016,6 +3024,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle
  *
  * # Returns
  * - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call `tsurugi_ffi_sql_execute_result_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
@@ -3083,6 +3092,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context,
  *
  * # Returns
  * - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call `tsurugi_ffi_sql_query_result_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -3158,6 +3168,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle c
  *
  * # Returns
  * - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call `tsurugi_ffi_sql_query_result_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlClientHandle sql_client,
@@ -3721,6 +3732,7 @@ TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context,
  *
  * # Returns
  * - `session_job_out` - Job for `TsurugiFfiSessionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ *   Handle taken from Job casts to `TsurugiFfiSessionHandle` and call `tsurugi_ffi_session_dispose()` to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context,
                                                TsurugiFfiConnectionOptionHandle connection_option,

@@ -161,6 +161,7 @@ pub extern "C" fn tsurugi_ffi_session_connect_for(
 ///
 /// # Returns
 /// - `session_job_out` - Job for `TsurugiFfiSessionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
+///   Handle taken from Job casts to `TsurugiFfiSessionHandle` and call `tsurugi_ffi_session_dispose()` to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_connect_async(
     context: TsurugiFfiContextHandle,
