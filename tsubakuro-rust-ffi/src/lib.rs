@@ -1,3 +1,9 @@
+//! [tsubakuro-rust-ffi](https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-ffi)
+//! is the library providing functions in C ABI format to access [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb).
+//!
+//! tsubakuro-rust-ffi uses [tsubakuro-rust-core](https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core),
+//! so refer to that for explanation.
+//!
 #![allow(private_interfaces)]
 #![allow(clippy::not_unsafe_ptr_arg_deref)]
 #![allow(clippy::missing_safety_doc)]
