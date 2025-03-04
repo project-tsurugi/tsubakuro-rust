@@ -222,7 +222,9 @@ async fn example_prepared_query(
 
 ## How to build
 
-First, copy the proto files from [tsubakuro-proto](https://github.com/project-tsurugi/tsubakuro/tree/master/modules/proto).
+Need to install [protoc](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation) since used [prost](https://crates.io/crates/prost).
+
+If proto files in [tsubakuro-proto](https://github.com/project-tsurugi/tsubakuro/tree/master/modules/proto) has been modified, copy from there.
 
 ```bash
 cd tsubakuro-rust-core
