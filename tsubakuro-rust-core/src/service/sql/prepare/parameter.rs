@@ -3,10 +3,13 @@ use std::sync::atomic::AtomicI64;
 #[cfg(feature = "with_chrono")]
 use {chrono::Datelike, chrono::Offset};
 
+#[cfg(any(feature = "with_bigdecimal", feature = "with_rust_decimal"))]
 use crate::jogasaki::proto::sql::common::Decimal as ProtoDecimal;
-use crate::jogasaki::proto::sql::common::TimeOfDayWithTimeZone as ProtoTimeOfDayWithTimeZone;
-use crate::jogasaki::proto::sql::common::TimePoint as ProtoTimePoint;
-use crate::jogasaki::proto::sql::common::TimePointWithTimeZone as ProtoTimePointWithTimeZone;
+#[cfg(any(feature = "with_chrono", feature = "with_time"))]
+use crate::jogasaki::proto::sql::common::{
+    TimeOfDayWithTimeZone as ProtoTimeOfDayWithTimeZone, TimePoint as ProtoTimePoint,
+    TimePointWithTimeZone as ProtoTimePointWithTimeZone,
+};
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
 use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
 use crate::prelude::{

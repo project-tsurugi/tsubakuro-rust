@@ -1,13 +1,37 @@
 # tsubakuro-rust-core
 
-tsubakuro-rust-core is the core library to access Tsurugi written in Rust.
+tsubakuro-rust-core is the core library to access [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb) for Rust.
+
+tsubakuro-rust-core is a port from [Tsubakuro/Java](https://github.com/project-tsurugi/tsubakuro), but it does not cover all functions.
+
+## Limitations
+
+- Provide SQL service only.
+- Only TCP connection is available.
+
+## Crate features
+
+Default feature include the following features.
+
+- `with_bigdecimal` - Enable decimal via [bigdecimal](https://crates.io/crates/bigdecimal).
+- `with_rust_decimal` - Enable decimal via [rust_decimal](https://crates.io/crates/rust_decimal).
+- `with_chrono` - Enable date/time via [chrono](https://crates.io/crates/chrono).
+- `with_time` - Enable date/time via [time](https://crates.io/crates/time).
+
+## Rust version requirements
+
+The Minimum Supported Rust Version (MSRV) is currently **Rust 1.75.0**.
 
 ## How to use
 
+Add `tsubakuro-rust-core` as a dependency to your `Cargo.toml` file:
+
 ```toml
 [dependencies]
-tsubakuro-rust-core = { path = "/path/to/tsubakuro-rust-core" }
+tsubakuro-rust-core = "0.1.0"
 ```
+
+
 
 ## Example
 
@@ -202,7 +226,7 @@ First, copy the proto files from [tsubakuro-proto](https://github.com/project-ts
 
 ```bash
 cd tsubakuro-rust-core
-cp -rp tsubakuro/modules/proto/src/main/protos .
+cp -rp /path/to/tsubakuro/modules/proto/src/main/protos .
 ```
 
 Then build with `cargo`.
@@ -220,3 +244,7 @@ cargo test
 ```
 
 See also [tsubakuro-rust-dbtest](../tsubakuro-rust-dbtest).
+
+## License
+
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)

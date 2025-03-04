@@ -4,7 +4,10 @@
 
 ## はじめに
 
-もともと『Tsubakuro』は「JavaでTsurugiにアクセスする為のライブラリー」の名称でしたが、RustでTsurugiにアクセスするライブラリーが作られたことで、『Tsubakuro』は「Tsurugiにアクセスするライブラリーの総称」という位置付けに変わりました。
+tsubakuro-rust-coreは「Rustで [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb) にアクセスする為のライブラリー（クレート）」です。
+
+もともと『Tsubakuro』という「JavaでTsurugi DBにアクセスする為のライブラリー」がありました。
+しかし、RustでTsurugiにアクセスするライブラリーが作られたことを契機に、『Tsubakuro』は「Tsurugiにアクセスするライブラリーの総称」という位置付けに変わりました。  
 そのため、従来のJava版は『Tsubakuro/Java』、Rust版は『Tsubakuro/Rust』と呼称することにします。
 
 ソースコードを管理するGitリポジトリーについては、[tsubakuroリポジトリー](https://github.com/project-tsurugi/tsubakuro) の下には既にTsubakuro/Java用の複数のサブプロジェクトが存在しており、そこにTsubakuro/Rustを追加すると混乱を招くため、別リポジトリーとなっています。
@@ -102,8 +105,9 @@ SqlPreparedStatementおよびTransactionではcloseメソッドが提供され�
 
 これらの構造体では使用終了後にTsurugi DBサーバーに対してリソース解放を通知する必要があるので、Rustのデストラクターであるdropメソッド内でDBサーバーに対して通知（通信）を行うようにしています。
 
-しかしdropメソッド内では本来は通信を行うべきではないでしょうし、また、通信エラーが発生してもユーザーがエラーをハンドリングすることができません。 
-そこで、これらの構造体では明示的にcloseメソッドを呼び出すようにしてください。 
+しかしdropメソッド内では本来は通信を行うべきではないでしょうし、また、通信エラーが発生してもユーザーがエラーをハンドリングすることができません。  
+そこで、エラーを返すことができるcloseメソッドを用意しています。
+これらの構造体では明示的にcloseメソッドを呼び出すようにしてください。   
 closeメソッドが呼ばれると、その成否にかかわらず、dropメソッド内では通信を行いません。
 
 SessionのクローズではDBサーバーとの通信は行いませんが、エラーのハンドリングという観点では同様です。

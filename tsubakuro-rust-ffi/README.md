@@ -1,16 +1,18 @@
 # tsubakuro-rust-ffi
 
-tsubakuro-rust-ffi is a library providing functions in C ABI format. (Functions called from other programming languages)
+tsubakuro-rust-ffi is a library providing functions in C ABI format to access [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb).
 
-Depends on [tsubakuro-rust-core](../tsubakuro-rust-core).
+tsubakuro-rust-ffi uses [tsubakuro-rust-core](../tsubakuro-rust-core), so refer to that for explanation.
 
 ## How to build
 
 ```bash
 cd tsubakuro-rust-ffi
 cargo build --release
-ls target/release/
+ls target/release/*tsubakuro_rust_ffi*
 ```
+
+`libtsubakuro_rust_ffi.so` (`tsubakuro_rust_ffi.dll` for MS-Windows) is generated.
 
 ## How to generate C header file
 
@@ -232,4 +234,8 @@ TsurugiFfiRc example_statement(TsurugiFfiContextHandle context, TsurugiFfiSqlCli
     return rc;
 }
 ```
+
+## License
+
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
