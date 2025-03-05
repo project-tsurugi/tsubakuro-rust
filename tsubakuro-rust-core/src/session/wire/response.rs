@@ -1,8 +1,12 @@
+use std::collections::HashMap;
+
 use prost::bytes::BytesMut;
 
 use crate::{
-    core_service_error, error::TgError, prost_decode_error,
-    tateyama::proto::diagnostics::Record as DiagnosticsRecord,
+    core_service_error,
+    error::TgError,
+    prost_decode_error,
+    tateyama::proto::{diagnostics::Record as DiagnosticsRecord, framework::common::BlobInfo},
 };
 
 #[derive(Debug)]
@@ -11,6 +15,7 @@ pub(crate) enum WireResponse {
     ResponseSessionPayload(
         /* slot */ i32,
         /* payload */ Option<BytesMut>,
+        Option<HashMap<String, BlobInfo>>,
         Option<WireResponseError>,
     ),
     ResponseResultSetHello(/* slot */ i32, /* ResultSet name */ String),

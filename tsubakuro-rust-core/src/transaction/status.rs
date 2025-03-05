@@ -47,7 +47,7 @@ pub(crate) fn transaction_status_processor(
 ) -> Result<TransactionStatus, TgError> {
     const FUNCTION_NAME: &str = "transaction_status_processor()";
 
-    let sql_response = convert_sql_response(FUNCTION_NAME, &response)?;
+    let (sql_response, _) = convert_sql_response(FUNCTION_NAME, &response)?;
     let message = sql_response.ok_or(invalid_response_error!(
         FUNCTION_NAME,
         format!("response {:?} is not ResponseSessionPayload", response),

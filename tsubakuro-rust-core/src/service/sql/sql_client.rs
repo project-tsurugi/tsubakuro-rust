@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use log::trace;
 
@@ -13,11 +13,12 @@ use crate::{
     prelude::{
         convert_lob_parameters, execute_result_processor,
         explain::explain_processor,
-        list_tables_processor, prepare_dispose_processor, prepare_processor,
-        query_result_processor,
+        list_tables_processor, lob_copy_to_processor, lob_open_processor,
+        prepare_dispose_processor, prepare_processor, query_result_processor,
         status::{transaction_status_processor, TransactionStatus},
         table_metadata_processor, CommitOption, ServiceClient, SqlExecuteResult, SqlParameter,
-        SqlPlaceholder, SqlQueryResult, TableList, TableMetadata,
+        SqlPlaceholder, SqlQueryResult, TableList, TableMetadata, TgBlobReference,
+        TgLargeObjectReference,
     },
     prost_decode_error,
     session::{
@@ -1070,6 +1071,177 @@ impl SqlClient {
         SqlCommand::ExecutePreparedQuery(request)
     }
 
+    /// Open BLOB file.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::io::Read;
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<Vec<u8>, TgError> {
+    ///     let blob: TgBlobReference = query_result.fetch().await?;
+    ///     let mut file = client.open_blob(transaction, &blob).await?;
+    ///
+    ///     let mut buffer = Vec::new();
+    ///     file.read_to_end(&mut buffer).unwrap();
+    ///
+    ///     Ok(buffer)
+    /// }
+    /// ```
+    pub async fn open_blob(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+    ) -> Result<std::fs::File, TgError> {
+        let timeout = self.default_timeout;
+        self.open_blob_for(transaction, blob, timeout).await
+    }
+
+    /// Open BLOB file.
+    pub async fn open_blob_for(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        timeout: Duration,
+    ) -> Result<std::fs::File, TgError> {
+        const FUNCTION_NAME: &str = "open_blob()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::open_lob_command(tx_handle, blob);
+        let response = self.send_and_pull_response(command, None, timeout).await?;
+        let file = lob_open_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(file)
+    }
+
+    /// Open BLOB file.
+    pub async fn open_blob_async(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+    ) -> Result<Job<std::fs::File>, TgError> {
+        const FUNCTION_NAME: &str = "open_blob_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::open_lob_command(tx_handle, blob);
+        let job = self
+            .send_and_pull_async("File", command, None, Box::new(lob_open_processor))
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn open_lob_command<T: TgLargeObjectReference>(transaction_handle: u64, lob: &T) -> SqlCommand {
+        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
+            handle: transaction_handle,
+        };
+        let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
+            provider: lob.provider().into(),
+            object_id: lob.object_id(),
+            contents_opt: None,
+        };
+
+        let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
+            transaction_handle: Some(tx_handle),
+            reference: Some(lob),
+        };
+        SqlCommand::GetLargeObjectData(request)
+    }
+
+    /// Copy BLOB to local file.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<(), TgError> {
+    ///     let blob: TgBlobReference = query_result.fetch().await?;
+    ///     client.copy_blob_to(transaction, &blob, "/path/to/blob.bin").await?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn copy_blob_to(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        destination: &str,
+    ) -> Result<(), TgError> {
+        let timeout = self.default_timeout;
+        self.copy_blob_to_for(transaction, blob, destination, timeout)
+            .await
+    }
+
+    /// Copy BLOB to local file.
+    pub async fn copy_blob_to_for(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        destination: &str,
+        timeout: Duration,
+    ) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "copy_blob_to()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::copy_blob_to_command(tx_handle, blob);
+        let response = self.send_and_pull_response(command, None, timeout).await?;
+        lob_copy_to_processor(response, destination)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(())
+    }
+
+    /// Copy BLOB to local file.
+    pub async fn copy_blob_to_async(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        destination: &'static str,
+    ) -> Result<Job<()>, TgError> {
+        const FUNCTION_NAME: &str = "copy_blob_to_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::copy_blob_to_command(tx_handle, blob);
+        let job = self
+            .send_and_pull_async(
+                "BlobCopy",
+                command,
+                None,
+                Box::new(move |response| lob_copy_to_processor(response, destination)),
+            )
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn copy_blob_to_command(transaction_handle: u64, blob: &TgBlobReference) -> SqlCommand {
+        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
+            handle: transaction_handle,
+        };
+        let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
+            provider: blob.provider().into(),
+            object_id: blob.object_id(),
+            contents_opt: None,
+        };
+
+        let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
+            transaction_handle: Some(tx_handle),
+            reference: Some(lob),
+        };
+        SqlCommand::GetLargeObjectData(request)
+    }
+
     /// Request commit to the SQL service.
     ///
     /// # Examples
@@ -1316,9 +1488,9 @@ impl SqlClient {
 pub(crate) fn convert_sql_response(
     function_name: &str,
     response: &WireResponse,
-) -> Result<Option<SqlResponse>, TgError> {
+) -> Result<(Option<SqlResponse>, Option<HashMap<String, BlobInfo>>), TgError> {
     match response {
-        WireResponse::ResponseSessionPayload(_slot, payload, error) => {
+        WireResponse::ResponseSessionPayload(_slot, payload, lobs, error) => {
             if let Some(e) = error {
                 return Err(e.to_tg_error());
             }
@@ -1333,19 +1505,19 @@ pub(crate) fn convert_sql_response(
                 Some(SqlResponseType::ResultOnly(result_only)) => match &result_only.result {
                     Some(crate::jogasaki::proto::sql::response::result_only::Result::Success(
                         _,
-                    )) => Ok(Some(sql_response)),
+                    )) => Ok((Some(sql_response), lobs.clone())),
                     Some(crate::jogasaki::proto::sql::response::result_only::Result::Error(
                         error,
                     )) => {
                         let error = error.clone();
                         Err(sql_service_error!(function_name, error))
                     }
-                    _ => Ok(Some(sql_response)),
+                    _ => Ok((Some(sql_response), lobs.clone())),
                 },
-                _ => Ok(Some(sql_response)),
+                _ => Ok((Some(sql_response), lobs.clone())),
             }
         }
-        _ => Ok(None),
+        _ => Ok((None, None)),
     }
 }
 
@@ -1353,7 +1525,7 @@ pub(crate) fn sql_result_only_success_processor(
     function_name: &str,
     response: WireResponse,
 ) -> Result<(), TgError> {
-    let sql_response = convert_sql_response(function_name, &response)?;
+    let (sql_response, _) = convert_sql_response(function_name, &response)?;
     let message = sql_response.ok_or(invalid_response_error!(
         function_name,
         format!("response {:?} is not ResponseSessionPayload", response),

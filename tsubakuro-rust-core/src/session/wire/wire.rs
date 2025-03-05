@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use log::trace;
 use prost::{
@@ -17,7 +17,7 @@ use crate::{
         framework::{
             common::{BlobInfo, RepeatedBlobInfo},
             request::Header as FrameworkRequestHeader,
-            response::Header as FrameworkResponseHeader,
+            response::{header::BlobOpt, Header as FrameworkResponseHeader},
         },
     },
     util::Timeout,
@@ -349,7 +349,9 @@ impl DelegateWire {
     }
 }
 
-pub(crate) fn skip_framework_header(payload: &mut Option<BytesMut>) -> Option<WireResponseError> {
+pub(crate) fn skip_framework_header(
+    payload: &mut Option<BytesMut>,
+) -> (Option<HashMap<String, BlobInfo>>, Option<WireResponseError>) {
     if let Some(payload) = payload.as_mut() {
         let mut slice = payload.as_ref();
         let before_length = slice.len();
@@ -359,15 +361,17 @@ pub(crate) fn skip_framework_header(payload: &mut Option<BytesMut>) -> Option<Wi
         let after_length = slice.len();
         payload.advance(before_length - after_length);
 
-        if let Err(e) = result {
-            return Some(e);
-        }
+        return match result {
+            Ok(Some(blob_opt)) => (Some(blob_opt_to_map(blob_opt)), None),
+            Ok(None) => (None, None),
+            Err(e) => (None, Some(e)),
+        };
     }
 
-    None
+    (None, None)
 }
 
-fn skip_framework_header_body(slice: &mut &[u8]) -> Result<(), WireResponseError> {
+fn skip_framework_header_body(slice: &mut &[u8]) -> Result<Option<BlobOpt>, WireResponseError> {
     const FUNCTION_NAME: &str = "skip_framework_header()";
 
     let header = FrameworkResponseHeader::decode_length_delimited(&mut *slice).map_err(|e| {
@@ -380,6 +384,21 @@ fn skip_framework_header_body(slice: &mut &[u8]) -> Result<(), WireResponseError
             })?;
             Err(core_service_wire_response_error!(FUNCTION_NAME, record))
         }
-        _ => Ok(()),
+        _ => Ok(header.blob_opt),
+    }
+}
+
+fn blob_opt_to_map(blob_opt: BlobOpt) -> HashMap<String, BlobInfo> {
+    match blob_opt {
+        BlobOpt::Blobs(repeated_blob_info) => {
+            let blobs = repeated_blob_info.blobs;
+
+            let mut map = HashMap::with_capacity(blobs.len());
+            for blob in blobs {
+                map.insert(blob.channel_name.clone(), blob);
+            }
+
+            map
+        }
     }
 }

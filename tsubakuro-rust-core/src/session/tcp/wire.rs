@@ -206,14 +206,16 @@ async fn tcp_convert_wire_response(link_message: LinkMessage) -> Result<WireResp
             // trace!("{}: RESPONSE_SESSION_PAYLOAD", FUNCTION_NAME);
             let slot = link_message.slot();
             let mut payload = link_message.take_payload().await;
-            let error = skip_framework_header(&mut payload);
-            Ok(WireResponse::ResponseSessionPayload(slot, payload, error))
+            let (lobs, error) = skip_framework_header(&mut payload);
+            Ok(WireResponse::ResponseSessionPayload(
+                slot, payload, lobs, error,
+            ))
         }
         TcpResponseInfo::ResponseSessionBodyhead => {
             // trace!("{}: RESPONSE_SESSION_BODYHEAD", FUNCTION_NAME);
             let slot = link_message.slot();
             let mut payload = link_message.take_payload().await;
-            let error = skip_framework_header(&mut payload);
+            let (_lobs, error) = skip_framework_header(&mut payload);
             Ok(WireResponse::ResponseSessionBodyhead(slot, payload, error))
         }
         TcpResponseInfo::ResponseResultSetPayload => {

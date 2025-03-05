@@ -1,5 +1,7 @@
 use crate::jogasaki::proto::sql::common::LargeObjectProvider;
 
+use super::blob::TgLargeObjectReference;
+
 /// CLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TgClob {
@@ -32,22 +34,24 @@ impl From<String> for TgClob {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TgClobReference {
     provider: LargeObjectProvider,
-    object_id: i64,
+    object_id: u64,
 }
 
 impl TgClobReference {
-    pub(crate) fn new(provider: LargeObjectProvider, object_id: i64) -> TgClobReference {
+    pub(crate) fn new(provider: LargeObjectProvider, object_id: u64) -> TgClobReference {
         TgClobReference {
             provider,
             object_id,
         }
     }
+}
 
-    pub(crate) fn _provider(&self) -> LargeObjectProvider {
+impl TgLargeObjectReference for TgClobReference {
+    fn provider(&self) -> LargeObjectProvider {
         self.provider
     }
 
-    pub(crate) fn _object_id(&self) -> i64 {
+    fn object_id(&self) -> u64 {
         self.object_id
     }
 }

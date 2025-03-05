@@ -153,22 +153,22 @@ impl CoreService {
 fn update_expiration_time_processor(wire_response: WireResponse) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "update_expiration_time_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload, error) = wire_response
-    {
-        if let Some(e) = error {
-            return Err(e.to_tg_error());
-        }
-        if let Some(payload) = payload {
-            payload
+    let payload =
+        if let WireResponse::ResponseSessionPayload(_slot, payload, _, error) = wire_response {
+            if let Some(e) = error {
+                return Err(e.to_tg_error());
+            }
+            if let Some(payload) = payload {
+                payload
+            } else {
+                return Err(invalid_response_error!(FUNCTION_NAME, "payload is None"));
+            }
         } else {
-            return Err(invalid_response_error!(FUNCTION_NAME, "payload is None"));
-        }
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
+            return Err(invalid_response_error!(
+                FUNCTION_NAME,
+                "response is not ResponseSessionPayload",
+            ));
+        };
 
     let message = UpdateExpirationTimeResponse::decode_length_delimited(payload)
         .map_err(|e| prost_decode_error!(FUNCTION_NAME, "UpdateExpirationTimeResponse", e))?;
@@ -194,22 +194,22 @@ fn shutdown_processor_main(
     function_name: &str,
     wire_response: WireResponse,
 ) -> Result<(), TgError> {
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload, error) = wire_response
-    {
-        if let Some(e) = error {
-            return Err(e.to_tg_error());
-        }
-        if let Some(payload) = payload {
-            payload
+    let payload =
+        if let WireResponse::ResponseSessionPayload(_slot, payload, _, error) = wire_response {
+            if let Some(e) = error {
+                return Err(e.to_tg_error());
+            }
+            if let Some(payload) = payload {
+                payload
+            } else {
+                return Err(invalid_response_error!(function_name, "payload is None"));
+            }
         } else {
-            return Err(invalid_response_error!(function_name, "payload is None"));
-        }
-    } else {
-        return Err(invalid_response_error!(
-            function_name,
-            "response is not ResponseSessionPayload",
-        ));
-    };
+            return Err(invalid_response_error!(
+                function_name,
+                "response is not ResponseSessionPayload",
+            ));
+        };
 
     let _message = ShutdownResponse::decode_length_delimited(payload)
         .map_err(|e| prost_decode_error!(function_name, "ShutdownResponse", e))?;

@@ -1,6 +1,7 @@
 mod bigdecimal0;
 mod bigdecimal1;
 mod binary;
+mod blob;
 mod boolean;
 mod char;
 mod chrono_date_time;

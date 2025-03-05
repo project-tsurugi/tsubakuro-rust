@@ -130,22 +130,22 @@ impl EndpointBroker {
 fn handshake_processor(wire_response: WireResponse) -> Result<i64, TgError> {
     const FUNCTION_NAME: &str = "handshake_processor()";
 
-    let payload = if let WireResponse::ResponseSessionPayload(_slot, payload, error) = wire_response
-    {
-        if let Some(e) = error {
-            return Err(e.to_tg_error());
-        }
-        if let Some(payload) = payload {
-            payload
+    let payload =
+        if let WireResponse::ResponseSessionPayload(_slot, payload, _, error) = wire_response {
+            if let Some(e) = error {
+                return Err(e.to_tg_error());
+            }
+            if let Some(payload) = payload {
+                payload
+            } else {
+                return Err(invalid_response_error!(FUNCTION_NAME, "payload is None"));
+            }
         } else {
-            return Err(invalid_response_error!(FUNCTION_NAME, "payload is None"));
-        }
-    } else {
-        return Err(invalid_response_error!(
-            FUNCTION_NAME,
-            "response is not ResponseSessionPayload",
-        ));
-    };
+            return Err(invalid_response_error!(
+                FUNCTION_NAME,
+                "response is not ResponseSessionPayload",
+            ));
+        };
 
     let message = HandshakeResponse::decode_length_delimited(payload)
         .map_err(|e| prost_decode_error!(FUNCTION_NAME, "HandshakeResponse", e))?;

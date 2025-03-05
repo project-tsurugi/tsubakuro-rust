@@ -1,4 +1,4 @@
-/// Data.
+/// Date.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TgDate {
     /// date (number of days offset of epoch 1970-01-01).
