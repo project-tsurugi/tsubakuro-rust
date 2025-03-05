@@ -13,7 +13,7 @@ use crate::{
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
         query_result_metadata::TsurugiFfiSqlQueryResultMetadata,
-        r#type::{blob::TsurugiFfiTgBlobReference, clob::TsurugiFfiTgClobReference},
+        r#type::{blob::TsurugiFfiBlobReference, clob::TsurugiFfiClobReference},
     },
     vec_u8_to_field, TsurugiFfiByteArrayHandle, TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
@@ -2033,7 +2033,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
     let runtime = query_result.runtime().clone();
     let value: TgBlobReference =
         ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
-    let value = Box::new(TsurugiFfiTgBlobReference::new(value));
+    let value = Box::new(TsurugiFfiBlobReference::new(value));
 
     let ptr = Box::into_raw(value);
     unsafe {
@@ -2092,7 +2092,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
         runtime,
         query_result.fetch_for(timeout)
     );
-    let value = Box::new(TsurugiFfiTgBlobReference::new(value));
+    let value = Box::new(TsurugiFfiBlobReference::new(value));
 
     let ptr = Box::into_raw(value);
     unsafe {
@@ -2141,7 +2141,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
     let runtime = query_result.runtime().clone();
     let value: TgClobReference =
         ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
-    let value = Box::new(TsurugiFfiTgClobReference::new(value));
+    let value = Box::new(TsurugiFfiClobReference::new(value));
 
     let ptr = Box::into_raw(value);
     unsafe {
@@ -2200,7 +2200,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_clob(
         runtime,
         query_result.fetch_for(timeout)
     );
-    let value = Box::new(TsurugiFfiTgClobReference::new(value));
+    let value = Box::new(TsurugiFfiClobReference::new(value));
 
     let ptr = Box::into_raw(value);
     unsafe {

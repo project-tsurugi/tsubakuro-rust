@@ -43,7 +43,11 @@ public class TgFfiTester {
 
     protected static String getEndpointJava() {
         if (staticEndpointJava == null) {
-            staticEndpointJava = System.getProperty(SYSPROP_DBTEST_ENDPOINT_JAVA, getEndpoint());
+            String endpoint = System.getProperty(SYSPROP_DBTEST_ENDPOINT_JAVA);
+            if (endpoint == null || endpoint.isEmpty()) {
+                endpoint = getEndpoint();
+            }
+            staticEndpointJava = endpoint;
         }
         return staticEndpointJava;
     }

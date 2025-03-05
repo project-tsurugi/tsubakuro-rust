@@ -4,20 +4,26 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 #[derive(Debug)]
-pub(crate) struct TsurugiFfiTgClobReference {
-    _clob_reference: TgClobReference,
+pub(crate) struct TsurugiFfiClobReference {
+    clob_reference: TgClobReference,
 }
 
-impl TsurugiFfiTgClobReference {
-    pub(crate) fn new(clob_reference: TgClobReference) -> TsurugiFfiTgClobReference {
-        TsurugiFfiTgClobReference {
-            _clob_reference: clob_reference,
-        }
+impl TsurugiFfiClobReference {
+    pub(crate) fn new(clob_reference: TgClobReference) -> TsurugiFfiClobReference {
+        TsurugiFfiClobReference { clob_reference }
+    }
+}
+
+impl std::ops::Deref for TsurugiFfiClobReference {
+    type Target = TgClobReference;
+
+    fn deref(&self) -> &Self::Target {
+        &self.clob_reference
     }
 }
 
 /// Clob.
-pub type TsurugiFfiClobReferenceHandle = *mut TsurugiFfiTgClobReference;
+pub type TsurugiFfiClobReferenceHandle = *mut TsurugiFfiClobReference;
 
 /// ClobReference: Dispose.
 ///

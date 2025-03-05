@@ -2754,6 +2754,9 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
     }
 
+    // copy_blob_to() → TgFfiTypeBlobTest
+    // copy_clob_to() → TgFfiTypeClobTest
+
     @Test
     void commit() {
         var manager = getFfiObjectManager();

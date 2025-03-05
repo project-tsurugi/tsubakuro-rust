@@ -96,7 +96,7 @@ tasks.named('test') {
     }
 
     systemProperty 'tsurugi.dbtest.endpoint', findProperty('dbtest.endpoint') ?: 'tcp://localhost:12345'
-    systemProperty 'tsurugi.dbtest.endpoint.java', findProperty('dbtest.endpoint.java') ?: 'tcp://localhost:12345'
+    systemProperty 'tsurugi.dbtest.endpoint.java', findProperty('dbtest.endpoint.java') ?: ''
     systemProperty 'tsurugi.ffi.library.path', findProperty('ffi.library.path')
 }
 

@@ -242,7 +242,11 @@ enum TsurugiFfiTransactionType {
 };
 typedef int32_t TsurugiFfiTransactionType;
 
+typedef struct TsurugiFfiBlobReference TsurugiFfiBlobReference;
+
 typedef struct TsurugiFfiCancelJob TsurugiFfiCancelJob;
+
+typedef struct TsurugiFfiClobReference TsurugiFfiClobReference;
 
 typedef struct TsurugiFfiCommitOption TsurugiFfiCommitOption;
 
@@ -275,10 +279,6 @@ typedef struct TsurugiFfiSqlQueryResultMetadata TsurugiFfiSqlQueryResultMetadata
 typedef struct TsurugiFfiTableList TsurugiFfiTableList;
 
 typedef struct TsurugiFfiTableMetadata TsurugiFfiTableMetadata;
-
-typedef struct TsurugiFfiTgBlobReference TsurugiFfiTgBlobReference;
-
-typedef struct TsurugiFfiTgClobReference TsurugiFfiTgClobReference;
 
 typedef struct TsurugiFfiTransaction TsurugiFfiTransaction;
 
@@ -366,12 +366,12 @@ typedef struct TsurugiFfiSqlQueryResultMetadata *TsurugiFfiSqlQueryResultMetadat
 /**
  * Blob.
  */
-typedef struct TsurugiFfiTgBlobReference *TsurugiFfiBlobReferenceHandle;
+typedef struct TsurugiFfiBlobReference *TsurugiFfiBlobReferenceHandle;
 
 /**
  * Clob.
  */
-typedef struct TsurugiFfiTgClobReference *TsurugiFfiClobReferenceHandle;
+typedef struct TsurugiFfiClobReference *TsurugiFfiClobReferenceHandle;
 
 /**
  * Sql client.
@@ -3177,6 +3177,132 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle
                                                          const TsurugiFfiSqlParameterHandle *parameters,
                                                          uint32_t parameters_size,
                                                          TsurugiFfiJobHandle *query_result_job_out);
+
+/**
+ * SqlClient: Copy BLOB to local file.
+ *
+ * See [`SqlClient::copy_blob_to`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ * - `destination` - the path of the destination file.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_copy_blob_to(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSqlClientHandle sql_client,
+                                                 TsurugiFfiTransactionHandle transaction,
+                                                 TsurugiFfiBlobReferenceHandle blob,
+                                                 TsurugiFfiStringHandle destination);
+
+/**
+ * SqlClient: Copy BLOB to local file.
+ *
+ * See [`SqlClient::copy_blob_to_for`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ * - `destination` - the path of the destination file.
+ * - `timeout` - timeout time \[nanoseconds\].
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_copy_blob_to_for(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlClientHandle sql_client,
+                                                     TsurugiFfiTransactionHandle transaction,
+                                                     TsurugiFfiBlobReferenceHandle blob,
+                                                     TsurugiFfiStringHandle destination,
+                                                     TsurugiFfiDuration timeout);
+
+/**
+ * SqlClient: Copy BLOB to local file.
+ *
+ * See [`SqlClient::copy_blob_to_async`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ * - `destination` - the path of the destination file.
+ *
+ * # Returns
+ * - `copy_blob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_copy_blob_to_async(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlClientHandle sql_client,
+                                                       TsurugiFfiTransactionHandle transaction,
+                                                       TsurugiFfiBlobReferenceHandle blob,
+                                                       TsurugiFfiStringHandle destination,
+                                                       TsurugiFfiJobHandle *copy_blob_to_job_out);
+
+/**
+ * SqlClient: Copy CLOB to local file.
+ *
+ * See [`SqlClient::copy_clob_to`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ * - `destination` - the path of the destination file.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_copy_clob_to(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSqlClientHandle sql_client,
+                                                 TsurugiFfiTransactionHandle transaction,
+                                                 TsurugiFfiClobReferenceHandle clob,
+                                                 TsurugiFfiStringHandle destination);
+
+/**
+ * SqlClient: Copy CLOB to local file.
+ *
+ * See [`SqlClient::copy_clob_to_for`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ * - `destination` - the path of the destination file.
+ * - `timeout` - timeout time \[nanoseconds\].
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_copy_clob_to_for(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiSqlClientHandle sql_client,
+                                                     TsurugiFfiTransactionHandle transaction,
+                                                     TsurugiFfiClobReferenceHandle clob,
+                                                     TsurugiFfiStringHandle destination,
+                                                     TsurugiFfiDuration timeout);
+
+/**
+ * SqlClient: Copy CLOB to local file.
+ *
+ * See [`SqlClient::copy_clob_to_async`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ * - `destination` - the path of the destination file.
+ *
+ * # Returns
+ * - `copy_clob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_copy_clob_to_async(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlClientHandle sql_client,
+                                                       TsurugiFfiTransactionHandle transaction,
+                                                       TsurugiFfiClobReferenceHandle clob,
+                                                       TsurugiFfiStringHandle destination,
+                                                       TsurugiFfiJobHandle *copy_clob_to_job_out);
 
 /**
  * SqlClient: Request commit to the SQL service.

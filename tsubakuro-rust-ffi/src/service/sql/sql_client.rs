@@ -33,6 +33,7 @@ use super::{
         prepared_statement::TsurugiFfiSqlPreparedStatementHandle,
     },
     query_result::TsurugiFfiSqlQueryResultHandle,
+    r#type::{blob::TsurugiFfiBlobReferenceHandle, clob::TsurugiFfiClobReferenceHandle},
     table_list::TsurugiFfiTableListHandle,
     table_metadata::TsurugiFfiTableMetadataHandle,
 };
@@ -2466,6 +2467,362 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. query_result_job={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Copy BLOB to local file.
+///
+/// See [`SqlClient::copy_blob_to`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+/// - `destination` - the path of the destination file.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_copy_blob_to(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    destination: TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_copy_blob_to()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, destination={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        destination
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, destination);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &*blob };
+    let destination = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 4, destination);
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.copy_blob_to(transaction, blob, destination)
+    );
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// SqlClient: Copy BLOB to local file.
+///
+/// See [`SqlClient::copy_blob_to_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+/// - `destination` - the path of the destination file.
+/// - `timeout` - timeout time \[nanoseconds\].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_copy_blob_to_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    destination: TsurugiFfiStringHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_copy_blob_to_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, destination={:?}, timeout={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        destination,
+        timeout
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, destination);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &*blob };
+    let destination = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 4, destination);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.copy_blob_to_for(transaction, blob, destination, timeout)
+    );
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// SqlClient: Copy BLOB to local file.
+///
+/// See [`SqlClient::copy_blob_to_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+/// - `destination` - the path of the destination file.
+///
+/// # Returns
+/// - `copy_blob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_copy_blob_to_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    destination: TsurugiFfiStringHandle,
+    copy_blob_to_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_copy_blob_to_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, destination={:?}, copy_blob_to_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        destination,
+        copy_blob_to_job_out
+    );
+
+    ffi_arg_out_initialize!(copy_blob_to_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, destination);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, copy_blob_to_job_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &*blob };
+    let destination = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 4, destination);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.copy_blob_to_async(transaction, blob, destination)
+    );
+    let job = TsurugiFfiJob::new(job, Box::new(VoidJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *copy_blob_to_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. copy_blob_to_job={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Copy CLOB to local file.
+///
+/// See [`SqlClient::copy_clob_to`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+/// - `destination` - the path of the destination file.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_copy_clob_to(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    destination: TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_copy_clob_to()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, destination={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        destination
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, destination);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &*clob };
+    let destination = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 4, destination);
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.copy_clob_to(transaction, clob, destination)
+    );
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// SqlClient: Copy CLOB to local file.
+///
+/// See [`SqlClient::copy_clob_to_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+/// - `destination` - the path of the destination file.
+/// - `timeout` - timeout time \[nanoseconds\].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_copy_clob_to_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    destination: TsurugiFfiStringHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_copy_clob_to_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, destination={:?}, timeout={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        destination,
+        timeout
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, destination);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &*clob };
+    let destination = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 4, destination);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.copy_clob_to_for(transaction, clob, destination, timeout)
+    );
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// SqlClient: Copy CLOB to local file.
+///
+/// See [`SqlClient::copy_clob_to_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+/// - `destination` - the path of the destination file.
+///
+/// # Returns
+/// - `copy_clob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_copy_clob_to_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    destination: TsurugiFfiStringHandle,
+    copy_clob_to_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_copy_clob_to_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, destination={:?}, copy_clob_to_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        destination,
+        copy_clob_to_job_out
+    );
+
+    ffi_arg_out_initialize!(copy_clob_to_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, destination);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, copy_clob_to_job_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &*clob };
+    let destination = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 4, destination);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.copy_clob_to_async(transaction, clob, destination)
+    );
+    let job = TsurugiFfiJob::new(job, Box::new(VoidJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *copy_clob_to_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. copy_clob_to_job={:?}",
         rc,
         handle
     );

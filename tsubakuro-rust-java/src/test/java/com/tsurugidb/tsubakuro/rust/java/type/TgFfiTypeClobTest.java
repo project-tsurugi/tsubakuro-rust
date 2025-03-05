@@ -2,10 +2,13 @@ package com.tsurugidb.tsubakuro.rust.java.type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.lang.foreign.MemorySegment;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
@@ -23,12 +26,16 @@ import com.tsurugidb.iceaxe.sql.parameter.TgParameterMapping;
 import com.tsurugidb.iceaxe.sql.type.IceaxeObjectFactory;
 import com.tsurugidb.iceaxe.sql.type.TgClob;
 import com.tsurugidb.iceaxe.transaction.option.TgTxOption;
+import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcType;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiAtomType;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResultMetadata;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiClobReference;
+import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRuntimeException;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
@@ -191,10 +198,12 @@ class TgFfiTypeClobTest extends TgFfiTester {
                             switch (pattern) {
                             case DIRECT:
                                 try (var value = qr.fetchClob(context)) {
+                                    new ClobTester(client, transaction, i, value).test();
                                 }
                                 break;
                             case DIRECT_FOR:
                                 try (var value = qr.fetchForClob(context, Duration.ofSeconds(5))) {
+                                    new ClobTester(client, transaction, i, value).test();
                                 }
                                 break;
                             default:
@@ -232,6 +241,197 @@ class TgFfiTypeClobTest extends TgFfiTester {
                 var c = columns.get(1);
                 assertEquals("value", c.getName(context));
                 assertEquals(TgFfiAtomType.CLOB, c.getAtomType(context));
+            }
+        }
+    }
+
+    class ClobTester {
+        private final TgFfiSqlClient client;
+        private final TgFfiTransaction transaction;
+        private final int index;
+        private final TgFfiClobReference clob;
+
+        ClobTester(TgFfiSqlClient client, TgFfiTransaction transaction, int index, TgFfiClobReference clob) {
+            this.client = client;
+            this.transaction = transaction;
+            this.index = index;
+            this.clob = clob;
+        }
+
+        void test() throws IOException {
+            for (var pattern : List.of(DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY)) {
+                copy_clob_to(pattern);
+            }
+
+            copy_clob_to_argError();
+            copy_clob_to_for_argError();
+            copy_clob_to_async_argError();
+        }
+
+        private void copy_clob_to(String pattern) throws IOException {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                var path = Path.of(System.getProperty("java.io.tmpdir")).resolve("TgFfiTypeClobTest.copy_clob_to." + System.currentTimeMillis() + ".bin");
+                try {
+                    switch (pattern) {
+                    case DIRECT:
+                        client.copyClobTo(context, transaction, clob, path);
+                        break;
+                    case DIRECT_FOR:
+                        client.copyClobToFor(context, transaction, clob, path, Duration.ofSeconds(5));
+                        break;
+                    default:
+                        try (var job = client.copyClobToAsync(context, transaction, clob, path)) {
+                            Void value = jobTake(job, pattern);
+                            assertNull(value);
+                        }
+
+                    }
+
+                    var value = Files.readString(path);
+                    switch (index) {
+                    case 1:
+                        assertEquals("abc", value);
+                        break;
+                    case 2:
+                        assertEquals("def", value);
+                        break;
+                    }
+                } finally {
+                    Files.deleteIfExists(path);
+                }
+            }
+        }
+
+        private void copy_clob_to_argError() {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var tx = transaction.handle();
+                var arg1 = clob.handle();
+                var arg2 = manager.allocateString("/path/to/destination");
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to(ctx, handle, tx, arg1, arg2);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = MemorySegment.NULL;
+                var arg1 = clob.handle();
+                var arg2 = manager.allocateString("/path/to/destination");
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to(ctx, handle, tx, arg1, arg2);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = MemorySegment.NULL;
+                var arg2 = manager.allocateString("/path/to/destination");
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to(ctx, handle, tx, arg1, arg2);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = clob.handle();
+                var arg2 = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to(ctx, handle, tx, arg1, arg2);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+
+        private void copy_clob_to_for_argError() {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var tx = transaction.handle();
+                var arg1 = clob.handle();
+                var arg2 = manager.allocateString("/path/to/destination");
+                var t = Duration.ofSeconds(5).toNanos();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_for(ctx, handle, tx, arg1, arg2, t);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = MemorySegment.NULL;
+                var arg1 = clob.handle();
+                var arg2 = manager.allocateString("/path/to/destination");
+                var t = Duration.ofSeconds(5).toNanos();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_for(ctx, handle, tx, arg1, arg2, t);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = MemorySegment.NULL;
+                var arg2 = manager.allocateString("/path/to/destination");
+                var t = Duration.ofSeconds(5).toNanos();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_for(ctx, handle, tx, arg1, arg2, t);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = clob.handle();
+                var arg2 = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_for(ctx, handle, tx, arg1, arg2, t);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+
+        private void copy_clob_to_async_argError() {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var tx = transaction.handle();
+                var arg1 = clob.handle();
+                var arg2 = manager.allocateString("/path/to/destination");
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_async(ctx, handle, tx, arg1, arg2, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = MemorySegment.NULL;
+                var arg1 = clob.handle();
+                var arg2 = manager.allocateString("/path/to/destination");
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_async(ctx, handle, tx, arg1, arg2, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = MemorySegment.NULL;
+                var arg2 = manager.allocateString("/path/to/destination");
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_async(ctx, handle, tx, arg1, arg2, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = clob.handle();
+                var arg2 = MemorySegment.NULL;
+                var out = manager.allocateHandleOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_async(ctx, handle, tx, arg1, arg2, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
             }
         }
     }

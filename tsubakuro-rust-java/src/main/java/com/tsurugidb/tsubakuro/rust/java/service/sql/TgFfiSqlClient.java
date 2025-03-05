@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import java.lang.foreign.MemorySegment;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +14,8 @@ import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiBlobReference;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiClobReference;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
@@ -623,6 +626,76 @@ public class TgFfiSqlClient extends TgFfiObject {
                 return new TgFfiSqlQueryResult(manager, valueHandle);
             }
         };
+    }
+
+    public synchronized void copyBlobTo(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob, Path destination) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var arg2 = allocateString(destination.toString());
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_blob_to(ctx, handle, tx, arg1, arg2);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized void copyBlobToFor(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob, Path destination, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var arg2 = allocateString(destination.toString());
+        var t = allocateDuration(timeout);
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_blob_to_for(ctx, handle, tx, arg1, arg2, t);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized TgFfiVoidJob copyBlobToAsync(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob, Path destination) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var arg2 = allocateString(destination.toString());
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_blob_to_async(ctx, handle, tx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiVoidJob(manager(), outHandle);
+    }
+
+    public synchronized void copyClobTo(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob, Path destination) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var arg2 = allocateString(destination.toString());
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to(ctx, handle, tx, arg1, arg2);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized void copyClobToFor(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob, Path destination, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var arg2 = allocateString(destination.toString());
+        var t = allocateDuration(timeout);
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_for(ctx, handle, tx, arg1, arg2, t);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized TgFfiVoidJob copyClobToAsync(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob, Path destination) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var arg2 = allocateString(destination.toString());
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_copy_clob_to_async(ctx, handle, tx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiVoidJob(manager(), outHandle);
     }
 
     public synchronized void commit(TgFfiContext context, TgFfiTransaction transaction, TgFfiCommitOption commitOption) {
