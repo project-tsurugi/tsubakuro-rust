@@ -117,15 +117,15 @@ async fn example_query(client: &SqlClient, transaction: &Transaction) -> Result<
 
     while query_result.next_row().await? {
         assert!(query_result.next_column().await?);
-        let id: i64 = query_result.fetch().await?;
+        let id: i64 = query_result.fetch().await?; // not null
 
         assert!(query_result.next_column().await?);
-        let name: String = query_result.fetch().await?;
+        let name: Option<String> = query_result.fetch().await?; // nullable
 
         assert!(query_result.next_column().await?);
-        let age: i32 = query_result.fetch().await?;
+        let age: Option<i32> = query_result.fetch().await?; // nullable
 
-        println!("id={id}, name={name}, age={age}");
+        println!("id={id}, name={name:?}, age={age:?}");
     }
 
     Ok(())
@@ -203,15 +203,15 @@ async fn example_prepared_query(
 
     while query_result.next_row().await? {
         assert!(query_result.next_column().await?);
-        let id: i32 = query_result.fetch().await?;
+        let id: i32 = query_result.fetch().await?; // not null
 
         assert!(query_result.next_column().await?);
-        let name: String = query_result.fetch().await?;
+        let name: Option<String> = query_result.fetch().await?; // nullable
 
         assert!(query_result.next_column().await?);
-        let age: i64 = query_result.fetch().await?;
+        let age: Option<i64> = query_result.fetch().await?; // nullable
 
-        println!("id={id}, name={name}, age={age}");
+        println!("id={id}, name={name:?}, age={age:?}");
     }
 
     Ok(())

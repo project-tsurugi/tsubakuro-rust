@@ -874,10 +874,10 @@ impl SqlClient {
     ///             let id: i64 = query_result.fetch().await?;
     ///         }
     ///         if query_result.next_column().await? {
-    ///             let name: String = query_result.fetch().await?;
+    ///             let name: Option<String> = query_result.fetch().await?;
     ///         }
     ///         if query_result.next_column().await? {
-    ///             let age: i32 = query_result.fetch().await?;
+    ///             let age: Option<i32> = query_result.fetch().await?;
     ///         }
     ///     }
     ///
@@ -972,10 +972,10 @@ impl SqlClient {
     ///             let id: i64 = query_result.fetch().await?;
     ///         }
     ///         if query_result.next_column().await? {
-    ///             let name: String = query_result.fetch().await?;
+    ///             let name: Option<String> = query_result.fetch().await?;
     ///         }
     ///         if query_result.next_column().await? {
-    ///             let age: i32 = query_result.fetch().await?;
+    ///             let age: Option<i32> = query_result.fetch().await?;
     ///         }
     ///     }
     ///

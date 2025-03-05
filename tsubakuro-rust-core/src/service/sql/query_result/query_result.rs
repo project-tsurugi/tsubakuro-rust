@@ -41,12 +41,12 @@ use super::value_stream::ResultSetValueStream;
 ///
 ///     while query_result.next_row().await? {
 ///         if query_result.next_column().await? {
-///             let pk: i32 = query_result.fetch().await?;
+///             let pk: i32 = query_result.fetch().await?; // not null
 ///             println!("pk={}", pk);
 ///         }
 ///         if query_result.next_column().await? {
-///             let value: String = query_result.fetch().await?;
-///             println!("value={}", value);
+///             let value: Option<String> = query_result.fetch().await?; // nullable
+///             println!("value={:?}", value);
 ///         }
 ///     }
 ///
@@ -109,6 +109,9 @@ impl SqlQueryResult {
     ///             let column_name = column.name();
     ///
     ///             assert!(query_result.next_column().await?);
+    ///             if query_result.is_null()? {
+    ///                 continue;
+    ///             }
     ///             match column.atom_type().unwrap() {
     ///                 AtomType::Int4 => { // int
     ///                     let value: i32 = query_result.fetch().await?;
