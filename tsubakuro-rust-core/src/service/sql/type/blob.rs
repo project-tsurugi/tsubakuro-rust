@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::{
     error::TgError,
     invalid_response_error, io_error,
@@ -81,9 +83,9 @@ pub(crate) fn lob_open_processor(response: WireResponse) -> Result<std::fs::File
     }
 }
 
-pub(crate) fn lob_copy_to_processor(
+pub(crate) fn lob_copy_to_processor<T: AsRef<Path>>(
     response: WireResponse,
-    destination: &str,
+    destination: T,
 ) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "lob_copy_to_processor()";
 

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test {
-    use std::io::{Read, Write};
+    use std::io::{BufReader, Read, Write};
 
     use crate::test::{commit_and_close, create_table, create_test_sql_client, start_occ};
     use tempfile::NamedTempFile;
@@ -42,7 +42,7 @@ mod test {
         create_table(
             client,
             "test",
-            "create table test (pk int primary key, v blob, r int default 999)",
+            "create table test (pk int primary key, v clob, r int default 999)",
         )
         .await;
 
@@ -51,26 +51,25 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::Blob), c.atom_type());
+        assert_eq!(Some(AtomType::Clob), c.atom_type());
     }
 
-    fn generate_values() -> Vec<(i32, Option<Vec<u8>>)> {
+    fn generate_values() -> Vec<(i32, Option<String>)> {
         let mut values = vec![];
 
         values.push((0, None));
-        values.push((1, Some(vec![1, 2, 3])));
-        values.push((2, Some(vec![0x11, 0x22, 0x33])));
+        values.push((1, Some("".to_string())));
+        values.push((2, Some("abc".to_string())));
 
         values
     }
 
-    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<Vec<u8>>)>) {
+    async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<String>)>) {
         let transaction = start_occ(&client).await;
 
         for value in values {
             let sql = if let Some(v) = &value.1 {
-                let v = v.iter().map(|b| format!("{:02x}", b)).collect::<String>();
-                format!("insert into test (pk, v) values({}, X'{}')", value.0, v)
+                format!("insert into test (pk, v) values({}, '{}')", value.0, v)
             } else {
                 format!("insert into test (pk, v) values({}, null)", value.0)
             };
@@ -80,30 +79,30 @@ mod test {
         commit_and_close(client, &transaction).await;
     }
 
-    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<Vec<u8>>)>) -> bool {
+    async fn insert_prepared(client: &SqlClient, values: &Vec<(i32, Option<String>)>) -> bool {
         let transaction = start_occ(&client).await;
 
         let sql = "insert into test (pk, v) values(:pk, :value)";
         let placeholders = vec![
             SqlPlaceholder::of::<i32>("pk"),
-            SqlPlaceholder::of::<TgBlob>("value"),
+            SqlPlaceholder::of::<TgClob>("value"),
         ];
         let ps = client.prepare(sql, placeholders).await.unwrap();
 
         for value in values {
             let mut file;
-            let blob = match &value.1 {
+            let clob = match &value.1 {
                 Some(value) => {
                     file = NamedTempFile::new().unwrap();
-                    file.write_all(value).unwrap();
-                    Some(TgBlob::new(file.path().to_str().unwrap()))
+                    write!(file, "{}", value).unwrap();
+                    Some(TgClob::new(file.path().to_str().unwrap()))
                 }
                 None => None,
             };
 
             let parameters = vec![
                 SqlParameter::of("pk", value.0),
-                SqlParameter::of("value", blob),
+                SqlParameter::of("value", clob),
             ];
             let result = client.prepared_execute(&transaction, &ps, parameters).await;
             if let Err(ref e) = result {
@@ -126,7 +125,7 @@ mod test {
         true
     }
 
-    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<Vec<u8>>)>, skip: bool) {
+    async fn select(client: &SqlClient, expected: &Vec<(i32, Option<String>)>, skip: bool) {
         let sql = "select * from test order by pk";
         let transaction = start_occ(&client).await;
 
@@ -137,7 +136,7 @@ mod test {
         assert_eq!(3, columns.len());
         let c = &columns[1];
         assert_eq!("v", c.name());
-        assert_eq!(Some(AtomType::Blob), c.atom_type());
+        assert_eq!(Some(AtomType::Clob), c.atom_type());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {
@@ -149,20 +148,22 @@ mod test {
 
             assert_eq!(true, query_result.next_column().await.unwrap());
             if !skip {
-                let v: Option<TgBlobReference> = query_result.fetch().await.unwrap();
-                if let Some(blob) = v {
-                    let mut file = client.open_blob(&transaction, &blob).await.unwrap();
-                    let mut v = Vec::new();
-                    file.read_to_end(&mut v).unwrap();
+                let v: Option<TgClobReference> = query_result.fetch().await.unwrap();
+                if let Some(clob) = v {
+                    let file = client.open_clob(&transaction, &clob).await.unwrap();
+                    let mut reader = BufReader::new(file);
+                    let mut v = String::new();
+                    reader.read_to_string(&mut v).unwrap();
                     assert_eq!(expected.1, Some(v));
 
-                    let mut file = NamedTempFile::new().unwrap();
+                    let file = NamedTempFile::new().unwrap();
                     client
-                        .copy_blob_to(&transaction, &blob, file.path())
+                        .copy_clob_to(&transaction, &clob, file.path())
                         .await
                         .unwrap();
-                    let mut v = Vec::new();
-                    file.read_to_end(&mut v).unwrap();
+                    let mut reader = BufReader::new(file);
+                    let mut v = String::new();
+                    reader.read_to_string(&mut v).unwrap();
                     assert_eq!(expected.1, Some(v));
                 } else {
                     assert_eq!(expected.1, None);

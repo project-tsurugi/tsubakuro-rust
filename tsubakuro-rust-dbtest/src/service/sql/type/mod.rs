@@ -10,6 +10,7 @@ mod chrono_naive_date;
 mod chrono_naive_date_time;
 mod chrono_naive_time;
 mod chrono_naive_time_with_offset;
+mod clob;
 mod date;
 mod decimal0;
 mod decimal1;
