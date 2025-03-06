@@ -73,6 +73,8 @@ impl DataChannelWire for TcpDataChannelWire {
                     ))
                 }
             }
+
+            tokio::task::yield_now().await;
         }
         Ok(())
     }
