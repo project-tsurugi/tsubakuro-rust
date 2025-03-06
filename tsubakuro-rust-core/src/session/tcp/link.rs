@@ -3,7 +3,7 @@ use std::{sync::atomic::AtomicBool, time::Duration};
 use log::trace;
 use prost::bytes::BytesMut;
 use tokio::{
-    io::{AsyncReadExt, AsyncWriteExt, ReadHalf, WriteHalf},
+    io::{AsyncReadExt, AsyncWriteExt},
     net::TcpStream,
     sync::Mutex,
 };
@@ -19,8 +19,7 @@ use super::r#enum::TcpResponseInfo;
 
 pub(crate) struct TcpLink {
     endpoint: Endpoint,
-    reader: Mutex<Option<ReadHalf<TcpStream>>>, // recv()とclose()の排他（recv()を呼ぶ側で排他するので、recv()同士の排他は不要）
-    writer: Mutex<Option<WriteHalf<TcpStream>>>, // send()系同士およびclose()の排他
+    tcp_stream: Mutex<Option<TcpStream>>, // send(), recv(), close()の排他
     send_timeout: Duration,
     recv_timeout: Duration,
     broken: AtomicBool,
@@ -59,11 +58,9 @@ impl TcpLink {
             .set_nodelay(true)
             .map_err(|e| io_error!("TcpLink.connect(): set_nodelay error", e))?;
 
-        let (reader, writer) = tokio::io::split(stream);
         Ok(TcpLink {
             endpoint: endpoint.clone(),
-            reader: Mutex::new(Some(reader)),
-            writer: Mutex::new(Some(writer)),
+            tcp_stream: Mutex::new(Some(stream)),
             send_timeout: connection_option.send_timeout(),
             recv_timeout: connection_option.recv_timeout(),
             broken: AtomicBool::new(false),
@@ -89,7 +86,7 @@ impl TcpLink {
         tcp_header[5] = ((length >> 16) & 0xff) as u8;
         tcp_header[6] = ((length >> 24) & 0xff) as u8;
 
-        let mut writer = self.writer.lock().await;
+        let mut writer = self.tcp_stream.lock().await;
         self.check_broken()?; // check after lock
         let writer = writer.as_mut().ok_or(io_error!("TcpLink already closed"))?;
 
@@ -116,7 +113,7 @@ impl TcpLink {
     }
 
     async fn send_body(
-        writer: &mut WriteHalf<TcpStream>,
+        writer: &mut TcpStream,
         tcp_header: &[u8],
         frame_header: &[u8],
         payload: &[u8],
@@ -151,7 +148,7 @@ impl TcpLink {
         tcp_header[1] = (slot & 0xff) as u8;
         tcp_header[2] = ((slot >> 8) & 0xff) as u8;
 
-        let mut writer = self.writer.lock().await;
+        let mut writer = self.tcp_stream.lock().await;
         self.check_broken()?; // check after lock
         let writer = writer.as_mut().ok_or(io_error!("TcpLink already closed"))?;
 
@@ -176,7 +173,7 @@ impl TcpLink {
     }
 
     async fn send_header_only_body(
-        writer: &mut WriteHalf<TcpStream>,
+        writer: &mut TcpStream,
         tcp_header: &[u8],
     ) -> Result<(), TgError> {
         writer
@@ -192,7 +189,7 @@ impl TcpLink {
     pub(crate) async fn recv(&self) -> Result<Option<LinkMessage>, TgError> {
         self.check_close()?;
 
-        let mut reader = match self.reader.try_lock() {
+        let mut reader = match self.tcp_stream.try_lock() {
             Ok(reader) => reader,
             Err(_) => return Ok(None),
         };
@@ -217,18 +214,24 @@ impl TcpLink {
         result
     }
 
-    async fn recv_body(reader: &mut ReadHalf<TcpStream>) -> Result<Option<LinkMessage>, TgError> {
+    async fn recv_body(reader: &mut TcpStream) -> Result<Option<LinkMessage>, TgError> {
         let info = {
-            let result = tokio::time::timeout(Duration::from_nanos(10), reader.read_u8()).await;
+            let mut buf = [0u8; 1];
+            let result = reader.try_read(&mut buf);
             match result {
-                Ok(result) => match result {
-                    Ok(info) => info,
-                    Err(e) => {
-                        return Err(io_error!("TcpLink.recv(): read[info] error", e));
-                    }
-                },
-                Err(_) => {
-                    return Ok(None); // timeout
+                Ok(0) => {
+                    return Ok(None);
+                }
+                Ok(1) => buf[0],
+                Ok(_) => {
+                    return Err(io_error!("TcpLink.recv(): read[info] error"));
+                }
+                Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+                    tokio::task::yield_now().await;
+                    return Ok(None);
+                }
+                Err(e) => {
+                    return Err(io_error!("TcpLink.recv(): read[info] error", e));
                 }
             }
         };
@@ -318,14 +321,8 @@ impl TcpLink {
             .is_ok()
         {
             // FIXME send()/recv()の終了を待たずにNoneにする方法
-            {
-                let mut writer = self.writer.lock().await;
-                writer.take(); // upadte to None
-            }
-            {
-                let mut reader = self.reader.lock().await;
-                reader.take(); // update to None
-            }
+            let mut stream = self.tcp_stream.lock().await;
+            stream.take(); // upadte to None
         }
         Ok(())
     }
