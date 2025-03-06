@@ -1137,111 +1137,6 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn open_lob_command<T: TgLargeObjectReference>(transaction_handle: u64, lob: &T) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
-        let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
-            provider: lob.provider().into(),
-            object_id: lob.object_id(),
-            contents_opt: None,
-        };
-
-        let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
-            transaction_handle: Some(tx_handle),
-            reference: Some(lob),
-        };
-        SqlCommand::GetLargeObjectData(request)
-    }
-
-    /// Copy BLOB to local file.
-    ///
-    /// # Examples
-    /// ```
-    /// use tsubakuro_rust_core::prelude::*;
-    ///
-    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<(), TgError> {
-    ///     let blob: TgBlobReference = query_result.fetch().await?;
-    ///     client.copy_blob_to(transaction, &blob, "/path/to/blob.bin").await?;
-    ///
-    ///     Ok(())
-    /// }
-    /// ```
-    pub async fn copy_blob_to<T: AsRef<Path>>(
-        &self,
-        transaction: &Transaction,
-        blob: &TgBlobReference,
-        destination: T,
-    ) -> Result<(), TgError> {
-        let timeout = self.default_timeout;
-        self.copy_blob_to_for(transaction, blob, destination, timeout)
-            .await
-    }
-
-    /// Copy BLOB to local file.
-    pub async fn copy_blob_to_for<T: AsRef<Path>>(
-        &self,
-        transaction: &Transaction,
-        blob: &TgBlobReference,
-        destination: T,
-        timeout: Duration,
-    ) -> Result<(), TgError> {
-        const FUNCTION_NAME: &str = "copy_blob_to()";
-        trace!("{} start", FUNCTION_NAME);
-
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::copy_blob_to_command(tx_handle, blob);
-        let response = self.send_and_pull_response(command, None, timeout).await?;
-        lob_copy_to_processor(response, destination)?;
-
-        trace!("{} end", FUNCTION_NAME);
-        Ok(())
-    }
-
-    /// Copy BLOB to local file.
-    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Clone + 'static>(
-        &self,
-        transaction: &Transaction,
-        blob: &TgBlobReference,
-        destination: T,
-    ) -> Result<Job<()>, TgError> {
-        const FUNCTION_NAME: &str = "copy_blob_to_async()";
-        trace!("{} start", FUNCTION_NAME);
-
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::copy_blob_to_command(tx_handle, blob);
-        let job = self
-            .send_and_pull_async(
-                "BlobCopy",
-                command,
-                None,
-                Box::new(move |response| lob_copy_to_processor(response, destination.clone())),
-            )
-            .await?;
-
-        trace!("{} end", FUNCTION_NAME);
-        Ok(job)
-    }
-
-    fn copy_blob_to_command(transaction_handle: u64, blob: &TgBlobReference) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
-        let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
-            provider: blob.provider().into(),
-            object_id: blob.object_id(),
-            contents_opt: None,
-        };
-
-        let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
-            transaction_handle: Some(tx_handle),
-            reference: Some(lob),
-        };
-        SqlCommand::GetLargeObjectData(request)
-    }
-
     /// Open CLOB file.
     ///
     /// # Examples
@@ -1308,6 +1203,94 @@ impl SqlClient {
         Ok(job)
     }
 
+    fn open_lob_command<T: TgLargeObjectReference>(transaction_handle: u64, lob: &T) -> SqlCommand {
+        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
+            handle: transaction_handle,
+        };
+        let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
+            provider: lob.provider().into(),
+            object_id: lob.object_id(),
+            contents_opt: None,
+        };
+
+        let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
+            transaction_handle: Some(tx_handle),
+            reference: Some(lob),
+        };
+        SqlCommand::GetLargeObjectData(request)
+    }
+
+    /// Copy BLOB to local file.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<(), TgError> {
+    ///     let blob: TgBlobReference = query_result.fetch().await?;
+    ///     client.copy_blob_to(transaction, &blob, "/path/to/blob.bin").await?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    pub async fn copy_blob_to<T: AsRef<Path>>(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        destination: T,
+    ) -> Result<(), TgError> {
+        let timeout = self.default_timeout;
+        self.copy_blob_to_for(transaction, blob, destination, timeout)
+            .await
+    }
+
+    /// Copy BLOB to local file.
+    pub async fn copy_blob_to_for<T: AsRef<Path>>(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        destination: T,
+        timeout: Duration,
+    ) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "copy_blob_to()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::copy_lob_to_command(tx_handle, blob);
+        let response = self.send_and_pull_response(command, None, timeout).await?;
+        lob_copy_to_processor(response, destination)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(())
+    }
+
+    /// Copy BLOB to local file.
+    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Clone + 'static>(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        destination: T,
+    ) -> Result<Job<()>, TgError> {
+        const FUNCTION_NAME: &str = "copy_blob_to_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::copy_lob_to_command(tx_handle, blob);
+        let job = self
+            .send_and_pull_async(
+                "BlobCopy",
+                command,
+                None,
+                Box::new(move |response| lob_copy_to_processor(response, destination.clone())),
+            )
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
     /// Copy CLOB to local file.
     ///
     /// # Examples
@@ -1345,7 +1328,7 @@ impl SqlClient {
 
         let tx_handle = transaction.transaction_handle()?;
 
-        let command = Self::copy_clob_to_command(tx_handle, clob);
+        let command = Self::copy_lob_to_command(tx_handle, clob);
         let response = self.send_and_pull_response(command, None, timeout).await?;
         lob_copy_to_processor(response, destination)?;
 
@@ -1365,7 +1348,7 @@ impl SqlClient {
 
         let tx_handle = transaction.transaction_handle()?;
 
-        let command = Self::copy_clob_to_command(tx_handle, clob);
+        let command = Self::copy_lob_to_command(tx_handle, clob);
         let job = self
             .send_and_pull_async(
                 "ClobCopy",
@@ -1379,7 +1362,10 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn copy_clob_to_command(transaction_handle: u64, clob: &TgClobReference) -> SqlCommand {
+    fn copy_lob_to_command<T: TgLargeObjectReference>(
+        transaction_handle: u64,
+        clob: &T,
+    ) -> SqlCommand {
         let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
             handle: transaction_handle,
         };
