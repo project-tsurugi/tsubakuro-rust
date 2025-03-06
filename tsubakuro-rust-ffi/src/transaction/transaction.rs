@@ -183,7 +183,7 @@ pub extern "C" fn tsurugi_ffi_transaction_get_close_timeout(
 ///
 /// See [`Transaction::close`].
 ///
-/// Note: Close is called in `tsurugi_ffi_transaction_dispose()`.
+/// Note: Close is called in [`tsurugi_ffi_transaction_dispose`].
 ///
 /// # Receiver
 /// - `transaction` - Transaction.
@@ -215,7 +215,7 @@ pub extern "C" fn tsurugi_ffi_transaction_close(
 ///
 /// See [`Transaction::close_for`].
 ///
-/// Note: Close is called in `tsurugi_ffi_transaction_dispose()`.
+/// Note: Close is called in [`tsurugi_ffi_transaction_dispose`].
 ///
 /// # Receiver
 /// - `transaction` - Transaction.

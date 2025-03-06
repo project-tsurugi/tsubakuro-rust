@@ -4,6 +4,9 @@
 //! tsubakuro-rust-ffi uses [tsubakuro-rust-core](https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core),
 //! so refer to that for explanation.
 //!
+//! # Examples
+//!
+//! See <https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-ffi#example>.
 #![allow(private_interfaces)]
 #![allow(clippy::not_unsafe_ptr_arg_deref)]
 #![allow(clippy::missing_safety_doc)]

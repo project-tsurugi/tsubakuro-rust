@@ -39,7 +39,7 @@ pub type TsurugiFfiEndpointHandle = *mut TsurugiFfiEndpoint;
 /// - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
 ///
 /// # Returns
-/// - `endpoint_out` - endpoint. To dispose, call `tsurugi_ffi_endpoint_dispose()`.
+/// - `endpoint_out` - endpoint. To dispose, call [`tsurugi_ffi_endpoint_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_endpoint_parse(
     context: TsurugiFfiContextHandle,

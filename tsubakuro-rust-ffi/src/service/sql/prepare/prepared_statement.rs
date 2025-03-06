@@ -179,7 +179,7 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_get_close_timeout(
 ///
 /// See [`SqlPreparedStatement::close`].
 ///
-/// Note: Close is called in `tsurugi_ffi_sql_prepared_statement_dispose()`.
+/// Note: Close is called in [`tsurugi_ffi_sql_prepared_statement_dispose`].
 ///
 /// # Receiver
 /// - `prepared_statement` - Sql prepared statement.
@@ -211,7 +211,7 @@ pub extern "C" fn tsurugi_ffi_sql_prepared_statement_close(
 ///
 /// See [`SqlPreparedStatement::close_for`].
 ///
-/// Note: Close is called in `tsurugi_ffi_sql_prepared_statement_dispose()`.
+/// Note: Close is called in [`tsurugi_ffi_sql_prepared_statement_dispose`].
 ///
 /// # Receiver
 /// - `prepared_statement` - Sql prepared statement.

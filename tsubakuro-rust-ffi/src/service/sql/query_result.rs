@@ -155,7 +155,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_get_default_timeout(
 /// - `query_result` - Sql query result.
 ///
 /// # Returns
-/// - `query_result_metadata_out` - metadata. To dispose, call `tsurugi_ffi_sql_query_result_metadata_dispose()`.
+/// - `query_result_metadata_out` - metadata. To dispose, call [`tsurugi_ffi_sql_query_result_metadata_dispose`](crate::service::sql::query_result_metadata::tsurugi_ffi_sql_query_result_metadata_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_get_metadata(
     context: TsurugiFfiContextHandle,
@@ -431,7 +431,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -440,7 +440,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
     context: TsurugiFfiContextHandle,
@@ -479,7 +479,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -491,7 +491,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
     context: TsurugiFfiContextHandle,
@@ -538,7 +538,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -547,7 +547,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
     context: TsurugiFfiContextHandle,
@@ -586,7 +586,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -598,7 +598,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
     context: TsurugiFfiContextHandle,
@@ -645,7 +645,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -654,7 +654,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
     context: TsurugiFfiContextHandle,
@@ -693,7 +693,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -705,7 +705,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
     context: TsurugiFfiContextHandle,
@@ -752,7 +752,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -761,7 +761,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
     context: TsurugiFfiContextHandle,
@@ -800,7 +800,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -812,7 +812,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
     context: TsurugiFfiContextHandle,
@@ -859,7 +859,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -871,7 +871,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
 /// - `unscaled_value_out` - unscaled value of decimal if `unscaled_value_bytes_out` is null (`unscaled_value_bytes_size_out` = 0).
 /// - `exponent_out` - exponent of decimal.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
     context: TsurugiFfiContextHandle,
@@ -942,7 +942,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -957,7 +957,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
 /// - `unscaled_value_out` - unscaled value of decimal if `unscaled_value_bytes_out` is null (`unscaled_value_bytes_size_out` = 0).
 /// - `exponent_out` - exponent of decimal.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
     context: TsurugiFfiContextHandle,
@@ -1035,7 +1035,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1046,7 +1046,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
 /// - `unscaled_value_low_out` - unscaled value of decimal (low 64bit).
 /// - `exponent_out` - exponent of decimal.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
     context: TsurugiFfiContextHandle,
@@ -1107,7 +1107,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1121,7 +1121,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
 /// - `unscaled_value_low_out` - unscaled value of decimal (low 64bit).
 /// - `exponent_out` - exponent of decimal.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
     context: TsurugiFfiContextHandle,
@@ -1189,7 +1189,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1198,7 +1198,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
     context: TsurugiFfiContextHandle,
@@ -1239,7 +1239,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1251,7 +1251,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
 /// # Returns
 /// - `value_out` - value.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     context: TsurugiFfiContextHandle,
@@ -1300,7 +1300,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1310,7 +1310,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
 /// - `value_out` - value.
 /// - `size_out` - `value_out` size \[byte\].
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
     context: TsurugiFfiContextHandle,
@@ -1361,7 +1361,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1374,7 +1374,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
 /// - `value_out` - value.
 /// - `size_out` - `value_out` size \[byte\].
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
     context: TsurugiFfiContextHandle,
@@ -1437,7 +1437,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1446,7 +1446,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
 /// # Returns
 /// - `value_out` - number of days offset of epoch 1970-01-01.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
     context: TsurugiFfiContextHandle,
@@ -1486,7 +1486,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1498,7 +1498,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
 /// # Returns
 /// - `value_out` - number of days offset of epoch 1970-01-01.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
     context: TsurugiFfiContextHandle,
@@ -1546,7 +1546,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1555,7 +1555,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
 /// # Returns
 /// - `value_out` - nanoseconds since 00:00:00.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
     context: TsurugiFfiContextHandle,
@@ -1596,7 +1596,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1608,7 +1608,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
 /// # Returns
 /// - `value_out` - nanoseconds since 00:00:00.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
     context: TsurugiFfiContextHandle,
@@ -1656,7 +1656,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1666,7 +1666,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
 /// - `value_out` - number of seconds offset of epoch 1970-01-01.
 /// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
     context: TsurugiFfiContextHandle,
@@ -1715,7 +1715,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1728,7 +1728,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
 /// - `value_out` - number of seconds offset of epoch 1970-01-01.
 /// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
     context: TsurugiFfiContextHandle,
@@ -1784,7 +1784,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1794,7 +1794,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
 /// - `value_out` - nanoseconds since 00:00:00.
 /// - `time_zone_offset_out` - timezone offset in minute.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -1843,7 +1843,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1856,7 +1856,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
 /// - `value_out` - nanoseconds since 00:00:00.
 /// - `time_zone_offset_out` - timezone offset in minute.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -1913,7 +1913,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_z
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1924,7 +1924,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_z
 /// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
 /// - `time_zone_offset_out` - timezone offset in minute.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -1978,7 +1978,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -1992,7 +1992,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
 /// - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
 /// - `time_zone_offset_out` - timezone offset in minute.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(
     context: TsurugiFfiContextHandle,
@@ -2054,7 +2054,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -2063,7 +2063,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
 /// # Returns
 /// - `blob_reference_out` - blob reference.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
     context: TsurugiFfiContextHandle,
@@ -2105,7 +2105,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -2117,7 +2117,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
 /// # Returns
 /// - `blob_reference_out` - blob reference.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
     context: TsurugiFfiContextHandle,
@@ -2166,7 +2166,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -2175,7 +2175,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
 /// # Returns
 /// - `clob_reference_out` - clob reference.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
     context: TsurugiFfiContextHandle,
@@ -2217,7 +2217,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
 ///
 /// Retrieves a value on the column of the cursor position.
 ///
-/// Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
 /// You can only take once to retrieve the value on the column.
 ///
 /// # Receiver
@@ -2229,7 +2229,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
 /// # Returns
 /// - `clob_reference_out` - clob reference.
 ///
-/// Return value is not null. Call `tsurugi_ffi_sql_query_result_is_null()` to check null.
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_clob(
     context: TsurugiFfiContextHandle,

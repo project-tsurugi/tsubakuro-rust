@@ -52,7 +52,7 @@ pub type TsurugiFfiSqlPlaceholderHandle = *mut TsurugiFfiSqlPlaceholder;
 /// - `atom_type` - parameter type.
 ///
 /// # Returns
-/// - `placeholder_out` - placeholder. To dispose, call `tsurugi_ffi_sql_placeholder_dispose()`.
+/// - `placeholder_out` - placeholder. To dispose, call [`tsurugi_ffi_sql_placeholder_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_placeholder_of_atom_type(
     context: TsurugiFfiContextHandle,

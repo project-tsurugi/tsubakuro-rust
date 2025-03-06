@@ -227,7 +227,7 @@ pub extern "C" fn tsurugi_ffi_explain_result_get_columns_size(
 /// - `index` - column index \[0..tsurugi_ffi_table_metadata_get_columns_size()-1\].
 ///
 /// # Returns
-/// - `sql_column_out` - column. To dispose, call `tsurugi_ffi_sql_column_dispose()`.
+/// - `sql_column_out` - column. To dispose, call [`tsurugi_ffi_sql_column_dispose`](crate::service::sql::column::tsurugi_ffi_sql_column_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_explain_result_get_columns_value(
     context: TsurugiFfiContextHandle,

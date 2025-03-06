@@ -63,7 +63,7 @@ pub type TsurugiFfiContextHandle = *mut TsurugiFfiContext;
 /// Context: Creates a new instance.
 ///
 /// # Returns
-/// - `context_out` - context object. To dispose, call `tsurugi_ffi_context_dispose()`.
+/// - `context_out` - context object. To dispose, call [`tsurugi_ffi_context_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_context_create(
     context_out: *mut TsurugiFfiContextHandle,

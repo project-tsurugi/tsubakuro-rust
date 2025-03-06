@@ -640,7 +640,7 @@ pub extern "C" fn tsurugi_ffi_job_cancel_for(
 /// - `job` - job.
 ///
 /// # Returns
-/// - `cancel_job_out` - cancel job. To dispose, call `tsurugi_ffi_cancel_job_dispose()`.
+/// - `cancel_job_out` - cancel job. To dispose, call [`tsurugi_ffi_cancel_job_dispose`](crate::job::cancel_job::tsurugi_ffi_cancel_job_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_job_cancel_async(
     context: TsurugiFfiContextHandle,
@@ -686,7 +686,7 @@ pub extern "C" fn tsurugi_ffi_job_cancel_async(
 ///
 /// See [`Job::close`].
 ///
-/// Note: Close is called in `tsurugi_ffi_job_dispose()`.
+/// Note: Close is called in [`tsurugi_ffi_job_dispose`].
 ///
 /// # Receiver
 /// - `job` - job.

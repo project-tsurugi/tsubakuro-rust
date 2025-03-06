@@ -76,7 +76,7 @@ pub type TsurugiFfiCommitOptionHandle = *mut TsurugiFfiCommitOption;
 /// See [`CommitOption::new`].
 ///
 /// # Returns
-/// - `commit_option_out` - commit option. To dispose, call `tsurugi_ffi_commit_option_dispose()`.
+/// - `commit_option_out` - commit option. To dispose, call [`tsurugi_ffi_commit_option_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_commit_option_create(
     context: TsurugiFfiContextHandle,

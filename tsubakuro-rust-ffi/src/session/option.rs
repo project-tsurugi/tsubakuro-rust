@@ -46,7 +46,7 @@ pub type TsurugiFfiConnectionOptionHandle = *mut TsurugiFfiConnectionOption;
 /// See [`ConnectionOption::new`].
 ///
 /// # Returns
-/// - `connection_option_out` - connection option. To dispose, call `tsurugi_ffi_connection_option_dispose()`.
+/// - `connection_option_out` - connection option. To dispose, call [`tsurugi_ffi_connection_option_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_connection_option_create(
     context: TsurugiFfiContextHandle,

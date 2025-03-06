@@ -48,7 +48,7 @@ pub type TsurugiFfiTransactionOptionHandle = *mut TsurugiFfiTransactionOption;
 /// See [`TransactionOption::new`].
 ///
 /// # Returns
-/// - `transaction_option_out` - transaction option. To dispose, call `tsurugi_ffi_transaction_option_dispose()`.
+/// - `transaction_option_out` - transaction option. To dispose, call [`tsurugi_ffi_transaction_option_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_create(
     context: TsurugiFfiContextHandle,

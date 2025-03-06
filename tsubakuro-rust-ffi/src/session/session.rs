@@ -54,7 +54,7 @@ pub type TsurugiFfiSessionHandle = *mut TsurugiFfiSession;
 /// - `connection_option` - connection option.
 ///
 /// # Returns
-/// - `session_out` - session. To dispose, call `tsurugi_ffi_session_dispose()`.
+/// - `session_out` - session. To dispose, call [`tsurugi_ffi_session_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_connect(
     context: TsurugiFfiContextHandle,
@@ -106,7 +106,7 @@ pub extern "C" fn tsurugi_ffi_session_connect(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `session_out` - session. To dispose, call `tsurugi_ffi_session_dispose()`.
+/// - `session_out` - session. To dispose, call [`tsurugi_ffi_session_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_connect_for(
     context: TsurugiFfiContextHandle,
@@ -160,8 +160,8 @@ pub extern "C" fn tsurugi_ffi_session_connect_for(
 /// - `connection_option` - connection option.
 ///
 /// # Returns
-/// - `session_job_out` - Job for `TsurugiFfiSessionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSessionHandle` and call `tsurugi_ffi_session_dispose()` to dispose.
+/// - `session_job_out` - Job for `TsurugiFfiSessionHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSessionHandle` and call [`tsurugi_ffi_session_dispose`] to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_connect_async(
     context: TsurugiFfiContextHandle,
@@ -310,7 +310,7 @@ pub extern "C" fn tsurugi_ffi_session_get_default_timeout(
 /// See [`Session::make_client`].
 ///
 /// # Returns
-/// - `sql_client_out` - SqlClient. To dispose, call `tsurugi_ffi_sql_client_dispose()`.
+/// - `sql_client_out` - SqlClient. To dispose, call [`tsurugi_ffi_sql_client_dispose`](crate::service::sql::tsurugi_ffi_sql_client_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_make_sql_client(
     context: TsurugiFfiContextHandle,
@@ -458,7 +458,7 @@ pub extern "C" fn tsurugi_ffi_session_update_expiration_time_for(
 /// - `expiration_time` - expiration time \[nanosecond\].
 ///
 /// # Returns
-/// - `update_expiration_time_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+/// - `update_expiration_time_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_update_expiration_time_async(
     context: TsurugiFfiContextHandle,
@@ -607,7 +607,7 @@ pub extern "C" fn tsurugi_ffi_session_shutdown_for(
 /// - `shutdown_type` - shutdown type.
 ///
 /// # Returns
-/// - `shutdown_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+/// - `shutdown_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_session_shutdown_async(
     context: TsurugiFfiContextHandle,

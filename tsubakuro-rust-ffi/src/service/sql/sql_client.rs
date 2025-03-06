@@ -128,7 +128,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_service_message_version(
 /// - `sql_client` - Sql client.
 ///
 /// # Returns
-/// - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
+/// - `table_list_out` - table list. To dispose, call [`tsurugi_ffi_table_list_dispose`](crate::service::sql::table_list::tsurugi_ffi_table_list_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
     context: TsurugiFfiContextHandle,
@@ -175,7 +175,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
+/// - `table_list_out` - table list. To dispose, call [`tsurugi_ffi_table_list_dispose`](crate::service::sql::table_list::tsurugi_ffi_table_list_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
     context: TsurugiFfiContextHandle,
@@ -227,8 +227,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_list_tables_for(
 /// - `sql_client` - Sql client.
 ///
 /// # Returns
-/// - `table_list_job_out` - Job for `TsurugiFfiTableListHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiTableListHandle` and call `tsurugi_ffi_table_list_dispose()` to dispose.
+/// - `table_list_job_out` - Job for `TsurugiFfiTableListHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiTableListHandle` and call [`tsurugi_ffi_table_list_dispose`](crate::service::sql::table_list::tsurugi_ffi_table_list_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_list_tables_async(
     context: TsurugiFfiContextHandle,
@@ -294,7 +294,7 @@ impl TableListJobDelegator {
 /// - `table_name` - table name.
 ///
 /// # Returns
-/// - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
+/// - `table_metadata_out` - table metadata. To dispose, call [`tsurugi_ffi_table_metadata_dispose`](crate::service::sql::table_metadata::tsurugi_ffi_table_metadata_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
     context: TsurugiFfiContextHandle,
@@ -355,7 +355,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
+/// - `table_metadata_out` - table metadata. To dispose, call [`tsurugi_ffi_table_metadata_dispose`](crate::service::sql::table_metadata::tsurugi_ffi_table_metadata_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
     context: TsurugiFfiContextHandle,
@@ -418,8 +418,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_for(
 /// - `table_name` - table name.
 ///
 /// # Returns
-/// - `table_metadata_job_out` - Job for `TsurugiFfiTableMetadataHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiTableMetadataHandle` and call `tsurugi_ffi_table_metadata_dispose()` to dispose.
+/// - `table_metadata_job_out` - Job for `TsurugiFfiTableMetadataHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiTableMetadataHandle` and call [`tsurugi_ffi_table_metadata_dispose`](crate::service::sql::table_metadata::tsurugi_ffi_table_metadata_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_table_metadata_async(
     context: TsurugiFfiContextHandle,
@@ -515,7 +515,7 @@ macro_rules! convert_placeholders {
 /// - `placeholders_size` - `placeholders` size \[number of placeholders\].
 ///
 /// # Returns
-/// - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
+/// - `prepared_statement_out` - prepared statement. To dispose, call [`tsurugi_ffi_sql_prepared_statement_dispose`](crate::service::sql::prepare::prepared_statement::tsurugi_ffi_sql_prepared_statement_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare(
     context: TsurugiFfiContextHandle,
@@ -590,7 +590,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
+/// - `prepared_statement_out` - prepared statement. To dispose, call [`tsurugi_ffi_sql_prepared_statement_dispose`](crate::service::sql::prepare::prepared_statement::tsurugi_ffi_sql_prepared_statement_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
     context: TsurugiFfiContextHandle,
@@ -667,8 +667,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepare_for(
 /// - `placeholders_size` - `placeholders` size \[number of placeholders\].
 ///
 /// # Returns
-/// - `prepared_statement_job_out` - Job for `TsurugiFfiSqlPreparedStatementHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSqlPreparedStatementHandle` and call `tsurugi_ffi_sql_prepared_statement_dispose()` to dispose.
+/// - `prepared_statement_job_out` - Job for `TsurugiFfiSqlPreparedStatementHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSqlPreparedStatementHandle` and call [`tsurugi_ffi_sql_prepared_statement_dispose`](crate::service::sql::prepare::prepared_statement::tsurugi_ffi_sql_prepared_statement_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepare_async(
     context: TsurugiFfiContextHandle,
@@ -757,7 +757,7 @@ impl SqlPreparedStatementJobDelegator {
 /// - `sql` - SQL satement.
 ///
 /// # Returns
-/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+/// - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_explain(
     context: TsurugiFfiContextHandle,
@@ -813,7 +813,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_explain(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+/// - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi]_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_explain_for(
     context: TsurugiFfiContextHandle,
@@ -876,8 +876,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_explain_for(
 /// - `sql` - SQL satement.
 ///
 /// # Returns
-/// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call `tsurugi_ffi_sql_explain_result_dispose()` to dispose.
+/// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_explain_async(
     context: TsurugiFfiContextHandle,
@@ -971,7 +971,7 @@ macro_rules! convert_parameters {
 /// - `parameters_size` - `parameters` size \[number of parameters\].
 ///
 /// # Returns
-/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+/// - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
     context: TsurugiFfiContextHandle,
@@ -1043,7 +1043,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+/// - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
     context: TsurugiFfiContextHandle,
@@ -1117,8 +1117,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_for(
 /// - `parameters_size` - `parameters` size \[number of parameters\].
 ///
 /// # Returns
-/// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call `tsurugi_ffi_sql_explain_result_dispose()` to dispose.
+/// - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
     context: TsurugiFfiContextHandle,
@@ -1191,7 +1191,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_explain_async(
 /// - `transaction_option` - transaction option.
 ///
 /// # Returns
-/// - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
+/// - `transaction_out` - transaction. To dispose, call [`tsurugi_ffi_transaction_dispose`](crate::transaction::tsurugi_ffi_transaction_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
     context: TsurugiFfiContextHandle,
@@ -1248,7 +1248,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
+/// - `transaction_out` - transaction. To dispose, call [`tsurugi_ffi_transaction_dispose`](crate::transaction::tsurugi_ffi_transaction_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
     context: TsurugiFfiContextHandle,
@@ -1307,8 +1307,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_for(
 /// - `transaction_option` - transaction option.
 ///
 /// # Returns
-/// - `transaction_job_out` - Job for `TsurugiFfiTransactionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiTransactionHandle` and call `tsurugi_ffi_transaction_dispose()` to dispose.
+/// - `transaction_job_out` - Job for `TsurugiFfiTransactionHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiTransactionHandle` and call [`tsurugi_ffi_transaction_dispose`](crate::transaction::tsurugi_ffi_transaction_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_start_transaction_async(
     context: TsurugiFfiContextHandle,
@@ -1384,7 +1384,7 @@ impl TransactionJobDelegator {
 /// - `transaction` - transaction.
 ///
 /// # Returns
-/// - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
+/// - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
     context: TsurugiFfiContextHandle,
@@ -1445,7 +1445,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
+/// - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
     context: TsurugiFfiContextHandle,
@@ -1508,8 +1508,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_for(
 /// - `transaction` - transaction.
 ///
 /// # Returns
-/// - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiTransactionStatusHandle` and call `tsurugi_ffi_transaction_status_dispose()` to dispose.
+/// - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiTransactionStatusHandle` and call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_transaction_status_async(
     context: TsurugiFfiContextHandle,
@@ -1590,7 +1590,7 @@ impl TransactionStatusJobDelegator {
 /// - `sql` - SQL statement.
 ///
 /// # Returns
-/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+/// - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_execute(
     context: TsurugiFfiContextHandle,
@@ -1656,7 +1656,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+/// - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
     context: TsurugiFfiContextHandle,
@@ -1724,8 +1724,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_execute_for(
 /// - `sql` - SQL statement.
 ///
 /// # Returns
-/// - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call `tsurugi_ffi_sql_execute_result_dispose()` to dispose.
+/// - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call [`tsurugi_ffi_sql_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_execute_async(
     context: TsurugiFfiContextHandle,
@@ -1812,7 +1812,7 @@ impl SqlExecuteResultJobDelegator {
 /// - `parameters_size` - `parameters` size \[number of parameters\].
 ///
 /// # Returns
-/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+/// - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
     context: TsurugiFfiContextHandle,
@@ -1889,7 +1889,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+/// - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
     context: TsurugiFfiContextHandle,
@@ -1968,8 +1968,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_for(
 /// - `parameters_size` - `parameters` size \[number of parameters\].
 ///
 /// # Returns
-/// - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call `tsurugi_ffi_sql_execute_result_dispose()` to dispose.
+/// - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call [`tsurugi_ffi_sql_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
     context: TsurugiFfiContextHandle,
@@ -2047,7 +2047,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
 /// - `sql` - SQL satement.
 ///
 /// # Returns
-/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+/// - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query(
     context: TsurugiFfiContextHandle,
@@ -2109,7 +2109,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+/// - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query_for(
     context: TsurugiFfiContextHandle,
@@ -2173,8 +2173,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_query_for(
 /// - `sql` - SQL satement.
 ///
 /// # Returns
-/// - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call `tsurugi_ffi_sql_query_result_dispose()` to dispose.
+/// - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call [`tsurugi_ffi_sql_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query_async(
     context: TsurugiFfiContextHandle,
@@ -2261,7 +2261,7 @@ impl SqlQueryResultJobDelegator {
 /// - `parameters_size` - `parameters` size \[number of parameters\].
 ///
 /// # Returns
-/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+/// - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
     context: TsurugiFfiContextHandle,
@@ -2333,7 +2333,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+/// - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
     context: TsurugiFfiContextHandle,
@@ -2407,8 +2407,8 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_for(
 /// - `parameters_size` - `parameters` size \[number of parameters\].
 ///
 /// # Returns
-/// - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
-///   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call `tsurugi_ffi_sql_query_result_dispose()` to dispose.
+/// - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call [`tsurugi_ffi_sql_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     context: TsurugiFfiContextHandle,
@@ -2594,7 +2594,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_copy_blob_to_for(
 /// - `destination` - the path of the destination file.
 ///
 /// # Returns
-/// - `copy_blob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+/// - `copy_blob_to_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_copy_blob_to_async(
     context: TsurugiFfiContextHandle,
@@ -2772,7 +2772,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_copy_clob_to_for(
 /// - `destination` - the path of the destination file.
 ///
 /// # Returns
-/// - `copy_clob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+/// - `copy_clob_to_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_copy_clob_to_async(
     context: TsurugiFfiContextHandle,
@@ -2939,7 +2939,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_commit_for(
 /// - `commit_option` - commit option.
 ///
 /// # Returns
-/// - `commit_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+/// - `commit_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_commit_async(
     context: TsurugiFfiContextHandle,
@@ -3087,7 +3087,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_rollback_for(
 /// - `transaction` - transaction.
 ///
 /// # Returns
-/// - `rollback_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+/// - `rollback_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi]_job_dispose`].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_rollback_async(
     context: TsurugiFfiContextHandle,
