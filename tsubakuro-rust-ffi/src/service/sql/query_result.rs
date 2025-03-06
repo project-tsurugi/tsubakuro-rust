@@ -2061,7 +2061,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
 /// - `query_result` - Sql query result.
 ///
 /// # Returns
-/// - `blob_reference_out` - blob reference.
+/// - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
@@ -2115,7 +2115,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `blob_reference_out` - blob reference.
+/// - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
@@ -2173,7 +2173,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
 /// - `query_result` - Sql query result.
 ///
 /// # Returns
-/// - `clob_reference_out` - clob reference.
+/// - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
@@ -2227,7 +2227,7 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `clob_reference_out` - clob reference.
+/// - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
 #[no_mangle]
