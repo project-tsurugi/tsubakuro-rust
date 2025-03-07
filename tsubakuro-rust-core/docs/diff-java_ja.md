@@ -2,7 +2,7 @@
 
 tsubakuro-rust-coreは [Tsubakuro/Java](https://github.com/project-tsurugi/tsubakuro) からの移植と言えますが、全機能が対象というわけではなく、また、JavaとRustとの違い等により意図的にAPIを変えているところもあります。
 
-当文書では、tsubakuro-rust-coreとTsubakuro/Javaの主な相違点を掲示します。
+当文書では、tsubakuro-rust-coreとTsubakuro/Javaの主な機能の比較を掲示します。
 
 ## サービス
 
@@ -40,6 +40,31 @@ tsubakuro-rust-coreは [Tsubakuro/Java](https://github.com/project-tsurugi/tsuba
 | 実行計画取得（PS）             | SqlClient::prepared_explain()   | SqlClient#explain()          |
 | ロード                         | ×                               | SqlClient#executeLoad()      |
 
+#### データ型
+
+| SQLのデータ型            | tsubakuro-rust-core（AtomType） | Rustの型                                  | Tsubakuro/Java（AtomType） |
+| ------------------------ | ------------------------------- | ----------------------------------------- | -------------------------- |
+|                          | Boolean                         | bool                                      | BOOLEAN                    |
+| int                      | Int4                            | i32                                       | INT4                       |
+| bigint                   | Int8                            | i64                                       | INT8                       |
+| real                     | Float4                          | f32                                       | FLOAT4                     |
+| double                   | Float8                          | f64                                       | FLOAT8                     |
+| decimal                  | Decimal                         | TgDecimal, TgDecimalI128, TgDecimalResult | DECIMAL                    |
+| char, varchar            | Character                       | &str, String                              | CHARACTER                  |
+| binary, varbinary        | Octet                           | [u8], Vec＜u8＞                           | OCTET                      |
+|                          | Bit                             |                                           | BIT                        |
+| date                     | Date                            | TgDate                                    | DATE                       |
+| time                     | TimeOfDay                       | TgTimeOfDay                               | TIME_OF_DAY                |
+| timestamp                | TimePoint                       | TgTimePoint                               | TIME_POINT                 |
+|                          | DatetimeInterval                |                                           | DATETIME_INTERVAL          |
+| time with time zone      | TimeOfDayWithTimeZone           | TgTimeOfDayWithTimeZone                   | TIME_OF_DAY_WITH_TIME_ZONE |
+| timestamp with time zone | TimePointWithTimeZone           | TgTimePointWithTimeZone                   | TIME_POINT_WITH_TIME_ZONE  |
+| clob                     | Clob                            | TgClob, TgClobReference                   | CLOB                       |
+| blob                     | Blob                            | TgBlob, TgBlobReference                   | BLOB                       |
+
+- decimalに関しては、[bigdecimal](https://crates.io/crates/bigdecimal), [rust_decimal](https://crates.io/crates/rust_decimal) も使用可能。
+- 日付時刻に関しては、[chrono](https://crates.io/crates/chrono), [time](https://crates.io/crates/time) も使用可能。
+
 #### トランザクション
 
 
@@ -65,7 +90,7 @@ tsubakuro-rust-coreは [Tsubakuro/Java](https://github.com/project-tsurugi/tsuba
 | トランザクションロールバック   | SqlClient::rollback()               | Transaction#rollback()               |
 | トランザクションステータス取得 | SqlClient::get_transaction_status() | Transaction#getSqlServiceException() |
 
-- トランザクションは将来KVSクライアントでも使われる想定で、SQL関連のトランザクション機能はSqlClientのメソッドとなっている。
+- トランザクションは将来KVSクライアントでも使われる想定で、SQL関連のトランザクション機能はSqlClientのメソッドとなっている。（Transactionを引数で渡す）
 
 #### 更新系SQL実行結果
 
