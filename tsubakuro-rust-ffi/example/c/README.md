@@ -4,7 +4,7 @@
 
 ```bash
 cd tsubakuro-rust-ffi
-cbindgen --lang C --config example/cbindgen.toml --output example/c/tsubakuro-rust-ffi.h
+cbindgen --lang C --config example/c/cbindgen.toml --output example/c/tsubakuro-rust-ffi.h
 ```
 
 ## How to build
