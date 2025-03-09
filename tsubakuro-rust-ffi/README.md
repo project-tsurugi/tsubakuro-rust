@@ -69,7 +69,7 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context) {
     rc = tsurugi_ffi_connection_option_create(context, &connection_option);
     if (rc != 0) {
         // error handling
-        const char *message;
+        TsurugiFfiStringHandle message;
         tsurugi_ffi_context_get_error_message(context, &message);
         printf("%s\n", message);
         return rc;
@@ -127,7 +127,7 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context) {
 ### transaction example
 
 ```c
-TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client) {
+TsurugiFfiRc example_transaction(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client) {
     TsurugiFfiRc rc;
 
     // create TransactionOption
@@ -183,7 +183,7 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiSqlClien
         }
 
         // commit
-        rc = tsurugi_ffi_sql_client_commit(context, client, transction, commit_option);
+        rc = tsurugi_ffi_sql_client_commit(context, client, transaction, commit_option);
         if (rc != 0) {
             ～error handling～
         }
@@ -205,28 +205,259 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiSqlClien
 TsurugiFfiRc example_statement(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction) {
     TsurugiFfiRc rc;
 
-    const char *sql = "update customer set c_age = 2 where c_id = 3";
+    TsurugiFfiStringHandle sql = "update customer set c_age = 2 where c_id = 3";
 
     TsurugiFfiSqlExecuteResultHandle execute_result;
-    rc = tsurugi_ffi_sql_client_execute(context, client, transction, sql);
+    rc = tsurugi_ffi_sql_client_execute(context, client, transaction, sql, &execute_result);
     if (rc != 0) {
         ～error handling～
         return rc;
     }
+
+    rc = example_execute_result(context, execute_result);
+
+    // dispose SqlExecuteResult
+    tsurugi_ffi_sql_execute_result_dispose(execute_result);
+
+    return rc;
+}
+
+TsurugiFfiRc example_execute_result(TsurugiFfiContextHandle context, TsurugiFfiSqlExecuteResultHandle execute_result) {
+    TsurugiFfiRc rc;
 
     // get rows
     int64_t updated_rows;
     rc = tsurugi_ffi_sql_execute_result_get_updated_rows(context, execute_result, &updated_rows);
     if (rc != 0) {
         ～error handling～
-
-        // dispose SqlExecuteResult
-        tsurugi_ffi_sql_execute_result_dispose(execute_result);
-
         return rc;
     }
 
-    printf("undated_rows=%ld\n", updated_rows);
+    printf("updated_rows=%ld\n", updated_rows);
+
+    return rc;
+}
+```
+
+### execute SQL(select) example
+
+```c
+TsurugiFfiRc example_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction) {
+    TsurugiFfiRc rc;
+
+    TsurugiFfiStringHandle sql = "select c_id, c_name, c_age from customer order by c_id";
+
+    TsurugiFfiSqlQueryResultHandle query_result;
+    rc = tsurugi_ffi_sql_client_query(context, client, transaction, sql, &query_result);
+    if (rc != 0) {
+        ～error handling～
+        return rc;
+    }
+
+    rc = example_query_result(context, query_result);
+
+    // dispose SqlQueryResult
+    tsurugi_ffi_sql_query_result_dispose(query_result);
+
+    return rc;
+}
+
+TsurugiFfiRc example_query_result(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result) {
+    TsurugiFfiRc rc;
+
+    for (;;) {
+        bool next_row;
+        rc = tsurugi_ffi_sql_query_result_next_row(context, query_result, &next_row);
+        if (rc != 0) {
+            ～error handling～
+            return rc;
+        }
+        if (!next_row) {
+            break;
+        }
+
+        // fetch c_id (bigint not null)
+        bool next_column;
+        rc = tsurugi_ffi_sql_query_result_next_column(context, query_result, &next_column);
+        if (rc != 0) {
+            ～error handling～
+            return rc;
+        }
+        if (next_column) {
+            int64_t value;
+            rc = tsurugi_ffi_sql_query_result_fetch_int8(context, query_result, &value);
+            if (rc != 0) {
+                ～error handling～
+                return rc;
+            }
+            printf("c_id=%ld\n", value);
+        }
+
+        // fetch c_name (varchar)
+        rc = tsurugi_ffi_sql_query_result_next_column(context, query_result, &next_column);
+        if (rc != 0) {
+            ～error handling～
+            return rc;
+        }
+        if (next_column) {
+            bool is_null;
+            rc = tsurugi_ffi_sql_query_result_is_null(context, query_result, &is_null);
+            if (rc != 0) {
+                ～error handling～
+                return rc;
+            }
+            if (!is_null) {
+                TsurugiFfiStringHandle value;
+                rc = tsurugi_ffi_sql_query_result_fetch_character(context, query_result, &value);
+                if (rc != 0) {
+                    ～error handling～
+                    return rc;
+                }
+                printf("c_name=%s\n", value);
+            }
+        }
+
+        // fetch c_age (int)
+        rc = tsurugi_ffi_sql_query_result_next_column(context, query_result, &next_column);
+        if (rc != 0) {
+            ～error handling～
+            return rc;
+        }
+        if (next_column) {
+            bool is_null;
+            rc = tsurugi_ffi_sql_query_result_is_null(context, query_result, &is_null);
+            if (rc != 0) {
+                ～error handling～
+                return rc;
+            }
+            if (!is_null) {
+                int32_t value;
+                rc = tsurugi_ffi_sql_query_result_fetch_int4(context, query_result, &value);
+                if (rc != 0) {
+                    ～error handling～
+                    return rc;
+                }
+                printf("c_age=%d\n", value);
+            }
+        }
+    } // end loop
+
+    return rc;
+}
+```
+
+#### prepared statement(insert) example
+
+```c
+TsurugiFfiRc example_prepared_statement_insert(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction) {
+    TsurugiFfiRc rc;
+
+    TsurugiFfiStringHandle sql = "insert into customer values(:id, :name, :age)";
+
+    TsurugiFfiSqlPlaceholderHandle p0;
+    rc = tsurugi_ffi_sql_placeholder_of_atom_type(context, "id", TSURUGI_FFI_ATOM_TYPE_INT8, &p0);
+    if (rc != 0) {
+        ～error handling～
+        return rc;
+    }
+
+    TsurugiFfiSqlPlaceholderHandle p1;
+    rc = tsurugi_ffi_sql_placeholder_of_atom_type(context, "name", TSURUGI_FFI_ATOM_TYPE_CHARACTER, &p1);
+    if (rc != 0) {
+        ～error handling～
+
+        tsurugi_ffi_sql_placeholder_dispose(p0);
+        return rc;
+    }
+
+    TsurugiFfiSqlPlaceholderHandle p2;
+    rc = tsurugi_ffi_sql_placeholder_of_atom_type(context, "age", TSURUGI_FFI_ATOM_TYPE_INT4, &p2);
+    if (rc != 0) {
+        ～error handling～
+
+        tsurugi_ffi_sql_placeholder_dispose(p0);
+        tsurugi_ffi_sql_placeholder_dispose(p1);
+        return rc;
+    }
+
+    TsurugiFfiSqlPlaceholderHandle placeholders[] = { p0, p1, p2 };
+    uint32_t placeholders_size = 3;
+    TsurugiFfiSqlPreparedStatementHandle prepared_statement;
+    rc = tsurugi_ffi_sql_client_prepare(context, client, sql, placeholders, placeholders_size, &prepared_statement);
+    if (rc != 0) {
+        ～error handling～
+
+        tsurugi_ffi_sql_placeholder_dispose(p0);
+        tsurugi_ffi_sql_placeholder_dispose(p1);
+        tsurugi_ffi_sql_placeholder_dispose(p2);
+        return rc;
+    }
+
+    // dispose SqlPlaceholder
+    tsurugi_ffi_sql_placeholder_dispose(p0);
+    tsurugi_ffi_sql_placeholder_dispose(p1);
+    tsurugi_ffi_sql_placeholder_dispose(p2);
+
+    // execute SQL
+    rc = example_prepared_execute(context, client, transaction, prepared_statement);
+
+    // dispose SqlPreparedStatement
+    tsurugi_ffi_sql_prepared_statement_dispose(prepared_statement);
+
+    return rc;
+}
+
+TsurugiFfiRc example_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement) {
+    TsurugiFfiRc rc;
+
+    int64_t id = 4;
+    TsurugiFfiSqlParameterHandle p0;
+    rc = tsurugi_ffi_sql_parameter_of_int8(context, "id", id, &p0);
+    if (rc != 0) {
+        ～error handling～
+        return rc;
+    }
+
+    TsurugiFfiStringHandle name = "example";
+    TsurugiFfiSqlParameterHandle p1;
+    rc = tsurugi_ffi_sql_parameter_of_character(context, "name", name, &p1);
+    if (rc != 0) {
+        ～error handling～
+
+        tsurugi_ffi_sql_parameter_dispose(p0);
+        return rc;
+    }
+
+    int32_t age = 20;
+    TsurugiFfiSqlParameterHandle p2;
+    rc = tsurugi_ffi_sql_parameter_of_int4(context, "age", age, &p2);
+    if (rc != 0) {
+        ～error handling～
+
+        tsurugi_ffi_sql_parameter_dispose(p0);
+        tsurugi_ffi_sql_parameter_dispose(p1);
+        return rc;
+    }
+
+    TsurugiFfiSqlParameterHandle parameters[] = { p0, p1, p2 };
+    uint32_t parameters_size = 3;
+    TsurugiFfiSqlExecuteResultHandle execute_result;
+    rc = tsurugi_ffi_sql_client_prepared_execute(context, client, transaction, prepared_statement, parameters, parameters_size, &execute_result);
+    if (rc != 0) {
+        ～error handling～
+
+        tsurugi_ffi_sql_parameter_dispose(p0);
+        tsurugi_ffi_sql_parameter_dispose(p1);
+        tsurugi_ffi_sql_parameter_dispose(p2);
+        return rc;
+    }
+
+    // dispose SqlParameter
+    tsurugi_ffi_sql_parameter_dispose(p0);
+    tsurugi_ffi_sql_parameter_dispose(p1);
+    tsurugi_ffi_sql_parameter_dispose(p2);
+
+    rc = example_execute_result(context, execute_result);
 
     // dispose SqlExecuteResult
     tsurugi_ffi_sql_execute_result_dispose(execute_result);
