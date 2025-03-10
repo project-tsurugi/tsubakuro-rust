@@ -110,8 +110,16 @@ mod test {
                 transaction.close().await.unwrap();
                 match e.diagnostic_code() {
                     Some(code) => {
-                        if code.name() == "IO_ERROR" {
-                            return false;
+                        if code.name() == "INVALID_REQUEST" {
+                            let message = e.to_string();
+                            if message.contains(
+                                "BLOB handling in privileged mode is not allowed on this endpoint",
+                            ) {
+                                return false;
+                            }
+                            if message.contains("BLOB file in privileged mode") {
+                                return false;
+                            }
                         }
                     }
                     None => {}
