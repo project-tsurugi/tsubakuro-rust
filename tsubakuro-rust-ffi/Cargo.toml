@@ -5,6 +5,7 @@ description = "library providing functions in C ABI format to access Tsurugi DB"
 homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-ffi"
 documentation = "https://docs.rs/tsubakuro_rust_ffi/"
 repository = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-ffi"
+authors = ["Project Tsurugi <https://github.com/project-tsurugi/tsurugidb>"]
 keywords = ["database", "tsurugidb", "sql"]
 categories = ["database"]
 license = "Apache-2.0"

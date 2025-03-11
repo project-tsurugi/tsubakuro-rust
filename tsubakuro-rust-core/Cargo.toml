@@ -5,6 +5,7 @@ description = "core library to access Tsurugi DB for Rust"
 homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core"
 documentation = "https://docs.rs/tsubakuro_rust_core/"
 repository = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core"
+authors = ["Project Tsurugi <https://github.com/project-tsurugi/tsurugidb>"]
 keywords = ["database", "tsurugidb", "sql"]
 categories = ["database"]
 license = "Apache-2.0"
