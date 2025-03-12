@@ -75,6 +75,7 @@ pub(crate) fn to_core_service_diagnostic_code_number(
         crate::tateyama::proto::diagnostics::Code::ServiceNotFound => 4_01,
         crate::tateyama::proto::diagnostics::Code::ServiceUnavailable => 4_02,
         crate::tateyama::proto::diagnostics::Code::OperationCanceled => 4_03,
+        crate::tateyama::proto::diagnostics::Code::OperationDenied => 4_04,
         crate::tateyama::proto::diagnostics::Code::InvalidRequest => 5_01,
     }
 }

@@ -263,11 +263,8 @@ class TgFfiTypeClobTest extends TgFfiTester {
                 try {
                     copy_clob_to(pattern);
                 } catch (TgFfiRuntimeException e) {
-                    if (e.getErrorName().equals("INVALID_REQUEST")) {
-                        String message = e.getMessage();
-                        if (message.contains("sending blob not allowed in non-privileged mode")) {
-                            continue;
-                        }
+                    if (e.getServerErrorStructuredCode().equals("SCD-00404")) { // OPERATION_DENIED
+                        continue;
                     }
                     throw e;
                 }
