@@ -32,9 +32,14 @@ impl From<&crate::tateyama::proto::diagnostics::Record> for DiagnosticCode {
     fn from(value: &crate::tateyama::proto::diagnostics::Record) -> Self {
         let code = value.code();
         let code_number = to_core_service_diagnostic_code_number(code);
-        let name = code.as_str_name();
 
-        DiagnosticCode::new(/*FIXME*/ 0, "SCD", code_number, name)
+        if code as i32 == value.code {
+            let name = code.as_str_name();
+            DiagnosticCode::new(/*FIXME*/ 0, "SCD", code_number, name)
+        } else {
+            let name = format!("UnknownCoreError{}", value.code);
+            DiagnosticCode::new(/*FIXME*/ 0, "SCD", code_number, &name)
+        }
     }
 }
 

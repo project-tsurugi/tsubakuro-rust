@@ -20,13 +20,20 @@ impl From<crate::jogasaki::proto::sql::response::Error> for DiagnosticCode {
     fn from(value: crate::jogasaki::proto::sql::response::Error) -> Self {
         let mut code = value.code();
         let mut code_number = to_sql_service_diagnostic_code_number(code);
+        let mut value_code = value.code;
         if code_number < 0 {
             code = crate::jogasaki::proto::sql::error::Code::SqlServiceException;
             code_number = to_sql_service_diagnostic_code_number(code);
+            value_code = code as i32;
         }
-        let name = code.as_str_name();
 
-        DiagnosticCode::new(SERVICE_ID_SQL, "SQL", code_number, name)
+        if code as i32 == value_code {
+            let name = code.as_str_name();
+            DiagnosticCode::new(SERVICE_ID_SQL, "SQL", code_number, name)
+        } else {
+            let name = format!("UnknownSqlError{}", value_code);
+            DiagnosticCode::new(SERVICE_ID_SQL, "SQL", code_number, &name)
+        }
     }
 }
 
