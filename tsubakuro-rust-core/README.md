@@ -1,11 +1,12 @@
 # tsubakuro-rust-core
 
-tsubakuro-rust-core is the core library to access [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb) for Rust.
+tsubakuro-rust-core is the core library to access [Tsurugi](https://github.com/project-tsurugi/tsurugidb) for Rust.
 
 tsubakuro-rust-core is a port from [Tsubakuro/Java](https://github.com/project-tsurugi/tsubakuro), but it does not cover all functions.
 
 ## Limitations
 
+- Tsurugi 1.3.0 or later.
 - Provide SQL service only.
 - Only TCP connection is available.
 

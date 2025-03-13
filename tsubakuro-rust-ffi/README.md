@@ -1,6 +1,6 @@
 # tsubakuro-rust-ffi
 
-tsubakuro-rust-ffi is a library providing functions in C ABI format to access [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb).
+tsubakuro-rust-ffi is a library providing functions in C ABI format to access [Tsurugi](https://github.com/project-tsurugi/tsurugidb).
 
 tsubakuro-rust-ffi uses [tsubakuro-rust-core](../tsubakuro-rust-core), so refer to that for explanation.
 

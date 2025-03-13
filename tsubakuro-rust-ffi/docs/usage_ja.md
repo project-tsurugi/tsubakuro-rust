@@ -9,7 +9,7 @@ tsubakuro-rust-ffiは、[tsubakuro-rust-core](../../tsubakuro-rust-core) をC言
 以降、当文書では、tsubakuro-rust-ffiが提供する構造体・関数のことを「FFI構造体」「FFI関数」と呼びます。
 
 tsubakuro-rust-ffiは言わばtsbakuro-rust-coreのラッパーであり、基本的にはFFI構造体/FFI関数はtsubakuro-rust-coreの構造体/メソッドと1対1に対応しています。（RustとC言語の違いもあり、一致していないところもあります）  
-したがって、Tsurugi DBにアクセスするための手順（メソッドの呼び出し順や機能）等については、tsubakuro-rust-coreのドキュメントを参照してください。
+したがって、Tsurugiにアクセスするための手順（メソッドの呼び出し順や機能）等については、tsubakuro-rust-coreのドキュメントを参照してください。
 
 tsubakuro-rust-ffiをビルドするとsoファイル（Linuxの場合）やdllファイル（MS-Windowsの場合）が生成されます。  
 また、cbindgenというツールを使って、FFI関数が宣言された「C言語のヘッダーファイル」を生成することもできます。  

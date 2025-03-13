@@ -4,9 +4,9 @@
 
 ## はじめに
 
-tsubakuro-rust-coreは「Rustで [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb) にアクセスする為のライブラリー（クレート）」です。
+tsubakuro-rust-coreは「Rustで [Tsurugi](https://github.com/project-tsurugi/tsurugidb) にアクセスする為のライブラリー（クレート）」です。
 
-もともと『Tsubakuro』という「JavaでTsurugi DBにアクセスする為のライブラリー」がありました。
+もともと『Tsubakuro』という「JavaでTsurugiにアクセスする為のライブラリー」がありました。
 しかし、RustでTsurugiにアクセスするライブラリーが作られたことを契機に、『Tsubakuro』は「Tsurugiにアクセスするライブラリーの総称」という位置付けに変わりました。  
 そのため、従来のJava版は『Tsubakuro/Java』、Rust版は『Tsubakuro/Rust』と呼称することにします。
 

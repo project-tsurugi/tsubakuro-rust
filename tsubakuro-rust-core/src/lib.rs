@@ -1,5 +1,5 @@
 //! [tsubakuro-rust-core](https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core)
-//! is the core library to access [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb) written in Rust.
+//! is the core library to access [Tsurugi](https://github.com/project-tsurugi/tsurugidb) written in Rust.
 //!
 //! # Overview
 //! The procedure for executing SQL in tsubakuro-rust-core is generally as follows.

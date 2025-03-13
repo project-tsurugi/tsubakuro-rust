@@ -1,6 +1,6 @@
 # Tsubakuro/Rust - Rust library for Tsurugi
 
-Tsubakuro/Rust is a Rust library that accesses the [Tsurugi DB](https://github.com/project-tsurugi/tsurugidb).
+Tsubakuro/Rust is a Rust library that accesses the [Tsurugi](https://github.com/project-tsurugi/tsurugidb).
 
 C ABI format library is also provided.
 
