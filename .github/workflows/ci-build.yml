@@ -115,3 +115,11 @@ jobs:
         run: |
           cd tsubakuro-rust-ffi
           cargo clippy
+
+      - name: Publish_Core
+        if: matrix.os == 'ubuntu-22.04' && github.repository_owner == 'project-tsurugi' && contains(github.ref, '/tags/')
+        run: |
+          cd tsubakuro-rust-core
+          cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO }}
