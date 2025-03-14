@@ -51,13 +51,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Checkout_Tsubakuro
-        uses: actions/checkout@v4
-        with:
-          repository: project-tsurugi/tsubakuro
-          path: tsubakuro
-          ref: master
-
       - name: Install_Tsurugidb_Local
         if: ${{ matrix.os == 'ubuntu-22.04' }}
         run: |
@@ -69,7 +62,6 @@ jobs:
 
       - name: Test_Core
         run: |
-          cp -rp tsubakuro/modules/proto/src/main/protos tsubakuro-rust-core
           cd tsubakuro-rust-core
           cargo build
           cargo test
