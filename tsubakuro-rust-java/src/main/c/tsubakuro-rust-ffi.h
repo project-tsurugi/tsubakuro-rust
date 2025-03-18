@@ -498,7 +498,7 @@ typedef struct TsurugiFfiSession *TsurugiFfiSessionHandle;
  * Context: Creates a new instance.
  *
  * # Returns
- * - `context_out` - context object. To dispose, call `tsurugi_ffi_context_dispose()`.
+ * - `context_out` - context object. To dispose, call [`tsurugi_ffi_context_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_context_create(TsurugiFfiContextHandle *context_out);
 
@@ -805,7 +805,7 @@ TsurugiFfiRc tsurugi_ffi_job_cancel_for(TsurugiFfiContextHandle context,
  * - `job` - job.
  *
  * # Returns
- * - `cancel_job_out` - cancel job. To dispose, call `tsurugi_ffi_cancel_job_dispose()`.
+ * - `cancel_job_out` - cancel job. To dispose, call [`tsurugi_ffi_cancel_job_dispose`](crate::job::cancel_job::tsurugi_ffi_cancel_job_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context,
                                           TsurugiFfiJobHandle job,
@@ -816,7 +816,7 @@ TsurugiFfiRc tsurugi_ffi_job_cancel_async(TsurugiFfiContextHandle context,
  *
  * See [`Job::close`].
  *
- * Note: Close is called in `tsurugi_ffi_job_dispose()`.
+ * Note: Close is called in [`tsurugi_ffi_job_dispose`].
  *
  * # Receiver
  * - `job` - job.
@@ -1048,7 +1048,7 @@ TsurugiFfiRc tsurugi_ffi_explain_result_get_columns_size(TsurugiFfiContextHandle
  * - `index` - column index \[0..tsurugi_ffi_table_metadata_get_columns_size()-1\].
  *
  * # Returns
- * - `sql_column_out` - column. To dispose, call `tsurugi_ffi_sql_column_dispose()`.
+ * - `sql_column_out` - column. To dispose, call [`tsurugi_ffi_sql_column_dispose`](crate::service::sql::column::tsurugi_ffi_sql_column_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_explain_result_get_columns_value(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlExplainResultHandle explain_result,
@@ -1072,7 +1072,7 @@ void tsurugi_ffi_sql_explain_result_dispose(TsurugiFfiSqlExplainResultHandle exp
  * - `name` - parameter name.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context,
                                             TsurugiFfiStringHandle name,
@@ -1088,7 +1088,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_null(TsurugiFfiContextHandle context,
  * - `value` - parameter value.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context,
                                                TsurugiFfiStringHandle name,
@@ -1105,7 +1105,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int4(TsurugiFfiContextHandle context,
  * - `value` - parameter value.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context,
                                                TsurugiFfiStringHandle name,
@@ -1122,7 +1122,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_int8(TsurugiFfiContextHandle context,
  * - `value` - parameter value.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context,
                                                  TsurugiFfiStringHandle name,
@@ -1139,7 +1139,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float4(TsurugiFfiContextHandle context
  * - `value` - parameter value.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context,
                                                  TsurugiFfiStringHandle name,
@@ -1158,7 +1158,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_float8(TsurugiFfiContextHandle context
  * - `exponent` - exponent of decimal.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal(TsurugiFfiContextHandle context,
                                                   TsurugiFfiStringHandle name,
@@ -1179,7 +1179,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal(TsurugiFfiContextHandle contex
  * - `exponent` - exponent of decimal.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal_i128(TsurugiFfiContextHandle context,
                                                        TsurugiFfiStringHandle name,
@@ -1198,7 +1198,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_decimal_i128(TsurugiFfiContextHandle c
  * - `value` - parameter value.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle context,
                                                     TsurugiFfiStringHandle name,
@@ -1216,7 +1216,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_character(TsurugiFfiContextHandle cont
  * - `value_size` - `value` size \[byte\].
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context,
                                                 TsurugiFfiStringHandle name,
@@ -1234,7 +1234,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_octet(TsurugiFfiContextHandle context,
  * - `epoch_days` - parameter value (number of days offset of epoch 1970-01-01).
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_date(TsurugiFfiContextHandle context,
                                                TsurugiFfiStringHandle name,
@@ -1251,7 +1251,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_date(TsurugiFfiContextHandle context,
  * - `nanoseconds_of_day` - parameter value (nanoseconds since 00:00:00).
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day(TsurugiFfiContextHandle context,
                                                       TsurugiFfiStringHandle name,
@@ -1269,7 +1269,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day(TsurugiFfiContextHandle co
  * - `nanos` - parameter value (nanoseconds adjustment \[0, 10^9-1\]).
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point(TsurugiFfiContextHandle context,
                                                      TsurugiFfiStringHandle name,
@@ -1288,7 +1288,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point(TsurugiFfiContextHandle con
  * - `time_zone_offset` - parameter value (timezone offset in minute).
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(TsurugiFfiContextHandle context,
                                                                      TsurugiFfiStringHandle name,
@@ -1308,7 +1308,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone(TsurugiFfiC
  * - `time_zone_offset` - parameter value (timezone offset in minute).
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiContextHandle context,
                                                                     TsurugiFfiStringHandle name,
@@ -1327,7 +1327,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(TsurugiFfiCo
  * - `path` - parameter value (path of file).
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob(TsurugiFfiContextHandle context,
                                                TsurugiFfiStringHandle name,
@@ -1345,7 +1345,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob(TsurugiFfiContextHandle context,
  * - `value_size` - `value` size \[byte\].
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob_contents(TsurugiFfiContextHandle context,
                                                         TsurugiFfiStringHandle name,
@@ -1363,7 +1363,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob_contents(TsurugiFfiContextHandle 
  * - `path` - parameter value (path of file).
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob(TsurugiFfiContextHandle context,
                                                TsurugiFfiStringHandle name,
@@ -1380,7 +1380,7 @@ TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob(TsurugiFfiContextHandle context,
  * - `value` - parameter value.
  *
  * # Returns
- * - `parameter_out` - parameter. To dispose, call `tsurugi_ffi_sql_parameter_dispose()`.
+ * - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob_contents(TsurugiFfiContextHandle context,
                                                         TsurugiFfiStringHandle name,
@@ -1420,7 +1420,7 @@ void tsurugi_ffi_sql_parameter_dispose(TsurugiFfiSqlParameterHandle parameter);
  * - `atom_type` - parameter type.
  *
  * # Returns
- * - `placeholder_out` - placeholder. To dispose, call `tsurugi_ffi_sql_placeholder_dispose()`.
+ * - `placeholder_out` - placeholder. To dispose, call [`tsurugi_ffi_sql_placeholder_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_placeholder_of_atom_type(TsurugiFfiContextHandle context,
                                                       TsurugiFfiStringHandle name,
@@ -1515,7 +1515,7 @@ TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_get_close_timeout(TsurugiFfiCont
  *
  * See [`SqlPreparedStatement::close`].
  *
- * Note: Close is called in `tsurugi_ffi_sql_prepared_statement_dispose()`.
+ * Note: Close is called in [`tsurugi_ffi_sql_prepared_statement_dispose`].
  *
  * # Receiver
  * - `prepared_statement` - Sql prepared statement.
@@ -1528,7 +1528,7 @@ TsurugiFfiRc tsurugi_ffi_sql_prepared_statement_close(TsurugiFfiContextHandle co
  *
  * See [`SqlPreparedStatement::close_for`].
  *
- * Note: Close is called in `tsurugi_ffi_sql_prepared_statement_dispose()`.
+ * Note: Close is called in [`tsurugi_ffi_sql_prepared_statement_dispose`].
  *
  * # Receiver
  * - `prepared_statement` - Sql prepared statement.
@@ -1602,7 +1602,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_get_default_timeout(TsurugiFfiContextH
  * - `query_result` - Sql query result.
  *
  * # Returns
- * - `query_result_metadata_out` - metadata. To dispose, call `tsurugi_ffi_sql_query_result_metadata_dispose()`.
+ * - `query_result_metadata_out` - metadata. To dispose, call [`tsurugi_ffi_sql_query_result_metadata_dispose`](crate::service::sql::query_result_metadata::tsurugi_ffi_sql_query_result_metadata_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
@@ -1698,7 +1698,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_is_null(TsurugiFfiContextHandle contex
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1706,6 +1706,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_is_null(TsurugiFfiContextHandle contex
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int4(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
@@ -1718,7 +1720,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int4(TsurugiFfiContextHandle con
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1729,6 +1731,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int4(TsurugiFfiContextHandle con
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int4(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlQueryResultHandle query_result,
@@ -1742,7 +1746,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int4(TsurugiFfiContextHandle
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1750,6 +1754,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int4(TsurugiFfiContextHandle
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int8(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
@@ -1762,7 +1768,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int8(TsurugiFfiContextHandle con
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1773,6 +1779,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int8(TsurugiFfiContextHandle con
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int8(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlQueryResultHandle query_result,
@@ -1786,7 +1794,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int8(TsurugiFfiContextHandle
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1794,6 +1802,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int8(TsurugiFfiContextHandle
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float4(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
@@ -1806,7 +1816,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float4(TsurugiFfiContextHandle c
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1817,6 +1827,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float4(TsurugiFfiContextHandle c
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float4(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlQueryResultHandle query_result,
@@ -1830,7 +1842,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float4(TsurugiFfiContextHand
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1838,6 +1850,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float4(TsurugiFfiContextHand
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float8(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlQueryResultHandle query_result,
@@ -1850,7 +1864,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float8(TsurugiFfiContextHandle c
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1861,6 +1875,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float8(TsurugiFfiContextHandle c
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float8(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlQueryResultHandle query_result,
@@ -1874,7 +1890,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float8(TsurugiFfiContextHand
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1885,6 +1901,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float8(TsurugiFfiContextHand
  * - `unscaled_value_bytes_size_out` - `unscaled_value_bytes_out` size \[byte\].
  * - `unscaled_value_out` - unscaled value of decimal if `unscaled_value_bytes_out` is null (`unscaled_value_bytes_size_out` = 0).
  * - `exponent_out` - exponent of decimal.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle context,
                                                         TsurugiFfiSqlQueryResultHandle query_result,
@@ -1900,7 +1918,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle 
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1914,6 +1932,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle 
  * - `unscaled_value_bytes_size_out` - `unscaled_value_bytes_out` size \[byte\].
  * - `unscaled_value_out` - unscaled value of decimal if `unscaled_value_bytes_out` is null (`unscaled_value_bytes_size_out` = 0).
  * - `exponent_out` - exponent of decimal.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHandle context,
                                                             TsurugiFfiSqlQueryResultHandle query_result,
@@ -1930,7 +1950,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHan
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1940,6 +1960,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHan
  * - `unscaled_value_high_out` - unscaled value of decimal (high 64bit).
  * - `unscaled_value_low_out` - unscaled value of decimal (low 64bit).
  * - `exponent_out` - exponent of decimal.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHandle context,
                                                              TsurugiFfiSqlQueryResultHandle query_result,
@@ -1954,7 +1976,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHa
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1967,6 +1989,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHa
  * - `unscaled_value_high_out` - unscaled value of decimal (high 64bit).
  * - `unscaled_value_low_out` - unscaled value of decimal (low 64bit).
  * - `exponent_out` - exponent of decimal.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiContextHandle context,
                                                                  TsurugiFfiSqlQueryResultHandle query_result,
@@ -1982,7 +2006,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiConte
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -1990,6 +2014,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiConte
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlQueryResultHandle query_result,
@@ -2002,7 +2028,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandl
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2013,6 +2039,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandl
  *
  * # Returns
  * - `value_out` - value.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextHandle context,
                                                               TsurugiFfiSqlQueryResultHandle query_result,
@@ -2026,7 +2054,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextH
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2035,6 +2063,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextH
  * # Returns
  * - `value_out` - value.
  * - `size_out` - `value_out` size \[byte\].
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlQueryResultHandle query_result,
@@ -2048,7 +2078,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle co
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2060,6 +2090,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle co
  * # Returns
  * - `value_out` - value.
  * - `size_out` - `value_out` size \[byte\].
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlQueryResultHandle query_result,
@@ -2074,7 +2106,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandl
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2082,6 +2114,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandl
  *
  * # Returns
  * - `value_out` - number of days offset of epoch 1970-01-01.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
@@ -2094,7 +2128,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle con
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2105,6 +2139,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle con
  *
  * # Returns
  * - `value_out` - number of days offset of epoch 1970-01-01.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlQueryResultHandle query_result,
@@ -2118,7 +2154,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2126,6 +2162,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle
  *
  * # Returns
  * - `value_out` - nanoseconds since 00:00:00.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHandle context,
                                                             TsurugiFfiSqlQueryResultHandle query_result,
@@ -2138,7 +2176,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHan
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2149,6 +2187,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHan
  *
  * # Returns
  * - `value_out` - nanoseconds since 00:00:00.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContextHandle context,
                                                                 TsurugiFfiSqlQueryResultHandle query_result,
@@ -2162,7 +2202,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContex
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2171,6 +2211,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContex
  * # Returns
  * - `value_out` - number of seconds offset of epoch 1970-01-01.
  * - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlQueryResultHandle query_result,
@@ -2184,7 +2226,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHand
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2196,6 +2238,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHand
  * # Returns
  * - `value_out` - number of seconds offset of epoch 1970-01-01.
  * - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContextHandle context,
                                                                TsurugiFfiSqlQueryResultHandle query_result,
@@ -2210,7 +2254,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContext
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2219,6 +2263,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContext
  * # Returns
  * - `value_out` - nanoseconds since 00:00:00.
  * - `time_zone_offset_out` - timezone offset in minute.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(TsurugiFfiContextHandle context,
                                                                            TsurugiFfiSqlQueryResultHandle query_result,
@@ -2232,7 +2278,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(Tsuru
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2244,6 +2290,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(Tsuru
  * # Returns
  * - `value_out` - nanoseconds since 00:00:00.
  * - `time_zone_offset_out` - timezone offset in minute.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(TsurugiFfiContextHandle context,
                                                                                TsurugiFfiSqlQueryResultHandle query_result,
@@ -2258,7 +2306,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(T
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2268,6 +2316,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(T
  * - `value_out` - number of seconds offset of epoch 1970-01-01.
  * - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
  * - `time_zone_offset_out` - timezone offset in minute.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(TsurugiFfiContextHandle context,
                                                                           TsurugiFfiSqlQueryResultHandle query_result,
@@ -2282,7 +2332,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(Tsurug
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2295,6 +2345,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(Tsurug
  * - `value_out` - number of seconds offset of epoch 1970-01-01.
  * - `nanos_out` - nanoseconds adjustment \[0, 10^9-1\].
  * - `time_zone_offset_out` - timezone offset in minute.
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(TsurugiFfiContextHandle context,
                                                                               TsurugiFfiSqlQueryResultHandle query_result,
@@ -2310,14 +2362,16 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(Ts
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
  * - `query_result` - Sql query result.
  *
  * # Returns
- * - `blob_reference_out` - blob reference.
+ * - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_blob(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
@@ -2330,7 +2384,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_blob(TsurugiFfiContextHandle con
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2340,7 +2394,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_blob(TsurugiFfiContextHandle con
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `blob_reference_out` - blob reference.
+ * - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_blob(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlQueryResultHandle query_result,
@@ -2354,14 +2410,16 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_blob(TsurugiFfiContextHandle
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
  * - `query_result` - Sql query result.
  *
  * # Returns
- * - `clob_reference_out` - clob reference.
+ * - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_clob(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
@@ -2374,7 +2432,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_clob(TsurugiFfiContextHandle con
  *
  * Retrieves a value on the column of the cursor position.
  *
- * Need to call `tsurugi_ffi_sql_query_result_next_column()` first.
+ * Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
  * You can only take once to retrieve the value on the column.
  *
  * # Receiver
@@ -2384,7 +2442,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_clob(TsurugiFfiContextHandle con
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `clob_reference_out` - clob reference.
+ * - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
+ *
+ * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_clob(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlQueryResultHandle query_result,
@@ -2426,7 +2486,7 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_metadata_get_columns_size(TsurugiFfiCo
  * - `index` - column index \[0..tsurugi_ffi_table_metadata_get_columns_size()-1\].
  *
  * # Returns
- * - `sql_column_out` - column. To dispose, call `tsurugi_ffi_sql_column_dispose()`.
+ * - `sql_column_out` - column. To dispose, call [`tsurugi_ffi_sql_column_dispose`](crate::service::sql::column::tsurugi_ffi_sql_column_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_metadata_get_columns_value(TsurugiFfiContextHandle context,
                                                                      TsurugiFfiSqlQueryResultMetadataHandle query_result_metadata,
@@ -2465,7 +2525,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_service_message_version(TsurugiFfiContex
  * - `sql_client` - Sql client.
  *
  * # Returns
- * - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
+ * - `table_list_out` - table list. To dispose, call [`tsurugi_ffi_table_list_dispose`](crate::service::sql::table_list::tsurugi_ffi_table_list_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -2483,7 +2543,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables(TsurugiFfiContextHandle context,
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `table_list_out` - table list. To dispose, call `tsurugi_ffi_table_list_dispose()`.
+ * - `table_list_out` - table list. To dispose, call [`tsurugi_ffi_table_list_dispose`](crate::service::sql::table_list::tsurugi_ffi_table_list_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_for(TsurugiFfiContextHandle context,
                                                     TsurugiFfiSqlClientHandle sql_client,
@@ -2499,8 +2559,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_for(TsurugiFfiContextHandle cont
  * - `sql_client` - Sql client.
  *
  * # Returns
- * - `table_list_job_out` - Job for `TsurugiFfiTableListHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiTableListHandle` and call `tsurugi_ffi_table_list_dispose()` to dispose.
+ * - `table_list_job_out` - Job for `TsurugiFfiTableListHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiTableListHandle` and call [`tsurugi_ffi_table_list_dispose`](crate::service::sql::table_list::tsurugi_ffi_table_list_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_async(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,
@@ -2518,7 +2578,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_list_tables_async(TsurugiFfiContextHandle co
  * - `table_name` - table name.
  *
  * # Returns
- * - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
+ * - `table_metadata_out` - table metadata. To dispose, call [`tsurugi_ffi_table_metadata_dispose`](crate::service::sql::table_metadata::tsurugi_ffi_table_metadata_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlClientHandle sql_client,
@@ -2538,7 +2598,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata(TsurugiFfiContextHandle c
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `table_metadata_out` - table metadata. To dispose, call `tsurugi_ffi_table_metadata_dispose()`.
+ * - `table_metadata_out` - table metadata. To dispose, call [`tsurugi_ffi_table_metadata_dispose`](crate::service::sql::table_metadata::tsurugi_ffi_table_metadata_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
@@ -2558,8 +2618,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_for(TsurugiFfiContextHand
  * - `table_name` - table name.
  *
  * # Returns
- * - `table_metadata_job_out` - Job for `TsurugiFfiTableMetadataHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiTableMetadataHandle` and call `tsurugi_ffi_table_metadata_dispose()` to dispose.
+ * - `table_metadata_job_out` - Job for `TsurugiFfiTableMetadataHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiTableMetadataHandle` and call [`tsurugi_ffi_table_metadata_dispose`](crate::service::sql::table_metadata::tsurugi_ffi_table_metadata_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHandle context,
                                                              TsurugiFfiSqlClientHandle sql_client,
@@ -2580,7 +2640,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_table_metadata_async(TsurugiFfiContextHa
  * - `placeholders_size` - `placeholders` size \[number of placeholders\].
  *
  * # Returns
- * - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
+ * - `prepared_statement_out` - prepared statement. To dispose, call [`tsurugi_ffi_sql_prepared_statement_dispose`](crate::service::sql::prepare::prepared_statement::tsurugi_ffi_sql_prepared_statement_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
@@ -2604,7 +2664,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare(TsurugiFfiContextHandle context,
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `prepared_statement_out` - prepared statement. To dispose, call `tsurugi_ffi_sql_prepared_statement_dispose()`.
+ * - `prepared_statement_out` - prepared statement. To dispose, call [`tsurugi_ffi_sql_prepared_statement_dispose`](crate::service::sql::prepare::prepared_statement::tsurugi_ffi_sql_prepared_statement_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -2628,8 +2688,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare_for(TsurugiFfiContextHandle context,
  * - `placeholders_size` - `placeholders` size \[number of placeholders\].
  *
  * # Returns
- * - `prepared_statement_job_out` - Job for `TsurugiFfiSqlPreparedStatementHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSqlPreparedStatementHandle` and call `tsurugi_ffi_sql_prepared_statement_dispose()` to dispose.
+ * - `prepared_statement_job_out` - Job for `TsurugiFfiSqlPreparedStatementHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSqlPreparedStatementHandle` and call [`tsurugi_ffi_sql_prepared_statement_dispose`](crate::service::sql::prepare::prepared_statement::tsurugi_ffi_sql_prepared_statement_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
@@ -2650,7 +2710,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepare_async(TsurugiFfiContextHandle contex
  * - `sql` - SQL satement.
  *
  * # Returns
- * - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+ * - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_explain(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
@@ -2670,7 +2730,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_explain(TsurugiFfiContextHandle context,
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+ * - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi]_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_explain_for(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -2690,8 +2750,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_explain_for(TsurugiFfiContextHandle context,
  * - `sql` - SQL satement.
  *
  * # Returns
- * - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call `tsurugi_ffi_sql_explain_result_dispose()` to dispose.
+ * - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_explain_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
@@ -2712,7 +2772,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_explain_async(TsurugiFfiContextHandle contex
  * - `parameters_size` - `parameters` size \[number of parameters\].
  *
  * # Returns
- * - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+ * - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlClientHandle sql_client,
@@ -2736,7 +2796,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain(TsurugiFfiContextHandle con
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `explain_result_out` - explain result. To dispose, call `tsurugi_ffi_sql_explain_result_dispose()`.
+ * - `explain_result_out` - explain result. To dispose, call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlClientHandle sql_client,
@@ -2760,8 +2820,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_for(TsurugiFfiContextHandle
  * - `parameters_size` - `parameters` size \[number of parameters\].
  *
  * # Returns
- * - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call `tsurugi_ffi_sql_explain_result_dispose()` to dispose.
+ * - `explain_result_job_out` - Job for `TsurugiFfiSqlExplainResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSqlExplainResultHandle` and call [`tsurugi_ffi_sql_explain_result_dispose`](crate::service::sql::explain::tsurugi_ffi_sql_explain_result_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
@@ -2782,7 +2842,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_explain_async(TsurugiFfiContextHand
  * - `transaction_option` - transaction option.
  *
  * # Returns
- * - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
+ * - `transaction_out` - transaction. To dispose, call [`tsurugi_ffi_transaction_dispose`](crate::transaction::tsurugi_ffi_transaction_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,
@@ -2802,7 +2862,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction(TsurugiFfiContextHandle co
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `transaction_out` - transaction. To dispose, call `tsurugi_ffi_transaction_dispose()`.
+ * - `transaction_out` - transaction. To dispose, call [`tsurugi_ffi_transaction_dispose`](crate::transaction::tsurugi_ffi_transaction_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_for(TsurugiFfiContextHandle context,
                                                           TsurugiFfiSqlClientHandle sql_client,
@@ -2822,8 +2882,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_for(TsurugiFfiContextHandl
  * - `transaction_option` - transaction option.
  *
  * # Returns
- * - `transaction_job_out` - Job for `TsurugiFfiTransactionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiTransactionHandle` and call `tsurugi_ffi_transaction_dispose()` to dispose.
+ * - `transaction_job_out` - Job for `TsurugiFfiTransactionHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiTransactionHandle` and call [`tsurugi_ffi_transaction_dispose`](crate::transaction::tsurugi_ffi_transaction_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHandle context,
                                                             TsurugiFfiSqlClientHandle sql_client,
@@ -2842,7 +2902,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHan
  * - `transaction` - transaction.
  *
  * # Returns
- * - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
+ * - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
@@ -2862,7 +2922,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHand
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `transaction_status_out` - transaction status. To dispose, call `tsurugi_ffi_transaction_status_dispose()`.
+ * - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context,
                                                                TsurugiFfiSqlClientHandle sql_client,
@@ -2882,8 +2942,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContext
  * - `transaction` - transaction.
  *
  * # Returns
- * - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiTransactionStatusHandle` and call `tsurugi_ffi_transaction_status_dispose()` to dispose.
+ * - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiTransactionStatusHandle` and call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context,
                                                                  TsurugiFfiSqlClientHandle sql_client,
@@ -2903,7 +2963,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiConte
  * - `sql` - SQL statement.
  *
  * # Returns
- * - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+ * - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
                                             TsurugiFfiSqlClientHandle sql_client,
@@ -2925,7 +2985,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_execute(TsurugiFfiContextHandle context,
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+ * - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -2947,8 +3007,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_execute_for(TsurugiFfiContextHandle context,
  * - `sql` - SQL statement.
  *
  * # Returns
- * - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call `tsurugi_ffi_sql_execute_result_dispose()` to dispose.
+ * - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call [`tsurugi_ffi_sql_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle context,
                                                   TsurugiFfiSqlClientHandle sql_client,
@@ -2971,7 +3031,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_execute_async(TsurugiFfiContextHandle contex
  * - `parameters_size` - `parameters` size \[number of parameters\].
  *
  * # Returns
- * - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+ * - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlClientHandle sql_client,
@@ -2997,7 +3057,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute(TsurugiFfiContextHandle con
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `execute_result_out` - execute result. To dispose, call `tsurugi_ffi_execute_result_dispose()`.
+ * - `execute_result_out` - execute result. To dispose, call [`tsurugi_ffi_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlClientHandle sql_client,
@@ -3023,8 +3083,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_for(TsurugiFfiContextHandle
  * - `parameters_size` - `parameters` size \[number of parameters\].
  *
  * # Returns
- * - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call `tsurugi_ffi_sql_execute_result_dispose()` to dispose.
+ * - `execute_result_job_out` - Job for `TsurugiFfiSqlExecuteResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSqlExecuteResultHandle` and call [`tsurugi_ffi_sql_execute_result_dispose`](crate::service::sql::execute_result::tsurugi_ffi_sql_execute_result_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
@@ -3047,7 +3107,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHand
  * - `sql` - SQL satement.
  *
  * # Returns
- * - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+ * - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
                                           TsurugiFfiSqlClientHandle sql_client,
@@ -3069,7 +3129,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+ * - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context,
                                               TsurugiFfiSqlClientHandle sql_client,
@@ -3091,8 +3151,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context,
  * - `sql` - SQL satement.
  *
  * # Returns
- * - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call `tsurugi_ffi_sql_query_result_dispose()` to dispose.
+ * - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call [`tsurugi_ffi_sql_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
@@ -3115,7 +3175,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_query_async(TsurugiFfiContextHandle context,
  * - `parameters_size` - `parameters` size \[number of parameters\].
  *
  * # Returns
- * - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+ * - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle context,
                                                    TsurugiFfiSqlClientHandle sql_client,
@@ -3141,7 +3201,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query(TsurugiFfiContextHandle conte
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `query_result_out` - query result. To dispose, call `tsurugi_ffi_query_result_dispose()`.
+ * - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlClientHandle sql_client,
@@ -3167,8 +3227,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_for(TsurugiFfiContextHandle c
  * - `parameters_size` - `parameters` size \[number of parameters\].
  *
  * # Returns
- * - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call `tsurugi_ffi_sql_query_result_dispose()` to dispose.
+ * - `query_result_job_out` - Job for `TsurugiFfiSqlQueryResultHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSqlQueryResultHandle` and call [`tsurugi_ffi_sql_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose) to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlClientHandle sql_client,
@@ -3232,7 +3292,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_copy_blob_to_for(TsurugiFfiContextHandle con
  * - `destination` - the path of the destination file.
  *
  * # Returns
- * - `copy_blob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ * - `copy_blob_to_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_copy_blob_to_async(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlClientHandle sql_client,
@@ -3295,7 +3355,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_copy_clob_to_for(TsurugiFfiContextHandle con
  * - `destination` - the path of the destination file.
  *
  * # Returns
- * - `copy_clob_to_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ * - `copy_clob_to_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_copy_clob_to_async(TsurugiFfiContextHandle context,
                                                        TsurugiFfiSqlClientHandle sql_client,
@@ -3353,7 +3413,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_commit_for(TsurugiFfiContextHandle context,
  * - `commit_option` - commit option.
  *
  * # Returns
- * - `commit_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ * - `commit_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_commit_async(TsurugiFfiContextHandle context,
                                                  TsurugiFfiSqlClientHandle sql_client,
@@ -3405,7 +3465,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_rollback_for(TsurugiFfiContextHandle context
  * - `transaction` - transaction.
  *
  * # Returns
- * - `rollback_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ * - `rollback_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi]_job_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_rollback_async(TsurugiFfiContextHandle context,
                                                    TsurugiFfiSqlClientHandle sql_client,
@@ -3517,7 +3577,7 @@ TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_size(TsurugiFfiContextHandle
  * - `index` - column index \[0..tsurugi_ffi_table_metadata_get_columns_size()-1\].
  *
  * # Returns
- * - `sql_column_out` - column. To dispose, call `tsurugi_ffi_sql_column_dispose()`.
+ * - `sql_column_out` - column. To dispose, call [`tsurugi_ffi_sql_column_dispose`](crate::service::sql::column::tsurugi_ffi_sql_column_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_value(TsurugiFfiContextHandle context,
                                                           TsurugiFfiTableMetadataHandle table_metadata,
@@ -3557,7 +3617,7 @@ void tsurugi_ffi_clob_reference_dispose(TsurugiFfiClobReferenceHandle clob_refer
  * - `endpoint` - endpoint url. (e.g. `tcp://localhost:12345`)
  *
  * # Returns
- * - `endpoint_out` - endpoint. To dispose, call `tsurugi_ffi_endpoint_dispose()`.
+ * - `endpoint_out` - endpoint. To dispose, call [`tsurugi_ffi_endpoint_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_endpoint_parse(TsurugiFfiContextHandle context,
                                         TsurugiFfiStringHandle endpoint,
@@ -3577,7 +3637,7 @@ void tsurugi_ffi_endpoint_dispose(TsurugiFfiEndpointHandle endpoint);
  * See [`ConnectionOption::new`].
  *
  * # Returns
- * - `connection_option_out` - connection option. To dispose, call `tsurugi_ffi_connection_option_dispose()`.
+ * - `connection_option_out` - connection option. To dispose, call [`tsurugi_ffi_connection_option_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_connection_option_create(TsurugiFfiContextHandle context,
                                                   TsurugiFfiConnectionOptionHandle *connection_option_out);
@@ -3825,7 +3885,7 @@ void tsurugi_ffi_connection_option_dispose(TsurugiFfiConnectionOptionHandle conn
  * - `connection_option` - connection option.
  *
  * # Returns
- * - `session_out` - session. To dispose, call `tsurugi_ffi_session_dispose()`.
+ * - `session_out` - session. To dispose, call [`tsurugi_ffi_session_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
                                          TsurugiFfiConnectionOptionHandle connection_option,
@@ -3841,7 +3901,7 @@ TsurugiFfiRc tsurugi_ffi_session_connect(TsurugiFfiContextHandle context,
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `session_out` - session. To dispose, call `tsurugi_ffi_session_dispose()`.
+ * - `session_out` - session. To dispose, call [`tsurugi_ffi_session_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context,
                                              TsurugiFfiConnectionOptionHandle connection_option,
@@ -3857,8 +3917,8 @@ TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context,
  * - `connection_option` - connection option.
  *
  * # Returns
- * - `session_job_out` - Job for `TsurugiFfiSessionHandle`. To dispose, call `tsurugi_ffi_job_dispose()`.
- *   Handle taken from Job casts to `TsurugiFfiSessionHandle` and call `tsurugi_ffi_session_dispose()` to dispose.
+ * - `session_job_out` - Job for `TsurugiFfiSessionHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSessionHandle` and call [`tsurugi_ffi_session_dispose`] to dispose.
  */
 TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context,
                                                TsurugiFfiConnectionOptionHandle connection_option,
@@ -3903,7 +3963,7 @@ TsurugiFfiRc tsurugi_ffi_session_get_default_timeout(TsurugiFfiContextHandle con
  * See [`Session::make_client`].
  *
  * # Returns
- * - `sql_client_out` - SqlClient. To dispose, call `tsurugi_ffi_sql_client_dispose()`.
+ * - `sql_client_out` - SqlClient. To dispose, call [`tsurugi_ffi_sql_client_dispose`](crate::service::sql::tsurugi_ffi_sql_client_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context,
                                                  TsurugiFfiSessionHandle session,
@@ -3958,7 +4018,7 @@ TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_for(TsurugiFfiContextHan
  * - `expiration_time` - expiration time \[nanosecond\].
  *
  * # Returns
- * - `update_expiration_time_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ * - `update_expiration_time_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_session_update_expiration_time_async(TsurugiFfiContextHandle context,
                                                               TsurugiFfiSessionHandle session,
@@ -4010,7 +4070,7 @@ TsurugiFfiRc tsurugi_ffi_session_shutdown_for(TsurugiFfiContextHandle context,
  * - `shutdown_type` - shutdown type.
  *
  * # Returns
- * - `shutdown_job_out` - Job for `void`. To dispose, call `tsurugi_ffi_job_dispose()`.
+ * - `shutdown_job_out` - Job for `void`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
  */
 TsurugiFfiRc tsurugi_ffi_session_shutdown_async(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSessionHandle session,
@@ -4072,7 +4132,7 @@ void tsurugi_ffi_session_dispose(TsurugiFfiSessionHandle session);
  * See [`CommitOption::new`].
  *
  * # Returns
- * - `commit_option_out` - commit option. To dispose, call `tsurugi_ffi_commit_option_dispose()`.
+ * - `commit_option_out` - commit option. To dispose, call [`tsurugi_ffi_commit_option_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_commit_option_create(TsurugiFfiContextHandle context,
                                               TsurugiFfiCommitOptionHandle *commit_option_out);
@@ -4151,7 +4211,7 @@ void tsurugi_ffi_commit_option_dispose(TsurugiFfiCommitOptionHandle commit_optio
  * See [`TransactionOption::new`].
  *
  * # Returns
- * - `transaction_option_out` - transaction option. To dispose, call `tsurugi_ffi_transaction_option_dispose()`.
+ * - `transaction_option_out` - transaction option. To dispose, call [`tsurugi_ffi_transaction_option_dispose`].
  */
 TsurugiFfiRc tsurugi_ffi_transaction_option_create(TsurugiFfiContextHandle context,
                                                    TsurugiFfiTransactionOptionHandle *transaction_option_out);
@@ -4595,7 +4655,7 @@ TsurugiFfiRc tsurugi_ffi_transaction_get_close_timeout(TsurugiFfiContextHandle c
  *
  * See [`Transaction::close`].
  *
- * Note: Close is called in `tsurugi_ffi_transaction_dispose()`.
+ * Note: Close is called in [`tsurugi_ffi_transaction_dispose`].
  *
  * # Receiver
  * - `transaction` - Transaction.
@@ -4608,7 +4668,7 @@ TsurugiFfiRc tsurugi_ffi_transaction_close(TsurugiFfiContextHandle context,
  *
  * See [`Transaction::close_for`].
  *
- * Note: Close is called in `tsurugi_ffi_transaction_dispose()`.
+ * Note: Close is called in [`tsurugi_ffi_transaction_dispose`].
  *
  * # Receiver
  * - `transaction` - Transaction.
