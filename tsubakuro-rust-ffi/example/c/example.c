@@ -46,6 +46,8 @@ void main(int argc, char *argv[]) {
 
 /*
  * error handling
+ *
+ * see https://github.com/project-tsurugi/tsubakuro-rust/blob/master/tsubakuro-rust-ffi/src/context.rs
  */
 void example_error(TsurugiFfiContextHandle context) {
     if (context == NULL) {
@@ -55,16 +57,23 @@ void example_error(TsurugiFfiContextHandle context) {
 
     TsurugiFfiRc rc;
     tsurugi_ffi_context_get_return_code(context, &rc);
+    printf("rc=%x\n", rc);
 
     TsurugiFfiStringHandle error_name;
     tsurugi_ffi_context_get_error_name(context, &error_name);
-
-    TsurugiFfiStringHandle structured_code; // if ServerError
-    tsurugi_ffi_context_get_server_error_structured_code(context, &structured_code);
+    printf("error_name=%s\n", error_name);
 
     TsurugiFfiStringHandle message;
     tsurugi_ffi_context_get_error_message(context, &message);
-    printf("%x %s[%s] %s\n", rc, error_name, structured_code, message);
+    printf("error_message=%s\n", message);
+
+    TsurugiFfiRcType rc_type;
+    tsurugi_ffi_context_get_error_type(context, &rc_type);
+    if (rc_type == TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR) {
+        TsurugiFfiStringHandle structured_code;
+        tsurugi_ffi_context_get_server_error_structured_code(context, &structured_code);
+        printf("structured_code=%s\n", structured_code);
+    }
 }
 
 /*

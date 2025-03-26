@@ -1,4 +1,29 @@
 //! context object module.
+//!
+//! The context object is specified as the first argument of the FFI function.
+//! When an error occurs in the function, the error information is stored in the context object.
+//!
+//! ## Examples
+//!
+//! Error information can be obtained from context object.
+//!
+//! | context object function                   | return value                      | remarks       |
+//! |-------------------------------------------|-----------------------------------|---------------|
+//! | [`tsurugi_ffi_context_get_return_code`]   | 0xc0300bb9                        | 0xbb9 = 3001  |
+//! | [`tsurugi_ffi_context_get_error_name`]    | "SYNTAX_EXCEPTION"                |               |
+//! | [`tsurugi_ffi_context_get_error_type`]    | TsurugiFfiRcType::CoreServerError |               |
+//! | [`tsurugi_ffi_context_get_error_message`] |                                   | error message |
+//!
+//! ### server error
+//!
+//! | context object function                                  | return value | remarks       |
+//! |----------------------------------------------------------|--------------|---------------|
+//! | [`tsurugi_ffi_context_get_server_error_category_number`] | 3            | 3 means "SQL" |
+//! | [`tsurugi_ffi_context_get_server_error_category_str`]    | "SQL"        |               |
+//! | [`tsurugi_ffi_context_get_server_error_code_number`]     | 3001         |               |
+//! | [`tsurugi_ffi_context_get_server_error_structured_code`] | "SQL-03001"  |               |
+//!
+//! See [Error Code of Tsurugi Services](https://github.com/project-tsurugi/tsurugidb/blob/master/docs/error-code-tsurugi-services.md) for structured_code and error_name.
 
 use std::ffi::CString;
 
