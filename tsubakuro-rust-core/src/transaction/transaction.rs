@@ -9,6 +9,7 @@ use crate::{
     client_error,
     error::TgError,
     invalid_response_error,
+    jogasaki::proto::sql::common::Transaction as ProtoTransaction,
     jogasaki::proto::sql::response::response::Response as SqlResponseType,
     prelude::{
         convert_sql_response, sql::SqlClient, sql_result_only_success_processor, ServiceClient,
@@ -52,7 +53,7 @@ use crate::{
 #[derive(Debug)]
 pub struct Transaction {
     session: Arc<Session>,
-    transaction_handle: u64,
+    transaction_handle: ProtoTransaction,
     transaction_id: String,
     close_timeout: Duration,
     closed: AtomicBool,
@@ -62,7 +63,7 @@ pub struct Transaction {
 impl Transaction {
     pub(crate) fn new(
         session: Arc<Session>,
-        transaction_handle: u64,
+        transaction_handle: ProtoTransaction,
         transaction_id: String,
         close_timeout: Duration,
     ) -> Transaction {
@@ -77,11 +78,11 @@ impl Transaction {
         }
     }
 
-    pub(crate) fn transaction_handle(&self) -> Result<u64, TgError> {
+    pub(crate) fn transaction_handle(&self) -> Result<&ProtoTransaction, TgError> {
         if self.is_closed() {
             Err(client_error!("transaction already closed"))
         } else {
-            Ok(self.transaction_handle)
+            Ok(&self.transaction_handle)
         }
     }
 
@@ -122,7 +123,7 @@ impl Transaction {
             .is_ok()
         {
             let sql_client = SqlClient::new(self.session.clone());
-            let tx_handle = self.transaction_handle;
+            let tx_handle = &self.transaction_handle;
             sql_client.dispose_transaction(tx_handle, timeout).await?;
         }
         Ok(())
@@ -168,7 +169,7 @@ impl Drop for Transaction {
                 };
                 runtime.block_on(async {
                     let sql_client = SqlClient::new(self.session.clone());
-                    let tx_handle = self.transaction_handle;
+                    let tx_handle = &self.transaction_handle;
                     if let Err(e) = sql_client.dispose_transaction_send_only(tx_handle).await {
                         warn!("Transaction.drop() dispose error. {}", e);
                         if self.fail_on_drop_error() {
@@ -196,13 +197,10 @@ pub(crate) fn transaction_begin_processor(
     match message.response {
         Some(SqlResponseType::Begin(begin)) => match begin.result {
             Some(crate::jogasaki::proto::sql::response::begin::Result::Success(success)) => {
-                let tx_handle = success
-                    .transaction_handle
-                    .ok_or(invalid_response_error!(
-                        FUNCTION_NAME,
-                        "response.transaction_handle is None"
-                    ))?
-                    .handle;
+                let tx_handle = success.transaction_handle.ok_or(invalid_response_error!(
+                    FUNCTION_NAME,
+                    "response.transaction_handle is None"
+                ))?;
                 let tx_id = success
                     .transaction_id
                     .ok_or(invalid_response_error!(

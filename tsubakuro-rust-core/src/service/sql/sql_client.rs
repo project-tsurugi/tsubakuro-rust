@@ -7,6 +7,7 @@ use crate::{
     invalid_response_error,
     job::Job,
     jogasaki::proto::sql::{
+        common::Transaction as ProtoTransaction,
         request::{request::Request as SqlCommand, Request as SqlRequest},
         response::{response::Response as SqlResponseType, Response as SqlResponse},
     },
@@ -679,12 +680,9 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn transaction_status_command(transaction_handle: u64) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
+    fn transaction_status_command(transaction_handle: &ProtoTransaction) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::GetErrorInfo {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
         };
         SqlCommand::GetErrorInfo(request)
     }
@@ -752,12 +750,9 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn execute_statement_command(transaction_handle: u64, sql: &str) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
+    fn execute_statement_command(transaction_handle: &ProtoTransaction, sql: &str) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::ExecuteStatement {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
             sql: ProstString::from(sql),
         };
         SqlCommand::ExecuteStatement(request)
@@ -840,19 +835,16 @@ impl SqlClient {
     }
 
     fn execute_prepared_statement_command(
-        transaction_handle: u64,
+        transaction_handle: &ProtoTransaction,
         prepared_statement: &SqlPreparedStatement,
         parameters: Vec<SqlParameter>,
     ) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
         let ps_handle = crate::jogasaki::proto::sql::common::PreparedStatement {
             handle: prepared_statement.prepare_handle(),
             has_result_records: prepared_statement.has_result_records(),
         };
         let request = crate::jogasaki::proto::sql::request::ExecutePreparedStatement {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
             prepared_statement_handle: Some(ps_handle),
             parameters,
         };
@@ -945,12 +937,9 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn execute_query_command(transaction_handle: u64, sql: &str) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
+    fn execute_query_command(transaction_handle: &ProtoTransaction, sql: &str) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::ExecuteQuery {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
             sql: ProstString::from(sql),
         };
         SqlCommand::ExecuteQuery(request)
@@ -1052,19 +1041,16 @@ impl SqlClient {
     }
 
     fn execute_prepared_query_command(
-        transaction_handle: u64,
+        transaction_handle: &ProtoTransaction,
         prepared_statement: &SqlPreparedStatement,
         parameters: Vec<SqlParameter>,
     ) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
         let ps_handle = crate::jogasaki::proto::sql::common::PreparedStatement {
             handle: prepared_statement.prepare_handle(),
             has_result_records: prepared_statement.has_result_records(),
         };
         let request = crate::jogasaki::proto::sql::request::ExecutePreparedQuery {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
             prepared_statement_handle: Some(ps_handle),
             parameters,
         };
@@ -1203,10 +1189,10 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn open_lob_command<T: TgLargeObjectReference>(transaction_handle: u64, lob: &T) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
+    fn open_lob_command<T: TgLargeObjectReference>(
+        transaction_handle: &ProtoTransaction,
+        lob: &T,
+    ) -> SqlCommand {
         let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
             provider: lob.provider().into(),
             object_id: lob.object_id(),
@@ -1214,7 +1200,7 @@ impl SqlClient {
         };
 
         let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
             reference: Some(lob),
         };
         SqlCommand::GetLargeObjectData(request)
@@ -1363,12 +1349,9 @@ impl SqlClient {
     }
 
     fn copy_lob_to_command<T: TgLargeObjectReference>(
-        transaction_handle: u64,
+        transaction_handle: &ProtoTransaction,
         clob: &T,
     ) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
         let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
             provider: clob.provider().into(),
             object_id: clob.object_id(),
@@ -1376,7 +1359,7 @@ impl SqlClient {
         };
 
         let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
             reference: Some(lob),
         };
         SqlCommand::GetLargeObjectData(request)
@@ -1449,13 +1432,12 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn commit_command(transaction_handle: u64, commit_option: &CommitOption) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
-
+    fn commit_command(
+        transaction_handle: &ProtoTransaction,
+        commit_option: &CommitOption,
+    ) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::Commit {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
             notification_type: commit_option.commit_type().into(),
             auto_dispose: commit_option.auto_dispose(),
         };
@@ -1519,20 +1501,16 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn rollback_command(transaction_handle: u64) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
-
+    fn rollback_command(transaction_handle: &ProtoTransaction) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::Rollback {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
         };
         SqlCommand::Rollback(request)
     }
 
     pub(crate) async fn dispose_transaction(
         &self,
-        transaction_handle: u64,
+        transaction_handle: &ProtoTransaction,
         timeout: Duration,
     ) -> Result<(), TgError> {
         const FUNCTION_NAME: &str = "dispose_transaction()";
@@ -1548,7 +1526,7 @@ impl SqlClient {
 
     pub(crate) async fn dispose_transaction_send_only(
         &self,
-        transaction_handle: u64,
+        transaction_handle: &ProtoTransaction,
     ) -> Result<(), TgError> {
         const FUNCTION_NAME: &str = "dispose_transaction()";
         trace!("{} start", FUNCTION_NAME);
@@ -1560,13 +1538,9 @@ impl SqlClient {
         Ok(())
     }
 
-    fn dispose_transaction_command(transaction_handle: u64) -> SqlCommand {
-        let tx_handle = crate::jogasaki::proto::sql::common::Transaction {
-            handle: transaction_handle,
-        };
-
+    fn dispose_transaction_command(transaction_handle: &ProtoTransaction) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::DisposeTransaction {
-            transaction_handle: Some(tx_handle),
+            transaction_handle: Some(*transaction_handle),
         };
         SqlCommand::DisposeTransaction(request)
     }
