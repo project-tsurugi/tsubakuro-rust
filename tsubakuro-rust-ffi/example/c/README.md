@@ -7,7 +7,7 @@ cd tsubakuro-rust-ffi
 cbindgen --lang C --config example/c/cbindgen.toml --output example/c/tsubakuro-rust-ffi.h
 ```
 
-- cbindgen 0.27.0
+- [cbindgen](https://github.com/mozilla/cbindgen) 0.27.0
 
 ## How to build
 
@@ -28,3 +28,4 @@ export RUST_LOG=tsubakuro_rust_ffi=trace
 ./example.out tcp://localhost:12345
 ```
 
+- See [env_logger](https://crates.io/crates/env_logger) for `RUST_LOG`.

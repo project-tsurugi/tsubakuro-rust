@@ -1,2 +1,3 @@
 [enum]
+# ex) TsurugiFfiTransactionType::Short -> TSURUGI_FFI_TRANSACTION_TYPE_SHORT
 rename_variants = "QualifiedScreamingSnakeCase"
