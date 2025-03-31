@@ -91,6 +91,51 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_null(
     rc
 }
 
+/// SqlParameter: Creates a parameter of boolean (boolean).
+///
+/// See [`SqlParameter::of`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `value` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_boolean(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    value: bool,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_boolean()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, parameter_out={:?}",
+        context,
+        name,
+        value,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let parameter = SqlParameter::of(name, value);
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
 /// SqlParameter: Creates a parameter of int4 (int).
 ///
 /// See [`SqlParameter::of`].

@@ -50,6 +50,28 @@ class TgFfiSqlParameterTest extends TgFfiTester {
     }
 
     @Test
+    void of_boolean_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = true;
+            var out = manager.allocateHandleOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_boolean(ctx, arg1, arg2, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var arg1 = manager.allocateString("test");
+            var arg2 = true;
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_boolean(ctx, arg1, arg2, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
     void of_int4_argError() {
         var manager = getFfiObjectManager();
 

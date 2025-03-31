@@ -18491,6 +18491,67 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_parameter_of_boolean {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_BOOL,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_boolean");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_boolean(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, _Bool value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_boolean$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_boolean.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_boolean(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, _Bool value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_boolean$handle() {
+        return tsurugi_ffi_sql_parameter_of_boolean.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_boolean(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, _Bool value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_boolean$address() {
+        return tsurugi_ffi_sql_parameter_of_boolean.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_boolean(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, _Bool value, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_boolean(MemorySegment context, MemorySegment name, boolean value, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_boolean.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_boolean", context, name, value, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_parameter_of_int4 {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -20786,6 +20847,127 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_is_null", context, query_result, is_null_out);
             }
             return (int)mh$.invokeExact(context, query_result, is_null_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_boolean {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_boolean");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_boolean$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_boolean.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_boolean$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_boolean.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_boolean$address() {
+        return tsurugi_ffi_sql_query_result_fetch_boolean.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *value_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_boolean(MemorySegment context, MemorySegment query_result, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_boolean.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_boolean", context, query_result, value_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_fetch_for_boolean {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_boolean");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, _Bool *value_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_fetch_for_boolean$descriptor() {
+        return tsurugi_ffi_sql_query_result_fetch_for_boolean.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, _Bool *value_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_fetch_for_boolean$handle() {
+        return tsurugi_ffi_sql_query_result_fetch_for_boolean.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, _Bool *value_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_fetch_for_boolean$address() {
+        return tsurugi_ffi_sql_query_result_fetch_for_boolean.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_boolean(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout, _Bool *value_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_fetch_for_boolean(MemorySegment context, MemorySegment query_result, long timeout, MemorySegment value_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_fetch_for_boolean.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_boolean", context, query_result, timeout, value_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout, value_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

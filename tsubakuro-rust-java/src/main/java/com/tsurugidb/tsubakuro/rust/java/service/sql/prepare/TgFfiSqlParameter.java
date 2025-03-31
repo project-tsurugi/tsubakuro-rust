@@ -51,6 +51,39 @@ public class TgFfiSqlParameter extends TgFfiObject {
         return new TgFfiSqlParameter(manager, outHandle);
     }
 
+    public static TgFfiSqlParameter ofBoolean(TgFfiContext context, String name, boolean value) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofBoolean(context.manager(), context, name, value);
+    }
+
+    public static TgFfiSqlParameter ofBoolean(TgFfiObjectManager manager, String name, boolean value) {
+        return ofBoolean(manager, null, name, value);
+    }
+
+    public static TgFfiSqlParameter ofBoolean(TgFfiObjectManager manager, TgFfiContext context, String name, boolean value) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofBooleanMain(manager, context, name, value);
+            }
+        } else {
+            return ofBooleanMain(manager, null, name, value);
+        }
+    }
+
+    private static TgFfiSqlParameter ofBooleanMain(TgFfiObjectManager manager, TgFfiContext context, String name, boolean value) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = value;
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_boolean(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
     public static TgFfiSqlParameter ofInt4(TgFfiContext context, String name, int value) {
         Objects.requireNonNull(context, "context must not be null");
         return ofInt4(context.manager(), context, name, value);

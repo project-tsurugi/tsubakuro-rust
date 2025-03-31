@@ -425,6 +425,114 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
     rc
 }
 
+/// SqlQueryResult: fetch boolean (boolean).
+///
+/// See [`SqlQueryResult::fetch`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Returns
+/// - `value_out` - value.
+///
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_boolean(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    value_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_boolean()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, value_out={:?}",
+        context,
+        query_result,
+        value_out
+    );
+
+    ffi_arg_out_initialize!(value_out, false);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.fetch());
+
+    unsafe {
+        *value_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
+}
+
+/// SqlQueryResult: fetch boolean (boolean).
+///
+/// See [`SqlQueryResult::fetch_for`].
+///
+/// Retrieves a value on the column of the cursor position.
+///
+/// Need to call [`tsurugi_ffi_sql_query_result_next_column`] first.
+/// You can only take once to retrieve the value on the column.
+///
+/// # Receiver
+/// - `query_result` - Sql query result.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
+///
+/// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_boolean(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_fetch_for_boolean()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}, value_out={:?}",
+        context,
+        query_result,
+        timeout,
+        value_out
+    );
+
+    ffi_arg_out_initialize!(value_out, false);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, value_out);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.fetch_for(timeout)
+    );
+
+    unsafe {
+        *value_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, value);
+    rc
+}
+
+
 /// SqlQueryResult: fetch int4 (int).
 ///
 /// See [`SqlQueryResult::fetch`].

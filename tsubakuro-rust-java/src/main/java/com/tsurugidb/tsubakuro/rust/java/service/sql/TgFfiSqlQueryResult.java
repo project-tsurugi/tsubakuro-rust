@@ -111,6 +111,27 @@ public class TgFfiSqlQueryResult extends TgFfiObject {
         return outToBoolean(out);
     }
 
+    public synchronized boolean fetchBoolean(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateBooleanOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_boolean(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return out.get(ValueLayout.JAVA_BOOLEAN, 0);
+    }
+
+    public synchronized boolean fetchForBoolean(TgFfiContext context, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var t = allocateDuration(timeout);
+        var out = allocateBooleanOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_boolean(ctx, handle, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return out.get(ValueLayout.JAVA_BOOLEAN, 0);
+    }
+
     public synchronized int fetchInt4(TgFfiContext context) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();
