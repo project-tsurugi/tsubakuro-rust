@@ -27,6 +27,7 @@ TsurugiFfiRc example_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientH
 TsurugiFfiRc example_query_result(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result);
 TsurugiFfiRc example_prepared_statement(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction);
 TsurugiFfiRc example_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement);
+TsurugiFfiRc example_prepared_execute_null(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement);
 TsurugiFfiRc example_prepared_statement_query0(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction);
 TsurugiFfiRc example_prepared_query0(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement);
 TsurugiFfiRc example_prepared_statement_query1(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction);
@@ -84,14 +85,14 @@ TsurugiFfiRc example(TsurugiFfiStringHandle endpoint) {
 
     // enable logger for tusbakuro-rust-ffi
     rc = tsurugi_ffi_env_logger_init();
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         return rc;
     }
 
     // create context object
     TsurugiFfiContextHandle context;
     rc = tsurugi_ffi_context_create(&context);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         return rc;
     }
 
@@ -113,13 +114,13 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHa
     // create ConnectionOption
     TsurugiFfiConnectionOptionHandle connection_option;
     rc = tsurugi_ffi_connection_option_create(context, &connection_option);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
 
     rc = example_connection_option(context, connection_option, endpoint);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         // dispose ConnectionOption
         tsurugi_ffi_connection_option_dispose(connection_option);
 
@@ -129,7 +130,7 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHa
     // connect (create Session)
     TsurugiFfiSessionHandle session;
     rc = tsurugi_ffi_session_connect(context, connection_option, &session);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         // dispose ConnectionOption
@@ -156,14 +157,14 @@ TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiF
 
     // set endpoint
     rc = tsurugi_ffi_connection_option_set_endpoint_url(context, connection_option, endpoint);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
 
     // set session label
     rc = tsurugi_ffi_connection_option_set_session_label(context, connection_option, "tsubakuro-rust-ffi/c example session");
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -171,7 +172,7 @@ TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiF
     // set default timeout
     TsurugiFfiDuration timeout = 10ull * 1000 * 1000 * 1000; // 10 sec
     rc = tsurugi_ffi_connection_option_set_default_timeout(context, connection_option, timeout);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -186,7 +187,7 @@ TsurugiFfiRc example_sql_client(TsurugiFfiContextHandle context, TsurugiFfiSessi
     // make SqlClient
     TsurugiFfiSqlClientHandle client;
     rc = tsurugi_ffi_session_make_sql_client(context, session, &client);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -209,13 +210,13 @@ TsurugiFfiRc example_transaction(TsurugiFfiContextHandle context, TsurugiFfiSqlC
     // create TransactionOption
     TsurugiFfiTransactionOptionHandle transaction_option;
     rc = tsurugi_ffi_transaction_option_create(context, &transaction_option);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
 
     rc = example_transaction_option(context, transaction_option);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         // dispose TransactionOption
         tsurugi_ffi_transaction_option_dispose(transaction_option);
 
@@ -225,7 +226,7 @@ TsurugiFfiRc example_transaction(TsurugiFfiContextHandle context, TsurugiFfiSqlC
     // start transaction (create Transaction)
     TsurugiFfiTransactionHandle transaction;
     rc = tsurugi_ffi_sql_client_start_transaction(context, client, transaction_option, &transaction);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         // dispose TransactionOption
@@ -241,11 +242,11 @@ TsurugiFfiRc example_transaction(TsurugiFfiContextHandle context, TsurugiFfiSqlC
     rc = example_sql(context, client, transaction);
 
     // transaction commit
-    if (rc == 0) {
+    if (rc == TSURUGI_FFI_RC_OK) {
         // create CommitOption
         TsurugiFfiCommitOptionHandle commit_option;
         rc = tsurugi_ffi_commit_option_create(context, &commit_option);
-        if (rc != 0) {
+        if (rc != TSURUGI_FFI_RC_OK) {
             example_error(context);
 
             // dispose CommitOption, Transaction
@@ -257,7 +258,7 @@ TsurugiFfiRc example_transaction(TsurugiFfiContextHandle context, TsurugiFfiSqlC
 
         // commit
         rc = tsurugi_ffi_sql_client_commit(context, client, transaction, commit_option);
-        if (rc != 0) {
+        if (rc != TSURUGI_FFI_RC_OK) {
             example_error(context);
         }
 
@@ -277,14 +278,14 @@ TsurugiFfiRc example_transaction_option(TsurugiFfiContextHandle context, Tsurugi
 
     // set transaction type
     rc = tsurugi_ffi_transaction_option_set_transaction_type(context, transaction_option, TSURUGI_FFI_TRANSACTION_TYPE_SHORT);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
 
     // set transaction label
     rc = tsurugi_ffi_transaction_option_set_transaction_label(context, transaction_option, "tsubakuro-rust-ffi/c example transaction");
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -297,27 +298,27 @@ TsurugiFfiRc example_sql(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHan
     TsurugiFfiRc rc;
 
     rc = example_statement(context, client, transaction);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         return rc;
     }
 
     rc = example_query(context, client, transaction);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         return rc;
     }
 
     rc = example_prepared_statement(context, client, transaction);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         return rc;
     }
 
     rc = example_prepared_statement_query0(context, client, transaction);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         return rc;
     }
 
     rc = example_prepared_statement_query1(context, client, transaction);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         return rc;
     }
 }
@@ -334,7 +335,7 @@ TsurugiFfiRc example_statement(TsurugiFfiContextHandle context, TsurugiFfiSqlCli
 
     TsurugiFfiSqlExecuteResultHandle execute_result;
     rc = tsurugi_ffi_sql_client_execute(context, client, transaction, sql, &execute_result);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -353,7 +354,7 @@ TsurugiFfiRc example_execute_result(TsurugiFfiContextHandle context, TsurugiFfiS
 
     int64_t inserted_rows;
     rc = tsurugi_ffi_sql_execute_result_get_inserted_rows(context, execute_result, &inserted_rows);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -361,7 +362,7 @@ TsurugiFfiRc example_execute_result(TsurugiFfiContextHandle context, TsurugiFfiS
 
     int64_t updated_rows;
     rc = tsurugi_ffi_sql_execute_result_get_updated_rows(context, execute_result, &updated_rows);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -369,7 +370,7 @@ TsurugiFfiRc example_execute_result(TsurugiFfiContextHandle context, TsurugiFfiS
 
     int64_t merged_rows;
     rc = tsurugi_ffi_sql_execute_result_get_merged_rows(context, execute_result, &merged_rows);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -377,7 +378,7 @@ TsurugiFfiRc example_execute_result(TsurugiFfiContextHandle context, TsurugiFfiS
 
     int64_t deleted_rows;
     rc = tsurugi_ffi_sql_execute_result_get_deleted_rows(context, execute_result, &deleted_rows);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -398,7 +399,7 @@ TsurugiFfiRc example_query(TsurugiFfiContextHandle context, TsurugiFfiSqlClientH
 
     TsurugiFfiSqlQueryResultHandle query_result;
     rc = tsurugi_ffi_sql_client_query(context, client, transaction, sql, &query_result);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -418,7 +419,7 @@ TsurugiFfiRc example_query_result(TsurugiFfiContextHandle context, TsurugiFfiSql
     for (;;) {
         bool next_row;
         rc = tsurugi_ffi_sql_query_result_next_row(context, query_result, &next_row);
-        if (rc != 0) {
+        if (rc != TSURUGI_FFI_RC_OK) {
             example_error(context);
             return rc;
         }
@@ -429,14 +430,14 @@ TsurugiFfiRc example_query_result(TsurugiFfiContextHandle context, TsurugiFfiSql
         // fetch c_id (bigint not null)
         bool next_column;
         rc = tsurugi_ffi_sql_query_result_next_column(context, query_result, &next_column);
-        if (rc != 0) {
+        if (rc != TSURUGI_FFI_RC_OK) {
             example_error(context);
             return rc;
         }
         if (next_column) {
             int64_t value;
             rc = tsurugi_ffi_sql_query_result_fetch_int8(context, query_result, &value);
-            if (rc != 0) {
+            if (rc != TSURUGI_FFI_RC_OK) {
                 example_error(context);
                 return rc;
             }
@@ -445,21 +446,21 @@ TsurugiFfiRc example_query_result(TsurugiFfiContextHandle context, TsurugiFfiSql
 
         // fetch c_name (varchar)
         rc = tsurugi_ffi_sql_query_result_next_column(context, query_result, &next_column);
-        if (rc != 0) {
+        if (rc != TSURUGI_FFI_RC_OK) {
             example_error(context);
             return rc;
         }
         if (next_column) {
             bool is_null;
             rc = tsurugi_ffi_sql_query_result_is_null(context, query_result, &is_null);
-            if (rc != 0) {
+            if (rc != TSURUGI_FFI_RC_OK) {
                 example_error(context);
                 return rc;
             }
             if (!is_null) {
                 TsurugiFfiStringHandle value;
                 rc = tsurugi_ffi_sql_query_result_fetch_character(context, query_result, &value);
-                if (rc != 0) {
+                if (rc != TSURUGI_FFI_RC_OK) {
                     example_error(context);
                     return rc;
                 }
@@ -469,21 +470,21 @@ TsurugiFfiRc example_query_result(TsurugiFfiContextHandle context, TsurugiFfiSql
 
         // fetch c_age (int)
         rc = tsurugi_ffi_sql_query_result_next_column(context, query_result, &next_column);
-        if (rc != 0) {
+        if (rc != TSURUGI_FFI_RC_OK) {
             example_error(context);
             return rc;
         }
         if (next_column) {
             bool is_null;
             rc = tsurugi_ffi_sql_query_result_is_null(context, query_result, &is_null);
-            if (rc != 0) {
+            if (rc != TSURUGI_FFI_RC_OK) {
                 example_error(context);
                 return rc;
             }
             if (!is_null) {
                 int32_t value;
                 rc = tsurugi_ffi_sql_query_result_fetch_int4(context, query_result, &value);
-                if (rc != 0) {
+                if (rc != TSURUGI_FFI_RC_OK) {
                     example_error(context);
                     return rc;
                 }
@@ -507,14 +508,14 @@ TsurugiFfiRc example_prepared_statement(TsurugiFfiContextHandle context, Tsurugi
 
     TsurugiFfiSqlPlaceholderHandle p0;
     rc = tsurugi_ffi_sql_placeholder_of_atom_type(context, "id", TSURUGI_FFI_ATOM_TYPE_INT8, &p0);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
 
     TsurugiFfiSqlPlaceholderHandle p1;
     rc = tsurugi_ffi_sql_placeholder_of_atom_type(context, "name", TSURUGI_FFI_ATOM_TYPE_CHARACTER, &p1);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_placeholder_dispose(p0);
@@ -523,7 +524,7 @@ TsurugiFfiRc example_prepared_statement(TsurugiFfiContextHandle context, Tsurugi
 
     TsurugiFfiSqlPlaceholderHandle p2;
     rc = tsurugi_ffi_sql_placeholder_of_atom_type(context, "age", TSURUGI_FFI_ATOM_TYPE_INT4, &p2);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_placeholder_dispose(p0);
@@ -535,7 +536,7 @@ TsurugiFfiRc example_prepared_statement(TsurugiFfiContextHandle context, Tsurugi
     uint32_t placeholders_size = 3;
     TsurugiFfiSqlPreparedStatementHandle prepared_statement;
     rc = tsurugi_ffi_sql_client_prepare(context, client, sql, placeholders, placeholders_size, &prepared_statement);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_placeholder_dispose(p0);
@@ -551,6 +552,9 @@ TsurugiFfiRc example_prepared_statement(TsurugiFfiContextHandle context, Tsurugi
 
     // execute SQL
     rc = example_prepared_execute(context, client, transaction, prepared_statement);
+    if (rc == TSURUGI_FFI_RC_OK) {
+        rc = example_prepared_execute_null(context, client, transaction, prepared_statement);
+    }
 
     // dispose SqlPreparedStatement
     tsurugi_ffi_sql_prepared_statement_dispose(prepared_statement);
@@ -558,13 +562,14 @@ TsurugiFfiRc example_prepared_statement(TsurugiFfiContextHandle context, Tsurugi
     return rc;
 }
 
+// insert ... values(4, 'example', 20)
 TsurugiFfiRc example_prepared_execute(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement) {
     TsurugiFfiRc rc;
 
     int64_t id = 4;
     TsurugiFfiSqlParameterHandle p0;
     rc = tsurugi_ffi_sql_parameter_of_int8(context, "id", id, &p0);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -572,7 +577,7 @@ TsurugiFfiRc example_prepared_execute(TsurugiFfiContextHandle context, TsurugiFf
     TsurugiFfiStringHandle name = "example";
     TsurugiFfiSqlParameterHandle p1;
     rc = tsurugi_ffi_sql_parameter_of_character(context, "name", name, &p1);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_parameter_dispose(p0);
@@ -582,7 +587,7 @@ TsurugiFfiRc example_prepared_execute(TsurugiFfiContextHandle context, TsurugiFf
     int32_t age = 20;
     TsurugiFfiSqlParameterHandle p2;
     rc = tsurugi_ffi_sql_parameter_of_int4(context, "age", age, &p2);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_parameter_dispose(p0);
@@ -594,7 +599,64 @@ TsurugiFfiRc example_prepared_execute(TsurugiFfiContextHandle context, TsurugiFf
     uint32_t parameters_size = 3;
     TsurugiFfiSqlExecuteResultHandle execute_result;
     rc = tsurugi_ffi_sql_client_prepared_execute(context, client, transaction, prepared_statement, parameters, parameters_size, &execute_result);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+
+        tsurugi_ffi_sql_parameter_dispose(p0);
+        tsurugi_ffi_sql_parameter_dispose(p1);
+        tsurugi_ffi_sql_parameter_dispose(p2);
+        return rc;
+    }
+
+    // dispose SqlParameter
+    tsurugi_ffi_sql_parameter_dispose(p0);
+    tsurugi_ffi_sql_parameter_dispose(p1);
+    tsurugi_ffi_sql_parameter_dispose(p2);
+
+    rc = example_execute_result(context, execute_result);
+
+    // dispose SqlExecuteResult
+    tsurugi_ffi_sql_execute_result_dispose(execute_result);
+
+    return rc;
+}
+
+// insert ... values(9, null, null)
+TsurugiFfiRc example_prepared_execute_null(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement) {
+    TsurugiFfiRc rc;
+
+    int64_t id = 9;
+    TsurugiFfiSqlParameterHandle p0;
+    rc = tsurugi_ffi_sql_parameter_of_int8(context, "id", id, &p0);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+        return rc;
+    }
+
+    TsurugiFfiSqlParameterHandle p1;
+    rc = tsurugi_ffi_sql_parameter_null(context, "name", &p1);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+
+        tsurugi_ffi_sql_parameter_dispose(p0);
+        return rc;
+    }
+
+    TsurugiFfiSqlParameterHandle p2;
+    rc = tsurugi_ffi_sql_parameter_null(context, "age", &p2);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+
+        tsurugi_ffi_sql_parameter_dispose(p0);
+        tsurugi_ffi_sql_parameter_dispose(p1);
+        return rc;
+    }
+
+    TsurugiFfiSqlParameterHandle parameters[] = { p0, p1, p2 };
+    uint32_t parameters_size = 3;
+    TsurugiFfiSqlExecuteResultHandle execute_result;
+    rc = tsurugi_ffi_sql_client_prepared_execute(context, client, transaction, prepared_statement, parameters, parameters_size, &execute_result);
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_parameter_dispose(p0);
@@ -630,7 +692,7 @@ TsurugiFfiRc example_prepared_statement_query0(TsurugiFfiContextHandle context, 
     uint32_t placeholders_size = 0;
     TsurugiFfiSqlPreparedStatementHandle prepared_statement;
     rc = tsurugi_ffi_sql_client_prepare(context, client, sql, placeholders, placeholders_size, &prepared_statement);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -651,7 +713,7 @@ TsurugiFfiRc example_prepared_query0(TsurugiFfiContextHandle context, TsurugiFfi
     uint32_t parameters_size = 0;
     TsurugiFfiSqlQueryResultHandle query_result;
     rc = tsurugi_ffi_sql_client_prepared_query(context, client, transaction, prepared_statement, parameters, parameters_size, &query_result);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -676,7 +738,7 @@ TsurugiFfiRc example_prepared_statement_query1(TsurugiFfiContextHandle context, 
 
     TsurugiFfiSqlPlaceholderHandle p0;
     rc = tsurugi_ffi_sql_placeholder_of_atom_type(context, "id", TSURUGI_FFI_ATOM_TYPE_INT8, &p0);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -685,7 +747,7 @@ TsurugiFfiRc example_prepared_statement_query1(TsurugiFfiContextHandle context, 
     uint32_t placeholders_size = 1;
     TsurugiFfiSqlPreparedStatementHandle prepared_statement;
     rc = tsurugi_ffi_sql_client_prepare(context, client, sql, placeholders, placeholders_size, &prepared_statement);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_placeholder_dispose(p0);
@@ -710,7 +772,7 @@ TsurugiFfiRc example_prepared_query1(TsurugiFfiContextHandle context, TsurugiFfi
     int64_t id = 3;
     TsurugiFfiSqlParameterHandle p0;
     rc = tsurugi_ffi_sql_parameter_of_int8(context, "id", id, &p0);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
     }
@@ -719,7 +781,7 @@ TsurugiFfiRc example_prepared_query1(TsurugiFfiContextHandle context, TsurugiFfi
     uint32_t parameters_size = 1;
     TsurugiFfiSqlQueryResultHandle query_result;
     rc = tsurugi_ffi_sql_client_prepared_query(context, client, transaction, prepared_statement, parameters, parameters_size, &query_result);
-    if (rc != 0) {
+    if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
 
         tsurugi_ffi_sql_parameter_dispose(p0);
