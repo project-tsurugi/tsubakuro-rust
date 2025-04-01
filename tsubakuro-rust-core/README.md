@@ -76,7 +76,8 @@ See [example.rs](https://github.com/project-tsurugi/tsubakuro-rust/blob/master/t
 
 ## How to build
 
-Need to install [protoc](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation) since used [prost](https://crates.io/crates/prost).
+Need [protoc](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation) command since used [prost](https://crates.io/crates/prost).  
+(For example, to install `protoc` on Ubuntu 22.04, execute `apt install protobuf-compiler`)
 
 If proto files in [tsubakuro-proto](https://github.com/project-tsurugi/tsubakuro/tree/master/modules/proto) has been modified, copy from there.
 
