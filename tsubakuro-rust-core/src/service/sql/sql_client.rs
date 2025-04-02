@@ -1599,6 +1599,7 @@ impl SqlClient {
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub(crate) fn convert_sql_response(
     function_name: &str,
     response: &WireResponse,
