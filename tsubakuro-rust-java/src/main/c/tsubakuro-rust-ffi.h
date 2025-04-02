@@ -867,6 +867,97 @@ TsurugiFfiRc tsurugi_ffi_sql_column_get_atom_type(TsurugiFfiContextHandle contex
                                                   TsurugiFfiAtomType *atom_type_out);
 
 /**
+ * SqlColumn: Get length for data types.
+ *
+ * See [`SqlColumn::length`].
+ *
+ * # Receiver
+ * - `sql_column` - Sql column.
+ *
+ * # Returns
+ * - `provided_out` - Whether length or arbitrary_length is provided.
+ * - `length_out` - defined length. Valid when `arbitrary_length` is `false`.
+ * - `arbitrary_length_out` - arbitrary length (*).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_column_get_length(TsurugiFfiContextHandle context,
+                                               TsurugiFfiSqlColumnHandle sql_column,
+                                               bool *provided_out,
+                                               uint32_t *length_out,
+                                               bool *arbitrary_length_out);
+
+/**
+ * SqlColumn: Get precision for decimal types.
+ *
+ * See [`SqlColumn::precision`].
+ *
+ * # Receiver
+ * - `sql_column` - Sql column.
+ *
+ * # Returns
+ * - `provided_out` - Whether precision or arbitrary_precision is provided.
+ * - `precision_out` - defined precision. Valid when `arbitrary_precision` is `false`.
+ * - `arbitrary_precision_out` - arbitrary precision (*).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_column_get_precision(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlColumnHandle sql_column,
+                                                  bool *provided_out,
+                                                  uint32_t *precision_out,
+                                                  bool *arbitrary_precision_out);
+
+/**
+ * SqlColumn: Get scale for decimal types.
+ *
+ * See [`SqlColumn::scale`].
+ *
+ * # Receiver
+ * - `sql_column` - Sql column.
+ *
+ * # Returns
+ * - `provided_out` - Whether scale or arbitrary_scale is provided.
+ * - `scale_out` - defined scale. Valid when `arbitrary_scale` is `false`.
+ * - `arbitrary_scale_out` - arbitrary scale (*).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_column_get_scale(TsurugiFfiContextHandle context,
+                                              TsurugiFfiSqlColumnHandle sql_column,
+                                              bool *provided_out,
+                                              uint32_t *scale_out,
+                                              bool *arbitrary_scale_out);
+
+/**
+ * SqlColumn: Whether the column type is nullable.
+ *
+ * See [`SqlColumn::nullable`].
+ *
+ * # Receiver
+ * - `sql_column` - Sql column.
+ *
+ * # Returns
+ * - `provided_out` - Whether nullable is provided.
+ * - `nullable_out` - Whether the column is nullable.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_column_get_nullable(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSqlColumnHandle sql_column,
+                                                 bool *provided_out,
+                                                 bool *nullable_out);
+
+/**
+ * SqlColumn: Whether the column type is varying.
+ *
+ * See [`SqlColumn::varying`].
+ *
+ * # Receiver
+ * - `sql_column` - Sql column.
+ *
+ * # Returns
+ * - `provided_out` - Whether varying is provided.
+ * - `varying_out` - Whether the column is varying.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_column_get_varying(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlColumnHandle sql_column,
+                                                bool *provided_out,
+                                                bool *varying_out);
+
+/**
  * SqlColumn: Dispose.
  *
  * # Receiver

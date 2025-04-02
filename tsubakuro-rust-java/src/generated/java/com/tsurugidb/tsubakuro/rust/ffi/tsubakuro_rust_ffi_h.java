@@ -17597,6 +17597,314 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_column_get_length {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_length");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_length(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *length_out, _Bool *arbitrary_length_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_length$descriptor() {
+        return tsurugi_ffi_sql_column_get_length.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_length(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *length_out, _Bool *arbitrary_length_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_length$handle() {
+        return tsurugi_ffi_sql_column_get_length.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_length(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *length_out, _Bool *arbitrary_length_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_length$address() {
+        return tsurugi_ffi_sql_column_get_length.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_length(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *length_out, _Bool *arbitrary_length_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_length(MemorySegment context, MemorySegment sql_column, MemorySegment provided_out, MemorySegment length_out, MemorySegment arbitrary_length_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_length.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_length", context, sql_column, provided_out, length_out, arbitrary_length_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, provided_out, length_out, arbitrary_length_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_column_get_precision {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_precision");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_precision(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *precision_out, _Bool *arbitrary_precision_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_precision$descriptor() {
+        return tsurugi_ffi_sql_column_get_precision.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_precision(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *precision_out, _Bool *arbitrary_precision_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_precision$handle() {
+        return tsurugi_ffi_sql_column_get_precision.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_precision(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *precision_out, _Bool *arbitrary_precision_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_precision$address() {
+        return tsurugi_ffi_sql_column_get_precision.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_precision(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *precision_out, _Bool *arbitrary_precision_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_precision(MemorySegment context, MemorySegment sql_column, MemorySegment provided_out, MemorySegment precision_out, MemorySegment arbitrary_precision_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_precision.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_precision", context, sql_column, provided_out, precision_out, arbitrary_precision_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, provided_out, precision_out, arbitrary_precision_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_column_get_scale {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_scale");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_scale(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *scale_out, _Bool *arbitrary_scale_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_scale$descriptor() {
+        return tsurugi_ffi_sql_column_get_scale.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_scale(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *scale_out, _Bool *arbitrary_scale_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_scale$handle() {
+        return tsurugi_ffi_sql_column_get_scale.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_scale(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *scale_out, _Bool *arbitrary_scale_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_scale$address() {
+        return tsurugi_ffi_sql_column_get_scale.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_scale(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, uint32_t *scale_out, _Bool *arbitrary_scale_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_scale(MemorySegment context, MemorySegment sql_column, MemorySegment provided_out, MemorySegment scale_out, MemorySegment arbitrary_scale_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_scale.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_scale", context, sql_column, provided_out, scale_out, arbitrary_scale_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, provided_out, scale_out, arbitrary_scale_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_column_get_nullable {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_nullable");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_nullable(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *nullable_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_nullable$descriptor() {
+        return tsurugi_ffi_sql_column_get_nullable.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_nullable(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *nullable_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_nullable$handle() {
+        return tsurugi_ffi_sql_column_get_nullable.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_nullable(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *nullable_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_nullable$address() {
+        return tsurugi_ffi_sql_column_get_nullable.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_nullable(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *nullable_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_nullable(MemorySegment context, MemorySegment sql_column, MemorySegment provided_out, MemorySegment nullable_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_nullable.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_nullable", context, sql_column, provided_out, nullable_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, provided_out, nullable_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_column_get_varying {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_varying");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_varying(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *varying_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_varying$descriptor() {
+        return tsurugi_ffi_sql_column_get_varying.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_varying(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *varying_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_varying$handle() {
+        return tsurugi_ffi_sql_column_get_varying.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_varying(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *varying_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_varying$address() {
+        return tsurugi_ffi_sql_column_get_varying.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_varying(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, _Bool *provided_out, _Bool *varying_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_varying(MemorySegment context, MemorySegment sql_column, MemorySegment provided_out, MemorySegment varying_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_varying.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_varying", context, sql_column, provided_out, varying_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, provided_out, varying_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_column_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

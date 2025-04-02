@@ -45,6 +45,11 @@ mod test {
         let c = &columns[1];
         assert_eq!("v", c.name());
         assert_eq!(Some(AtomType::Date), c.atom_type());
+        assert_eq!(None, c.length());
+        assert_eq!(None, c.precision());
+        assert_eq!(None, c.scale());
+        assert_eq!(None, c.nullable());
+        assert_eq!(None, c.varying());
     }
 
     fn generate_values(minus: bool) -> Vec<(i32, Option<NaiveDate>)> {
@@ -121,6 +126,11 @@ mod test {
         let c = &columns[1];
         assert_eq!("v", c.name());
         assert_eq!(Some(AtomType::Date), c.atom_type());
+        assert_eq!(None, c.length());
+        assert_eq!(None, c.precision());
+        assert_eq!(None, c.scale());
+        assert_eq!(None, c.nullable());
+        assert_eq!(None, c.varying());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {
