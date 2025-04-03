@@ -8,7 +8,7 @@ on:
       tsurugi_version:
         type: string
         default: 'snapshot'
-      os_version:
+      os:
         type: string
         default: 'ubuntu-22.04'
       tsurugi_loglevel:
@@ -17,33 +17,24 @@ on:
 
 jobs:
   Build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-22.04, ubuntu-24.04]
-    runs-on: [self-hosted, docker]
+    runs-on: ${{ inputs.os || 'ubuntu-22.04' }}
     permissions:
       checks: write
       contents: read
     timeout-minutes: 30
-    container:
-      image: ghcr.io/project-tsurugi/tsurugi-ci:${{ matrix.os }}
-      volumes:
-        - ${{ vars.gradle_cache_dir }}:/root/.gradle
     defaults:
       run:
         shell: bash
     env:
-      DBTEST_ENDPOINT      : ${{ matrix.os == 'ubuntu-22.04' && 'tcp://localhost:12345' || 'tcp://tsurugi:12345' }}
-      DBTEST_ENDPOINT_JAVA : ${{ matrix.os == 'ubuntu-22.04' && 'ipc:tsurugi' || 'tcp://tsurugi:12345' }}
-      TSURUGI_HOME         : ${{ github.workspace }}/tsurugi
-      GH_TOKEN             : ${{ github.token }}
+      DBTEST_ENDPOINT      : tcp://localhost:12345
+      DBTEST_ENDPOINT_JAVA : tcp://localhost:12345
       GLOG_v               : ${{ inputs.tsurugi_loglevel || 30 }}
-      GLOG_logtostderr     : 1
 
     services:
       tsurugi:
-        image: ghcr.io/project-tsurugi/tsurugidb:${{ inputs.tsurugi_version || 'snapshot' }}-${{ inputs.os_version || 'ubuntu-22.04' }}
+        image: ghcr.io/project-tsurugi/tsurugidb:${{ inputs.tsurugi_version || 'snapshot' }}-${{ inputs.os || 'ubuntu-22.04' }}
+        ports:
+          - 12345:12345
         env:
           GLOG_v: ${{ inputs.tsurugi_loglevel || 30 }}
 
@@ -51,14 +42,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install_Tsurugidb_Local
-        if: ${{ matrix.os == 'ubuntu-22.04' }}
+      - name: Apt_Install
         run: |
-          RUN_ID=$(gh run list -R project-tsurugi/tsurugidb -b master -s success -w tsurugidb-CI -L 1 --json databaseId -q '.[].databaseId')
-          gh run download ${RUN_ID} --repo project-tsurugi/tsurugidb --pattern binary-archive-${{ matrix.os }}
-          tar xf binary-archive-${{ matrix.os }}/tsurugidb-bin-*.tar.gz
-
-          sed -i '/\[stream_endpoint\]/,/^\[/{s/^\([[:space:]]*\)#enabled[[:space:]]*=[[:space:]]*false/\1enabled=true/}' tsurugi/var/etc/tsurugi.ini
+          if command -v apt-get > /dev/null; then
+            sudo apt-get update -y
+            sudo apt-get install -y protobuf-compiler
+          fi
 
       - name: Test_Core
         run: |
@@ -68,17 +57,9 @@ jobs:
 
       - name: Test_DBTest
         run: |
-          if [ -d ${TSURUGI_HOME} ]; then
-            ${TSURUGI_HOME}/bin/tgctl start
-          fi
-
           cd tsubakuro-rust-dbtest
           cargo run ${DBTEST_ENDPOINT}
           cargo test "" -- --test-threads=1 endpoint=${DBTEST_ENDPOINT}
-
-          if [ -d ${TSURUGI_HOME} ]; then
-            ${TSURUGI_HOME}/bin/tgctl shutdown
-          fi
 
       - name: Build_FFI
         run: |
@@ -87,16 +68,8 @@ jobs:
 
       - name: Test_Java
         run: |
-          if [ -d ${TSURUGI_HOME} ]; then
-            ${TSURUGI_HOME}/bin/tgctl start
-          fi
-
           cd tsubakuro-rust-java
           ./gradlew test -Pffi.library.path=${GITHUB_WORKSPACE}/tsubakuro-rust-ffi/target/release/libtsubakuro_rust_ffi.so -Pdbtest.endpoint=${DBTEST_ENDPOINT} -Pdbtest.endpoint.java=${DBTEST_ENDPOINT_JAVA}
-
-          if [ -d ${TSURUGI_HOME} ]; then
-            ${TSURUGI_HOME}/bin/tgctl shutdown
-          fi
 
       - name: Lint_Core
         run: |
@@ -109,7 +82,7 @@ jobs:
           cargo clippy
 
       - name: Publish_Core
-        if: matrix.os == 'ubuntu-22.04' && github.repository_owner == 'project-tsurugi' && contains(github.ref, '/tags/')
+        if: github.repository_owner == 'project-tsurugi' && contains(github.ref, '/tags/')
         run: |
           cd tsubakuro-rust-core
           cargo publish
