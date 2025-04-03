@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -22,7 +23,8 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
 class TgFfiSqlExecuteResultTest extends TgFfiTester {
 
-    private void before() {
+    @BeforeEach
+    void before() {
         dropIfExists("test");
 
         try (var context = TgFfiContext.create(getFfiObjectManager())) {
@@ -60,8 +62,6 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
     }
 
     private void getRows(boolean prepare, String pattern) {
-        before();
-
         var manager = getFfiObjectManager();
         var context = TgFfiContext.create(manager);
 
