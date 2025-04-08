@@ -2048,6 +2048,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_execute_async(
 ///
 /// # Returns
 /// - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
+///   A `SqlQueryResult` instance can only be used while the transaction is alive.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query(
     context: TsurugiFfiContextHandle,
@@ -2110,6 +2111,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_query(
 ///
 /// # Returns
 /// - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
+///   A `SqlQueryResult` instance can only be used while the transaction is alive.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_query_for(
     context: TsurugiFfiContextHandle,

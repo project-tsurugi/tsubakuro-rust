@@ -202,6 +202,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_get_metadata(
 
 /// SqlQueryResult: Next row.
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::next_row`].
 ///
 /// # Receiver
@@ -242,6 +244,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row(
 }
 
 /// SqlQueryResult: Next row.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::next_row_for`].
 ///
@@ -295,6 +299,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_row_for(
 
 /// SqlQueryResult: Next column.
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::next_column`].
 ///
 /// # Receiver
@@ -335,6 +341,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column(
 }
 
 /// SqlQueryResult: Next column.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::next_column_for`].
 ///
@@ -388,6 +396,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_next_column_for(
 
 /// SqlQueryResult: Whether the column on this cursor is `NULL` or not.
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::is_null`].
 ///
 /// # Receiver
@@ -426,6 +436,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_is_null(
 }
 
 /// SqlQueryResult: fetch boolean (boolean).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch`].
 ///
@@ -474,6 +486,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_boolean(
 }
 
 /// SqlQueryResult: fetch boolean (boolean).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -532,8 +546,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_boolean(
     rc
 }
 
-
 /// SqlQueryResult: fetch int4 (int).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch`].
 ///
@@ -582,6 +597,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int4(
 }
 
 /// SqlQueryResult: fetch int4 (int).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -642,6 +659,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int4(
 
 /// SqlQueryResult: fetch int8 (bigint).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -689,6 +708,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_int8(
 }
 
 /// SqlQueryResult: fetch int8 (bigint).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -749,6 +770,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_int8(
 
 /// SqlQueryResult: fetch float4 (real).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -796,6 +819,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float4(
 }
 
 /// SqlQueryResult: fetch float4 (real).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -856,6 +881,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float4(
 
 /// SqlQueryResult: fetch float8 (double).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -903,6 +930,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_float8(
 }
 
 /// SqlQueryResult: fetch float8 (double).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -962,6 +991,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_float8(
 }
 
 /// SqlQueryResult: fetch decimal.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch`].
 ///
@@ -1045,6 +1076,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal(
 }
 
 /// SqlQueryResult: fetch decimal.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -1139,6 +1172,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal(
 
 /// SqlQueryResult: fetch decimal.
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -1210,6 +1245,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_decimal_i128(
 }
 
 /// SqlQueryResult: fetch decimal.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -1293,6 +1330,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(
 
 /// SqlQueryResult: fetch character (char/varchar).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -1342,6 +1381,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_character(
 }
 
 /// SqlQueryResult: fetch character (char/varchar).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -1402,7 +1443,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_character(
     rc
 }
 
-/// SqlQueryResult: fetch octet.
+/// SqlQueryResult: fetch octet (binary/varbinary).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch`].
 ///
@@ -1463,7 +1506,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_octet(
     rc
 }
 
-/// SqlQueryResult: fetch octet.
+/// SqlQueryResult: fetch octet (binary/varbinary).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -1541,6 +1586,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_octet(
 
 /// SqlQueryResult: fetch date.
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -1589,6 +1636,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_date(
 }
 
 /// SqlQueryResult: fetch date.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -1650,6 +1699,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_date(
 
 /// SqlQueryResult: fetch time of day (time).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -1699,6 +1750,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day(
 }
 
 /// SqlQueryResult: fetch time of day (time).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -1760,6 +1813,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day(
 
 /// SqlQueryResult: fetch time point (timestamp).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -1818,6 +1873,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point(
 }
 
 /// SqlQueryResult: fetch time point (timestamp).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -1888,6 +1945,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point(
 
 /// SqlQueryResult: fetch time of day with time zone (time with time zone).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -1946,6 +2005,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(
 }
 
 /// SqlQueryResult: fetch time of day with time zone (time with time zone).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -2017,6 +2078,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_z
 
 /// SqlQueryResult: fetch time point with time zone (timestamp with time zone).
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -2081,6 +2144,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(
 }
 
 /// SqlQueryResult: fetch time point with time zone (timestamp with time zone).
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -2158,6 +2223,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
 
 /// SqlQueryResult: fetch blob.
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -2208,6 +2275,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
 }
 
 /// SqlQueryResult: fetch blob.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///
@@ -2270,6 +2339,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
 
 /// SqlQueryResult: fetch clob.
 ///
+/// This method can only be used while the transaction is alive.
+///
 /// See [`SqlQueryResult::fetch`].
 ///
 /// Retrieves a value on the column of the cursor position.
@@ -2320,6 +2391,8 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
 }
 
 /// SqlQueryResult: fetch clob.
+///
+/// This method can only be used while the transaction is alive.
 ///
 /// See [`SqlQueryResult::fetch_for`].
 ///

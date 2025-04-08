@@ -10,6 +10,8 @@ impl SqlQueryResultFetch<rust_decimal::Decimal> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<rust_decimal::Decimal, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -17,6 +19,8 @@ impl SqlQueryResultFetch<rust_decimal::Decimal> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<rust_decimal::Decimal, TgError> {
         let timeout = Timeout::new(timeout);
         let (coefficient_bytes, coefficient, exponent) =

@@ -22,6 +22,8 @@ use super::value_stream::ResultSetValueStream;
 
 /// Represents a server side SQL result set.
 ///
+/// A `SqlQueryResult` instance can only be used while the transaction is alive.
+///
 /// **thread unsafe**
 ///
 /// # Examples
@@ -226,11 +228,15 @@ pub trait SqlQueryResultFetch<T> {
     /// Retrieves a value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<T, TgError>;
 
     /// Retrieves a value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<T, TgError>;
 }
 
@@ -239,6 +245,8 @@ impl SqlQueryResultFetch<bool> for SqlQueryResult {
     /// Retrieves a `BOOLEAN` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<bool, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         self.value_stream.fetch_boolean_value(&timeout).await
@@ -247,6 +255,8 @@ impl SqlQueryResultFetch<bool> for SqlQueryResult {
     /// Retrieves a `BOOLEAN` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<bool, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_boolean_value(&timeout).await
@@ -258,6 +268,8 @@ impl SqlQueryResultFetch<i32> for SqlQueryResult {
     /// Retrieves a `INT4` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<i32, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         self.value_stream.fetch_int4_value(&timeout).await
@@ -266,6 +278,8 @@ impl SqlQueryResultFetch<i32> for SqlQueryResult {
     /// Retrieves a `INT4` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<i32, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_int4_value(&timeout).await
@@ -277,6 +291,8 @@ impl SqlQueryResultFetch<i64> for SqlQueryResult {
     /// Retrieves a `INT8` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<i64, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         self.value_stream.fetch_int8_value(&timeout).await
@@ -285,6 +301,8 @@ impl SqlQueryResultFetch<i64> for SqlQueryResult {
     /// Retrieves a `INT8` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<i64, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_int8_value(&timeout).await
@@ -296,6 +314,8 @@ impl SqlQueryResultFetch<f32> for SqlQueryResult {
     /// Retrieves a `FLOAT4` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<f32, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         self.value_stream.fetch_float4_value(&timeout).await
@@ -304,6 +324,8 @@ impl SqlQueryResultFetch<f32> for SqlQueryResult {
     /// Retrieves a `FLOAT4` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<f32, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_float4_value(&timeout).await
@@ -315,6 +337,8 @@ impl SqlQueryResultFetch<f64> for SqlQueryResult {
     /// Retrieves a `FLOAT8` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<f64, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         self.value_stream.fetch_float8_value(&timeout).await
@@ -323,6 +347,8 @@ impl SqlQueryResultFetch<f64> for SqlQueryResult {
     /// Retrieves a `FLOAT8` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<f64, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_float8_value(&timeout).await
@@ -334,6 +360,8 @@ impl SqlQueryResultFetch<TgDecimalResult> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgDecimalResult, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -341,6 +369,8 @@ impl SqlQueryResultFetch<TgDecimalResult> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgDecimalResult, TgError> {
         let timeout = Timeout::new(timeout);
         let (coefficient_bytes, coefficient, exponent) =
@@ -359,6 +389,8 @@ impl SqlQueryResultFetch<TgDecimalI128> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgDecimalI128, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -366,6 +398,8 @@ impl SqlQueryResultFetch<TgDecimalI128> for SqlQueryResult {
     /// Retrieves a `DECIMAL` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgDecimalI128, TgError> {
         let value: TgDecimalResult = self.fetch_for(timeout).await?;
         TgDecimalI128::try_from(value)
@@ -377,6 +411,8 @@ impl SqlQueryResultFetch<String> for SqlQueryResult {
     /// Retrieves a `CHARACTER` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<String, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         self.value_stream.fetch_character_value(&timeout).await
@@ -385,6 +421,8 @@ impl SqlQueryResultFetch<String> for SqlQueryResult {
     /// Retrieves a `CHARACTER` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<String, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_character_value(&timeout).await
@@ -396,6 +434,8 @@ impl SqlQueryResultFetch<BytesMut> for SqlQueryResult {
     /// Retrieves a `OCTET` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<BytesMut, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         self.value_stream.fetch_octet_value(&timeout).await
@@ -404,6 +444,8 @@ impl SqlQueryResultFetch<BytesMut> for SqlQueryResult {
     /// Retrieves a `OCTET` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<BytesMut, TgError> {
         let timeout = Timeout::new(timeout);
         self.value_stream.fetch_octet_value(&timeout).await
@@ -415,6 +457,8 @@ impl SqlQueryResultFetch<Vec<u8>> for SqlQueryResult {
     /// Retrieves a `OCTET` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<Vec<u8>, TgError> {
         let timeout = Timeout::new(self.default_timeout);
         let value = self.value_stream.fetch_octet_value(&timeout).await?;
@@ -424,6 +468,8 @@ impl SqlQueryResultFetch<Vec<u8>> for SqlQueryResult {
     /// Retrieves a `OCTET` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<Vec<u8>, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_octet_value(&timeout).await?;
@@ -436,6 +482,8 @@ impl SqlQueryResultFetch<TgDate> for SqlQueryResult {
     /// Retrieves a `DATE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgDate, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -443,6 +491,8 @@ impl SqlQueryResultFetch<TgDate> for SqlQueryResult {
     /// Retrieves a `DATE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgDate, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_date_value(&timeout).await?;
@@ -455,6 +505,8 @@ impl SqlQueryResultFetch<TgTimeOfDay> for SqlQueryResult {
     /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgTimeOfDay, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -462,6 +514,8 @@ impl SqlQueryResultFetch<TgTimeOfDay> for SqlQueryResult {
     /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgTimeOfDay, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
@@ -474,6 +528,8 @@ impl SqlQueryResultFetch<TgTimePoint> for SqlQueryResult {
     /// Retrieves a `TIME_POINT` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgTimePoint, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -481,6 +537,8 @@ impl SqlQueryResultFetch<TgTimePoint> for SqlQueryResult {
     /// Retrieves a `TIME_POINT` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgTimePoint, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_time_point_value(&timeout).await?;
@@ -493,6 +551,8 @@ impl SqlQueryResultFetch<TgTimeOfDayWithTimeZone> for SqlQueryResult {
     /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgTimeOfDayWithTimeZone, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -500,6 +560,8 @@ impl SqlQueryResultFetch<TgTimeOfDayWithTimeZone> for SqlQueryResult {
     /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgTimeOfDayWithTimeZone, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self
@@ -515,6 +577,8 @@ impl SqlQueryResultFetch<TgTimePointWithTimeZone> for SqlQueryResult {
     /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgTimePointWithTimeZone, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -522,6 +586,8 @@ impl SqlQueryResultFetch<TgTimePointWithTimeZone> for SqlQueryResult {
     /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgTimePointWithTimeZone, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self
@@ -537,6 +603,8 @@ impl SqlQueryResultFetch<TgBlobReference> for SqlQueryResult {
     /// Retrieves a `BLOB` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgBlobReference, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -544,6 +612,8 @@ impl SqlQueryResultFetch<TgBlobReference> for SqlQueryResult {
     /// Retrieves a `BLOB` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgBlobReference, TgError> {
         let timeout = Timeout::new(timeout);
         let (provider, object_id) = self.value_stream.fetch_blob(&timeout).await?;
@@ -556,6 +626,8 @@ impl SqlQueryResultFetch<TgClobReference> for SqlQueryResult {
     /// Retrieves a `CLOB` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<TgClobReference, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -563,6 +635,8 @@ impl SqlQueryResultFetch<TgClobReference> for SqlQueryResult {
     /// Retrieves a `CLOB` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgClobReference, TgError> {
         let timeout = Timeout::new(timeout);
         let (provider, object_id) = self.value_stream.fetch_clob(&timeout).await?;

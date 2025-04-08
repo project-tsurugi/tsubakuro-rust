@@ -10,6 +10,8 @@ impl SqlQueryResultFetch<chrono::NaiveDate> for SqlQueryResult {
     /// Retrieves a `DATE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<chrono::NaiveDate, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -17,6 +19,8 @@ impl SqlQueryResultFetch<chrono::NaiveDate> for SqlQueryResult {
     /// Retrieves a `DATE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDate, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_date_value(&timeout).await?;
@@ -43,6 +47,8 @@ impl SqlQueryResultFetch<chrono::NaiveTime> for SqlQueryResult {
     /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<chrono::NaiveTime, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -50,6 +56,8 @@ impl SqlQueryResultFetch<chrono::NaiveTime> for SqlQueryResult {
     /// Retrieves a `TIME_OF_DAY` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveTime, TgError> {
         let timeout = Timeout::new(timeout);
         let value = self.value_stream.fetch_time_of_day_value(&timeout).await?;
@@ -78,6 +86,8 @@ impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
     /// Retrieves a `TIME_POINT` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<chrono::NaiveDateTime, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -85,6 +95,8 @@ impl SqlQueryResultFetch<chrono::NaiveDateTime> for SqlQueryResult {
     /// Retrieves a `TIME_POINT` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(&mut self, timeout: Duration) -> Result<chrono::NaiveDateTime, TgError> {
         let timeout = Timeout::new(timeout);
         let (epoch_seconds, nanos) = self.value_stream.fetch_time_point_value(&timeout).await?;
@@ -111,6 +123,8 @@ impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryR
     /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<(chrono::NaiveTime, chrono::FixedOffset), TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -118,6 +132,8 @@ impl SqlQueryResultFetch<(chrono::NaiveTime, chrono::FixedOffset)> for SqlQueryR
     /// Retrieves a `TIME_OF_DAY_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(
         &mut self,
         timeout: Duration,
@@ -160,6 +176,8 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::FixedOffset>> for SqlQueryResu
     /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<chrono::DateTime<chrono::FixedOffset>, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -167,6 +185,8 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::FixedOffset>> for SqlQueryResu
     /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(
         &mut self,
         timeout: Duration,
@@ -223,6 +243,8 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::Utc>> for SqlQueryResult {
     /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch(&mut self) -> Result<chrono::DateTime<chrono::Utc>, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -230,6 +252,8 @@ impl SqlQueryResultFetch<chrono::DateTime<chrono::Utc>> for SqlQueryResult {
     /// Retrieves a `TIME_POINT_WITH_TIME_ZONE` value on the column of the cursor position.
     ///
     /// You can only take once to retrieve the value on the column.
+    ///
+    /// This method can only be used while the transaction is alive.
     async fn fetch_for(
         &mut self,
         timeout: Duration,

@@ -1719,6 +1719,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_get_metadata(TsurugiFfiContextHandle c
 /**
  * SqlQueryResult: Next row.
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::next_row`].
  *
  * # Receiver
@@ -1733,6 +1735,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_next_row(TsurugiFfiContextHandle conte
 
 /**
  * SqlQueryResult: Next row.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::next_row_for`].
  *
@@ -1753,6 +1757,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_next_row_for(TsurugiFfiContextHandle c
 /**
  * SqlQueryResult: Next column.
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::next_column`].
  *
  * # Receiver
@@ -1767,6 +1773,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_next_column(TsurugiFfiContextHandle co
 
 /**
  * SqlQueryResult: Next column.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::next_column_for`].
  *
@@ -1787,6 +1795,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_next_column_for(TsurugiFfiContextHandl
 /**
  * SqlQueryResult: Whether the column on this cursor is `NULL` or not.
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::is_null`].
  *
  * # Receiver
@@ -1801,6 +1811,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_is_null(TsurugiFfiContextHandle contex
 
 /**
  * SqlQueryResult: fetch boolean (boolean).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch`].
  *
@@ -1823,6 +1835,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_boolean(TsurugiFfiContextHandle 
 
 /**
  * SqlQueryResult: fetch boolean (boolean).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -1850,6 +1864,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_boolean(TsurugiFfiContextHan
 /**
  * SqlQueryResult: fetch int4 (int).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -1871,6 +1887,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int4(TsurugiFfiContextHandle con
 
 /**
  * SqlQueryResult: fetch int4 (int).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -1898,6 +1916,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int4(TsurugiFfiContextHandle
 /**
  * SqlQueryResult: fetch int8 (bigint).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -1919,6 +1939,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_int8(TsurugiFfiContextHandle con
 
 /**
  * SqlQueryResult: fetch int8 (bigint).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -1946,6 +1968,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_int8(TsurugiFfiContextHandle
 /**
  * SqlQueryResult: fetch float4 (real).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -1967,6 +1991,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float4(TsurugiFfiContextHandle c
 
 /**
  * SqlQueryResult: fetch float4 (real).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -1994,6 +2020,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float4(TsurugiFfiContextHand
 /**
  * SqlQueryResult: fetch float8 (double).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2015,6 +2043,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_float8(TsurugiFfiContextHandle c
 
 /**
  * SqlQueryResult: fetch float8 (double).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2041,6 +2071,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_float8(TsurugiFfiContextHand
 
 /**
  * SqlQueryResult: fetch decimal.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch`].
  *
@@ -2069,6 +2101,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal(TsurugiFfiContextHandle 
 
 /**
  * SqlQueryResult: fetch decimal.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2102,6 +2136,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal(TsurugiFfiContextHan
 /**
  * SqlQueryResult: fetch decimal.
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2127,6 +2163,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_decimal_i128(TsurugiFfiContextHa
 
 /**
  * SqlQueryResult: fetch decimal.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2158,6 +2196,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_decimal_i128(TsurugiFfiConte
 /**
  * SqlQueryResult: fetch character (char/varchar).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2179,6 +2219,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_character(TsurugiFfiContextHandl
 
 /**
  * SqlQueryResult: fetch character (char/varchar).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2204,7 +2246,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_character(TsurugiFfiContextH
                                                               TsurugiFfiStringHandle *value_out);
 
 /**
- * SqlQueryResult: fetch octet.
+ * SqlQueryResult: fetch octet (binary/varbinary).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch`].
  *
@@ -2228,7 +2272,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_octet(TsurugiFfiContextHandle co
                                                       uint64_t *size_out);
 
 /**
- * SqlQueryResult: fetch octet.
+ * SqlQueryResult: fetch octet (binary/varbinary).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2258,6 +2304,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_octet(TsurugiFfiContextHandl
 /**
  * SqlQueryResult: fetch date.
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2279,6 +2327,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_date(TsurugiFfiContextHandle con
 
 /**
  * SqlQueryResult: fetch date.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2306,6 +2356,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_date(TsurugiFfiContextHandle
 /**
  * SqlQueryResult: fetch time of day (time).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2327,6 +2379,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day(TsurugiFfiContextHan
 
 /**
  * SqlQueryResult: fetch time of day (time).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2354,6 +2408,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day(TsurugiFfiContex
 /**
  * SqlQueryResult: fetch time point (timestamp).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2377,6 +2433,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point(TsurugiFfiContextHand
 
 /**
  * SqlQueryResult: fetch time point (timestamp).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2406,6 +2464,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point(TsurugiFfiContext
 /**
  * SqlQueryResult: fetch time of day with time zone (time with time zone).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2429,6 +2489,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone(Tsuru
 
 /**
  * SqlQueryResult: fetch time of day with time zone (time with time zone).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2458,6 +2520,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone(T
 /**
  * SqlQueryResult: fetch time point with time zone (timestamp with time zone).
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2483,6 +2547,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone(Tsurug
 
 /**
  * SqlQueryResult: fetch time point with time zone (timestamp with time zone).
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2514,6 +2580,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(Ts
 /**
  * SqlQueryResult: fetch blob.
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2535,6 +2603,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_blob(TsurugiFfiContextHandle con
 
 /**
  * SqlQueryResult: fetch blob.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -2562,6 +2632,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_blob(TsurugiFfiContextHandle
 /**
  * SqlQueryResult: fetch clob.
  *
+ * This method can only be used while the transaction is alive.
+ *
  * See [`SqlQueryResult::fetch`].
  *
  * Retrieves a value on the column of the cursor position.
@@ -2583,6 +2655,8 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_clob(TsurugiFfiContextHandle con
 
 /**
  * SqlQueryResult: fetch clob.
+ *
+ * This method can only be used while the transaction is alive.
  *
  * See [`SqlQueryResult::fetch_for`].
  *
@@ -3264,6 +3338,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_execute_async(TsurugiFfiContextHand
  *
  * # Returns
  * - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
+ *   A `SqlQueryResult` instance can only be used while the transaction is alive.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
                                           TsurugiFfiSqlClientHandle sql_client,
@@ -3286,6 +3361,7 @@ TsurugiFfiRc tsurugi_ffi_sql_client_query(TsurugiFfiContextHandle context,
  *
  * # Returns
  * - `query_result_out` - query result. To dispose, call [`tsurugi_ffi_query_result_dispose`](crate::service::sql::query_result::tsurugi_ffi_sql_query_result_dispose).
+ *   A `SqlQueryResult` instance can only be used while the transaction is alive.
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_query_for(TsurugiFfiContextHandle context,
                                               TsurugiFfiSqlClientHandle sql_client,
