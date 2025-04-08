@@ -44,11 +44,11 @@ mod test {
         let c = &columns[1];
         assert_eq!("v", c.name());
         assert_eq!(Some(AtomType::Octet), c.atom_type());
-        assert_eq!(None, c.length());
+        assert_eq!(Some((4, false)), c.length());
         assert_eq!(None, c.precision());
         assert_eq!(None, c.scale());
-        assert_eq!(None, c.nullable());
-        assert_eq!(None, c.varying());
+        assert_eq!(Some(true), c.nullable());
+        assert_eq!(Some(true), c.varying());
     }
 
     fn generate_values() -> Vec<(i32, Option<Vec<u8>>)> {

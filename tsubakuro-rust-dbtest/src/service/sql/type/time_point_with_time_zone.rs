@@ -53,7 +53,7 @@ mod test {
         assert_eq!(None, c.length());
         assert_eq!(None, c.precision());
         assert_eq!(None, c.scale());
-        assert_eq!(None, c.nullable());
+        assert_eq!(Some(true), c.nullable());
         assert_eq!(None, c.varying());
     }
 
