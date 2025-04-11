@@ -605,6 +605,8 @@ impl SqlQueryResultFetch<TgBlobReference> for SqlQueryResult {
     /// You can only take once to retrieve the value on the column.
     ///
     /// This method can only be used while the transaction is alive.
+    ///
+    /// See [`SqlClient::open_blob`](crate::prelude::SqlClient::open_blob), [`copy_blob_to`](crate::prelude::SqlClient::copy_blob_to).
     async fn fetch(&mut self) -> Result<TgBlobReference, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -614,6 +616,8 @@ impl SqlQueryResultFetch<TgBlobReference> for SqlQueryResult {
     /// You can only take once to retrieve the value on the column.
     ///
     /// This method can only be used while the transaction is alive.
+    ///
+    /// See [`SqlClient::open_blob`](crate::prelude::SqlClient::open_blob), [`copy_blob_to`](crate::prelude::SqlClient::copy_blob_to).
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgBlobReference, TgError> {
         let timeout = Timeout::new(timeout);
         let (provider, object_id) = self.value_stream.fetch_blob(&timeout).await?;
@@ -628,6 +632,8 @@ impl SqlQueryResultFetch<TgClobReference> for SqlQueryResult {
     /// You can only take once to retrieve the value on the column.
     ///
     /// This method can only be used while the transaction is alive.
+    ///
+    /// See [`SqlClient::open_clob`](crate::prelude::SqlClient::open_clob), [`copy_clob_to`](crate::prelude::SqlClient::copy_clob_to).
     async fn fetch(&mut self) -> Result<TgClobReference, TgError> {
         self.fetch_for(self.default_timeout).await
     }
@@ -637,6 +643,8 @@ impl SqlQueryResultFetch<TgClobReference> for SqlQueryResult {
     /// You can only take once to retrieve the value on the column.
     ///
     /// This method can only be used while the transaction is alive.
+    ///
+    /// See [`SqlClient::open_clob`](crate::prelude::SqlClient::open_clob), [`copy_clob_to`](crate::prelude::SqlClient::copy_clob_to).
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgClobReference, TgError> {
         let timeout = Timeout::new(timeout);
         let (provider, object_id) = self.value_stream.fetch_clob(&timeout).await?;
