@@ -13,5 +13,5 @@ log = "0.4.22"
 rust_decimal = "1.36.0"
 tempfile = "3.17.1"
 time = "0.3.37"
-tokio = { version = "1.42.0", features = ["macros"] }
+tokio = { version = "1.43.1", features = ["macros"] }
 tsubakuro-rust-core = { path = "../tsubakuro-rust-core" }
