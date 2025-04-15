@@ -41,12 +41,17 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
         final TgFfiSqlPreparedStatement preparedStatement;
         final TgFfiTransaction transaction;
         final TgFfiSqlQueryResult queryResult;
+        final boolean commitOnClose;
 
         public TestResource() {
-            this(false, DIRECT, "select * from test order by foo");
+            this(false, DIRECT, "select * from test order by foo", false);
         }
 
         public TestResource(boolean prepare, String pattern, String sql) {
+            this(prepare, pattern, sql, true);
+        }
+
+        public TestResource(boolean prepare, String pattern, String sql, boolean commitOnClose) {
             var manager = getFfiObjectManager();
             try (var context = TgFfiContext.create(manager)) {
                 this.context = TgFfiContext.create(manager);
@@ -85,6 +90,7 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                     }
                 }
             }
+            this.commitOnClose = commitOnClose;
         }
 
         @Override
@@ -92,7 +98,11 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
             try (context; client; preparedStatement; transaction) {
                 try (queryResult) {
                 }
-                commit(client, transaction);
+                if (this.commitOnClose) {
+                    commit(client, transaction);
+                } else {
+                    client.rollback(context, transaction);
+                }
             }
         }
     }
