@@ -18,6 +18,7 @@ use super::atom_type::TsurugiFfiAtomType;
 pub(crate) struct TsurugiFfiSqlColumn {
     sql_column: SqlColumn,
     name: Option<CString>,
+    description: Option<CString>,
 }
 
 impl TsurugiFfiSqlColumn {
@@ -25,6 +26,7 @@ impl TsurugiFfiSqlColumn {
         TsurugiFfiSqlColumn {
             sql_column,
             name: None,
+            description: None,
         }
     }
 }
@@ -76,8 +78,8 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_name(
     let sql_column = unsafe { &mut *sql_column };
 
     if sql_column.name.is_none() {
-        let table_name = sql_column.name().clone();
-        cchar_field_set!(context, sql_column.name, table_name);
+        let column_name = sql_column.name().clone();
+        cchar_field_set!(context, sql_column.name, column_name);
     }
 
     let ptr = cstring_to_cchar!(sql_column.name);
@@ -428,6 +430,51 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_varying(
         provided,
         varying,
     );
+    rc
+}
+
+/// SqlColumn: Get description.
+///
+/// See [`SqlColumn::description`].
+///
+/// # Receiver
+/// - `sql_column` - Sql column.
+///
+/// # Returns
+/// - `description_out` - column description (nullable).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_column_get_description(
+    context: TsurugiFfiContextHandle,
+    sql_column: TsurugiFfiSqlColumnHandle,
+    description_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_description()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_column={:?}, description_out={:?}",
+        context,
+        sql_column,
+        description_out
+    );
+
+    ffi_arg_out_initialize!(description_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, description_out);
+
+    let sql_column = unsafe { &mut *sql_column };
+
+    if sql_column.description.is_none() {
+        if let Some(description) = sql_column.description().clone() {
+            cchar_field_set!(context, sql_column.description, description.clone());
+        }
+    }
+
+    let ptr = cstring_to_cchar!(sql_column.description);
+    unsafe {
+        *description_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (description={:?})", rc, ptr);
     rc
 }
 

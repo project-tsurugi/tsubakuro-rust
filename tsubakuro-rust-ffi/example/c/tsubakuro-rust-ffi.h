@@ -958,6 +958,21 @@ TsurugiFfiRc tsurugi_ffi_sql_column_get_varying(TsurugiFfiContextHandle context,
                                                 bool *varying_out);
 
 /**
+ * SqlColumn: Get description.
+ *
+ * See [`SqlColumn::description`].
+ *
+ * # Receiver
+ * - `sql_column` - Sql column.
+ *
+ * # Returns
+ * - `description_out` - column description (nullable).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_column_get_description(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiSqlColumnHandle sql_column,
+                                                    TsurugiFfiStringHandle *description_out);
+
+/**
  * SqlColumn: Dispose.
  *
  * # Receiver
@@ -3781,6 +3796,21 @@ TsurugiFfiRc tsurugi_ffi_table_metadata_get_schema_name(TsurugiFfiContextHandle 
 TsurugiFfiRc tsurugi_ffi_table_metadata_get_table_name(TsurugiFfiContextHandle context,
                                                        TsurugiFfiTableMetadataHandle table_metadata,
                                                        TsurugiFfiStringHandle *table_name_out);
+
+/**
+ * TableMetadata: Get description.
+ *
+ * See [`TableMetadata::description`].
+ *
+ * # Receiver
+ * - `table_metadata` - Table metadata.
+ *
+ * # Returns
+ * - `description_out` - description (nullable).
+ */
+TsurugiFfiRc tsurugi_ffi_table_metadata_get_description(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiTableMetadataHandle table_metadata,
+                                                        TsurugiFfiStringHandle *description_out);
 
 /**
  * TableMetadata: Get columns size.

@@ -49,6 +49,16 @@ public class TgFfiTableMetadata extends TgFfiObject {
         return outToString(out);
     }
 
+    public synchronized String getDescription(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_description(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToString(out);
+    }
+
     public synchronized List<TgFfiSqlColumn> getColumns(TgFfiContext context) {
         if (this.columns == null) {
             this.columns = createColumns(context);

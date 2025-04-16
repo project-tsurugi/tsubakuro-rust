@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
@@ -21,9 +22,15 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
     @BeforeAll
     static void beforeAll() {
         dropAndCreateTable("test", """
+                /**
+                 test table.
+                 */
                 create table test (
+                  /** primary key */
                   foo int primary key,
+                  /** long value */
                   bar bigint,
+                  /** text value */
                   zzz varchar(10)
                 )""");
     }
@@ -41,6 +48,8 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
             assertEquals("", schemaName);
             var tableName = metadata.getTableName(context);
             assertEquals("test", tableName);
+            var description = metadata.getDescription(context);
+            assertEquals(null, description);
 
             var columns = metadata.getColumns(context);
             assertEquals(3, columns.size());
@@ -50,16 +59,20 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
                 var column = columns.get(i++);
                 assertEquals("foo", column.getName(context));
                 assertEquals(TgFfiAtomType.INT4, column.getAtomType(context));
+                assertEquals(null, column.getDescription(context));
             }
             {
                 var column = columns.get(i++);
                 assertEquals("bar", column.getName(context));
                 assertEquals(TgFfiAtomType.INT8, column.getAtomType(context));
+                assertEquals(null, column.getDescription(context));
             }
             {
                 var column = columns.get(i++);
                 assertEquals("zzz", column.getName(context));
                 assertEquals(TgFfiAtomType.CHARACTER, column.getAtomType(context));
+                assertTrue(column.getVarying(context));
+                assertEquals(null, column.getDescription(context));
             }
         }
     }
@@ -72,6 +85,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
             get_database_name_argError(context, metadata);
             get_schema_name_argError(context, metadata);
             get_table_name_argError(context, metadata);
+            get_description_argError(context, metadata);
             get_columns_size_argError(context, metadata);
             get_columns_value_argError(context, metadata);
         }
@@ -130,6 +144,25 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
             var handle = metadata.handle();
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_table_name(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+    }
+
+    private void get_description_argError(TgFfiContext context, TgFfiTableMetadata metadata) {
+        var manager = getFfiObjectManager();
+
+        {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var out = manager.allocatePtrOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_description(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        {
+            var ctx = context.handle();
+            var handle = metadata.handle();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_description(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
     }

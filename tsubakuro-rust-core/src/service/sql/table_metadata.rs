@@ -44,6 +44,17 @@ impl TableMetadata {
         &self.describe_table.table_name
     }
 
+    /// Returns description of the table.
+    ///
+    /// since 0.2.0
+    pub fn description(&self) -> Option<&String> {
+        use crate::jogasaki::proto::sql::response::describe_table::success::DescriptionOpt;
+        match &self.describe_table.description_opt {
+            Some(DescriptionOpt::Description(description)) => Some(description),
+            _ => None,
+        }
+    }
+
     /// Returns the column information of the table.
     pub fn columns(&self) -> &Vec<SqlColumn> {
         &self.describe_table.columns

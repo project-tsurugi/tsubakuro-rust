@@ -87,4 +87,15 @@ impl SqlColumn {
             _ => None,
         }
     }
+
+    /// Returns description of the column.
+    ///
+    /// since 0.2.0
+    pub fn description(&self) -> Option<&String> {
+        use crate::jogasaki::proto::sql::common::column::DescriptionOpt;
+        match &self.description_opt {
+            Some(DescriptionOpt::Description(description)) => Some(description),
+            _ => None,
+        }
+    }
 }

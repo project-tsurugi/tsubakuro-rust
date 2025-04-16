@@ -21,6 +21,7 @@ pub(crate) struct TsurugiFfiTableMetadata {
     database_name: Option<CString>,
     schema_name: Option<CString>,
     table_name: Option<CString>,
+    description: Option<CString>,
 }
 
 impl TsurugiFfiTableMetadata {
@@ -30,6 +31,7 @@ impl TsurugiFfiTableMetadata {
             database_name: None,
             schema_name: None,
             table_name: None,
+            description: None,
         }
     }
 }
@@ -180,6 +182,51 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_table_name(
 
     let rc = rc_ok(context);
     trace!("{FUNCTION_NAME} end rc={:x}. (table_name={:?})", rc, ptr);
+    rc
+}
+
+/// TableMetadata: Get description.
+///
+/// See [`TableMetadata::description`].
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
+///
+/// # Returns
+/// - `description_out` - description (nullable).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_table_metadata_get_description(
+    context: TsurugiFfiContextHandle,
+    table_metadata: TsurugiFfiTableMetadataHandle,
+    description_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_description()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, table_metadata={:?}, description_out={:?}",
+        context,
+        table_metadata,
+        description_out
+    );
+
+    ffi_arg_out_initialize!(description_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, description_out);
+
+    let table_metadata = unsafe { &mut *table_metadata };
+
+    if table_metadata.description.is_none() {
+        if let Some(description) = table_metadata.description() {
+            cchar_field_set!(context, table_metadata.description, description.clone());
+        }
+    }
+
+    let ptr = cstring_to_cchar!(table_metadata.description);
+    unsafe {
+        *description_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (description={:?})", rc, ptr);
     rc
 }
 

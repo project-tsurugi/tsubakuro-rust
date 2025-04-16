@@ -52,6 +52,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(38), c.getPrecision(context));
                 assertEquals(ArbitraryInt.of(0), c.getScale(context));
                 assertNull(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -70,6 +71,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(10), c.getPrecision(context));
                 assertEquals(ArbitraryInt.of(0), c.getScale(context));
                 assertNull(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -88,6 +90,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(10), c.getPrecision(context));
                 assertEquals(ArbitraryInt.of(2), c.getScale(context));
                 assertNull(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -106,6 +109,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(38), c.getPrecision(context));
                 assertEquals(ArbitraryInt.of(0), c.getScale(context));
                 assertNull(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -124,6 +128,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(38), c.getPrecision(context));
                 assertEquals(ArbitraryInt.of(2), c.getScale(context));
                 assertNull(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -142,6 +147,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getPrecision(context));
                 assertNull(c.getScale(context));
                 assertFalse(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -160,6 +166,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getPrecision(context));
                 assertNull(c.getScale(context));
                 assertFalse(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -178,6 +185,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getPrecision(context));
                 assertNull(c.getScale(context));
                 assertTrue(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -196,6 +204,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getPrecision(context));
                 assertNull(c.getScale(context));
                 assertTrue(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -214,6 +223,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getPrecision(context));
                 assertNull(c.getScale(context));
                 assertTrue(c.getVarying(context));
+                assertNull(c.getDescription(context));
             }
         };
         tester.test();
@@ -270,6 +280,8 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             try (var context = TgFfiContext.create(manager); //
                     var client = createSqlClient()) {
                 try (var metadata = client.getTableMetadata(context, "test")) {
+                    assertNull(metadata.getDescription(context));
+
                     var columns = metadata.getColumns(context);
                     assertEquals(2, columns.size());
                     {
@@ -300,6 +312,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             assertNull(c.getPrecision(context));
             assertNull(c.getScale(context));
             assertNull(c.getVarying(context));
+            assertNull(c.getDescription(context));
         }
 
         private void testResultSetMetadata(Boolean nullable) {
@@ -331,6 +344,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                         // TODO assertEquals(scale, c.getScale(context));
                         // TODO assertEquals(nullable, c.getNullable(context));
                         // TODO assertEquals(varying, c.getVarying(context));
+                        assertNull(c.getDescription(context));
                     }
                 }
             }
@@ -350,6 +364,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             get_scale_argError(c);
             get_nullable_argError(c);
             get_varying_argError(c);
+            get_description_argError(c);
         }
     }
 
@@ -562,6 +577,24 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             var valueOut = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_varying(ctx, handle, providedOut, valueOut);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    private void get_description_argError(TgFfiSqlColumn c) {
+        var manager = getFfiObjectManager();
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var out = manager.allocatePtrOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_description(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = c.handle();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_description(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
     }
 }

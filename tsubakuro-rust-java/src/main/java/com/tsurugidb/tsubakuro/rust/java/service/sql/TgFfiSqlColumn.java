@@ -113,6 +113,16 @@ public class TgFfiSqlColumn extends TgFfiObject {
         }
     }
 
+    public synchronized String getDescription(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_get_description(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToString(out);
+    }
+
     @Override
     protected void dispose(MemorySegment handle) {
         tsubakuro_rust_ffi_h.tsurugi_ffi_sql_column_dispose(handle);

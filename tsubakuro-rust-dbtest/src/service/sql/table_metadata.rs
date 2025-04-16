@@ -21,11 +21,17 @@ mod test {
         create_table(
             &client,
             "test",
-            "create table test (
-        foo int primary key,
-        bar bigint,
-        zzz varchar(10)
-        )",
+            "/**
+ test table.
+ */
+ create table test (
+   /** primary key */
+   foo int primary key,
+   /** long value */
+   bar bigint,
+   /** text value */
+   zzz varchar(10)
+)",
         )
         .await;
 
@@ -34,18 +40,24 @@ mod test {
             assert_eq!("", metadata.database_name());
             assert_eq!("", metadata.schema_name());
             assert_eq!("test", metadata.table_name());
+            assert_eq!(None, metadata.description());
 
             let columns = metadata.columns();
             assert_eq!(3, columns.len());
             let c = &columns[0];
             assert_eq!("foo", c.name());
             assert_eq!(Some(AtomType::Int4), c.atom_type());
+            assert_eq!(None, c.description());
             let c = &columns[1];
             assert_eq!("bar", c.name());
             assert_eq!(Some(AtomType::Int8), c.atom_type());
+            assert_eq!(None, c.description());
             let c = &columns[2];
             assert_eq!("zzz", c.name());
             assert_eq!(Some(AtomType::Character), c.atom_type());
+            assert_eq!(Some(true), c.varying());
+            assert_eq!(Some((10, false)), c.length());
+            assert_eq!(None, c.description());
         }
     }
 
@@ -82,18 +94,24 @@ mod test {
             assert_eq!("", metadata.database_name());
             assert_eq!("", metadata.schema_name());
             assert_eq!("test", metadata.table_name());
+            assert_eq!(None, metadata.description());
 
             let columns = metadata.columns();
             assert_eq!(3, columns.len());
             let c = &columns[0];
             assert_eq!("foo", c.name());
             assert_eq!(Some(AtomType::Int4), c.atom_type());
+            assert_eq!(None, c.description());
             let c = &columns[1];
             assert_eq!("bar", c.name());
             assert_eq!(Some(AtomType::Int8), c.atom_type());
+            assert_eq!(None, c.description());
             let c = &columns[2];
             assert_eq!("zzz", c.name());
             assert_eq!(Some(AtomType::Character), c.atom_type());
+            assert_eq!(Some(true), c.varying());
+            assert_eq!(Some((10, false)), c.length());
+            assert_eq!(None, c.description());
         }
     }
 }
