@@ -126,6 +126,8 @@ public class TgFfiExampleMain {
         System.out.println("execute(): " + sql);
         try (var transaction = startOcc()) {
             try (var er = doExecute(transaction, sql)) {
+                long rows = er.getRows(context);
+                System.out.println("rows=" + rows);
             }
 
             doCommit(transaction);
