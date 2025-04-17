@@ -414,7 +414,7 @@ class TgFfiTypeClobTest extends TgFfiTester {
                 var t = Duration.ofSeconds(5).toNanos();
                 var out = manager.allocatePtrOut();
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_read_clob_for(ctx, handle, tx, arg1, t, out);
-                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
             try (var context = TgFfiContext.create(manager)) {
                 var ctx = context.handle();
