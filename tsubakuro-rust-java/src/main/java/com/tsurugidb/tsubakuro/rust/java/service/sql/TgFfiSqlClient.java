@@ -628,6 +628,58 @@ public class TgFfiSqlClient extends TgFfiObject {
         };
     }
 
+    public synchronized byte[] readBlob(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var out = allocatePtrOut();
+        var sizeOut = allocateLongOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_read_blob(ctx, handle, tx, arg1, out, sizeOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToBytesLong(out, sizeOut);
+    }
+
+    public synchronized byte[] readBlobFor(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var t = allocateDuration(timeout);
+        var out = allocatePtrOut();
+        var sizeOut = allocateLongOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_read_blob_for(ctx, handle, tx, arg1, t, out, sizeOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToBytesLong(out, sizeOut);
+    }
+
+    public synchronized String readClob(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_read_clob(ctx, handle, tx, arg1, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToString(out);
+    }
+
+    public synchronized String readClobFor(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var t = allocateDuration(timeout);
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_read_clob_for(ctx, handle, tx, arg1, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToString(out);
+    }
+
     public synchronized void copyBlobTo(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob, Path destination) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();

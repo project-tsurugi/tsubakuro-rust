@@ -181,6 +181,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
                 for (var value : values) {
                     var parameters = List.of(TgFfiSqlParameter.ofInt4(context, "pk", i), (value != null) ? ffiParameter(context, "value", value) : TgFfiSqlParameter.ofNull(context, "value"));
                     try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
+                        assertEquals(1, er.getRows(context));
                     }
                     i++;
                 }

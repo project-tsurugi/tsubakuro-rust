@@ -6,11 +6,15 @@ use tsubakuro_rust_core::prelude::*;
 #[derive(Debug)]
 pub(crate) struct TsurugiFfiBlobReference {
     blob_reference: TgBlobReference,
+    pub(crate) value: Option<Vec<u8>>,
 }
 
 impl TsurugiFfiBlobReference {
     pub(crate) fn new(blob_reference: TgBlobReference) -> TsurugiFfiBlobReference {
-        TsurugiFfiBlobReference { blob_reference }
+        TsurugiFfiBlobReference {
+            blob_reference,
+            value: None,
+        }
     }
 }
 

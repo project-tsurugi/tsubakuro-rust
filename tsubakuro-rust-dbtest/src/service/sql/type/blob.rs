@@ -167,6 +167,9 @@ mod test {
                     file.read_to_end(&mut v).unwrap();
                     assert_eq!(expected.1, Some(v));
 
+                    let v = client.read_blob(&transaction, &blob).await.unwrap();
+                    assert_eq!(expected.1, Some(v));
+
                     let mut file = NamedTempFile::new().unwrap();
                     client
                         .copy_blob_to(&transaction, &blob, file.path())

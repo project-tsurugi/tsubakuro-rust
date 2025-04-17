@@ -1,16 +1,22 @@
 //! clob.
 
+use std::ffi::CString;
+
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 #[derive(Debug)]
 pub(crate) struct TsurugiFfiClobReference {
     clob_reference: TgClobReference,
+    pub(crate) value: Option<CString>,
 }
 
 impl TsurugiFfiClobReference {
     pub(crate) fn new(clob_reference: TgClobReference) -> TsurugiFfiClobReference {
-        TsurugiFfiClobReference { clob_reference }
+        TsurugiFfiClobReference {
+            clob_reference,
+            value: None,
+        }
     }
 }
 

@@ -20,3 +20,16 @@ macro_rules! vec_u8_to_field {
         }
     }};
 }
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! vec_u8_to_ptr {
+    ($vec:expr) => {{
+        let size = $vec.len();
+        if size > 0 {
+            ($vec.as_ptr(), size as u64)
+        } else {
+            (std::ptr::null(), 0u64)
+        }
+    }};
+}

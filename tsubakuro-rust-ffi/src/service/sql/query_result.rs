@@ -2239,6 +2239,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zo
 /// - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+///
+/// See [`tsurugi_ffi_sql_client_read_blob`](crate::service::sql::tsurugi_ffi_sql_client_read_blob),
+///     [`tsurugi_ffi_sql_client_copy_blob_to`](crate::service::sql::tsurugi_ffi_sql_client_copy_blob_to).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
     context: TsurugiFfiContextHandle,
@@ -2295,6 +2298,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_blob(
 /// - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+///
+/// See [`tsurugi_ffi_sql_client_read_blob_for`](crate::service::sql::tsurugi_ffi_sql_client_read_blob_for),
+///     [`tsurugi_ffi_sql_client_copy_blob_to_for`](crate::service::sql::tsurugi_ffi_sql_client_copy_blob_to_for).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
     context: TsurugiFfiContextHandle,
@@ -2355,6 +2361,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_blob(
 /// - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+///
+/// See [`tsurugi_ffi_sql_client_read_clob`](crate::service::sql::tsurugi_ffi_sql_client_read_clob),
+///     [`tsurugi_ffi_sql_client_copy_clob_to`](crate::service::sql::tsurugi_ffi_sql_client_copy_clob_to).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
     context: TsurugiFfiContextHandle,
@@ -2411,6 +2420,9 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_clob(
 /// - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
 ///
 /// Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+///
+/// See [`tsurugi_ffi_sql_client_read_clob_for`](crate::service::sql::tsurugi_ffi_sql_client_read_clob_for),
+///     [`tsurugi_ffi_sql_client_copy_clob_to_for`](crate::service::sql::tsurugi_ffi_sql_client_copy_clob_to_for).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_clob(
     context: TsurugiFfiContextHandle,

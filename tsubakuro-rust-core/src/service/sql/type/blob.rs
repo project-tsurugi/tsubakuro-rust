@@ -79,7 +79,7 @@ pub(crate) fn lob_open_processor(response: WireResponse) -> Result<std::fs::File
 
     match std::fs::File::open(path) {
         Ok(value) => Ok(value),
-        Err(e) => Err(io_error!("", e)),
+        Err(e) => Err(io_error!("lob file open error", e)),
     }
 }
 

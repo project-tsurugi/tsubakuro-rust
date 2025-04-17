@@ -1,10 +1,10 @@
-use std::{collections::HashMap, path::Path, sync::Arc, time::Duration};
+use std::{collections::HashMap, io::Read, path::Path, sync::Arc, time::Duration};
 
 use log::trace;
 
 use crate::{
     error::TgError,
-    invalid_response_error,
+    invalid_response_error, io_error,
     job::Job,
     jogasaki::proto::sql::{
         common::Transaction as ProtoTransaction,
@@ -1130,12 +1130,12 @@ impl SqlClient {
     /// use std::io::Read;
     /// use tsubakuro_rust_core::prelude::*;
     ///
-    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<Vec<u8>, TgError> {
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<String, TgError> {
     ///     let clob: TgClobReference = query_result.fetch().await?;
     ///     let mut file = client.open_clob(transaction, &clob).await?;
     ///
-    ///     let mut buffer = Vec::new();
-    ///     file.read_to_end(&mut buffer).unwrap();
+    ///     let mut buffer = String::new();
+    ///     file.read_to_string(&mut buffer).unwrap();
     ///
     ///     Ok(buffer)
     /// }
@@ -1204,6 +1204,162 @@ impl SqlClient {
             reference: Some(lob),
         };
         SqlCommand::GetLargeObjectData(request)
+    }
+
+    /// Read BLOB.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::io::Read;
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<Vec<u8>, TgError> {
+    ///     let blob: TgBlobReference = query_result.fetch().await?;
+    ///     let bytes = client.read_blob(transaction, &blob).await?;
+    ///
+    ///     Ok(bytes)
+    /// }
+    /// ```
+    ///
+    /// since 0.2.0
+    pub async fn read_blob(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+    ) -> Result<Vec<u8>, TgError> {
+        let timeout = self.default_timeout;
+        self.read_blob_for(transaction, blob, timeout).await
+    }
+
+    /// Read BLOB.
+    ///
+    /// since 0.2.0
+    pub async fn read_blob_for(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        timeout: Duration,
+    ) -> Result<Vec<u8>, TgError> {
+        const FUNCTION_NAME: &str = "read_blob()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::open_lob_command(tx_handle, blob);
+        let response = self.send_and_pull_response(command, None, timeout).await?;
+        let buf = Self::blob_read_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(buf)
+    }
+
+    /// Read BLOB.
+    ///
+    /// since 0.2.0
+    pub async fn read_blob_async(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+    ) -> Result<Job<Vec<u8>>, TgError> {
+        const FUNCTION_NAME: &str = "read_blob_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::open_lob_command(tx_handle, blob);
+        let job = self
+            .send_and_pull_async("BLOB", command, None, Box::new(Self::blob_read_processor))
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn blob_read_processor(response: WireResponse) -> Result<Vec<u8>, TgError> {
+        let mut file = lob_open_processor(response)?;
+        let mut buf = Vec::new();
+        file.read_to_end(&mut buf)
+            .map_err(|e| io_error!("BLOB read error", e))?;
+
+        Ok(buf)
+    }
+
+    /// Read CLOB.
+    ///
+    /// # Examples
+    /// ```
+    /// use std::io::Read;
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<String, TgError> {
+    ///     let clob: TgClobReference = query_result.fetch().await?;
+    ///     let text = client.read_clob(transaction, &clob).await?;
+    ///
+    ///     Ok(text)
+    /// }
+    /// ```
+    ///
+    /// since 0.2.0
+    pub async fn read_clob(
+        &self,
+        transaction: &Transaction,
+        clob: &TgClobReference,
+    ) -> Result<String, TgError> {
+        let timeout = self.default_timeout;
+        self.read_clob_for(transaction, clob, timeout).await
+    }
+
+    /// Read CLOB.
+    ///
+    /// since 0.2.0
+    pub async fn read_clob_for(
+        &self,
+        transaction: &Transaction,
+        clob: &TgClobReference,
+        timeout: Duration,
+    ) -> Result<String, TgError> {
+        const FUNCTION_NAME: &str = "read_clob()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::open_lob_command(tx_handle, clob);
+        let response = self.send_and_pull_response(command, None, timeout).await?;
+        let buf = Self::clob_read_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(buf)
+    }
+
+    /// Read CLOB.
+    ///
+    /// since 0.2.0
+    pub async fn read_clob_async(
+        &self,
+        transaction: &Transaction,
+        clob: &TgClobReference,
+    ) -> Result<Job<String>, TgError> {
+        const FUNCTION_NAME: &str = "read_clob_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let tx_handle = transaction.transaction_handle()?;
+
+        let command = Self::open_lob_command(tx_handle, clob);
+        let job = self
+            .send_and_pull_async("CLOB", command, None, Box::new(Self::clob_read_processor))
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn clob_read_processor(response: WireResponse) -> Result<String, TgError> {
+        let mut file = lob_open_processor(response)?;
+        let mut buf = String::new();
+        file.read_to_string(&mut buf)
+            .map_err(|e| io_error!("CLOB read error", e))?;
+
+        Ok(buf)
     }
 
     /// Copy BLOB to local file.

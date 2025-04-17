@@ -2611,6 +2611,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone(Ts
  * - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
  *
  * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+ *
+ * See [`tsurugi_ffi_sql_client_read_blob`](crate::service::sql::tsurugi_ffi_sql_client_read_blob),
+ *     [`tsurugi_ffi_sql_client_copy_blob_to`](crate::service::sql::tsurugi_ffi_sql_client_copy_blob_to).
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_blob(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
@@ -2638,6 +2641,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_blob(TsurugiFfiContextHandle con
  * - `blob_reference_out` - blob reference. To dispose, call [`tsurugi_ffi_blob_reference_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_reference_dispose).
  *
  * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+ *
+ * See [`tsurugi_ffi_sql_client_read_blob_for`](crate::service::sql::tsurugi_ffi_sql_client_read_blob_for),
+ *     [`tsurugi_ffi_sql_client_copy_blob_to_for`](crate::service::sql::tsurugi_ffi_sql_client_copy_blob_to_for).
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_blob(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlQueryResultHandle query_result,
@@ -2663,6 +2669,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_blob(TsurugiFfiContextHandle
  * - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
  *
  * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+ *
+ * See [`tsurugi_ffi_sql_client_read_clob`](crate::service::sql::tsurugi_ffi_sql_client_read_clob),
+ *     [`tsurugi_ffi_sql_client_copy_clob_to`](crate::service::sql::tsurugi_ffi_sql_client_copy_clob_to).
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_clob(TsurugiFfiContextHandle context,
                                                      TsurugiFfiSqlQueryResultHandle query_result,
@@ -2690,6 +2699,9 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_clob(TsurugiFfiContextHandle con
  * - `clob_reference_out` - clob reference. To dispose, call [`tsurugi_ffi_clob_reference_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_reference_dispose).
  *
  * Return value is not null. Call [`tsurugi_ffi_sql_query_result_is_null`] to check null.
+ *
+ * See [`tsurugi_ffi_sql_client_read_clob_for`](crate::service::sql::tsurugi_ffi_sql_client_read_clob_for),
+ *     [`tsurugi_ffi_sql_client_copy_clob_to_for`](crate::service::sql::tsurugi_ffi_sql_client_copy_clob_to_for).
  */
 TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_clob(TsurugiFfiContextHandle context,
                                                          TsurugiFfiSqlQueryResultHandle query_result,
@@ -3484,6 +3496,98 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle
                                                          const TsurugiFfiSqlParameterHandle *parameters,
                                                          uint32_t parameters_size,
                                                          TsurugiFfiJobHandle *query_result_job_out);
+
+/**
+ * SqlClient: Read BLOB.
+ *
+ * See [`SqlClient::read_blob`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ *
+ * # Returns
+ * - `value_out` - value.
+ * - `size_out` - `value_out` size \[byte\].
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_read_blob(TsurugiFfiContextHandle context,
+                                              TsurugiFfiSqlClientHandle sql_client,
+                                              TsurugiFfiTransactionHandle transaction,
+                                              TsurugiFfiBlobReferenceHandle blob,
+                                              TsurugiFfiByteArrayHandle *value_out,
+                                              uint64_t *size_out);
+
+/**
+ * SqlClient: Read BLOB.
+ *
+ * See [`SqlClient::read_blob_for`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `value_out` - value.
+ * - `size_out` - `value_out` size \[byte\].
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_read_blob_for(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlClientHandle sql_client,
+                                                  TsurugiFfiTransactionHandle transaction,
+                                                  TsurugiFfiBlobReferenceHandle blob,
+                                                  TsurugiFfiDuration timeout,
+                                                  TsurugiFfiByteArrayHandle *value_out,
+                                                  uint64_t *size_out);
+
+/**
+ * SqlClient: Read CLOB.
+ *
+ * See [`SqlClient::read_clob`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ *
+ * # Returns
+ * - `value_out` - value.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_read_clob(TsurugiFfiContextHandle context,
+                                              TsurugiFfiSqlClientHandle sql_client,
+                                              TsurugiFfiTransactionHandle transaction,
+                                              TsurugiFfiClobReferenceHandle clob,
+                                              TsurugiFfiStringHandle *value_out);
+
+/**
+ * SqlClient: Read CLOB.
+ *
+ * See [`SqlClient::read_clob_for`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `value_out` - value.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_read_clob_for(TsurugiFfiContextHandle context,
+                                                  TsurugiFfiSqlClientHandle sql_client,
+                                                  TsurugiFfiTransactionHandle transaction,
+                                                  TsurugiFfiClobReferenceHandle clob,
+                                                  TsurugiFfiDuration timeout,
+                                                  TsurugiFfiStringHandle *value_out);
 
 /**
  * SqlClient: Copy BLOB to local file.

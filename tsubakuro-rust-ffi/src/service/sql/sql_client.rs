@@ -22,7 +22,8 @@ use crate::{
         status::{TsurugiFfiTransactionStatus, TsurugiFfiTransactionStatusHandle},
         TsurugiFfiTransaction, TsurugiFfiTransactionHandle,
     },
-    TsurugiFfiDuration, TsurugiFfiStringHandle,
+    vec_u8_to_field, vec_u8_to_ptr, TsurugiFfiByteArrayHandle, TsurugiFfiDuration,
+    TsurugiFfiStringHandle,
 };
 
 use super::{
@@ -2472,6 +2473,282 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
         rc,
         handle
     );
+    rc
+}
+
+/// SqlClient: Read BLOB.
+///
+/// See [`SqlClient::read_blob`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+///
+/// # Returns
+/// - `value_out` - value.
+/// - `size_out` - `value_out` size \[byte\].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_read_blob(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    value_out: *mut TsurugiFfiByteArrayHandle,
+    size_out: *mut u64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_read_blob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, value_out={:?}, size_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        value_out,
+        size_out
+    );
+
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(size_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, size_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &mut *blob };
+
+    let (ptr, size) = if let Some(value) = &blob.value {
+        vec_u8_to_ptr!(value)
+    } else {
+        let runtime = client.runtime();
+        let value = ffi_exec_core_async!(
+            context,
+            FUNCTION_NAME,
+            runtime,
+            client.read_blob(transaction, blob)
+        );
+        vec_u8_to_field!(blob.value, value)
+    };
+    unsafe {
+        *value_out = ptr;
+        *size_out = size;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, size={:?})",
+        rc,
+        ptr,
+        size
+    );
+    rc
+}
+
+/// SqlClient: Read BLOB.
+///
+/// See [`SqlClient::read_blob_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
+/// - `size_out` - `value_out` size \[byte\].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_read_blob_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut TsurugiFfiByteArrayHandle,
+    size_out: *mut u64,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_read_blob_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, timeout={:?}, value_out={:?}, size_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        timeout,
+        value_out,
+        size_out
+    );
+
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(size_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, value_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 6, size_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &mut *blob };
+    let timeout = Duration::from_nanos(timeout);
+
+    let (ptr, size) = if let Some(value) = &blob.value {
+        vec_u8_to_ptr!(value)
+    } else {
+        let runtime = client.runtime();
+        let value = ffi_exec_core_async!(
+            context,
+            FUNCTION_NAME,
+            runtime,
+            client.read_blob_for(transaction, blob, timeout)
+        );
+        vec_u8_to_field!(blob.value, value)
+    };
+    unsafe {
+        *value_out = ptr;
+        *size_out = size;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (value={:?}, size={:?})",
+        rc,
+        ptr,
+        size
+    );
+    rc
+}
+
+/// SqlClient: Read CLOB.
+///
+/// See [`SqlClient::read_clob`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+///
+/// # Returns
+/// - `value_out` - value.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_read_clob(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    value_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_read_clob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, value_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        value_out
+    );
+
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, value_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &mut *clob };
+
+    if clob.value.is_none() {
+        let runtime = client.runtime();
+        let value = ffi_exec_core_async!(
+            context,
+            FUNCTION_NAME,
+            runtime,
+            client.read_clob(transaction, clob)
+        );
+        cchar_field_set!(context, clob.value, value);
+    }
+    let ptr = cstring_to_cchar!(clob.value);
+    unsafe {
+        *value_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, ptr);
+    rc
+}
+
+/// SqlClient: Read CLOB.
+///
+/// See [`SqlClient::read_clob_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `value_out` - value.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_read_clob_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    timeout: TsurugiFfiDuration,
+    value_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_read_clob_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, timeout={:?}, value_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        timeout,
+        value_out
+    );
+
+    ffi_arg_out_initialize!(value_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, value_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &mut *clob };
+    let timeout = Duration::from_nanos(timeout);
+
+    if clob.value.is_none() {
+        let runtime = client.runtime();
+        let value = ffi_exec_core_async!(
+            context,
+            FUNCTION_NAME,
+            runtime,
+            client.read_clob_for(transaction, clob, timeout)
+        );
+        cchar_field_set!(context, clob.value, value);
+    }
+    let ptr = cstring_to_cchar!(clob.value);
+    unsafe {
+        *value_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (value={:?})", rc, ptr);
     rc
 }
 
