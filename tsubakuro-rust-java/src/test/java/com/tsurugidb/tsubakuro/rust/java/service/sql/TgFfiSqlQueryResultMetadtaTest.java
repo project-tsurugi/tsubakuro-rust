@@ -46,7 +46,10 @@ class TgFfiSqlQueryResultMetadtaTest extends TgFfiTester {
             try (client; transaction) {
                 try (queryResult; metadata) {
                 }
-                commit(client, transaction);
+                var manager = getFfiObjectManager();
+                try (var context = TgFfiContext.create(manager)) {
+                    client.rollback(context, transaction);
+                }
             }
         }
     }
