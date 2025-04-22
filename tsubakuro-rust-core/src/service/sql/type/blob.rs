@@ -11,6 +11,8 @@ use crate::{
     sql_service_error,
 };
 
+use super::large_object::TgLargeObjectReference;
+
 /// BLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TgBlob {
@@ -30,11 +32,6 @@ impl From<Vec<u8>> for TgBlob {
     fn from(value: Vec<u8>) -> Self {
         TgBlob::Contents(value)
     }
-}
-
-pub(crate) trait TgLargeObjectReference {
-    fn provider(&self) -> LargeObjectProvider;
-    fn object_id(&self) -> u64;
 }
 
 /// BLOB for [SqlQueryResult](crate::prelude::SqlQueryResult).

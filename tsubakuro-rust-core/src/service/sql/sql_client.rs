@@ -19,7 +19,6 @@ use crate::{
         status::{transaction_status_processor, TransactionStatus},
         table_metadata_processor, CommitOption, ServiceClient, SqlExecuteResult, SqlParameter,
         SqlPlaceholder, SqlQueryResult, TableList, TableMetadata, TgBlobReference, TgClobReference,
-        TgLargeObjectReference,
     },
     prost_decode_error,
     session::{
@@ -36,7 +35,10 @@ use crate::{
 
 use prost::{alloc::string::String as ProstString, Message};
 
-use super::{explain::SqlExplainResult, prepare::SqlPreparedStatement};
+use super::{
+    explain::SqlExplainResult, prepare::SqlPreparedStatement,
+    r#type::large_object::TgLargeObjectReference,
+};
 
 /// The symbolic ID of the destination service.
 const SERVICE_SYMBOLIC_ID: &str = "sql";

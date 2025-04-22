@@ -1,6 +1,6 @@
 use crate::jogasaki::proto::sql::common::LargeObjectProvider;
 
-use super::blob::TgLargeObjectReference;
+use super::large_object::TgLargeObjectReference;
 
 /// CLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]

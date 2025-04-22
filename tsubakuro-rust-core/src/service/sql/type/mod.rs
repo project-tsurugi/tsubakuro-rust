@@ -2,6 +2,7 @@ pub mod blob;
 pub mod clob;
 pub mod date;
 pub mod decimal;
+pub mod large_object;
 pub mod time_of_day;
 pub mod time_of_day_with_time_zone;
 pub mod time_point;
