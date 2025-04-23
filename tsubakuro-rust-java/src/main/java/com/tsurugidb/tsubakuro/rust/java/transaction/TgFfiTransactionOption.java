@@ -4,6 +4,7 @@ import java.lang.foreign.MemorySegment;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalInt;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -171,6 +172,30 @@ public class TgFfiTransactionOption extends TgFfiObject {
         TgFfiRcUtil.throwIfError(rc, context);
 
         return outToStringList(out, sizeOut);
+    }
+
+    public synchronized void setScanParallel(TgFfiContext context, int scanParallel) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = scanParallel;
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_scan_parallel(ctx, handle, arg);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized OptionalInt getScanParallel(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var existsOut = allocateBooleanOut();
+        var out = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_scan_parallel(ctx, handle, existsOut, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        boolean exists = outToBoolean(existsOut);
+        if (exists) {
+            return OptionalInt.of(outToInt(out));
+        } else {
+            return OptionalInt.empty();
+        }
     }
 
     public synchronized void setPriority(TgFfiContext context, TgFfiTransactionPriority priority) {

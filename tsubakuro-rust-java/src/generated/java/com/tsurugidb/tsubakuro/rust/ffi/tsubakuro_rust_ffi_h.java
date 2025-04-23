@@ -30651,6 +30651,127 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_transaction_option_set_scan_parallel {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_scan_parallel");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, int32_t scan_parallel)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_set_scan_parallel$descriptor() {
+        return tsurugi_ffi_transaction_option_set_scan_parallel.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, int32_t scan_parallel)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_set_scan_parallel$handle() {
+        return tsurugi_ffi_transaction_option_set_scan_parallel.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, int32_t scan_parallel)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_set_scan_parallel$address() {
+        return tsurugi_ffi_transaction_option_set_scan_parallel.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_set_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, int32_t scan_parallel)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_set_scan_parallel(MemorySegment context, MemorySegment transaction_option, int scan_parallel) {
+        var mh$ = tsurugi_ffi_transaction_option_set_scan_parallel.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_set_scan_parallel", context, transaction_option, scan_parallel);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, scan_parallel);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_transaction_option_get_scan_parallel {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_scan_parallel");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *scan_parallel_exists_out, int32_t *scan_parallel_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_transaction_option_get_scan_parallel$descriptor() {
+        return tsurugi_ffi_transaction_option_get_scan_parallel.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *scan_parallel_exists_out, int32_t *scan_parallel_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_transaction_option_get_scan_parallel$handle() {
+        return tsurugi_ffi_transaction_option_get_scan_parallel.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *scan_parallel_exists_out, int32_t *scan_parallel_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_transaction_option_get_scan_parallel$address() {
+        return tsurugi_ffi_transaction_option_get_scan_parallel.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_transaction_option_get_scan_parallel(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option, _Bool *scan_parallel_exists_out, int32_t *scan_parallel_out)
+     * }
+     */
+    public static int tsurugi_ffi_transaction_option_get_scan_parallel(MemorySegment context, MemorySegment transaction_option, MemorySegment scan_parallel_exists_out, MemorySegment scan_parallel_out) {
+        var mh$ = tsurugi_ffi_transaction_option_get_scan_parallel.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_transaction_option_get_scan_parallel", context, transaction_option, scan_parallel_exists_out, scan_parallel_out);
+            }
+            return (int)mh$.invokeExact(context, transaction_option, scan_parallel_exists_out, scan_parallel_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_transaction_option_set_priority {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,

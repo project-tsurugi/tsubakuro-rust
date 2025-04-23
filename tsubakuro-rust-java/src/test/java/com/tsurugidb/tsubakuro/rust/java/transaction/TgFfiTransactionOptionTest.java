@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
 import java.util.List;
+import java.util.OptionalInt;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,10 +23,10 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
         var manager = getFfiObjectManager();
 
         try (var context = TgFfiContext.create(manager); //
-                var target = TgFfiTransactionOption.create(context)) {
+                var _ = TgFfiTransactionOption.create(context)) {
         }
 
-        try (var target = TgFfiTransactionOption.create(manager)) {
+        try (var _ = TgFfiTransactionOption.create(manager)) {
         }
     }
 
@@ -404,6 +405,69 @@ class TgFfiTransactionOptionTest extends TgFfiTester {
             var out = manager.allocatePtrOut();
             var sout = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_exclusive_read_area(ctx, handle, out, sout);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void set_scan_parallel() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiTransactionOption.create(context)) {
+            var scanParallel = target.getScanParallel(context);
+            assertEquals(OptionalInt.empty(), scanParallel);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiTransactionOption.create(context)) {
+            target.setScanParallel(context, 123);
+
+            var scanParallel = target.getScanParallel(context);
+            assertEquals(OptionalInt.of(123), scanParallel);
+        }
+    }
+
+    @Test
+    void set_scan_parallel_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg = 123;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_set_scan_parallel(ctx, handle, arg);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void get_scan_parallel_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var existsOut = manager.allocateBooleanOut();
+            var out = manager.allocateIntOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_scan_parallel(ctx, handle, existsOut, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiTransactionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var existsOut = MemorySegment.NULL;
+            var out = manager.allocateIntOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_scan_parallel(ctx, handle, existsOut, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiTransactionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var existsOut = manager.allocateBooleanOut();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_transaction_option_get_scan_parallel(ctx, handle, existsOut, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
         }
     }

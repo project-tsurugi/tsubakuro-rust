@@ -642,6 +642,93 @@ pub extern "C" fn tsurugi_ffi_transaction_option_get_exclusive_read_area(
     rc
 }
 
+/// TransactionOption: Set scan parallel.
+///
+/// See [`TransactionOption::set_scan_parallel`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Parameters
+/// - `scan_parallel` - scan parallel.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_set_scan_parallel(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    scan_parallel: i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_set_scan_parallel()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, scan_parallel={:?}",
+        context,
+        transaction_option,
+        scan_parallel
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+
+    transaction_option.set_scan_parallel(scan_parallel);
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// TransactionOption: Get scan parallel.
+///
+/// See [`TransactionOption::scan_parallel`].
+///
+/// # Receiver
+/// - `transaction_option` - Transaction option.
+///
+/// # Returns
+/// - `scan_parallel_exists_out` - `true`: scan parallel exists.
+/// - `scan_parallel_out` - scan parallel.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_transaction_option_get_scan_parallel(
+    context: TsurugiFfiContextHandle,
+    transaction_option: TsurugiFfiTransactionOptionHandle,
+    scan_parallel_exists_out: *mut bool,
+    scan_parallel_out: *mut i32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_transaction_option_get_scan_parallel()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, transaction_option={:?}, scan_parallel_exists_out={:?}, scan_parallel_out={:?}",
+        context,
+        transaction_option,
+        scan_parallel_exists_out,
+        scan_parallel_out
+    );
+
+    ffi_arg_out_initialize!(scan_parallel_exists_out, false);
+    ffi_arg_out_initialize!(scan_parallel_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, transaction_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, scan_parallel_exists_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, scan_parallel_out);
+
+    let transaction_option = unsafe { &mut *transaction_option };
+
+    let scan_parallel = transaction_option.scan_parallel();
+
+    let exists = scan_parallel.is_some();
+    let value = scan_parallel.unwrap_or(0);
+    unsafe {
+        *scan_parallel_exists_out = exists;
+        *scan_parallel_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (scan_parallel_exists={}, scan_parallel_out={})",
+        rc,
+        exists,
+        value
+    );
+    rc
+}
+
 /// TransactionOption: Set priority.
 ///
 /// See [`TransactionOption::set_priority`].
@@ -764,6 +851,7 @@ pub extern "C" fn tsurugi_ffi_transaction_option_set_close_timeout(
 /// - `transaction_option` - Transaction option.
 ///
 /// # Returns
+/// - `close_timeout_exists_out` - `true`: close timeout exists.
 /// - `close_timeout_out` - close timeout \[nanoseconds\].
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_transaction_option_get_close_timeout(

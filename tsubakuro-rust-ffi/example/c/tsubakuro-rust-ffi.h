@@ -4826,6 +4826,38 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_exclusive_read_area(TsurugiFfiCo
                                                                     uint32_t *table_names_size_out);
 
 /**
+ * TransactionOption: Set scan parallel.
+ *
+ * See [`TransactionOption::set_scan_parallel`].
+ *
+ * # Receiver
+ * - `transaction_option` - Transaction option.
+ *
+ * # Parameters
+ * - `scan_parallel` - scan parallel.
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_option_set_scan_parallel(TsurugiFfiContextHandle context,
+                                                              TsurugiFfiTransactionOptionHandle transaction_option,
+                                                              int32_t scan_parallel);
+
+/**
+ * TransactionOption: Get scan parallel.
+ *
+ * See [`TransactionOption::scan_parallel`].
+ *
+ * # Receiver
+ * - `transaction_option` - Transaction option.
+ *
+ * # Returns
+ * - `scan_parallel_exists_out` - `true`: scan parallel exists.
+ * - `scan_parallel_out` - scan parallel.
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_option_get_scan_parallel(TsurugiFfiContextHandle context,
+                                                              TsurugiFfiTransactionOptionHandle transaction_option,
+                                                              bool *scan_parallel_exists_out,
+                                                              int32_t *scan_parallel_out);
+
+/**
  * TransactionOption: Set priority.
  *
  * See [`TransactionOption::set_priority`].
@@ -4879,6 +4911,7 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_set_close_timeout(TsurugiFfiContextH
  * - `transaction_option` - Transaction option.
  *
  * # Returns
+ * - `close_timeout_exists_out` - `true`: close timeout exists.
  * - `close_timeout_out` - close timeout \[nanoseconds\].
  */
 TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextHandle context,

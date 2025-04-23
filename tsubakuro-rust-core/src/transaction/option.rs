@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::jogasaki::proto::sql::request::transaction_option::ScanParallelOpt;
 use crate::jogasaki::proto::sql::request::ReadArea;
 use crate::jogasaki::proto::sql::request::TransactionOption as RequestTransactionOption;
 use crate::jogasaki::proto::sql::request::TransactionPriority;
@@ -86,6 +87,7 @@ pub struct TransactionOption {
     write_preserve: Vec<String>,
     inclusive_read_area: Vec<String>,
     exclusive_read_area: Vec<String>,
+    scan_parallel: Option<i32>,
     priority: TransactionPriority,
     close_timeout: Option<Duration>,
 }
@@ -106,6 +108,7 @@ impl TransactionOption {
             write_preserve: vec![],
             inclusive_read_area: vec![],
             exclusive_read_area: vec![],
+            scan_parallel: None,
             priority: TransactionPriority::Unspecified,
             close_timeout: None,
         }
@@ -159,6 +162,20 @@ impl TransactionOption {
     /// Get exclusive read area.
     pub fn exclusive_read_area(&self) -> &Vec<String> {
         &self.exclusive_read_area
+    }
+
+    /// Set scan parallel.
+    ///
+    /// since 0.2.0
+    pub fn set_scan_parallel(&mut self, scan_parallel: i32) {
+        self.scan_parallel = Some(scan_parallel);
+    }
+
+    /// Get scan parallel.
+    ///
+    /// since 0.2.0
+    pub fn scan_parallel(&self) -> Option<i32> {
+        self.scan_parallel
     }
 
     /// Set priority.
@@ -245,6 +262,7 @@ impl TransactionOption {
             write_preserves: Self::to_write_preserve(&self.write_preserve),
             inclusive_read_areas: Self::to_read_area(&self.inclusive_read_area),
             exclusive_read_areas: Self::to_read_area(&self.exclusive_read_area),
+            scan_parallel_opt: self.scan_parallel.map(ScanParallelOpt::ScanParallel),
         }
     }
 
@@ -281,6 +299,7 @@ mod test {
             assert_eq!(true, option.write_preserve().is_empty());
             assert_eq!(true, option.inclusive_read_area().is_empty());
             assert_eq!(true, option.exclusive_read_area().is_empty());
+            assert_eq!(None, option.scan_parallel());
             assert_eq!(TransactionPriority::Unspecified, option.priority());
             assert_eq!(None, option.close_timeout());
 
@@ -290,6 +309,7 @@ mod test {
             assert_eq!("", request.label);
             assert_eq!(false, request.modifies_definitions);
             assert_eq!(true, request.write_preserves.is_empty());
+            assert_eq!(None, request.scan_parallel_opt);
             assert_eq!(true, request.inclusive_read_areas.is_empty());
             assert_eq!(true, request.exclusive_read_areas.is_empty());
         }
@@ -301,6 +321,7 @@ mod test {
             option.set_write_preserve(&vec!["wp"]);
             option.set_inclusive_read_area(&vec!["r1"]);
             option.set_exclusive_read_area(&vec!["r2"]);
+            option.set_scan_parallel(12);
             option.set_priority(TransactionPriority::Interrupt);
             option.set_close_timeout(Duration::from_secs(123));
 
@@ -327,6 +348,11 @@ mod test {
                 }],
                 request.exclusive_read_areas
             );
+            assert_eq!(
+                Some(ScanParallelOpt::ScanParallel(12)),
+                request.scan_parallel_opt
+            );
+
             assert_eq!(Some(Duration::from_secs(123)), option.close_timeout());
         }
     }
