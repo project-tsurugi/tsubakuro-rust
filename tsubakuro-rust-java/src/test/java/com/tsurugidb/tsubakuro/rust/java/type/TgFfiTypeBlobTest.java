@@ -120,9 +120,10 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                     TgFfiSqlPlaceholder.ofAtomType(context, "pk", TgFfiAtomType.INT4), //
                     TgFfiSqlPlaceholder.ofAtomType(context, "value", TgFfiAtomType.BLOB));
             try (var ps = client.prepare(context, sql, placeholders)) {
+                var path = Files.createTempFile("tsubakuro-rust-ffi.test", "blob.bin");
                 var parameters = List.of( //
                         TgFfiSqlParameter.ofInt4(context, "pk", 4), //
-                        TgFfiSqlParameter.ofBlob(context, "value", Path.of("/path/to/file")));
+                        TgFfiSqlParameter.ofBlob(context, "value", path));
                 var e = assertThrows(TgFfiRuntimeException.class, () -> {
                     try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
                         assertEquals(1, er.getRows(context));

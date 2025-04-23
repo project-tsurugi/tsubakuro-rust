@@ -459,6 +459,131 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_keep_alive(
     rc
 }
 
+/// ConnectionOption: Adds a path mapping entry for both sending and receiving BLOB/CLOB.
+///
+/// See [`ConnectionOption::add_large_object_path_mapping`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Parameters
+/// - `client_path` - the client path, must be a directory
+/// - `server_path` - the server path, must be a directory
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_add_large_object_path_mapping(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    client_path: TsurugiFfiStringHandle,
+    server_path: TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_add_large_object_path_mapping()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, client_path={:?}, server_path={:?}",
+        context,
+        connection_option,
+        client_path,
+        server_path
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, client_path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, server_path);
+
+    let connection_option = unsafe { &mut *connection_option };
+    let client_path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, client_path);
+    let server_path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, server_path);
+
+    connection_option.add_large_object_path_mapping(client_path, server_path);
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// ConnectionOption: Adds a path mapping entry for sending BLOB/CLOB.
+///
+/// See [`ConnectionOption::add_large_object_path_mapping_on_send`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Parameters
+/// - `client_path` - the client path to be transformed, must be a directory
+/// - `server_path` - the server path, must be a directory
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    client_path: TsurugiFfiStringHandle,
+    server_path: TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str =
+        "tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, client_path={:?}, server_path={:?}",
+        context,
+        connection_option,
+        client_path,
+        server_path
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, client_path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, server_path);
+
+    let connection_option = unsafe { &mut *connection_option };
+    let client_path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, client_path);
+    let server_path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, server_path);
+
+    connection_option.add_large_object_path_mapping_on_send(client_path, server_path);
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// ConnectionOption: Adds a path mapping entry for receiving BLOB/CLOB.
+///
+/// See [`ConnectionOption::add_large_object_path_mapping_on_recv`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Parameters
+/// - `server_path` - the target server path to be transformed, must be a directory
+/// - `client_path` - the target client path, must be a directory
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    server_path: TsurugiFfiStringHandle,
+    client_path: TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str =
+        "tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, server_path={:?}, client_path={:?}",
+        context,
+        connection_option,
+        server_path,
+        client_path
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, server_path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, client_path);
+
+    let connection_option = unsafe { &mut *connection_option };
+    let server_path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, server_path);
+    let client_path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 3, client_path);
+
+    connection_option.add_large_object_path_mapping_on_recv(server_path, client_path);
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
 /// ConnectionOption: Set default timeout.
 ///
 /// See [`ConnectionOption::set_default_timeout`].

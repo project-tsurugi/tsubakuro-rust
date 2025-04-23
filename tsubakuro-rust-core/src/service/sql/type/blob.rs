@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use crate::{
     error::TgError,
@@ -6,7 +6,7 @@ use crate::{
     jogasaki::proto::sql::{
         common::LargeObjectProvider, response::response::Response as SqlResponseType,
     },
-    prelude::convert_sql_response,
+    prelude::{convert_sql_response, Session},
     session::wire::response::WireResponse,
     sql_service_error,
 };
@@ -60,12 +60,15 @@ impl TgLargeObjectReference for TgBlobReference {
     }
 }
 
-pub(crate) fn lob_open_processor(response: WireResponse) -> Result<std::fs::File, TgError> {
+pub(crate) fn lob_open_processor(
+    response: WireResponse,
+    session: &Arc<Session>,
+) -> Result<std::fs::File, TgError> {
     const FUNCTION_NAME: &str = "lob_open_processor()";
 
     let lob = large_object_data_processor(FUNCTION_NAME, response)?;
-    let path = match lob {
-        LobResult::Path(value) => value,
+    let server_path = match lob {
+        LobResult::Path(path) => path,
         _ => {
             return Err(invalid_response_error!(
                 FUNCTION_NAME,
@@ -74,7 +77,10 @@ pub(crate) fn lob_open_processor(response: WireResponse) -> Result<std::fs::File
         }
     };
 
-    match std::fs::File::open(path) {
+    let lob_recv_path_mapping = session.large_object_path_mapping_on_recv();
+    let client_path = lob_recv_path_mapping.convert_to_client_path(&server_path)?;
+
+    match std::fs::File::open(client_path) {
         Ok(value) => Ok(value),
         Err(e) => Err(io_error!("lob file open error", e)),
     }
@@ -82,13 +88,14 @@ pub(crate) fn lob_open_processor(response: WireResponse) -> Result<std::fs::File
 
 pub(crate) fn lob_copy_to_processor<T: AsRef<Path>>(
     response: WireResponse,
+    session: &Arc<Session>,
     destination: T,
 ) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "lob_copy_to_processor()";
 
     let lob = large_object_data_processor(FUNCTION_NAME, response)?;
-    let path = match lob {
-        LobResult::Path(value) => value,
+    let server_path = match lob {
+        LobResult::Path(path) => path,
         _ => {
             return Err(invalid_response_error!(
                 FUNCTION_NAME,
@@ -97,7 +104,10 @@ pub(crate) fn lob_copy_to_processor<T: AsRef<Path>>(
         }
     };
 
-    if let Err(e) = std::fs::copy(path, destination) {
+    let lob_recv_path_mapping = session.large_object_path_mapping_on_recv();
+    let client_path = lob_recv_path_mapping.convert_to_client_path(&server_path)?;
+
+    if let Err(e) = std::fs::copy(client_path, destination) {
         return Err(io_error!("file copy error", e));
     }
     Ok(())

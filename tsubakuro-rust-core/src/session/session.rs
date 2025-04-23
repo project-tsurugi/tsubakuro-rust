@@ -9,7 +9,10 @@ use crate::{
     error::TgError,
     illegal_argument_error,
     job::Job,
-    prelude::{Endpoint, ShutdownType},
+    prelude::{
+        r#type::large_object::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
+        Endpoint, ShutdownType,
+    },
     service::{core::core_service::CoreService, ServiceClient},
     tateyama::proto::endpoint::request::ClientInformation,
     util::string_to_prost_string,
@@ -44,6 +47,8 @@ use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
 #[derive(Debug)]
 pub struct Session {
     wire: Arc<Wire>,
+    lob_send_path_mapping: LargeObjectSendPathMapping,
+    lob_recv_path_mapping: LargeObjectRecvPathMapping,
     default_timeout: RwLock<Duration>,
     shutdowned: AtomicBool,
     fail_on_drop_error: AtomicBool,
@@ -214,6 +219,14 @@ impl Session {
         .await
     }
 
+    pub(crate) fn large_object_path_mapping_on_send(&self) -> &LargeObjectSendPathMapping {
+        &self.lob_send_path_mapping
+    }
+
+    pub(crate) fn large_object_path_mapping_on_recv(&self) -> &LargeObjectRecvPathMapping {
+        &self.lob_recv_path_mapping
+    }
+
     /// Request to shutdown the current session and wait for the running requests were finished.
     pub async fn shutdown(&self, shutdown_type: ShutdownType) -> Result<(), TgError> {
         let timeout = self.default_timeout();
@@ -283,16 +296,23 @@ impl Session {
 impl Session {
     pub(crate) fn new(
         wire: Arc<Wire>,
-        keep_alive: Duration,
+        connection_option: &ConnectionOption,
         default_timeout: Duration,
     ) -> Arc<Self> {
         let session = Arc::new(Session {
             wire,
+            lob_send_path_mapping: connection_option
+                .large_object_path_mapping_on_send()
+                .clone(),
+            lob_recv_path_mapping: connection_option
+                .large_object_path_mapping_on_recv()
+                .clone(),
             default_timeout: RwLock::new(default_timeout),
             shutdowned: AtomicBool::new(false),
             fail_on_drop_error: AtomicBool::new(false),
         });
 
+        let keep_alive = connection_option.keep_alive();
         if !keep_alive.is_zero() {
             let wire = session.wire();
             tokio::spawn(async move {

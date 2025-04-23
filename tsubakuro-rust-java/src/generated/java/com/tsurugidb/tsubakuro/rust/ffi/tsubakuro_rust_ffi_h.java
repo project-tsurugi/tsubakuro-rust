@@ -27946,6 +27946,189 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_connection_option_add_large_object_path_mapping {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_add_large_object_path_mapping$descriptor() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_add_large_object_path_mapping$handle() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_add_large_object_path_mapping$address() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_add_large_object_path_mapping(MemorySegment context, MemorySegment connection_option, MemorySegment client_path, MemorySegment server_path) {
+        var mh$ = tsurugi_ffi_connection_option_add_large_object_path_mapping.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_add_large_object_path_mapping", context, connection_option, client_path, server_path);
+            }
+            return (int)mh$.invokeExact(context, connection_option, client_path, server_path);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send$descriptor() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send$handle() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send$address() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle client_path, TsurugiFfiStringHandle server_path)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(MemorySegment context, MemorySegment connection_option, MemorySegment client_path, MemorySegment server_path) {
+        var mh$ = tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send", context, connection_option, client_path, server_path);
+            }
+            return (int)mh$.invokeExact(context, connection_option, client_path, server_path);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle server_path, TsurugiFfiStringHandle client_path)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv$descriptor() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle server_path, TsurugiFfiStringHandle client_path)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv$handle() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle server_path, TsurugiFfiStringHandle client_path)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv$address() {
+        return tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle server_path, TsurugiFfiStringHandle client_path)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(MemorySegment context, MemorySegment connection_option, MemorySegment server_path, MemorySegment client_path) {
+        var mh$ = tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv", context, connection_option, server_path, client_path);
+            }
+            return (int)mh$.invokeExact(context, connection_option, server_path, client_path);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_connection_option_set_default_timeout {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,

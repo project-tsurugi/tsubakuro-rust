@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.java.session;
 
 import java.lang.foreign.MemorySegment;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -135,6 +136,42 @@ public class TgFfiConnectionOption extends TgFfiObject {
         TgFfiRcUtil.throwIfError(rc, context);
 
         return outToDuration(out);
+    }
+
+    public synchronized void addLargeObjectPathMapping(TgFfiContext context, Path clientPath, String serverPath) {
+        Objects.requireNonNull(clientPath, "clientPath must not be null");
+        Objects.requireNonNull(serverPath, "serverPath must not be null");
+
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg1 = allocateString(clientPath.toString());
+        var arg2 = allocateString(serverPath);
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping(ctx, handle, arg1, arg2);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized void addLargeObjectPathMappingOnSend(TgFfiContext context, Path clientPath, String serverPath) {
+        Objects.requireNonNull(clientPath, "clientPath must not be null");
+        Objects.requireNonNull(serverPath, "serverPath must not be null");
+
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg1 = allocateString(clientPath.toString());
+        var arg2 = allocateString(serverPath);
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(ctx, handle, arg1, arg2);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized void addLargeObjectPathMappingOnRecv(TgFfiContext context, String serverPath, Path clientPath) {
+        Objects.requireNonNull(serverPath, "serverPath must not be null");
+        Objects.requireNonNull(clientPath, "clientPath must not be null");
+
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg1 = allocateString(serverPath);
+        var arg2 = allocateString(clientPath.toString());
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(ctx, handle, arg1, arg2);
+        TgFfiRcUtil.throwIfError(rc, context);
     }
 
     public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {

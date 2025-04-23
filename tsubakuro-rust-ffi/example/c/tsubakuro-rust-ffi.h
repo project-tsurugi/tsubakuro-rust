@@ -4145,6 +4145,57 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_keep_alive(TsurugiFfiContextHandl
                                                           TsurugiFfiDuration *keep_alive_out);
 
 /**
+ * ConnectionOption: Adds a path mapping entry for both sending and receiving BLOB/CLOB.
+ *
+ * See [`ConnectionOption::add_large_object_path_mapping`].
+ *
+ * # Receiver
+ * - `connection_option` - Connection option.
+ *
+ * # Parameters
+ * - `client_path` - the client path, must be a directory
+ * - `server_path` - the server path, must be a directory
+ */
+TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping(TsurugiFfiContextHandle context,
+                                                                         TsurugiFfiConnectionOptionHandle connection_option,
+                                                                         TsurugiFfiStringHandle client_path,
+                                                                         TsurugiFfiStringHandle server_path);
+
+/**
+ * ConnectionOption: Adds a path mapping entry for sending BLOB/CLOB.
+ *
+ * See [`ConnectionOption::add_large_object_path_mapping_on_send`].
+ *
+ * # Receiver
+ * - `connection_option` - Connection option.
+ *
+ * # Parameters
+ * - `client_path` - the client path to be transformed, must be a directory
+ * - `server_path` - the server path, must be a directory
+ */
+TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(TsurugiFfiContextHandle context,
+                                                                                 TsurugiFfiConnectionOptionHandle connection_option,
+                                                                                 TsurugiFfiStringHandle client_path,
+                                                                                 TsurugiFfiStringHandle server_path);
+
+/**
+ * ConnectionOption: Adds a path mapping entry for receiving BLOB/CLOB.
+ *
+ * See [`ConnectionOption::add_large_object_path_mapping_on_recv`].
+ *
+ * # Receiver
+ * - `connection_option` - Connection option.
+ *
+ * # Parameters
+ * - `server_path` - the target server path to be transformed, must be a directory
+ * - `client_path` - the target client path, must be a directory
+ */
+TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(TsurugiFfiContextHandle context,
+                                                                                 TsurugiFfiConnectionOptionHandle connection_option,
+                                                                                 TsurugiFfiStringHandle server_path,
+                                                                                 TsurugiFfiStringHandle client_path);
+
+/**
  * ConnectionOption: Set default timeout.
  *
  * See [`ConnectionOption::set_default_timeout`].

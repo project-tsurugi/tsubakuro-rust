@@ -1,6 +1,9 @@
-use std::time::Duration;
+use std::{path::Path, time::Duration};
 
-use crate::error::TgError;
+use crate::{
+    error::TgError,
+    prelude::r#type::large_object::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
+};
 
 use super::endpoint::Endpoint;
 
@@ -28,6 +31,8 @@ pub struct ConnectionOption {
     application_name: Option<String>,
     session_label: Option<String>,
     keep_alive: Duration,
+    lob_send_path_mapping: LargeObjectSendPathMapping,
+    lob_recv_path_mapping: LargeObjectRecvPathMapping,
     default_timeout: Duration,
     send_timeout: Duration,
     recv_timeout: Duration,
@@ -47,6 +52,8 @@ impl ConnectionOption {
             application_name: None,
             session_label: None,
             keep_alive: Duration::from_secs(60),
+            lob_send_path_mapping: LargeObjectSendPathMapping::new(),
+            lob_recv_path_mapping: LargeObjectRecvPathMapping::new(),
             default_timeout: Duration::ZERO,
             send_timeout: Duration::ZERO,
             recv_timeout: Duration::ZERO,
@@ -103,6 +110,48 @@ impl ConnectionOption {
     /// Get keep alive interval.
     pub fn keep_alive(&self) -> Duration {
         self.keep_alive
+    }
+
+    /// Adds a path mapping entry for both sending and receiving BLOB/CLOB.
+    ///
+    /// since 0.2.0
+    pub fn add_large_object_path_mapping<T: AsRef<Path>>(
+        &mut self,
+        client_path: T,
+        server_path: &str,
+    ) {
+        self.add_large_object_path_mapping_on_send(&client_path, server_path);
+        self.add_large_object_path_mapping_on_recv(server_path, &client_path);
+    }
+
+    /// Adds a path mapping entry for sending BLOB/CLOB.
+    ///
+    /// since 0.2.0
+    pub fn add_large_object_path_mapping_on_send<T: AsRef<Path>>(
+        &mut self,
+        client_path: T,
+        server_path: &str,
+    ) {
+        self.lob_send_path_mapping.add(client_path, server_path);
+    }
+
+    /// Adds a path mapping entry for receiving BLOB/CLOB.
+    ///
+    /// since 0.2.0
+    pub fn add_large_object_path_mapping_on_recv<T: AsRef<Path>>(
+        &mut self,
+        server_path: &str,
+        client_path: T,
+    ) {
+        self.lob_recv_path_mapping.add(server_path, client_path);
+    }
+
+    pub(crate) fn large_object_path_mapping_on_send(&self) -> &LargeObjectSendPathMapping {
+        &self.lob_send_path_mapping
+    }
+
+    pub(crate) fn large_object_path_mapping_on_recv(&self) -> &LargeObjectRecvPathMapping {
+        &self.lob_recv_path_mapping
     }
 
     /// Set default timeout.

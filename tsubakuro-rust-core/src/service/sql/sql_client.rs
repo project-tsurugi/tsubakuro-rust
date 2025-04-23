@@ -485,7 +485,8 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "prepared_explain()";
         trace!("{} start", FUNCTION_NAME);
 
-        let (parameters, lobs) = convert_lob_parameters(parameters);
+        let (parameters, lobs) =
+            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
         let command = Self::explain_prepared_command(prepared_statement, parameters);
         let response = self.send_and_pull_response(command, lobs, timeout).await?;
         let explain_result = explain_processor(response)?;
@@ -503,7 +504,8 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "prepared_explain_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let (parameters, lobs) = convert_lob_parameters(parameters);
+        let (parameters, lobs) =
+            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
         let command = Self::explain_prepared_command(prepared_statement, parameters);
         let job = self
             .send_and_pull_async("Explain", command, lobs, Box::new(explain_processor))
@@ -802,7 +804,8 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) = convert_lob_parameters(parameters);
+        let (parameters, lobs) =
+            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
 
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
@@ -824,7 +827,8 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) = convert_lob_parameters(parameters);
+        let (parameters, lobs) =
+            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
 
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
@@ -996,7 +1000,8 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) = convert_lob_parameters(parameters);
+        let (parameters, lobs) =
+            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
 
         let command =
             Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
@@ -1021,7 +1026,8 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) = convert_lob_parameters(parameters);
+        let (parameters, lobs) =
+            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
 
         let command =
             Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
@@ -1099,7 +1105,7 @@ impl SqlClient {
 
         let command = Self::open_lob_command(tx_handle, blob);
         let response = self.send_and_pull_response(command, None, timeout).await?;
-        let file = lob_open_processor(response)?;
+        let file = lob_open_processor(response, &self.session)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(file)
@@ -1117,8 +1123,14 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::open_lob_command(tx_handle, blob);
+        let session = self.session.clone();
         let job = self
-            .send_and_pull_async("File", command, None, Box::new(lob_open_processor))
+            .send_and_pull_async(
+                "File",
+                command,
+                None,
+                Box::new(move |response| lob_open_processor(response, &session)),
+            )
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -1165,7 +1177,7 @@ impl SqlClient {
 
         let command = Self::open_lob_command(tx_handle, clob);
         let response = self.send_and_pull_response(command, None, timeout).await?;
-        let file = lob_open_processor(response)?;
+        let file = lob_open_processor(response, &self.session)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(file)
@@ -1183,8 +1195,14 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::open_lob_command(tx_handle, clob);
+        let session = self.session.clone();
         let job = self
-            .send_and_pull_async("File", command, None, Box::new(lob_open_processor))
+            .send_and_pull_async(
+                "File",
+                command,
+                None,
+                Box::new(move |response| lob_open_processor(response, &session)),
+            )
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -1249,7 +1267,7 @@ impl SqlClient {
 
         let command = Self::open_lob_command(tx_handle, blob);
         let response = self.send_and_pull_response(command, None, timeout).await?;
-        let buf = Self::blob_read_processor(response)?;
+        let buf = Self::blob_read_processor(response, &self.session)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(buf)
@@ -1269,16 +1287,25 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::open_lob_command(tx_handle, blob);
+        let session = self.session.clone();
         let job = self
-            .send_and_pull_async("BLOB", command, None, Box::new(Self::blob_read_processor))
+            .send_and_pull_async(
+                "BLOB",
+                command,
+                None,
+                Box::new(move |response| Self::blob_read_processor(response, &session)),
+            )
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
     }
 
-    fn blob_read_processor(response: WireResponse) -> Result<Vec<u8>, TgError> {
-        let mut file = lob_open_processor(response)?;
+    fn blob_read_processor(
+        response: WireResponse,
+        session: &Arc<Session>,
+    ) -> Result<Vec<u8>, TgError> {
+        let mut file = lob_open_processor(response, session)?;
         let mut buf = Vec::new();
         file.read_to_end(&mut buf)
             .map_err(|e| io_error!("BLOB read error", e))?;
@@ -1327,7 +1354,7 @@ impl SqlClient {
 
         let command = Self::open_lob_command(tx_handle, clob);
         let response = self.send_and_pull_response(command, None, timeout).await?;
-        let buf = Self::clob_read_processor(response)?;
+        let buf = Self::clob_read_processor(response, &self.session)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(buf)
@@ -1347,16 +1374,25 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::open_lob_command(tx_handle, clob);
+        let session = self.session.clone();
         let job = self
-            .send_and_pull_async("CLOB", command, None, Box::new(Self::clob_read_processor))
+            .send_and_pull_async(
+                "CLOB",
+                command,
+                None,
+                Box::new(move |response| Self::clob_read_processor(response, &session)),
+            )
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
     }
 
-    fn clob_read_processor(response: WireResponse) -> Result<String, TgError> {
-        let mut file = lob_open_processor(response)?;
+    fn clob_read_processor(
+        response: WireResponse,
+        session: &Arc<Session>,
+    ) -> Result<String, TgError> {
+        let mut file = lob_open_processor(response, session)?;
         let mut buf = String::new();
         file.read_to_string(&mut buf)
             .map_err(|e| io_error!("CLOB read error", e))?;
@@ -1403,7 +1439,7 @@ impl SqlClient {
 
         let command = Self::copy_lob_to_command(tx_handle, blob);
         let response = self.send_and_pull_response(command, None, timeout).await?;
-        lob_copy_to_processor(response, destination)?;
+        lob_copy_to_processor(response, &self.session, destination)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
@@ -1422,12 +1458,15 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::copy_lob_to_command(tx_handle, blob);
+        let session = self.session.clone();
         let job = self
             .send_and_pull_async(
                 "BlobCopy",
                 command,
                 None,
-                Box::new(move |response| lob_copy_to_processor(response, destination.clone())),
+                Box::new(move |response| {
+                    lob_copy_to_processor(response, &session, destination.clone())
+                }),
             )
             .await?;
 
@@ -1474,7 +1513,7 @@ impl SqlClient {
 
         let command = Self::copy_lob_to_command(tx_handle, clob);
         let response = self.send_and_pull_response(command, None, timeout).await?;
-        lob_copy_to_processor(response, destination)?;
+        lob_copy_to_processor(response, &self.session, destination)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
@@ -1493,12 +1532,15 @@ impl SqlClient {
         let tx_handle = transaction.transaction_handle()?;
 
         let command = Self::copy_lob_to_command(tx_handle, clob);
+        let session = self.session.clone();
         let job = self
             .send_and_pull_async(
                 "ClobCopy",
                 command,
                 None,
-                Box::new(move |response| lob_copy_to_processor(response, destination.clone())),
+                Box::new(move |response| {
+                    lob_copy_to_processor(response, &session, destination.clone())
+                }),
             )
             .await?;
 

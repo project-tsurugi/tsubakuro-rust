@@ -11,12 +11,12 @@ use crate::jogasaki::proto::sql::common::{
     TimePointWithTimeZone as ProtoTimePointWithTimeZone,
 };
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
-use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
 use crate::prelude::{
-    TgBlob, TgClob, TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone,
-    TgTimePoint, TgTimePointWithTimeZone,
+    r#type::large_object::LargeObjectSendPathMapping, TgBlob, TgClob, TgDate, TgDecimal,
+    TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone, TgTimePoint, TgTimePointWithTimeZone,
 };
 use crate::tateyama::proto::framework::common::BlobInfo;
+use crate::{error::TgError, jogasaki::proto::sql::request::Parameter as SqlParameter};
 
 impl SqlParameter {
     fn new(name: &str, value: Option<Value>) -> SqlParameter {
@@ -572,7 +572,8 @@ static CLOB_NUMBER: AtomicI64 = AtomicI64::new(0);
 
 pub(crate) fn convert_lob_parameters(
     parameters: Vec<SqlParameter>,
-) -> (Vec<SqlParameter>, Option<Vec<BlobInfo>>) {
+    lob_send_path_mapping: &LargeObjectSendPathMapping,
+) -> Result<(Vec<SqlParameter>, Option<Vec<BlobInfo>>), TgError> {
     use crate::jogasaki::proto::sql::common::blob::Data as BlobData;
     use crate::jogasaki::proto::sql::common::clob::Data as ClobData;
     use crate::jogasaki::proto::sql::common::Blob;
@@ -589,6 +590,7 @@ pub(crate) fn convert_lob_parameters(
                         data: Some(BlobData::LocalPath(path)),
                     })),
             } => {
+                let path = lob_send_path_mapping.contert_to_server_path(&path)?;
                 let channel_name = create_channel_name("Blob", &BLOB_NUMBER);
                 let lob_info = BlobInfo {
                     channel_name: channel_name.clone(),
@@ -612,6 +614,7 @@ pub(crate) fn convert_lob_parameters(
                         data: Some(ClobData::LocalPath(path)),
                     })),
             } => {
+                let path = lob_send_path_mapping.contert_to_server_path(&path)?;
                 let channel_name = create_channel_name("Clob", &CLOB_NUMBER);
                 // not ClobInfo
                 let lob_info = BlobInfo {
@@ -635,9 +638,9 @@ pub(crate) fn convert_lob_parameters(
     }
 
     if lobs.is_empty() {
-        (parameters_result, None)
+        Ok((parameters_result, None))
     } else {
-        (parameters_result, Some(lobs))
+        Ok((parameters_result, Some(lobs)))
     }
 }
 

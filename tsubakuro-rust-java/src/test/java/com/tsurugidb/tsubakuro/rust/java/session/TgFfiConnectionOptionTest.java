@@ -19,10 +19,10 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
         var manager = getFfiObjectManager();
 
         try (var context = TgFfiContext.create(manager); //
-                var target = TgFfiConnectionOption.create(context)) {
+                var _ = TgFfiConnectionOption.create(context)) {
         }
 
-        try (var target = TgFfiConnectionOption.create(manager)) {
+        try (var _ = TgFfiConnectionOption.create(manager)) {
         }
     }
 
@@ -298,6 +298,102 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
             var out = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_keep_alive(ctx, handle, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void add_large_object_path_mapping_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg1 = manager.allocateString("client path");
+            var arg2 = manager.allocateString("server path");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = manager.allocateString("server path");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = manager.allocateString("client path");
+            var arg2 = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void add_large_object_path_mapping_on_send_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg1 = manager.allocateString("client path");
+            var arg2 = manager.allocateString("server path");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = manager.allocateString("server path");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = manager.allocateString("client path");
+            var arg2 = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void add_large_object_path_mapping_on_recv_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg1 = manager.allocateString("server path");
+            var arg2 = manager.allocateString("client path");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = MemorySegment.NULL;
+            var arg2 = manager.allocateString("client path");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = manager.allocateString("server path");
+            var arg2 = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(ctx, handle, arg1, arg2);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
         }
     }
 
