@@ -145,7 +145,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         var client = createSqlClient();
 
         var context = TgFfiContext.create(manager);
-        try (var tableMetadata = client.getTableMetadata(context, "test")) {
+        try (var _ = client.getTableMetadata(context, "test")) {
         }
     }
 
@@ -158,7 +158,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 
         var context = TgFfiContext.create(manager);
         var e = assertThrows(TgFfiRuntimeException.class, () -> {
-            try (var tableMetadata = client.getTableMetadata(context, "test2")) {
+            try (var _ = client.getTableMetadata(context, "test2")) {
             }
         });
 
@@ -238,7 +238,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
 
         var context = TgFfiContext.create(manager);
         try (var tableMetadataJob = client.getTableMetadataAsync(context, "test"); //
-                var tableMetadata = tableMetadataJob.take(context)) {
+                var _ = tableMetadataJob.take(context)) {
         }
     }
 
@@ -252,7 +252,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         var context = TgFfiContext.create(manager);
         try (var tableMetadataJob = client.getTableMetadataAsync(context, "test2")) {
             var e = assertThrows(TgFfiRuntimeException.class, () -> {
-                try (var tableMetadata = tableMetadataJob.take(context)) {
+                try (var _ = tableMetadataJob.take(context)) {
                 }
             });
 
@@ -1312,10 +1312,10 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
     }
 
-    // get_transaction_status(), _for(), _async() → TgFfiTransactionStatus
+    // get_transaction_error_info(), _for(), _async() → TgFfiTransactionStatus
 
     @Test
-    void get_transaction_status_argError() {
+    void get_transaction_error_info_argError() {
         var manager = getFfiObjectManager();
         var client = createSqlClient();
 
@@ -1326,7 +1326,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var handle = MemorySegment.NULL;
                 var arg = transaction.handle();
                 var out = manager.allocateHandleOut();
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status(ctx, handle, arg, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info(ctx, handle, arg, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
             {
@@ -1334,7 +1334,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var handle = client.handle();
                 var arg = MemorySegment.NULL;
                 var out = manager.allocateHandleOut();
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status(ctx, handle, arg, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info(ctx, handle, arg, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
             {
@@ -1342,14 +1342,14 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var handle = client.handle();
                 var arg = transaction.handle();
                 var out = MemorySegment.NULL;
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status(ctx, handle, arg, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info(ctx, handle, arg, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
         }
     }
 
     @Test
-    void get_transaction_status_for_argError() {
+    void get_transaction_error_info_for_argError() {
         var manager = getFfiObjectManager();
         var client = createSqlClient();
 
@@ -1361,7 +1361,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var arg = transaction.handle();
                 var t = Duration.ofSeconds(5).toNanos();
                 var out = manager.allocateHandleOut();
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info_for(ctx, handle, arg, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
             {
@@ -1370,7 +1370,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var arg = MemorySegment.NULL;
                 var t = Duration.ofSeconds(5).toNanos();
                 var out = manager.allocateHandleOut();
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info_for(ctx, handle, arg, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
             {
@@ -1379,14 +1379,14 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var arg = transaction.handle();
                 var t = Duration.ofSeconds(5).toNanos();
                 var out = MemorySegment.NULL;
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_for(ctx, handle, arg, t, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info_for(ctx, handle, arg, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
             }
         }
     }
 
     @Test
-    void get_transaction_status_async_argError() {
+    void get_transaction_error_info_async_argError() {
         var manager = getFfiObjectManager();
         var client = createSqlClient();
 
@@ -1397,7 +1397,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var handle = MemorySegment.NULL;
                 var arg = transaction.handle();
                 var out = manager.allocateHandleOut();
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_async(ctx, handle, arg, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info_async(ctx, handle, arg, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
             }
             {
@@ -1405,7 +1405,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var handle = client.handle();
                 var arg = MemorySegment.NULL;
                 var out = manager.allocateHandleOut();
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_async(ctx, handle, arg, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info_async(ctx, handle, arg, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
             }
             {
@@ -1413,7 +1413,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 var handle = client.handle();
                 var arg = transaction.handle();
                 var out = MemorySegment.NULL;
-                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_status_async(ctx, handle, arg, out);
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_transaction_error_info_async(ctx, handle, arg, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
         }
@@ -1436,7 +1436,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
         try (var transaction = startOcc(client)) {
             var sql = "delete from test";
-            try (var er = client.execute(context, transaction, sql)) {
+            try (var _ = client.execute(context, transaction, sql)) {
             }
 
             commitAndClose(client, transaction, DIRECT);
@@ -1459,9 +1459,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute(ctx, handle, tx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -1513,7 +1511,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         try (var transaction = startOcc(client)) {
             var sql = "delete from test";
             var timeout = Duration.ofSeconds(5);
-            try (var er = client.executeFor(context, transaction, sql, timeout)) {
+            try (var _ = client.executeFor(context, transaction, sql, timeout)) {
             }
 
             commitAndClose(client, transaction, DIRECT_FOR);
@@ -1537,9 +1535,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_for(ctx, handle, tx, arg, t, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -1595,7 +1591,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         try (var transaction = startOcc(client)) {
             var sql = "delete from test";
             try (var erJob = client.executeAsync(context, transaction, sql); //
-                    var er = jobTake(erJob, pattern)) {
+                    var _ = jobTake(erJob, pattern)) {
             }
 
             commitAndClose(client, transaction, pattern);
@@ -1618,9 +1614,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_execute_async(ctx, handle, tx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -1692,7 +1686,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             try (var ps = client.prepare(context, sql, placeholders)) {
                 try (var transaction = startOcc(client)) {
                     var parameters = List.<TgFfiSqlParameter>of();
-                    try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
+                    try (var _ = client.preparedExecute(context, transaction, ps, parameters)) {
                     }
 
                     commitAndClose(client, transaction, DIRECT);
@@ -1825,7 +1819,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 try (var transaction = startOcc(client)) {
                     var parameters = List.<TgFfiSqlParameter>of();
                     var timeout = Duration.ofSeconds(5);
-                    try (var er = client.preparedExecuteFor(context, transaction, ps, parameters, timeout)) {
+                    try (var _ = client.preparedExecuteFor(context, transaction, ps, parameters, timeout)) {
                     }
 
                     commitAndClose(client, transaction, DIRECT_FOR);
@@ -1965,7 +1959,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
                 try (var transaction = startOcc(client)) {
                     var parameters = List.<TgFfiSqlParameter>of();
                     try (var erJob = client.preparedExecuteAsync(context, transaction, ps, parameters); //
-                            var er = jobTake(erJob, pattern)) {
+                            var _ = jobTake(erJob, pattern)) {
                     }
 
                     commitAndClose(client, transaction, pattern);
@@ -2104,9 +2098,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query(ctx, handle, tx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -2186,9 +2178,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query_for(ctx, handle, tx, arg, t, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -2271,9 +2261,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_query_async(ctx, handle, tx, arg, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -2789,8 +2777,6 @@ class TgFfiSqlClientTest extends TgFfiTester {
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
         try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption); //
                 var commitOption = TgFfiCommitOption.create(context)) {
             var ctx = context.handle();
             var handle = client.handle();
@@ -2801,8 +2787,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
         try (var context = TgFfiContext.create(manager); //
                 var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption); //
-                var commitOption = TgFfiCommitOption.create(context)) {
+                var transaction = client.startTransaction(context, transactionOption)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = transaction.handle();
@@ -2846,8 +2831,6 @@ class TgFfiSqlClientTest extends TgFfiTester {
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
         try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption); //
                 var commit_forOption = TgFfiCommitOption.create(context)) {
             var ctx = context.handle();
             var handle = client.handle();
@@ -2859,8 +2842,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
         try (var context = TgFfiContext.create(manager); //
                 var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption); //
-                var commit_forOption = TgFfiCommitOption.create(context)) {
+                var transaction = client.startTransaction(context, transactionOption)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = transaction.handle();
@@ -2906,8 +2888,6 @@ class TgFfiSqlClientTest extends TgFfiTester {
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
         try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption); //
                 var commitOption = TgFfiCommitOption.create(context)) {
             var ctx = context.handle();
             var handle = client.handle();
@@ -2919,8 +2899,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
         try (var context = TgFfiContext.create(manager); //
                 var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption); //
-                var commitOption = TgFfiCommitOption.create(context)) {
+                var transaction = client.startTransaction(context, transactionOption)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = transaction.handle();
@@ -2971,9 +2950,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback(ctx, handle, tx);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -3012,9 +2989,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback_for(ctx, handle, tx, t);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;
@@ -3055,9 +3030,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_rollback_async(ctx, handle, tx, out);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
         }
-        try (var context = TgFfiContext.create(manager); //
-                var transactionOption = TgFfiTransactionOption.create(context); //
-                var transaction = client.startTransaction(context, transactionOption)) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = client.handle();
             var tx = MemorySegment.NULL;

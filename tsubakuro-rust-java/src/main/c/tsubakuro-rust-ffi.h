@@ -282,9 +282,9 @@ typedef struct TsurugiFfiTableMetadata TsurugiFfiTableMetadata;
 
 typedef struct TsurugiFfiTransaction TsurugiFfiTransaction;
 
-typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
+typedef struct TsurugiFfiTransactionErrorInfo TsurugiFfiTransactionErrorInfo;
 
-typedef struct TsurugiFfiTransactionStatus TsurugiFfiTransactionStatus;
+typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
 
 /**
  * Return code of tsubakuro-rust-ffi function.
@@ -399,9 +399,9 @@ typedef struct TsurugiFfiTransactionOption *TsurugiFfiTransactionOptionHandle;
 typedef struct TsurugiFfiTransaction *TsurugiFfiTransactionHandle;
 
 /**
- * Transaction status.
+ * Transaction error information.
  */
-typedef struct TsurugiFfiTransactionStatus *TsurugiFfiTransactionStatusHandle;
+typedef struct TsurugiFfiTransactionErrorInfo *TsurugiFfiTransactionErrorInfoHandle;
 
 /**
  * Commit option.
@@ -3148,9 +3148,9 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHan
                                                             TsurugiFfiJobHandle *transaction_job_out);
 
 /**
- * SqlClient: Get transaction status.
+ * SqlClient: Get transaction error information.
  *
- * See [`SqlClient::get_transaction_status`].
+ * See [`SqlClient::get_transaction_error_info`].
  *
  * # Receiver
  * - `sql_client` - Sql client.
@@ -3159,17 +3159,17 @@ TsurugiFfiRc tsurugi_ffi_sql_client_start_transaction_async(TsurugiFfiContextHan
  * - `transaction` - transaction.
  *
  * # Returns
- * - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose).
+ * - `transaction_error_info_out` - transaction error information. To dispose, call [`tsurugi_ffi_transaction_error_info_dispose`](crate::transaction::error_info::tsurugi_ffi_transaction_error_info_dispose).
  */
-TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context,
-                                                           TsurugiFfiSqlClientHandle sql_client,
-                                                           TsurugiFfiTransactionHandle transaction,
-                                                           TsurugiFfiTransactionStatusHandle *transaction_status_out);
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_error_info(TsurugiFfiContextHandle context,
+                                                               TsurugiFfiSqlClientHandle sql_client,
+                                                               TsurugiFfiTransactionHandle transaction,
+                                                               TsurugiFfiTransactionErrorInfoHandle *transaction_error_info_out);
 
 /**
- * SqlClient: Get transaction status.
+ * SqlClient: Get transaction error information.
  *
- * See [`SqlClient::get_transaction_status_for`].
+ * See [`SqlClient::get_transaction_error_info_for`].
  *
  * # Receiver
  * - `sql_client` - Sql client.
@@ -3179,18 +3179,18 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHand
  * - `timeout` - timeout time \[nanoseconds\].
  *
  * # Returns
- * - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose).
+ * - `transaction_error_info_out` - transaction error information. To dispose, call [`tsurugi_ffi_transaction_error_info_dispose`](crate::transaction::error_info::tsurugi_ffi_transaction_error_info_dispose).
  */
-TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context,
-                                                               TsurugiFfiSqlClientHandle sql_client,
-                                                               TsurugiFfiTransactionHandle transaction,
-                                                               TsurugiFfiDuration timeout,
-                                                               TsurugiFfiTransactionStatusHandle *transaction_status_out);
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_error_info_for(TsurugiFfiContextHandle context,
+                                                                   TsurugiFfiSqlClientHandle sql_client,
+                                                                   TsurugiFfiTransactionHandle transaction,
+                                                                   TsurugiFfiDuration timeout,
+                                                                   TsurugiFfiTransactionErrorInfoHandle *transaction_error_info_out);
 
 /**
- * SqlClient: Get transaction status.
+ * SqlClient: Get transaction error information.
  *
- * See [`SqlClient::get_transaction_status_async`].
+ * See [`SqlClient::get_transaction_error_info_async`].
  *
  * # Receiver
  * - `sql_client` - Sql client.
@@ -3199,13 +3199,13 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContext
  * - `transaction` - transaction.
  *
  * # Returns
- * - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
- *   Handle taken from Job casts to `TsurugiFfiTransactionStatusHandle` and call [`tsurugi_ffi_transaction_status_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_dispose) to dispose.
+ * - `transaction_error_info_job_out` - Job for `TsurugiFfiTransactionErrorInfoHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiTransactionErrorInfoHandle` and call [`tsurugi_ffi_transaction_error_info_dispose`](crate::transaction::error_info::tsurugi_ffi_transaction_error_info_dispose) to dispose.
  */
-TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context,
-                                                                 TsurugiFfiSqlClientHandle sql_client,
-                                                                 TsurugiFfiTransactionHandle transaction,
-                                                                 TsurugiFfiJobHandle *transaction_status_job_out);
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_error_info_async(TsurugiFfiContextHandle context,
+                                                                     TsurugiFfiSqlClientHandle sql_client,
+                                                                     TsurugiFfiTransactionHandle transaction,
+                                                                     TsurugiFfiJobHandle *transaction_error_info_job_out);
 
 /**
  * SqlClient: Executes a SQL statement.
@@ -4623,6 +4623,134 @@ TsurugiFfiRc tsurugi_ffi_commit_option_get_auto_dispose(TsurugiFfiContextHandle 
 void tsurugi_ffi_commit_option_dispose(TsurugiFfiCommitOptionHandle commit_option);
 
 /**
+ * TransactionErrorInfo: Whether the status is normal.
+ *
+ * See [`TransactionErrorInfo::is_normal`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `is_normal_out` - `true`: No error / `false`: Error occurred in transaction.
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_is_normal(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                          bool *is_normal_out);
+
+/**
+ * TransactionErrorInfo: Whether the status is error.
+ *
+ * See [`TransactionErrorInfo::is_error`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `is_error_out` - `true`: Error occurred in transaction / `false`: No error.
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_is_error(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                         bool *is_error_out);
+
+/**
+ * TransactionErrorInfo: Get server error name.
+ *
+ * See [`TransactionErrorInfo::server_error`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `error_name_out` - error name (`null` if no error).
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_get_server_error_name(TsurugiFfiContextHandle context,
+                                                                      TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                                      TsurugiFfiStringHandle *error_name_out);
+
+/**
+ * TransactionErrorInfo: Get server error message.
+ *
+ * See [`TransactionErrorInfo::server_error`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `error_message_out` - error message (`null` if no error).
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_get_server_error_message(TsurugiFfiContextHandle context,
+                                                                         TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                                         TsurugiFfiStringHandle *error_message_out);
+
+/**
+ * TransactionErrorInfo: Get server error category.
+ *
+ * See [`TransactionErrorInfo::server_error`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `category_number_out` - error category (0 if no error).
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_get_server_error_category_number(TsurugiFfiContextHandle context,
+                                                                                 TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                                                 int32_t *category_number_out);
+
+/**
+ * TransactionErrorInfo: Get server error category.
+ *
+ * See [`TransactionErrorInfo::server_error`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `category_str_out` - error category (`null` if no error).
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_get_server_error_category_str(TsurugiFfiContextHandle context,
+                                                                              TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                                              TsurugiFfiStringHandle *category_str_out);
+
+/**
+ * TransactionErrorInfo: Get server error code.
+ *
+ * See [`TransactionErrorInfo::server_error`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `code_number_out` - error code (0 if no error).
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_get_server_error_code_number(TsurugiFfiContextHandle context,
+                                                                             TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                                             int32_t *code_number_out);
+
+/**
+ * TransactionErrorInfo: Get server error structured code.
+ *
+ * See [`TransactionErrorInfo::server_error`].
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ *
+ * # Returns
+ * - `structured_code_out` - structured error code (`null` if no error).
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_error_info_get_server_error_structured_code(TsurugiFfiContextHandle context,
+                                                                                 TsurugiFfiTransactionErrorInfoHandle transaction_error_info,
+                                                                                 TsurugiFfiStringHandle *structured_code_out);
+
+/**
+ * TransactionErrorInfo: Dispose.
+ *
+ * # Receiver
+ * - `transaction_error_info` - Transaction error information.
+ */
+void tsurugi_ffi_transaction_error_info_dispose(TsurugiFfiTransactionErrorInfoHandle transaction_error_info);
+
+/**
  * TransactionOption: Creates a new instance.
  *
  * See [`TransactionOption::new`].
@@ -4926,134 +5054,6 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextH
  * - `transaction_option` - Transaction option.
  */
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
-
-/**
- * TransactionStatus: Whether the status is normal.
- *
- * See [`TransactionStatus::is_normal`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `is_normal_out` - `true`: No error / `false`: Error occurred in transaction.
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_is_normal(TsurugiFfiContextHandle context,
-                                                      TsurugiFfiTransactionStatusHandle transaction_status,
-                                                      bool *is_normal_out);
-
-/**
- * TransactionStatus: Whether the status is error.
- *
- * See [`TransactionStatus::is_error`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `is_error_out` - `true`: Error occurred in transaction / `false`: No error.
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_is_error(TsurugiFfiContextHandle context,
-                                                     TsurugiFfiTransactionStatusHandle transaction_status,
-                                                     bool *is_error_out);
-
-/**
- * TransactionStatus: Get server error name.
- *
- * See [`TransactionStatus::server_error`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `error_name_out` - error name (`null` if no error).
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_name(TsurugiFfiContextHandle context,
-                                                                  TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                  TsurugiFfiStringHandle *error_name_out);
-
-/**
- * TransactionStatus: Get server error message.
- *
- * See [`TransactionStatus::server_error`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `error_message_out` - error message (`null` if no error).
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_message(TsurugiFfiContextHandle context,
-                                                                     TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                     TsurugiFfiStringHandle *error_message_out);
-
-/**
- * TransactionStatus: Get server error category.
- *
- * See [`TransactionStatus::server_error`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `category_number_out` - error category (0 if no error).
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_number(TsurugiFfiContextHandle context,
-                                                                             TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                             int32_t *category_number_out);
-
-/**
- * TransactionStatus: Get server error category.
- *
- * See [`TransactionStatus::server_error`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `category_str_out` - error category (`null` if no error).
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_category_str(TsurugiFfiContextHandle context,
-                                                                          TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                          TsurugiFfiStringHandle *category_str_out);
-
-/**
- * TransactionStatus: Get server error code.
- *
- * See [`TransactionStatus::server_error`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `code_number_out` - error code (0 if no error).
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_code_number(TsurugiFfiContextHandle context,
-                                                                         TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                         int32_t *code_number_out);
-
-/**
- * TransactionStatus: Get server error structured code.
- *
- * See [`TransactionStatus::server_error`].
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- *
- * # Returns
- * - `structured_code_out` - structured error code (`null` if no error).
- */
-TsurugiFfiRc tsurugi_ffi_transaction_status_get_server_error_structured_code(TsurugiFfiContextHandle context,
-                                                                             TsurugiFfiTransactionStatusHandle transaction_status,
-                                                                             TsurugiFfiStringHandle *structured_code_out);
-
-/**
- * TransactionStatus: Dispose.
- *
- * # Receiver
- * - `transaction_status` - Transaction status.
- */
-void tsurugi_ffi_transaction_status_dispose(TsurugiFfiTransactionStatusHandle transaction_status);
 
 /**
  * Transaction: Get transaction id.

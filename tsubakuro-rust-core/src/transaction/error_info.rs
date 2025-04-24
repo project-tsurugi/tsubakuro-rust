@@ -7,15 +7,15 @@ use crate::{
     sql_service_error,
 };
 
-/// Transaction status.
+/// Transaction error information.
 #[derive(Debug)]
-pub struct TransactionStatus {
+pub struct TransactionErrorInfo {
     server_error: Option<TgError>,
 }
 
-impl TransactionStatus {
-    pub(crate) fn new(server_error: Option<TgError>) -> TransactionStatus {
-        TransactionStatus { server_error }
+impl TransactionErrorInfo {
+    pub(crate) fn new(server_error: Option<TgError>) -> TransactionErrorInfo {
+        TransactionErrorInfo { server_error }
     }
 
     /// Returns occurred error in the target transaction, only if the transaction has been accidentally aborted.
@@ -42,10 +42,10 @@ impl TransactionStatus {
     }
 }
 
-pub(crate) fn transaction_status_processor(
+pub(crate) fn transaction_error_info_processor(
     response: WireResponse,
-) -> Result<TransactionStatus, TgError> {
-    const FUNCTION_NAME: &str = "transaction_status_processor()";
+) -> Result<TransactionErrorInfo, TgError> {
+    const FUNCTION_NAME: &str = "transaction_error_info_processor()";
 
     let (sql_response, _) = convert_sql_response(FUNCTION_NAME, &response)?;
     let message = sql_response.ok_or(invalid_response_error!(
@@ -55,14 +55,14 @@ pub(crate) fn transaction_status_processor(
     match message.response {
         Some(SqlResponseType::GetErrorInfo(info)) => match info.result {
             Some(crate::jogasaki::proto::sql::response::get_error_info::Result::Success(error)) => {
-                Ok(TransactionStatus::new(Some(sql_service_error!(
+                Ok(TransactionErrorInfo::new(Some(sql_service_error!(
                     FUNCTION_NAME,
                     error
                 ))))
             }
             Some(crate::jogasaki::proto::sql::response::get_error_info::Result::ErrorNotFound(
                 _,
-            )) => Ok(TransactionStatus::new(None)),
+            )) => Ok(TransactionErrorInfo::new(None)),
             Some(crate::jogasaki::proto::sql::response::get_error_info::Result::Error(error)) => {
                 Err(sql_service_error!(FUNCTION_NAME, error))
             }

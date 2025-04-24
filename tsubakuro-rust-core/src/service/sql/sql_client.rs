@@ -12,11 +12,12 @@ use crate::{
         response::{response::Response as SqlResponseType, Response as SqlResponse},
     },
     prelude::{
-        convert_lob_parameters, execute_result_processor,
+        convert_lob_parameters,
+        error_info::{transaction_error_info_processor, TransactionErrorInfo},
+        execute_result_processor,
         explain::explain_processor,
         list_tables_processor, lob_copy_to_processor, lob_open_processor,
         prepare_dispose_processor, prepare_processor, query_result_processor,
-        status::{transaction_status_processor, TransactionStatus},
         table_metadata_processor, CommitOption, ServiceClient, SqlExecuteResult, SqlParameter,
         SqlPlaceholder, SqlQueryResult, TableList, TableMetadata, TgBlobReference, TgClobReference,
     },
@@ -627,7 +628,7 @@ impl SqlClient {
     /// use tsubakuro_rust_core::prelude::*;
     ///
     /// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
-    ///     let status = client.get_transaction_status(transaction).await?;
+    ///     let status = client.get_transaction_error_info(transaction).await?;
     ///     println!("is_error={}", status.is_error());
     ///
     ///     if let Some(code) = status.diagnostic_code() {
@@ -637,46 +638,47 @@ impl SqlClient {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn get_transaction_status(
+    pub async fn get_transaction_error_info(
         &self,
         transaction: &Transaction,
-    ) -> Result<TransactionStatus, TgError> {
+    ) -> Result<TransactionErrorInfo, TgError> {
         let timeout = self.default_timeout;
-        self.get_transaction_status_for(transaction, timeout).await
+        self.get_transaction_error_info_for(transaction, timeout)
+            .await
     }
 
     /// Returns occurred error in the target transaction.
-    pub async fn get_transaction_status_for(
+    pub async fn get_transaction_error_info_for(
         &self,
         transaction: &Transaction,
         timeout: Duration,
-    ) -> Result<TransactionStatus, TgError> {
-        const FUNCTION_NAME: &str = "get_transaction_status()";
+    ) -> Result<TransactionErrorInfo, TgError> {
+        const FUNCTION_NAME: &str = "get_transaction_error_info()";
         trace!("{} start", FUNCTION_NAME);
 
-        let command = Self::transaction_status_command(transaction.transaction_handle()?);
+        let command = Self::transaction_error_info_command(transaction.transaction_handle()?);
         let response = self.send_and_pull_response(command, None, timeout).await?;
-        let status = transaction_status_processor(response)?;
+        let status = transaction_error_info_processor(response)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(status)
     }
 
     /// Returns occurred error in the target transaction.
-    pub async fn get_transaction_status_async(
+    pub async fn get_transaction_error_info_async(
         &self,
         transaction: &Transaction,
-    ) -> Result<Job<TransactionStatus>, TgError> {
-        const FUNCTION_NAME: &str = "get_transaction_status_async()";
+    ) -> Result<Job<TransactionErrorInfo>, TgError> {
+        const FUNCTION_NAME: &str = "get_transaction_error_info_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let command = Self::transaction_status_command(transaction.transaction_handle()?);
+        let command = Self::transaction_error_info_command(transaction.transaction_handle()?);
         let job = self
             .send_and_pull_async(
-                "TransactionStatus",
+                "TransactionErrorInfo",
                 command,
                 None,
-                Box::new(transaction_status_processor),
+                Box::new(transaction_error_info_processor),
             )
             .await?;
 
@@ -684,7 +686,7 @@ impl SqlClient {
         Ok(job)
     }
 
-    fn transaction_status_command(transaction_handle: &ProtoTransaction) -> SqlCommand {
+    fn transaction_error_info_command(transaction_handle: &ProtoTransaction) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::GetErrorInfo {
             transaction_handle: Some(*transaction_handle),
         };

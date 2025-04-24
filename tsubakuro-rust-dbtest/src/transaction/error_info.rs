@@ -9,7 +9,7 @@ mod test {
         let client = create_test_sql_client().await;
 
         let transaction = start_occ(&client).await;
-        let status = client.get_transaction_status(&transaction).await.unwrap();
+        let status = client.get_transaction_error_info(&transaction).await.unwrap();
         assert_eq!(true, status.server_error().is_none());
         assert_eq!(true, status.is_normal());
         assert_eq!(false, status.is_error());
@@ -24,10 +24,10 @@ mod test {
 
         let transaction = start_occ(&client).await;
         let mut job = client
-            .get_transaction_status_async(&transaction)
+            .get_transaction_error_info_async(&transaction)
             .await
             .unwrap();
-        assert_eq!("TransactionStatus", job.name());
+        assert_eq!("TransactionErrorInfo", job.name());
         let status = job.take().await.unwrap();
         assert_eq!(true, status.server_error().is_none());
         assert_eq!(true, status.is_normal());
@@ -52,7 +52,7 @@ mod test {
             panic!("{error}");
         }
 
-        let status = client.get_transaction_status(&transaction).await.unwrap();
+        let status = client.get_transaction_error_info(&transaction).await.unwrap();
         if let Some(TgError::ServerError(_, _, code, message)) = status.server_error() {
             assert_eq!(error_code, code);
             assert_eq!(error_message, message);
@@ -82,7 +82,7 @@ mod test {
         }
 
         let mut job = client
-            .get_transaction_status_async(&transaction)
+            .get_transaction_error_info_async(&transaction)
             .await
             .unwrap();
         let status = job.take().await.unwrap();
