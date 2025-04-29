@@ -40,24 +40,24 @@ mod test {
             assert_eq!("", metadata.database_name());
             assert_eq!("", metadata.schema_name());
             assert_eq!("test", metadata.table_name());
-            assert_eq!(None, metadata.description());
+            assert_eq!(Some(&"test table.".to_string()), metadata.description());
 
             let columns = metadata.columns();
             assert_eq!(3, columns.len());
             let c = &columns[0];
             assert_eq!("foo", c.name());
             assert_eq!(Some(AtomType::Int4), c.atom_type());
-            assert_eq!(None, c.description());
+            assert_eq!(Some(&"primary key".to_string()), c.description());
             let c = &columns[1];
             assert_eq!("bar", c.name());
             assert_eq!(Some(AtomType::Int8), c.atom_type());
-            assert_eq!(None, c.description());
+            assert_eq!(Some(&"long value".to_string()), c.description());
             let c = &columns[2];
             assert_eq!("zzz", c.name());
             assert_eq!(Some(AtomType::Character), c.atom_type());
             assert_eq!(Some(true), c.varying());
             assert_eq!(Some((10, false)), c.length());
-            assert_eq!(None, c.description());
+            assert_eq!(Some(&"text value".to_string()), c.description());
         }
     }
 

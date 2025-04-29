@@ -49,7 +49,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
             var tableName = metadata.getTableName(context);
             assertEquals("test", tableName);
             var description = metadata.getDescription(context);
-            assertEquals(null, description);
+            assertEquals("test table.", description);
 
             var columns = metadata.getColumns(context);
             assertEquals(3, columns.size());
@@ -59,20 +59,20 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
                 var column = columns.get(i++);
                 assertEquals("foo", column.getName(context));
                 assertEquals(TgFfiAtomType.INT4, column.getAtomType(context));
-                assertEquals(null, column.getDescription(context));
+                assertEquals("primary key", column.getDescription(context));
             }
             {
                 var column = columns.get(i++);
                 assertEquals("bar", column.getName(context));
                 assertEquals(TgFfiAtomType.INT8, column.getAtomType(context));
-                assertEquals(null, column.getDescription(context));
+                assertEquals("long value", column.getDescription(context));
             }
             {
                 var column = columns.get(i++);
                 assertEquals("zzz", column.getName(context));
                 assertEquals(TgFfiAtomType.CHARACTER, column.getAtomType(context));
                 assertTrue(column.getVarying(context));
-                assertEquals(null, column.getDescription(context));
+                assertEquals("text value", column.getDescription(context));
             }
         }
     }
