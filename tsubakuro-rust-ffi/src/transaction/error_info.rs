@@ -14,7 +14,7 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub(crate) struct TsurugiFfiTransactionErrorInfo {
+pub struct TsurugiFfiTransactionErrorInfo {
     transaction_error_info: TransactionErrorInfo,
     error_name: Option<CString>,
     error_message: Option<CString>,

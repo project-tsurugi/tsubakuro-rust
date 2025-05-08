@@ -220,6 +220,45 @@ enum TsurugiFfiTransactionPriority {
 typedef int32_t TsurugiFfiTransactionPriority;
 
 /**
+ * Transaction status.
+ */
+enum TsurugiFfiTransactionStatus {
+  /**
+   * the transaction status unknown or not provided.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_UNSPECIFIED = 0,
+  /**
+   * the transaction is started and running.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_RUNNING = 10,
+  /**
+   * the transaction is in the process of committing.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_COMMITTING = 20,
+  /**
+   * the transaction has been committed and visible for others.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_AVAILABLE = 30,
+  /**
+   * the transaction has been committed and saved on the local disk.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_STORED = 40,
+  /**
+   * the transaction has been committed and propagated to all the suitable nodes.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_PROPAGATED = 50,
+  /**
+   * the transaction is in the process of aborting.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_ABORTING = 60,
+  /**
+   * the transaction has been aborted.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_ABORTED = 70,
+};
+typedef int32_t TsurugiFfiTransactionStatus;
+
+/**
  * Transaction type.
  */
 enum TsurugiFfiTransactionType {
@@ -285,6 +324,8 @@ typedef struct TsurugiFfiTransaction TsurugiFfiTransaction;
 typedef struct TsurugiFfiTransactionErrorInfo TsurugiFfiTransactionErrorInfo;
 
 typedef struct TsurugiFfiTransactionOption TsurugiFfiTransactionOption;
+
+typedef struct TsurugiFfiTransactionStatusWithMessage TsurugiFfiTransactionStatusWithMessage;
 
 /**
  * Return code of tsubakuro-rust-ffi function.
@@ -402,6 +443,11 @@ typedef struct TsurugiFfiTransaction *TsurugiFfiTransactionHandle;
  * Transaction error information.
  */
 typedef struct TsurugiFfiTransactionErrorInfo *TsurugiFfiTransactionErrorInfoHandle;
+
+/**
+ * Transaction status.
+ */
+typedef struct TsurugiFfiTransactionStatusWithMessage *TsurugiFfiTransactionStatusWithMessageHandle;
 
 /**
  * Commit option.
@@ -3208,6 +3254,66 @@ TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_error_info_async(TsurugiFfiC
                                                                      TsurugiFfiJobHandle *transaction_error_info_job_out);
 
 /**
+ * SqlClient: Get transaction status.
+ *
+ * See [`SqlClient::get_transaction_status`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ *
+ * # Returns
+ * - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_with_message_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_with_message_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSqlClientHandle sql_client,
+                                                           TsurugiFfiTransactionHandle transaction,
+                                                           TsurugiFfiTransactionStatusWithMessageHandle *transaction_status_out);
+
+/**
+ * SqlClient: Get transaction status.
+ *
+ * See [`SqlClient::get_transaction_status_for`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `transaction_status_out` - transaction status. To dispose, call [`tsurugi_ffi_transaction_status_with_message_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_with_message_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_for(TsurugiFfiContextHandle context,
+                                                               TsurugiFfiSqlClientHandle sql_client,
+                                                               TsurugiFfiTransactionHandle transaction,
+                                                               TsurugiFfiDuration timeout,
+                                                               TsurugiFfiTransactionStatusWithMessageHandle *transaction_status_out);
+
+/**
+ * SqlClient: Get transaction status.
+ *
+ * See [`SqlClient::get_transaction_status_async`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ *
+ * # Returns
+ * - `transaction_status_job_out` - Job for `TsurugiFfiTransactionStatusWithMessageHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiTransactionStatusWithMessageHandle` and call [`tsurugi_ffi_transaction_status_with_message_dispose`](crate::transaction::status::tsurugi_ffi_transaction_status_with_message_dispose) to dispose.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_transaction_status_async(TsurugiFfiContextHandle context,
+                                                                 TsurugiFfiSqlClientHandle sql_client,
+                                                                 TsurugiFfiTransactionHandle transaction,
+                                                                 TsurugiFfiJobHandle *transaction_status_job_out);
+
+/**
  * SqlClient: Executes a SQL statement.
  *
  * See [`SqlClient::execute`].
@@ -5054,6 +5160,44 @@ TsurugiFfiRc tsurugi_ffi_transaction_option_get_close_timeout(TsurugiFfiContextH
  * - `transaction_option` - Transaction option.
  */
 void tsurugi_ffi_transaction_option_dispose(TsurugiFfiTransactionOptionHandle transaction_option);
+
+/**
+ * TransactionStatusWithMessage: Get transaction status.
+ *
+ * See [`TransactionStatusWithMessage::status`].
+ *
+ * # Receiver
+ * - `transaction_status` - Transaction status.
+ *
+ * # Returns
+ * - `status_out` - transaction status.
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_status_with_message_get_status(TsurugiFfiContextHandle context,
+                                                                    TsurugiFfiTransactionStatusWithMessageHandle transaction_status,
+                                                                    TsurugiFfiTransactionStatus *status_out);
+
+/**
+ * TransactionStatus: Returns additional information for the transaction status.
+ *
+ * See [`TransactionStatusWithMessage::message`].
+ *
+ * # Receiver
+ * - `transaction_status` - Transaction status.
+ *
+ * # Returns
+ * - `message_out` - message.
+ */
+TsurugiFfiRc tsurugi_ffi_transaction_status_with_message_get_message(TsurugiFfiContextHandle context,
+                                                                     TsurugiFfiTransactionStatusWithMessageHandle transaction_status,
+                                                                     TsurugiFfiStringHandle *message_out);
+
+/**
+ * TransactionStatusWithMessage: Dispose.
+ *
+ * # Receiver
+ * - `transaction_status` - Transaction status.
+ */
+void tsurugi_ffi_transaction_status_with_message_dispose(TsurugiFfiTransactionStatusWithMessageHandle transaction_status);
 
 /**
  * Transaction: Get transaction id.

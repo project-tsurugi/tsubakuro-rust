@@ -18,8 +18,9 @@ use crate::{
         explain::explain_processor,
         list_tables_processor, lob_copy_to_processor, lob_open_processor,
         prepare_dispose_processor, prepare_processor, query_result_processor,
-        table_metadata_processor, CommitOption, ServiceClient, SqlExecuteResult, SqlParameter,
-        SqlPlaceholder, SqlQueryResult, TableList, TableMetadata, TgBlobReference, TgClobReference,
+        table_metadata_processor, transaction_status_processor, CommitOption, ServiceClient,
+        SqlExecuteResult, SqlParameter, SqlPlaceholder, SqlQueryResult, TableList, TableMetadata,
+        TgBlobReference, TgClobReference, TransactionStatusWithMessage,
     },
     prost_decode_error,
     session::{
@@ -638,6 +639,8 @@ impl SqlClient {
     ///     Ok(())
     /// }
     /// ```
+    ///
+    /// since 0.2.0
     pub async fn get_transaction_error_info(
         &self,
         transaction: &Transaction,
@@ -648,6 +651,8 @@ impl SqlClient {
     }
 
     /// Returns occurred error in the target transaction.
+    ///
+    /// since 0.2.0
     pub async fn get_transaction_error_info_for(
         &self,
         transaction: &Transaction,
@@ -665,6 +670,8 @@ impl SqlClient {
     }
 
     /// Returns occurred error in the target transaction.
+    ///
+    /// since 0.2.0
     pub async fn get_transaction_error_info_async(
         &self,
         transaction: &Transaction,
@@ -691,6 +698,80 @@ impl SqlClient {
             transaction_handle: Some(*transaction_handle),
         };
         SqlCommand::GetErrorInfo(request)
+    }
+
+    /// Get the transaction status on the server.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
+    ///     let status = client.get_transaction_status(transaction).await?;
+    ///     println!("status={:?}", status.status());
+    ///     println!("message={}", status.message());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
+    /// since 0.2.0
+    pub async fn get_transaction_status(
+        &self,
+        transaction: &Transaction,
+    ) -> Result<TransactionStatusWithMessage, TgError> {
+        let timeout = self.default_timeout;
+        self.get_transaction_status_for(transaction, timeout).await
+    }
+
+    /// Get the transaction status on the server.
+    ///
+    /// since 0.2.0
+    pub async fn get_transaction_status_for(
+        &self,
+        transaction: &Transaction,
+        timeout: Duration,
+    ) -> Result<TransactionStatusWithMessage, TgError> {
+        const FUNCTION_NAME: &str = "get_transaction_status()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::transaction_status_command(transaction.transaction_handle()?);
+        let response = self.send_and_pull_response(command, None, timeout).await?;
+        let status = transaction_status_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(status)
+    }
+
+    /// Get the transaction status on the server.
+    ///
+    /// since 0.2.0
+    pub async fn get_transaction_status_async(
+        &self,
+        transaction: &Transaction,
+    ) -> Result<Job<TransactionStatusWithMessage>, TgError> {
+        const FUNCTION_NAME: &str = "get_transaction_status_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::transaction_status_command(transaction.transaction_handle()?);
+        let job = self
+            .send_and_pull_async(
+                "TransactionStatus",
+                command,
+                None,
+                Box::new(transaction_status_processor),
+            )
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    fn transaction_status_command(transaction_handle: &ProtoTransaction) -> SqlCommand {
+        let request = crate::jogasaki::proto::sql::request::GetTransactionStatus {
+            transaction_handle: Some(*transaction_handle),
+        };
+        SqlCommand::GetTransactionStatus(request)
     }
 
     /// Executes a SQL statement.

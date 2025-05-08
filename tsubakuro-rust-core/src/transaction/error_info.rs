@@ -8,6 +8,8 @@ use crate::{
 };
 
 /// Transaction error information.
+///
+/// since 0.2.0
 #[derive(Debug)]
 pub struct TransactionErrorInfo {
     server_error: Option<TgError>,
@@ -52,20 +54,15 @@ pub(crate) fn transaction_error_info_processor(
         FUNCTION_NAME,
         format!("response {:?} is not ResponseSessionPayload", response),
     ))?;
+
+    use crate::jogasaki::proto::sql::response::get_error_info::Result;
     match message.response {
         Some(SqlResponseType::GetErrorInfo(info)) => match info.result {
-            Some(crate::jogasaki::proto::sql::response::get_error_info::Result::Success(error)) => {
-                Ok(TransactionErrorInfo::new(Some(sql_service_error!(
-                    FUNCTION_NAME,
-                    error
-                ))))
-            }
-            Some(crate::jogasaki::proto::sql::response::get_error_info::Result::ErrorNotFound(
-                _,
-            )) => Ok(TransactionErrorInfo::new(None)),
-            Some(crate::jogasaki::proto::sql::response::get_error_info::Result::Error(error)) => {
-                Err(sql_service_error!(FUNCTION_NAME, error))
-            }
+            Some(Result::Success(error)) => Ok(TransactionErrorInfo::new(Some(
+                sql_service_error!(FUNCTION_NAME, error),
+            ))),
+            Some(Result::ErrorNotFound(_)) => Ok(TransactionErrorInfo::new(None)),
+            Some(Result::Error(error)) => Err(sql_service_error!(FUNCTION_NAME, error)),
             None => Err(invalid_response_error!(
                 FUNCTION_NAME,
                 format!("response GetErrorInfo.result is None"),

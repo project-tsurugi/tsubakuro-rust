@@ -9,11 +9,14 @@ mod test {
         let client = create_test_sql_client().await;
 
         let transaction = start_occ(&client).await;
-        let status = client.get_transaction_error_info(&transaction).await.unwrap();
-        assert_eq!(true, status.server_error().is_none());
-        assert_eq!(true, status.is_normal());
-        assert_eq!(false, status.is_error());
-        assert_eq!(None, status.diagnostic_code());
+        let info = client
+            .get_transaction_error_info(&transaction)
+            .await
+            .unwrap();
+        assert_eq!(true, info.server_error().is_none());
+        assert_eq!(true, info.is_normal());
+        assert_eq!(false, info.is_error());
+        assert_eq!(None, info.diagnostic_code());
 
         transaction.close().await.unwrap();
     }
@@ -28,11 +31,11 @@ mod test {
             .await
             .unwrap();
         assert_eq!("TransactionErrorInfo", job.name());
-        let status = job.take().await.unwrap();
-        assert_eq!(true, status.server_error().is_none());
-        assert_eq!(true, status.is_normal());
-        assert_eq!(false, status.is_error());
-        assert_eq!(None, status.diagnostic_code());
+        let info = job.take().await.unwrap();
+        assert_eq!(true, info.server_error().is_none());
+        assert_eq!(true, info.is_normal());
+        assert_eq!(false, info.is_error());
+        assert_eq!(None, info.diagnostic_code());
 
         transaction.close().await.unwrap();
     }
@@ -52,16 +55,19 @@ mod test {
             panic!("{error}");
         }
 
-        let status = client.get_transaction_error_info(&transaction).await.unwrap();
-        if let Some(TgError::ServerError(_, _, code, message)) = status.server_error() {
+        let info = client
+            .get_transaction_error_info(&transaction)
+            .await
+            .unwrap();
+        if let Some(TgError::ServerError(_, _, code, message)) = info.server_error() {
             assert_eq!(error_code, code);
             assert_eq!(error_message, message);
         } else {
-            panic!("left={:?}, right={:?}", error, status.server_error());
+            panic!("left={:?}, right={:?}", error, info.server_error());
         }
-        assert_eq!(false, status.is_normal());
-        assert_eq!(true, status.is_error());
-        assert_eq!(Some(error_code), status.diagnostic_code());
+        assert_eq!(false, info.is_normal());
+        assert_eq!(true, info.is_error());
+        assert_eq!(Some(error_code), info.diagnostic_code());
 
         transaction.close().await.unwrap();
     }
@@ -85,16 +91,16 @@ mod test {
             .get_transaction_error_info_async(&transaction)
             .await
             .unwrap();
-        let status = job.take().await.unwrap();
-        if let Some(TgError::ServerError(_, _, code, message)) = status.server_error() {
+        let info = job.take().await.unwrap();
+        if let Some(TgError::ServerError(_, _, code, message)) = info.server_error() {
             assert_eq!(error_code, code);
             assert_eq!(error_message, message);
         } else {
-            panic!("left={:?}, right={:?}", error, status.server_error());
+            panic!("left={:?}, right={:?}", error, info.server_error());
         }
-        assert_eq!(false, status.is_normal());
-        assert_eq!(true, status.is_error());
-        assert_eq!(error_code, status.diagnostic_code().unwrap());
+        assert_eq!(false, info.is_normal());
+        assert_eq!(true, info.is_error());
+        assert_eq!(error_code, info.diagnostic_code().unwrap());
 
         transaction.close().await.unwrap();
     }
