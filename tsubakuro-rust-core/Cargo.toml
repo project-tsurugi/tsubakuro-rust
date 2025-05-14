@@ -1,6 +1,6 @@
 [package]
 name = "tsubakuro-rust-core"
-version = "0.2.0-beta.1"
+version = "0.2.0"
 description = "core library to access Tsurugi for Rust"
 homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-core"
 documentation = "https://docs.rs/tsubakuro_rust_core/"
