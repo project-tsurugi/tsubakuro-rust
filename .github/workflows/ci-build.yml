@@ -88,3 +88,11 @@ jobs:
           cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO }}
+
+      - name: Create_GitHub_Release
+        if: github.repository_owner == 'project-tsurugi' && contains(github.ref, '/tags/')
+        run: |
+          gh release create ${TSUBAKURO_RUST_VERSION} --title ${TSUBAKURO_RUST_VERSION} --latest --repo project-tsurugi/tsubakuro-rust
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TSUBAKURO_RUST_VERSION: ${{ github.ref_name }}
