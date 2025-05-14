@@ -224,9 +224,13 @@ typedef int32_t TsurugiFfiTransactionPriority;
  */
 enum TsurugiFfiTransactionStatus {
   /**
-   * the transaction status unknown or not provided.
+   * the transaction status is not specified (should not be used normally).
    */
   TSURUGI_FFI_TRANSACTION_STATUS_UNSPECIFIED = 0,
+  /**
+   * the transaction status unknown or not provided.
+   */
+  TSURUGI_FFI_TRANSACTION_STATUS_UNTRACKED = 1,
   /**
    * the transaction is started and running.
    */

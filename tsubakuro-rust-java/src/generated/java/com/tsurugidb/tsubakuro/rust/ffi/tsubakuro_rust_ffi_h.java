@@ -15794,6 +15794,15 @@ public class tsubakuro_rust_ffi_h {
     public static int TSURUGI_FFI_TRANSACTION_STATUS_UNSPECIFIED() {
         return TSURUGI_FFI_TRANSACTION_STATUS_UNSPECIFIED;
     }
+    private static final int TSURUGI_FFI_TRANSACTION_STATUS_UNTRACKED = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionStatus.TSURUGI_FFI_TRANSACTION_STATUS_UNTRACKED = 1
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_STATUS_UNTRACKED() {
+        return TSURUGI_FFI_TRANSACTION_STATUS_UNTRACKED;
+    }
     private static final int TSURUGI_FFI_TRANSACTION_STATUS_RUNNING = (int)10L;
     /**
      * {@snippet lang=c :

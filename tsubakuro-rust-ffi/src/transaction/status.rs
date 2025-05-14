@@ -17,8 +17,10 @@ use crate::{
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(i32)]
 pub enum TsurugiFfiTransactionStatus {
-    /// the transaction status unknown or not provided.
+    /// the transaction status is not specified (should not be used normally).
     Unspecified = 0,
+    /// the transaction status unknown or not provided.
+    Untracked = 1,
     /// the transaction is started and running.
     Running = 10,
     /// the transaction is in the process of committing.
@@ -39,6 +41,7 @@ impl From<TransactionStatus> for TsurugiFfiTransactionStatus {
     fn from(value: TransactionStatus) -> Self {
         match value {
             TransactionStatus::Unspecified => TsurugiFfiTransactionStatus::Unspecified,
+            TransactionStatus::Untracked => TsurugiFfiTransactionStatus::Untracked,
             TransactionStatus::Running => TsurugiFfiTransactionStatus::Running,
             TransactionStatus::Committing => TsurugiFfiTransactionStatus::Committing,
             TransactionStatus::Available => TsurugiFfiTransactionStatus::Available,
@@ -54,6 +57,7 @@ impl From<TsurugiFfiTransactionStatus> for TransactionStatus {
     fn from(value: TsurugiFfiTransactionStatus) -> Self {
         match value {
             TsurugiFfiTransactionStatus::Unspecified => Self::Unspecified,
+            TsurugiFfiTransactionStatus::Untracked => Self::Untracked,
             TsurugiFfiTransactionStatus::Running => Self::Running,
             TsurugiFfiTransactionStatus::Committing => Self::Committing,
             TsurugiFfiTransactionStatus::Available => Self::Available,

@@ -7,12 +7,20 @@ public enum TgFfiTransactionStatus {
 
     /**
      * <pre>
-     * the transaction status unknown or not provided.
+     * the transaction status is not specified (should not be used normally).
      * </pre>
      *
      * <code>TRANSACTION_STATUS_UNSPECIFIED = 0;</code>
      */
     UNSPECIFIED(0),
+    /**
+     * <pre>
+     * the transaction status unknown or not provided.
+     * </pre>
+     *
+     * <code>UNTRACKED = 1;</code>
+     */
+    UNTRACKED(1),
     /**
      * <pre>
      * the transaction is started and running.
