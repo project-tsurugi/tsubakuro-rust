@@ -29,7 +29,7 @@ Add `tsubakuro-rust-core` as a dependency to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-tsubakuro-rust-core = "0.1.0"
+tsubakuro-rust-core = "0.2.0"
 ```
 
 
