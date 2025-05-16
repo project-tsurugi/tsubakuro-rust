@@ -6,7 +6,7 @@ tsubakuro-rust-core is a port from [Tsubakuro/Java](https://github.com/project-t
 
 ## Limitations
 
-- Tsurugi 1.3.0 or later.
+- Tsurugi 1.4.0 or later.
 - Provide SQL service only.
 - Only TCP connection is available.
 
