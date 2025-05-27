@@ -49,7 +49,7 @@ const SERVICE_SYMBOLIC_ID: &str = "sql";
 const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 1;
 
 /// The minor service message version which this client requests.
-const SERVICE_MESSAGE_VERSION_MINOR: u64 = 5;
+const SERVICE_MESSAGE_VERSION_MINOR: u64 = 6;
 
 pub(crate) const SERVICE_ID_SQL: i32 = 3;
 
@@ -1721,8 +1721,9 @@ impl SqlClient {
     ) -> SqlCommand {
         let request = crate::jogasaki::proto::sql::request::Commit {
             transaction_handle: Some(*transaction_handle),
-            notification_type: commit_option.commit_type().into(),
-            auto_dispose: commit_option.auto_dispose(),
+            notification_type: commit_option.notification_type,
+            auto_dispose: commit_option.auto_dispose,
+            option: Some(*commit_option),
         };
         SqlCommand::Commit(request)
     }
@@ -1950,6 +1951,6 @@ mod test {
     #[test]
     fn service_message_version() {
         let smv = SqlClient::service_message_version();
-        assert_eq!("sql-1.5", smv);
+        assert_eq!("sql-1.6", smv);
     }
 }
