@@ -35,7 +35,7 @@ pub struct Job<T> {
     name: String,
     wire: Arc<Wire>,
     slot_handle: Arc<SlotEntryHandle>,
-    converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
+    converter: Box<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send>,
     default_timeout: Duration,
     done: bool,
     taked: bool,
@@ -69,7 +69,7 @@ impl<T> Job<T> {
         fail_on_drop_error: bool,
     ) -> Job<T>
     where
-        F: Fn(WireResponse) -> Result<T, TgError> + Send + 'static,
+        F: Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + 'static,
     {
         Job {
             name: name.to_string(),
@@ -216,7 +216,7 @@ impl<T> Job<T> {
         let response = self.wire.pull_response(slot_handle, &timeout).await?;
         self.done = true;
         self.taked = true;
-        (self.converter)(response)
+        (self.converter)(slot_handle.clone(), response)
     }
 
     /// Retrieves the result value if a response has been received.

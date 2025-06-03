@@ -43,7 +43,7 @@ impl EndpointBroker {
         let command = Self::handshake_command(client_information, wire_information);
         let request = Self::new_request(command);
 
-        let response = wire
+        let (_, response) = wire
             .send_and_pull_response(SERVICE_ID_ENDPOINT_BROKER, request, None, timeout)
             .await?;
         let session_id = handshake_processor(response)?;
@@ -75,7 +75,7 @@ impl EndpointBroker {
                 SERVICE_ID_ENDPOINT_BROKER,
                 request,
                 None,
-                Box::new(move |response| {
+                Box::new(move |_, response| {
                     let session_id = handshake_processor(response)?;
                     converter(session_id)
                 }),

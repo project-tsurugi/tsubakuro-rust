@@ -1,9 +1,11 @@
+use std::sync::Arc;
+
 use crate::{
     error::TgError,
     invalid_response_error,
     jogasaki::proto::sql::response::response::Response as SqlResponseType,
     prelude::{convert_sql_response, SqlColumn},
-    session::wire::response::WireResponse,
+    session::wire::{response::WireResponse, response_box::SlotEntryHandle},
     sql_service_error,
 };
 
@@ -56,7 +58,10 @@ impl SqlExplainResult {
     }
 }
 
-pub(crate) fn explain_processor(response: WireResponse) -> Result<SqlExplainResult, TgError> {
+pub(crate) fn explain_processor(
+    _: Arc<SlotEntryHandle>,
+    response: WireResponse,
+) -> Result<SqlExplainResult, TgError> {
     const FUNCTION_NAME: &str = "explain_processor()";
 
     let (sql_response, _) = convert_sql_response(FUNCTION_NAME, &response)?;

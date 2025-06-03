@@ -78,11 +78,11 @@ impl Wire {
         request: R,
         lobs: Option<Vec<BlobInfo>>,
         timeout: Duration,
-    ) -> Result<WireResponse, TgError> {
+    ) -> Result<(Arc<SlotEntryHandle>, WireResponse), TgError> {
         let timeout = Timeout::new(timeout);
         let slot_handle = self.send_internal(service_id, request, lobs).await?;
         let response = self.pull_response(&slot_handle, &timeout).await?;
-        Ok(response)
+        Ok((slot_handle, response))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -92,7 +92,7 @@ impl Wire {
         service_id: i32,
         request: R,
         lobs: Option<Vec<BlobInfo>>,
-        converter: Box<dyn Fn(WireResponse) -> Result<T, TgError> + Send>,
+        converter: Box<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send>,
         default_timeout: Duration,
         fail_on_drop_error: bool,
     ) -> Result<Job<T>, TgError> {
@@ -165,10 +165,6 @@ impl Wire {
 
         self.wire.send(slot, &header, &payload).await?;
         Ok(())
-    }
-
-    pub(crate) fn find_slot_handle(&self, slot: i32) -> Option<Arc<SlotEntryHandle>> {
-        self.wire.response_box().find_slot_handle(slot)
     }
 
     pub(crate) async fn pull_response(

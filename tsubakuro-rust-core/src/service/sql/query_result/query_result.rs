@@ -72,7 +72,7 @@ impl std::fmt::Debug for SqlQueryResult {
 impl SqlQueryResult {
     fn new(
         wire: Arc<Wire>,
-        slot_handle: Option<Arc<SlotEntryHandle>>,
+        slot_handle: Arc<SlotEntryHandle>,
         name: String,
         metadata: Option<SqlQueryResultMetadata>,
         value_stream: ResultSetValueStream,
@@ -80,7 +80,7 @@ impl SqlQueryResult {
     ) -> SqlQueryResult {
         SqlQueryResult {
             wire,
-            slot_handle,
+            slot_handle: Some(slot_handle),
             name,
             metadata,
             value_stream,
@@ -144,14 +144,11 @@ impl SqlQueryResult {
 
 pub(crate) fn query_result_processor(
     wire: Arc<Wire>,
+    slot_handle: Arc<SlotEntryHandle>,
     response: WireResponse,
     default_timeout: Duration,
 ) -> Result<SqlQueryResult, TgError> {
     // const FUNCTION_NAME: &str = "query_result_processor()";
-
-    let slot = response.slot();
-    let slot_handle = wire.find_slot_handle(slot);
-    assert!(slot_handle.is_some());
 
     let (dc_name, metadata) = read_result_set_metadata(response)?;
 

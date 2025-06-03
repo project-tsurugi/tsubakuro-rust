@@ -32,18 +32,6 @@ pub(crate) enum WireResponse {
     ResponseResultSetBye(/* slot */ i32),
 }
 
-impl WireResponse {
-    pub(crate) fn slot(&self) -> i32 {
-        match self {
-            WireResponse::ResponseSessionPayload(slot, _, _, _) => *slot,
-            WireResponse::ResponseResultSetHello(slot, _) => *slot,
-            WireResponse::ResponseSessionBodyhead(slot, _, _) => *slot,
-            WireResponse::ResponseResultSetPayload(slot, _, _) => *slot,
-            WireResponse::ResponseResultSetBye(slot) => *slot,
-        }
-    }
-}
-
 // WireResponseではTgErrorを保持できない。
 // （TgErrorで保持しているstd::error::ErrorがSend,Syncを実装していないので、スレッド間で渡せない為）
 // そこで、WireResponseで保持する専用のエラーを用意する。

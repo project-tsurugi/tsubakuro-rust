@@ -9,7 +9,7 @@ use crate::{
     invalid_response_error,
     job::Job,
     prost_decode_error,
-    session::wire::{response::WireResponse, Wire},
+    session::wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
     tateyama::proto::core::{
         request::{request::Command as CoreCommand, Request as CoreRequest, ShutdownType},
         response::{
@@ -38,10 +38,10 @@ impl CoreService {
         let command = Self::update_expiration_time_command(expiration_time);
         let request = Self::new_request(command);
 
-        let response = wire
+        let (slot_handle, response) = wire
             .send_and_pull_response(SERVICE_ID_ROUTING, request, None, timeout)
             .await?;
-        update_expiration_time_processor(response)?;
+        update_expiration_time_processor(slot_handle, response)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
@@ -96,7 +96,7 @@ impl CoreService {
         let command = Self::shutdown_command(shutdown_type);
         let request = Self::new_request(command);
 
-        let response = wire
+        let (_, response) = wire
             .send_and_pull_response(SERVICE_ID_ROUTING, request, None, timeout)
             .await?;
         shutdown_processor(wire, response).await?;
@@ -124,7 +124,7 @@ impl CoreService {
                 SERVICE_ID_ROUTING,
                 request,
                 None,
-                Box::new(move |response| shutdown_processor_for_job(&wire_clone, response)),
+                Box::new(move |_, response| shutdown_processor_for_job(&wire_clone, response)),
                 default_timeout,
                 fail_on_drop_error,
             )
@@ -150,7 +150,10 @@ impl CoreService {
     }
 }
 
-fn update_expiration_time_processor(wire_response: WireResponse) -> Result<(), TgError> {
+fn update_expiration_time_processor(
+    _: Arc<SlotEntryHandle>,
+    wire_response: WireResponse,
+) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "update_expiration_time_processor()";
 
     let payload =

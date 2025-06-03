@@ -146,19 +146,6 @@ impl ResponseBox {
         slot_handle
     }
 
-    pub(crate) fn find_slot_handle(
-        self: Arc<ResponseBox>,
-        slot: i32,
-    ) -> Option<Arc<SlotEntryHandle>> {
-        let index = slot as usize;
-
-        let recv_wait_pool = self.recv_wait_pool.lock().unwrap();
-        match recv_wait_pool.get(index) {
-            Some(Some(slot_handle)) => Some(slot_handle.clone()),
-            _ => None,
-        }
-    }
-
     fn set_slot_handle_to_wait_pool(&self, slot_handle: Arc<SlotEntryHandle>) {
         let index = slot_handle.slot() as usize;
 

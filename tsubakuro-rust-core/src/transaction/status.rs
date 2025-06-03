@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     error::TgError,
     invalid_response_error,
@@ -5,7 +7,7 @@ use crate::{
         get_transaction_status::Success, response::Response as SqlResponseType,
     },
     prelude::{convert_sql_response, TransactionStatus},
-    session::wire::response::WireResponse,
+    session::wire::{response::WireResponse, response_box::SlotEntryHandle},
     sql_service_error,
 };
 
@@ -34,6 +36,7 @@ impl TransactionStatusWithMessage {
 }
 
 pub(crate) fn transaction_status_processor(
+    _: Arc<SlotEntryHandle>,
     response: WireResponse,
 ) -> Result<TransactionStatusWithMessage, TgError> {
     const FUNCTION_NAME: &str = "transaction_status_processor()";

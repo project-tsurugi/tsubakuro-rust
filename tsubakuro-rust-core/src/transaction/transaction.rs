@@ -9,13 +9,14 @@ use crate::{
     client_error,
     error::TgError,
     invalid_response_error,
-    jogasaki::proto::sql::common::Transaction as ProtoTransaction,
-    jogasaki::proto::sql::response::response::Response as SqlResponseType,
+    jogasaki::proto::sql::{
+        common::Transaction as ProtoTransaction, response::response::Response as SqlResponseType,
+    },
     prelude::{
         convert_sql_response, sql::SqlClient, sql_result_only_success_processor, ServiceClient,
         Session,
     },
-    session::wire::response::WireResponse,
+    session::wire::{response::WireResponse, response_box::SlotEntryHandle},
     sql_service_error,
 };
 
@@ -225,13 +226,19 @@ pub(crate) fn transaction_begin_processor(
     }
 }
 
-pub(crate) fn transaction_commit_processor(response: WireResponse) -> Result<(), TgError> {
+pub(crate) fn transaction_commit_processor(
+    _: Arc<SlotEntryHandle>,
+    response: WireResponse,
+) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "transaction_commit_processor()";
 
     sql_result_only_success_processor(FUNCTION_NAME, response)
 }
 
-pub(crate) fn transaction_rollback_processor(response: WireResponse) -> Result<(), TgError> {
+pub(crate) fn transaction_rollback_processor(
+    _: Arc<SlotEntryHandle>,
+    response: WireResponse,
+) -> Result<(), TgError> {
     const FUNCTION_NAME: &str = "transaction_rollback_processor()";
 
     sql_result_only_success_processor(FUNCTION_NAME, response)

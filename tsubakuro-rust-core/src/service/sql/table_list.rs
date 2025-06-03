@@ -1,9 +1,11 @@
+use std::sync::Arc;
+
 use crate::{
     error::TgError,
     invalid_response_error,
     jogasaki::proto::sql::response::{response::Response as SqlResponseType, Name},
     prelude::convert_sql_response,
-    session::wire::response::WireResponse,
+    session::wire::{response::WireResponse, response_box::SlotEntryHandle},
     sql_service_error,
 };
 
@@ -30,7 +32,10 @@ impl TableList {
     }
 }
 
-pub(crate) fn list_tables_processor(response: WireResponse) -> Result<TableList, TgError> {
+pub(crate) fn list_tables_processor(
+    _: Arc<SlotEntryHandle>,
+    response: WireResponse,
+) -> Result<TableList, TgError> {
     const FUNCTION_NAME: &str = "list_tables_processor()";
 
     let (sql_response, _) = convert_sql_response(FUNCTION_NAME, &response)?;

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::{
     error::TgError,
@@ -7,7 +7,7 @@ use crate::{
         execute_result::CounterType, response::Response as SqlResponseType,
     },
     prelude::convert_sql_response,
-    session::wire::response::WireResponse,
+    session::wire::{response::WireResponse, response_box::SlotEntryHandle},
     sql_service_error,
 };
 
@@ -61,6 +61,7 @@ impl SqlExecuteResult {
 }
 
 pub(crate) fn execute_result_processor(
+    _: Arc<SlotEntryHandle>,
     response: WireResponse,
 ) -> Result<SqlExecuteResult, TgError> {
     const FUNCTION_NAME: &str = "execute_result_processor()";
