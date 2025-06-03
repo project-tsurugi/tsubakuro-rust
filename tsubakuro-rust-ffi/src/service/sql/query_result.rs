@@ -2465,6 +2465,201 @@ pub extern "C" fn tsurugi_ffi_sql_query_result_fetch_for_clob(
     rc
 }
 
+/// SqlQueryResult: Set close timeout.
+///
+/// See [`SqlQueryResult::set_close_timeout`].
+///
+/// # Receiver
+/// - `query_result` - SqlQueryResult.
+///
+/// # Parameters
+/// - `close_timeout` - timeout time \[nanoseconds\].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_set_close_timeout(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    close_timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_set_close_timeout()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, close_timeout={:?}",
+        context,
+        query_result,
+        close_timeout
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+
+    let query_result = unsafe { &mut *query_result };
+    let close_timeout = Duration::from_nanos(close_timeout);
+
+    query_result.set_close_timeout(close_timeout);
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// SqlQueryResult: Get close timeout.
+///
+/// See [`SqlQueryResult::close_timeout`].
+///
+/// # Receiver
+/// - `query_result` - SqlQueryResult.
+///
+/// # Returns
+/// - `close_timeout_out` - timeout time \[nanoseconds\].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_get_close_timeout(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    close_timeout_out: *mut TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_get_close_timeout()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, close_timeout_out={:?}",
+        context,
+        query_result,
+        close_timeout_out
+    );
+
+    ffi_arg_out_initialize!(close_timeout_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, close_timeout_out);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let close_timeout = query_result.close_timeout();
+
+    let value = close_timeout.as_nanos() as TsurugiFfiDuration;
+    unsafe {
+        *close_timeout_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (close_timeout={:?})",
+        rc,
+        value
+    );
+    rc
+}
+
+/// SqlQueryResult: Close.
+///
+/// See [`SqlQueryResult::close`].
+///
+/// Note: Close is called in [`tsurugi_ffi_sql_query_result_dispose`].
+///
+/// # Receiver
+/// - `query_result` - SqlQueryResult.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_close(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_close()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}",
+        context,
+        query_result
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+
+    let query_result = unsafe { &mut *query_result };
+
+    let runtime = query_result.runtime().clone();
+    ffi_exec_core_async!(context, FUNCTION_NAME, runtime, query_result.close());
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// SqlQueryResult: Close.
+///
+/// See [`SqlQueryResult::close_for`].
+///
+/// Note: Close is called in [`tsurugi_ffi_sql_query_result_dispose`].
+///
+/// # Receiver
+/// - `query_result` - SqlQueryResult.
+///
+/// # Parameters
+/// - `timeout` - timeout time \[nanoseconds\].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_close_for(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    timeout: TsurugiFfiDuration,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_close_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, timeout={:?}",
+        context,
+        query_result,
+        timeout
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+
+    let query_result = unsafe { &mut *query_result };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = query_result.runtime().clone();
+    ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        query_result.close_for(timeout)
+    );
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// SqlQueryResult: Check if the session is closed.
+///
+/// See [`SqlQueryResult::is_closed`].
+///
+/// # Receiver
+/// - `query_result` - SqlQueryResult.
+///
+/// # Returns
+/// - `is_closed_out` - `true`: Already closed / `false`: Not closed.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_query_result_is_closed(
+    context: TsurugiFfiContextHandle,
+    query_result: TsurugiFfiSqlQueryResultHandle,
+    is_closed_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_query_result_is_closed()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, query_result={:?}, is_closed_out={:?}",
+        context,
+        query_result,
+        is_closed_out
+    );
+
+    ffi_arg_out_initialize!(is_closed_out, false);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, query_result);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, is_closed_out);
+
+    let query_result = unsafe { &*query_result };
+
+    let value = query_result.is_closed();
+
+    unsafe {
+        *is_closed_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (is_closed={:?})", rc, value);
+    rc
+}
+
 /// SqlQueryResult: Dispose.
 ///
 /// # Receiver

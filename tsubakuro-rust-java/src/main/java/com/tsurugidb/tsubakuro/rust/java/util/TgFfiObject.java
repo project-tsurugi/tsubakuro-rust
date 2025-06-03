@@ -181,4 +181,8 @@ public abstract class TgFfiObject implements Closeable {
     }
 
     protected abstract void dispose(MemorySegment handle);
+
+    public boolean isDisposed() {
+        return this.handle == null;
+    }
 }

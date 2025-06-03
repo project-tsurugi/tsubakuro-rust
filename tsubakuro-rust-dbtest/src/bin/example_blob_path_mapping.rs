@@ -177,5 +177,7 @@ async fn example_blob_query(client: &SqlClient, transaction: &Transaction) -> Re
         println!("pk={pk}, value={value:?}");
     }
 
+    query_result.close().await?;
+
     Ok(())
 }

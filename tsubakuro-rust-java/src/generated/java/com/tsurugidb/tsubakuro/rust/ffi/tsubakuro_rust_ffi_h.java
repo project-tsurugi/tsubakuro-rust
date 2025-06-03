@@ -23269,6 +23269,305 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_query_result_set_close_timeout {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_set_close_timeout");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration close_timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_set_close_timeout$descriptor() {
+        return tsurugi_ffi_sql_query_result_set_close_timeout.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration close_timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_set_close_timeout$handle() {
+        return tsurugi_ffi_sql_query_result_set_close_timeout.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration close_timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_set_close_timeout$address() {
+        return tsurugi_ffi_sql_query_result_set_close_timeout.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_set_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration close_timeout)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_set_close_timeout(MemorySegment context, MemorySegment query_result, long close_timeout) {
+        var mh$ = tsurugi_ffi_sql_query_result_set_close_timeout.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_set_close_timeout", context, query_result, close_timeout);
+            }
+            return (int)mh$.invokeExact(context, query_result, close_timeout);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_get_close_timeout {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_get_close_timeout");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_get_close_timeout$descriptor() {
+        return tsurugi_ffi_sql_query_result_get_close_timeout.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_get_close_timeout$handle() {
+        return tsurugi_ffi_sql_query_result_get_close_timeout.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_get_close_timeout$address() {
+        return tsurugi_ffi_sql_query_result_get_close_timeout.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_get_close_timeout(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration *close_timeout_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_get_close_timeout(MemorySegment context, MemorySegment query_result, MemorySegment close_timeout_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_get_close_timeout.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_get_close_timeout", context, query_result, close_timeout_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, close_timeout_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_close {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_close");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_close$descriptor() {
+        return tsurugi_ffi_sql_query_result_close.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_close$handle() {
+        return tsurugi_ffi_sql_query_result_close.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_close$address() {
+        return tsurugi_ffi_sql_query_result_close.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_close(MemorySegment context, MemorySegment query_result) {
+        var mh$ = tsurugi_ffi_sql_query_result_close.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_close", context, query_result);
+            }
+            return (int)mh$.invokeExact(context, query_result);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_close_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_close_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_close_for$descriptor() {
+        return tsurugi_ffi_sql_query_result_close_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_close_for$handle() {
+        return tsurugi_ffi_sql_query_result_close_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_close_for$address() {
+        return tsurugi_ffi_sql_query_result_close_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_close_for(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_close_for(MemorySegment context, MemorySegment query_result, long timeout) {
+        var mh$ = tsurugi_ffi_sql_query_result_close_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_close_for", context, query_result, timeout);
+            }
+            return (int)mh$.invokeExact(context, query_result, timeout);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_query_result_is_closed {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_is_closed");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_is_closed(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *is_closed_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_query_result_is_closed$descriptor() {
+        return tsurugi_ffi_sql_query_result_is_closed.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_is_closed(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *is_closed_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_query_result_is_closed$handle() {
+        return tsurugi_ffi_sql_query_result_is_closed.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_is_closed(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *is_closed_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_query_result_is_closed$address() {
+        return tsurugi_ffi_sql_query_result_is_closed.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_query_result_is_closed(TsurugiFfiContextHandle context, TsurugiFfiSqlQueryResultHandle query_result, _Bool *is_closed_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_query_result_is_closed(MemorySegment context, MemorySegment query_result, MemorySegment is_closed_out) {
+        var mh$ = tsurugi_ffi_sql_query_result_is_closed.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_query_result_is_closed", context, query_result, is_closed_out);
+            }
+            return (int)mh$.invokeExact(context, query_result, is_closed_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_query_result_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

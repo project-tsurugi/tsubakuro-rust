@@ -493,6 +493,12 @@ TsurugiFfiRc example_query_result(TsurugiFfiContextHandle context, TsurugiFfiSql
         }
     } // end loop
 
+    rc = tsurugi_ffi_sql_query_result_close(context, query_result);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+        return rc;
+    }
+
     return rc;
 }
 

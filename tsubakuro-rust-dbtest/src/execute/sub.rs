@@ -55,6 +55,7 @@ create table test (
             assert_eq!(false, result.next_column().await?);
             println!("{foo}, {bar}, {zzz}");
         }
+        result.close().await?;
 
         commit(&client, &tx).await?;
     }

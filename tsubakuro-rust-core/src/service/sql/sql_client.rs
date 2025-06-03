@@ -962,6 +962,8 @@ impl SqlClient {
     ///         }
     ///     }
     ///
+    ///     query_result.close().await?;
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -1056,6 +1058,8 @@ impl SqlClient {
     ///             let age: Option<i32> = query_result.fetch().await?;
     ///         }
     ///     }
+    ///
+    ///     query_result.close().await?;
     ///
     ///     Ok(())
     /// }

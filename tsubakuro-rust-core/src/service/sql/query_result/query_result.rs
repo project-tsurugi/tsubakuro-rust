@@ -11,7 +11,7 @@ use crate::{
         TgTimePointWithTimeZone,
     },
     prost_decode_error,
-    session::wire::{response::WireResponse, Wire},
+    session::wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
     util::Timeout,
 };
 use async_trait::async_trait;
@@ -45,14 +45,19 @@ use super::value_stream::ResultSetValueStream;
 ///         }
 ///     }
 ///
+///     query_result.close().await?;
+///
 ///     Ok(())
 /// }
 /// ```
 pub struct SqlQueryResult {
+    wire: Arc<Wire>,
+    slot_handle: Option<Arc<SlotEntryHandle>>,
     name: String,
     metadata: Option<SqlQueryResultMetadata>,
     pub(crate) value_stream: ResultSetValueStream,
     pub(crate) default_timeout: Duration,
+    close_timeout: Duration,
 }
 
 impl std::fmt::Debug for SqlQueryResult {
@@ -66,16 +71,21 @@ impl std::fmt::Debug for SqlQueryResult {
 
 impl SqlQueryResult {
     fn new(
+        wire: Arc<Wire>,
+        slot_handle: Option<Arc<SlotEntryHandle>>,
         name: String,
         metadata: Option<SqlQueryResultMetadata>,
         value_stream: ResultSetValueStream,
         default_timeout: Duration,
     ) -> SqlQueryResult {
         SqlQueryResult {
+            wire,
+            slot_handle,
             name,
             metadata,
             value_stream,
             default_timeout,
+            close_timeout: default_timeout,
         }
     }
 
@@ -122,6 +132,8 @@ impl SqlQueryResult {
     ///         }
     ///     }
     ///
+    ///     query_result.close().await?;
+    ///
     ///     Ok(())
     /// }
     /// ```
@@ -137,11 +149,22 @@ pub(crate) fn query_result_processor(
 ) -> Result<SqlQueryResult, TgError> {
     // const FUNCTION_NAME: &str = "query_result_processor()";
 
+    let slot = response.slot();
+    let slot_handle = wire.find_slot_handle(slot);
+    assert!(slot_handle.is_some());
+
     let (dc_name, metadata) = read_result_set_metadata(response)?;
 
     let data_channel = wire.create_data_channel(&dc_name)?;
     let value_stream = ResultSetValueStream::new(data_channel);
-    let query_result = SqlQueryResult::new(dc_name, metadata, value_stream, default_timeout);
+    let query_result = SqlQueryResult::new(
+        wire,
+        slot_handle,
+        dc_name,
+        metadata,
+        value_stream,
+        default_timeout,
+    );
 
     Ok(query_result)
 }
@@ -679,5 +702,50 @@ where
             let value: T = self.fetch_for(timeout).await?;
             Ok(Some(value))
         }
+    }
+}
+
+impl SqlQueryResult {
+    /// Set close timeout.
+    ///
+    /// since 0.3.0
+    pub fn set_close_timeout(&mut self, timeout: Duration) {
+        self.close_timeout = timeout;
+    }
+
+    /// Get close timeout.
+    ///
+    /// since 0.3.0
+    pub fn close_timeout(&self) -> Duration {
+        self.close_timeout
+    }
+
+    /// Disposes this resource.
+    ///
+    /// since 0.3.0
+    pub async fn close(&mut self) -> Result<(), TgError> {
+        self.close_for(self.close_timeout).await
+    }
+
+    /// Disposes this resource.
+    ///
+    /// since 0.3.0
+    pub async fn close_for(&mut self, timeout: Duration) -> Result<(), TgError> {
+        const FUNCTION_NAME: &str = "close()";
+
+        let slot_handle = self.slot_handle.take();
+        if let Some(slot_handle) = slot_handle {
+            let timeout = Timeout::new(timeout);
+            let response = self.wire.pull_response(&slot_handle, &timeout).await?;
+            convert_sql_response(FUNCTION_NAME, &response)?;
+        }
+        Ok(())
+    }
+
+    /// Check if this resource is closed.
+    ///
+    /// since 0.3.0
+    pub fn is_closed(&self) -> bool {
+        self.slot_handle.is_none()
     }
 }

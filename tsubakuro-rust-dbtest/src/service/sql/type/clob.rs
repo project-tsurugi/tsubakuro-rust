@@ -192,6 +192,8 @@ mod test {
         }
         assert_eq!(expected.len(), i);
 
+        query_result.close().await.unwrap();
+
         commit_and_close(client, &transaction).await;
     }
 }

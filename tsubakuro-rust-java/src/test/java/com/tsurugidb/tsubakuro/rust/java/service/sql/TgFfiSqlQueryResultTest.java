@@ -212,6 +212,19 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 assertFalse(qr.nextColumn(context));
 
                 assertFalse(qr.nextRow(context));
+
+                assertFalse(qr.isClosed(context));
+                switch (pattern) {
+                default:
+                    qr.close(context);
+                    break;
+                case DIRECT_FOR:
+                    qr.closeFor(context, Duration.ofSeconds(5));
+                    break;
+                }
+                assertTrue(qr.isClosed(context));
+
+                is_closed_argError(context, qr);
             }
         }
     }
@@ -1389,6 +1402,127 @@ class TgFfiSqlQueryResultTest extends TgFfiTester {
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_fetch_for_clob(ctx, handle, t, out);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
             }
+        }
+    }
+
+    @Test
+    void set_close_timeout() {
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+            var target = resource.queryResult;
+
+            target.setCloseTimeout(context, Duration.ofSeconds(5));
+
+            var timeout = target.getCloseTimeout(context);
+            assertEquals(Duration.ofSeconds(5), timeout);
+        }
+    }
+
+    @Test
+    void set_close_timeout_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg = Duration.ofSeconds(5).toNanos();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_set_close_timeout(ctx, handle, arg);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void get_close_timeout_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var resource = new TestResource()) {
+            var context = resource.context;
+            var target = resource.queryResult;
+
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var out = manager.allocateLongOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_close_timeout(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = target.handle();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_get_close_timeout(ctx, handle, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+        }
+    }
+
+    // fetchせずにクローズ
+    // クローズを複数回呼ぶ
+    @ParameterizedTest
+    @ValueSource(strings = { DIRECT, DIRECT_FOR })
+    void query_close(String pattern) {
+        var sql = "select * from test";
+        try (var resource = new TestResource(false, pattern, sql)) {
+            var context = resource.context;
+
+            try (var qr = resource.queryResult) {
+                assertFalse(qr.isClosed(context));
+                for (int i = 0; i < 2; i++) {
+                    switch (pattern) {
+                    default:
+                        qr.close(context);
+                        break;
+                    case DIRECT_FOR:
+                        qr.closeFor(context, Duration.ofSeconds(5));
+                        break;
+                    }
+                    assertTrue(qr.isClosed(context));
+                }
+            }
+        }
+    }
+
+    @Test
+    void close_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_close(ctx, handle);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void close_for_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var t = Duration.ofSeconds(5).toNanos();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_close_for(ctx, handle, t);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+    }
+
+    private void is_closed_argError(TgFfiContext context, TgFfiSqlQueryResult queryResult) {
+        var manager = getFfiObjectManager();
+
+        {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var out = manager.allocateBooleanOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_is_closed(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        {
+            var ctx = context.handle();
+            var handle = queryResult.handle();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_query_result_is_closed(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
     }
 }

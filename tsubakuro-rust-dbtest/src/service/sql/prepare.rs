@@ -98,6 +98,8 @@ mod test {
             assert_eq!(false, query_result.next_column().await.unwrap());
 
             assert_eq!(false, query_result.next_row().await.unwrap());
+
+            query_result.close().await.unwrap()
         }
 
         {
@@ -118,6 +120,8 @@ mod test {
             assert_eq!(false, query_result.next_column().await.unwrap());
 
             assert_eq!(false, query_result.next_row().await.unwrap());
+
+            query_result.close().await.unwrap()
         }
 
         commit_and_close(client, &transaction).await;
@@ -227,6 +231,8 @@ mod test {
             assert_eq!(false, query_result.next_column().await.unwrap());
 
             assert_eq!(false, query_result.next_row().await.unwrap());
+
+            query_result.close().await.unwrap()
         }
 
         {
@@ -248,6 +254,8 @@ mod test {
             assert_eq!(false, query_result.next_column().await.unwrap());
 
             assert_eq!(false, query_result.next_row().await.unwrap());
+
+            query_result.close().await.unwrap()
         }
 
         commit_and_close(client, &transaction).await;

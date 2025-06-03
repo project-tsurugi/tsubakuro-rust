@@ -463,7 +463,7 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_description(
     let sql_column = unsafe { &mut *sql_column };
 
     if sql_column.description.is_none() {
-        if let Some(description) = sql_column.description().clone() {
+        if let Some(description) = sql_column.description() {
             cchar_field_set!(context, sql_column.description, description.clone());
         }
     }

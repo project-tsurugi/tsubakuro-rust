@@ -167,6 +167,10 @@ impl Wire {
         Ok(())
     }
 
+    pub(crate) fn find_slot_handle(&self, slot: i32) -> Option<Arc<SlotEntryHandle>> {
+        self.wire.response_box().find_slot_handle(slot)
+    }
+
     pub(crate) async fn pull_response(
         &self,
         slot_handle: &Arc<SlotEntryHandle>,

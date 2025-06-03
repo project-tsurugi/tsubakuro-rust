@@ -2759,6 +2759,81 @@ TsurugiFfiRc tsurugi_ffi_sql_query_result_fetch_for_clob(TsurugiFfiContextHandle
                                                          TsurugiFfiClobReferenceHandle *clob_reference_out);
 
 /**
+ * SqlQueryResult: Set close timeout.
+ *
+ * See [`SqlQueryResult::set_close_timeout`].
+ *
+ * # Receiver
+ * - `query_result` - SqlQueryResult.
+ *
+ * # Parameters
+ * - `close_timeout` - timeout time \[nanoseconds\].
+ */
+TsurugiFfiRc tsurugi_ffi_sql_query_result_set_close_timeout(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiSqlQueryResultHandle query_result,
+                                                            TsurugiFfiDuration close_timeout);
+
+/**
+ * SqlQueryResult: Get close timeout.
+ *
+ * See [`SqlQueryResult::close_timeout`].
+ *
+ * # Receiver
+ * - `query_result` - SqlQueryResult.
+ *
+ * # Returns
+ * - `close_timeout_out` - timeout time \[nanoseconds\].
+ */
+TsurugiFfiRc tsurugi_ffi_sql_query_result_get_close_timeout(TsurugiFfiContextHandle context,
+                                                            TsurugiFfiSqlQueryResultHandle query_result,
+                                                            TsurugiFfiDuration *close_timeout_out);
+
+/**
+ * SqlQueryResult: Close.
+ *
+ * See [`SqlQueryResult::close`].
+ *
+ * Note: Close is called in [`tsurugi_ffi_sql_query_result_dispose`].
+ *
+ * # Receiver
+ * - `query_result` - SqlQueryResult.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_query_result_close(TsurugiFfiContextHandle context,
+                                                TsurugiFfiSqlQueryResultHandle query_result);
+
+/**
+ * SqlQueryResult: Close.
+ *
+ * See [`SqlQueryResult::close_for`].
+ *
+ * Note: Close is called in [`tsurugi_ffi_sql_query_result_dispose`].
+ *
+ * # Receiver
+ * - `query_result` - SqlQueryResult.
+ *
+ * # Parameters
+ * - `timeout` - timeout time \[nanoseconds\].
+ */
+TsurugiFfiRc tsurugi_ffi_sql_query_result_close_for(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiSqlQueryResultHandle query_result,
+                                                    TsurugiFfiDuration timeout);
+
+/**
+ * SqlQueryResult: Check if the session is closed.
+ *
+ * See [`SqlQueryResult::is_closed`].
+ *
+ * # Receiver
+ * - `query_result` - SqlQueryResult.
+ *
+ * # Returns
+ * - `is_closed_out` - `true`: Already closed / `false`: Not closed.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_query_result_is_closed(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiSqlQueryResultHandle query_result,
+                                                    bool *is_closed_out);
+
+/**
  * SqlQueryResult: Dispose.
  *
  * # Receiver

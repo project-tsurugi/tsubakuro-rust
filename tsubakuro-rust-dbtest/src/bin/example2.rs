@@ -113,6 +113,8 @@ async fn example_query(client: &SqlClient, transaction: &Transaction) -> Result<
         println!("id={id}, name={name:?}, age={age:?}");
     }
 
+    query_result.close().await?;
+
     Ok(())
 }
 
@@ -199,6 +201,8 @@ async fn example_prepared_query0(
         println!("id={id}, name={name:?}, age={age:?}");
     }
 
+    query_result.close().await?;
+
     Ok(())
 }
 
@@ -243,6 +247,8 @@ async fn example_prepared_query1(
 
         println!("id={id}, name={name:?}, age={age:?}");
     }
+
+    query_result.close().await?;
 
     Ok(())
 }
