@@ -58,6 +58,8 @@ mod test {
             assert_eq!(Some(true), c.varying());
             assert_eq!(Some((10, false)), c.length());
             assert_eq!(Some(&"text value".to_string()), c.description());
+
+            assert_eq!(&vec!["foo".to_string()], metadata.primary_keys());
         }
     }
 

@@ -27635,6 +27635,67 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_table_metadata_get_primary_keys {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_primary_keys");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_primary_keys(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringArrayHandle *primary_keys_out, uint32_t *primary_keys_size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_table_metadata_get_primary_keys$descriptor() {
+        return tsurugi_ffi_table_metadata_get_primary_keys.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_primary_keys(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringArrayHandle *primary_keys_out, uint32_t *primary_keys_size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_table_metadata_get_primary_keys$handle() {
+        return tsurugi_ffi_table_metadata_get_primary_keys.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_primary_keys(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringArrayHandle *primary_keys_out, uint32_t *primary_keys_size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_table_metadata_get_primary_keys$address() {
+        return tsurugi_ffi_table_metadata_get_primary_keys.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_table_metadata_get_primary_keys(TsurugiFfiContextHandle context, TsurugiFfiTableMetadataHandle table_metadata, TsurugiFfiStringArrayHandle *primary_keys_out, uint32_t *primary_keys_size_out)
+     * }
+     */
+    public static int tsurugi_ffi_table_metadata_get_primary_keys(MemorySegment context, MemorySegment table_metadata, MemorySegment primary_keys_out, MemorySegment primary_keys_size_out) {
+        var mh$ = tsurugi_ffi_table_metadata_get_primary_keys.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_table_metadata_get_primary_keys", context, table_metadata, primary_keys_out, primary_keys_size_out);
+            }
+            return (int)mh$.invokeExact(context, table_metadata, primary_keys_out, primary_keys_size_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_table_metadata_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

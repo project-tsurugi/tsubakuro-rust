@@ -61,6 +61,13 @@ impl TableMetadata {
     pub fn columns(&self) -> &Vec<SqlColumn> {
         &self.describe_table.columns
     }
+
+    /// Returns the primary keys of the table.
+    ///
+    /// since 0.3.0
+    pub fn primary_keys(&self) -> &Vec<String> {
+        &self.describe_table.primary_key
+    }
 }
 
 pub(crate) fn table_metadata_processor(

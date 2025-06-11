@@ -8,10 +8,12 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     cchar_field_set,
     context::TsurugiFfiContextHandle,
-    cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
+    cstring_array_field_set_if_none, cstring_array_field_to_ptr, cstring_to_cchar,
+    ffi_arg_out_initialize, ffi_arg_require_non_null, rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::column::TsurugiFfiSqlColumn,
-    TsurugiFfiStringHandle,
+    util::cchar::TsurugiFfiCStringArray,
+    TsurugiFfiStringArrayHandle, TsurugiFfiStringHandle,
 };
 
 use super::column::TsurugiFfiSqlColumnHandle;
@@ -22,6 +24,7 @@ pub(crate) struct TsurugiFfiTableMetadata {
     schema_name: Option<CString>,
     table_name: Option<CString>,
     description: Option<CString>,
+    primary_keys: Option<TsurugiFfiCStringArray>,
 }
 
 impl TsurugiFfiTableMetadata {
@@ -32,6 +35,7 @@ impl TsurugiFfiTableMetadata {
             schema_name: None,
             table_name: None,
             description: None,
+            primary_keys: None,
         }
     }
 }
@@ -320,6 +324,60 @@ pub extern "C" fn tsurugi_ffi_table_metadata_get_columns_value(
 
     let rc = rc_ok(context);
     trace!("{FUNCTION_NAME} end rc={:x}. sql_column={:?}", rc, handle);
+    rc
+}
+
+/// TableMetadata: Get primary keys.
+///
+/// See [`TableMetadata::primary_keys`].
+///
+/// # Receiver
+/// - `table_metadata` - Table metadata.
+///
+/// # Returns
+/// - `primary_keys_out` - primary keys (string array).
+/// - `primary_keys_size_out` - `primary_keys_out` size (number of keys).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_table_metadata_get_primary_keys(
+    context: TsurugiFfiContextHandle,
+    table_metadata: TsurugiFfiTableMetadataHandle,
+    primary_keys_out: *mut TsurugiFfiStringArrayHandle,
+    primary_keys_size_out: *mut u32,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_table_metadata_get_primary_keys()";
+    trace!("{FUNCTION_NAME} start. context={:?}, table_list={:?}, primary_keys_out={:?}, primary_keys_size_out={:?}",
+        context,
+        table_metadata,
+        primary_keys_out,
+        primary_keys_size_out
+    );
+
+    ffi_arg_out_initialize!(primary_keys_out, std::ptr::null_mut());
+    ffi_arg_out_initialize!(primary_keys_size_out, 0);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, table_metadata);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, primary_keys_out);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, primary_keys_size_out);
+
+    let table_metadata = unsafe { &mut *table_metadata };
+    let primary_keys = table_metadata.primary_keys();
+
+    let size = primary_keys.len();
+
+    cstring_array_field_set_if_none!(context, table_metadata.primary_keys, primary_keys);
+
+    let ptr = cstring_array_field_to_ptr!(table_metadata.primary_keys);
+    unsafe {
+        *primary_keys_out = ptr;
+        *primary_keys_size_out = size as u32;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (primary_keys={:?}, primary_keys_size={:?})",
+        rc,
+        ptr,
+        size as u32
+    );
     rc
 }
 

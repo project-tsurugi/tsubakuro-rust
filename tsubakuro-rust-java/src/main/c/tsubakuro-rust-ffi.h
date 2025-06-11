@@ -4136,6 +4136,23 @@ TsurugiFfiRc tsurugi_ffi_table_metadata_get_columns_value(TsurugiFfiContextHandl
                                                           TsurugiFfiSqlColumnHandle *sql_column_out);
 
 /**
+ * TableMetadata: Get primary keys.
+ *
+ * See [`TableMetadata::primary_keys`].
+ *
+ * # Receiver
+ * - `table_metadata` - Table metadata.
+ *
+ * # Returns
+ * - `primary_keys_out` - primary keys (string array).
+ * - `primary_keys_size_out` - `primary_keys_out` size (number of keys).
+ */
+TsurugiFfiRc tsurugi_ffi_table_metadata_get_primary_keys(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiTableMetadataHandle table_metadata,
+                                                         TsurugiFfiStringArrayHandle *primary_keys_out,
+                                                         uint32_t *primary_keys_size_out);
+
+/**
  * TableMetadata: Dispose.
  *
  * # Receiver

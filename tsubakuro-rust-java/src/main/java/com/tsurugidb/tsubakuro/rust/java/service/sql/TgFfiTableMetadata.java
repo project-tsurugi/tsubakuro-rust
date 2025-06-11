@@ -14,6 +14,7 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 public class TgFfiTableMetadata extends TgFfiObject {
 
     private List<TgFfiSqlColumn> columns = null;
+    private List<String> primaryKeys = null;
 
     TgFfiTableMetadata(TgFfiObjectManager manager, MemorySegment handle) {
         super(manager, handle);
@@ -90,6 +91,25 @@ public class TgFfiTableMetadata extends TgFfiObject {
         }
 
         return Collections.unmodifiableList(list);
+    }
+
+    public synchronized List<String> getPrimaryKeys(TgFfiContext context) {
+        if (this.primaryKeys == null) {
+            this.primaryKeys = createPrimaryKeys(context);
+        }
+        return this.primaryKeys;
+    }
+
+    private List<String> createPrimaryKeys(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+
+        var out = allocatePtrOut();
+        var sizeOut = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_table_metadata_get_primary_keys(ctx, handle, out, sizeOut);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return outToStringList(out, sizeOut);
     }
 
     @Override

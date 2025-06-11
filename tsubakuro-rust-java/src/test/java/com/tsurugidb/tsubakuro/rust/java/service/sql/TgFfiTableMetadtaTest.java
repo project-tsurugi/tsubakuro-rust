@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -74,6 +75,8 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
                 assertTrue(column.getVarying(context));
                 assertEquals("text value", column.getDescription(context));
             }
+
+            assertEquals(List.of("foo"), metadata.getPrimaryKeys(context));
         }
     }
 

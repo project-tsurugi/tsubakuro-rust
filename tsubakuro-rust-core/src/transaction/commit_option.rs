@@ -39,7 +39,6 @@ use crate::jogasaki::proto::sql::request::{CommitOption, CommitStatus as CommitT
 ///
 /// let transaction_option = TransactionOption::default();
 /// ```
-
 impl CommitOption {
     /// Creates a new instance.
     pub fn new() -> CommitOption {

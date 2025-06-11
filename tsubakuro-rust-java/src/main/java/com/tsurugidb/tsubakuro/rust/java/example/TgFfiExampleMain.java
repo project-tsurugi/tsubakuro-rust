@@ -206,6 +206,7 @@ public class TgFfiExampleMain {
             for (var column : columns) {
                 System.out.printf("%s: %s%n", column.getName(context), column.getAtomType(context));
             }
+            System.out.println("primary keys=" + tableMetadata.getPrimaryKeys(context));
         } catch (TgFfiRuntimeException e) {
             String name = e.getErrorName();
             if (name.equals("TARGET_NOT_FOUND_EXCEPTION")) {
