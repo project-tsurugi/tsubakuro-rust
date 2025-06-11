@@ -17,6 +17,7 @@ on:
 
 jobs:
   Build:
+    if: false
     runs-on: ${{ inputs.os || 'ubuntu-22.04' }}
     permissions:
       checks: write
@@ -96,3 +97,32 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TSUBAKURO_RUST_VERSION: ${{ github.ref_name }}
+
+  Build_Windows:
+    runs-on: windows-latest
+    permissions:
+      checks: write
+      contents: write
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install_Protobuf
+        run: |
+          choco install protoc -y
+
+      - name: Test_Core
+        run: |
+          cd tsubakuro-rust-core
+          cargo build
+          cargo test
+
+      - name: Build_FFI
+        run: |
+          cd tsubakuro-rust-ffi
+          cargo build --release
