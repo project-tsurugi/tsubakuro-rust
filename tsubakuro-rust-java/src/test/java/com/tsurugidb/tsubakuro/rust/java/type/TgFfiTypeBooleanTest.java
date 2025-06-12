@@ -81,6 +81,7 @@ class TgFfiTypeBooleanTest extends TgFfiTester {
                     var c = columns.get(1);
                     assertEquals("value", c.getName(context));
                     assertEquals(TgFfiAtomType.INT4, c.getAtomType(context)); // TODO BOOLEAN
+                    // TODO assertEquals("BOOLEAN", c.getSqlTypeName(context));
                 }
             }
         }

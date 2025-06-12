@@ -102,6 +102,7 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                     var c = columns.get(1);
                     assertEquals("value", c.getName(context));
                     assertEquals(TgFfiAtomType.BLOB, c.getAtomType(context));
+                    assertEquals("BLOB", c.getSqlTypeName(context));
                 }
             }
         }

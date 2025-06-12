@@ -53,6 +53,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(0), c.getScale(context));
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -72,6 +73,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(0), c.getScale(context));
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -91,6 +93,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(2), c.getScale(context));
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -110,6 +113,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(0), c.getScale(context));
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -129,6 +133,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertEquals(ArbitraryInt.of(2), c.getScale(context));
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -148,6 +153,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getScale(context));
                 assertFalse(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -167,6 +173,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getScale(context));
                 assertFalse(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -186,6 +193,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getScale(context));
                 assertTrue(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -205,6 +213,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getScale(context));
                 assertTrue(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -224,6 +233,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getScale(context));
                 assertTrue(c.getVarying(context));
                 assertNull(c.getDescription(context));
+                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
             }
         };
         tester.test();
@@ -255,6 +265,16 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             this.atomType = atomType;
             this.length = length;
             this.varying = varying;
+        }
+
+        protected String sqlTypeName() {
+            String type = this.sqlType;
+            int n = type.indexOf('(');
+            if (n < 0) {
+                return type.toUpperCase();
+            } else {
+                return type.substring(0, n).toUpperCase();
+            }
         }
 
         public void test() {
@@ -313,6 +333,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             assertNull(c.getScale(context));
             assertNull(c.getVarying(context));
             assertNull(c.getDescription(context));
+            assertEquals(sqlTypeName(), c.getSqlTypeName(context));
         }
 
         private void testResultSetMetadata(Boolean nullable) {
@@ -345,6 +366,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                         // TODO assertEquals(nullable, c.getNullable(context));
                         // TODO assertEquals(varying, c.getVarying(context));
                         assertNull(c.getDescription(context));
+                        // TODO assertEquals(sqlTypeName(), c.getSqlTypeName(context));
                     }
                 }
             }

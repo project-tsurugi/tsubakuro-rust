@@ -98,4 +98,77 @@ impl SqlColumn {
             _ => None,
         }
     }
+
+    /// Returns SQL type name for the column.
+    ///
+    /// since 0.3.0
+    pub fn sql_type_name(&self) -> Option<&'static str> {
+        let atom_type = self.atom_type()?;
+
+        match atom_type {
+            AtomType::Boolean => Some("BOOLEAN"),
+            AtomType::Int4 => Some("INT"),
+            AtomType::Int8 => Some("BIGINT"),
+            AtomType::Float4 => Some("REAL"),
+            AtomType::Float8 => Some("DOUBLE"),
+            AtomType::Decimal => Some("DECIMAL"),
+            AtomType::Character => {
+                if self.varying().unwrap_or(false) {
+                    Some("VARCHAR")
+                } else {
+                    Some("CHAR")
+                }
+            }
+            AtomType::Octet => {
+                if self.varying().unwrap_or(false) {
+                    Some("VARBINARY")
+                } else {
+                    Some("BINARY")
+                }
+            }
+            AtomType::Bit => None,
+            AtomType::Date => Some("DATE"),
+            AtomType::TimeOfDay => Some("TIME"),
+            AtomType::TimePoint => Some("TIMESTAMP"),
+            AtomType::DatetimeInterval => None,
+            AtomType::TimeOfDayWithTimeZone => Some("TIME WITH TIME ZONE"),
+            AtomType::TimePointWithTimeZone => Some("TIMESTAMP WITH TIME ZONE"),
+            AtomType::Clob => Some("CLOB"),
+            AtomType::Blob => Some("BLOB"),
+            _ => None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn sql_type_name_char() {
+        let mut column = SqlColumn::default();
+        column.type_info = Some(
+            crate::jogasaki::proto::sql::common::column::TypeInfo::AtomType(
+                crate::jogasaki::proto::sql::common::AtomType::Character.into(),
+            ),
+        );
+        column.varying_opt =
+            Some(crate::jogasaki::proto::sql::common::column::VaryingOpt::Varying(false));
+
+        assert_eq!(Some("CHAR"), column.sql_type_name());
+    }
+
+    #[test]
+    fn sql_type_name_varchar() {
+        let mut column = SqlColumn::default();
+        column.type_info = Some(
+            crate::jogasaki::proto::sql::common::column::TypeInfo::AtomType(
+                crate::jogasaki::proto::sql::common::AtomType::Character.into(),
+            ),
+        );
+        column.varying_opt =
+            Some(crate::jogasaki::proto::sql::common::column::VaryingOpt::Varying(true));
+
+        assert_eq!(Some("VARCHAR"), column.sql_type_name());
+    }
 }
