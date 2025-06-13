@@ -101,6 +101,9 @@ impl SqlColumn {
 
     /// Returns SQL type name for the column.
     ///
+    /// # Returns
+    /// For example, `varchar(10)` returns `VARCHAR`.
+    ///
     /// since 0.3.0
     pub fn sql_type_name(&self) -> Option<&'static str> {
         let atom_type = self.atom_type()?;
@@ -138,6 +141,60 @@ impl SqlColumn {
             _ => None,
         }
     }
+
+    /// Returns SQL type for the column.
+    ///
+    /// # Returns
+    /// For example, `varchar(10)` returns `VARCHAR(10)`.
+    ///
+    /// since 0.3.0
+    pub fn sql_type(&self) -> Option<String> {
+        let base_name = self.sql_type_name()?;
+        let atom_type = self.atom_type()?;
+
+        match atom_type {
+            AtomType::Decimal => match self.precision() {
+                Some((precision, arbitrary)) => match self.scale() {
+                    Some((scale, scale_arbitrary)) =>
+                    {
+                        #[allow(clippy::collapsible_else_if)]
+                        if arbitrary {
+                            if scale_arbitrary {
+                                Some(format!("{base_name}(*, *)"))
+                            } else {
+                                Some(format!("{base_name}(*, {scale})"))
+                            }
+                        } else {
+                            if scale_arbitrary {
+                                Some(format!("{base_name}({precision}, *)"))
+                            } else {
+                                Some(format!("{base_name}({precision}, {scale})"))
+                            }
+                        }
+                    }
+                    None => {
+                        if arbitrary {
+                            Some(format!("{base_name}(*)"))
+                        } else {
+                            Some(format!("{base_name}({precision})"))
+                        }
+                    }
+                },
+                None => Some(base_name.to_string()),
+            },
+            AtomType::Character | AtomType::Octet => match self.length() {
+                Some((length, arbitrary)) => {
+                    if arbitrary {
+                        Some(format!("{base_name}(*)"))
+                    } else {
+                        Some(format!("{base_name}({length})"))
+                    }
+                }
+                None => Some(base_name.to_string()),
+            },
+            _ => Some(base_name.to_string()),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -170,5 +227,82 @@ mod test {
             Some(crate::jogasaki::proto::sql::common::column::VaryingOpt::Varying(true));
 
         assert_eq!(Some("VARCHAR"), column.sql_type_name());
+    }
+
+    #[test]
+    fn sql_type_char() {
+        let mut column = SqlColumn::default();
+        column.type_info = Some(
+            crate::jogasaki::proto::sql::common::column::TypeInfo::AtomType(
+                crate::jogasaki::proto::sql::common::AtomType::Character.into(),
+            ),
+        );
+        column.varying_opt =
+            Some(crate::jogasaki::proto::sql::common::column::VaryingOpt::Varying(false));
+        assert_eq!(Some("CHAR".to_string()), column.sql_type());
+
+        {
+            column.length_opt =
+                Some(crate::jogasaki::proto::sql::common::column::LengthOpt::Length(123));
+
+            assert_eq!(Some("CHAR(123)".to_string()), column.sql_type());
+        }
+        {
+            column.length_opt =
+                Some(crate::jogasaki::proto::sql::common::column::LengthOpt::ArbitraryLength(()));
+
+            assert_eq!(Some("CHAR(*)".to_string()), column.sql_type());
+        }
+    }
+    #[test]
+    fn sql_type_decimal() {
+        let mut column = SqlColumn::default();
+        column.type_info = Some(
+            crate::jogasaki::proto::sql::common::column::TypeInfo::AtomType(
+                crate::jogasaki::proto::sql::common::AtomType::Decimal.into(),
+            ),
+        );
+        assert_eq!(Some("DECIMAL".to_string()), column.sql_type());
+
+        {
+            column.precision_opt =
+                Some(crate::jogasaki::proto::sql::common::column::PrecisionOpt::Precision(15));
+
+            assert_eq!(Some("DECIMAL(15)".to_string()), column.sql_type());
+
+            {
+                column.scale_opt =
+                    Some(crate::jogasaki::proto::sql::common::column::ScaleOpt::Scale(3));
+
+                assert_eq!(Some("DECIMAL(15, 3)".to_string()), column.sql_type());
+            }
+            {
+                column.scale_opt =
+                    Some(crate::jogasaki::proto::sql::common::column::ScaleOpt::ArbitraryScale(()));
+
+                assert_eq!(Some("DECIMAL(15, *)".to_string()), column.sql_type());
+            }
+        }
+        {
+            column.precision_opt = Some(
+                crate::jogasaki::proto::sql::common::column::PrecisionOpt::ArbitraryPrecision(()),
+            );
+            column.scale_opt = None;
+
+            assert_eq!(Some("DECIMAL(*)".to_string()), column.sql_type());
+
+            {
+                column.scale_opt =
+                    Some(crate::jogasaki::proto::sql::common::column::ScaleOpt::Scale(3));
+
+                assert_eq!(Some("DECIMAL(*, 3)".to_string()), column.sql_type());
+            }
+            {
+                column.scale_opt =
+                    Some(crate::jogasaki::proto::sql::common::column::ScaleOpt::ArbitraryScale(()));
+
+                assert_eq!(Some("DECIMAL(*, *)".to_string()), column.sql_type());
+            }
+        }
     }
 }

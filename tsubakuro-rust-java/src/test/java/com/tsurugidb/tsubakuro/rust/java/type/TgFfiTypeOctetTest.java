@@ -23,6 +23,11 @@ class TgFfiTypeOctetTest extends TgFfiTypeTester<byte[]> {
     }
 
     @Override
+    protected String expectedSqlType() {
+        return "VARBINARY(*)";
+    }
+
+    @Override
     protected List<byte[]> values() {
         var list = new ArrayList<byte[]>();
         list.add(new byte[0]);

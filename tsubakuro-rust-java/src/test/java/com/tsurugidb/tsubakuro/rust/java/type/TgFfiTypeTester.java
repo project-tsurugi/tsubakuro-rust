@@ -53,6 +53,10 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
         }
     }
 
+    protected String expectedSqlType() {
+        return sqlType().toUpperCase();
+    }
+
     private void tableMetadata() {
         var manager = getFfiObjectManager();
 
@@ -71,6 +75,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
                     assertEquals("value", c.getName(context));
                     assertEquals(ffiAtomType(), c.getAtomType(context));
                     assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                    assertEquals(expectedSqlType(), c.getSqlType(context));
                 }
             }
         }

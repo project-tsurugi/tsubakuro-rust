@@ -18118,6 +18118,66 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_sql_column_get_sql_type {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_sql_type");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_sql_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *sql_type_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_column_get_sql_type$descriptor() {
+        return tsurugi_ffi_sql_column_get_sql_type.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_sql_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *sql_type_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_column_get_sql_type$handle() {
+        return tsurugi_ffi_sql_column_get_sql_type.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_sql_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *sql_type_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_column_get_sql_type$address() {
+        return tsurugi_ffi_sql_column_get_sql_type.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_column_get_sql_type(TsurugiFfiContextHandle context, TsurugiFfiSqlColumnHandle sql_column, TsurugiFfiStringHandle *sql_type_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_column_get_sql_type(MemorySegment context, MemorySegment sql_column, MemorySegment sql_type_out) {
+        var mh$ = tsurugi_ffi_sql_column_get_sql_type.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_column_get_sql_type", context, sql_column, sql_type_out);
+            }
+            return (int)mh$.invokeExact(context, sql_column, sql_type_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_column_dispose {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
             tsubakuro_rust_ffi_h.C_POINTER

@@ -1038,6 +1038,21 @@ TsurugiFfiRc tsurugi_ffi_sql_column_get_sql_type_name(TsurugiFfiContextHandle co
                                                       TsurugiFfiStringHandle *sql_type_name_out);
 
 /**
+ * SqlColumn: Get SQL type.
+ *
+ * See [`SqlColumn::sql_type`].
+ *
+ * # Receiver
+ * - `sql_column` - Sql column.
+ *
+ * # Returns
+ * - `sql_type_out` - SQL type (nullable).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_column_get_sql_type(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSqlColumnHandle sql_column,
+                                                 TsurugiFfiStringHandle *sql_type_out);
+
+/**
  * SqlColumn: Dispose.
  *
  * # Receiver

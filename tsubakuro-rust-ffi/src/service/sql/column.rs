@@ -20,6 +20,7 @@ pub(crate) struct TsurugiFfiSqlColumn {
     name: Option<CString>,
     description: Option<CString>,
     sql_type_name: Option<CString>,
+    sql_type: Option<CString>,
 }
 
 impl TsurugiFfiSqlColumn {
@@ -29,6 +30,7 @@ impl TsurugiFfiSqlColumn {
             name: None,
             description: None,
             sql_type_name: None,
+            sql_type: None,
         }
     }
 }
@@ -522,6 +524,51 @@ pub extern "C" fn tsurugi_ffi_sql_column_get_sql_type_name(
 
     let rc = rc_ok(context);
     trace!("{FUNCTION_NAME} end rc={:x}. (sql_type_name={:?})", rc, ptr);
+    rc
+}
+
+/// SqlColumn: Get SQL type.
+///
+/// See [`SqlColumn::sql_type`].
+///
+/// # Receiver
+/// - `sql_column` - Sql column.
+///
+/// # Returns
+/// - `sql_type_out` - SQL type (nullable).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_column_get_sql_type(
+    context: TsurugiFfiContextHandle,
+    sql_column: TsurugiFfiSqlColumnHandle,
+    sql_type_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_column_get_sql_type()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_column={:?}, sql_type_out={:?}",
+        context,
+        sql_column,
+        sql_type_out
+    );
+
+    ffi_arg_out_initialize!(sql_type_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_column);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, sql_type_out);
+
+    let sql_column = unsafe { &mut *sql_column };
+
+    if sql_column.sql_type.is_none() {
+        if let Some(sql_type) = sql_column.sql_type() {
+            cchar_field_set!(context, sql_column.sql_type, sql_type);
+        }
+    }
+
+    let ptr = cstring_to_cchar!(sql_column.sql_type);
+    unsafe {
+        *sql_type_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (sql_type={:?})", rc, ptr);
     rc
 }
 

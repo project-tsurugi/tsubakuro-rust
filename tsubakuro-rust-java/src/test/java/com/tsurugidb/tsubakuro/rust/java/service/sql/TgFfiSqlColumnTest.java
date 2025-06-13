@@ -54,6 +54,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("DECIMAL(38, 0)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -74,6 +75,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("DECIMAL(10, 0)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -94,6 +96,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("DECIMAL(10, 2)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -114,6 +117,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("DECIMAL(38, 0)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -134,6 +138,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertNull(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("DECIMAL(38, 2)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -154,6 +159,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertFalse(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("CHAR(1)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -174,6 +180,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertFalse(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("CHAR(10)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -194,6 +201,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertTrue(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("VARCHAR(*)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -214,6 +222,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertTrue(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("VARCHAR(10)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -234,6 +243,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                 assertTrue(c.getVarying(context));
                 assertNull(c.getDescription(context));
                 assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                assertEquals("VARCHAR(*)", c.getSqlType(context));
             }
         };
         tester.test();
@@ -334,6 +344,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             assertNull(c.getVarying(context));
             assertNull(c.getDescription(context));
             assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+            assertEquals(sqlTypeName(), c.getSqlType(context));
         }
 
         private void testResultSetMetadata(Boolean nullable) {
@@ -367,6 +378,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                         // TODO assertEquals(varying, c.getVarying(context));
                         assertNull(c.getDescription(context));
                         // TODO assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                        // TODO assertEquals(sqlType(), c.getSqlType(context));
                     }
                 }
             }
