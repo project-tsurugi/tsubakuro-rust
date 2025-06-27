@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 pub use crate::jogasaki::proto::sql::common::Decimal as TgDecimal;
 use crate::{client_error, error::TgError};
 
@@ -99,6 +101,34 @@ impl std::fmt::Display for TgDecimalI128 {
                 }
             }
         }
+    }
+}
+
+impl FromStr for TgDecimalI128 {
+    type Err = Box<dyn std::error::Error>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (value, exponent) = if let Some((left, right)) = s.split_once('e') {
+            let exponent = right.parse::<i32>()?;
+            (left, exponent)
+        } else if let Some((left, right)) = s.split_once('E') {
+            let exponent = right.parse::<i32>()?;
+            (left, exponent)
+        } else {
+            (s, 0)
+        };
+        let (unscaled_value, scale) = if let Some((left, right)) = value.split_once(".") {
+            let value = format!("{}{}", left, right);
+            let value = value.parse::<i128>()?;
+            let scale = right.len() as i32;
+            (value, scale)
+        } else {
+            let value = value.parse::<i128>()?;
+            (value, 0)
+        };
+        let exponent = exponent - scale;
+
+        Ok(TgDecimalI128::new(unscaled_value, exponent))
     }
 }
 
@@ -223,6 +253,114 @@ mod test {
             assert_eq!("-0.01234", value.to_string());
             let value = TgDecimalI128::new(v, -6);
             assert_eq!("-0.001234", value.to_string());
+        }
+    }
+
+    #[test]
+    fn decimal_i128_from_str() {
+        {
+            let value = TgDecimalI128::from_str("0").unwrap();
+            assert_eq!(0, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("+0").unwrap();
+            assert_eq!(0, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("-0").unwrap();
+            assert_eq!(0, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("0.").unwrap();
+            assert_eq!(0, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("0.00").unwrap();
+            assert_eq!(0, value.unscaled_value);
+            assert_eq!(-2, value.exponent);
+        }
+
+        {
+            let value = TgDecimalI128::from_str("123e0").unwrap();
+            assert_eq!(123, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123e2").unwrap();
+            assert_eq!(123, value.unscaled_value);
+            assert_eq!(2, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123e-2").unwrap();
+            assert_eq!(123, value.unscaled_value);
+            assert_eq!(-2, value.exponent);
+        }
+
+        {
+            let value = TgDecimalI128::from_str("123E0").unwrap();
+            assert_eq!(123, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123E2").unwrap();
+            assert_eq!(123, value.unscaled_value);
+            assert_eq!(2, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123E-2").unwrap();
+            assert_eq!(123, value.unscaled_value);
+            assert_eq!(-2, value.exponent);
+        }
+
+        {
+            let value = TgDecimalI128::from_str("123").unwrap();
+            assert_eq!(123, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123.0").unwrap();
+            assert_eq!(1230, value.unscaled_value);
+            assert_eq!(-1, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123.4").unwrap();
+            assert_eq!(1234, value.unscaled_value);
+            assert_eq!(-1, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("-123").unwrap();
+            assert_eq!(-123, value.unscaled_value);
+            assert_eq!(0, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("-123.0").unwrap();
+            assert_eq!(-1230, value.unscaled_value);
+            assert_eq!(-1, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("-123.4").unwrap();
+            assert_eq!(-1234, value.unscaled_value);
+            assert_eq!(-1, value.exponent);
+        }
+
+        {
+            let value = TgDecimalI128::from_str("123.45e0").unwrap();
+            assert_eq!(12345, value.unscaled_value);
+            assert_eq!(-2, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123.45e1").unwrap();
+            assert_eq!(12345, value.unscaled_value);
+            assert_eq!(-1, value.exponent);
+        }
+        {
+            let value = TgDecimalI128::from_str("123.45e-1").unwrap();
+            assert_eq!(12345, value.unscaled_value);
+            assert_eq!(-3, value.exponent);
         }
     }
 
