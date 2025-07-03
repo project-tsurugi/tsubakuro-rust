@@ -1,6 +1,6 @@
 [package]
 name = "tsubakuro-rust-ffi"
-version = "0.3.0"
+version = "0.4.0"
 description = "library providing functions in C ABI format to access Tsurugi"
 homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-ffi"
 documentation = "https://docs.rs/tsubakuro_rust_ffi/"
