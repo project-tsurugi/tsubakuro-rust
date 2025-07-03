@@ -6,7 +6,7 @@ tsubakuro-rust-core is a port from [Tsubakuro/Java](https://github.com/project-t
 
 ## Limitations
 
-- Tsurugi 1.4.0 or later.
+- Tsurugi 1.5.0 or later.
 - Provide SQL service only.
 - Only TCP connection is available.
 
@@ -29,7 +29,7 @@ Add `tsubakuro-rust-core` as a dependency to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-tsubakuro-rust-core = "0.2.0"
+tsubakuro-rust-core = "0.3.0"
 ```
 
 
