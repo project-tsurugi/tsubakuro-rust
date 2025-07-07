@@ -79,6 +79,9 @@ task licenseFormatDist(type: com.hierynomus.gradle.license.tasks.LicenseFormat) 
 licenseFormat.dependsOn licenseFormatDist
 
 dependencies {
+  implementation 'org.slf4j:slf4j-api:1.7.36'
+  implementation 'org.slf4j:slf4j-simple:1.7.32'
+
   testImplementation platform('org.junit:junit-bom:5.10.1')
   testImplementation 'org.junit.jupiter:junit-jupiter'
   testImplementation 'com.tsurugidb.iceaxe:iceaxe-core:1.11.0-SNAPSHOT'
