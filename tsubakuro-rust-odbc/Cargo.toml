@@ -1,0 +1,22 @@
+[package]
+name = "tsubakuro-rust-odbc"
+version = "0.3.0"
+description = "ODBC Driver for Tsurugi"
+authors = ["Project Tsurugi <https://github.com/project-tsurugi/tsurugidb>"]
+keywords = ["database", "tsurugidb", "sql"]
+categories = ["database"]
+license = "Apache-2.0"
+edition = "2021"
+rust-version = "1.75.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+dtoa = "1.0.10"
+env_logger = "0.11.6"
+log = "0.4.25"
+rust_decimal = "1.37.2"
+time = { version = "0.3.37", features = ["formatting", "parsing", "macros"]}
+tokio = { version = "1.43.1" }
+tsubakuro-rust-core = { path = "../tsubakuro-rust-core", default-features = false, features = ["with_time"] }
