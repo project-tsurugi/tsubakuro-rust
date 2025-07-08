@@ -439,6 +439,16 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
      * @return data (nullable)
      */
     public <T> T getData(int columnNumber, TgOdbcGetDataArgument<T> arg) {
+        short result = getData0(columnNumber, arg);
+        SqlReturn.check("SQLGetData", result, this);
+
+        if (arg.isDataNull()) {
+            return null;
+        }
+        return arg.getData();
+    }
+
+    public <T> short getData0(int columnNumber, TgOdbcGetDataArgument<T> arg) {
         MemorySegment statementHandle = handleAddress();
         short columnNumberValue = (short) columnNumber;
         short targetTypeValue = arg.targetType().value();
@@ -446,13 +456,7 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         long bufferSize = arg.bufferSize();
         MemorySegment lengthOrIndPtr = arg.lengthOrIndPtr();
         try {
-            short result = (short) OdbcFunction.sqlGetData.invoke(statementHandle, columnNumberValue, targetTypeValue, valuePtr, bufferSize, lengthOrIndPtr);
-            SqlReturn.check("SQLGetData", result, this);
-
-            if (arg.isDataNull()) {
-                return null;
-            }
-            return arg.getData();
+            return (short) OdbcFunction.sqlGetData.invoke(statementHandle, columnNumberValue, targetTypeValue, valuePtr, bufferSize, lengthOrIndPtr);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {

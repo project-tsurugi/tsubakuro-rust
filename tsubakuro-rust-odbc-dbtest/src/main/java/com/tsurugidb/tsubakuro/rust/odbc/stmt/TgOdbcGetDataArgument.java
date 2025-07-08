@@ -142,8 +142,9 @@ public abstract class TgOdbcGetDataArgument<T> {
             @Override
             public byte[] getData() {
                 int length = (int) lengthOrInd();
-                var buf = new byte[length];
-                for (int i = 0; i < length; i++) {
+                int size = Math.min((int) bufferSize, length);
+                var buf = new byte[size];
+                for (int i = 0; i < size; i++) {
                     buf[i] = valuePtr.get(ValueLayout.JAVA_BYTE, i);
                 }
                 return buf;

@@ -117,7 +117,8 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
     }
 
     public enum ConnectionAttribute {
-        SQL_ATTR_AUTOCOMMIT(102),
+        SQL_ATTR_AUTOCOMMIT(102), //
+        SQL_ATTR_ANSI_APP(115), //
 
         ;
 
@@ -133,6 +134,7 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         int stringLength = 0;
         switch (attribute) {
         case SQL_ATTR_AUTOCOMMIT:
+        case SQL_ATTR_ANSI_APP:
             valuePtr = MemorySegment.ofAddress((Integer) value);
             break;
         default:

@@ -92,7 +92,7 @@ public class TgOdbcTester {
 
     protected TgOdbcConnection createConnection(TgOdbcDbcHandle dbc) {
         String connectionString = getConnectionString();
-        return dbc.driverConnect(connectionString, false);
+        return dbc.driverConnect(connectionString, true);
     }
 
     protected TgOdbcStmtHandle createStmt() {
@@ -126,7 +126,7 @@ public class TgOdbcTester {
                 henv.setEnvAttr(OdbcAttrConst.SQL_ATTR_ODBC_VERSION, OdbcAttrConst.SQL_OV_ODBC3);
                 try (var hdbc = TgOdbcDbcHandle.allocDbcHandle(henv)) {
                     String connectionString = getConnectionString();
-                    try (var connection = hdbc.driverConnect(connectionString, false)) {
+                    try (var connection = hdbc.driverConnect(connectionString, true)) {
                         connection.execute(sql, false);
                     }
                 }
