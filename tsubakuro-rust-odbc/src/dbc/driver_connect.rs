@@ -52,6 +52,7 @@ pub extern "system" fn SQLDriverConnect(
 
     let connection_string = map_to_connection_string(&map);
     let rc1 = write_char(
+        "SQLDriverConnect.out_connection_string",
         &connection_string,
         out_connection_string,
         out_connection_string_size,
@@ -108,6 +109,7 @@ pub extern "system" fn SQLDriverConnectW(
 
     let connection_string = map_to_connection_string(&map);
     let rc1 = write_wchar(
+        "SQLDriverConnectW.out_connection_string",
         &connection_string,
         out_connection_string,
         out_connection_string_size,

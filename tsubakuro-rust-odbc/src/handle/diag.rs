@@ -45,8 +45,11 @@ pub enum TsurugiOdbcError {
     StatementProcessorNotFound = 302,
     ListTablesError = 31001,
     ColumnNumberOutOfBounds = 32001,
+    // SQLGetData
     GetDataUnsupportedTargetType = 32002,
+    GetDataInvalidTargetValuePtr = 32003,
     GetDataInvalidStrLenOrIndPtr = 32004,
+
     GetTableMetadataError = 33001,
     BindColError = 33101,
 
@@ -99,8 +102,9 @@ impl From<&TsurugiOdbcError> for &str {
             //
             ListTablesError => "HY000",
             ColumnNumberOutOfBounds => "HY000",
-            //
+            // SQLGetData
             GetDataUnsupportedTargetType => "HY000",
+            GetDataInvalidTargetValuePtr => "HY009",
             GetDataInvalidStrLenOrIndPtr => "22002",
             //
             GetTableMetadataError => "HY000",
@@ -232,12 +236,20 @@ pub extern "system" fn SQLGetDiagRec(
     };
 
     let state_code: &str = (&diag.error_code).into();
-    let rc1 = write_char(state_code, state, 6, std::ptr::null_mut(), None);
+    let rc1 = write_char(
+        "SQLDiagRec.state",
+        state_code,
+        state,
+        6,
+        std::ptr::null_mut(),
+        None,
+    );
 
     let native_error = diag.error_code as i32;
     write_integer(native_error, native_error_ptr);
 
     let rc2 = write_char(
+        "SQLDiagRec.message_text",
         &diag.message,
         message_text,
         buffer_length,
@@ -306,12 +318,20 @@ pub extern "system" fn SQLGetDiagRecW(
     };
 
     let state_code: &str = (&diag.error_code).into();
-    let rc1 = write_wchar(state_code, state, 6, std::ptr::null_mut(), None);
+    let rc1 = write_wchar(
+        "SQLDiagRecW.state",
+        state_code,
+        state,
+        6,
+        std::ptr::null_mut(),
+        None,
+    );
 
     let native_error = diag.error_code as i32;
     write_integer(native_error, native_error_ptr);
 
     let rc2 = write_wchar(
+        "SQLDiagRecW.message_text",
         &diag.message,
         message_text,
         buffer_length,

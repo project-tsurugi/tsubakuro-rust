@@ -35,7 +35,7 @@ pub(crate) fn char_to_string_integer(
     length: SqlInteger,
 ) -> Result<String, Box<dyn std::error::Error>> {
     if src.is_null() {
-        return Err("char_to_string(): src is null".into());
+        return Err("char_to_string_integer(): src is null".into());
     }
 
     if length == SQL_NTS.into() {
@@ -79,7 +79,7 @@ pub(crate) fn wchar_to_string_integer(
     length: SqlInteger,
 ) -> Result<String, Box<dyn std::error::Error>> {
     if src.is_null() {
-        return Err("wchar_to_string(): src is null".into());
+        return Err("wchar_to_string_integer(): src is null".into());
     }
 
     if length == SQL_NTS.into() {
@@ -149,6 +149,7 @@ pub(crate) fn wchar_to_string_opt(
 }
 
 pub(crate) fn write_char(
+    name: &str,
     src: &str,
     dst: *mut SqlChar,
     buffer_length: SqlSmallInt,
@@ -159,7 +160,9 @@ pub(crate) fn write_char(
     let bytes = s.as_bytes_with_nul();
     let value_len = bytes.len();
 
-    let rc = if !dst.is_null() {
+    let rc = if dst.is_null() {
+        SqlReturn::SQL_SUCCESS
+    } else {
         let copy_len = value_len.min(buffer_length as usize);
         unsafe {
             std::ptr::copy_nonoverlapping(bytes.as_ptr(), dst, copy_len);
@@ -169,15 +172,12 @@ pub(crate) fn write_char(
             SqlReturn::SQL_SUCCESS
         } else {
             if let Some(diags) = diags {
-                diags.add_diag(TsurugiOdbcError::DataTruncated, "Data truncated");
+                diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
+            } else {
+                // do nothing for SQLDiagRec
             }
             SqlReturn::SQL_SUCCESS_WITH_INFO
         }
-    } else {
-        if let Some(diags) = diags {
-            diags.add_diag(TsurugiOdbcError::StringError, "output ptr is null");
-        }
-        SqlReturn::SQL_SUCCESS_WITH_INFO
     };
 
     if !out_length.is_null() {
@@ -190,6 +190,7 @@ pub(crate) fn write_char(
 }
 
 pub(crate) fn write_char_len(
+    name: &str,
     src: &str,
     dst: *mut SqlChar,
     buffer_length: SqlLen,
@@ -200,7 +201,9 @@ pub(crate) fn write_char_len(
     let bytes = s.as_bytes_with_nul();
     let value_len = bytes.len();
 
-    let rc = if !dst.is_null() {
+    let rc = if dst.is_null() {
+        SqlReturn::SQL_SUCCESS
+    } else {
         let copy_len = value_len.min(buffer_length as usize);
         unsafe {
             std::ptr::copy_nonoverlapping(bytes.as_ptr(), dst, copy_len);
@@ -209,12 +212,9 @@ pub(crate) fn write_char_len(
         if value_len <= buffer_length as usize {
             SqlReturn::SQL_SUCCESS
         } else {
-            diags.add_diag(TsurugiOdbcError::DataTruncated, "Data truncated");
+            diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
             SqlReturn::SQL_SUCCESS_WITH_INFO
         }
-    } else {
-        diags.add_diag(TsurugiOdbcError::StringError, "output ptr is null");
-        SqlReturn::SQL_SUCCESS_WITH_INFO
     };
 
     if !out_length.is_null() {
@@ -227,6 +227,7 @@ pub(crate) fn write_char_len(
 }
 
 pub(crate) fn write_wchar(
+    name: &str,
     src: &str,
     dst: *mut SqlWChar,
     buffer_length: SqlSmallInt,
@@ -237,7 +238,9 @@ pub(crate) fn write_wchar(
     utf16.push(0); // nul-terminate
     let value_len = utf16.len();
 
-    let rc = if !dst.is_null() {
+    let rc = if dst.is_null() {
+        SqlReturn::SQL_SUCCESS
+    } else {
         let copy_len = value_len.min(buffer_length as usize);
         unsafe {
             std::ptr::copy_nonoverlapping(utf16.as_ptr(), dst, copy_len);
@@ -247,15 +250,12 @@ pub(crate) fn write_wchar(
             SqlReturn::SQL_SUCCESS
         } else {
             if let Some(diags) = diags {
-                diags.add_diag(TsurugiOdbcError::DataTruncated, "Data truncated");
+                diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
+            } else {
+                // do nothing for SQLDiagRecW
             }
             SqlReturn::SQL_SUCCESS_WITH_INFO
         }
-    } else {
-        if let Some(diags) = diags {
-            diags.add_diag(TsurugiOdbcError::StringError, "output ptr is null");
-        }
-        SqlReturn::SQL_SUCCESS_WITH_INFO
     };
 
     if !out_length.is_null() {
@@ -268,6 +268,7 @@ pub(crate) fn write_wchar(
 }
 
 pub(crate) fn write_wchar_bytes(
+    name: &str,
     src: &str,
     dst: *mut SqlWChar,
     buffer_length: SqlSmallInt,
@@ -280,7 +281,9 @@ pub(crate) fn write_wchar_bytes(
     utf16.push(0); // nul-terminate
     let value_len = utf16.len();
 
-    let rc = if !dst.is_null() {
+    let rc = if dst.is_null() {
+        SqlReturn::SQL_SUCCESS
+    } else {
         let copy_len = value_len.min(buffer_length);
         unsafe {
             std::ptr::copy_nonoverlapping(utf16.as_ptr(), dst, copy_len);
@@ -289,12 +292,9 @@ pub(crate) fn write_wchar_bytes(
         if value_len <= buffer_length {
             SqlReturn::SQL_SUCCESS
         } else {
-            diags.add_diag(TsurugiOdbcError::DataTruncated, "Data truncated");
+            diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
             SqlReturn::SQL_SUCCESS_WITH_INFO
         }
-    } else {
-        diags.add_diag(TsurugiOdbcError::StringError, "output ptr is null");
-        SqlReturn::SQL_SUCCESS_WITH_INFO
     };
 
     if !out_length.is_null() {
@@ -307,6 +307,7 @@ pub(crate) fn write_wchar_bytes(
 }
 
 pub(crate) fn write_wchar_len(
+    name: &str,
     src: &str,
     dst: *mut SqlWChar,
     buffer_length: SqlLen,
@@ -317,7 +318,9 @@ pub(crate) fn write_wchar_len(
     utf16.push(0); // nul-terminate
     let value_len = utf16.len();
 
-    let rc = if !dst.is_null() {
+    let rc = if dst.is_null() {
+        SqlReturn::SQL_SUCCESS
+    } else {
         let copy_len = value_len.min(buffer_length as usize);
         unsafe {
             std::ptr::copy_nonoverlapping(utf16.as_ptr(), dst, copy_len);
@@ -326,12 +329,9 @@ pub(crate) fn write_wchar_len(
         if value_len <= buffer_length as usize {
             SqlReturn::SQL_SUCCESS
         } else {
-            diags.add_diag(TsurugiOdbcError::DataTruncated, "Data truncated");
+            diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
             SqlReturn::SQL_SUCCESS_WITH_INFO
         }
-    } else {
-        diags.add_diag(TsurugiOdbcError::StringError, "dst ptr is null");
-        SqlReturn::SQL_ERROR
     };
 
     if !out_length.is_null() {

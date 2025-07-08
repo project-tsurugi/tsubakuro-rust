@@ -106,6 +106,15 @@ fn get_data(
         }
     };
 
+    if target_value_ptr.is_null() {
+        debug!("{stmt}.{FUNCTION_NAME} error. target_value_ptr is null");
+        stmt.add_diag(
+            TsurugiOdbcError::GetDataInvalidTargetValuePtr,
+            "SQLGetData.target_value_ptr is null",
+        );
+        return SqlReturn::SQL_ERROR;
+    }
+
     do_get_data(
         stmt,
         col_or_param_num,

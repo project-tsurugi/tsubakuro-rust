@@ -186,6 +186,7 @@ fn describe_col(
 
     let rc = if wide_char {
         write_wchar(
+            "SQLDescribeColW.column_name_ptr",
             &column.column_name,
             column_name_ptr as *mut SqlWChar,
             buffer_length,
@@ -194,6 +195,7 @@ fn describe_col(
         )
     } else {
         write_char(
+            "SQLDescribeCol.column_name_ptr",
             &column.column_name,
             column_name_ptr as *mut SqlChar,
             buffer_length,

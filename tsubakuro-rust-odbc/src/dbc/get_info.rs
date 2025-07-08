@@ -140,6 +140,7 @@ impl SqlGetInfo {
     fn write_string(&self, value: &str) -> SqlReturn {
         if self.wide_char {
             write_wchar_bytes(
+                "SQLGetInfoW.info_value_ptr",
                 value,
                 self.info_value_ptr as *mut SqlWChar,
                 self.buffer_length,
@@ -148,6 +149,7 @@ impl SqlGetInfo {
             )
         } else {
             write_char(
+                "SQLGetInfo.info_value_ptr",
                 value,
                 self.info_value_ptr as *mut SqlChar,
                 self.buffer_length,

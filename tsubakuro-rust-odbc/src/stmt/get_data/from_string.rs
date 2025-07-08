@@ -102,6 +102,7 @@ pub(crate) fn do_get_data_string(
     use CDataType::*;
     match target_type {
         SQL_C_CHAR => write_char_len(
+            "SQLGetData.target_value_ptr",
             value,
             target_value_ptr as *mut SqlChar,
             buffer_length,
@@ -109,6 +110,7 @@ pub(crate) fn do_get_data_string(
             &stmt.diag_collection(),
         ),
         SQL_C_WCHAR => write_wchar_len(
+            "SQLGetData.target_value_ptr",
             value,
             target_value_ptr as *mut SqlWChar,
             buffer_length,
