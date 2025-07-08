@@ -59,3 +59,14 @@ Tsurugiの接続先として、接続文字列内にエンドポイントを記�
 - 一般的にODBCではプレースホルダーに `?` を使用します。
 - Tsurugi固有のライブラリーでは基本的にプレースホルダーは `:name` を使用しますが、Tsurugi ODBCドライバーでは使用できません。
   - SQL文の中に `:name` を記述することはできても、値をバインドする SQLBindParameter関数でその名前を指定することができません。
+
+## ログ出力
+
+tsubakuro-rust-odbcは [env_logger](https://crates.io/crates/env_logger) を使ってログ出力しています。
+
+Tsurugi ODBC Driverを呼び出すアプリケーションの実行時に 環境変数RUST_LOGを設定しておくと、標準エラーにトレースログやデバッグログが出力されます。
+
+```dos
+set RUST_LOG=tsubakuro_rust_odbc=trace
+```
+
