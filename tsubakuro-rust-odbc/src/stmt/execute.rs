@@ -52,7 +52,7 @@ fn execute(stmt: &mut TsurugiOdbcStmt) -> SqlReturn {
         Err(rc) => return rc,
     };
 
-    let rc = if ps.has_result_records() {
+    if ps.has_result_records() {
         stmt.set_name("SQLExecute.PreparedQuery");
         match prepared_query(stmt, ps, parameters, false) {
             Ok(_) => SqlReturn::SQL_SUCCESS,
@@ -61,9 +61,7 @@ fn execute(stmt: &mut TsurugiOdbcStmt) -> SqlReturn {
     } else {
         stmt.set_name("SQLExecute.PreparedExecute");
         prepared_execute(stmt, ps, parameters)
-    };
-
-    rc
+    }
 }
 
 pub(crate) fn prepared_query(
@@ -81,7 +79,7 @@ pub(crate) fn prepared_query(
     let runtime = stmt.runtime();
 
     let query_result =
-        match runtime.block_on(sql_client.prepared_query(&transaction, &ps, parameters)) {
+        match runtime.block_on(sql_client.prepared_query(&transaction, ps, parameters)) {
             Ok(result) => {
                 debug!("{stmt}.{FUNCTION_NAME}: prepared_query() succeeded");
                 result
@@ -121,7 +119,7 @@ pub(crate) fn prepared_execute(
     let sql_client = check_sql_client!(stmt);
 
     let execute_result =
-        match runtime.block_on(sql_client.prepared_execute(&transaction, &ps, parameters)) {
+        match runtime.block_on(sql_client.prepared_execute(&transaction, ps, parameters)) {
             Ok(result) => {
                 debug!("{stmt}.{FUNCTION_NAME}: prepared_execute() succeeded");
                 result
@@ -140,7 +138,5 @@ pub(crate) fn prepared_execute(
     let processor = TsurugiOdbcSqlExecuteResult::new(execute_result);
     stmt.set_processor(processor);
 
-    let rc = stmt.commit_if_auto_commit();
-
-    rc
+    stmt.commit_if_auto_commit()
 }

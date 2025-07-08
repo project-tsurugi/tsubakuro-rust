@@ -57,6 +57,9 @@ impl std::fmt::Display for TsurugiOdbcStmt {
     }
 }
 
+unsafe impl Send for TsurugiOdbcStmt {}
+unsafe impl Sync for TsurugiOdbcStmt {}
+
 impl TsurugiOdbcStmt {
     fn new(dbc: Arc<TsurugiOdbcDbc>) -> TsurugiOdbcStmt {
         TsurugiOdbcStmt {

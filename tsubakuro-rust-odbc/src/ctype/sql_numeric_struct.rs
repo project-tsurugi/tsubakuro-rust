@@ -50,7 +50,7 @@ impl SqlNumericStruct {
         if self.positive() {
             let mut be = [0u8; 16];
             for i in 0..SQL_MAX_NUMERIC_LEN {
-                be[15 - i] = self.val[i] as u8;
+                be[15 - i] = self.val[i];
             }
             be
         } else {
@@ -104,7 +104,7 @@ impl TryFrom<&str> for SqlNumericStruct {
     type Error = Box<dyn std::error::Error>;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let value = TgDecimalI128::from_str(&value)?;
+        let value = TgDecimalI128::from_str(value)?;
         let unscaled_value = value.unscaled_value;
         let scale = -value.exponent as i8;
         let value = if unscaled_value >= 0 {

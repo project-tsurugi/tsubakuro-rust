@@ -111,6 +111,7 @@ pub(crate) fn do_string_to_time(value: &str) -> Result<time::Time, Box<dyn std::
     let format = if period {
         time::macros::format_description!("[hour]:[minute]:[second].[subsecond]")
     } else {
+        #[allow(clippy::collapsible_else_if)]
         if count == 1 {
             time::macros::format_description!("[hour]:[minute]")
         } else {

@@ -199,6 +199,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcQueryResult {
 }
 
 impl TsurugiOdbcQueryResult {
+    #[allow(clippy::result_large_err)]
     fn fetch_value(
         &mut self,
         stmt: &TsurugiOdbcStmt,

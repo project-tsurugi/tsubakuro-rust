@@ -132,6 +132,7 @@ pub extern "system" fn SQLDescribeColW(
     rc
 }
 
+#[allow(clippy::too_many_arguments)]
 fn describe_col(
     stmt: &TsurugiOdbcStmt,
     column_number: SqlUSmallInt,

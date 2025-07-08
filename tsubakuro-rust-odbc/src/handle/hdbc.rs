@@ -274,6 +274,7 @@ impl TsurugiOdbcDbc {
             *self_transaction = None;
             rc.or(rc1)
         } else {
+            #[allow(clippy::collapsible_else_if)]
             if error_if_not_found {
                 debug!("{self}.{FUNCTION_NAME}: Ttransaction not found");
                 diags.add_diag(

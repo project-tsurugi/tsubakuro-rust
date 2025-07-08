@@ -45,7 +45,7 @@ pub extern "system" fn SQLExecDirect(
         }
     };
 
-    let rc = if stmt.parameters().len() == 0 {
+    let rc = if stmt.parameters().is_empty() {
         exec_direct(&mut stmt, statement)
     } else {
         exec_direct_prepared(&mut stmt, statement)
@@ -86,7 +86,7 @@ pub extern "system" fn SQLExecDirectW(
         }
     };
 
-    let rc = if stmt.parameters().len() == 0 {
+    let rc = if stmt.parameters().is_empty() {
         exec_direct(&mut stmt, statement)
     } else {
         exec_direct_prepared(&mut stmt, statement)

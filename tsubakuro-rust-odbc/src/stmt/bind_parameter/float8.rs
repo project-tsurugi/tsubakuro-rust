@@ -61,9 +61,9 @@ impl TsurugiOdbcBindParameter {
             },
             SQL_C_DOUBLE => unsafe {
                 let ptr = value_ptr as *mut f64;
-                *ptr as f64
+                *ptr
             },
-            SQL_C_NUMERIC => numeric_ptr_to_f64(value_ptr) as f64,
+            SQL_C_NUMERIC => numeric_ptr_to_f64(value_ptr),
             SQL_C_CHAR => {
                 let value = self.char_ptr_to_string(FUNCTION_NAME, stmt)?;
                 str_to_f64(stmt, &value)?

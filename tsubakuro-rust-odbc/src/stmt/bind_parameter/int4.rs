@@ -41,7 +41,7 @@ impl TsurugiOdbcBindParameter {
             },
             SQL_C_LONG | SQL_C_SLONG => unsafe {
                 let ptr = value_ptr as *mut i32;
-                *ptr as i32
+                *ptr
             },
             SQL_C_ULONG => unsafe {
                 let ptr = value_ptr as *mut u32;

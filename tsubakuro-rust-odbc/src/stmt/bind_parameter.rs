@@ -75,6 +75,7 @@ pub extern "system" fn SQLBindParameter(
     rc
 }
 
+#[allow(clippy::too_many_arguments)]
 fn bind_parameter(
     stmt: &mut TsurugiOdbcStmt,
     parameter_number: SqlUSmallInt,
@@ -196,6 +197,7 @@ impl std::fmt::Debug for TsurugiOdbcBindParameter {
 }
 
 impl TsurugiOdbcBindParameter {
+    #[allow(clippy::too_many_arguments)]
     fn new(
         parameter_number: SqlUSmallInt,
         value_type: CDataType,
@@ -273,7 +275,7 @@ impl TsurugiOdbcBindParameter {
                     TsurugiOdbcError::UnsupportedSqlDataType,
                     format!("Unsupported AtomType {:?}", atom_type),
                 );
-                return Err(SqlReturn::SQL_ERROR);
+                Err(SqlReturn::SQL_ERROR)
             }
         }
     }

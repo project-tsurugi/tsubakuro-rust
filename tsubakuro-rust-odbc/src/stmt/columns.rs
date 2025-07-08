@@ -138,7 +138,7 @@ pub extern "system" fn SQLColumnsW(
 }
 
 fn columns(stmt: &mut TsurugiOdbcStmt, table_name: String) -> SqlReturn {
-    let metadata = match get_table_metadata(&stmt, &table_name) {
+    let metadata = match get_table_metadata(stmt, &table_name) {
         Ok(metadata) => metadata,
         Err(rc) => return rc,
     };

@@ -2,7 +2,7 @@ use super::*;
 
 pub(crate) fn get_data_bytes(
     stmt: &TsurugiOdbcStmt,
-    value: &Vec<u8>,
+    value: &[u8],
     target_type: CDataType,
     target_value_ptr: SqlPointer,
     buffer_length: SqlLen,
@@ -19,8 +19,9 @@ pub(crate) fn get_data_bytes(
         return SqlReturn::SQL_ERROR;
     }
 
+    use CDataType::*;
     match target_type {
-        CDataType::SQL_C_BINARY => write_bytes(
+        SQL_C_BINARY => write_bytes(
             stmt,
             value,
             target_value_ptr,

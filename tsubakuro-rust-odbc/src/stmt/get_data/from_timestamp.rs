@@ -21,20 +21,21 @@ pub(crate) fn get_data_timestamp(
         return SqlReturn::SQL_ERROR;
     }
 
+    use CDataType::*;
     match target_type {
-        CDataType::SQL_C_TYPE_DATE | CDataType::SQL_C_DATE => {
+        SQL_C_TYPE_DATE | SQL_C_DATE => {
             let value = SqlDateStruct::from(value);
             write_date_struct(value, target_value_ptr, str_len_or_ind_ptr)
         }
-        CDataType::SQL_C_TYPE_TIME | CDataType::SQL_C_TIME => {
+        SQL_C_TYPE_TIME | SQL_C_TIME => {
             let value = SqlTimeStruct::from(value);
             write_time_struct(value, target_value_ptr, str_len_or_ind_ptr)
         }
-        CDataType::SQL_C_TYPE_TIMESTAMP | CDataType::SQL_C_TIMESTAMP => {
+        SQL_C_TYPE_TIMESTAMP | SQL_C_TIMESTAMP => {
             let value = SqlTimestampStruct::from(value);
             write_timestamp_struct(value, target_value_ptr, str_len_or_ind_ptr)
         }
-        CDataType::SQL_C_CHAR | CDataType::SQL_C_WCHAR => match timestamp_to_string(stmt, value) {
+        SQL_C_CHAR | SQL_C_WCHAR => match timestamp_to_string(stmt, value) {
             Ok(value) => get_data_string(
                 stmt,
                 &value,
@@ -43,7 +44,7 @@ pub(crate) fn get_data_timestamp(
                 buffer_length,
                 str_len_or_ind_ptr,
             ),
-            Err(rc) => return rc,
+            Err(rc) => rc,
         },
         _ => {
             debug!(

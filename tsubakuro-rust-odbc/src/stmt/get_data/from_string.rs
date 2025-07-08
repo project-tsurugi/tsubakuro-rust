@@ -19,56 +19,57 @@ pub(crate) fn get_data_string(
         return SqlReturn::SQL_ERROR;
     }
 
+    use CDataType::*;
     match target_type {
-        CDataType::SQL_C_BIT => match str_to_bool(stmt, value) {
+        SQL_C_BIT => match str_to_bool(stmt, value) {
             Ok(v) => write_bool(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_UTINYINT => match str_to_u8(stmt, value) {
+        SQL_C_UTINYINT => match str_to_u8(stmt, value) {
             Ok(v) => write_u8(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_STINYINT | CDataType::SQL_C_TINYINT => match str_to_i8(stmt, value) {
+        SQL_C_STINYINT | SQL_C_TINYINT => match str_to_i8(stmt, value) {
             Ok(v) => write_i8(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_USHORT => match str_to_u16(stmt, value) {
+        SQL_C_USHORT => match str_to_u16(stmt, value) {
             Ok(v) => write_u16(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_SSHORT | CDataType::SQL_C_SHORT => match str_to_i16(stmt, value) {
+        SQL_C_SSHORT | SQL_C_SHORT => match str_to_i16(stmt, value) {
             Ok(v) => write_i16(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_ULONG => match str_to_u32(stmt, value) {
+        SQL_C_ULONG => match str_to_u32(stmt, value) {
             Ok(v) => write_u32(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_SLONG | CDataType::SQL_C_LONG => match str_to_i32(stmt, value) {
+        SQL_C_SLONG | SQL_C_LONG => match str_to_i32(stmt, value) {
             Ok(v) => write_i32(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_UBIGINT => match str_to_u64(stmt, value) {
+        SQL_C_UBIGINT => match str_to_u64(stmt, value) {
             Ok(v) => write_u64(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_SBIGINT => match str_to_i64(stmt, value) {
+        SQL_C_SBIGINT => match str_to_i64(stmt, value) {
             Ok(v) => write_i64(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_FLOAT => match str_to_f32(stmt, value) {
+        SQL_C_FLOAT => match str_to_f32(stmt, value) {
             Ok(v) => write_f32(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_DOUBLE => match str_to_f64(stmt, value) {
+        SQL_C_DOUBLE => match str_to_f64(stmt, value) {
             Ok(v) => write_f64(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_NUMERIC => match str_to_numeric_struct(stmt, value) {
+        SQL_C_NUMERIC => match str_to_numeric_struct(stmt, value) {
             Ok(v) => write_numeric_struct(v, target_value_ptr, str_len_or_ind_ptr),
             Err(rc) => rc,
         },
-        CDataType::SQL_C_CHAR | CDataType::SQL_C_WCHAR => do_get_data_string(
+        SQL_C_CHAR | SQL_C_WCHAR => do_get_data_string(
             stmt,
             value,
             target_type,
@@ -98,15 +99,16 @@ pub(crate) fn do_get_data_string(
     buffer_length: SqlLen,
     str_len_or_ind_ptr: *mut SqlLen,
 ) -> SqlReturn {
+    use CDataType::*;
     match target_type {
-        CDataType::SQL_C_CHAR => write_char_len(
+        SQL_C_CHAR => write_char_len(
             value,
             target_value_ptr as *mut SqlChar,
             buffer_length,
             str_len_or_ind_ptr,
             &stmt.diag_collection(),
         ),
-        CDataType::SQL_C_WCHAR => write_wchar_len(
+        SQL_C_WCHAR => write_wchar_len(
             value,
             target_value_ptr as *mut SqlWChar,
             buffer_length,

@@ -48,6 +48,7 @@ macro_rules! handle_type {
 }
 
 #[no_mangle]
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub extern "system" fn SQLAllocHandle(
     handle_type: SqlSmallInt,
     input_handle: Handle,

@@ -151,7 +151,7 @@ pub(crate) fn do_get_data(
     let column_index = column_number - 1;
 
     processor.get_data(
-        &stmt,
+        stmt,
         column_index,
         target_type,
         target_value_ptr,
@@ -310,7 +310,7 @@ fn write_numeric_struct(
 
 fn write_bytes(
     stmt: &TsurugiOdbcStmt,
-    value: &Vec<u8>,
+    value: &[u8],
     target_value_ptr: SqlPointer,
     buffer_length: SqlLen,
     str_len_or_ind_ptr: *mut SqlLen,

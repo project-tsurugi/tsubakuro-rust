@@ -57,7 +57,7 @@ impl TsurugiOdbcBindParameter {
             },
             SQL_C_FLOAT => unsafe {
                 let ptr = value_ptr as *mut f32;
-                *ptr as f32
+                *ptr
             },
             SQL_C_DOUBLE => unsafe {
                 let ptr = value_ptr as *mut f64;

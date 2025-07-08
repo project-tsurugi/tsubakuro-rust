@@ -247,7 +247,7 @@ pub extern "system" fn SQLGetDiagRec(
 
     let rc = rc1.or(rc2);
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
-    return rc;
+    rc
 }
 
 #[no_mangle]
@@ -321,7 +321,7 @@ pub extern "system" fn SQLGetDiagRecW(
 
     let rc = rc1.or(rc2);
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
-    return rc;
+    rc
 }
 
 fn get_diag_collection(

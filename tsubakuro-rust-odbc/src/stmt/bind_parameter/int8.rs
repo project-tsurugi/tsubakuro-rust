@@ -49,7 +49,7 @@ impl TsurugiOdbcBindParameter {
             },
             SQL_C_SBIGINT => unsafe {
                 let ptr = value_ptr as *mut i64;
-                *ptr as i64
+                *ptr
             },
             SQL_C_UBIGINT => unsafe {
                 let ptr = value_ptr as *mut u64;

@@ -533,7 +533,7 @@ fn column_size(data_type: &SqlDataType) -> Option<i32> {
         SQL_BINARY | SQL_VARBINARY => 2097132,
         SQL_LONGVARBINARY => todo!(),
         SQL_BIGINT => 8 * 8,
-        SQL_TINYINT => 1 * 8,
+        SQL_TINYINT => 8,
         SQL_BIT => 1,
         _ => return None,
     };

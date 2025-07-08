@@ -34,11 +34,10 @@ impl std::fmt::Debug for SqlReturn {
 
 impl SqlReturn {
     pub fn is_success(&self) -> bool {
-        match self {
-            SqlReturn::SQL_SUCCESS => true,
-            SqlReturn::SQL_SUCCESS_WITH_INFO => true,
-            _ => false,
-        }
+        matches!(
+            self,
+            SqlReturn::SQL_SUCCESS | SqlReturn::SQL_SUCCESS_WITH_INFO
+        )
     }
 
     pub fn or(&self, other: SqlReturn) -> SqlReturn {

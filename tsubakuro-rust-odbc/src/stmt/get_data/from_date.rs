@@ -21,16 +21,17 @@ pub(crate) fn get_data_date(
         return SqlReturn::SQL_ERROR;
     }
 
+    use CDataType::*;
     match target_type {
-        CDataType::SQL_C_TYPE_DATE | CDataType::SQL_C_DATE => {
+        SQL_C_TYPE_DATE | SQL_C_DATE => {
             let value = SqlDateStruct::from(value);
             write_date_struct(value, target_value_ptr, str_len_or_ind_ptr)
         }
-        CDataType::SQL_C_TYPE_TIMESTAMP | CDataType::SQL_C_TIMESTAMP => {
+        SQL_C_TYPE_TIMESTAMP | SQL_C_TIMESTAMP => {
             let value = SqlTimestampStruct::from(value);
             write_timestamp_struct(value, target_value_ptr, str_len_or_ind_ptr)
         }
-        CDataType::SQL_C_CHAR | CDataType::SQL_C_WCHAR => {
+        SQL_C_CHAR | SQL_C_WCHAR => {
             let value = value.to_string();
             do_get_data_string(
                 stmt,
