@@ -162,7 +162,7 @@ fn describe_col(
             stmt.add_diag(
                 TsurugiOdbcError::ColumnNumberOutOfBounds,
                 format!(
-                    "column_number must be between 1 and 5, but got {}",
+                    "column_number must be between 1 and {number_of_columns}, but got {}",
                     column_number
                 ),
             );
