@@ -191,3 +191,14 @@ Tsurugi ODBCドライバーが対応しているODBC関数の一覧を返しま�
 ### SQLGetTypeInfo
 
 Tsurugi ODBCドライバーが対応しているデータ型の情報を返します。
+
+
+
+## WCHARについて
+
+Tsurugi ODBCドライバーは、関数名の末尾にWが付く関数も提供しています。
+
+関数名の末尾がWの関数は、文字列（SQLWCHAR）をUTF-16LEとして扱います。
+
+それ以外の関数については、文字列（SQLCHAR）をUTF-8として扱います。  |
+（ASCIIの範囲内であれば問題ありませんが、それ以外の文字だと、MS-WindowsのODBCドライバーマネージャーが文字列をShift_JISとして扱うことがあるようで、文字化けする可能性があります）
