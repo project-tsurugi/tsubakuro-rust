@@ -101,7 +101,7 @@ impl From<&TsurugiOdbcError> for &str {
             ColumnNumberOutOfBounds => "HY000",
             //
             GetDataUnsupportedTargetType => "HY000",
-            GetDataInvalidStrLenOrIndPtr => "HY009",
+            GetDataInvalidStrLenOrIndPtr => "22002",
             //
             GetTableMetadataError => "HY000",
             //
