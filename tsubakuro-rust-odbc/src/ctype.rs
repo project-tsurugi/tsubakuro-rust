@@ -29,9 +29,14 @@ pub type HWnd = SqlPointer;
 pub const SQL_FALSE: i32 = 0;
 pub const SQL_TRUE: i32 = 1;
 
-pub const SQL_NO_NULLS: i32 = 0;
-pub const SQL_NULLABLE: i32 = 1;
-pub const SQL_NULLABLE_UNKNOWN: i32 = 2;
+#[repr(i32)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub enum SqlNullable {
+    SQL_NO_NULLS = 0,
+    SQL_NULLABLE = 1,
+    SQL_NULLABLE_UNKNOWN = 2,
+}
 
 #[allow(dead_code)]
 pub const SQL_PRED_NONE: i32 = 0;

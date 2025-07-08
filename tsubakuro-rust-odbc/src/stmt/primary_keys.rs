@@ -4,8 +4,8 @@ use tsubakuro_rust_core::prelude::TableMetadata;
 use crate::{
     check_stmt,
     ctype::{
-        CDataType, SqlChar, SqlDataType, SqlLen, SqlPointer, SqlReturn, SqlSmallInt, SqlUSmallInt,
-        SqlWChar, SQL_NO_NULLS, SQL_NULLABLE,
+        CDataType, SqlChar, SqlDataType, SqlLen, SqlNullable::*, SqlPointer, SqlReturn,
+        SqlSmallInt, SqlUSmallInt, SqlWChar,
     },
     handle::{
         diag::TsurugiOdbcError,

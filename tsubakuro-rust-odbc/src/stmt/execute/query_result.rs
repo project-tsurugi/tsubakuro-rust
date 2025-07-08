@@ -3,7 +3,8 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::{
     ctype::{
-        CDataType, SqlDataType, SqlLen, SqlPointer, SqlReturn, SqlUSmallInt, SQL_NULLABLE_UNKNOWN,
+        CDataType, SqlDataType, SqlLen, SqlNullable::SQL_NULLABLE_UNKNOWN, SqlPointer, SqlReturn,
+        SqlUSmallInt,
     },
     handle::{diag::TsurugiOdbcError, hstmt::TsurugiOdbcStmt},
     stmt::{describe_col::TsurugiOdbcDescribeColumn, get_data::*, TsurugiOdbcStatementProcessor},

@@ -3,7 +3,8 @@ use log::{debug, trace};
 use crate::{
     check_stmt,
     ctype::{
-        SqlChar, SqlDataType, SqlPointer, SqlReturn, SqlSmallInt, SqlULen, SqlUSmallInt, SqlWChar,
+        SqlChar, SqlDataType, SqlNullable, SqlPointer, SqlReturn, SqlSmallInt, SqlULen,
+        SqlUSmallInt, SqlWChar,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -12,12 +13,13 @@ use crate::{
     util::{write_char, write_wchar},
 };
 
+#[derive(Debug)]
 pub(crate) struct TsurugiOdbcDescribeColumn {
     column_name: String,
     data_type: SqlDataType,
     column_size: SqlULen,
     decimal_digits: SqlSmallInt,
-    nullable: SqlSmallInt,
+    nullable: SqlNullable, // SqlSmallInt
 }
 
 impl TsurugiOdbcDescribeColumn {
@@ -26,14 +28,14 @@ impl TsurugiOdbcDescribeColumn {
         data_type: SqlDataType,
         column_size: SqlULen,
         decimal_digits: SqlSmallInt,
-        nullable: i32,
+        nullable: SqlNullable,
     ) -> TsurugiOdbcDescribeColumn {
         TsurugiOdbcDescribeColumn {
             column_name: column_name.to_string(),
             data_type,
             column_size,
             decimal_digits,
-            nullable: nullable as SqlSmallInt,
+            nullable,
         }
     }
 }
@@ -177,6 +179,11 @@ fn describe_col(
         }
     };
 
+    debug!(
+        "{stmt}.{FUNCTION_NAME}: column_number={}, column={:?}",
+        column_number, column
+    );
+
     let rc = if wide_char {
         write_wchar(
             &column.column_name,
@@ -226,10 +233,10 @@ fn write_decimal_digits(value: SqlSmallInt, decimal_digits_ptr: *mut SqlSmallInt
     }
 }
 
-fn write_nullable(value: SqlSmallInt, nullable_ptr: *mut SqlSmallInt) {
+fn write_nullable(value: SqlNullable, nullable_ptr: *mut SqlSmallInt) {
     if !nullable_ptr.is_null() {
         unsafe {
-            *nullable_ptr = value;
+            *nullable_ptr = value as SqlSmallInt;
         }
     }
 }

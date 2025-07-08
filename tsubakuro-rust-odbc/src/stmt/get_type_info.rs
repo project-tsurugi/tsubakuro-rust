@@ -3,8 +3,8 @@ use log::{debug, trace, warn};
 use crate::{
     check_stmt,
     ctype::{
-        CDataType, SqlDataType, SqlLen, SqlPointer, SqlReturn, SqlSmallInt, SqlUSmallInt,
-        SQL_FALSE, SQL_NO_NULLS, SQL_NULLABLE, SQL_PRED_BASIC, SQL_PRED_CHAR, SQL_TRUE,
+        CDataType, SqlDataType, SqlLen, SqlNullable::*, SqlPointer, SqlReturn, SqlSmallInt,
+        SqlUSmallInt, SQL_FALSE, SQL_PRED_BASIC, SQL_PRED_CHAR, SQL_TRUE,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -365,7 +365,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
             ), // CREATE_PARAMS varchar
             6 => get_data_i32(
                 stmt,
-                SQL_NULLABLE,
+                SQL_NULLABLE as i32,
                 target_type,
                 target_value_ptr,
                 buffer_length,

@@ -174,6 +174,12 @@ public class TgOdbcExampleMain {
             if (columnCount != 3) {
                 System.err.printf("columnCount=%d\n", columnCount);
             }
+
+            for (int i = 1; i <= columnCount; i++) {
+                var desc = stmt.describeCol(i, false);
+                System.out.println(i + "=" + desc);
+            }
+
             while (stmt.fetch()) {
                 int foo = stmt.getDataInt(1);
                 Long bar = stmt.getDataLong(2);

@@ -4,8 +4,8 @@ use tsubakuro_rust_core::prelude::{AtomType, SqlColumn, TableMetadata};
 use crate::{
     check_sql_client_or_err, check_stmt,
     ctype::{
-        sql_numeric_struct::SqlNumericStruct, CDataType, SqlChar, SqlDataType, SqlLen, SqlPointer,
-        SqlReturn, SqlSmallInt, SqlUSmallInt, SqlWChar, SQL_NO_NULLS, SQL_NULLABLE,
+        sql_numeric_struct::SqlNumericStruct, CDataType, SqlChar, SqlDataType, SqlLen,
+        SqlNullable::*, SqlPointer, SqlReturn, SqlSmallInt, SqlUSmallInt, SqlWChar,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -454,9 +454,13 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
             ), // NUM_PREC_RADIX SmallInt
             10 => get_data_i32_opt(
                 stmt,
-                column
-                    .nullable()
-                    .map(|b| if b { SQL_NULLABLE } else { SQL_NO_NULLS }),
+                column.nullable().map(|b| {
+                    if b {
+                        SQL_NULLABLE as i32
+                    } else {
+                        SQL_NO_NULLS as i32
+                    }
+                }),
                 target_type,
                 target_value_ptr,
                 buffer_length,
