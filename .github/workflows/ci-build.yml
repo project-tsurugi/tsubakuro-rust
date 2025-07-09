@@ -96,3 +96,47 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TSUBAKURO_RUST_VERSION: ${{ github.ref_name }}
+
+  Build_Windows:
+    runs-on: windows-latest
+    permissions:
+      checks: write
+      contents: write
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install_Protobuf
+        run: |
+          choco install protoc -y
+
+      - name: Test_Core
+        run: |
+          cd tsubakuro-rust-core
+          cargo build
+          cargo test
+
+      - name: Test_ODBC
+        run: |
+          cd tsubakuro-rust-odbc
+          cargo build --release
+          ls -l target/release/
+
+          cargo test
+
+      - name: Lint_ODBC
+        continue-on-error: true
+        run: |
+          cd tsubakuro-rust-odbc
+          cargo clippy
+
+      - name: Upload_DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsubakuro_rust_odbc.dll
+          path: tsubakuro-rust-odbc/target/release/tsubakuro_rust_odbc.dll
