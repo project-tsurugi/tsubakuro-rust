@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use log::{debug, trace};
+use log::{debug, trace, warn};
 
 use crate::{
     check_dbc,
@@ -17,6 +17,7 @@ use crate::{
 #[allow(non_camel_case_types)]
 enum ConnectionAttribute {
     SQL_ATTR_AUTOCOMMIT = 102,
+    SQL_ATTR_ANSI_APP = 115,
 }
 
 // SQL_ATTR_AUTOCOMMIT
@@ -30,6 +31,7 @@ impl TryFrom<i32> for ConnectionAttribute {
         use ConnectionAttribute::*;
         match value {
             102 => Ok(SQL_ATTR_AUTOCOMMIT),
+            115 => Ok(SQL_ATTR_ANSI_APP),
             _ => Err(TsurugiOdbcError::InvalidAttribute),
         }
     }
@@ -40,8 +42,8 @@ macro_rules! connection_attribute {
         match ConnectionAttribute::try_from($attribute) {
             Ok(value) => value,
             Err(e) => {
-                log::debug!("{FUNCTION_NAME}: unsupported attribute {:?}", $attribute);
-                $dbc.add_diag(e, format!("unsupported attribute {:?}", $attribute));
+                log::warn!("{FUNCTION_NAME}: Unsupported attribute {:?}", $attribute);
+                $dbc.add_diag(e, format!("Unsupported attribute {:?}", $attribute));
                 let rc = SqlReturn::SQL_ERROR;
                 log::trace!("{FUNCTION_NAME} end. rc={:?}", rc);
                 return rc;
@@ -116,6 +118,10 @@ fn set_connect_attr(
             let auto_commit = auto_commit != SQL_AUTOCOMMIT_OFF;
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, auto_commit);
             dbc.set_auto_commit(auto_commit)
+        }
+        SQL_ATTR_ANSI_APP => {
+            debug!("{dbc}.{FUNCTION_NAME}: {:?}={:?}", attribute, value_ptr);
+            SqlReturn::SQL_SUCCESS
         }
     }
 }
@@ -219,6 +225,17 @@ fn get_connect_attr(
                 *ptr = auto_commit;
             }
             SqlReturn::SQL_SUCCESS
+        }
+        _ => {
+            warn!(
+                "{dbc}.{FUNCTION_NAME}: Unsupported attribute {:?}",
+                attribute
+            );
+            dbc.add_diag(
+                TsurugiOdbcError::InvalidAttribute,
+                format!("Unsupported attribute {:?}", attribute),
+            );
+            SqlReturn::SQL_ERROR
         }
     }
 }

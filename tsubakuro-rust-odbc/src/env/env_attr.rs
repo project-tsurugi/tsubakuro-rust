@@ -35,8 +35,8 @@ macro_rules! environment_attribute {
         match EnvironmentAttribute::try_from($attribute) {
             Ok(value) => value,
             Err(e) => {
-                log::debug!("{FUNCTION_NAME}: unsupported attribute {:?}", $attribute);
-                $env.add_diag(e, format!("unsupported attribute {:?}", $attribute));
+                log::warn!("{FUNCTION_NAME}: Unsupported attribute {:?}", $attribute);
+                $env.add_diag(e, format!("Unsupported attribute {:?}", $attribute));
                 let rc = SqlReturn::SQL_ERROR;
                 log::trace!("{FUNCTION_NAME} end. rc={:?}", rc);
                 return rc;
