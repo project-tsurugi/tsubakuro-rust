@@ -10,7 +10,7 @@ keywords = ["database", "tsurugidb", "sql"]
 categories = ["database"]
 license = "Apache-2.0"
 edition = "2021"
-rust-version = "1.75.0"
+rust-version = "1.84.1"
 
 [dependencies]
 async-trait = "0.1.83"
