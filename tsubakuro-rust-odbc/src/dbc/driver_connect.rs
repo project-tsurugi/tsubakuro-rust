@@ -22,12 +22,12 @@ pub extern "system" fn SQLDriverConnect(
     out_connection_string: *mut SqlChar,
     out_connection_string_size: SqlSmallInt,
     out_connection_string_length: *mut SqlSmallInt,
-    _driver_completion: SqlUSmallInt,
+    driver_completion: SqlUSmallInt,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "SQLDriverConnect()";
     trace!(
-        "{FUNCTION_NAME} start. hdbc={:?}, in_connection_string={:?}, in_connection_string_length={:?}, out_connection_string={:?}, out_connection_string_size={:?}, out_connection_string_length={:?}",
-        hdbc, in_connection_string, in_connection_string_length,out_connection_string, out_connection_string_size, out_connection_string_length
+        "{FUNCTION_NAME} start. hdbc={:?}, in_connection_string={:?}, in_connection_string_length={:?}, out_connection_string={:?}, out_connection_string_size={:?}, out_connection_string_length={:?}, driver_completion={:?}",
+        hdbc, in_connection_string, in_connection_string_length,out_connection_string, out_connection_string_size, out_connection_string_length, driver_completion
     );
 
     let dbc = check_dbc!(hdbc);
@@ -76,12 +76,12 @@ pub extern "system" fn SQLDriverConnectW(
     out_connection_string: *mut SqlWChar,
     out_connection_string_size: SqlSmallInt,
     out_connection_string_length: *mut SqlSmallInt,
-    _driver_completion: SqlUSmallInt,
+    driver_completion: SqlUSmallInt,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "SQLDriverConnectW()";
     trace!(
-        "{FUNCTION_NAME} start. hdbc={:?}, in_connection_string={:?}, in_connection_string_length={:?}, out_connection_string={:?}, out_connection_string_size={:?}, out_connection_string_length={:?}",
-        hdbc, in_connection_string, in_connection_string_length,out_connection_string, out_connection_string_size, out_connection_string_length
+        "{FUNCTION_NAME} start. hdbc={:?}, in_connection_string={:?}, in_connection_string_length={:?}, out_connection_string={:?}, out_connection_string_size={:?}, out_connection_string_length={:?}, driver_completion={:?}",
+        hdbc, in_connection_string, in_connection_string_length,out_connection_string, out_connection_string_size, out_connection_string_length, driver_completion
     );
 
     let dbc = check_dbc!(hdbc);
