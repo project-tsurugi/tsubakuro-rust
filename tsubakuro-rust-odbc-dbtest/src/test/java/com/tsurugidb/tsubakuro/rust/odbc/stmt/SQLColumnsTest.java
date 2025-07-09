@@ -165,4 +165,16 @@ class SQLColumnsTest extends TgOdbcTester {
             assertTrue(stmt.fetch());
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void notFound(boolean wideChar) {
+        dropIfExists("not_found_test");
+
+        try (var stmt = createStmt()) {
+            stmt.columns("not_found_test", wideChar);
+
+            assertFalse(stmt.fetch());
+        }
+    }
 }

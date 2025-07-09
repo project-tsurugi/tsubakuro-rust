@@ -141,13 +141,13 @@ fn primary_keys(stmt: &mut TsurugiOdbcStmt, table_name: String) -> SqlReturn {
 }
 
 struct TsurugiOdbcPrimaryKeys {
-    metadata: TableMetadata,
+    metadata: Option<TableMetadata>,
     row_index: isize,
 }
 
 impl TsurugiOdbcPrimaryKeys {
-    fn new(metadata: TableMetadata) -> Self {
-        Self {
+    fn new(metadata: Option<TableMetadata>) -> TsurugiOdbcPrimaryKeys {
+        TsurugiOdbcPrimaryKeys {
             metadata,
             row_index: -1,
         }
@@ -212,11 +212,17 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcPrimaryKeys {
     }
 
     fn row_count(&self) -> SqlLen {
-        let keys = self.metadata.primary_keys();
-        keys.len() as SqlLen
+        match self.metadata {
+            Some(ref metadata) => metadata.primary_keys().len() as SqlLen,
+            None => 0,
+        }
     }
 
     fn fetch(&mut self, _stmt: &mut TsurugiOdbcStmt) -> SqlReturn {
+        if self.metadata.is_none() {
+            return SqlReturn::SQL_NO_DATA;
+        }
+
         let index = self.row_index + 1;
         if index < self.row_count() {
             self.row_index = index;
@@ -229,7 +235,14 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcPrimaryKeys {
     fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcPrimaryKeys.get_data()";
 
-        let keys = self.metadata.primary_keys();
+        let metadata = match self.metadata {
+            Some(ref metadata) => metadata,
+            None => {
+                return SqlReturn::SQL_NO_DATA;
+            }
+        };
+
+        let keys = metadata.primary_keys();
         if self.row_index < 0 || self.row_index as usize >= keys.len() {
             debug!(
                 "{stmt}.{FUNCTION_NAME} error. index out of bounds. self.row_index={}",
@@ -239,12 +252,12 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcPrimaryKeys {
         }
 
         match arg.column_index() {
-            0 => get_data_string(stmt, arg, self.metadata.database_name()), // TABLE_CAT varchar
-            1 => get_data_string(stmt, arg, self.metadata.schema_name()),   // TABLE_SCHEM varchar
-            2 => get_data_string(stmt, arg, self.metadata.table_name()),    // TABLE_NAME varchar
+            0 => get_data_string(stmt, arg, metadata.database_name()), // TABLE_CAT varchar
+            1 => get_data_string(stmt, arg, metadata.schema_name()),   // TABLE_SCHEM varchar
+            2 => get_data_string(stmt, arg, metadata.table_name()),    // TABLE_NAME varchar
             3 => get_data_string(stmt, arg, &keys[self.row_index as usize]), // COLUMN_NAME varchar
-            4 => get_data_i32(stmt, arg, self.row_index as i32 + 1),        // KEY_SEQ Smallint
-            5 => get_data_null(stmt, arg),                                  // PK_NAME varchar
+            4 => get_data_i32(stmt, arg, self.row_index as i32 + 1),   // KEY_SEQ Smallint
+            5 => get_data_null(stmt, arg),                             // PK_NAME varchar
             _ => unreachable!(),
         }
     }

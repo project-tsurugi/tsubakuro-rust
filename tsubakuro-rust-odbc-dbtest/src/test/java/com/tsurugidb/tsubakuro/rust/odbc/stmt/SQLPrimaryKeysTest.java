@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.odbc.stmt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -113,6 +114,18 @@ class SQLPrimaryKeysTest extends TgOdbcTester {
             stmt.primaryKeys("testz", 4, wideChar);
 
             assertTrue(stmt.fetch());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void notFound(boolean wideChar) {
+        dropIfExists("not_found_test");
+
+        try (var stmt = createStmt()) {
+            stmt.primaryKeys("not_found_test", wideChar);
+
+            assertFalse(stmt.fetch());
         }
     }
 }

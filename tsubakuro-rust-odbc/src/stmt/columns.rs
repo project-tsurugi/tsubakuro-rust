@@ -153,42 +153,50 @@ fn columns(stmt: &mut TsurugiOdbcStmt, table_name: String) -> SqlReturn {
 pub(crate) fn get_table_metadata(
     stmt: &TsurugiOdbcStmt,
     table_name: &str,
-) -> Result<TableMetadata, SqlReturn> {
+) -> Result<Option<TableMetadata>, SqlReturn> {
     const FUNCTION_NAME: &str = "get_table_metadata()";
 
     let sql_client = check_sql_client_or_err!(stmt);
 
     let runtime = stmt.runtime();
     let result = runtime.block_on(sql_client.get_table_metadata(table_name));
-    let metadata = match result {
+    match result {
         Ok(metadata) => {
-            debug!("{stmt}.{FUNCTION_NAME}: get_table_metadata() succeeded");
-            metadata
+            debug!("{stmt}.{FUNCTION_NAME}: sql_client.get_table_metadata() succeeded");
+            Ok(Some(metadata))
         }
         Err(e) => {
+            if let Some(code) = e.diagnostic_code() {
+                if code.category_number() == 3 && code.code_number() == 2014 {
+                    // SQL-02014 TARGET_NOT_FOUND_EXCEPTION
+                    debug!(
+                        "{stmt}.{FUNCTION_NAME}: sql_client.get_table_metadata() table not found"
+                    );
+                    return Ok(None);
+                }
+            }
+
             warn!(
-                "{stmt}.{FUNCTION_NAME}: get_table_metadata() error. {:?}",
+                "{stmt}.{FUNCTION_NAME}: sql_client.get_table_metadata() error. {:?}",
                 e
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetTableMetadataError,
                 format!("get table metadta error. {}", e),
             );
-            return Err(SqlReturn::SQL_ERROR);
+            Err(SqlReturn::SQL_ERROR)
         }
-    };
-
-    Ok(metadata)
+    }
 }
 
 struct TsurugiOdbcColumns {
-    metadata: TableMetadata,
+    metadata: Option<TableMetadata>,
     row_index: isize,
 }
 
 impl TsurugiOdbcColumns {
-    fn new(metadata: TableMetadata) -> Self {
-        Self {
+    fn new(metadata: Option<TableMetadata>) -> TsurugiOdbcColumns {
+        TsurugiOdbcColumns {
             metadata,
             row_index: -1,
         }
@@ -336,11 +344,17 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
     }
 
     fn row_count(&self) -> SqlLen {
-        let columns = self.metadata.columns();
-        columns.len() as SqlLen
+        match self.metadata {
+            Some(ref metadata) => metadata.columns().len() as SqlLen,
+            None => 0,
+        }
     }
 
     fn fetch(&mut self, _stmt: &mut TsurugiOdbcStmt) -> SqlReturn {
+        if self.metadata.is_none() {
+            return SqlReturn::SQL_NO_DATA;
+        }
+
         let index = self.row_index + 1;
         if index < self.row_count() {
             self.row_index = index;
@@ -353,7 +367,14 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
     fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcColumns.get_data()";
 
-        let columns = self.metadata.columns();
+        let metadata = match self.metadata {
+            Some(ref metadata) => metadata,
+            None => {
+                return SqlReturn::SQL_NO_DATA;
+            }
+        };
+
+        let columns = metadata.columns();
         if self.row_index < 0 || self.row_index as usize >= columns.len() {
             debug!(
                 "{stmt}.{FUNCTION_NAME} error. index out of bounds. self.row_index={}",
@@ -366,16 +387,16 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
         // TODO SQLGetColumn() field
         let column_index = arg.column_index();
         match column_index {
-            0 => get_data_string(stmt, arg, self.metadata.database_name()), // TABLE_CAT varchar
-            1 => get_data_string(stmt, arg, self.metadata.schema_name()),   // TABLE_SCHEM varchar
-            2 => get_data_string(stmt, arg, self.metadata.table_name()),    // TABLE_NAME varchar
-            3 => get_data_string(stmt, arg, column.name()),                 // COLUMN_NAME varchar
+            0 => get_data_string(stmt, arg, metadata.database_name()), // TABLE_CAT varchar
+            1 => get_data_string(stmt, arg, metadata.schema_name()),   // TABLE_SCHEM varchar
+            2 => get_data_string(stmt, arg, metadata.table_name()),    // TABLE_NAME varchar
+            3 => get_data_string(stmt, arg, column.name()),            // COLUMN_NAME varchar
             4 => get_data_i32(stmt, arg, SqlDataType::from(column) as i32), // DATA_TYPE SmallInt
-            5 => get_data_string_opt(stmt, arg, column.sql_type()),         // TYPE_NAME varchar
-            6 => get_data_i32_opt(stmt, arg, column_size(column)),          // COLUMN_SIZE Integer
+            5 => get_data_string_opt(stmt, arg, column.sql_type()),    // TYPE_NAME varchar
+            6 => get_data_i32_opt(stmt, arg, column_size(column)),     // COLUMN_SIZE Integer
             7 => get_data_i32_opt(stmt, arg, column_buffer_length(column)), // BUFFER_LENGTH Integer
-            8 => get_data_i32_opt(stmt, arg, decimal_digits(column)), // DECIMAL_DIGITS SmallInt
-            9 => get_data_i32_opt(stmt, arg, num_prec_radix(column)), // NUM_PREC_RADIX SmallInt
+            8 => get_data_i32_opt(stmt, arg, decimal_digits(column)),  // DECIMAL_DIGITS SmallInt
+            9 => get_data_i32_opt(stmt, arg, num_prec_radix(column)),  // NUM_PREC_RADIX SmallInt
             10 => get_data_i32_opt(
                 stmt,
                 arg,
@@ -388,7 +409,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
                 }),
             ), // NULLABLE SmallInt
             11 => get_data_string_opt(stmt, arg, column.description()), // REMARKS varchar
-            12 => not_yet_implemented(stmt, arg),                     // COLUMN_DEF varchar
+            12 => not_yet_implemented(stmt, arg),                      // COLUMN_DEF varchar
             13 => get_data_i32(stmt, arg, SqlDataType::from(column) as i32), // SQL_DATA_TYPE SmallInt
             14 => not_yet_implemented(stmt, arg), // SQL_DATETIME_SUB SmallInt
             15 => get_data_i32_opt(stmt, arg, char_octet_length(column)), // CHAR_OCTET_LENGTH Integer
