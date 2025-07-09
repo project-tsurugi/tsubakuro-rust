@@ -1,7 +1,7 @@
 use crate::{
     ctype::{SqlLen, SqlReturn, SqlUSmallInt},
     handle::hstmt::TsurugiOdbcStmt,
-    stmt::{describe_col::TsurugiOdbcDescribeColumn, get_data::GetDataArguments},
+    stmt::{describe_col::TsurugiOdbcDescribeColumn, get_data::TsurugiOdbcGetDataArguments},
 };
 
 pub mod bind_col;
@@ -32,7 +32,7 @@ pub(crate) trait TsurugiOdbcStatementProcessor {
 
     fn fetch(&mut self, stmt: &mut TsurugiOdbcStmt) -> SqlReturn;
 
-    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn;
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn;
 
     fn dispose(&mut self, stmt: &mut TsurugiOdbcStmt) -> SqlReturn;
 }

@@ -4,12 +4,12 @@ use super::*;
 
 pub(crate) fn get_data_timestamp_tz(
     stmt: &TsurugiOdbcStmt,
-    arg: GetDataArguments,
+    arg: &TsurugiOdbcGetDataArguments,
     value: time::OffsetDateTime,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "get_data_timestamp_tz()";
 
-    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, &arg) {
+    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, arg) {
         return rc;
     }
 

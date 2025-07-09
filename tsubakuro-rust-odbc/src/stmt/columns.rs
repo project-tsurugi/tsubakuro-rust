@@ -15,7 +15,7 @@ use crate::{
         describe_col::TsurugiOdbcDescribeColumn,
         get_data::{
             get_data_i32, get_data_i32_opt, get_data_null, get_data_string, get_data_string_opt,
-            GetDataArguments,
+            TsurugiOdbcGetDataArguments,
         },
         TsurugiOdbcStatementProcessor,
     },
@@ -350,7 +350,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
         }
     }
 
-    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcColumns.get_data()";
 
         let columns = self.metadata.columns();
@@ -510,7 +510,7 @@ fn char_octet_length(column: &SqlColumn) -> Option<i32> {
     Some(size)
 }
 
-fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
     const FUNCTION_NAME: &str = "TsurugiOdbcColumns.get_data()";
 
     warn!(

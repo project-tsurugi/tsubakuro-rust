@@ -4,7 +4,7 @@ use crate::{
     ctype::{SqlLen, SqlReturn, SqlUSmallInt},
     handle::hstmt::TsurugiOdbcStmt,
     stmt::{
-        describe_col::TsurugiOdbcDescribeColumn, get_data::GetDataArguments,
+        describe_col::TsurugiOdbcDescribeColumn, get_data::TsurugiOdbcGetDataArguments,
         TsurugiOdbcStatementProcessor,
     },
 };
@@ -39,7 +39,11 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcSqlExecuteResult {
         SqlReturn::SQL_NO_DATA
     }
 
-    fn get_data(&mut self, _stmt: &TsurugiOdbcStmt, _arg: GetDataArguments) -> SqlReturn {
+    fn get_data(
+        &mut self,
+        _stmt: &TsurugiOdbcStmt,
+        _arg: &TsurugiOdbcGetDataArguments,
+    ) -> SqlReturn {
         SqlReturn::SQL_NO_DATA
     }
 

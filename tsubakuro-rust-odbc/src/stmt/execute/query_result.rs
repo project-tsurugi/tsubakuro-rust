@@ -82,7 +82,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcQueryResult {
         }
     }
 
-    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcQueryResult.get_data()";
 
         let column_index = arg.column_index();
@@ -186,7 +186,7 @@ impl TsurugiOdbcQueryResult {
     fn fetch_value(
         &mut self,
         stmt: &TsurugiOdbcStmt,
-        arg: GetDataArguments,
+        arg: &TsurugiOdbcGetDataArguments,
     ) -> Result<SqlReturn, TgError> {
         const FUNCTION_NAME: &str = "TsurugiOdbcQueryResult.fetch_value()";
 

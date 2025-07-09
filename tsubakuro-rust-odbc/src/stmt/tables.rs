@@ -13,7 +13,9 @@ use crate::{
     },
     stmt::{
         describe_col::TsurugiOdbcDescribeColumn,
-        get_data::{get_data_null, get_data_string, get_data_string_opt, GetDataArguments},
+        get_data::{
+            get_data_null, get_data_string, get_data_string_opt, TsurugiOdbcGetDataArguments,
+        },
         TsurugiOdbcStatementProcessor,
     },
 };
@@ -200,7 +202,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTableList {
         }
     }
 
-    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcTableList.get_data()";
 
         let table_names = self.table_list.table_names();

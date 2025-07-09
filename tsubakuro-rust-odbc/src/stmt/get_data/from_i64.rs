@@ -1,9 +1,13 @@
 use super::*;
 
-pub(crate) fn get_data_i64(stmt: &TsurugiOdbcStmt, arg: GetDataArguments, value: i64) -> SqlReturn {
+pub(crate) fn get_data_i64(
+    stmt: &TsurugiOdbcStmt,
+    arg: &TsurugiOdbcGetDataArguments,
+    value: i64,
+) -> SqlReturn {
     const FUNCTION_NAME: &str = "get_data_i64()";
 
-    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, &arg) {
+    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, arg) {
         return rc;
     }
 

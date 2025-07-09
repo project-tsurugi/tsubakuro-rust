@@ -106,17 +106,18 @@ fn get_data(
         }
     };
 
-    let arg = GetDataArguments::new(
+    let arg = TsurugiOdbcGetDataArguments::new(
         col_or_param_num,
         target_type,
         target_value_ptr,
         buffer_length,
         str_len_or_ind_ptr,
     );
-    do_get_data(stmt, arg)
+    do_get_data(stmt, &arg)
 }
 
-pub(crate) struct GetDataArguments {
+#[derive(Debug)]
+pub(crate) struct TsurugiOdbcGetDataArguments {
     column_number: SqlUSmallInt,
     target_type: CDataType,
     target_value_ptr: SqlPointer,
@@ -124,15 +125,15 @@ pub(crate) struct GetDataArguments {
     str_len_or_ind_ptr: *mut SqlLen,
 }
 
-impl GetDataArguments {
+impl TsurugiOdbcGetDataArguments {
     pub fn new(
         column_number: SqlUSmallInt,
         target_type: CDataType,
         target_value_ptr: SqlPointer,
         buffer_length: SqlLen,
         str_len_or_ind_ptr: *mut SqlLen,
-    ) -> GetDataArguments {
-        GetDataArguments {
+    ) -> TsurugiOdbcGetDataArguments {
+        TsurugiOdbcGetDataArguments {
             column_number,
             target_type,
             target_value_ptr,
@@ -146,7 +147,7 @@ impl GetDataArguments {
     }
 }
 
-pub(crate) fn do_get_data(stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+pub(crate) fn do_get_data(stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
     const FUNCTION_NAME: &str = "do_get_data()";
 
     let processor = match stmt.processor(FUNCTION_NAME) {
@@ -179,7 +180,7 @@ pub(crate) fn do_get_data(stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlR
 fn check_target_value_ptr(
     function_name: &str,
     stmt: &TsurugiOdbcStmt,
-    arg: &GetDataArguments,
+    arg: &TsurugiOdbcGetDataArguments,
 ) -> Result<(), SqlReturn> {
     if arg.target_value_ptr.is_null() {
         debug!("{stmt}.{function_name} error. target_value_ptr is null");
@@ -193,7 +194,7 @@ fn check_target_value_ptr(
     }
 }
 
-fn write_bool(arg: GetDataArguments, value: bool) -> SqlReturn {
+fn write_bool(arg: &TsurugiOdbcGetDataArguments, value: bool) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut u8) = if value { 1 } else { 0 };
     }
@@ -201,7 +202,7 @@ fn write_bool(arg: GetDataArguments, value: bool) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_u8(arg: GetDataArguments, value: u8) -> SqlReturn {
+fn write_u8(arg: &TsurugiOdbcGetDataArguments, value: u8) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut u8) = value;
     }
@@ -209,7 +210,7 @@ fn write_u8(arg: GetDataArguments, value: u8) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_i8(arg: GetDataArguments, value: i8) -> SqlReturn {
+fn write_i8(arg: &TsurugiOdbcGetDataArguments, value: i8) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut i8) = value;
     }
@@ -217,7 +218,7 @@ fn write_i8(arg: GetDataArguments, value: i8) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_u16(arg: GetDataArguments, value: u16) -> SqlReturn {
+fn write_u16(arg: &TsurugiOdbcGetDataArguments, value: u16) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut u16) = value;
     }
@@ -225,7 +226,7 @@ fn write_u16(arg: GetDataArguments, value: u16) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_i16(arg: GetDataArguments, value: i16) -> SqlReturn {
+fn write_i16(arg: &TsurugiOdbcGetDataArguments, value: i16) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut i16) = value;
     }
@@ -233,7 +234,7 @@ fn write_i16(arg: GetDataArguments, value: i16) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_u32(arg: GetDataArguments, value: u32) -> SqlReturn {
+fn write_u32(arg: &TsurugiOdbcGetDataArguments, value: u32) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut u32) = value;
     }
@@ -241,7 +242,7 @@ fn write_u32(arg: GetDataArguments, value: u32) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_i32(arg: GetDataArguments, value: i32) -> SqlReturn {
+fn write_i32(arg: &TsurugiOdbcGetDataArguments, value: i32) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut i32) = value;
     }
@@ -249,7 +250,7 @@ fn write_i32(arg: GetDataArguments, value: i32) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_u64(arg: GetDataArguments, value: u64) -> SqlReturn {
+fn write_u64(arg: &TsurugiOdbcGetDataArguments, value: u64) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut u64) = value;
     }
@@ -257,7 +258,7 @@ fn write_u64(arg: GetDataArguments, value: u64) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_i64(arg: GetDataArguments, value: i64) -> SqlReturn {
+fn write_i64(arg: &TsurugiOdbcGetDataArguments, value: i64) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut i64) = value;
     }
@@ -265,7 +266,7 @@ fn write_i64(arg: GetDataArguments, value: i64) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_f32(arg: GetDataArguments, value: f32) -> SqlReturn {
+fn write_f32(arg: &TsurugiOdbcGetDataArguments, value: f32) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut f32) = value;
     }
@@ -273,7 +274,7 @@ fn write_f32(arg: GetDataArguments, value: f32) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_f64(arg: GetDataArguments, value: f64) -> SqlReturn {
+fn write_f64(arg: &TsurugiOdbcGetDataArguments, value: f64) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut f64) = value;
     }
@@ -281,12 +282,12 @@ fn write_f64(arg: GetDataArguments, value: f64) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_numeric_i128(arg: GetDataArguments, value: i128) -> SqlReturn {
+fn write_numeric_i128(arg: &TsurugiOdbcGetDataArguments, value: i128) -> SqlReturn {
     let value = SqlNumericStruct::from(value);
     write_numeric_struct(arg, value)
 }
 
-fn write_numeric_struct(arg: GetDataArguments, value: SqlNumericStruct) -> SqlReturn {
+fn write_numeric_struct(arg: &TsurugiOdbcGetDataArguments, value: SqlNumericStruct) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut SqlNumericStruct) = value;
     }
@@ -294,7 +295,11 @@ fn write_numeric_struct(arg: GetDataArguments, value: SqlNumericStruct) -> SqlRe
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_bytes(stmt: &TsurugiOdbcStmt, arg: GetDataArguments, value: &[u8]) -> SqlReturn {
+fn write_bytes(
+    stmt: &TsurugiOdbcStmt,
+    arg: &TsurugiOdbcGetDataArguments,
+    value: &[u8],
+) -> SqlReturn {
     let value_len = value.len() as SqlLen;
     let buffer_length = arg.buffer_length;
     let copy_len = std::cmp::min(value_len, buffer_length);
@@ -315,7 +320,7 @@ fn write_bytes(stmt: &TsurugiOdbcStmt, arg: GetDataArguments, value: &[u8]) -> S
     }
 }
 
-fn write_date_struct(arg: GetDataArguments, value: SqlDateStruct) -> SqlReturn {
+fn write_date_struct(arg: &TsurugiOdbcGetDataArguments, value: SqlDateStruct) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut SqlDateStruct) = value;
     }
@@ -323,7 +328,7 @@ fn write_date_struct(arg: GetDataArguments, value: SqlDateStruct) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_time_struct(arg: GetDataArguments, value: SqlTimeStruct) -> SqlReturn {
+fn write_time_struct(arg: &TsurugiOdbcGetDataArguments, value: SqlTimeStruct) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut SqlTimeStruct) = value;
     }
@@ -331,7 +336,10 @@ fn write_time_struct(arg: GetDataArguments, value: SqlTimeStruct) -> SqlReturn {
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_timestamp_struct(arg: GetDataArguments, value: SqlTimestampStruct) -> SqlReturn {
+fn write_timestamp_struct(
+    arg: &TsurugiOdbcGetDataArguments,
+    value: SqlTimestampStruct,
+) -> SqlReturn {
     unsafe {
         *(arg.target_value_ptr as *mut SqlTimestampStruct) = value;
     }
@@ -339,7 +347,7 @@ fn write_timestamp_struct(arg: GetDataArguments, value: SqlTimestampStruct) -> S
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_str_len_or_ind(arg: GetDataArguments, value: SqlLen) {
+fn write_str_len_or_ind(arg: &TsurugiOdbcGetDataArguments, value: SqlLen) {
     let str_len_or_ind_ptr = arg.str_len_or_ind_ptr;
     if !str_len_or_ind_ptr.is_null() {
         unsafe {

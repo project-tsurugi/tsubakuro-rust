@@ -15,7 +15,7 @@ use crate::{
         hdbc::{HDbc, TsurugiOdbcDbc},
     },
     stmt::{
-        bind_col::TsurugiOdbcBindColumn, bind_parameter::TsurugiOdbcBindParameter,
+        bind_parameter::TsurugiOdbcBindParameter, get_data::TsurugiOdbcGetDataArguments,
         prepare::TsurugiOdbcPrepare, TsurugiOdbcStatementProcessor,
     },
 };
@@ -28,7 +28,7 @@ pub struct TsurugiOdbcStmt {
     stmt_id: u64,
     dbc: Arc<TsurugiOdbcDbc>,
     name: String,
-    bind_columns: Vec<Option<TsurugiOdbcBindColumn>>,
+    bind_columns: Vec<Option<TsurugiOdbcGetDataArguments>>,
     parameters: Vec<Option<TsurugiOdbcBindParameter>>,
     prepare: Option<Rc<RefCell<TsurugiOdbcPrepare>>>,
     processor: Option<Rc<RefCell<dyn TsurugiOdbcStatementProcessor>>>,
@@ -91,8 +91,8 @@ impl TsurugiOdbcStmt {
         self.name = name.to_string();
     }
 
-    pub(crate) fn set_bind_column(&mut self, bind_column: TsurugiOdbcBindColumn) {
-        let index = bind_column.column_number() as usize - 1;
+    pub(crate) fn set_bind_column(&mut self, bind_column: TsurugiOdbcGetDataArguments) {
+        let index = bind_column.column_index() as usize;
         while index >= self.bind_columns.len() {
             self.bind_columns.push(None);
         }
@@ -104,7 +104,7 @@ impl TsurugiOdbcStmt {
         !self.bind_columns.is_empty()
     }
 
-    pub(crate) fn bind_columns(&self) -> &Vec<Option<TsurugiOdbcBindColumn>> {
+    pub(crate) fn bind_columns(&self) -> &Vec<Option<TsurugiOdbcGetDataArguments>> {
         &self.bind_columns
     }
 

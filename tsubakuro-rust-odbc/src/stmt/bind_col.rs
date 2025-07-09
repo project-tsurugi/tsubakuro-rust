@@ -7,6 +7,7 @@ use crate::{
         diag::TsurugiOdbcError,
         hstmt::{HStmt, TsurugiOdbcStmt},
     },
+    stmt::get_data::TsurugiOdbcGetDataArguments,
 };
 
 #[no_mangle]
@@ -74,7 +75,7 @@ fn bind_col(
         return SqlReturn::SQL_ERROR;
     };
 
-    let bind_column = TsurugiOdbcBindColumn::new(
+    let bind_column = TsurugiOdbcGetDataArguments::new(
         column_number,
         target_type,
         target_value_ptr,
@@ -85,51 +86,4 @@ fn bind_col(
     stmt.set_bind_column(bind_column);
 
     SqlReturn::SQL_SUCCESS
-}
-
-#[derive(Debug)]
-pub(crate) struct TsurugiOdbcBindColumn {
-    column_number: SqlUSmallInt,
-    target_type: CDataType,
-    target_value_ptr: SqlPointer,
-    buffer_length: SqlLen,
-    str_len_or_ind_ptr: *mut SqlLen,
-}
-
-impl TsurugiOdbcBindColumn {
-    fn new(
-        column_number: SqlUSmallInt,
-        target_type: CDataType,
-        target_value_ptr: SqlPointer,
-        buffer_length: SqlLen,
-        str_len_or_ind_ptr: *mut SqlLen,
-    ) -> TsurugiOdbcBindColumn {
-        TsurugiOdbcBindColumn {
-            column_number,
-            target_type,
-            target_value_ptr,
-            buffer_length,
-            str_len_or_ind_ptr,
-        }
-    }
-
-    pub(crate) fn column_number(&self) -> SqlUSmallInt {
-        self.column_number
-    }
-
-    pub(crate) fn target_type(&self) -> CDataType {
-        self.target_type
-    }
-
-    pub(crate) fn target_value_ptr(&self) -> SqlPointer {
-        self.target_value_ptr
-    }
-
-    pub(crate) fn buffer_length(&self) -> SqlLen {
-        self.buffer_length
-    }
-
-    pub(crate) fn str_len_or_ind_ptr(&self) -> *mut SqlLen {
-        self.str_len_or_ind_ptr
-    }
 }

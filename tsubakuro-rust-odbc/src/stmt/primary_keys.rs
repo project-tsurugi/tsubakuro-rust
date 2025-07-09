@@ -14,7 +14,7 @@ use crate::{
     stmt::{
         columns::get_table_metadata,
         describe_col::TsurugiOdbcDescribeColumn,
-        get_data::{get_data_i32, get_data_null, get_data_string, GetDataArguments},
+        get_data::{get_data_i32, get_data_null, get_data_string, TsurugiOdbcGetDataArguments},
         TsurugiOdbcStatementProcessor,
     },
     util::{char_to_string_opt, wchar_to_string_opt},
@@ -226,7 +226,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcPrimaryKeys {
         }
     }
 
-    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcPrimaryKeys.get_data()";
 
         let keys = self.metadata.primary_keys();

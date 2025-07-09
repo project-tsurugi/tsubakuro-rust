@@ -14,7 +14,7 @@ use crate::{
         describe_col::TsurugiOdbcDescribeColumn,
         get_data::{
             get_data_i32, get_data_i32_opt, get_data_null, get_data_string, get_data_string_opt,
-            GetDataArguments,
+            TsurugiOdbcGetDataArguments,
         },
         TsurugiOdbcStatementProcessor,
     },
@@ -293,7 +293,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
         }
     }
 
-    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
         let data_types = &self.data_types;
         if self.row_index < 0 || self.row_index as usize >= data_types.len() {
             debug!(
@@ -572,7 +572,7 @@ fn num_prec_radix(data_type: &SqlDataType) -> Option<i32> {
     Some(ret)
 }
 
-fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
     const FUNCTION_NAME: &str = "TsurugiOdbcTypeInfo.get_data()";
 
     warn!(

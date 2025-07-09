@@ -2,12 +2,12 @@ use super::*;
 
 pub(crate) fn get_data_string(
     stmt: &TsurugiOdbcStmt,
-    arg: GetDataArguments,
+    arg: &TsurugiOdbcGetDataArguments,
     value: &str,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "get_data_string()";
 
-    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, &arg) {
+    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, arg) {
         return rc;
     }
 
@@ -79,7 +79,7 @@ pub(crate) fn get_data_string(
 
 pub(crate) fn do_get_data_string(
     stmt: &TsurugiOdbcStmt,
-    arg: GetDataArguments,
+    arg: &TsurugiOdbcGetDataArguments,
     value: impl AsRef<str>,
 ) -> SqlReturn {
     let value = value.as_ref();
@@ -108,7 +108,7 @@ pub(crate) fn do_get_data_string(
 
 pub(crate) fn get_data_string_opt<S: AsRef<str>>(
     stmt: &TsurugiOdbcStmt,
-    arg: GetDataArguments,
+    arg: &TsurugiOdbcGetDataArguments,
     value: Option<S>,
 ) -> SqlReturn {
     match value {

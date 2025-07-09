@@ -1,9 +1,13 @@
 use super::*;
 
-pub(crate) fn get_data_i32(stmt: &TsurugiOdbcStmt, arg: GetDataArguments, value: i32) -> SqlReturn {
+pub(crate) fn get_data_i32(
+    stmt: &TsurugiOdbcStmt,
+    arg: &TsurugiOdbcGetDataArguments,
+    value: i32,
+) -> SqlReturn {
     const FUNCTION_NAME: &str = "get_data_i32()";
 
-    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, &arg) {
+    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, arg) {
         return rc;
     }
 
@@ -42,7 +46,7 @@ pub(crate) fn get_data_i32(stmt: &TsurugiOdbcStmt, arg: GetDataArguments, value:
 
 pub(crate) fn get_data_i32_opt(
     stmt: &TsurugiOdbcStmt,
-    arg: GetDataArguments,
+    arg: &TsurugiOdbcGetDataArguments,
     value: Option<i32>,
 ) -> SqlReturn {
     match value {
