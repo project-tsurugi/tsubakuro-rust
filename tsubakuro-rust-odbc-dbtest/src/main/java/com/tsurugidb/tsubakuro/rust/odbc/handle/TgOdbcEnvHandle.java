@@ -26,10 +26,8 @@ public class TgOdbcEnvHandle extends TgOdbcHandle {
         MemorySegment valuePtr = MemorySegment.ofAddress(value);
         try {
             short result = (short) OdbcFunction.sqlSetEnvAttr.invoke(henv, attribute, valuePtr, 0);
-            SqlReturn.check("SQLSetEnvAttr", result);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Error e) {
+            SqlReturn.check("SQLSetEnvAttr", result, this);
+        } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
             throw new RuntimeException(e);
