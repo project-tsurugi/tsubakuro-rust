@@ -1,9 +1,14 @@
+use std::sync::Arc;
+
 use log::{debug, trace};
 
 use crate::{
     check_env,
     ctype::{SqlInteger, SqlPointer, SqlReturn},
-    handle::{diag::TsurugiOdbcError, henv::HEnv},
+    handle::{
+        diag::TsurugiOdbcError,
+        henv::{HEnv, TsurugiOdbcEnv},
+    },
 };
 
 #[repr(i32)]
@@ -91,7 +96,7 @@ pub extern "system" fn SQLGetEnvAttr(
     let rc = match attribute {
         EnvironmentAttribute::SQL_ATTR_ODBC_VERSION => {
             let value = env.odbc_version();
-            write_integer(value as i32, value_ptr, buffer_length)
+            write_integer(&env, value as i32, value_ptr)
         }
     };
 
@@ -99,9 +104,15 @@ pub extern "system" fn SQLGetEnvAttr(
     rc
 }
 
-fn write_integer(value: i32, value_ptr: SqlPointer, buffer_length: SqlInteger) -> SqlReturn {
-    if value_ptr.is_null() || buffer_length < 4 {
-        debug!("write_integer(): value_ptr is null or buffer_length is too small");
+fn write_integer(env: &Arc<TsurugiOdbcEnv>, value: i32, value_ptr: SqlPointer) -> SqlReturn {
+    const FUNCTION_NAME: &str = "write_integer()";
+
+    if value_ptr.is_null() {
+        debug!("env.{FUNCTION_NAME}: value_ptr is null");
+        env.add_diag(
+            TsurugiOdbcError::InvalidValuePtr,
+            "SQLGetEnvAttr.value_ptr is null",
+        );
         return SqlReturn::SQL_ERROR;
     }
 
