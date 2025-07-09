@@ -12,6 +12,7 @@ import java.lang.foreign.SymbolLookup;
 import java.lang.invoke.MethodHandle;
 
 public class OdbcFunction {
+    private static final String SYSPROP_ODBC_LIB_NAME = "tsurugi.dbtest.odbc.lib.name";
 
     /** SQLRETURN SQLAllocHandle(SQLSMALLINT HandleType, SQLHANDLE InputHandle, SQLHANDLE *OutputHandlePtr) */
     public static final MethodHandle sqlAllocHandle;
@@ -149,9 +150,15 @@ public class OdbcFunction {
     public static final MethodHandle sqlTablesW;
 
     static {
+        String libraryName = System.getProperty(SYSPROP_ODBC_LIB_NAME);
+        if (libraryName == null || libraryName.isEmpty()) {
+            libraryName = "odbc32";
+        }
+
+        var linker = Linker.nativeLinker();
+        var lookup = SymbolLookup.libraryLookup(libraryName, Arena.global());
+
         try {
-            var linker = Linker.nativeLinker();
-            var lookup = SymbolLookup.libraryLookup("odbc32", Arena.global());
 
             {
                 var symbol = lookup.find("SQLAllocHandle").orElseThrow(() -> new RuntimeException("SQLAllocHandle not found"));

@@ -20,6 +20,13 @@ public class TgOdbcExampleMain {
     public static void main(String[] args) {
         LOG.info("start. args={}", Arrays.toString(args));
 
+        if (args.length < 1) {
+            System.err.println("args: endpoint-url");
+            System.exit(1);
+        }
+
+        String endpoint = args[0];
+
         try (var manager = new TgOdbcManager()) {
             try (var henv = TgOdbcEnvHandle.allocEnvHandle(manager)) {
                 LOG.info("henv={}", henv);
@@ -27,7 +34,7 @@ public class TgOdbcExampleMain {
                 try (var hdbc = TgOdbcDbcHandle.allocDbcHandle(henv)) {
                     LOG.info("hdbc={}", hdbc);
 
-                    String connectionString = "DRIVER=Tsurugi Driver;Endpoint=tcp://localhost:12345";
+                    String connectionString = "DRIVER=Tsurugi Driver;Endpoint=" + endpoint;
                     LOG.info("connectionString={}", connectionString);
                     try (var connection = hdbc.driverConnect(connectionString, false)) {
                         System.out.println("connected. " + connection);

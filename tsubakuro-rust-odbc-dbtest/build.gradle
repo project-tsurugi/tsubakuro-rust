@@ -97,8 +97,15 @@ tasks.named('test') {
         exceptionFormat 'full'
     }
 
+    systemProperty 'tsurugi.dbtest.odbc.lib.name', findProperty('dbtest.odbc.lib.name') ?: 'odbc32'
     systemProperty 'tsurugi.dbtest.endpoint', findProperty('dbtest.endpoint') ?: 'tcp://localhost:12345'
     systemProperty 'tsurugi.dbtest.endpoint.java', findProperty('dbtest.endpoint.java') ?: ''
+}
+
+
+application {
+    applicationName = 'odbc-example'
+    mainClass = 'com.tsurugidb.tsubakuro.rust.odbc.example.TgOdbcExampleMain'
 }
 
 distTar {
