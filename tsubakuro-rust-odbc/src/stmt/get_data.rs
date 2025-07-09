@@ -106,34 +106,48 @@ fn get_data(
         }
     };
 
-    if target_value_ptr.is_null() {
-        debug!("{stmt}.{FUNCTION_NAME} error. target_value_ptr is null");
-        stmt.add_diag(
-            TsurugiOdbcError::GetDataInvalidTargetValuePtr,
-            "SQLGetData.target_value_ptr is null",
-        );
-        return SqlReturn::SQL_ERROR;
-    }
-
-    do_get_data(
-        stmt,
+    let arg = GetDataArguments::new(
         col_or_param_num,
         target_type,
         target_value_ptr,
         buffer_length,
         str_len_or_ind_ptr,
-    )
+    );
+    do_get_data(stmt, arg)
 }
 
-pub(crate) fn do_get_data(
-    stmt: &TsurugiOdbcStmt,
+pub(crate) struct GetDataArguments {
     column_number: SqlUSmallInt,
     target_type: CDataType,
     target_value_ptr: SqlPointer,
     buffer_length: SqlLen,
     str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    const FUNCTION_NAME: &str = "execute_get_data()";
+}
+
+impl GetDataArguments {
+    pub fn new(
+        column_number: SqlUSmallInt,
+        target_type: CDataType,
+        target_value_ptr: SqlPointer,
+        buffer_length: SqlLen,
+        str_len_or_ind_ptr: *mut SqlLen,
+    ) -> GetDataArguments {
+        GetDataArguments {
+            column_number,
+            target_type,
+            target_value_ptr,
+            buffer_length,
+            str_len_or_ind_ptr,
+        }
+    }
+
+    pub(crate) fn column_index(&self) -> isize {
+        self.column_number as isize - 1
+    }
+}
+
+pub(crate) fn do_get_data(stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
+    const FUNCTION_NAME: &str = "do_get_data()";
 
     let processor = match stmt.processor(FUNCTION_NAME) {
         Ok(processor) => processor,
@@ -141,6 +155,7 @@ pub(crate) fn do_get_data(
     };
     let mut processor = processor.borrow_mut();
 
+    let column_number = arg.column_number;
     let number_of_columns = processor.number_of_columns();
     if column_number < 1 || column_number > number_of_columns {
         debug!(
@@ -157,183 +172,140 @@ pub(crate) fn do_get_data(
         );
         return SqlReturn::SQL_ERROR;
     }
-    let column_index = column_number - 1;
 
-    processor.get_data(
-        stmt,
-        column_index,
-        target_type,
-        target_value_ptr,
-        buffer_length,
-        str_len_or_ind_ptr,
-    )
+    processor.get_data(stmt, arg)
 }
 
-fn write_bool(
-    value: bool,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut u8) = if value { 1 } else { 0 };
-    }
-    write_str_len_or_ind(1, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_u8(value: u8, target_value_ptr: SqlPointer, str_len_or_ind_ptr: *mut SqlLen) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut u8) = value;
-    }
-    write_str_len_or_ind(1, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_i8(value: i8, target_value_ptr: SqlPointer, str_len_or_ind_ptr: *mut SqlLen) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut i8) = value;
-    }
-    write_str_len_or_ind(1, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_u16(
-    value: u16,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut u16) = value;
-    }
-    write_str_len_or_ind(2, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_i16(
-    value: i16,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut i16) = value;
-    }
-    write_str_len_or_ind(2, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_u32(
-    value: u32,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut u32) = value;
-    }
-    write_str_len_or_ind(4, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_i32(
-    value: i32,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut i32) = value;
-    }
-    write_str_len_or_ind(4, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_u64(
-    value: u64,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut u64) = value;
-    }
-    write_str_len_or_ind(8, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_i64(
-    value: i64,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut i64) = value;
-    }
-    write_str_len_or_ind(8, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_f32(
-    value: f32,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut f32) = value;
-    }
-    write_str_len_or_ind(4, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_f64(
-    value: f64,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut f64) = value;
-    }
-    write_str_len_or_ind(8, str_len_or_ind_ptr);
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_numeric_i128(
-    value: i128,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    let value = SqlNumericStruct::from(value);
-    write_numeric_struct(value, target_value_ptr, str_len_or_ind_ptr)
-}
-
-fn write_numeric_struct(
-    value: SqlNumericStruct,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    unsafe {
-        *(target_value_ptr as *mut SqlNumericStruct) = value;
-    }
-    write_str_len_or_ind(
-        std::mem::size_of::<SqlNumericStruct>() as SqlLen,
-        str_len_or_ind_ptr,
-    );
-    SqlReturn::SQL_SUCCESS
-}
-
-fn write_bytes(
+fn check_target_value_ptr(
+    function_name: &str,
     stmt: &TsurugiOdbcStmt,
-    value: &[u8],
-    target_value_ptr: SqlPointer,
-    buffer_length: SqlLen,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
+    arg: &GetDataArguments,
+) -> Result<(), SqlReturn> {
+    if arg.target_value_ptr.is_null() {
+        debug!("{stmt}.{function_name} error. target_value_ptr is null");
+        stmt.add_diag(
+            TsurugiOdbcError::GetDataInvalidTargetValuePtr,
+            "SQLGetData.target_value_ptr is null",
+        );
+        Err(SqlReturn::SQL_ERROR)
+    } else {
+        Ok(())
+    }
+}
+
+fn write_bool(arg: GetDataArguments, value: bool) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut u8) = if value { 1 } else { 0 };
+    }
+    write_str_len_or_ind(arg, 1);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_u8(arg: GetDataArguments, value: u8) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut u8) = value;
+    }
+    write_str_len_or_ind(arg, 1);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_i8(arg: GetDataArguments, value: i8) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut i8) = value;
+    }
+    write_str_len_or_ind(arg, 1);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_u16(arg: GetDataArguments, value: u16) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut u16) = value;
+    }
+    write_str_len_or_ind(arg, 2);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_i16(arg: GetDataArguments, value: i16) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut i16) = value;
+    }
+    write_str_len_or_ind(arg, 2);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_u32(arg: GetDataArguments, value: u32) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut u32) = value;
+    }
+    write_str_len_or_ind(arg, 4);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_i32(arg: GetDataArguments, value: i32) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut i32) = value;
+    }
+    write_str_len_or_ind(arg, 4);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_u64(arg: GetDataArguments, value: u64) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut u64) = value;
+    }
+    write_str_len_or_ind(arg, 8);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_i64(arg: GetDataArguments, value: i64) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut i64) = value;
+    }
+    write_str_len_or_ind(arg, 8);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_f32(arg: GetDataArguments, value: f32) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut f32) = value;
+    }
+    write_str_len_or_ind(arg, 4);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_f64(arg: GetDataArguments, value: f64) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut f64) = value;
+    }
+    write_str_len_or_ind(arg, 8);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_numeric_i128(arg: GetDataArguments, value: i128) -> SqlReturn {
+    let value = SqlNumericStruct::from(value);
+    write_numeric_struct(arg, value)
+}
+
+fn write_numeric_struct(arg: GetDataArguments, value: SqlNumericStruct) -> SqlReturn {
+    unsafe {
+        *(arg.target_value_ptr as *mut SqlNumericStruct) = value;
+    }
+    write_str_len_or_ind(arg, std::mem::size_of::<SqlNumericStruct>() as SqlLen);
+    SqlReturn::SQL_SUCCESS
+}
+
+fn write_bytes(stmt: &TsurugiOdbcStmt, arg: GetDataArguments, value: &[u8]) -> SqlReturn {
     let value_len = value.len() as SqlLen;
+    let buffer_length = arg.buffer_length;
     let copy_len = std::cmp::min(value_len, buffer_length);
     unsafe {
         std::ptr::copy_nonoverlapping(
             value.as_ptr(),
-            target_value_ptr as *mut u8,
+            arg.target_value_ptr as *mut u8,
             copy_len as usize,
         );
     }
-    write_str_len_or_ind(value_len, str_len_or_ind_ptr);
+    write_str_len_or_ind(arg, value_len);
 
     if value_len <= buffer_length {
         SqlReturn::SQL_SUCCESS
@@ -343,52 +315,32 @@ fn write_bytes(
     }
 }
 
-fn write_date_struct(
-    value: SqlDateStruct,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
+fn write_date_struct(arg: GetDataArguments, value: SqlDateStruct) -> SqlReturn {
     unsafe {
-        *(target_value_ptr as *mut SqlDateStruct) = value;
+        *(arg.target_value_ptr as *mut SqlDateStruct) = value;
     }
-    write_str_len_or_ind(
-        std::mem::size_of::<SqlDateStruct>() as SqlLen,
-        str_len_or_ind_ptr,
-    );
+    write_str_len_or_ind(arg, std::mem::size_of::<SqlDateStruct>() as SqlLen);
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_time_struct(
-    value: SqlTimeStruct,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
+fn write_time_struct(arg: GetDataArguments, value: SqlTimeStruct) -> SqlReturn {
     unsafe {
-        *(target_value_ptr as *mut SqlTimeStruct) = value;
+        *(arg.target_value_ptr as *mut SqlTimeStruct) = value;
     }
-    write_str_len_or_ind(
-        std::mem::size_of::<SqlTimeStruct>() as SqlLen,
-        str_len_or_ind_ptr,
-    );
+    write_str_len_or_ind(arg, std::mem::size_of::<SqlTimeStruct>() as SqlLen);
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_timestamp_struct(
-    value: SqlTimestampStruct,
-    target_value_ptr: SqlPointer,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
+fn write_timestamp_struct(arg: GetDataArguments, value: SqlTimestampStruct) -> SqlReturn {
     unsafe {
-        *(target_value_ptr as *mut SqlTimestampStruct) = value;
+        *(arg.target_value_ptr as *mut SqlTimestampStruct) = value;
     }
-    write_str_len_or_ind(
-        std::mem::size_of::<SqlTimestampStruct>() as SqlLen,
-        str_len_or_ind_ptr,
-    );
+    write_str_len_or_ind(arg, std::mem::size_of::<SqlTimestampStruct>() as SqlLen);
     SqlReturn::SQL_SUCCESS
 }
 
-fn write_str_len_or_ind(value: SqlLen, str_len_or_ind_ptr: *mut SqlLen) {
+fn write_str_len_or_ind(arg: GetDataArguments, value: SqlLen) {
+    let str_len_or_ind_ptr = arg.str_len_or_ind_ptr;
     if !str_len_or_ind_ptr.is_null() {
         unsafe {
             *str_len_or_ind_ptr = value;

@@ -2,82 +2,68 @@ use super::*;
 
 pub(crate) fn get_data_decimal(
     stmt: &TsurugiOdbcStmt,
+    arg: GetDataArguments,
     value: TgDecimalResult,
-    target_type: CDataType,
-    target_value_ptr: SqlPointer,
-    buffer_length: SqlLen,
-    str_len_or_ind_ptr: *mut SqlLen,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "get_data_decimal()";
 
-    if target_value_ptr.is_null() {
-        debug!("{stmt}.{FUNCTION_NAME} error. target_value_ptr is null");
-        stmt.add_diag(
-            TsurugiOdbcError::InvalidValuePtr,
-            "target_value_ptr is null",
-        );
-        return SqlReturn::SQL_ERROR;
+    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, &arg) {
+        return rc;
     }
 
     use CDataType::*;
+    let target_type = arg.target_type;
     match target_type {
         SQL_C_BIT => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_bool(v != 0, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_bool(arg, value != 0),
             Err(rc) => rc,
         },
         SQL_C_UTINYINT => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_u8(v as u8, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u8(arg, value as u8),
             Err(rc) => rc,
         },
         SQL_C_STINYINT | SQL_C_TINYINT => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_i8(v as i8, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i8(arg, value as i8),
             Err(rc) => rc,
         },
         SQL_C_USHORT => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_u16(v as u16, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u16(arg, value as u16),
             Err(rc) => rc,
         },
         SQL_C_SSHORT | SQL_C_SHORT => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_i16(v as i16, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i16(arg, value as i16),
             Err(rc) => rc,
         },
         SQL_C_ULONG => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_u32(v as u32, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u32(arg, value as u32),
             Err(rc) => rc,
         },
         SQL_C_SLONG | SQL_C_LONG => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_i32(v as i32, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i32(arg, value as i32),
             Err(rc) => rc,
         },
         SQL_C_UBIGINT => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_u64(v as u64, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u64(arg, value as u64),
             Err(rc) => rc,
         },
         SQL_C_SBIGINT => match decimal_to_i128(stmt, value) {
-            Ok(v) => write_i64(v as i64, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i64(arg, value as i64),
             Err(rc) => rc,
         },
         SQL_C_FLOAT => match decimal_to_f32(stmt, value) {
-            Ok(v) => write_f32(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_f32(arg, value),
             Err(rc) => rc,
         },
         SQL_C_DOUBLE => match decimal_to_f64(stmt, value) {
-            Ok(v) => write_f64(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_f64(arg, value),
             Err(rc) => rc,
         },
         SQL_C_NUMERIC => {
-            let v = SqlNumericStruct::from(value);
-            write_numeric_struct(v, target_value_ptr, str_len_or_ind_ptr)
+            let value = SqlNumericStruct::from(value);
+            write_numeric_struct(arg, value)
         }
         SQL_C_CHAR | SQL_C_WCHAR => match decimal_to_string(stmt, value) {
-            Ok(value) => do_get_data_string(
-                stmt,
-                &value,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ),
+            Ok(value) => do_get_data_string(stmt, arg, &value),
             Err(rc) => rc,
         },
         _ => {

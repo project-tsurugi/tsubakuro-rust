@@ -3,8 +3,8 @@ use log::{debug, trace, warn};
 use crate::{
     check_stmt,
     ctype::{
-        CDataType, SqlDataType, SqlLen, SqlNullable::*, SqlPointer, SqlReturn, SqlSmallInt,
-        SqlUSmallInt, SQL_FALSE, SQL_PRED_BASIC, SQL_PRED_CHAR, SQL_TRUE,
+        SqlDataType, SqlLen, SqlNullable::*, SqlReturn, SqlSmallInt, SqlUSmallInt, SQL_FALSE,
+        SQL_PRED_BASIC, SQL_PRED_CHAR, SQL_TRUE,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -14,6 +14,7 @@ use crate::{
         describe_col::TsurugiOdbcDescribeColumn,
         get_data::{
             get_data_i32, get_data_i32_opt, get_data_null, get_data_string, get_data_string_opt,
+            GetDataArguments,
         },
         TsurugiOdbcStatementProcessor,
     },
@@ -292,15 +293,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
         }
     }
 
-    fn get_data(
-        &mut self,
-        stmt: &TsurugiOdbcStmt,
-        column_index: SqlUSmallInt,
-        target_type: CDataType,
-        target_value_ptr: SqlPointer,
-        buffer_length: SqlLen,
-        str_len_or_ind_ptr: *mut SqlLen,
-    ) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
         let data_types = &self.data_types;
         if self.row_index < 0 || self.row_index as usize >= data_types.len() {
             debug!(
@@ -311,141 +304,34 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
         }
         let data_type = &data_types[self.row_index as usize];
 
+        let column_index = arg.column_index();
         match column_index {
             0 => match type_name(stmt, data_type) {
-                Ok(v) => get_data_string(
-                    stmt,
-                    v,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                ),
+                Ok(value) => get_data_string(stmt, arg, value),
                 Err(rc) => rc,
             }, // TYPE_NAME varchar
-            1 => get_data_i32(
-                stmt,
-                *data_type as i32,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // DATA_TYPE Smallint
-            2 => get_data_i32_opt(
-                stmt,
-                column_size(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // COLUMN_SIZE Integer
-            3 => get_data_string_opt(
-                stmt,
-                literal_prefix(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // LITERAL_PREFIX varchar
-            4 => get_data_string_opt(
-                stmt,
-                literal_suffix(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // LITERAL_SUFFIX varchar
-            5 => get_data_string_opt(
-                stmt,
-                create_params(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // CREATE_PARAMS varchar
-            6 => get_data_i32(
-                stmt,
-                SQL_NULLABLE as i32,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // NULLABLE SmallInt
-            7 => get_data_i32(
-                stmt,
-                case_sensitive(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // CASE_SENSITIVE SmallInt
-            8 => get_data_i32(
-                stmt,
-                searchable(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // SEARCHABLE SmallInt
-            9 => get_data_i32_opt(
-                stmt,
-                unsigned_attribute(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // UNSIGNED_ATTRIBUTE SmallInt
-            10 => get_data_i32(
-                stmt,
-                SQL_FALSE,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // FIXED_PREC_SCALE SmallInt
-            11 => get_data_i32_opt(
-                stmt,
-                auto_unique_value(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // AUTO_UNIQUE_VALUE SmallInt
-            12 => get_data_null(stmt, str_len_or_ind_ptr), // LOCAL_TYPE_NAME varchar
-            13 => get_data_i32_opt(
-                stmt,
-                minimum_scale(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // MINIMUM_SCALE SmallInt
-            14 => get_data_i32_opt(
-                stmt,
-                maximum_scale(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // MAXIMUM_SCALE SmallInt
+            1 => get_data_i32(stmt, arg, *data_type as i32), // DATA_TYPE Smallint
+            2 => get_data_i32_opt(stmt, arg, column_size(data_type)), // COLUMN_SIZE Integer
+            3 => get_data_string_opt(stmt, arg, literal_prefix(data_type)), // LITERAL_PREFIX varchar
+            4 => get_data_string_opt(stmt, arg, literal_suffix(data_type)), // LITERAL_SUFFIX varchar
+            5 => get_data_string_opt(stmt, arg, create_params(data_type)),  // CREATE_PARAMS varchar
+            6 => get_data_i32(stmt, arg, SQL_NULLABLE as i32),              // NULLABLE SmallInt
+            7 => get_data_i32(stmt, arg, case_sensitive(data_type)), // CASE_SENSITIVE SmallInt
+            8 => get_data_i32(stmt, arg, searchable(data_type)),     // SEARCHABLE SmallInt
+            9 => get_data_i32_opt(stmt, arg, unsigned_attribute(data_type)), // UNSIGNED_ATTRIBUTE SmallInt
+            10 => get_data_i32(stmt, arg, SQL_FALSE), // FIXED_PREC_SCALE SmallInt
+            11 => get_data_i32_opt(stmt, arg, auto_unique_value(data_type)), // AUTO_UNIQUE_VALUE SmallInt
+            12 => get_data_null(stmt, arg), // LOCAL_TYPE_NAME varchar
+            13 => get_data_i32_opt(stmt, arg, minimum_scale(data_type)), // MINIMUM_SCALE SmallInt
+            14 => get_data_i32_opt(stmt, arg, maximum_scale(data_type)), // MAXIMUM_SCALE SmallInt
             15 => get_data_i32(
                 stmt,
+                arg,
                 *data_type as i32, // TODO SQL_DATETIME
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
             ), // SQL_DATA_TYPE SmallInt
-            16 => not_yet_implemented(stmt, column_index, str_len_or_ind_ptr), // SQL_DATETIME_SUB SmallInt
-            17 => get_data_i32_opt(
-                stmt,
-                num_prec_radix(data_type),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // NUM_PREC_RADIX Integer
-            18 => not_yet_implemented(stmt, column_index, str_len_or_ind_ptr), // INTERVAL_PRECISION SmallInt
+            16 => not_yet_implemented(stmt, arg), // SQL_DATETIME_SUB SmallInt
+            17 => get_data_i32_opt(stmt, arg, num_prec_radix(data_type)), // NUM_PREC_RADIX Integer
+            18 => not_yet_implemented(stmt, arg), // INTERVAL_PRECISION SmallInt
             _ => unreachable!(),
         }
     }
@@ -686,16 +572,12 @@ fn num_prec_radix(data_type: &SqlDataType) -> Option<i32> {
     Some(ret)
 }
 
-fn not_yet_implemented(
-    stmt: &TsurugiOdbcStmt,
-    column_index: SqlUSmallInt,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
+fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
     const FUNCTION_NAME: &str = "TsurugiOdbcTypeInfo.get_data()";
 
     warn!(
         "{stmt}.{FUNCTION_NAME}: not yet implemented. column_index={}",
-        column_index
+        arg.column_index()
     );
-    get_data_null(stmt, str_len_or_ind_ptr)
+    get_data_null(stmt, arg)
 }

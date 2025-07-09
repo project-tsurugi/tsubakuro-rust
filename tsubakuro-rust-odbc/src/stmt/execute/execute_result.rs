@@ -1,9 +1,12 @@
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    ctype::{CDataType, SqlLen, SqlPointer, SqlReturn, SqlUSmallInt},
+    ctype::{SqlLen, SqlReturn, SqlUSmallInt},
     handle::hstmt::TsurugiOdbcStmt,
-    stmt::{describe_col::TsurugiOdbcDescribeColumn, TsurugiOdbcStatementProcessor},
+    stmt::{
+        describe_col::TsurugiOdbcDescribeColumn, get_data::GetDataArguments,
+        TsurugiOdbcStatementProcessor,
+    },
 };
 
 pub(super) struct TsurugiOdbcSqlExecuteResult {
@@ -36,15 +39,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcSqlExecuteResult {
         SqlReturn::SQL_NO_DATA
     }
 
-    fn get_data(
-        &mut self,
-        _stmt: &TsurugiOdbcStmt,
-        _column_index: SqlUSmallInt,
-        _target_type: CDataType,
-        _target_value_ptr: SqlPointer,
-        _buffer_length: SqlLen,
-        _str_len_or_ind_ptr: *mut SqlLen,
-    ) -> SqlReturn {
+    fn get_data(&mut self, _stmt: &TsurugiOdbcStmt, _arg: GetDataArguments) -> SqlReturn {
         SqlReturn::SQL_NO_DATA
     }
 

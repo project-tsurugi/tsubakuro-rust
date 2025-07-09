@@ -4,8 +4,8 @@ use tsubakuro_rust_core::prelude::TableMetadata;
 use crate::{
     check_stmt,
     ctype::{
-        CDataType, SqlChar, SqlDataType, SqlLen, SqlNullable::*, SqlPointer, SqlReturn,
-        SqlSmallInt, SqlUSmallInt, SqlWChar,
+        SqlChar, SqlDataType, SqlLen, SqlNullable::*, SqlReturn, SqlSmallInt, SqlUSmallInt,
+        SqlWChar,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -14,7 +14,7 @@ use crate::{
     stmt::{
         columns::get_table_metadata,
         describe_col::TsurugiOdbcDescribeColumn,
-        get_data::{get_data_i32, get_data_null, get_data_string},
+        get_data::{get_data_i32, get_data_null, get_data_string, GetDataArguments},
         TsurugiOdbcStatementProcessor,
     },
     util::{char_to_string_opt, wchar_to_string_opt},
@@ -226,15 +226,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcPrimaryKeys {
         }
     }
 
-    fn get_data(
-        &mut self,
-        stmt: &TsurugiOdbcStmt,
-        column_index: SqlUSmallInt,
-        target_type: CDataType,
-        target_value_ptr: SqlPointer,
-        buffer_length: SqlLen,
-        str_len_or_ind_ptr: *mut SqlLen,
-    ) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcPrimaryKeys.get_data()";
 
         let keys = self.metadata.primary_keys();
@@ -246,48 +238,13 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcPrimaryKeys {
             return SqlReturn::SQL_NO_DATA;
         }
 
-        match column_index {
-            0 => get_data_string(
-                stmt,
-                self.metadata.database_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_CAT varchar
-            1 => get_data_string(
-                stmt,
-                self.metadata.schema_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_SCHEM varchar
-            2 => get_data_string(
-                stmt,
-                self.metadata.table_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_NAME varchar
-            3 => get_data_string(
-                stmt,
-                &keys[self.row_index as usize],
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // COLUMN_NAME varchar
-            4 => get_data_i32(
-                stmt,
-                self.row_index as i32 + 1,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // KEY_SEQ Smallint
-            5 => get_data_null(stmt, str_len_or_ind_ptr), // PK_NAME varchar
+        match arg.column_index() {
+            0 => get_data_string(stmt, arg, self.metadata.database_name()), // TABLE_CAT varchar
+            1 => get_data_string(stmt, arg, self.metadata.schema_name()),   // TABLE_SCHEM varchar
+            2 => get_data_string(stmt, arg, self.metadata.table_name()),    // TABLE_NAME varchar
+            3 => get_data_string(stmt, arg, &keys[self.row_index as usize]), // COLUMN_NAME varchar
+            4 => get_data_i32(stmt, arg, self.row_index as i32 + 1),        // KEY_SEQ Smallint
+            5 => get_data_null(stmt, arg),                                  // PK_NAME varchar
             _ => unreachable!(),
         }
     }

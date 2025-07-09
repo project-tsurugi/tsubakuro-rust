@@ -2,10 +2,7 @@ use log::{debug, warn};
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    ctype::{
-        CDataType, SqlDataType, SqlLen, SqlNullable::SQL_NULLABLE_UNKNOWN, SqlPointer, SqlReturn,
-        SqlUSmallInt,
-    },
+    ctype::{SqlDataType, SqlLen, SqlNullable::SQL_NULLABLE_UNKNOWN, SqlReturn, SqlUSmallInt},
     handle::{diag::TsurugiOdbcError, hstmt::TsurugiOdbcStmt},
     stmt::{describe_col::TsurugiOdbcDescribeColumn, get_data::*, TsurugiOdbcStatementProcessor},
 };
@@ -85,18 +82,10 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcQueryResult {
         }
     }
 
-    fn get_data(
-        &mut self,
-        stmt: &TsurugiOdbcStmt,
-        column_index: SqlUSmallInt,
-        target_type: CDataType,
-        target_value_ptr: SqlPointer,
-        buffer_length: SqlLen,
-        str_len_or_ind_ptr: *mut SqlLen,
-    ) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcQueryResult.get_data()";
 
-        let column_index = column_index as isize;
+        let column_index = arg.column_index();
         let next_index = self.column_index + 1;
         if column_index < next_index {
             debug!(
@@ -158,7 +147,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcQueryResult {
 
         match self.query_result.is_null() {
             Ok(true) => {
-                return get_data_null(stmt, str_len_or_ind_ptr);
+                return get_data_null(stmt, arg);
             }
             Ok(false) => {}
             Err(e) => {
@@ -174,14 +163,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcQueryResult {
             }
         }
 
-        match self.fetch_value(
-            stmt,
-            column_index as usize,
-            target_type,
-            target_value_ptr,
-            buffer_length,
-            str_len_or_ind_ptr,
-        ) {
+        match self.fetch_value(stmt, arg) {
             Ok(rc) => rc,
             Err(e) => {
                 warn!("{stmt}.{FUNCTION_NAME}: fetch_value() error. {:?}", e);
@@ -204,15 +186,13 @@ impl TsurugiOdbcQueryResult {
     fn fetch_value(
         &mut self,
         stmt: &TsurugiOdbcStmt,
-        column_index: usize,
-        target_type: CDataType,
-        target_value_ptr: SqlPointer,
-        buffer_length: SqlLen,
-        str_len_or_ind_ptr: *mut SqlLen,
+        arg: GetDataArguments,
     ) -> Result<SqlReturn, TgError> {
         const FUNCTION_NAME: &str = "TsurugiOdbcQueryResult.fetch_value()";
 
         let runtime = stmt.runtime();
+
+        let column_index = arg.column_index() as usize;
         let column = &self.query_result.get_metadata().unwrap().columns()[column_index];
 
         use AtomType::*;
@@ -220,149 +200,58 @@ impl TsurugiOdbcQueryResult {
         let rc = match atom_type {
             Boolean => {
                 let value: bool = runtime.block_on(self.query_result.fetch())?;
-                get_data_bool(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_bool(stmt, arg, value)
             }
             Int4 => {
                 let value: i32 = runtime.block_on(self.query_result.fetch())?;
-                get_data_i32(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_i32(stmt, arg, value)
             }
             Int8 => {
                 let value: i64 = runtime.block_on(self.query_result.fetch())?;
-                get_data_i64(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_i64(stmt, arg, value)
             }
             Float4 => {
                 let value: f32 = runtime.block_on(self.query_result.fetch())?;
-                get_data_f32(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_f32(stmt, arg, value)
             }
             Float8 => {
                 let value: f64 = runtime.block_on(self.query_result.fetch())?;
-                get_data_f64(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_f64(stmt, arg, value)
             }
             Decimal => {
                 let value: TgDecimalResult = runtime.block_on(self.query_result.fetch())?;
-                get_data_decimal(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_decimal(stmt, arg, value)
             }
             Character => {
                 let value: String = runtime.block_on(self.query_result.fetch())?;
-                get_data_string(
-                    stmt,
-                    &value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_string(stmt, arg, &value)
             }
             Octet => {
                 let value: Vec<u8> = runtime.block_on(self.query_result.fetch())?;
-                get_data_bytes(
-                    stmt,
-                    &value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_bytes(stmt, arg, &value)
             }
             // Bit => todo!(),
             Date => {
                 let value: time::Date = runtime.block_on(self.query_result.fetch())?;
-                get_data_date(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_date(stmt, arg, value)
             }
             TimeOfDay => {
                 let value: time::Time = runtime.block_on(self.query_result.fetch())?;
-                get_data_time(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_time(stmt, arg, value)
             }
             TimePoint => {
                 let value: time::PrimitiveDateTime = runtime.block_on(self.query_result.fetch())?;
-                get_data_timestamp(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_timestamp(stmt, arg, value)
             }
             // DatetimeInterval => todo!(),
             TimeOfDayWithTimeZone => {
                 let value: (time::Time, time::UtcOffset) =
                     runtime.block_on(self.query_result.fetch())?;
-                get_data_time_tz(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_time_tz(stmt, arg, value)
             }
             TimePointWithTimeZone => {
                 let value: time::OffsetDateTime = runtime.block_on(self.query_result.fetch())?;
-                get_data_timestamp_tz(
-                    stmt,
-                    value,
-                    target_type,
-                    target_value_ptr,
-                    buffer_length,
-                    str_len_or_ind_ptr,
-                )
+                get_data_timestamp_tz(stmt, arg, value)
             }
             // Clob => todo!(),
             // Blob => todo!(),

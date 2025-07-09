@@ -2,81 +2,67 @@ use super::*;
 
 pub(crate) fn get_data_string(
     stmt: &TsurugiOdbcStmt,
+    arg: GetDataArguments,
     value: &str,
-    target_type: CDataType,
-    target_value_ptr: SqlPointer,
-    buffer_length: SqlLen,
-    str_len_or_ind_ptr: *mut SqlLen,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "get_data_string()";
 
-    if target_value_ptr.is_null() {
-        debug!("{stmt}.{FUNCTION_NAME} error. target_value_ptr is null");
-        stmt.add_diag(
-            TsurugiOdbcError::InvalidValuePtr,
-            "target_value_ptr is null",
-        );
-        return SqlReturn::SQL_ERROR;
+    if let Err(rc) = check_target_value_ptr(FUNCTION_NAME, stmt, &arg) {
+        return rc;
     }
 
     use CDataType::*;
+    let target_type = arg.target_type;
     match target_type {
         SQL_C_BIT => match str_to_bool(stmt, value) {
-            Ok(v) => write_bool(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_bool(arg, value),
             Err(rc) => rc,
         },
         SQL_C_UTINYINT => match str_to_u8(stmt, value) {
-            Ok(v) => write_u8(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u8(arg, value),
             Err(rc) => rc,
         },
         SQL_C_STINYINT | SQL_C_TINYINT => match str_to_i8(stmt, value) {
-            Ok(v) => write_i8(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i8(arg, value),
             Err(rc) => rc,
         },
         SQL_C_USHORT => match str_to_u16(stmt, value) {
-            Ok(v) => write_u16(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u16(arg, value),
             Err(rc) => rc,
         },
         SQL_C_SSHORT | SQL_C_SHORT => match str_to_i16(stmt, value) {
-            Ok(v) => write_i16(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i16(arg, value),
             Err(rc) => rc,
         },
         SQL_C_ULONG => match str_to_u32(stmt, value) {
-            Ok(v) => write_u32(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u32(arg, value),
             Err(rc) => rc,
         },
         SQL_C_SLONG | SQL_C_LONG => match str_to_i32(stmt, value) {
-            Ok(v) => write_i32(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i32(arg, value),
             Err(rc) => rc,
         },
         SQL_C_UBIGINT => match str_to_u64(stmt, value) {
-            Ok(v) => write_u64(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_u64(arg, value),
             Err(rc) => rc,
         },
         SQL_C_SBIGINT => match str_to_i64(stmt, value) {
-            Ok(v) => write_i64(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_i64(arg, value),
             Err(rc) => rc,
         },
         SQL_C_FLOAT => match str_to_f32(stmt, value) {
-            Ok(v) => write_f32(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_f32(arg, value),
             Err(rc) => rc,
         },
         SQL_C_DOUBLE => match str_to_f64(stmt, value) {
-            Ok(v) => write_f64(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_f64(arg, value),
             Err(rc) => rc,
         },
         SQL_C_NUMERIC => match str_to_numeric_struct(stmt, value) {
-            Ok(v) => write_numeric_struct(v, target_value_ptr, str_len_or_ind_ptr),
+            Ok(value) => write_numeric_struct(arg, value),
             Err(rc) => rc,
         },
-        SQL_C_CHAR | SQL_C_WCHAR => do_get_data_string(
-            stmt,
-            value,
-            target_type,
-            target_value_ptr,
-            buffer_length,
-            str_len_or_ind_ptr,
-        ),
+        SQL_C_CHAR | SQL_C_WCHAR => do_get_data_string(stmt, arg, value),
         _ => {
             debug!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported target type {:?}",
@@ -93,28 +79,27 @@ pub(crate) fn get_data_string(
 
 pub(crate) fn do_get_data_string(
     stmt: &TsurugiOdbcStmt,
-    value: &str,
-    target_type: CDataType,
-    target_value_ptr: SqlPointer,
-    buffer_length: SqlLen,
-    str_len_or_ind_ptr: *mut SqlLen,
+    arg: GetDataArguments,
+    value: impl AsRef<str>,
 ) -> SqlReturn {
+    let value = value.as_ref();
+
     use CDataType::*;
-    match target_type {
+    match arg.target_type {
         SQL_C_CHAR => write_char_len(
             "SQLGetData.target_value_ptr",
             value,
-            target_value_ptr as *mut SqlChar,
-            buffer_length,
-            str_len_or_ind_ptr,
+            arg.target_value_ptr as *mut SqlChar,
+            arg.buffer_length,
+            arg.str_len_or_ind_ptr,
             &stmt.diag_collection(),
         ),
         SQL_C_WCHAR => write_wchar_len(
             "SQLGetData.target_value_ptr",
             value,
-            target_value_ptr as *mut SqlWChar,
-            buffer_length,
-            str_len_or_ind_ptr,
+            arg.target_value_ptr as *mut SqlWChar,
+            arg.buffer_length,
+            arg.str_len_or_ind_ptr,
             &stmt.diag_collection(),
         ),
         _ => unreachable!(),
@@ -123,22 +108,12 @@ pub(crate) fn do_get_data_string(
 
 pub(crate) fn get_data_string_opt<S: AsRef<str>>(
     stmt: &TsurugiOdbcStmt,
+    arg: GetDataArguments,
     value: Option<S>,
-    target_type: CDataType,
-    target_value_ptr: SqlPointer,
-    buffer_length: SqlLen,
-    str_len_or_ind_ptr: *mut SqlLen,
 ) -> SqlReturn {
     match value {
-        Some(value) => get_data_string(
-            stmt,
-            value.as_ref(),
-            target_type,
-            target_value_ptr,
-            buffer_length,
-            str_len_or_ind_ptr,
-        ),
-        None => get_data_null(stmt, str_len_or_ind_ptr),
+        Some(value) => get_data_string(stmt, arg, value.as_ref()),
+        None => get_data_null(stmt, arg),
     }
 }
 

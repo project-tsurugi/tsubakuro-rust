@@ -4,8 +4,8 @@ use tsubakuro_rust_core::prelude::{AtomType, SqlColumn, TableMetadata};
 use crate::{
     check_sql_client_or_err, check_stmt,
     ctype::{
-        sql_numeric_struct::SqlNumericStruct, CDataType, SqlChar, SqlDataType, SqlLen,
-        SqlNullable::*, SqlPointer, SqlReturn, SqlSmallInt, SqlUSmallInt, SqlWChar,
+        sql_numeric_struct::SqlNumericStruct, SqlChar, SqlDataType, SqlLen, SqlNullable::*,
+        SqlReturn, SqlSmallInt, SqlUSmallInt, SqlWChar,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -15,6 +15,7 @@ use crate::{
         describe_col::TsurugiOdbcDescribeColumn,
         get_data::{
             get_data_i32, get_data_i32_opt, get_data_null, get_data_string, get_data_string_opt,
+            GetDataArguments,
         },
         TsurugiOdbcStatementProcessor,
     },
@@ -349,15 +350,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
         }
     }
 
-    fn get_data(
-        &mut self,
-        stmt: &TsurugiOdbcStmt,
-        column_index: SqlUSmallInt,
-        target_type: CDataType,
-        target_value_ptr: SqlPointer,
-        buffer_length: SqlLen,
-        str_len_or_ind_ptr: *mut SqlLen,
-    ) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcColumns.get_data()";
 
         let columns = self.metadata.columns();
@@ -371,89 +364,21 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
         let column = &columns[self.row_index as usize];
 
         // TODO SQLGetColumn() field
+        let column_index = arg.column_index();
         match column_index {
-            0 => get_data_string(
-                stmt,
-                self.metadata.database_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_CAT varchar
-            1 => get_data_string(
-                stmt,
-                self.metadata.schema_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_SCHEM varchar
-            2 => get_data_string(
-                stmt,
-                self.metadata.table_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_NAME varchar
-            3 => get_data_string(
-                stmt,
-                column.name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // COLUMN_NAME varchar
-            4 => get_data_i32(
-                stmt,
-                SqlDataType::from(column) as i32,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // DATA_TYPE SmallInt
-            5 => get_data_string_opt(
-                stmt,
-                column.sql_type(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TYPE_NAME varchar
-            6 => get_data_i32_opt(
-                stmt,
-                column_size(column),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // COLUMN_SIZE Integer
-            7 => get_data_i32_opt(
-                stmt,
-                column_buffer_length(column),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // BUFFER_LENGTH Integer
-            8 => get_data_i32_opt(
-                stmt,
-                decimal_digits(column),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // DECIMAL_DIGITS SmallInt
-            9 => get_data_i32_opt(
-                stmt,
-                num_prec_radix(column),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // NUM_PREC_RADIX SmallInt
+            0 => get_data_string(stmt, arg, self.metadata.database_name()), // TABLE_CAT varchar
+            1 => get_data_string(stmt, arg, self.metadata.schema_name()),   // TABLE_SCHEM varchar
+            2 => get_data_string(stmt, arg, self.metadata.table_name()),    // TABLE_NAME varchar
+            3 => get_data_string(stmt, arg, column.name()),                 // COLUMN_NAME varchar
+            4 => get_data_i32(stmt, arg, SqlDataType::from(column) as i32), // DATA_TYPE SmallInt
+            5 => get_data_string_opt(stmt, arg, column.sql_type()),         // TYPE_NAME varchar
+            6 => get_data_i32_opt(stmt, arg, column_size(column)),          // COLUMN_SIZE Integer
+            7 => get_data_i32_opt(stmt, arg, column_buffer_length(column)), // BUFFER_LENGTH Integer
+            8 => get_data_i32_opt(stmt, arg, decimal_digits(column)), // DECIMAL_DIGITS SmallInt
+            9 => get_data_i32_opt(stmt, arg, num_prec_radix(column)), // NUM_PREC_RADIX SmallInt
             10 => get_data_i32_opt(
                 stmt,
+                arg,
                 column.nullable().map(|b| {
                     if b {
                         SQL_NULLABLE as i32
@@ -461,52 +386,17 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
                         SQL_NO_NULLS as i32
                     }
                 }),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
             ), // NULLABLE SmallInt
-            11 => get_data_string_opt(
-                stmt,
-                column.description(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // REMARKS varchar
-            12 => not_yet_implemented(stmt, column_index, str_len_or_ind_ptr), // COLUMN_DEF varchar
-            13 => get_data_i32(
-                stmt,
-                SqlDataType::from(column) as i32,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // SQL_DATA_TYPE SmallInt
-            14 => not_yet_implemented(stmt, column_index, str_len_or_ind_ptr), // SQL_DATETIME_SUB SmallInt
-            15 => get_data_i32_opt(
-                stmt,
-                char_octet_length(column),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // CHAR_OCTET_LENGTH Integer
-            16 => get_data_i32(
-                stmt,
-                self.row_index as i32 + 1,
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // ORDINAL_POSITION Integer
+            11 => get_data_string_opt(stmt, arg, column.description()), // REMARKS varchar
+            12 => not_yet_implemented(stmt, arg),                     // COLUMN_DEF varchar
+            13 => get_data_i32(stmt, arg, SqlDataType::from(column) as i32), // SQL_DATA_TYPE SmallInt
+            14 => not_yet_implemented(stmt, arg), // SQL_DATETIME_SUB SmallInt
+            15 => get_data_i32_opt(stmt, arg, char_octet_length(column)), // CHAR_OCTET_LENGTH Integer
+            16 => get_data_i32(stmt, arg, self.row_index as i32 + 1), // ORDINAL_POSITION Integer
             17 => get_data_string_opt(
                 stmt,
+                arg,
                 column.nullable().map(|b| if b { "YES" } else { "NO" }),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
             ), // IS_NULLABLE varchar
             _ => unreachable!(),
         }
@@ -620,16 +510,12 @@ fn char_octet_length(column: &SqlColumn) -> Option<i32> {
     Some(size)
 }
 
-fn not_yet_implemented(
-    stmt: &TsurugiOdbcStmt,
-    column_index: SqlUSmallInt,
-    str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
+fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
     const FUNCTION_NAME: &str = "TsurugiOdbcColumns.get_data()";
 
     warn!(
         "{stmt}.{FUNCTION_NAME}: not yet implemented. column_index={}",
-        column_index
+        arg.column_index()
     );
-    get_data_null(stmt, str_len_or_ind_ptr)
+    get_data_null(stmt, arg)
 }

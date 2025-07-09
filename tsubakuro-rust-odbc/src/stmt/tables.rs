@@ -4,8 +4,8 @@ use tsubakuro_rust_core::prelude::TableList;
 use crate::{
     check_sql_client, check_stmt,
     ctype::{
-        CDataType, SqlChar, SqlDataType, SqlLen, SqlNullable::*, SqlPointer, SqlReturn,
-        SqlSmallInt, SqlUSmallInt, SqlWChar,
+        SqlChar, SqlDataType, SqlLen, SqlNullable::*, SqlReturn, SqlSmallInt, SqlUSmallInt,
+        SqlWChar,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -13,7 +13,7 @@ use crate::{
     },
     stmt::{
         describe_col::TsurugiOdbcDescribeColumn,
-        get_data::{get_data_null, get_data_string, get_data_string_opt},
+        get_data::{get_data_null, get_data_string, get_data_string_opt, GetDataArguments},
         TsurugiOdbcStatementProcessor,
     },
 };
@@ -200,15 +200,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTableList {
         }
     }
 
-    fn get_data(
-        &mut self,
-        stmt: &TsurugiOdbcStmt,
-        column_index: SqlUSmallInt,
-        target_type: CDataType,
-        target_value_ptr: SqlPointer,
-        buffer_length: SqlLen,
-        str_len_or_ind_ptr: *mut SqlLen,
-    ) -> SqlReturn {
+    fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: GetDataArguments) -> SqlReturn {
         const FUNCTION_NAME: &str = "TsurugiOdbcTableList.get_data()";
 
         let table_names = self.table_list.table_names();
@@ -221,40 +213,12 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTableList {
         }
         let name = &table_names[self.row_index as usize];
 
-        match column_index {
-            0 => get_data_string_opt(
-                stmt,
-                name.database_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_CAT varchar
-            1 => get_data_string_opt(
-                stmt,
-                name.schema_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_SCHEM varchar
-            2 => get_data_string_opt(
-                stmt,
-                name.last_name(),
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_NAME varchar
-            3 => get_data_string(
-                stmt,
-                "TABLE",
-                target_type,
-                target_value_ptr,
-                buffer_length,
-                str_len_or_ind_ptr,
-            ), // TABLE_TYPE varchar
-            4 => get_data_null(stmt, str_len_or_ind_ptr), // REMARKS varchar
+        match arg.column_index() {
+            0 => get_data_string_opt(stmt, arg, name.database_name()), // TABLE_CAT varchar
+            1 => get_data_string_opt(stmt, arg, name.schema_name()),   // TABLE_SCHEM varchar
+            2 => get_data_string_opt(stmt, arg, name.last_name()),     // TABLE_NAME varchar
+            3 => get_data_string(stmt, arg, "TABLE"),                  // TABLE_TYPE varchar
+            4 => get_data_null(stmt, arg),                             // REMARKS varchar
             _ => unreachable!(),
         }
     }
