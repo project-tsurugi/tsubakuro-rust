@@ -122,6 +122,10 @@ public class TgOdbcManager implements AutoCloseable {
 
     public static String stringFromUtf16(MemorySegment ptr, MemorySegment lengthPtr) {
         short length = lengthPtr.get(ValueLayout.JAVA_SHORT, 0);
+        return stringFromUtf16(ptr, length);
+    }
+
+    public static String stringFromUtf16(MemorySegment ptr, int length) {
         if (length == 0) {
             return "";
         }
@@ -131,12 +135,12 @@ public class TgOdbcManager implements AutoCloseable {
         return ptr.asSlice(0, (length + 1) * 2).getString(0, StandardCharsets.UTF_16LE);
     }
 
-    public static String stringFromUtf16Long(MemorySegment ptr, MemorySegment longLengthPtr) {
+    public static String stringFromUtf16LongBytes(MemorySegment ptr, MemorySegment longLengthPtr) {
         long length = longLengthPtr.get(ValueLayout.JAVA_LONG, 0);
-        return stringFromUtf16Long(ptr, length);
+        return stringFromUtf16Bytes(ptr, length);
     }
 
-    public static String stringFromUtf16Long(MemorySegment ptr, long length) {
+    public static String stringFromUtf16Bytes(MemorySegment ptr, long length) {
         if (length == 0) {
             return "";
         }

@@ -156,33 +156,11 @@ pub(crate) fn write_char(
     out_length: *mut SqlSmallInt,
     diags: Option<&Arc<TsurugiOdbcDiagCollection>>,
 ) -> SqlReturn {
-    let s = CString::new(src).unwrap();
-    let bytes = s.as_bytes_with_nul();
-    let value_len = bytes.len();
-
-    let rc = if dst.is_null() {
-        SqlReturn::SQL_SUCCESS
-    } else {
-        let copy_len = value_len.min(buffer_length as usize);
-        unsafe {
-            std::ptr::copy_nonoverlapping(bytes.as_ptr(), dst, copy_len);
-        }
-
-        if value_len <= buffer_length as usize {
-            SqlReturn::SQL_SUCCESS
-        } else {
-            if let Some(diags) = diags {
-                diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
-            } else {
-                // do nothing for SQLDiagRec
-            }
-            SqlReturn::SQL_SUCCESS_WITH_INFO
-        }
-    };
+    let (rc, len) = write_char0(name, src, dst, buffer_length as usize, diags);
 
     if !out_length.is_null() {
         unsafe {
-            *out_length = (value_len - 1) as SqlSmallInt;
+            *out_length = len as SqlSmallInt;
         }
     }
 
@@ -197,6 +175,23 @@ pub(crate) fn write_char_len(
     out_length: *mut SqlLen,
     diags: &Arc<TsurugiOdbcDiagCollection>,
 ) -> SqlReturn {
+    let (rc, len) = write_char0(name, src, dst, buffer_length as usize, Some(diags));
+
+    if !out_length.is_null() {
+        unsafe {
+            *out_length = len as SqlLen;
+        }
+    }
+
+    rc
+}
+fn write_char0(
+    name: &str,
+    src: &str,
+    dst: *mut SqlChar,
+    buffer_length: usize,
+    diags: Option<&Arc<TsurugiOdbcDiagCollection>>,
+) -> (SqlReturn, usize) {
     let s = CString::new(src).unwrap();
     let bytes = s.as_bytes_with_nul();
     let value_len = bytes.len();
@@ -204,26 +199,24 @@ pub(crate) fn write_char_len(
     let rc = if dst.is_null() {
         SqlReturn::SQL_SUCCESS
     } else {
-        let copy_len = value_len.min(buffer_length as usize);
+        let copy_len = value_len.min(buffer_length);
         unsafe {
             std::ptr::copy_nonoverlapping(bytes.as_ptr(), dst, copy_len);
         }
 
-        if value_len <= buffer_length as usize {
+        if value_len <= buffer_length {
             SqlReturn::SQL_SUCCESS
         } else {
-            diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
+            if let Some(diags) = diags {
+                diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
+            } else {
+                // do nothing for SQLDiagRec
+            }
             SqlReturn::SQL_SUCCESS_WITH_INFO
         }
     };
 
-    if !out_length.is_null() {
-        unsafe {
-            *out_length = (value_len - 1) as SqlLen;
-        }
-    }
-
-    rc
+    (rc, value_len - 1)
 }
 
 pub(crate) fn write_wchar(
@@ -234,33 +227,12 @@ pub(crate) fn write_wchar(
     out_length: *mut SqlSmallInt,
     diags: Option<&Arc<TsurugiOdbcDiagCollection>>,
 ) -> SqlReturn {
-    let mut utf16 = src.encode_utf16().collect::<Vec<u16>>();
-    utf16.push(0); // nul-terminate
-    let value_len = utf16.len();
-
-    let rc = if dst.is_null() {
-        SqlReturn::SQL_SUCCESS
-    } else {
-        let copy_len = value_len.min(buffer_length as usize);
-        unsafe {
-            std::ptr::copy_nonoverlapping(utf16.as_ptr(), dst, copy_len);
-        }
-
-        if value_len <= buffer_length as usize {
-            SqlReturn::SQL_SUCCESS
-        } else {
-            if let Some(diags) = diags {
-                diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
-            } else {
-                // do nothing for SQLDiagRecW
-            }
-            SqlReturn::SQL_SUCCESS_WITH_INFO
-        }
-    };
+    let buffer_chars = buffer_length as usize;
+    let (rc, len) = write_wchar0(name, src, dst, buffer_chars, diags);
 
     if !out_length.is_null() {
         unsafe {
-            *out_length = (value_len - 1) as SqlSmallInt;
+            *out_length = len as SqlSmallInt;
         }
     }
 
@@ -275,38 +247,19 @@ pub(crate) fn write_wchar_bytes(
     out_length: *mut SqlSmallInt,
     diags: &Arc<TsurugiOdbcDiagCollection>,
 ) -> SqlReturn {
-    let buffer_length = buffer_length as usize / 2; // SqlWChar is 2 bytes
-
-    let mut utf16 = src.encode_utf16().collect::<Vec<u16>>();
-    utf16.push(0); // nul-terminate
-    let value_len = utf16.len();
-
-    let rc = if dst.is_null() {
-        SqlReturn::SQL_SUCCESS
-    } else {
-        let copy_len = value_len.min(buffer_length);
-        unsafe {
-            std::ptr::copy_nonoverlapping(utf16.as_ptr(), dst, copy_len);
-        }
-
-        if value_len <= buffer_length {
-            SqlReturn::SQL_SUCCESS
-        } else {
-            diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
-            SqlReturn::SQL_SUCCESS_WITH_INFO
-        }
-    };
+    let buffer_chars = buffer_length as usize / 2; // SqlWChar is 2 bytes
+    let (rc, len) = write_wchar0(name, src, dst, buffer_chars, Some(diags));
 
     if !out_length.is_null() {
         unsafe {
-            *out_length = ((value_len - 1) * 2) as SqlSmallInt;
+            *out_length = (len * 2) as SqlSmallInt;
         }
     }
 
     rc
 }
 
-pub(crate) fn write_wchar_len(
+pub(crate) fn write_wchar_len_bytes(
     name: &str,
     src: &str,
     dst: *mut SqlWChar,
@@ -314,6 +267,25 @@ pub(crate) fn write_wchar_len(
     out_length: *mut SqlLen,
     diags: &Arc<TsurugiOdbcDiagCollection>,
 ) -> SqlReturn {
+    let buffer_chars = buffer_length as usize / 2; // SqlWChar is 2 bytes
+    let (rc, len) = write_wchar0(name, src, dst, buffer_chars, Some(diags));
+
+    if !out_length.is_null() {
+        unsafe {
+            *out_length = (len * 2) as SqlLen;
+        }
+    }
+
+    rc
+}
+
+fn write_wchar0(
+    name: &str,
+    src: &str,
+    dst: *mut SqlWChar,
+    buffer_chars: usize,
+    diags: Option<&Arc<TsurugiOdbcDiagCollection>>,
+) -> (SqlReturn, usize) {
     let mut utf16 = src.encode_utf16().collect::<Vec<u16>>();
     utf16.push(0); // nul-terminate
     let value_len = utf16.len();
@@ -321,24 +293,22 @@ pub(crate) fn write_wchar_len(
     let rc = if dst.is_null() {
         SqlReturn::SQL_SUCCESS
     } else {
-        let copy_len = value_len.min(buffer_length as usize);
+        let copy_len = value_len.min(buffer_chars);
         unsafe {
             std::ptr::copy_nonoverlapping(utf16.as_ptr(), dst, copy_len);
         }
 
-        if value_len <= buffer_length as usize {
+        if value_len <= buffer_chars {
             SqlReturn::SQL_SUCCESS
         } else {
-            diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
+            if let Some(diags) = diags {
+                diags.add_diag(TsurugiOdbcError::DataTruncated, format!("{name} truncated"));
+            } else {
+                // do nothing for SQLDiagRecW
+            }
             SqlReturn::SQL_SUCCESS_WITH_INFO
         }
     };
 
-    if !out_length.is_null() {
-        unsafe {
-            *out_length = (value_len - 1) as SqlLen;
-        }
-    }
-
-    rc
+    (rc, value_len - 1)
 }

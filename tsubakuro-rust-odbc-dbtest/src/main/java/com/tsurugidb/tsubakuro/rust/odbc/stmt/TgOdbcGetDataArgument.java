@@ -126,7 +126,7 @@ public abstract class TgOdbcGetDataArgument<T> {
             @Override
             public String getData() {
                 if (wideChar) {
-                    return TgOdbcManager.stringFromUtf16Long(valuePtr, lengthOrInd());
+                    return TgOdbcManager.stringFromUtf16Bytes(valuePtr, lengthOrInd());
                 } else {
                     return TgOdbcManager.stringFromUtf8(valuePtr, lengthOrInd());
                 }

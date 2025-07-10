@@ -94,7 +94,7 @@ pub(crate) fn do_get_data_string(
             arg.str_len_or_ind_ptr,
             &stmt.diag_collection(),
         ),
-        SQL_C_WCHAR => write_wchar_len(
+        SQL_C_WCHAR => write_wchar_len_bytes(
             "SQLGetData.target_value_ptr",
             value,
             arg.target_value_ptr as *mut SqlWChar,

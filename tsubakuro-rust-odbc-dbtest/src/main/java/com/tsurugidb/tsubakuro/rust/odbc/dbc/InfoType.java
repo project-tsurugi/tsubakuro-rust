@@ -58,7 +58,7 @@ public abstract class InfoType<T> {
         @Override
         public String infoValue(MemorySegment infoValuePtr, short stringLength, boolean wideChar) {
             if (wideChar) {
-                return TgOdbcManager.stringFromUtf16Long(infoValuePtr, stringLength);
+                return TgOdbcManager.stringFromUtf16Bytes(infoValuePtr, stringLength);
             } else {
                 return TgOdbcManager.stringFromUtf8(infoValuePtr, stringLength);
             }

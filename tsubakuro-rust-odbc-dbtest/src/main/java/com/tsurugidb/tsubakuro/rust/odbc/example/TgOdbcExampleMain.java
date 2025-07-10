@@ -36,7 +36,7 @@ public class TgOdbcExampleMain {
 
                     String connectionString = "DRIVER=Tsurugi Driver;Endpoint=" + endpoint;
                     LOG.info("connectionString={}", connectionString);
-                    try (var connection = hdbc.driverConnect(connectionString, false)) {
+                    try (var connection = hdbc.driverConnect(connectionString, true)) {
                         System.out.println("connected. " + connection);
 
                         dropAndCreateTable(connection);

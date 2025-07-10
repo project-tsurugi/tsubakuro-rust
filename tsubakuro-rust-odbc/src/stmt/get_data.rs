@@ -12,7 +12,7 @@ use crate::{
         diag::TsurugiOdbcError,
         hstmt::{HStmt, TsurugiOdbcStmt},
     },
-    util::{write_char_len, write_wchar_len},
+    util::*,
 };
 
 mod from_bool;
