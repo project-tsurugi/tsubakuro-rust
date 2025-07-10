@@ -35,7 +35,7 @@ class SQLGetInfoTest extends TgOdbcTester {
         var dbc = getConnection().dbc();
 
         String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_ODBC_VER, 32, wideChar);
-        assertEquals("03.00", actual);
+        assertEquals("03.51", actual);
     }
 
     @ParameterizedTest
@@ -55,7 +55,7 @@ class SQLGetInfoTest extends TgOdbcTester {
         {
             var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 6, wideChar);
             assertEquals(SqlReturn.SQL_SUCCESS, result.rc());
-            assertEquals("03.00", result.infoValue());
+            assertEquals("03.51", result.infoValue());
         }
         {
             var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 5, wideChar);
@@ -74,7 +74,7 @@ class SQLGetInfoTest extends TgOdbcTester {
         {
             var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 6 * 2, wideChar);
             assertEquals(SqlReturn.SQL_SUCCESS, result.rc());
-            assertEquals("03.00", result.infoValue());
+            assertEquals("03.51", result.infoValue());
         }
         {
             var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 5 * 2, wideChar);

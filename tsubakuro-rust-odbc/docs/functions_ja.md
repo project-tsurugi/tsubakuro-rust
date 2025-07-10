@@ -144,6 +144,12 @@ SQLを実行します。
 >
 > select文の実行結果の場合、現在のTsurugi ODBCドライバーでは、columnSizeやdecimalGigitsは正しい値を返しません。（常に0を返します）
 
+### SQLColAttribute
+
+実行結果の列の情報を返します。
+
+- field_identifierは限定的に対応しています。
+
 ### SQLRowCount
 
 実行結果の行数を返します。

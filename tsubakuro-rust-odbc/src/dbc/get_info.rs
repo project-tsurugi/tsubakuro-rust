@@ -113,7 +113,7 @@ impl SqlGetInfo {
             }
             77 => {
                 let name = "SQL_DRIVER_ODBC_VER";
-                let value = "03.00";
+                let value = "03.51";
                 debug!("{dbc}.{FUNCTION_NAME}: {}={}", name, value);
                 self.write_string(value)
             }

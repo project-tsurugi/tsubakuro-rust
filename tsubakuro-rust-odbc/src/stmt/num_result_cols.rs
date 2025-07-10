@@ -41,7 +41,7 @@ fn num_result_cols(stmt: &TsurugiOdbcStmt, column_count_ptr: *mut i16) -> SqlRet
     let processor = processor.borrow();
 
     let count = processor.number_of_columns();
-    debug!("{stmt}.{FUNCTION_NAME}: column_count={}", count);
+    debug!("{stmt}.{FUNCTION_NAME}: number_of_columns={}", count);
 
     if column_count_ptr.is_null() {
         debug!("{stmt}.{FUNCTION_NAME}: column_count_ptr is null");

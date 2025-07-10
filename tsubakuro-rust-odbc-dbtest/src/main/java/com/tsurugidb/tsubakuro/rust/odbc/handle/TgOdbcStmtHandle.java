@@ -457,15 +457,19 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
     }
 
     public String getDataString(int columnNumber) {
-        return getDataString(columnNumber, 1024);
+        return getDataString(columnNumber, 1024, false);
     }
 
-    public String getDataString(int columnNumber, int bufferSize) {
-        var arg = TgOdbcGetDataArgument.ofString(manager, bufferSize, false);
+    public String getDataString(int columnNumber, boolean wideChar) {
+        return getDataString(columnNumber, 1024, wideChar);
+    }
+
+    public String getDataString(int columnNumber, int bufferSize, boolean wideChar) {
+        var arg = TgOdbcGetDataArgument.ofString(manager, bufferSize, wideChar);
         String value = getData(columnNumber, arg);
         long length = arg.lengthOrInd();
         if (length > bufferSize) {
-            return getDataString(columnNumber, (int) length + 1);
+            return getDataString(columnNumber, (int) length + 1, wideChar);
         }
         return value;
     }

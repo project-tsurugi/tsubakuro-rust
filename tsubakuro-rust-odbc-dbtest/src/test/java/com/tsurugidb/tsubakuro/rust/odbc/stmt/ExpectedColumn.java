@@ -208,7 +208,7 @@ public class ExpectedColumn {
         return this;
     }
 
-    public void test(TgOdbcStmtHandle stmt) {
+    public void test(TgOdbcStmtHandle stmt, boolean wideChar) {
         String databaseName = stmt.getDataString(1);
         assertEquals("", databaseName);
 

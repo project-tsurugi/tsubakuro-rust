@@ -83,13 +83,13 @@ class TgOdbcTypeBooleanTest extends TgOdbcTester {
                 assertTrue(stmt.fetch());
 
                 new ExpectedColumn(1, "pk").initialize("INT").notNull() //
-                        .test(stmt);
+                        .test(stmt, wideChar);
             }
             {
                 assertTrue(stmt.fetch());
 
                 var expected = new ExpectedColumn(2, "value").initialize("INT"); // TODO BOOLEAN
-                expected.test(stmt);
+                expected.test(stmt, wideChar);
             }
             assertFalse(stmt.fetch());
         }

@@ -1,4 +1,4 @@
-use log::{debug, trace};
+use log::{debug, trace, warn};
 
 use crate::{
     check_stmt,
@@ -348,14 +348,16 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
             write_integer(stmt, &arg, value as SqlLen)
         }
         SQL_DESC_LOCAL_TYPE_NAME => write_string(stmt, &arg, ""),
-        // TODO SQL_DESC_LENGTH
+        // TODO SQL_DESC_LENGTH | SQL_COLUMN_LENGTH
         // TODO SQL_DESC_LITERAL_PREFIX
         // TODO SQL_DESC_LITERAL_SUFFIX
-        SQL_DESC_NULLABLE => write_integer(stmt, &arg, column.nullable() as SqlLen),
+        SQL_DESC_NULLABLE | SQL_COLUMN_NULLABLE => {
+            write_integer(stmt, &arg, column.nullable() as SqlLen)
+        }
         // TODO SQL_DESC_NUM_PREC_RADIX
         // TODO SQL_DESC_OCTET_LENGTH
-        // TODO SQL_DESC_PRECISION => write_integer(&arg, column.decimal_digits() as SqlLen),
-        // TODO SQL_DESC_SCALE
+        // TODO SQL_DESC_PRECISION|SQL_COLUMN_PRECISION => write_integer(&arg, column.decimal_digits() as SqlLen),
+        // TODO SQL_DESC_SCALE|SQL_COLUMN_SCALE
         SQL_DESC_SCHEMA_NAME => write_string(stmt, &arg, ""), // TODO schema name
         // TODO SQL_DESC_SEARCHABLE
         // TODO SQL_DESC_TYPE
@@ -364,7 +366,7 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
         // TODO SQL_DESC_UNSIGNED
         // TODO SQL_DESC_UPDATABLE
         _ => {
-            debug!(
+            warn!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported field_identifier: {:?}",
                 field_identifier
             );
@@ -382,7 +384,7 @@ fn write_string(
     arg: &TsurugiOdbcColAttributeArguments,
     value: &str,
 ) -> SqlReturn {
-    const FUNCTION_NAME: &str = "write_string()";
+    const FUNCTION_NAME: &str = "col_attribute.write_string()";
     debug!(
         "{stmt}.{FUNCTION_NAME}: column_number={}, {:?}={}",
         arg.column_number, arg.field_identifier, value
@@ -414,7 +416,7 @@ fn write_integer(
     arg: &TsurugiOdbcColAttributeArguments,
     value: SqlLen,
 ) -> SqlReturn {
-    const FUNCTION_NAME: &str = "write_integer()";
+    const FUNCTION_NAME: &str = "col_attribute.write_integer()";
     debug!(
         "{stmt}.{FUNCTION_NAME}: column_number={}, {:?}={}",
         arg.column_number, arg.field_identifier, value

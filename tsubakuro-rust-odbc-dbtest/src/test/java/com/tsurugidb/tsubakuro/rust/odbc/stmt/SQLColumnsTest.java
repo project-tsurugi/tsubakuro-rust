@@ -43,16 +43,16 @@ class SQLColumnsTest extends TgOdbcTester {
 
             assertTrue(stmt.fetch());
             new ExpectedColumn(1, "foo").initialize("INT").notNull().remarks("int value") //
-                    .test(stmt);
+                    .test(stmt, wideChar);
             assertTrue(stmt.fetch());
             new ExpectedColumn(2, "bar").initialize("BIGINT").notNull().remarks("long value") //
-                    .test(stmt);
+                    .test(stmt, wideChar);
             assertTrue(stmt.fetch());
             new ExpectedColumn(3, "zzz").initialize("VARCHAR(10)").remarks("string value") //
-                    .test(stmt);
+                    .test(stmt, wideChar);
             assertTrue(stmt.fetch());
             new ExpectedColumn(4, "num").initialize("DECIMAL(15, 3)").remarks("decimal value") //
-                    .test(stmt);
+                    .test(stmt, wideChar);
             assertFalse(stmt.fetch());
         }
     }

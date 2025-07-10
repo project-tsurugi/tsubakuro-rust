@@ -86,19 +86,19 @@ class QueryResultTest extends TgOdbcTester {
                 assertTrue(stmt.fetch());
                 assertEquals(1, stmt.getDataInt(1));
                 assertEquals(111L, stmt.getDataLong(2));
-                assertEquals("aaa", stmt.getDataString(3, 32));
+                assertEquals("aaa", stmt.getDataString(3, 32, wideChar));
             }
             {
                 assertTrue(stmt.fetch());
                 assertEquals(2, stmt.getDataInt(1));
                 assertEquals(222L, stmt.getDataLong(2));
-                assertEquals("bbb", stmt.getDataString(3, 32));
+                assertEquals("bbb", stmt.getDataString(3, 32, wideChar));
             }
             {
                 assertTrue(stmt.fetch());
                 assertEquals(3, stmt.getDataInt(1));
                 assertNull(stmt.getDataLong(2));
-                assertEquals("ccc", stmt.getDataString(3, 32));
+                assertEquals("ccc", stmt.getDataString(3, 32, wideChar));
             }
             assertFalse(stmt.fetch());
         }
@@ -114,19 +114,19 @@ class QueryResultTest extends TgOdbcTester {
                 assertTrue(stmt.fetch());
 //              assertEquals(1, stmt.getDataInt(1));
                 assertEquals(111L, stmt.getDataLong(2));
-                assertEquals("aaa", stmt.getDataString(3, 32));
+                assertEquals("aaa", stmt.getDataString(3, 32, wideChar));
             }
             {
                 assertTrue(stmt.fetch());
                 assertEquals(2, stmt.getDataInt(1));
 //              assertEquals(222L, stmt.getDataLong(2));
-                assertEquals("bbb", stmt.getDataString(3, 32));
+                assertEquals("bbb", stmt.getDataString(3, 32, wideChar));
             }
             {
                 assertTrue(stmt.fetch());
                 assertEquals(3, stmt.getDataInt(1));
                 assertNull(stmt.getDataLong(2));
-//              assertEquals("ccc", stmt.getDataString(3, 32));
+//              assertEquals("ccc", stmt.getDataString(3, 32, wideChar));
             }
             assertFalse(stmt.fetch());
         }
@@ -147,7 +147,7 @@ class QueryResultTest extends TgOdbcTester {
                 });
                 assertTrue(e.getMessage().contains("Already fetched"), () -> e.getMessage());
 
-                assertEquals("aaa", stmt.getDataString(3, 32));
+                assertEquals("aaa", stmt.getDataString(3, 32, wideChar));
             }
             {
                 assertTrue(stmt.fetch());
@@ -159,7 +159,7 @@ class QueryResultTest extends TgOdbcTester {
                 assertTrue(e.getMessage().contains("Already fetched"), () -> e.getMessage());
 
                 assertEquals(222L, stmt.getDataLong(2));
-                assertEquals("bbb", stmt.getDataString(3, 32));
+                assertEquals("bbb", stmt.getDataString(3, 32, wideChar));
             }
         }
     }
@@ -174,10 +174,10 @@ class QueryResultTest extends TgOdbcTester {
                 assertTrue(stmt.fetch());
                 assertEquals(1, stmt.getDataInt(1));
                 assertEquals(111L, stmt.getDataLong(2));
-                assertEquals("aaa", stmt.getDataString(3, 32));
+                assertEquals("aaa", stmt.getDataString(3, 32, wideChar));
 
                 var e = assertThrows(TgOdbcRuntimeException.class, () -> {
-                    stmt.getDataString(4, 32);
+                    stmt.getDataString(4, 32, wideChar);
                 });
                 assertTrue(e.getMessage().contains("column_number must be between 1 and 3"), () -> e.getMessage());
             }
@@ -185,7 +185,7 @@ class QueryResultTest extends TgOdbcTester {
                 assertTrue(stmt.fetch());
 
                 var e = assertThrows(TgOdbcRuntimeException.class, () -> {
-                    stmt.getDataString(4, 32);
+                    stmt.getDataString(4, 32, wideChar);
                 });
                 assertTrue(e.getMessage().contains("column_number must be between 1 and 3"), () -> e.getMessage());
             }
