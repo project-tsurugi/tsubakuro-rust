@@ -6,6 +6,7 @@ use crate::{
 
 pub mod bind_col;
 pub mod bind_parameter;
+pub mod col_attribute;
 pub mod columns;
 pub mod describe_col;
 pub mod exec_direct;

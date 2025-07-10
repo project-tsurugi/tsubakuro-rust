@@ -31,6 +31,7 @@ import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.ExpectedColumn;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcGetDataArgument;
+import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument.FieldIdentifier;
 import com.tsurugidb.tsubakuro.rust.odbc.util.TgOdbcTester;
 
 public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
@@ -115,6 +116,7 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
             stmt.execDirect("select * from test order by pk", wideChar);
 
             describeColumn(stmt, wideChar);
+            columnAttribute(stmt, wideChar);
 
             var actual = new ArrayList<T>();
             int rowIndex = 0;
@@ -146,6 +148,28 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
             var desc = stmt.describeCol(2, wideChar);
             assertEquals("value", desc.columnName());
             assertEquals(dataType(), desc.dataType());
+        }
+    }
+
+    private void columnAttribute(TgOdbcStmtHandle stmt, boolean wideChar) {
+        long numberOfColumns = stmt.colAttributeNumeric(0, FieldIdentifier.SQL_DESC_COUNT, wideChar);
+        assertEquals(2, numberOfColumns);
+
+        {
+            final int i = 1;
+            String name = stmt.colAttributeString(i, FieldIdentifier.SQL_DESC_NAME, wideChar);
+            assertEquals("pk", name);
+
+            long dataType = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
+            assertEquals(SqlDataType.SQL_INTEGER, SqlDataType.fromValue((int) dataType));
+        }
+        {
+            final int i = 2;
+            String name = stmt.colAttributeString(i, FieldIdentifier.SQL_DESC_NAME, wideChar);
+            assertEquals("value", name);
+
+            long dataType = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
+            assertEquals(dataType(), SqlDataType.fromValue((int) dataType));
         }
     }
 

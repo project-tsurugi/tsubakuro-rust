@@ -38,6 +38,26 @@ impl TsurugiOdbcDescribeColumn {
             nullable,
         }
     }
+
+    pub(crate) fn column_name(&self) -> &String {
+        &self.column_name
+    }
+
+    pub(crate) fn data_type(&self) -> SqlDataType {
+        self.data_type
+    }
+
+    pub(crate) fn column_size(&self) -> SqlULen {
+        self.column_size
+    }
+
+    pub(crate) fn decimal_digits(&self) -> SqlSmallInt {
+        self.decimal_digits
+    }
+
+    pub(crate) fn nullable(&self) -> SqlNullable {
+        self.nullable
+    }
 }
 
 #[no_mangle]

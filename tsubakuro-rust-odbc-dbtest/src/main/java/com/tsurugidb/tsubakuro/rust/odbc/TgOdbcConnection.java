@@ -2,9 +2,9 @@ package com.tsurugidb.tsubakuro.rust.odbc;
 
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcAttrConst;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle;
+import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle.ConnectionAttribute;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcHandle.CompletionType;
-import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 
 public class TgOdbcConnection extends TgOdbcResource {
 

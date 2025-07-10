@@ -14,6 +14,7 @@ const SQL_API_ODBC3_ALL_FUNCTIONS_SIZE: usize = 250;
 const SQL_API_SQLALLOCHANDLE: SqlUSmallInt = 1001;
 const SQL_API_SQLBINDCOL: SqlUSmallInt = 4;
 const SQL_API_SQLBINDPARAMETER: SqlUSmallInt = 72;
+const SQL_API_SQLCOLATTRIBUTE: SqlUSmallInt = 6;
 const SQL_API_SQLCOLUMNS: SqlUSmallInt = 40;
 const SQL_API_SQLDESCRIBECOL: SqlUSmallInt = 8;
 const SQL_API_SQLDISCONNECT: SqlUSmallInt = 9;
@@ -128,6 +129,7 @@ fn get_function_set() -> &'static HashSet<SqlUSmallInt> {
             SQL_API_SQLALLOCHANDLE,
             SQL_API_SQLBINDCOL,
             SQL_API_SQLBINDPARAMETER,
+            SQL_API_SQLCOLATTRIBUTE,
             SQL_API_SQLCOLUMNS,
             SQL_API_SQLDESCRIBECOL,
             SQL_API_SQLDISCONNECT,

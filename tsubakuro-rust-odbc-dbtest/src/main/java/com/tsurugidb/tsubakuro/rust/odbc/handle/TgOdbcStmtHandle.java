@@ -9,6 +9,8 @@ import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcFunction;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlReturn;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
+import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument;
+import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument.FieldIdentifier;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcGetDataArgument;
 
 public class TgOdbcStmtHandle extends TgOdbcHandle {
@@ -404,6 +406,42 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         short decimalDigits = decimalDigitsPtr.get(ValueLayout.JAVA_SHORT, 0);
         short nullable = nullablePtr.get(ValueLayout.JAVA_SHORT, 0);
         return new DescribeColumn(columnName, dataType, columnSize, decimalDigits, nullable);
+    }
+
+    public String colAttributeString(int columnNumber, FieldIdentifier fieldIdentifier, boolean wideChar) {
+        var arg = TgOdbcColAttributeArgument.ofString(manager, fieldIdentifier, 1024);
+
+        colAttribute(columnNumber, arg, wideChar);
+
+        return arg.characterAttribute(wideChar);
+    }
+
+    public long colAttributeNumeric(int columnNumber, FieldIdentifier fieldIdentifier, boolean wideChar) {
+        var arg = TgOdbcColAttributeArgument.ofNumeric(manager, fieldIdentifier);
+
+        colAttribute(columnNumber, arg, wideChar);
+
+        return arg.numericAttribute();
+    }
+
+    private void colAttribute(int columnNumber, TgOdbcColAttributeArgument arg, boolean wideChar) {
+        MemorySegment statementHandle = handleAddress();
+
+        try {
+            if (wideChar) {
+                short result = (short) OdbcFunction.sqlColAttributeW.invoke(statementHandle, (short) columnNumber, arg.fieldIdentifier().value(), arg.characterAttributePtr(), arg.bufferLength(),
+                        arg.stringLengthPtr(), arg.numericAttributePtr());
+                SqlReturn.check("SQLColAttributeW", result, this);
+            } else {
+                short result = (short) OdbcFunction.sqlColAttributeA.invoke(statementHandle, (short) columnNumber, arg.fieldIdentifier().value(), arg.characterAttributePtr(), arg.bufferLength(),
+                        arg.stringLengthPtr(), arg.numericAttributePtr());
+                SqlReturn.check("SQLColAttributeA", result, this);
+            }
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Short getDataShort(int columnNumber) {

@@ -45,6 +45,10 @@ pub enum TsurugiOdbcError {
     StatementProcessorNotFound = 302,
     ListTablesError = 31001,
     ColumnNumberOutOfBounds = 32001,
+
+    // SQLColAttribute
+    UnsupportedFieldIdentifier = 32101,
+
     // SQLGetData
     GetDataUnsupportedTargetType = 32002,
     GetDataInvalidTargetValuePtr = 32003,
@@ -102,6 +106,8 @@ impl From<&TsurugiOdbcError> for &str {
             //
             ListTablesError => "HY000",
             ColumnNumberOutOfBounds => "HY000",
+            // SQLColAttribute
+            UnsupportedFieldIdentifier => "HY000",
             // SQLGetData
             GetDataUnsupportedTargetType => "HY000",
             GetDataInvalidTargetValuePtr => "HY009",

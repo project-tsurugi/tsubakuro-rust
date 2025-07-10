@@ -24,6 +24,17 @@ public class OdbcFunction {
     public static final MethodHandle sqlBindParameter;
 
     /**
+     * SQLRETURN SQLColAttributeA(SQLHSTMT StatementHandle, SQLUSMALLINT ColumnNumber, SQLUSMALLINT FieldIdentifier, SQLPOINTER CharacterAttributePtr, SQLSMALLINT BufferLength, SQLSMALLINT*
+     * StringLengthPtr, SQLLEN* NumericAttributePtr)
+     */
+    public static final MethodHandle sqlColAttributeA;
+    /**
+     * SQLRETURN SQLColAttributeW(SQLHSTMT StatementHandle, SQLUSMALLINT ColumnNumber, SQLUSMALLINT FieldIdentifier, SQLPOINTER CharacterAttributePtr, SQLSMALLINT BufferLength, SQLSMALLINT*
+     * StringLengthPtr, SQLLEN* NumericAttributePtr)
+     */
+    public static final MethodHandle sqlColAttributeW;
+
+    /**
      * SQLRETURN SQLColumnsA(SQLHSTMT hstmt, SQLCHAR* szCatalogName, SQLSMALLINT cbCatalogName, SQLCHAR* szSchemaName, SQLSMALLINT cbSchemaName, SQLCHAR* szTableName, SQLSMALLINT cbTableName, SQLCHAR*
      * szColumnName, SQLSMALLINT cbColumnName)
      */
@@ -200,6 +211,36 @@ public class OdbcFunction {
                 );
 
                 sqlBindParameter = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLColAttributeA").orElseThrow(() -> new RuntimeException("SQLColAttributeA not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHSTMT StatementHandle
+                        JAVA_SHORT, // SQLUSMALLINT ColumnNumber
+                        JAVA_SHORT, // SQLUSMALLINT FieldIdentifier
+                        ADDRESS, // SQLPOINTER CharacterAttributePtr
+                        JAVA_SHORT, // SQLSMALLINT BufferLength
+                        ADDRESS, // SQLSMALLINT* StringLengthPtr
+                        ADDRESS // SQLLEN* NumericAttributePtr
+                );
+
+                sqlColAttributeA = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLColAttributeW").orElseThrow(() -> new RuntimeException("SQLColAttributeW not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHSTMT StatementHandle
+                        JAVA_SHORT, // SQLUSMALLINT ColumnNumber
+                        JAVA_SHORT, // SQLUSMALLINT FieldIdentifier
+                        ADDRESS, // SQLPOINTER CharacterAttributePtr
+                        JAVA_SHORT, // SQLSMALLINT BufferLength
+                        ADDRESS, // SQLSMALLINT* StringLengthPtr
+                        ADDRESS // SQLLEN* NumericAttributePtr
+                );
+
+                sqlColAttributeW = linker.downcallHandle(symbol, desc);
             }
             {
                 var symbol = lookup.find("SQLColumnsA").orElseThrow(() -> new RuntimeException("SQLColumnsA not found"));
