@@ -26,3 +26,11 @@ Tsurugi ODBCドライバーのインストール方法を説明します。
 
 3. regファイルを実行します。（regファイルをダブルクリックする）
    これにより、レジストリーにTsurugi ODBCドライバーが登録されます。
+
+### 接続文字列の例
+
+上記の手順でTsurugi ODBCドライバーをインストールした場合、接続文字列は以下のようになります。
+
+```
+DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;
+```
