@@ -7,3 +7,4 @@ pub mod stmt;
 mod util;
 
 const DRIVER_NAME: &str = "Tsurugi ODBC Driver";
+const DRIVER_VERSION: &str = "00.04.0001";

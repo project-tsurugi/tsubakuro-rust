@@ -10,7 +10,7 @@ use crate::{
         hdbc::{HDbc, TsurugiOdbcDbc},
     },
     util::{write_char, write_wchar_bytes},
-    DRIVER_NAME,
+    DRIVER_NAME, DRIVER_VERSION,
 };
 
 #[repr(u16)]
@@ -388,6 +388,7 @@ impl SqlGetInfo {
         use InfoType::*;
         match info_type {
             SQL_DRIVER_NAME => self.write_string(info_type, DRIVER_NAME),
+            SQL_DRIVER_VER => self.write_string(info_type, DRIVER_VERSION),
             SQL_DRIVER_ODBC_VER => self.write_string(info_type, "03.51"),
             SQL_CURSOR_COMMIT_BEHAVIOR => {
                 self.write_usmallint(info_type, SqlCursorBehavior::SQL_CB_DELETE as SqlUSmallInt)

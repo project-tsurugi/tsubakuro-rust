@@ -1,6 +1,7 @@
 package com.tsurugidb.tsubakuro.rust.odbc.dbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +19,15 @@ class SQLGetInfoTest extends TgOdbcTester {
 
         String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_NAME, 64, wideChar);
         assertEquals("Tsurugi ODBC Driver", actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void SQL_DRIVER_VER(boolean wideChar) {
+        var dbc = getConnection().dbc();
+
+        String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_VER, 32, wideChar);
+        assertNotNull(actual);
     }
 
     @ParameterizedTest
