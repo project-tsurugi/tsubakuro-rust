@@ -171,11 +171,15 @@ pub extern "system" fn SQLColAttribute(
         Ok(value) => value,
         Err(e) => {
             debug!(
-                "{stmt}.{FUNCTION_NAME} error. Unsupported field identifier: {field_identifier}"
+                "{stmt}.{FUNCTION_NAME} error. Unsupported field_identifier: {}",
+                field_identifier
             );
             stmt.add_diag(
                 e,
-                format!("Unsupported field identifier: {field_identifier}"),
+                format!(
+                    "SQLColAttribute(): Unsupported field_identifier: {}",
+                    field_identifier
+                ),
             );
             return SqlReturn::SQL_ERROR;
         }
@@ -231,7 +235,10 @@ pub extern "system" fn SQLColAttributeW(
             );
             stmt.add_diag(
                 e,
-                format!("Unsupported field_identifier: {}", field_identifier),
+                format!(
+                    "SQLColAttributeW(): Unsupported field_identifier: {}",
+                    field_identifier
+                ),
             );
             return SqlReturn::SQL_ERROR;
         }

@@ -47,7 +47,10 @@ macro_rules! connection_attribute {
             Ok(value) => value,
             Err(e) => {
                 log::warn!("{FUNCTION_NAME}: Unsupported attribute {:?}", $attribute);
-                $dbc.add_diag(e, format!("Unsupported attribute {:?}", $attribute));
+                $dbc.add_diag(
+                    e,
+                    format!("{FUNCTION_NAME}: Unsupported attribute {:?}", $attribute),
+                );
                 let rc = SqlReturn::SQL_ERROR;
                 log::trace!("{FUNCTION_NAME} end. rc={:?}", rc);
                 return rc;
@@ -241,9 +244,17 @@ fn get_connect_attr(
                 "{dbc}.{FUNCTION_NAME}: Unsupported attribute {:?}",
                 attribute
             );
+            let odbc_function_name = if _wide_char {
+                "GetConnectAttrW()"
+            } else {
+                "GetConnectAttr()"
+            };
             dbc.add_diag(
                 TsurugiOdbcError::InvalidAttribute,
-                format!("Unsupported attribute {:?}", attribute),
+                format!(
+                    "{odbc_function_name}: Unsupported attribute {:?}",
+                    attribute
+                ),
             );
             SqlReturn::SQL_ERROR
         }
