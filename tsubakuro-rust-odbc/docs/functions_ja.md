@@ -31,8 +31,12 @@ henvの属性を設定・取得します。
 
 hdbcの属性を設定・取得します。
 
-対応している属性は以下の通りです。
+対応している主な属性は以下の通りです。
 
+- SQL_ATTR_CONNECTION_TIMEOUT
+  - 接続タイムアウト時間（秒）。0の場合、タイムアウトしません。
+- SQL_ATTR_LOGIN_TIMEOUT
+  - SQL_ATTR_CONNECTION_TIMEOUTとして扱われます。
 - SQL_ATTR_AUTOCOMMIT
   - デフォルトはSQL_AUTOCOMMIT_ON（SQLを実行する度に自動的にコミットする）
 

@@ -17,6 +17,8 @@ use crate::{
 #[allow(non_camel_case_types)]
 enum ConnectionAttribute {
     SQL_ATTR_AUTOCOMMIT = 102,
+    SQL_ATTR_LOGIN_TIMEOUT = 103,
+    SQL_ATTR_CONNECTION_TIMEOUT = 113,
     SQL_ATTR_ANSI_APP = 115,
 }
 
@@ -31,6 +33,8 @@ impl TryFrom<i32> for ConnectionAttribute {
         use ConnectionAttribute::*;
         match value {
             102 => Ok(SQL_ATTR_AUTOCOMMIT),
+            103 => Ok(SQL_ATTR_LOGIN_TIMEOUT),
+            113 => Ok(SQL_ATTR_CONNECTION_TIMEOUT),
             115 => Ok(SQL_ATTR_ANSI_APP),
             _ => Err(TsurugiOdbcError::InvalidAttribute),
         }
@@ -114,10 +118,15 @@ fn set_connect_attr(
     use ConnectionAttribute::*;
     match attribute {
         SQL_ATTR_AUTOCOMMIT => {
-            let auto_commit = value_ptr as SqlUInteger;
-            let auto_commit = auto_commit != SQL_AUTOCOMMIT_OFF;
-            debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, auto_commit);
-            dbc.set_auto_commit(auto_commit)
+            let value = value_ptr as SqlUInteger;
+            let value = value != SQL_AUTOCOMMIT_OFF;
+            debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
+            dbc.set_auto_commit(value)
+        }
+        SQL_ATTR_LOGIN_TIMEOUT | SQL_ATTR_CONNECTION_TIMEOUT => {
+            let value = value_ptr as SqlUInteger;
+            debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
+            dbc.set_connection_timeout(value)
         }
         SQL_ATTR_ANSI_APP => {
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={:?}", attribute, value_ptr);
@@ -215,16 +224,17 @@ fn get_connect_attr(
         SQL_ATTR_AUTOCOMMIT => {
             let auto_commit = dbc.auto_commit();
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, auto_commit);
-            let auto_commit = if auto_commit {
+            let value = if auto_commit {
                 SQL_AUTOCOMMIT_ON
             } else {
                 SQL_AUTOCOMMIT_OFF
             };
-            let ptr = value_ptr as *mut SqlUInteger;
-            unsafe {
-                *ptr = auto_commit;
-            }
-            SqlReturn::SQL_SUCCESS
+            write_uinteger(value, value_ptr)
+        }
+        SQL_ATTR_LOGIN_TIMEOUT | SQL_ATTR_CONNECTION_TIMEOUT => {
+            let value = dbc.connection_timeout();
+            debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
+            write_uinteger(value, value_ptr)
         }
         _ => {
             warn!(
@@ -238,4 +248,12 @@ fn get_connect_attr(
             SqlReturn::SQL_ERROR
         }
     }
+}
+
+fn write_uinteger(value: SqlUInteger, value_ptr: SqlPointer) -> SqlReturn {
+    let ptr = value_ptr as *mut SqlUInteger;
+    unsafe {
+        *ptr = value;
+    }
+    SqlReturn::SQL_SUCCESS
 }

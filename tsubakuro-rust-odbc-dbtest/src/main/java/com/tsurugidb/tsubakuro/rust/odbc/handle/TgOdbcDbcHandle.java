@@ -118,6 +118,8 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
 
     public enum ConnectionAttribute {
         SQL_ATTR_AUTOCOMMIT(102), //
+        SQL_ATTR_LOGIN_TIMEOUT(103), //
+        SQL_ATTR_CONNECTION_TIMEOUT(113), //
         SQL_ATTR_ANSI_APP(115), //
 
         ;
@@ -134,6 +136,8 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         int stringLength = 0;
         switch (attribute) {
         case SQL_ATTR_AUTOCOMMIT:
+        case SQL_ATTR_LOGIN_TIMEOUT:
+        case SQL_ATTR_CONNECTION_TIMEOUT:
         case SQL_ATTR_ANSI_APP:
             valuePtr = MemorySegment.ofAddress((Integer) value);
             break;
@@ -174,6 +178,8 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         int bufferLength;
         switch (attribute) {
         case SQL_ATTR_AUTOCOMMIT:
+        case SQL_ATTR_LOGIN_TIMEOUT:
+        case SQL_ATTR_CONNECTION_TIMEOUT:
             valuePtr = manager.allocateInt();
             bufferLength = 4;
             break;
@@ -218,6 +224,8 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
     private Object getConnectAttr(ConnectionAttribute attribute, MemorySegment valuePtr, MemorySegment stringLengthPtr, boolean wideChar) {
         switch (attribute) {
         case SQL_ATTR_AUTOCOMMIT:
+        case SQL_ATTR_LOGIN_TIMEOUT:
+        case SQL_ATTR_CONNECTION_TIMEOUT:
             return valuePtr.get(ValueLayout.JAVA_INT, 0);
         default:
             throw new UnsupportedOperationException(attribute.name());

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use log::{debug, trace, warn};
 use tsubakuro_rust_core::prelude::*;
@@ -178,7 +178,9 @@ fn connect(dbc: &Arc<TsurugiOdbcDbc>, map: HashMap<String, String>) -> SqlReturn
     }
 
     let runtime = dbc.runtime();
-    let session = runtime.block_on(async { Session::connect(&connection_option).await });
+
+    let timeout = Duration::from_secs(dbc.connection_timeout() as u64);
+    let session = runtime.block_on(Session::connect_for(&connection_option, timeout));
     let session = match session {
         Ok(session) => {
             debug!("{dbc}.{FUNCTION_NAME}: Session::connect() succeeded");
