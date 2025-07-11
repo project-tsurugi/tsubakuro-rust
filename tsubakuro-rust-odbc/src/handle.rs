@@ -14,8 +14,10 @@ use crate::{
     logger::env_logger_init,
 };
 
-pub mod diag;
+pub(crate) mod diag;
 pub mod end_tran;
+pub mod get_diag_field;
+pub mod get_diag_rec;
 pub(crate) mod hdbc;
 pub(crate) mod henv;
 pub(crate) mod hstmt;

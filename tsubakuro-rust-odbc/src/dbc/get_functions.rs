@@ -26,6 +26,7 @@ const SQL_API_SQLFETCH: SqlUSmallInt = 13;
 const SQL_API_SQLFREEHANDLE: SqlUSmallInt = 1006;
 const SQL_API_SQLGETCONNECTATTR: SqlUSmallInt = 1007;
 const SQL_API_SQLGETDATA: SqlUSmallInt = 43;
+const SQL_API_SQLGETDIAGFIELD: SqlUSmallInt = 1010;
 const SQL_API_SQLGETDIAGREC: SqlUSmallInt = 1011;
 const SQL_API_SQLGETENVATTR: SqlUSmallInt = 1012;
 const SQL_API_SQLGETFUNCTIONS: SqlUSmallInt = 44;
@@ -141,6 +142,7 @@ fn get_function_set() -> &'static HashSet<SqlUSmallInt> {
             SQL_API_SQLFREEHANDLE,
             SQL_API_SQLGETCONNECTATTR,
             SQL_API_SQLGETDATA,
+            SQL_API_SQLGETDIAGFIELD,
             SQL_API_SQLGETDIAGREC,
             SQL_API_SQLGETENVATTR,
             SQL_API_SQLGETFUNCTIONS,

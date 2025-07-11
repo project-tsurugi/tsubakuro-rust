@@ -145,7 +145,7 @@ impl SqlGetInfo {
                 self.info_value_ptr as *mut SqlWChar,
                 self.buffer_length,
                 self.string_length_ptr,
-                &self.dbc.diag_collection(),
+                Some(&self.dbc.diag_collection()),
             )
         } else {
             write_char(

@@ -211,35 +211,26 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
     }
 
     public void execDirect(String sql, boolean wideChar) {
+        short result = execDirect0(sql, OdbcConst.SQL_NTS, wideChar);
+        SqlReturn.check(wideChar ? "SQLExecDirectW" : "SQLExecDirectA", result, this);
+    }
+
+    public short execDirect0(String sql, int length, boolean wideChar) {
+        MemorySegment statementHandle = handleAddress();
+        short statementLength = (short) length;
         try {
             if (wideChar) {
-                execDirectW(sql);
+                MemorySegment statementPtr = manager.allocateUtf16(sql);
+                return (short) OdbcFunction.sqlExecDirectW.invoke(statementHandle, statementPtr, statementLength);
             } else {
-                execDirectA(sql);
+                MemorySegment statementPtr = manager.allocateUtf8(sql);
+                return (short) OdbcFunction.sqlExecDirectA.invoke(statementHandle, statementPtr, statementLength);
             }
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void execDirectA(String sql) throws Throwable {
-        MemorySegment statementHandle = handleAddress();
-        MemorySegment statementPtr = manager.allocateUtf8(sql);
-        short statementLength = OdbcConst.SQL_NTS;
-
-        short result = (short) OdbcFunction.sqlExecDirectA.invoke(statementHandle, statementPtr, statementLength);
-        SqlReturn.check("SQLExecDirectA", result, this);
-    }
-
-    private void execDirectW(String sql) throws Throwable {
-        MemorySegment statementHandle = handleAddress();
-        MemorySegment statementPtr = manager.allocateUtf16(sql);
-        short statementLength = OdbcConst.SQL_NTS;
-
-        short result = (short) OdbcFunction.sqlExecDirectW.invoke(statementHandle, statementPtr, statementLength);
-        SqlReturn.check("SQLExecDirectW", result, this);
     }
 
     public void prepare(String sql, boolean wideChar) {

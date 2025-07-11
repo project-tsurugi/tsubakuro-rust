@@ -11,19 +11,19 @@ public class SqlReturn {
     public static final int SQL_NO_DATA = 100;
     public static final int SQL_ERROR = -1;
 
-    public static boolean isSuccess(short result) {
-        return (result == SQL_SUCCESS) || (result == SQL_SUCCESS_WITH_INFO);
+    public static boolean isSuccess(short rc) {
+        return (rc == SQL_SUCCESS) || (rc == SQL_SUCCESS_WITH_INFO);
     }
 
-    public static void check(String functionName, short result) {
-        if (isSuccess(result)) {
+    public static void check(String functionName, short rc) {
+        if (isSuccess(rc)) {
             return;
         }
-        throw new TgOdbcRuntimeException(functionName, result);
+        throw new TgOdbcRuntimeException(functionName, rc);
     }
 
-    public static void check(String functionName, short result, TgOdbcHandle handle) {
-        if (isSuccess(result)) {
+    public static void check(String functionName, short rc, TgOdbcHandle handle) {
+        if (isSuccess(rc)) {
             return;
         }
 
@@ -31,10 +31,10 @@ public class SqlReturn {
         try {
             diagRec = handle.getDiagRec(1);
         } catch (Throwable t) {
-            var e = new TgOdbcRuntimeException(functionName, result);
+            var e = new TgOdbcRuntimeException(functionName, rc);
             e.addSuppressed(t);
             throw e;
         }
-        throw new TgOdbcRuntimeException(functionName, result, diagRec);
+        throw new TgOdbcRuntimeException(functionName, rc, diagRec);
     }
 }

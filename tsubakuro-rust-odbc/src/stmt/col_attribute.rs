@@ -397,7 +397,7 @@ fn write_string(
             arg.character_attribute_ptr as *mut SqlWChar,
             arg.buffer_length,
             arg.string_length_ptr,
-            &stmt.diag_collection(),
+            Some(&stmt.diag_collection()),
         )
     } else {
         write_char(

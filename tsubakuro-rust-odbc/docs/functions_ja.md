@@ -148,7 +148,7 @@ SQLを実行します。
 
 実行結果の列の情報を返します。
 
-- field_identifierは限定的に対応しています。
+- 一部のfield_identifierのみ対応しています。
 
 ### SQLRowCount
 
@@ -176,6 +176,12 @@ SQLを実行します。
 ### SQLGetDiagRec
 
 エラーコード・エラーメッセージを返します。
+
+### SQLGetDiagField
+
+エラー情報を返します。
+
+- 一部のdiag_identifierのみ対応しています。
 
 ## ドライバー情報関連
 

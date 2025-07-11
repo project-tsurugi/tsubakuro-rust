@@ -95,6 +95,17 @@ public class OdbcFunction {
     public static final MethodHandle sqlGetData;
 
     /**
+     * SQLRETURN SQLGetDiagFieldA(SQLSMALLINT HandleType, SQLHANDLE Handle, SQLSMALLINT RecNumber, SQLSMALLINT DiagIdentifier, SQLPOINTER DiagInfoPtr, SQLSMALLINT BufferLength, SQLSMALLINT*
+     * StringLengthPtr)
+     */
+    public static final MethodHandle sqlGetDiagFieldA;
+    /**
+     * SQLRETURN SQLGetDiagFieldW(SQLSMALLINT HandleType, SQLHANDLE Handle, SQLSMALLINT RecNumber, SQLSMALLINT DiagIdentifier, SQLPOINTER DiagInfoPtr, SQLSMALLINT BufferLength, SQLSMALLINT*
+     * StringLengthPtr)
+     */
+    public static final MethodHandle sqlGetDiagFieldW;
+
+    /**
      * SQLRETURN SQLGetDiagRec(SQLSMALLINT HandleType, SQLHANDLE Handle, SQLSMALLINT RecNumber, SQLCHAR *SQLState, SQLINTEGER *NativeErrorPtr, SQLCHAR *MessageText, SQLSMALLINT BufferLength,
      * SQLSMALLINT *TextLengthPtr)
      */
@@ -437,6 +448,36 @@ public class OdbcFunction {
                 );
 
                 sqlGetData = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLGetDiagFieldA").orElseThrow(() -> new RuntimeException("SQLGetDiagFieldA not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        JAVA_SHORT, // SQLSMALLINT HandleType
+                        ADDRESS, // SQLHANDLE Handle
+                        JAVA_SHORT, // SQLSMALLINT RecNumber
+                        JAVA_SHORT, // SQLSMALLINT DiagIdentifier
+                        ADDRESS, // SQLPOINTER DiagInfoPtr
+                        JAVA_SHORT, // SQLSMALLINT BufferLength
+                        ADDRESS // SQLSMALLINT* StringLengthPtr
+                );
+
+                sqlGetDiagFieldA = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLGetDiagFieldW").orElseThrow(() -> new RuntimeException("SQLGetDiagFieldW not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        JAVA_SHORT, // SQLSMALLINT HandleType
+                        ADDRESS, // SQLHANDLE Handle
+                        JAVA_SHORT, // SQLSMALLINT RecNumber
+                        JAVA_SHORT, // SQLSMALLINT DiagIdentifier
+                        ADDRESS, // SQLPOINTER DiagInfoPtr
+                        JAVA_SHORT, // SQLSMALLINT BufferLength
+                        ADDRESS // SQLSMALLINT* StringLengthPtr
+                );
+
+                sqlGetDiagFieldW = linker.downcallHandle(symbol, desc);
             }
             {
                 var symbol = lookup.find("SQLGetDiagRecA").orElseThrow(() -> new RuntimeException("SQLGetDiagRecA not found"));

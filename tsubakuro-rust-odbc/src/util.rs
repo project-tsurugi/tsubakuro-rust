@@ -245,10 +245,10 @@ pub(crate) fn write_wchar_bytes(
     dst: *mut SqlWChar,
     buffer_length: SqlSmallInt,
     out_length: *mut SqlSmallInt,
-    diags: &Arc<TsurugiOdbcDiagCollection>,
+    diags: Option<&Arc<TsurugiOdbcDiagCollection>>,
 ) -> SqlReturn {
     let buffer_chars = buffer_length as usize / 2; // SqlWChar is 2 bytes
-    let (rc, len) = write_wchar0(name, src, dst, buffer_chars, Some(diags));
+    let (rc, len) = write_wchar0(name, src, dst, buffer_chars, diags);
 
     if !out_length.is_null() {
         unsafe {
