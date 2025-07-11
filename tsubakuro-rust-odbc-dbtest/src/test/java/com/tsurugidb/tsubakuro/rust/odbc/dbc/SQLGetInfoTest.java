@@ -13,6 +13,15 @@ class SQLGetInfoTest extends TgOdbcTester {
 
     @ParameterizedTest
     @ValueSource(booleans = { false, true })
+    void SQL_DRIVER_NAME(boolean wideChar) {
+        var dbc = getConnection().dbc();
+
+        String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_NAME, 64, wideChar);
+        assertEquals("Tsurugi ODBC Driver", actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
     void SQL_CURSOR_COMMIT_BEHAVIOR(boolean wideChar) {
         var dbc = getConnection().dbc();
 
