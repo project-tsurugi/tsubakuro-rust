@@ -11,36 +11,42 @@ const SQL_API_ALL_FUNCTIONS: SqlUSmallInt = 0;
 const SQL_API_ODBC3_ALL_FUNCTIONS: SqlUSmallInt = 999;
 const SQL_API_ODBC3_ALL_FUNCTIONS_SIZE: usize = 250;
 
-const SQL_API_SQLALLOCHANDLE: SqlUSmallInt = 1001;
-const SQL_API_SQLBINDCOL: SqlUSmallInt = 4;
-const SQL_API_SQLBINDPARAMETER: SqlUSmallInt = 72;
-const SQL_API_SQLCOLATTRIBUTE: SqlUSmallInt = 6;
-const SQL_API_SQLCOLUMNS: SqlUSmallInt = 40;
-const SQL_API_SQLDESCRIBECOL: SqlUSmallInt = 8;
-const SQL_API_SQLDISCONNECT: SqlUSmallInt = 9;
-const SQL_API_SQLDRIVERCONNECT: SqlUSmallInt = 41;
-const SQL_API_SQLENDTRAN: SqlUSmallInt = 1005;
-const SQL_API_SQLEXECDIRECT: SqlUSmallInt = 11;
-const SQL_API_SQLEXECUTE: SqlUSmallInt = 12;
-const SQL_API_SQLFETCH: SqlUSmallInt = 13;
-const SQL_API_SQLFREEHANDLE: SqlUSmallInt = 1006;
-const SQL_API_SQLGETCONNECTATTR: SqlUSmallInt = 1007;
-const SQL_API_SQLGETDATA: SqlUSmallInt = 43;
-const SQL_API_SQLGETDIAGFIELD: SqlUSmallInt = 1010;
-const SQL_API_SQLGETDIAGREC: SqlUSmallInt = 1011;
-const SQL_API_SQLGETENVATTR: SqlUSmallInt = 1012;
-const SQL_API_SQLGETFUNCTIONS: SqlUSmallInt = 44;
-const SQL_API_SQLGETINFO: SqlUSmallInt = 45;
-const SQL_API_SQLGETSTMTATTR: SqlUSmallInt = 1014;
-const SQL_API_SQLGETTYPEINFO: SqlUSmallInt = 47;
-const SQL_API_SQLNUMRESULTCOLS: SqlUSmallInt = 18;
-const SQL_API_SQLPREPARE: SqlUSmallInt = 19;
-const SQL_API_SQLPRIMARYKEYS: SqlUSmallInt = 65;
-const SQL_API_SQLROWCOUNT: SqlUSmallInt = 20;
-const SQL_API_SQLSETCONNECTATTR: SqlUSmallInt = 1016;
-const SQL_API_SQLSETENVATTR: SqlUSmallInt = 1019;
-const SQL_API_SQLSETSTMTATTR: SqlUSmallInt = 1020;
-const SQL_API_SQLTABLES: SqlUSmallInt = 54;
+#[repr(u16)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[allow(non_camel_case_types)]
+enum SqlApiFunction {
+    SQL_API_SQLALLOCHANDLE = 1001,
+    SQL_API_SQLBINDCOL = 4,
+    SQL_API_SQLBINDPARAMETER = 72,
+    SQL_API_SQLCOLATTRIBUTE = 6,
+    SQL_API_SQLCOLUMNS = 40,
+    SQL_API_SQLCONNECT = 7,
+    SQL_API_SQLDESCRIBECOL = 8,
+    SQL_API_SQLDISCONNECT = 9,
+    SQL_API_SQLDRIVERCONNECT = 41,
+    SQL_API_SQLENDTRAN = 1005,
+    SQL_API_SQLEXECDIRECT = 11,
+    SQL_API_SQLEXECUTE = 12,
+    SQL_API_SQLFETCH = 13,
+    SQL_API_SQLFREEHANDLE = 1006,
+    SQL_API_SQLGETCONNECTATTR = 1007,
+    SQL_API_SQLGETDATA = 43,
+    SQL_API_SQLGETDIAGFIELD = 1010,
+    SQL_API_SQLGETDIAGREC = 1011,
+    SQL_API_SQLGETENVATTR = 1012,
+    SQL_API_SQLGETFUNCTIONS = 44,
+    SQL_API_SQLGETINFO = 45,
+    SQL_API_SQLGETSTMTATTR = 1014,
+    SQL_API_SQLGETTYPEINFO = 47,
+    SQL_API_SQLNUMRESULTCOLS = 18,
+    SQL_API_SQLPREPARE = 19,
+    SQL_API_SQLPRIMARYKEYS = 65,
+    SQL_API_SQLROWCOUNT = 20,
+    SQL_API_SQLSETCONNECTATTR = 1016,
+    SQL_API_SQLSETENVATTR = 1019,
+    SQL_API_SQLSETSTMTATTR = 1020,
+    SQL_API_SQLTABLES = 54,
+}
 
 #[no_mangle]
 pub extern "system" fn SQLGetFunctions(
@@ -125,6 +131,7 @@ fn exists_function(function_id: SqlUSmallInt, supported: *mut SqlUSmallInt) -> S
 static FUNCTION_SET: OnceLock<HashSet<SqlUSmallInt>> = OnceLock::new();
 
 fn get_function_set() -> &'static HashSet<SqlUSmallInt> {
+    use SqlApiFunction::*;
     FUNCTION_SET.get_or_init(|| {
         HashSet::from([
             SQL_API_SQLALLOCHANDLE,
@@ -132,6 +139,7 @@ fn get_function_set() -> &'static HashSet<SqlUSmallInt> {
             SQL_API_SQLBINDPARAMETER,
             SQL_API_SQLCOLATTRIBUTE,
             SQL_API_SQLCOLUMNS,
+            SQL_API_SQLCONNECT,
             SQL_API_SQLDESCRIBECOL,
             SQL_API_SQLDISCONNECT,
             SQL_API_SQLDRIVERCONNECT,
@@ -158,5 +166,8 @@ fn get_function_set() -> &'static HashSet<SqlUSmallInt> {
             SQL_API_SQLSETSTMTATTR,
             SQL_API_SQLTABLES,
         ])
+        .iter()
+        .map(|e| *e as SqlUSmallInt)
+        .collect()
     })
 }
