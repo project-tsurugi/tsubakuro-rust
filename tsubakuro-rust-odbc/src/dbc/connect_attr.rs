@@ -132,7 +132,13 @@ fn set_connect_attr(
             dbc.set_connection_timeout(value)
         }
         SQL_ATTR_ANSI_APP => {
-            debug!("{dbc}.{FUNCTION_NAME}: {:?}={:?}", attribute, value_ptr);
+            let value = value_ptr as SqlInteger;
+            let value = match value {
+                1 => "SQL_AA_TRUE",
+                0 => "SQL_AA_FALSE",
+                _ => &value.to_string(),
+            };
+            debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
             SqlReturn::SQL_SUCCESS
         }
     }
