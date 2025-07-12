@@ -21,14 +21,16 @@ pub(crate) fn env_logger_init() {
 fn env_logger_init_main() -> Result<(), Box<dyn std::error::Error>> {
     let mut builder = Builder::new();
 
-    if let Ok(filters) = std::env::var("TSURUGI_ODBC_DRIVER_LOGLEVEL") {
+    if let Ok(filters) = std::env::var("TSURUGI_ODBC_DRIVER_LOG_LEVEL") {
         builder.parse_filters(&filters);
     } else {
         return Ok(());
     }
 
-    if let Ok(path) = std::env::var("TSURUGI_ODBC_DRIVER_LOGFILE") {
-        env_logger_init_file(&mut builder, &path)?
+    if let Ok(path) = std::env::var("TSURUGI_ODBC_DRIVER_LOG_FILE") {
+        if !path.trim().is_empty() {
+            env_logger_init_file(&mut builder, &path)?
+        }
     }
 
     builder.format_timestamp_millis();
