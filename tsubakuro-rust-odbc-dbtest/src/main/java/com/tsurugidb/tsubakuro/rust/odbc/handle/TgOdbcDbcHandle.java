@@ -120,7 +120,6 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         SQL_ATTR_AUTOCOMMIT(102), //
         SQL_ATTR_LOGIN_TIMEOUT(103), //
         SQL_ATTR_CONNECTION_TIMEOUT(113), //
-        SQL_ATTR_ANSI_APP(115), //
 
         ;
 
@@ -138,7 +137,6 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         case SQL_ATTR_AUTOCOMMIT:
         case SQL_ATTR_LOGIN_TIMEOUT:
         case SQL_ATTR_CONNECTION_TIMEOUT:
-        case SQL_ATTR_ANSI_APP:
             valuePtr = MemorySegment.ofAddress((Integer) value);
             break;
         default:

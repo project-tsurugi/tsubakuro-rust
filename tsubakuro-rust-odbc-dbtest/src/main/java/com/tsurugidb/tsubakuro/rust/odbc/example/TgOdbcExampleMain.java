@@ -12,7 +12,6 @@ import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcAttrConst;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcEnvHandle;
-//import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle.ConnectionAttribute;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
 
 public class TgOdbcExampleMain {
@@ -36,8 +35,6 @@ public class TgOdbcExampleMain {
                 henv.setEnvAttr(OdbcAttrConst.SQL_ATTR_ODBC_VERSION, OdbcAttrConst.SQL_OV_ODBC3);
                 try (var hdbc = TgOdbcDbcHandle.allocDbcHandle(henv)) {
                     LOG.info("hdbc={}", hdbc);
-
-//                  hdbc.setConnectAttr(ConnectionAttribute.SQL_ATTR_ANSI_APP, 0, wideChar);
 
                     String connectionString = "DRIVER=Tsurugi Driver;Endpoint=" + endpoint;
                     LOG.info("connectionString={}", connectionString);
