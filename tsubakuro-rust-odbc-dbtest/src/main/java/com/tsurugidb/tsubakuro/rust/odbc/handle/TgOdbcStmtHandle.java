@@ -49,17 +49,17 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
     private void getTypeInfoA(short dataType) throws Throwable {
         MemorySegment statementHandle = handleAddress();
 
-        short result = (short) OdbcFunction.sqlGetTypeInfoA.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlGetTypeInfoA.invoke(statementHandle, //
                 dataType);
-        SqlReturn.check("SQLGetTypeInfoW", result, this);
+        SqlReturn.check("SQLGetTypeInfoW", rc, this);
     }
 
     private void getTypeInfoW(short dataType) throws Throwable {
         MemorySegment statementHandle = handleAddress();
 
-        short result = (short) OdbcFunction.sqlGetTypeInfoW.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlGetTypeInfoW.invoke(statementHandle, //
                 dataType);
-        SqlReturn.check("SQLGetTypeInfoW", result, this);
+        SqlReturn.check("SQLGetTypeInfoW", rc, this);
     }
 
     public void tables(boolean wideChar) {
@@ -86,12 +86,12 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment tableType = manager.allocateUtf8(type);
         short tableTypeLength = 5;
 
-        short result = (short) OdbcFunction.sqlTablesA.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlTablesA.invoke(statementHandle, //
                 allStr, length, // catalogName
                 allStr, length, // schemaName
                 allStr, length, // tableName
                 tableType, tableTypeLength);
-        SqlReturn.check("SQLTablesA", result, this);
+        SqlReturn.check("SQLTablesA", rc, this);
     }
 
     private void tablesW() throws Throwable {
@@ -104,12 +104,12 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment tableType = manager.allocateUtf16(type);
         short tableTypeLength = 5;
 
-        short result = (short) OdbcFunction.sqlTablesW.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlTablesW.invoke(statementHandle, //
                 allStr, length, // catalogName
                 allStr, length, // schemaName
                 allStr, length, // tableName
                 tableType, tableTypeLength);
-        SqlReturn.check("SQLTablesW", result, this);
+        SqlReturn.check("SQLTablesW", rc, this);
     }
 
     public void columns(String tableName, boolean wideChar) {
@@ -136,13 +136,13 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         short length = 0;
         MemorySegment tableNamePtr = manager.allocateUtf8(tableName);
 
-        short result = (short) OdbcFunction.sqlColumnsA.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlColumnsA.invoke(statementHandle, //
                 allStr, length, // catalogName
                 allStr, length, // schemaName
                 tableNamePtr, tableNameLength, // tableName
                 allStr, length // columnName
         );
-        SqlReturn.check("SQLColumnsA", result, this);
+        SqlReturn.check("SQLColumnsA", rc, this);
     }
 
     private void columnsW(String tableName, short tableNameLength) throws Throwable {
@@ -151,13 +151,13 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         short length = 0;
         MemorySegment tableNamePtr = manager.allocateUtf16(tableName);
 
-        short result = (short) OdbcFunction.sqlColumnsW.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlColumnsW.invoke(statementHandle, //
                 allStr, length, // catalogName
                 allStr, length, // schemaName
                 tableNamePtr, tableNameLength, // tableName
                 allStr, length // columnName
         );
-        SqlReturn.check("SQLColumnsW", result, this);
+        SqlReturn.check("SQLColumnsW", rc, this);
     }
 
     public record PrimaryKey(String databaseName, String schemaName, String tableName, String columnName, int keySeq, String pkName) {
@@ -188,12 +188,12 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         short length = 0;
         MemorySegment tableNamePtr = manager.allocateUtf8(tableName);
 
-        short result = (short) OdbcFunction.sqlPrimaryKeysA.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlPrimaryKeysA.invoke(statementHandle, //
                 allStr, length, // catalogName
                 allStr, length, // schemaName
                 tableNamePtr, tableNameLength // tableName
         );
-        SqlReturn.check("SQLPrimaryKeysA", result, this);
+        SqlReturn.check("SQLPrimaryKeysA", rc, this);
     }
 
     private void primaryKeysW(String tableName, short tableNameLength) throws Throwable {
@@ -202,17 +202,17 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         short length = 0;
         MemorySegment tableNamePtr = manager.allocateUtf16(tableName);
 
-        short result = (short) OdbcFunction.sqlPrimaryKeysW.invoke(statementHandle, //
+        short rc = (short) OdbcFunction.sqlPrimaryKeysW.invoke(statementHandle, //
                 allStr, length, // catalogName
                 allStr, length, // schemaName
                 tableNamePtr, tableNameLength // tableName
         );
-        SqlReturn.check("SQLPrimaryKeysW", result, this);
+        SqlReturn.check("SQLPrimaryKeysW", rc, this);
     }
 
     public void execDirect(String sql, boolean wideChar) {
-        short result = execDirect0(sql, OdbcConst.SQL_NTS, wideChar);
-        SqlReturn.check(wideChar ? "SQLExecDirectW" : "SQLExecDirectA", result, this);
+        short rc = execDirect0(sql, OdbcConst.SQL_NTS, wideChar);
+        SqlReturn.check(wideChar ? "SQLExecDirectW" : "SQLExecDirectA", rc, this);
     }
 
     public short execDirect0(String sql, int length, boolean wideChar) {
@@ -252,8 +252,8 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment statementPtr = manager.allocateUtf8(sql);
         short statementLength = OdbcConst.SQL_NTS;
 
-        short result = (short) OdbcFunction.sqlPrepareA.invoke(statementHandle, statementPtr, statementLength);
-        SqlReturn.check("SQLPrepareA", result, this);
+        short rc = (short) OdbcFunction.sqlPrepareA.invoke(statementHandle, statementPtr, statementLength);
+        SqlReturn.check("SQLPrepareA", rc, this);
     }
 
     private void prepareW(String sql) throws Throwable {
@@ -261,8 +261,8 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment statementPtr = manager.allocateUtf16(sql);
         short statementLength = OdbcConst.SQL_NTS;
 
-        short result = (short) OdbcFunction.sqlPrepareW.invoke(statementHandle, statementPtr, statementLength);
-        SqlReturn.check("SQLPrepareW", result, this);
+        short rc = (short) OdbcFunction.sqlPrepareW.invoke(statementHandle, statementPtr, statementLength);
+        SqlReturn.check("SQLPrepareW", rc, this);
     }
 
     public void bindParameter(int parameterNumber, TgOdbcBindParameter parameter) {
@@ -277,9 +277,9 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         long bufferLength = 0;
         MemorySegment strLenOrIndPtr = manager.allocateLong(parameter.lengthOrInd());
         try {
-            short result = (short) OdbcFunction.sqlBindParameter.invoke(statementHandle, parameterNumberValue, inputOutputType, valueType, parameterType, columnSize, decimalDigits, parameterValuePtr,
+            short rc = (short) OdbcFunction.sqlBindParameter.invoke(statementHandle, parameterNumberValue, inputOutputType, valueType, parameterType, columnSize, decimalDigits, parameterValuePtr,
                     bufferLength, strLenOrIndPtr);
-            SqlReturn.check("SQLBindParameter", result, this);
+            SqlReturn.check("SQLBindParameter", rc, this);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
@@ -290,8 +290,8 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
     public void execute() {
         MemorySegment statementHandle = handleAddress();
         try {
-            short result = (short) OdbcFunction.sqlExecute.invoke(statementHandle);
-            SqlReturn.check("SQLExecute", result, this);
+            short rc = (short) OdbcFunction.sqlExecute.invoke(statementHandle);
+            SqlReturn.check("SQLExecute", rc, this);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
@@ -303,15 +303,15 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
     public boolean fetch() {
         MemorySegment statementHandle = handleAddress();
         try {
-            short result = (short) OdbcFunction.sqlFetch.invoke(statementHandle);
-            switch (result) {
+            short rc = (short) OdbcFunction.sqlFetch.invoke(statementHandle);
+            switch (rc) {
             case SqlReturn.SQL_SUCCESS:
             case SqlReturn.SQL_SUCCESS_WITH_INFO:
                 return true;
             case SqlReturn.SQL_NO_DATA:
                 return false;
             default:
-                SqlReturn.check("SQLFetch", result, this);
+                SqlReturn.check("SQLFetch", rc, this);
                 return false;
             }
         } catch (RuntimeException | Error e) {
@@ -325,17 +325,15 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment statementHandle = handleAddress();
         MemorySegment countPtr = manager.allocateShort();
         try {
-            short result = (short) OdbcFunction.sqlNumResultCols.invoke(statementHandle, countPtr);
-            SqlReturn.check("SQLNumResultCols", result, this);
-
-            return countPtr.get(ValueLayout.JAVA_SHORT, 0);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Error e) {
+            short rc = (short) OdbcFunction.sqlNumResultCols.invoke(statementHandle, countPtr);
+            SqlReturn.check("SQLNumResultCols", rc, this);
+        } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
+
+        return countPtr.get(ValueLayout.JAVA_SHORT, 0);
     }
 
     public DescribeColumn describeCol(int columnNumber, boolean wideChar) {
@@ -365,9 +363,9 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment decimalDigitsPtr = manager.allocateShort();
         MemorySegment nullablePtr = manager.allocateShort();
 
-        short result = (short) OdbcFunction.sqlDescribeColA.invoke(statementHandle, (short) columnNumber, columnNamePtr, bufferLength, nameLengthPtr, dataTypePtr, columnSizePtr, decimalDigitsPtr,
+        short rc = (short) OdbcFunction.sqlDescribeColA.invoke(statementHandle, (short) columnNumber, columnNamePtr, bufferLength, nameLengthPtr, dataTypePtr, columnSizePtr, decimalDigitsPtr,
                 nullablePtr);
-        SqlReturn.check("SQLDescribeColA", result, this);
+        SqlReturn.check("SQLDescribeColA", rc, this);
 
         String columnName = TgOdbcManager.stringFromUtf8(columnNamePtr, nameLengthPtr);
         var dataType = SqlDataType.fromValue(dataTypePtr.get(ValueLayout.JAVA_SHORT, 0));
@@ -387,9 +385,9 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment decimalDigitsPtr = manager.allocateShort();
         MemorySegment nullablePtr = manager.allocateShort();
 
-        short result = (short) OdbcFunction.sqlDescribeColW.invoke(statementHandle, (short) columnNumber, columnNamePtr, bufferLength, nameLengthPtr, dataTypePtr, columnSizePtr, decimalDigitsPtr,
+        short rc = (short) OdbcFunction.sqlDescribeColW.invoke(statementHandle, (short) columnNumber, columnNamePtr, bufferLength, nameLengthPtr, dataTypePtr, columnSizePtr, decimalDigitsPtr,
                 nullablePtr);
-        SqlReturn.check("SQLDescribeColW", result, this);
+        SqlReturn.check("SQLDescribeColW", rc, this);
 
         String columnName = TgOdbcManager.stringFromUtf16(columnNamePtr, nameLengthPtr);
         var dataType = SqlDataType.fromValue(dataTypePtr.get(ValueLayout.JAVA_SHORT, 0));
@@ -420,13 +418,13 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
 
         try {
             if (wideChar) {
-                short result = (short) OdbcFunction.sqlColAttributeW.invoke(statementHandle, (short) columnNumber, arg.fieldIdentifier().value(), arg.characterAttributePtr(), arg.bufferLength(),
+                short rc = (short) OdbcFunction.sqlColAttributeW.invoke(statementHandle, (short) columnNumber, arg.fieldIdentifier().value(), arg.characterAttributePtr(), arg.bufferLength(),
                         arg.stringLengthPtr(), arg.numericAttributePtr());
-                SqlReturn.check("SQLColAttributeW", result, this);
+                SqlReturn.check("SQLColAttributeW", rc, this);
             } else {
-                short result = (short) OdbcFunction.sqlColAttributeA.invoke(statementHandle, (short) columnNumber, arg.fieldIdentifier().value(), arg.characterAttributePtr(), arg.bufferLength(),
+                short rc = (short) OdbcFunction.sqlColAttributeA.invoke(statementHandle, (short) columnNumber, arg.fieldIdentifier().value(), arg.characterAttributePtr(), arg.bufferLength(),
                         arg.stringLengthPtr(), arg.numericAttributePtr());
-                SqlReturn.check("SQLColAttributeA", result, this);
+                SqlReturn.check("SQLColAttributeA", rc, this);
             }
         } catch (RuntimeException | Error e) {
             throw e;
@@ -472,8 +470,8 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
      * @return data (nullable)
      */
     public <T> T getData(int columnNumber, TgOdbcGetDataArgument<T> arg) {
-        short result = getData0(columnNumber, arg);
-        SqlReturn.check("SQLGetData", result, this);
+        short rc = getData0(columnNumber, arg);
+        SqlReturn.check("SQLGetData", rc, this);
 
         if (arg.isDataNull()) {
             return null;
@@ -510,8 +508,8 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         long bufferSize = arg.bufferSize();
         MemorySegment lengthOrIndPtr = arg.lengthOrIndPtr();
         try {
-            short result = (short) OdbcFunction.sqlBindCol.invoke(statementHandle, columnNumberValue, targetTypeValue, valuePtr, bufferSize, lengthOrIndPtr);
-            SqlReturn.check("SQLBindCol", result, this);
+            short rc = (short) OdbcFunction.sqlBindCol.invoke(statementHandle, columnNumberValue, targetTypeValue, valuePtr, bufferSize, lengthOrIndPtr);
+            SqlReturn.check("SQLBindCol", rc, this);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
@@ -523,16 +521,31 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         MemorySegment statementHandle = handleAddress();
         MemorySegment rowCountPtr = manager.allocateLong();
         try {
-            short result = (short) OdbcFunction.sqlRowCount.invoke(statementHandle, rowCountPtr);
-            SqlReturn.check("SQLRowCount", result, this);
-
-            return rowCountPtr.get(ValueLayout.JAVA_LONG, 0);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Error e) {
+            short rc = (short) OdbcFunction.sqlRowCount.invoke(statementHandle, rowCountPtr);
+            SqlReturn.check("SQLRowCount", rc, this);
+        } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
+
+        return rowCountPtr.get(ValueLayout.JAVA_LONG, 0);
+    }
+
+    public boolean moreResults() {
+        MemorySegment statementHandle = handleAddress();
+        try {
+            short rc = (short) OdbcFunction.sqlMoreResults.invoke(statementHandle);
+            if (rc == SqlReturn.SQL_NO_DATA) {
+                return false;
+            }
+            SqlReturn.check("SQLMoreResults", rc, this);
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+
+        return true;
     }
 }

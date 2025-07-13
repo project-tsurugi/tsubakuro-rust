@@ -14,6 +14,7 @@ pub mod execute;
 pub mod fetch;
 pub mod get_data;
 pub mod get_type_info;
+pub mod more_results;
 pub mod num_result_cols;
 pub mod prepare;
 pub mod primary_keys;

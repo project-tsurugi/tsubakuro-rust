@@ -175,6 +175,10 @@ SQLを実行します。
 
 - Tsurugi ODBCドライバーの制約として、select文の実行結果の場合、SQLGetData関数を呼び出す順序はcolumn_numberの昇順でなければなりません。また、（同一行内で）同じcolumn_numberで再度SQLGetData関数を呼び出すことはできません。
 
+### SQLMoreResults
+
+ひとつのSQLExecDirectやSQLExecute関数で複数のSQLを実行した際に 次の実行結果へ移動する関数ですが、Tsurugiでは1回の呼び出しで複数のSQLを実行することはできないので、常にSQL_NO_DATAを返します。
+
 ## エラー関連
 
 ### SQLGetDiagRec

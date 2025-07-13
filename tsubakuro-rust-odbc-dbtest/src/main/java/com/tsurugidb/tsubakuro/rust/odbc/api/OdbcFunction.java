@@ -132,6 +132,9 @@ public class OdbcFunction {
     /** SQLRETURN SQLFreeHandle(SQLSMALLINT HandleType, SQLHANDLE Handle) */
     public static final MethodHandle sqlFreeHandle;
 
+    /** SQLRETURN SQLMoreResults(SQLHSTMT StatementHandle) */
+    public static final MethodHandle sqlMoreResults;
+
     /** SQLRETURN SQLNumResultCols(SQLHSTMT StatementHandle, SQLSMALLINT* ColumnCountPtr) */
     public static final MethodHandle sqlNumResultCols;
 
@@ -571,6 +574,15 @@ public class OdbcFunction {
                         ADDRESS // SQLHANDLE Handle
                 );
                 sqlFreeHandle = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLMoreResults").orElseThrow(() -> new RuntimeException("SQLMoreResults not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS // SQLHSTMT StatementHandle
+                );
+
+                sqlMoreResults = linker.downcallHandle(symbol, desc);
             }
             {
                 var symbol = lookup.find("SQLNumResultCols").orElseThrow(() -> new RuntimeException("SQLNumResultCols not found"));
