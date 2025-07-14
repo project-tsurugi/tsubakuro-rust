@@ -8,6 +8,7 @@ import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst;
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcFunction;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlReturn;
+import com.tsurugidb.tsubakuro.rust.odbc.stmt.FreeStmtOption;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument.FieldIdentifier;
@@ -547,5 +548,22 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         }
 
         return true;
+    }
+
+    public void freeStmt(FreeStmtOption option) {
+        MemorySegment statementHandle = handleAddress();
+        short optionValue = option.value();
+        try {
+            short rc = (short) OdbcFunction.sqlFreeStmt.invoke(statementHandle, optionValue);
+            SqlReturn.check("SQLFreeStmt", rc, this);
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (option == FreeStmtOption.SQL_DROP) {
+                clearHandleAddress();
+            }
+        }
     }
 }

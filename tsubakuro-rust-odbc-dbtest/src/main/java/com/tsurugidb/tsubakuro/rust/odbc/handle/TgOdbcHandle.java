@@ -54,6 +54,10 @@ public abstract class TgOdbcHandle extends TgOdbcResource {
         return this.handleAddress;
     }
 
+    protected void clearHandleAddress() {
+        this.handleAddress = null;
+    }
+
     public TgOdbcDiagRec getDiagRec(int recNumber) {
         return getDiagRec(recNumber, true);
     }

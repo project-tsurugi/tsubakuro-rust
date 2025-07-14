@@ -69,7 +69,10 @@ pub enum TsurugiOdbcError {
     SqlQueryResultAtomTypeError = 34206,
     SqlQueryResultCloseError = 34209,
     PreparedExecuteError = 35001,
-    EndTranError = 39001,
+    EndTranError = 38001,
+
+    // SQLFreeStmt
+    UnsupportedFreeStmtOption = 39001,
 }
 
 // for state
@@ -137,6 +140,9 @@ impl From<&TsurugiOdbcError> for &str {
             PreparedExecuteError => "HY000",
             //
             EndTranError => "HY000",
+
+            // SQLFreeStmt
+            UnsupportedFreeStmtOption => "HY092",
         }
     }
 }

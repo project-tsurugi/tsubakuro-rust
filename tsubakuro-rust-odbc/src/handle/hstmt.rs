@@ -108,6 +108,11 @@ impl TsurugiOdbcStmt {
         &self.bind_columns
     }
 
+    pub(crate) fn clear_bind_columns(&mut self) -> SqlReturn {
+        self.bind_columns.clear();
+        SqlReturn::SQL_SUCCESS
+    }
+
     pub(crate) fn set_parameter(&mut self, parameter: TsurugiOdbcBindParameter) {
         let index = parameter.parameter_number() as usize - 1;
         while index >= self.parameters.len() {
@@ -119,6 +124,11 @@ impl TsurugiOdbcStmt {
 
     pub(crate) fn parameters(&self) -> &Vec<Option<TsurugiOdbcBindParameter>> {
         &self.parameters
+    }
+
+    pub(crate) fn clear_parameters(&mut self) -> SqlReturn {
+        self.parameters.clear();
+        SqlReturn::SQL_SUCCESS
     }
 
     pub(crate) fn set_prepare(&mut self, prepare: TsurugiOdbcPrepare) {
@@ -163,7 +173,7 @@ impl TsurugiOdbcStmt {
         }
     }
 
-    fn close_processor(&mut self) -> SqlReturn {
+    pub(crate) fn close_processor(&mut self) -> SqlReturn {
         if let Some(processor) = self.processor.take() {
             processor.borrow_mut().dispose(self)
         } else {

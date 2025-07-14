@@ -12,6 +12,7 @@ pub mod describe_col;
 pub mod exec_direct;
 pub mod execute;
 pub mod fetch;
+pub mod free_stmt;
 pub mod get_data;
 pub mod get_type_info;
 pub mod more_results;

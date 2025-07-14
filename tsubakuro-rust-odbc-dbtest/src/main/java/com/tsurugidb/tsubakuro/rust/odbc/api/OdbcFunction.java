@@ -84,6 +84,9 @@ public class OdbcFunction {
     /** SQLRETURN SQLFetch(SQLHSTMT StatementHandle) */
     public static final MethodHandle sqlFetch;
 
+    /** SQLRETURN SQLFreeStmt(SQLHSTMT StatementHandle, SQLUSMALLINT Option) */
+    public static final MethodHandle sqlFreeStmt;
+
     /** SQLRETURN SQLGetConnectAttrA(SQLHDBC ConnectionHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER BufferLength, SQLINTEGER* StringLengthPtr) */
     public static final MethodHandle sqlGetConnectAttrA;
     /** SQLRETURN SQLGetConnectAttrW(SQLHDBC ConnectionHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER BufferLength, SQLINTEGER* StringLengthPtr) */
@@ -411,6 +414,16 @@ public class OdbcFunction {
                 );
 
                 sqlFetch = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLFreeStmt").orElseThrow(() -> new RuntimeException("SQLFreeStmt not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHSTMT StatementHandle
+                        JAVA_SHORT // SQLUSMALLINT Option
+                );
+
+                sqlFreeStmt = linker.downcallHandle(symbol, desc);
             }
             {
                 var symbol = lookup.find("SQLGetConnectAttrA").orElseThrow(() -> new RuntimeException("SQLGetConnectAttrA not found"));

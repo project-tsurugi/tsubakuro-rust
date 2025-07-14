@@ -18,6 +18,10 @@ Tsurugi ODBCドライバーが対応しているODBC関数を示します。
 
 ハンドルを解放します。
 
+### SQLFreeStmt
+
+hstmtの各種クローズ処理を行います。
+
 ### SQLSetEnvAttr・SQLGetEnvAttr
 
 henvの属性を設定・取得します。
