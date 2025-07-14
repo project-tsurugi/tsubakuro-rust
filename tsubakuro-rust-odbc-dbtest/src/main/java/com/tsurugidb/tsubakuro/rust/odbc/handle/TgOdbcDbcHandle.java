@@ -7,6 +7,7 @@ import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcConnection;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcFunction;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlReturn;
+import com.tsurugidb.tsubakuro.rust.odbc.dbc.ConnectionAttribute;
 import com.tsurugidb.tsubakuro.rust.odbc.dbc.InfoType;
 import com.tsurugidb.tsubakuro.rust.odbc.dbc.TgOdbcDriverConnectArgument;
 
@@ -71,12 +72,12 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         MemorySegment infoValuePtr = manager.allocateBytes(bufferLengthValue);
         MemorySegment stringLengthPtr = manager.allocateShort();
 
-        short result;
+        short rc;
         try {
             if (wideChar) {
-                result = (short) OdbcFunction.sqlGetInfoW.invoke(connectionHandle, infoTypeValue, infoValuePtr, bufferLengthValue, stringLengthPtr);
+                rc = (short) OdbcFunction.sqlGetInfoW.invoke(connectionHandle, infoTypeValue, infoValuePtr, bufferLengthValue, stringLengthPtr);
             } else {
-                result = (short) OdbcFunction.sqlGetInfoA.invoke(connectionHandle, infoTypeValue, infoValuePtr, bufferLengthValue, stringLengthPtr);
+                rc = (short) OdbcFunction.sqlGetInfoA.invoke(connectionHandle, infoTypeValue, infoValuePtr, bufferLengthValue, stringLengthPtr);
             }
         } catch (RuntimeException | Error e) {
             throw e;
@@ -85,7 +86,7 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         }
 
         short stringLength = stringLengthPtr.get(ValueLayout.JAVA_SHORT, 0);
-        return new GetInfoResult<>(result, infoType, infoValuePtr, stringLength, wideChar);
+        return new GetInfoResult<>(rc, infoType, infoValuePtr, stringLength, wideChar);
     }
 
     public TgOdbcConnection driverConnect(String connectionString, boolean wideChar) {
@@ -93,13 +94,13 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
                 .inConnectionString(connectionString) //
                 .bufferLength(connectionString.length() * 2);
 
-        short result = driverConnect(arg);
-        SqlReturn.check(wideChar ? "SQLDriverConnectW" : "SQLDriverConnectA", result, this);
+        short rc = driverConnect0(arg);
+        SqlReturn.check(wideChar ? "SQLDriverConnectW" : "SQLDriverConnectA", rc, this);
 
         return new TgOdbcConnection(this, arg.outConnectionString());
     }
 
-    public short driverConnect(TgOdbcDriverConnectArgument arg) {
+    public short driverConnect0(TgOdbcDriverConnectArgument arg) {
         MemorySegment connectionHandle = handleAddress();
         try {
             if (arg.wideChar()) {
@@ -116,37 +117,29 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         }
     }
 
-    public enum ConnectionAttribute {
-        SQL_ATTR_AUTOCOMMIT(102), //
-        SQL_ATTR_LOGIN_TIMEOUT(103), //
-        SQL_ATTR_CONNECTION_TIMEOUT(113), //
-
-        ;
-
-        private int value;
-
-        ConnectionAttribute(int value) {
-            this.value = value;
-        }
-    }
-
     public void setConnectAttr(ConnectionAttribute attribute, Object value, boolean wideChar) {
         MemorySegment valuePtr;
         int stringLength = 0;
-        switch (attribute) {
-        case SQL_ATTR_AUTOCOMMIT:
-        case SQL_ATTR_LOGIN_TIMEOUT:
-        case SQL_ATTR_CONNECTION_TIMEOUT:
+        switch (attribute.type()) {
+        case SQLUINTEGER:
             valuePtr = MemorySegment.ofAddress((Integer) value);
             break;
         default:
             throw new UnsupportedOperationException(attribute.name());
         }
+
+        short rc = setConnectAttr0(attribute, valuePtr, stringLength, wideChar);
+        SqlReturn.check(wideChar ? "SQLSetConnectAttrW" : "SQLSetConnectAttrA", rc, this);
+    }
+
+    private short setConnectAttr0(ConnectionAttribute attribute, MemorySegment valuePtr, int stringLength, boolean wideChar) {
+        MemorySegment connectionHandle = handleAddress();
+        int attributeValue = attribute.value();
         try {
             if (wideChar) {
-                setConnectAttrW(attribute, valuePtr, stringLength);
+                return (short) OdbcFunction.sqlSetConnectAttrW.invoke(connectionHandle, attributeValue, valuePtr, stringLength);
             } else {
-                setConnectAttrA(attribute, valuePtr, stringLength);
+                return (short) OdbcFunction.sqlSetConnectAttrA.invoke(connectionHandle, attributeValue, valuePtr, stringLength);
             }
         } catch (RuntimeException | Error e) {
             throw e;
@@ -155,86 +148,56 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         }
     }
 
-    private void setConnectAttrA(ConnectionAttribute attribute, MemorySegment valuePtr, int stringLength) throws Throwable {
-        MemorySegment connectionHandle = handleAddress();
-        int attributeValue = attribute.value;
-
-        short result = (short) OdbcFunction.sqlSetConnectAttrA.invoke(connectionHandle, attributeValue, valuePtr, stringLength);
-        SqlReturn.check("SQLSetConnectAttrA", result, this);
+    public int getConnectAttrInt(ConnectionAttribute attribute, boolean wideChar) {
+        return (int) getConnectAttr(attribute, wideChar);
     }
 
-    private void setConnectAttrW(ConnectionAttribute attribute, MemorySegment valuePtr, int stringLength) throws Throwable {
-        MemorySegment connectionHandle = handleAddress();
-        int attributeValue = attribute.value;
-
-        short result = (short) OdbcFunction.sqlSetConnectAttrW.invoke(connectionHandle, attributeValue, valuePtr, stringLength);
-        SqlReturn.check("SQLSetConnectAttrW", result, this);
-    }
-
-    public Object getConnectAttr(ConnectionAttribute attribute, boolean wideChar) {
+    private Object getConnectAttr(ConnectionAttribute attribute, boolean wideChar) {
         MemorySegment valuePtr;
         int bufferLength;
-        switch (attribute) {
-        case SQL_ATTR_AUTOCOMMIT:
-        case SQL_ATTR_LOGIN_TIMEOUT:
-        case SQL_ATTR_CONNECTION_TIMEOUT:
+        switch (attribute.type()) {
+        case SQLUINTEGER:
             valuePtr = manager.allocateInt();
             bufferLength = 4;
             break;
         default:
-            throw new UnsupportedOperationException(attribute.name());
+            throw new UnsupportedOperationException(attribute.type().name());
         }
+
+        MemorySegment stringLengthPtr = manager.allocateInt();
+
+        short rc = getConnectAttr0(attribute, valuePtr, bufferLength, stringLengthPtr, wideChar);
+        SqlReturn.check(wideChar ? "SQLGetConnectAttrW" : "SQLGetConnectAttrA", rc, this);
+
+        switch (attribute.type()) {
+        case SQLUINTEGER:
+            return valuePtr.get(ValueLayout.JAVA_INT, 0);
+        default:
+            throw new UnsupportedOperationException(attribute.type().name());
+        }
+    }
+
+    private short getConnectAttr0(ConnectionAttribute attribute, MemorySegment valuePtr, int bufferLength, MemorySegment stringLengthPtr, boolean wideChar) {
+        MemorySegment connectionHandle = handleAddress();
+        int attributeValue = attribute.value();
         try {
             if (wideChar) {
-                return getConnectAttrW(attribute, valuePtr, bufferLength);
+                return (short) OdbcFunction.sqlGetConnectAttrW.invoke(connectionHandle, attributeValue, valuePtr, bufferLength, stringLengthPtr);
             } else {
-                return getConnectAttrA(attribute, valuePtr, bufferLength);
+                return (short) OdbcFunction.sqlGetConnectAttrW.invoke(connectionHandle, attributeValue, valuePtr, bufferLength, stringLengthPtr);
             }
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private Object getConnectAttrA(ConnectionAttribute attribute, MemorySegment valuePtr, int bufferLength) throws Throwable {
-        MemorySegment connectionHandle = handleAddress();
-        int attributeValue = attribute.value;
-        MemorySegment stringLengthPtr = manager.allocateInt();
-
-        short result = (short) OdbcFunction.sqlGetConnectAttrA.invoke(connectionHandle, attributeValue, valuePtr, bufferLength, stringLengthPtr);
-        SqlReturn.check("SQLGetConnectAttrA", result, this);
-
-        return getConnectAttr(attribute, valuePtr, stringLengthPtr, false);
-    }
-
-    private Object getConnectAttrW(ConnectionAttribute attribute, MemorySegment valuePtr, int bufferLength) throws Throwable {
-        MemorySegment connectionHandle = handleAddress();
-        int attributeValue = attribute.value;
-        MemorySegment stringLengthPtr = manager.allocateInt();
-
-        short result = (short) OdbcFunction.sqlGetConnectAttrW.invoke(connectionHandle, attributeValue, valuePtr, bufferLength, stringLengthPtr);
-        SqlReturn.check("SQLGetConnectAttrW", result, this);
-
-        return getConnectAttr(attribute, valuePtr, stringLengthPtr, true);
-    }
-
-    private Object getConnectAttr(ConnectionAttribute attribute, MemorySegment valuePtr, MemorySegment stringLengthPtr, boolean wideChar) {
-        switch (attribute) {
-        case SQL_ATTR_AUTOCOMMIT:
-        case SQL_ATTR_LOGIN_TIMEOUT:
-        case SQL_ATTR_CONNECTION_TIMEOUT:
-            return valuePtr.get(ValueLayout.JAVA_INT, 0);
-        default:
-            throw new UnsupportedOperationException(attribute.name());
         }
     }
 
     public void disconnect() {
         MemorySegment connectionHandle = handleAddress();
         try {
-            short result = (short) OdbcFunction.sqlDisconnect.invoke(connectionHandle);
-            SqlReturn.check("SQLDisconnect", result, this);
+            short rc = (short) OdbcFunction.sqlDisconnect.invoke(connectionHandle);
+            SqlReturn.check("SQLDisconnect", rc, this);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Throwable e) {

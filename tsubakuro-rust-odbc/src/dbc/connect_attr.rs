@@ -20,11 +20,26 @@ enum ConnectionAttribute {
     SQL_ATTR_LOGIN_TIMEOUT = 103,
     SQL_ATTR_CONNECTION_TIMEOUT = 113,
     SQL_ATTR_ANSI_APP = 115,
+    SQL_ATTR_CONNECTION_DEAD = 1209,
 }
 
 // SQL_ATTR_AUTOCOMMIT
-const SQL_AUTOCOMMIT_OFF: SqlUInteger = 0;
-const SQL_AUTOCOMMIT_ON: SqlUInteger = 1;
+#[repr(u32)]
+#[derive(Debug, Clone, Copy)]
+#[allow(non_camel_case_types)]
+enum AutoCommit {
+    SQL_AUTOCOMMIT_OFF = 0,
+    SQL_AUTOCOMMIT_ON = 1,
+}
+
+// SQL_ATTR_CONNECTION_DEAD
+#[repr(u32)]
+#[derive(Debug, Clone, Copy)]
+#[allow(non_camel_case_types)]
+enum ConnectionDead {
+    SQL_CD_TRUE = 1,
+    SQL_CD_FALSE = 0,
+}
 
 impl TryFrom<i32> for ConnectionAttribute {
     type Error = TsurugiOdbcError;
@@ -36,6 +51,7 @@ impl TryFrom<i32> for ConnectionAttribute {
             103 => Ok(SQL_ATTR_LOGIN_TIMEOUT),
             113 => Ok(SQL_ATTR_CONNECTION_TIMEOUT),
             115 => Ok(SQL_ATTR_ANSI_APP),
+            1209 => Ok(SQL_ATTR_CONNECTION_DEAD),
             _ => Err(TsurugiOdbcError::InvalidAttribute),
         }
     }
@@ -114,7 +130,7 @@ fn set_connect_attr(
     attribute: ConnectionAttribute,
     value_ptr: SqlPointer,
     _string_length: SqlInteger,
-    _wide_char: bool,
+    wide_char: bool,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "set_connect_attr()";
 
@@ -122,7 +138,7 @@ fn set_connect_attr(
     match attribute {
         SQL_ATTR_AUTOCOMMIT => {
             let value = value_ptr as SqlUInteger;
-            let value = value != SQL_AUTOCOMMIT_OFF;
+            let value = value != AutoCommit::SQL_AUTOCOMMIT_OFF as SqlUInteger;
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
             dbc.set_auto_commit(value)
         }
@@ -140,6 +156,25 @@ fn set_connect_attr(
             };
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
             SqlReturn::SQL_SUCCESS
+        }
+        SQL_ATTR_CONNECTION_DEAD => {
+            warn!(
+                "{dbc}.{FUNCTION_NAME}: Unsupported attribute {:?}",
+                attribute
+            );
+            let odbc_function_name = if wide_char {
+                "SetConnectAttrW()"
+            } else {
+                "SetConnectAttr()"
+            };
+            dbc.add_diag(
+                TsurugiOdbcError::InvalidAttribute,
+                format!(
+                    "{odbc_function_name}: Unsupported attribute {:?}",
+                    attribute
+                ),
+            );
+            SqlReturn::SQL_ERROR
         }
     }
 }
@@ -218,7 +253,7 @@ fn get_connect_attr(
     value_ptr: SqlPointer,
     _buffer_length: SqlInteger,
     _string_length_ptr: *mut SqlInteger,
-    _wide_char: bool,
+    wide_char: bool,
 ) -> SqlReturn {
     const FUNCTION_NAME: &str = "get_connect_attr()";
 
@@ -231,26 +266,26 @@ fn get_connect_attr(
     use ConnectionAttribute::*;
     match attribute {
         SQL_ATTR_AUTOCOMMIT => {
-            let auto_commit = dbc.auto_commit();
-            debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, auto_commit);
-            let value = if auto_commit {
-                SQL_AUTOCOMMIT_ON
-            } else {
-                SQL_AUTOCOMMIT_OFF
-            };
-            write_uinteger(value, value_ptr)
+            let value = get_auto_commit(&dbc);
+            debug!("{dbc}.{FUNCTION_NAME}: {:?}={:?}", attribute, value);
+            write_uinteger(value as SqlUInteger, value_ptr)
         }
         SQL_ATTR_LOGIN_TIMEOUT | SQL_ATTR_CONNECTION_TIMEOUT => {
             let value = dbc.connection_timeout();
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
             write_uinteger(value, value_ptr)
         }
-        _ => {
+        SQL_ATTR_CONNECTION_DEAD => {
+            let value = get_connection_dead(&dbc);
+            debug!("{dbc}.{FUNCTION_NAME}: {:?}={:?}", attribute, value);
+            write_uinteger(value as SqlUInteger, value_ptr)
+        }
+        SQL_ATTR_ANSI_APP => {
             warn!(
                 "{dbc}.{FUNCTION_NAME}: Unsupported attribute {:?}",
                 attribute
             );
-            let odbc_function_name = if _wide_char {
+            let odbc_function_name = if wide_char {
                 "GetConnectAttrW()"
             } else {
                 "GetConnectAttr()"
@@ -265,6 +300,27 @@ fn get_connect_attr(
             SqlReturn::SQL_ERROR
         }
     }
+}
+
+fn get_auto_commit(dbc: &Arc<TsurugiOdbcDbc>) -> AutoCommit {
+    let value = dbc.auto_commit();
+    if value {
+        AutoCommit::SQL_AUTOCOMMIT_ON
+    } else {
+        AutoCommit::SQL_AUTOCOMMIT_OFF
+    }
+}
+
+fn get_connection_dead(dbc: &Arc<TsurugiOdbcDbc>) -> ConnectionDead {
+    if let Some(session) = dbc.session() {
+        // FIXME session.is_alive()
+        if session.is_closed() || session.is_shutdowned() {
+            // fall through
+        } else {
+            return ConnectionDead::SQL_CD_FALSE;
+        }
+    }
+    ConnectionDead::SQL_CD_TRUE
 }
 
 fn write_uinteger(value: SqlUInteger, value_ptr: SqlPointer) -> SqlReturn {

@@ -1,9 +1,9 @@
 package com.tsurugidb.tsubakuro.rust.odbc;
 
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcAttrConst;
+import com.tsurugidb.tsubakuro.rust.odbc.dbc.ConnectionAttribute;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
-import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle.ConnectionAttribute;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcHandle.CompletionType;
 
 public class TgOdbcConnection extends TgOdbcResource {
@@ -47,7 +47,7 @@ public class TgOdbcConnection extends TgOdbcResource {
     }
 
     public boolean autoCommit(boolean wideChar) {
-        int value = (Integer) dbc.getConnectAttr(ConnectionAttribute.SQL_ATTR_AUTOCOMMIT, wideChar);
+        int value = dbc.getConnectAttrInt(ConnectionAttribute.SQL_ATTR_AUTOCOMMIT, wideChar);
         return value != OdbcAttrConst.SQL_AUTOCOMMIT_OFF;
     }
 

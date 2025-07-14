@@ -26,7 +26,7 @@ class SQLDriverConnectTest extends TgOdbcTester {
                     .inConnectionString(inConnectionString) //
                     .bufferLength(length * 2);
 
-            short rc = dbc.driverConnect(arg);
+            short rc = dbc.driverConnect0(arg);
             try {
                 assertEquals(SqlReturn.SQL_SUCCESS, rc);
 
@@ -53,7 +53,7 @@ class SQLDriverConnectTest extends TgOdbcTester {
                     .inConnectionString(inConnectionString, length) //
                     .bufferLength(length * 2);
 
-            short rc = dbc.driverConnect(arg);
+            short rc = dbc.driverConnect0(arg);
             try {
                 assertEquals(SqlReturn.SQL_SUCCESS, rc);
             } finally {
@@ -70,7 +70,7 @@ class SQLDriverConnectTest extends TgOdbcTester {
                     .inConnectionString(inConnectionString, length) //
                     .bufferLength(length * 2);
 
-            short rc = dbc.driverConnect(arg);
+            short rc = dbc.driverConnect0(arg);
             try {
                 assertEquals(SqlReturn.SQL_SUCCESS, rc);
 
@@ -94,7 +94,7 @@ class SQLDriverConnectTest extends TgOdbcTester {
                     .inConnectionString(inConnectionString) //
                     .bufferLength(length + 1);
 
-            short rc = dbc.driverConnect(arg);
+            short rc = dbc.driverConnect0(arg);
             try {
                 assertEquals(SqlReturn.SQL_SUCCESS, rc);
             } finally {
@@ -110,7 +110,7 @@ class SQLDriverConnectTest extends TgOdbcTester {
                     .inConnectionString(inConnectionString) //
                     .bufferLength(length);
 
-            short rc = dbc.driverConnect(arg);
+            short rc = dbc.driverConnect0(arg);
             try {
                 assertEquals(SqlReturn.SQL_SUCCESS_WITH_INFO, rc);
 
