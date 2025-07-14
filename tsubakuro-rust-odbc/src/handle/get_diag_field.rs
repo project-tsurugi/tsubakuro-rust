@@ -8,7 +8,7 @@ use crate::{
     },
     handle_type,
     util::{write_char, write_wchar_bytes},
-    DRIVER_NAME,
+    ODBC_DRIVER_NAME,
 };
 
 #[repr(i16)]
@@ -201,13 +201,13 @@ fn get_diag_field(
     };
 
     match diag_identifier {
-        SQL_DIAG_CLASS_ORIGIN => write_string(DRIVER_NAME, arg),
+        SQL_DIAG_CLASS_ORIGIN => write_string(ODBC_DRIVER_NAME, arg),
         SQL_DIAG_CONNECTION_NAME => write_string("TODO SQL_DIAG_CONNECTION_NAME", arg), // TODO SQL_DIAG_CONNECTION_NAME
         SQL_DIAG_MESSAGE_TEXT => write_string(diag.message(), arg),
         SQL_DIAG_NATIVE => write_integer(diag.error_code() as SqlInteger, arg),
         SQL_DIAG_SERVER_NAME => write_string("TODO SQL_DIAG_SERVER_NAME", arg), // TODO SQL_DIAG_SERVER_NAME
         SQL_DIAG_SQLSTATE => write_string((&diag.error_code()).into(), arg),
-        SQL_DIAG_SUBCLASS_ORIGIN => write_string(DRIVER_NAME, arg),
+        SQL_DIAG_SUBCLASS_ORIGIN => write_string(ODBC_DRIVER_NAME, arg),
         _ => {
             warn!(
                 "{FUNCTION_NAME} error. Unsupported diag_identifier: {:?}",

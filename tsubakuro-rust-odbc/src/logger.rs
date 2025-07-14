@@ -3,7 +3,7 @@ use std::sync::Once;
 use env_logger::{Builder, Target};
 use log::trace;
 
-use crate::DRIVER_NAME;
+use crate::ODBC_DRIVER_NAME;
 
 static ENV_LOGGER_INIT: Once = Once::new();
 
@@ -36,7 +36,7 @@ fn env_logger_init_main() -> Result<(), Box<dyn std::error::Error>> {
     builder.format_timestamp_millis();
 
     if let Err(e) = builder.try_init() {
-        eprintln!("{DRIVER_NAME}: env_logger init fail. {}", e);
+        eprintln!("{ODBC_DRIVER_NAME}: env_logger init fail. {}", e);
         return Err(e.into());
     }
 
@@ -54,7 +54,7 @@ fn env_logger_init_file(
     {
         Ok(file) => file,
         Err(e) => {
-            eprintln!("{DRIVER_NAME}: log file open error. {}", e);
+            eprintln!("{ODBC_DRIVER_NAME}: log file open error. {}", e);
             return Err(e.into());
         }
     };

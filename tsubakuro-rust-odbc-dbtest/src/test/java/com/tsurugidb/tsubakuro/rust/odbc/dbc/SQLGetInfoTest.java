@@ -18,7 +18,7 @@ class SQLGetInfoTest extends TgOdbcTester {
         var dbc = getConnection().dbc();
 
         String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_NAME, 64, wideChar);
-        assertEquals("Tsurugi ODBC Driver", actual);
+        assertEquals("tsubakuro_rust_odbc.dll", actual);
     }
 
     @ParameterizedTest
