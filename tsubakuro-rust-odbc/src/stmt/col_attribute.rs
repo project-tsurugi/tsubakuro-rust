@@ -10,6 +10,7 @@ use crate::{
         diag::TsurugiOdbcError,
         hstmt::{HStmt, TsurugiOdbcStmt},
     },
+    stmt::get_type_info::unsigned_attribute,
     util::{write_char, write_wchar_bytes},
 };
 
@@ -305,7 +306,7 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
     use FieldIdentifier::*;
     match field_identifier {
         SQL_DESC_COUNT | SQL_COLUMN_COUNT => {
-            return write_integer(stmt, &arg, processor.number_of_columns() as SqlLen);
+            return write_numeric(stmt, &arg, processor.number_of_columns() as SqlLen);
         }
         _ => {}
     }
@@ -336,30 +337,30 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
     };
 
     match field_identifier {
-        SQL_DESC_AUTO_UNIQUE_VALUE => write_integer(stmt, &arg, SQL_FALSE as SqlLen),
+        SQL_DESC_AUTO_UNIQUE_VALUE => write_numeric(stmt, &arg, SQL_FALSE as SqlLen),
         SQL_DESC_BASE_COLUMN_NAME | SQL_DESC_LABEL | SQL_DESC_NAME | SQL_COLUMN_NAME => {
             write_string(stmt, &arg, column.column_name())
         }
         SQL_DESC_BASE_TABLE_NAME | SQL_DESC_TABLE_NAME => write_string(stmt, &arg, ""), // TODO table name
-        SQL_DESC_CASE_SENSITIVE => write_integer(stmt, &arg, SQL_TRUE as SqlLen),
+        SQL_DESC_CASE_SENSITIVE => write_numeric(stmt, &arg, SQL_TRUE as SqlLen),
         SQL_DESC_CATALOG_NAME => write_string(stmt, &arg, ""), // TODO catalog name
-        SQL_DESC_CONCISE_TYPE => write_integer(stmt, &arg, column.data_type() as SqlLen),
+        SQL_DESC_CONCISE_TYPE => write_numeric(stmt, &arg, column.data_type() as SqlLen),
         SQL_DESC_COUNT | SQL_COLUMN_COUNT => unreachable!(),
-        SQL_DESC_DISPLAY_SIZE => write_integer(stmt, &arg, column.column_size() as SqlLen),
+        SQL_DESC_DISPLAY_SIZE => write_numeric(stmt, &arg, column.column_size() as SqlLen),
         SQL_DESC_FIXED_PREC_SCALE => {
             let value = if column.decimal_digits() != 0 {
                 SQL_TRUE
             } else {
                 SQL_FALSE
             };
-            write_integer(stmt, &arg, value as SqlLen)
+            write_numeric(stmt, &arg, value as SqlLen)
         }
         SQL_DESC_LOCAL_TYPE_NAME => write_string(stmt, &arg, ""),
         // TODO SQL_DESC_LENGTH | SQL_COLUMN_LENGTH
         // TODO SQL_DESC_LITERAL_PREFIX
         // TODO SQL_DESC_LITERAL_SUFFIX
         SQL_DESC_NULLABLE | SQL_COLUMN_NULLABLE => {
-            write_integer(stmt, &arg, column.nullable() as SqlLen)
+            write_numeric(stmt, &arg, column.nullable() as SqlLen)
         }
         // TODO SQL_DESC_NUM_PREC_RADIX
         // TODO SQL_DESC_OCTET_LENGTH
@@ -370,7 +371,13 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
         // TODO SQL_DESC_TYPE
         // TODO SQL_DESC_TYPE_NAME
         // TODO SQL_DESC_UNNAMED
-        // TODO SQL_DESC_UNSIGNED
+        SQL_DESC_UNSIGNED => {
+            let value = match unsigned_attribute(&column.data_type()) {
+                Some(value) => value,
+                None => SQL_TRUE, // not numeric
+            };
+            write_numeric(stmt, &arg, value as SqlLen)
+        }
         // TODO SQL_DESC_UPDATABLE
         _ => {
             warn!(
@@ -418,7 +425,7 @@ fn write_string(
     }
 }
 
-fn write_integer(
+fn write_numeric(
     stmt: &TsurugiOdbcStmt,
     arg: &TsurugiOdbcColAttributeArguments,
     value: SqlLen,

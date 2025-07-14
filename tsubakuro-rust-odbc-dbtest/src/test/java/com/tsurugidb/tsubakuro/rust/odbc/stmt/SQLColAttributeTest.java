@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument.FieldIdentifier;
@@ -51,6 +52,10 @@ class SQLColAttributeTest extends TgOdbcTester {
             long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
             assertEquals(SqlDataType.SQL_INTEGER.value(), actual);
         }
+        {
+            long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_UNSIGNED, wideChar);
+            assertEquals(OdbcConst.SQL_FALSE, actual);
+        }
     }
 
     private void test2(TgOdbcStmtHandle stmt, boolean wideChar) {
@@ -63,6 +68,10 @@ class SQLColAttributeTest extends TgOdbcTester {
             long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
             assertEquals(SqlDataType.SQL_BIGINT.value(), actual);
         }
+        {
+            long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_UNSIGNED, wideChar);
+            assertEquals(OdbcConst.SQL_FALSE, actual);
+        }
     }
 
     private void test3(TgOdbcStmtHandle stmt, boolean wideChar) {
@@ -74,6 +83,10 @@ class SQLColAttributeTest extends TgOdbcTester {
         {
             long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
             assertEquals(SqlDataType.SQL_CHAR.value(), actual); // TODO SQL_VARCHAR
+        }
+        {
+            long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_UNSIGNED, wideChar);
+            assertEquals(OdbcConst.SQL_TRUE, actual);
         }
     }
 }

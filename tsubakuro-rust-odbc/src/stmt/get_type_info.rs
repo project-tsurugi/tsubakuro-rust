@@ -510,7 +510,7 @@ fn searchable(data_type: &SqlDataType) -> i32 {
     }
 }
 
-fn unsigned_attribute(data_type: &SqlDataType) -> Option<i32> {
+pub(crate) fn unsigned_attribute(data_type: &SqlDataType) -> Option<i32> {
     use SqlDataType::*;
     let ret = match data_type {
         SQL_NUMERIC | SQL_DECIMAL => SQL_FALSE,
