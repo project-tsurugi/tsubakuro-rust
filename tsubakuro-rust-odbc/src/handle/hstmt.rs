@@ -27,6 +27,7 @@ pub type HStmt = *const Mutex<TsurugiOdbcStmt>;
 pub struct TsurugiOdbcStmt {
     stmt_id: u64,
     dbc: Arc<TsurugiOdbcDbc>,
+    query_timeout: u64, // seconds
     name: String,
     bind_columns: Vec<Option<TsurugiOdbcGetDataArguments>>,
     parameters: Vec<Option<TsurugiOdbcBindParameter>>,
@@ -65,6 +66,7 @@ impl TsurugiOdbcStmt {
         TsurugiOdbcStmt {
             stmt_id: STMT_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed),
             dbc,
+            query_timeout: 0,
             name: "None".to_string(),
             bind_columns: Vec::new(),
             parameters: Vec::new(),
@@ -85,6 +87,14 @@ impl TsurugiOdbcStmt {
 
     pub(crate) fn sql_client(&self) -> Option<Arc<SqlClient>> {
         self.dbc.sql_client()
+    }
+
+    pub(crate) fn set_query_timeout(&mut self, value: u64) {
+        self.query_timeout = value;
+    }
+
+    pub(crate) fn query_timeout(&self) -> u64 {
+        self.query_timeout
     }
 
     pub(crate) fn set_name(&mut self, name: &str) {

@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use log::{debug, trace, warn};
 use tsubakuro_rust_core::prelude::*;
 
@@ -78,22 +80,27 @@ pub(crate) fn prepared_query(
     let sql_client = check_sql_client_or_err!(stmt);
     let runtime = stmt.runtime();
 
-    let query_result =
-        match runtime.block_on(sql_client.prepared_query(&transaction, ps, parameters)) {
-            Ok(result) => {
-                debug!("{stmt}.{FUNCTION_NAME}: prepared_query() succeeded");
-                result
-            }
-            Err(e) => {
-                warn!("{stmt}.{FUNCTION_NAME}: prepared_query() error. {:?}", e);
-                stmt.add_diag(
-                    TsurugiOdbcError::PreparedQueryError,
-                    format!("query error. {}", e),
-                );
-                stmt.rollback_if_auto_commit();
-                return Err(SqlReturn::SQL_ERROR);
-            }
-        };
+    let timeout = Duration::from_secs(stmt.query_timeout());
+    let query_result = match runtime.block_on(sql_client.prepared_query_for(
+        &transaction,
+        ps,
+        parameters,
+        timeout,
+    )) {
+        Ok(result) => {
+            debug!("{stmt}.{FUNCTION_NAME}: prepared_query() succeeded");
+            result
+        }
+        Err(e) => {
+            warn!("{stmt}.{FUNCTION_NAME}: prepared_query() error. {:?}", e);
+            stmt.add_diag(
+                TsurugiOdbcError::PreparedQueryError,
+                format!("query error. {}", e),
+            );
+            stmt.rollback_if_auto_commit();
+            return Err(SqlReturn::SQL_ERROR);
+        }
+    };
 
     let processor = TsurugiOdbcQueryResult::new(query_result, close_ps);
     stmt.set_processor(processor);
@@ -118,22 +125,27 @@ pub(crate) fn prepared_execute(
 
     let sql_client = check_sql_client!(stmt);
 
-    let execute_result =
-        match runtime.block_on(sql_client.prepared_execute(&transaction, ps, parameters)) {
-            Ok(result) => {
-                debug!("{stmt}.{FUNCTION_NAME}: prepared_execute() succeeded");
-                result
-            }
-            Err(e) => {
-                warn!("{stmt}.{FUNCTION_NAME}: prepared_execute() error. {:?}", e);
-                stmt.add_diag(
-                    TsurugiOdbcError::PreparedExecuteError,
-                    format!("SQL execute error. {}", e),
-                );
-                stmt.rollback_if_auto_commit();
-                return SqlReturn::SQL_ERROR;
-            }
-        };
+    let timeout = Duration::from_secs(stmt.query_timeout());
+    let execute_result = match runtime.block_on(sql_client.prepared_execute_for(
+        &transaction,
+        ps,
+        parameters,
+        timeout,
+    )) {
+        Ok(result) => {
+            debug!("{stmt}.{FUNCTION_NAME}: prepared_execute() succeeded");
+            result
+        }
+        Err(e) => {
+            warn!("{stmt}.{FUNCTION_NAME}: prepared_execute() error. {:?}", e);
+            stmt.add_diag(
+                TsurugiOdbcError::PreparedExecuteError,
+                format!("SQL execute error. {}", e),
+            );
+            stmt.rollback_if_auto_commit();
+            return SqlReturn::SQL_ERROR;
+        }
+    };
 
     let processor = TsurugiOdbcSqlExecuteResult::new(execute_result);
     stmt.set_processor(processor);

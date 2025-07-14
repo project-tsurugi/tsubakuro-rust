@@ -1,5 +1,5 @@
 use std::sync::{
-    atomic::{AtomicBool, AtomicU32, AtomicU64},
+    atomic::{AtomicBool, AtomicU64},
     Arc, Mutex, Weak,
 };
 
@@ -25,7 +25,7 @@ pub struct TsurugiOdbcDbc {
     dbc_id: u64,
     env: Weak<TsurugiOdbcEnv>,
     runtime: Arc<Runtime>,
-    connection_timeout: AtomicU32, // seconds
+    connection_timeout: AtomicU64, // seconds
     session: Mutex<Option<Arc<Session>>>,
     sql_client: Mutex<Option<Arc<SqlClient>>>,
     auto_commit: AtomicBool,
@@ -60,7 +60,7 @@ impl TsurugiOdbcDbc {
             dbc_id: DBC_ID_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed),
             env: Arc::downgrade(&env),
             runtime: Arc::new(runtime),
-            connection_timeout: AtomicU32::new(0),
+            connection_timeout: AtomicU64::new(0),
             session: Mutex::new(None),
             sql_client: Mutex::new(None),
             auto_commit: AtomicBool::new(true),
@@ -77,13 +77,13 @@ impl TsurugiOdbcDbc {
         &self.runtime
     }
 
-    pub(crate) fn set_connection_timeout(&self, connection_timeout: u32) -> SqlReturn {
+    pub(crate) fn set_connection_timeout(&self, connection_timeout: u64) -> SqlReturn {
         self.connection_timeout
             .store(connection_timeout, std::sync::atomic::Ordering::SeqCst);
         SqlReturn::SQL_SUCCESS
     }
 
-    pub(crate) fn connection_timeout(&self) -> u32 {
+    pub(crate) fn connection_timeout(&self) -> u64 {
         self.connection_timeout
             .load(std::sync::atomic::Ordering::SeqCst)
     }

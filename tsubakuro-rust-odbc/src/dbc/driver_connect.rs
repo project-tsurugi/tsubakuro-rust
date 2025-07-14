@@ -179,7 +179,7 @@ fn connect(dbc: &Arc<TsurugiOdbcDbc>, map: HashMap<String, String>) -> SqlReturn
 
     let runtime = dbc.runtime();
 
-    let timeout = Duration::from_secs(dbc.connection_timeout() as u64);
+    let timeout = Duration::from_secs(dbc.connection_timeout());
     let session = runtime.block_on(Session::connect_for(&connection_option, timeout));
     let session = match session {
         Ok(session) => {

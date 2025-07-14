@@ -124,6 +124,11 @@ public class OdbcFunction {
     /** SQLRETURN SQLGetInfoW(SQLHDBC ConnectionHandle, SQLUSMALLINT InfoType, SQLPOINTER InfoValuePtr, SQLSMALLINT BufferLength, SQLSMALLINT* StringLengthPtr) */
     public static final MethodHandle sqlGetInfoW;
 
+    /** SQLRETURN SQLGetStmtAttrA(SQLHSTMT StatementHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER BufferLength, SQLINTEGER* StringLengthPtr) */
+    public static final MethodHandle sqlGetStmtAttrA;
+    /** SQLRETURN SQLGetStmtAttrA(SQLHSTMT StatementHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER BufferLength, SQLINTEGER* StringLengthPtr) */
+    public static final MethodHandle sqlGetStmtAttrW;
+
     /** SQLRETURN SQLGetTypeInfoA(SQLHSTMT StatementHandle, SQLSMALLINT DataType) */
     public static final MethodHandle sqlGetTypeInfoA;
     /** SQLRETURN SQLGetTypeInfoW(SQLHSTMT StatementHandle, SQLSMALLINT DataType) */
@@ -165,6 +170,11 @@ public class OdbcFunction {
 
     /** SQLRETURN SQLSetEnvAttr(SQLHENV EnvironmentHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER StringLength); */
     public static final MethodHandle sqlSetEnvAttr;
+
+    /** SQLRETURN SQLSetStmtAttrA(SQLHSTMT StatementHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER StringLength) */
+    public static final MethodHandle sqlSetStmtAttrA;
+    /** SQLRETURN SQLSetStmtAttrA(SQLHSTMT StatementHandle, SQLINTEGER Attribute, SQLPOINTER ValuePtr, SQLINTEGER StringLength) */
+    public static final MethodHandle sqlSetStmtAttrW;
 
     /**
      * SQLRETURN SQLTablesA(SQLHSTMT hstmt, SQLCHAR* szCatalogName, SQLSMALLINT cbCatalogName, SQLCHAR* szSchemaName, SQLSMALLINT cbSchemaName, SQLCHAR* szTableName, SQLSMALLINT cbTableName, SQLCHAR*
@@ -552,6 +562,32 @@ public class OdbcFunction {
                 sqlGetInfoW = linker.downcallHandle(symbol, desc);
             }
             {
+                var symbol = lookup.find("SQLGetStmtAttrA").orElseThrow(() -> new RuntimeException("SQLGetStmtAttrA not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHSTMT StatementHandle
+                        JAVA_INT, // SQLINTEGER Attribute
+                        ADDRESS, // SQLPOINTER ValuePtr
+                        JAVA_INT, // SQLINTEGER BufferLength
+                        ADDRESS // SQLINTEGER* StringLengthPtr
+                );
+
+                sqlGetStmtAttrA = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLGetStmtAttrW").orElseThrow(() -> new RuntimeException("SQLGetStmtAttrW not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHSTMT StatementHandle
+                        JAVA_INT, // SQLINTEGER Attribute
+                        ADDRESS, // SQLPOINTER ValuePtr
+                        JAVA_INT, // SQLINTEGER BufferLength
+                        ADDRESS // SQLINTEGER* StringLengthPtr
+                );
+
+                sqlGetStmtAttrW = linker.downcallHandle(symbol, desc);
+            }
+            {
                 var symbol = lookup.find("SQLGetTypeInfoA").orElseThrow(() -> new RuntimeException("SQLGetTypeInfoA not found"));
 
                 var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
@@ -702,6 +738,30 @@ public class OdbcFunction {
                         JAVA_INT // SQLINTEGER StringLength
                 );
                 sqlSetEnvAttr = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLSetStmtAttrA").orElseThrow(() -> new RuntimeException("SQLSetStmtAttrA not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHSTMT StatementHandle
+                        JAVA_INT, // SQLINTEGER Attribute
+                        ADDRESS, // SQLPOINTER ValuePtr
+                        JAVA_INT // SQLINTEGER StringLength
+                );
+
+                sqlSetStmtAttrA = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLSetStmtAttrW").orElseThrow(() -> new RuntimeException("SQLSetStmtAttrW not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHSTMT StatementHandle
+                        JAVA_INT, // SQLINTEGER Attribute
+                        ADDRESS, // SQLPOINTER ValuePtr
+                        JAVA_INT // SQLINTEGER StringLength
+                );
+
+                sqlSetStmtAttrW = linker.downcallHandle(symbol, desc);
             }
             {
                 var symbol = lookup.find("SQLTablesA").orElseThrow(() -> new RuntimeException("SQLTablesA not found"));

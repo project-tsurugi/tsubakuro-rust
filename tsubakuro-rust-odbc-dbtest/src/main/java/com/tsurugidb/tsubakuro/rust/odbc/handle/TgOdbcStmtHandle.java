@@ -9,6 +9,7 @@ import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcFunction;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlReturn;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.FreeStmtOption;
+import com.tsurugidb.tsubakuro.rust.odbc.stmt.StatementAttribute;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument.FieldIdentifier;
@@ -61,6 +62,82 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         short rc = (short) OdbcFunction.sqlGetTypeInfoW.invoke(statementHandle, //
                 dataType);
         SqlReturn.check("SQLGetTypeInfoW", rc, this);
+    }
+
+    public void setStmtAttr(StatementAttribute attribute, Object value, boolean wideChar) {
+        MemorySegment valuePtr;
+        int stringLength = 0;
+        switch (attribute.type()) {
+        case SQLULEN:
+            valuePtr = MemorySegment.ofAddress((Long) value);
+            break;
+        default:
+            throw new UnsupportedOperationException(attribute.name());
+        }
+
+        short rc = setStmtAttr0(attribute, valuePtr, stringLength, wideChar);
+        SqlReturn.check(wideChar ? "SQLSetStmtAttrW" : "SQLSetStmtAttrA", rc, this);
+    }
+
+    private short setStmtAttr0(StatementAttribute attribute, MemorySegment valuePtr, int stringLength, boolean wideChar) {
+        MemorySegment connectionHandle = handleAddress();
+        int attributeValue = attribute.value();
+        try {
+            if (wideChar) {
+                return (short) OdbcFunction.sqlSetStmtAttrW.invoke(connectionHandle, attributeValue, valuePtr, stringLength);
+            } else {
+                return (short) OdbcFunction.sqlSetStmtAttrA.invoke(connectionHandle, attributeValue, valuePtr, stringLength);
+            }
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public long getStmtAttrLong(StatementAttribute attribute, boolean wideChar) {
+        return (long) getStmtAttr(attribute, wideChar);
+    }
+
+    private Object getStmtAttr(StatementAttribute attribute, boolean wideChar) {
+        MemorySegment valuePtr;
+        int bufferLength;
+        switch (attribute.type()) {
+        case SQLULEN:
+            valuePtr = manager.allocateLong();
+            bufferLength = 8;
+            break;
+        default:
+            throw new UnsupportedOperationException(attribute.type().name());
+        }
+
+        MemorySegment stringLengthPtr = manager.allocateInt();
+
+        short rc = getStmtAttr0(attribute, valuePtr, bufferLength, stringLengthPtr, wideChar);
+        SqlReturn.check(wideChar ? "SQLGetStmtAttrW" : "SQLGetStmtAttrA", rc, this);
+
+        switch (attribute.type()) {
+        case SQLULEN:
+            return valuePtr.get(ValueLayout.JAVA_LONG, 0);
+        default:
+            throw new UnsupportedOperationException(attribute.type().name());
+        }
+    }
+
+    private short getStmtAttr0(StatementAttribute attribute, MemorySegment valuePtr, int bufferLength, MemorySegment stringLengthPtr, boolean wideChar) {
+        MemorySegment connectionHandle = handleAddress();
+        int attributeValue = attribute.value();
+        try {
+            if (wideChar) {
+                return (short) OdbcFunction.sqlGetStmtAttrW.invoke(connectionHandle, attributeValue, valuePtr, bufferLength, stringLengthPtr);
+            } else {
+                return (short) OdbcFunction.sqlGetStmtAttrW.invoke(connectionHandle, attributeValue, valuePtr, bufferLength, stringLengthPtr);
+            }
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void tables(boolean wideChar) {

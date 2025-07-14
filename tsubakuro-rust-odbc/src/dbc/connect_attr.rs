@@ -143,7 +143,7 @@ fn set_connect_attr(
             dbc.set_auto_commit(value)
         }
         SQL_ATTR_LOGIN_TIMEOUT | SQL_ATTR_CONNECTION_TIMEOUT => {
-            let value = value_ptr as SqlUInteger;
+            let value = value_ptr as SqlUInteger as u64;
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
             dbc.set_connection_timeout(value)
         }
@@ -273,7 +273,7 @@ fn get_connect_attr(
         SQL_ATTR_LOGIN_TIMEOUT | SQL_ATTR_CONNECTION_TIMEOUT => {
             let value = dbc.connection_timeout();
             debug!("{dbc}.{FUNCTION_NAME}: {:?}={}", attribute, value);
-            write_uinteger(value, value_ptr)
+            write_uinteger(value as SqlUInteger, value_ptr)
         }
         SQL_ATTR_CONNECTION_DEAD => {
             let value = get_connection_dead(&dbc);
