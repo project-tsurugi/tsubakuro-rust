@@ -17,7 +17,7 @@ class SQLGetInfoTest extends TgOdbcTester {
     void SQL_DRIVER_NAME(boolean wideChar) {
         var dbc = getConnection().dbc();
 
-        String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_NAME, 64, wideChar);
+        String actual = dbc.getInfoString(InfoType.SQL_DRIVER_NAME, 64, wideChar);
         assertEquals("tsubakuro_rust_odbc.dll", actual);
     }
 
@@ -26,7 +26,7 @@ class SQLGetInfoTest extends TgOdbcTester {
     void SQL_DRIVER_VER(boolean wideChar) {
         var dbc = getConnection().dbc();
 
-        String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_VER, 32, wideChar);
+        String actual = dbc.getInfoString(InfoType.SQL_DRIVER_VER, 32, wideChar);
         assertNotNull(actual);
     }
 
@@ -35,7 +35,7 @@ class SQLGetInfoTest extends TgOdbcTester {
     void SQL_CURSOR_COMMIT_BEHAVIOR(boolean wideChar) {
         var dbc = getConnection().dbc();
 
-        int actual = dbc.getInfoTypeInt(InfoType.SQL_CURSOR_COMMIT_BEHAVIOR, wideChar);
+        int actual = dbc.getInfoInt(InfoType.SQL_CURSOR_COMMIT_BEHAVIOR, wideChar);
         assertEquals(0, actual);
     }
 
@@ -44,7 +44,7 @@ class SQLGetInfoTest extends TgOdbcTester {
     void SQL_CURSOR_ROLLBACK_BEHAVIOR(boolean wideChar) {
         var dbc = getConnection().dbc();
 
-        int actual = dbc.getInfoTypeInt(InfoType.SQL_CURSOR_ROLLBACK_BEHAVIOR, wideChar);
+        int actual = dbc.getInfoInt(InfoType.SQL_CURSOR_ROLLBACK_BEHAVIOR, wideChar);
         assertEquals(0, actual);
     }
 
@@ -53,7 +53,7 @@ class SQLGetInfoTest extends TgOdbcTester {
     void SQL_DRIVER_ODBC_VER(boolean wideChar) {
         var dbc = getConnection().dbc();
 
-        String actual = dbc.getInfoTypeString(InfoType.SQL_DRIVER_ODBC_VER, 32, wideChar);
+        String actual = dbc.getInfoString(InfoType.SQL_DRIVER_ODBC_VER, 32, wideChar);
         assertEquals("03.51", actual);
     }
 
@@ -62,7 +62,7 @@ class SQLGetInfoTest extends TgOdbcTester {
     void SQL_GETDATA_EXTENSIONS(boolean wideChar) {
         var dbc = getConnection().dbc();
 
-        int actual = dbc.getInfoTypeInt(InfoType.SQL_GETDATA_EXTENSIONS, wideChar);
+        int actual = dbc.getInfoInt(InfoType.SQL_GETDATA_EXTENSIONS, wideChar);
         assertEquals(0, actual);
     }
 
@@ -72,12 +72,12 @@ class SQLGetInfoTest extends TgOdbcTester {
         var dbc = getConnection().dbc();
 
         {
-            var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 6, wideChar);
+            var result = dbc.getInfo(InfoType.SQL_DRIVER_ODBC_VER, 6, wideChar);
             assertEquals(SqlReturn.SQL_SUCCESS, result.rc());
             assertEquals("03.51", result.infoValue());
         }
         {
-            var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 5, wideChar);
+            var result = dbc.getInfo(InfoType.SQL_DRIVER_ODBC_VER, 5, wideChar);
             assertEquals(SqlReturn.SQL_SUCCESS_WITH_INFO, result.rc());
 
             var rec = dbc.getDiagRec(1);
@@ -91,12 +91,12 @@ class SQLGetInfoTest extends TgOdbcTester {
         var dbc = getConnection().dbc();
 
         {
-            var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 6 * 2, wideChar);
+            var result = dbc.getInfo(InfoType.SQL_DRIVER_ODBC_VER, 6 * 2, wideChar);
             assertEquals(SqlReturn.SQL_SUCCESS, result.rc());
             assertEquals("03.51", result.infoValue());
         }
         {
-            var result = dbc.getInfoType(InfoType.SQL_DRIVER_ODBC_VER, 5 * 2, wideChar);
+            var result = dbc.getInfo(InfoType.SQL_DRIVER_ODBC_VER, 5 * 2, wideChar);
             assertEquals(SqlReturn.SQL_SUCCESS_WITH_INFO, result.rc());
 
             var rec = dbc.getDiagRec(1);

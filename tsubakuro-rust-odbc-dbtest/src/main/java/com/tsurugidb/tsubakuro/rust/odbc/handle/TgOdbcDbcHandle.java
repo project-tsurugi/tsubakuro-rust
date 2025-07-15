@@ -26,16 +26,16 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         return HandleType.SQL_HANDLE_DBC;
     }
 
-    public int getInfoTypeInt(InfoType<Integer> infoType, boolean wideChar) {
-        return getInfoTypeValue(infoType, infoType.bufferLength(), wideChar);
+    public int getInfoInt(InfoType<Integer> infoType, boolean wideChar) {
+        return getInfoValue(infoType, infoType.bufferLength(), wideChar);
     }
 
-    public String getInfoTypeString(InfoType<String> infoType, int bufferLength, boolean wideChar) {
-        return getInfoTypeValue(infoType, bufferLength, wideChar);
+    public String getInfoString(InfoType<String> infoType, int bufferLength, boolean wideChar) {
+        return getInfoValue(infoType, bufferLength, wideChar);
     }
 
-    private <T> T getInfoTypeValue(InfoType<T> infoType, int bufferLength, boolean wideChar) {
-        var result = getInfoType(infoType, bufferLength, wideChar);
+    private <T> T getInfoValue(InfoType<T> infoType, int bufferLength, boolean wideChar) {
+        var result = getInfo(infoType, bufferLength, wideChar);
         SqlReturn.check(wideChar ? "SQLGetInfoW" : "SQLGetInfoA", result.rc(), this);
 
         return result.infoValue();
@@ -65,7 +65,7 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         }
     }
 
-    public <T> GetInfoResult<T> getInfoType(InfoType<T> infoType, int bufferLength, boolean wideChar) {
+    public <T> GetInfoResult<T> getInfo(InfoType<T> infoType, int bufferLength, boolean wideChar) {
         MemorySegment connectionHandle = handleAddress();
         short infoTypeValue = infoType.infoType();
         short bufferLengthValue = (short) bufferLength;

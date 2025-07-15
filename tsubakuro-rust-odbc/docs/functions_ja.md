@@ -201,13 +201,6 @@ SQLを実行します。
 
 Tsurugi ODBCドライバーの情報を返します。
 
-対応している情報種別は以下の通りです。
-
-- SQL_CURSOR_COMMIT_BEHAVIOR
-- SQL_CURSOR_ROLLBACK_BEHAVIOR
-- SQL_DRIVER_ODBC_VER
-- SQL_GETDATA_EXTENSIONS
-
 ### SQLGetFunctions
 
 Tsurugi ODBCドライバーが対応しているODBC関数の一覧を返します。

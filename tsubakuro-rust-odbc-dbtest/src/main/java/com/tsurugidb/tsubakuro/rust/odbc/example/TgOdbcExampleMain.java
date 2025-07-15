@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcConnection;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcAttrConst;
+import com.tsurugidb.tsubakuro.rust.odbc.dbc.InfoType;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcEnvHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
@@ -41,6 +42,8 @@ public class TgOdbcExampleMain {
                     try (var connection = hdbc.driverConnect(connectionString, wideChar)) {
                         System.out.println("connected. " + connection);
 
+                        info(hdbc);
+
                         dropAndCreateTable(connection);
 
                         tables(connection);
@@ -60,6 +63,24 @@ public class TgOdbcExampleMain {
         }
 
         LOG.info("end");
+    }
+
+    static void info(TgOdbcDbcHandle hdbc) {
+        LOG.info("SQLGetInfo() start");
+
+        var list = List.of( //
+                InfoType.SQL_DRIVER_NAME, //
+                InfoType.SQL_DRIVER_VER, //
+                InfoType.SQL_DRIVER_ODBC_VER, //
+                InfoType.SQL_DBMS_NAME, //
+                InfoType.SQL_DBMS_VER //
+        );
+        for (var infoType : list) {
+            String value = hdbc.getInfoString(infoType, 1024, wideChar);
+            System.out.println(value);
+        }
+
+        LOG.info("SQLGetInfo() end");
     }
 
     static void dropAndCreateTable(TgOdbcConnection connection) {

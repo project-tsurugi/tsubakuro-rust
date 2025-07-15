@@ -9,8 +9,9 @@ use crate::{
         diag::TsurugiOdbcError,
         hdbc::{HDbc, TsurugiOdbcDbc},
     },
+    odbc_driver_version,
     util::{write_char, write_wchar_bytes},
-    ODBC_DRIVER_VERSION, TSURUGI_VERSION,
+    TSURUGI_VERSION,
 };
 
 #[repr(u16)]
@@ -33,6 +34,7 @@ pub enum InfoType {
     SQL_SERVER_NAME = 13,
     SQL_SEARCH_PATTERN_ESCAPE = 14,
     SQL_ODBC_SQL_CONFORMANCE = 15,
+    SQL_DATABASE_NAME = 16,
     SQL_DBMS_NAME = 17,
     SQL_DBMS_VER = 18,
     SQL_ACCESSIBLE_TABLES = 19,
@@ -407,6 +409,8 @@ impl TryFrom<u16> for InfoType {
     }
 }
 
+const SQL_TXN_SERIALIZABLE: SqlUInteger = 0x00000008;
+
 #[no_mangle]
 pub extern "system" fn SQLGetInfo(
     hdbc: HDbc,
@@ -523,24 +527,140 @@ impl SqlGetInfo {
         use InfoType::*;
         match info_type {
             SQL_DRIVER_NAME => self.write_string(info_type, "tsubakuro_rust_odbc.dll"), // TODO UNIXのときのDRIVER_NAME
-            SQL_DRIVER_VER => self.write_string(info_type, ODBC_DRIVER_VERSION),
+            SQL_DRIVER_VER => self.write_string(info_type, odbc_driver_version()),
             SQL_DRIVER_ODBC_VER => self.write_string(info_type, "03.51"),
             SQL_DBMS_NAME => self.write_string(info_type, "Tsurugi"),
             SQL_DBMS_VER => self.write_string(info_type, TSURUGI_VERSION), // TODO 接続中のTsurugiのバージョン
-            SQL_IDENTIFIER_QUOTE_CHAR => self.write_string(info_type, "\""),
+
+            SQL_ACCESSIBLE_PROCEDURES => self.write_string(info_type, "N"),
+            SQL_ACCESSIBLE_TABLES => self.write_string(info_type, "Y"),
+            SQL_ACTIVE_ENVIRONMENTS => self.write_usmallint(info_type, 0),
+            SQL_AGGREGATE_FUNCTIONS => self.write_uinteger(info_type, aggregate_functions()),
+            SQL_ALTER_DOMAIN | SQL_ALTER_TABLE => self.write_uinteger(info_type, 0),
+            // SQL_ASYNC_DBC_FUNCTIONS
+            SQL_ASYNC_MODE => {
+                self.write_uinteger(info_type, 0 /* SQL_AM_NONE */)
+            }
+            // SQL_ASYNC_NOTIFICATION
+            // TODO SQL_BATCH_ROW_COUNT
+            SQL_BATCH_SUPPORT => self.write_uinteger(info_type, 0),
+            SQL_BOOKMARK_PERSISTENCE => self.write_uinteger(info_type, 0),
             SQL_CATALOG_LOCATION => self.write_usmallint(info_type, 0), // TODO カタログがサポートされたらSQL_CL_STARTを返す
             SQL_CATALOG_NAME => self.write_string(info_type, "N"), // TODO カタログがサポートされたら"Y"を返す
             SQL_CATALOG_NAME_SEPARATOR => self.write_string(info_type, "."),
             SQL_CATALOG_TERM => self.write_string(info_type, "database"),
             SQL_CATALOG_USAGE => self.write_uinteger(info_type, 0), // TODO カタログがサポートされたらビットマスクを返す
+            SQL_COLLATION_SEQ => self.write_string(info_type, "UTF-8"),
+            SQL_COLUMN_ALIAS => self.write_string(info_type, "Y"),
+            SQL_CONCAT_NULL_BEHAVIOR => self.write_usmallint(info_type, 0 /* SQL_CB_NULL */),
+            SQL_CONVERT_BIGINT
+            | SQL_CONVERT_BINARY
+            | SQL_CONVERT_BIT
+            | SQL_CONVERT_CHAR
+            | SQL_CONVERT_GUID
+            | SQL_CONVERT_DATE
+            | SQL_CONVERT_DECIMAL
+            | SQL_CONVERT_DOUBLE
+            | SQL_CONVERT_FLOAT
+            | SQL_CONVERT_INTEGER
+            | SQL_CONVERT_INTERVAL_YEAR_MONTH
+            | SQL_CONVERT_INTERVAL_DAY_TIME
+            | SQL_CONVERT_LONGVARBINARY
+            | SQL_CONVERT_LONGVARCHAR
+            | SQL_CONVERT_NUMERIC
+            | SQL_CONVERT_REAL
+            | SQL_CONVERT_SMALLINT
+            | SQL_CONVERT_TIME
+            | SQL_CONVERT_TIMESTAMP
+            | SQL_CONVERT_TINYINT
+            | SQL_CONVERT_VARBINARY
+            | SQL_CONVERT_VARCHAR => self.write_uinteger(info_type, 0),
+            SQL_CONVERT_FUNCTIONS => self.write_uinteger(info_type, 0),
+            // TODO SQL_CORRELATION_NAME
+            SQL_CREATE_ASSERTION
+            | SQL_CREATE_CHARACTER_SET
+            | SQL_CREATE_COLLATION
+            | SQL_CREATE_DOMAIN
+            | SQL_CREATE_SCHEMA
+            | SQL_CREATE_TRANSLATION
+            | SQL_CREATE_VIEW => self.write_uinteger(info_type, 0),
+            SQL_CREATE_TABLE => {
+                const SQL_CT_CREATE_TABLE: SqlUInteger = 0x00000001;
+                const SQL_CT_COLUMN_DEFAULT: SqlUInteger = 0x00000400;
+                self.write_uinteger(info_type, SQL_CT_CREATE_TABLE | SQL_CT_COLUMN_DEFAULT)
+            }
             SQL_CURSOR_COMMIT_BEHAVIOR => {
                 self.write_usmallint(info_type, SqlCursorBehavior::SQL_CB_DELETE as SqlUSmallInt)
             }
             SQL_CURSOR_ROLLBACK_BEHAVIOR => {
                 self.write_usmallint(info_type, SqlCursorBehavior::SQL_CB_DELETE as SqlUSmallInt)
             }
+            SQL_CURSOR_SENSITIVITY => self.write_uinteger(info_type, 1 /* SQL_INSENSITIVE  */),
+            // TODO SQL_DATA_SOURCE_NAME
+            SQL_DATA_SOURCE_READ_ONLY => self.write_string(info_type, "N"),
+            SQL_DATABASE_NAME => self.write_string(info_type, ""), // TODO データベース名
+            SQL_DATETIME_LITERALS => {
+                const SQL_DL_SQL92_DATE: SqlUInteger = 0x00000001;
+                const SQL_DL_SQL92_TIME: SqlUInteger = 0x00000002;
+                const SQL_DL_SQL92_TIMESTAMP: SqlUInteger = 0x00000004;
+                self.write_uinteger(
+                    info_type,
+                    SQL_DL_SQL92_DATE | SQL_DL_SQL92_TIME | SQL_DL_SQL92_TIMESTAMP,
+                )
+            }
+            SQL_DDL_INDEX => {
+                const SQL_DI_CREATE_INDEX: SqlUInteger = 0x00000001;
+                const SQL_DI_DROP_INDEX: SqlUInteger = 0x00000002;
+                self.write_uinteger(info_type, SQL_DI_CREATE_INDEX | SQL_DI_DROP_INDEX)
+            }
+            SQL_DEFAULT_TXN_ISOLATION => self.write_uinteger(info_type, SQL_TXN_SERIALIZABLE),
+            // TODO SQL_DESCRIBE_PARAMETER
+            SQL_DROP_ASSERTION
+            | SQL_DROP_CHARACTER_SET
+            | SQL_DROP_COLLATION
+            | SQL_DROP_DOMAIN
+            | SQL_DROP_SCHEMA
+            | SQL_DROP_TRANSLATION
+            | SQL_DROP_VIEW => self.write_uinteger(info_type, 0),
+            SQL_DROP_TABLE => {
+                const SQL_DT_DROP_TABLE: SqlUInteger = 0x00000001;
+                self.write_uinteger(info_type, SQL_DT_DROP_TABLE)
+            }
+            SQL_DYNAMIC_CURSOR_ATTRIBUTES1 | SQL_DYNAMIC_CURSOR_ATTRIBUTES2 => {
+                self.write_uinteger(info_type, 0)
+            }
+            SQL_EXPRESSIONS_IN_ORDERBY => self.write_string(info_type, "Y"),
+            SQL_FILE_USAGE => self.write_usmallint(info_type, 0 /* SQL_FILE_NOT_SUPPORTED */),
+            SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1 | SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2 => {
+                self.write_uinteger(info_type, 0)
+            }
             SQL_GETDATA_EXTENSIONS => self.write_uinteger(info_type, 0),
-            SQL_ACCESSIBLE_TABLES => self.write_string(info_type, "Y"),
+            SQL_GROUP_BY => {
+                self.write_usmallint(info_type, 1 /* SQL_GB_GROUP_BY_EQUALS_SELECT */)
+            }
+            SQL_IDENTIFIER_CASE => {
+                self.write_usmallint(info_type, 3 /* SQL_IC_SENSITIVE */)
+            }
+            SQL_IDENTIFIER_QUOTE_CHAR => self.write_string(info_type, "\""),
+            SQL_INDEX_KEYWORDS => {
+                const SQL_IK_ASC: SqlUInteger = 0x00000001;
+                const SQL_IK_DESC: SqlUInteger = 0x00000002;
+                const SQL_IK_ALL: SqlUInteger = SQL_IK_ASC | SQL_IK_DESC;
+                self.write_uinteger(info_type, SQL_IK_ALL)
+            }
+            SQL_INFO_SCHEMA_VIEWS => self.write_uinteger(info_type, 0),
+            SQL_INSERT_STATEMENT => {
+                const SQL_IS_INSERT_LITERALS: SqlUInteger = 0x00000001;
+                const SQL_IS_INSERT_SEARCHED: SqlUInteger = 0x00000002;
+                // const SQL_IS_SELECT_INTO: SqlUInteger = 0x00000004;
+                self.write_uinteger(info_type, SQL_IS_INSERT_LITERALS | SQL_IS_INSERT_SEARCHED)
+            }
+            SQL_KEYSET_CURSOR_ATTRIBUTES1 | SQL_KEYSET_CURSOR_ATTRIBUTES2 => {
+                self.write_uinteger(info_type, 0)
+            }
+            SQL_INTEGRITY => self.write_string(info_type, "N"),
+            // TODO SQL_KEYWORDS
+            SQL_LIKE_ESCAPE_CLAUSE => self.write_string(info_type, "Y"),
             SQL_MAX_ASYNC_CONCURRENT_STATEMENTS
             | SQL_MAX_BINARY_LITERAL_LEN
             | SQL_MAX_CHAR_LITERAL_LEN
@@ -572,6 +692,7 @@ impl SqlGetInfo {
             SQL_NULL_COLLATION => {
                 self.write_usmallint(info_type, 1 /* SQL_NC_LOW */)
             }
+            SQL_NUMERIC_FUNCTIONS => self.write_uinteger(info_type, numeric_functions()),
             SQL_ODBC_INTERFACE_CONFORMANCE => {
                 self.write_uinteger(info_type, 1 /* SQL_OIC_CORE */)
             }
@@ -579,11 +700,43 @@ impl SqlGetInfo {
             SQL_PROCEDURES => self.write_string(info_type, "N"),
             SQL_SCHEMA_TERM => self.write_string(info_type, "schema"),
             SQL_SCHEMA_USAGE => self.write_uinteger(info_type, 0), // TODO スキーマがサポートされたらビットマスクを返す
+            // TODO SQL_SCROLL_OPTIONS
+            SQL_SEARCH_PATTERN_ESCAPE => self.write_string(info_type, ""),
+            // TODO SQL_SERVER_NAME
+            SQL_SPECIAL_CHARACTERS => self.write_string(info_type, ""),
             SQL_SQL_CONFORMANCE => self.write_uinteger(info_type, 1 /* SQL_SC_SQL92_ENTRY */),
+            SQL_SQL92_DATETIME_FUNCTIONS => {
+                self.write_uinteger(info_type, sql92_datetime_functions())
+            }
+            SQL_SQL92_FOREIGN_KEY_DELETE_RULE | SQL_SQL92_FOREIGN_KEY_UPDATE_RULE => {
+                self.write_uinteger(info_type, 0)
+            }
+            SQL_SQL92_GRANT => self.write_uinteger(info_type, 0),
+            SQL_SQL92_NUMERIC_VALUE_FUNCTIONS => {
+                self.write_uinteger(info_type, numeric_value_functions())
+            }
+            SQL_SQL92_PREDICATES => self.write_uinteger(info_type, predicates()),
+            SQL_SQL92_RELATIONAL_JOIN_OPERATORS => {
+                self.write_uinteger(info_type, relational_join_operators())
+            }
+            SQL_SQL92_REVOKE => self.write_uinteger(info_type, 0),
+            SQL_SQL92_ROW_VALUE_CONSTRUCTOR => self.write_uinteger(info_type, 0),
+            SQL_SQL92_STRING_FUNCTIONS => self.write_uinteger(info_type, sql92_string_functions()),
+            SQL_SQL92_VALUE_EXPRESSIONS => self.write_uinteger(info_type, value_expressions()),
+            SQL_STANDARD_CLI_CONFORMANCE => self.write_uinteger(info_type, 0),
+            SQL_STATIC_CURSOR_ATTRIBUTES1 | SQL_STATIC_CURSOR_ATTRIBUTES2 => {
+                self.write_uinteger(info_type, 0)
+            }
+            SQL_STRING_FUNCTIONS => self.write_uinteger(info_type, string_functions()),
+            SQL_SUBQUERIES => self.write_uinteger(info_type, 0), // TODO サブクエリー
+            SQL_SYSTEM_FUNCTIONS => self.write_uinteger(info_type, system_functions()),
             SQL_TABLE_TERM => self.write_string(info_type, "table"),
+            SQL_TIMEDATE_ADD_INTERVALS => self.write_uinteger(info_type, 0),
+            SQL_TIMEDATE_DIFF_INTERVALS => self.write_uinteger(info_type, 0),
+            SQL_TIMEDATE_FUNCTIONS => self.write_uinteger(info_type, datetime_functions()),
             SQL_TRANSACTION_CAPABLE => self.write_usmallint(info_type, 2 /* SQL_TC_ALL */),
             SQL_TRANSACTION_ISOLATION_OPTION => {
-                self.write_uinteger(info_type, 8 /* SQL_TXN_SERIALIZABLE */)
+                self.write_uinteger(info_type, SQL_TXN_SERIALIZABLE)
             }
             SQL_UNION_STATEMENT => {
                 self.write_uinteger(info_type, 3 /* SQL_U_UNION|SQL_U_UNION_ALL */)
@@ -655,4 +808,200 @@ impl SqlGetInfo {
         }
         SqlReturn::SQL_SUCCESS
     }
+}
+
+fn aggregate_functions() -> SqlUInteger {
+    const SQL_AF_AVG: SqlUInteger = 0x00000001;
+    const SQL_AF_COUNT: SqlUInteger = 0x00000002;
+    const SQL_AF_MAX: SqlUInteger = 0x00000004;
+    const SQL_AF_MIN: SqlUInteger = 0x00000008;
+    const SQL_AF_SUM: SqlUInteger = 0x00000010;
+    const SQL_AF_DISTINCT: SqlUInteger = 0x00000020;
+    const SQL_AF_ALL: SqlUInteger = 0x00000040;
+
+    SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM | SQL_AF_DISTINCT | SQL_AF_ALL
+}
+
+#[allow(dead_code)]
+fn numeric_functions() -> SqlUInteger {
+    const SQL_FN_NUM_ABS: SqlUInteger = 0x00000001;
+    const SQL_FN_NUM_ACOS: SqlUInteger = 0x00000002;
+    const SQL_FN_NUM_ASIN: SqlUInteger = 0x00000004;
+    const SQL_FN_NUM_ATAN: SqlUInteger = 0x00000008;
+    const SQL_FN_NUM_ATAN2: SqlUInteger = 0x00000010;
+    const SQL_FN_NUM_CEILING: SqlUInteger = 0x00000020;
+    const SQL_FN_NUM_COS: SqlUInteger = 0x00000040;
+    const SQL_FN_NUM_COT: SqlUInteger = 0x00000080;
+    const SQL_FN_NUM_EXP: SqlUInteger = 0x00000100;
+    const SQL_FN_NUM_FLOOR: SqlUInteger = 0x00000200;
+    const SQL_FN_NUM_LOG: SqlUInteger = 0x00000400;
+    const SQL_FN_NUM_MOD: SqlUInteger = 0x00000800;
+    const SQL_FN_NUM_SIGN: SqlUInteger = 0x00001000;
+    const SQL_FN_NUM_SIN: SqlUInteger = 0x00002000;
+    const SQL_FN_NUM_SQRT: SqlUInteger = 0x00004000;
+    const SQL_FN_NUM_TAN: SqlUInteger = 0x00008000;
+    const SQL_FN_NUM_PI: SqlUInteger = 0x00010000;
+    const SQL_FN_NUM_RAND: SqlUInteger = 0x00020000;
+    const SQL_FN_NUM_DEGREES: SqlUInteger = 0x00040000;
+    const SQL_FN_NUM_LOG10: SqlUInteger = 0x00080000;
+    const SQL_FN_NUM_POWER: SqlUInteger = 0x00100000;
+    const SQL_FN_NUM_RADIANS: SqlUInteger = 0x00200000;
+    const SQL_FN_NUM_ROUND: SqlUInteger = 0x00400000;
+    const SQL_FN_NUM_TRUNCATE: SqlUInteger = 0x00800000;
+
+    SQL_FN_NUM_ABS | SQL_FN_NUM_CEILING | SQL_FN_NUM_FLOOR | SQL_FN_NUM_MOD | SQL_FN_NUM_ROUND
+}
+
+#[allow(dead_code)]
+fn string_functions() -> SqlUInteger {
+    const SQL_FN_STR_CONCAT: SqlUInteger = 0x00000001;
+    const SQL_FN_STR_INSERT: SqlUInteger = 0x00000002;
+    const SQL_FN_STR_LEFT: SqlUInteger = 0x00000004;
+    const SQL_FN_STR_LTRIM: SqlUInteger = 0x00000008;
+    const SQL_FN_STR_LENGTH: SqlUInteger = 0x00000010;
+    const SQL_FN_STR_LOCATE: SqlUInteger = 0x00000020;
+    const SQL_FN_STR_LCASE: SqlUInteger = 0x00000040;
+    const SQL_FN_STR_REPEAT: SqlUInteger = 0x00000080;
+    const SQL_FN_STR_REPLACE: SqlUInteger = 0x00000100;
+    const SQL_FN_STR_RIGHT: SqlUInteger = 0x00000200;
+    const SQL_FN_STR_RTRIM: SqlUInteger = 0x00000400;
+    const SQL_FN_STR_SUBSTRING: SqlUInteger = 0x00000800;
+    const SQL_FN_STR_UCASE: SqlUInteger = 0x00001000;
+    const SQL_FN_STR_ASCII: SqlUInteger = 0x00002000;
+    const SQL_FN_STR_CHAR: SqlUInteger = 0x00004000;
+    const SQL_FN_STR_DIFFERENCE: SqlUInteger = 0x00008000;
+    const SQL_FN_STR_LOCATE_2: SqlUInteger = 0x00010000;
+    const SQL_FN_STR_SOUNDEX: SqlUInteger = 0x00020000;
+    const SQL_FN_STR_SPACE: SqlUInteger = 0x00040000;
+    const SQL_FN_STR_BIT_LENGTH: SqlUInteger = 0x00080000;
+    const SQL_FN_STR_CHAR_LENGTH: SqlUInteger = 0x00100000;
+    const SQL_FN_STR_CHARACTER_LENGTH: SqlUInteger = 0x00200000;
+    const SQL_FN_STR_OCTET_LENGTH: SqlUInteger = 0x00400000;
+    const SQL_FN_STR_POSITION: SqlUInteger = 0x00800000;
+
+    SQL_FN_STR_CHAR_LENGTH
+        | SQL_FN_STR_CHARACTER_LENGTH
+        | SQL_FN_STR_OCTET_LENGTH
+        | SQL_FN_STR_POSITION
+        | SQL_FN_STR_SUBSTRING
+}
+
+#[allow(dead_code)]
+fn sql92_string_functions() -> SqlUInteger {
+    const SQL_SSF_CONVERT: SqlUInteger = 0x00000001;
+    const SQL_SSF_LOWER: SqlUInteger = 0x00000002;
+    const SQL_SSF_UPPER: SqlUInteger = 0x00000004;
+    const SQL_SSF_SUBSTRING: SqlUInteger = 0x00000008;
+    const SQL_SSF_TRANSLATE: SqlUInteger = 0x00000010;
+    const SQL_SSF_TRIM_BOTH: SqlUInteger = 0x00000020;
+    const SQL_SSF_TRIM_LEADING: SqlUInteger = 0x00000040;
+    const SQL_SSF_TRIM_TRAILING: SqlUInteger = 0x00000080;
+
+    SQL_SSF_LOWER | SQL_SSF_SUBSTRING | SQL_SSF_UPPER
+}
+
+#[allow(dead_code)]
+fn numeric_value_functions() -> SqlUInteger {
+    const SQL_SNVF_BIT_LENGTH: SqlUInteger = 0x00000001;
+    const SQL_SNVF_CHAR_LENGTH: SqlUInteger = 0x00000002;
+    const SQL_SNVF_CHARACTER_LENGTH: SqlUInteger = 0x00000004;
+    const SQL_SNVF_EXTRACT: SqlUInteger = 0x00000008;
+    const SQL_SNVF_OCTET_LENGTH: SqlUInteger = 0x00000010;
+    const SQL_SNVF_POSITION: SqlUInteger = 0x00000020;
+
+    SQL_SNVF_CHAR_LENGTH | SQL_SNVF_CHARACTER_LENGTH | SQL_SNVF_OCTET_LENGTH | SQL_SNVF_POSITION
+}
+
+#[allow(dead_code)]
+fn datetime_functions() -> SqlUInteger {
+    const SQL_FN_TD_NOW: SqlUInteger = 0x00000001;
+    const SQL_FN_TD_CURDATE: SqlUInteger = 0x00000002;
+    const SQL_FN_TD_DAYOFMONTH: SqlUInteger = 0x00000004;
+    const SQL_FN_TD_DAYOFWEEK: SqlUInteger = 0x00000008;
+    const SQL_FN_TD_DAYOFYEAR: SqlUInteger = 0x00000010;
+    const SQL_FN_TD_MONTH: SqlUInteger = 0x00000020;
+    const SQL_FN_TD_QUARTER: SqlUInteger = 0x00000040;
+    const SQL_FN_TD_WEEK: SqlUInteger = 0x00000080;
+    const SQL_FN_TD_YEAR: SqlUInteger = 0x00000100;
+    const SQL_FN_TD_CURTIME: SqlUInteger = 0x00000200;
+    const SQL_FN_TD_HOUR: SqlUInteger = 0x00000400;
+    const SQL_FN_TD_MINUTE: SqlUInteger = 0x00000800;
+    const SQL_FN_TD_SECOND: SqlUInteger = 0x00001000;
+    const SQL_FN_TD_TIMESTAMPADD: SqlUInteger = 0x00002000;
+    const SQL_FN_TD_TIMESTAMPDIFF: SqlUInteger = 0x00004000;
+    const SQL_FN_TD_DAYNAME: SqlUInteger = 0x00008000;
+    const SQL_FN_TD_MONTHNAME: SqlUInteger = 0x00010000;
+    const SQL_FN_TD_CURRENT_DATE: SqlUInteger = 0x00020000;
+    const SQL_FN_TD_CURRENT_TIME: SqlUInteger = 0x00040000;
+    const SQL_FN_TD_CURRENT_TIMESTAMP: SqlUInteger = 0x00080000;
+    const SQL_FN_TD_EXTRACT: SqlUInteger = 0x00100000;
+
+    SQL_FN_TD_CURRENT_DATE | SQL_FN_TD_CURRENT_TIMESTAMP
+}
+
+#[allow(dead_code)]
+fn sql92_datetime_functions() -> SqlUInteger {
+    const SQL_SDF_CURRENT_DATE: SqlUInteger = 0x00000001;
+    const SQL_SDF_CURRENT_TIME: SqlUInteger = 0x00000002;
+    const SQL_SDF_CURRENT_TIMESTAMP: SqlUInteger = 0x00000004;
+
+    SQL_SDF_CURRENT_DATE | SQL_SDF_CURRENT_TIMESTAMP
+}
+
+#[allow(dead_code)]
+fn system_functions() -> SqlUInteger {
+    const SQL_FN_SYS_USERNAME: SqlUInteger = 0x00000001;
+    const SQL_FN_SYS_DBNAME: SqlUInteger = 0x00000002;
+    const SQL_FN_SYS_IFNULL: SqlUInteger = 0x00000004;
+
+    0
+}
+
+#[allow(dead_code)]
+fn predicates() -> SqlUInteger {
+    const SQL_SP_EXISTS: SqlUInteger = 0x00000001;
+    const SQL_SP_ISNOTNULL: SqlUInteger = 0x00000002;
+    const SQL_SP_ISNULL: SqlUInteger = 0x00000004;
+    const SQL_SP_MATCH_FULL: SqlUInteger = 0x00000008;
+    const SQL_SP_MATCH_PARTIAL: SqlUInteger = 0x00000010;
+    const SQL_SP_MATCH_UNIQUE_FULL: SqlUInteger = 0x00000020;
+    const SQL_SP_MATCH_UNIQUE_PARTIAL: SqlUInteger = 0x00000040;
+    const SQL_SP_OVERLAPS: SqlUInteger = 0x00000080;
+    const SQL_SP_UNIQUE: SqlUInteger = 0x00000100;
+    const SQL_SP_LIKE: SqlUInteger = 0x00000200;
+    const SQL_SP_IN: SqlUInteger = 0x00000400;
+    const SQL_SP_BETWEEN: SqlUInteger = 0x00000800;
+    const SQL_SP_COMPARISON: SqlUInteger = 0x00001000;
+    const SQL_SP_QUANTIFIED_COMPARISON: SqlUInteger = 0x00002000;
+
+    SQL_SP_ISNOTNULL | SQL_SP_ISNULL | SQL_SP_LIKE | SQL_SP_IN | SQL_SP_BETWEEN | SQL_SP_COMPARISON
+}
+
+fn value_expressions() -> SqlUInteger {
+    const SQL_SVE_CASE: SqlUInteger = 0x00000001;
+    const SQL_SVE_CAST: SqlUInteger = 0x00000002;
+    const SQL_SVE_COALESCE: SqlUInteger = 0x00000004;
+    const SQL_SVE_NULLIF: SqlUInteger = 0x00000008;
+
+    SQL_SVE_CASE | SQL_SVE_CAST | SQL_SVE_COALESCE | SQL_SVE_NULLIF
+}
+
+#[allow(dead_code)]
+fn relational_join_operators() -> SqlUInteger {
+    const SQL_SRJO_CORRESPONDING_CLAUSE: SqlUInteger = 0x00000001;
+    const SQL_SRJO_CROSS_JOIN: SqlUInteger = 0x00000002;
+    const SQL_SRJO_EXCEPT_JOIN: SqlUInteger = 0x00000004;
+    const SQL_SRJO_FULL_OUTER_JOIN: SqlUInteger = 0x00000008;
+    const SQL_SRJO_INNER_JOIN: SqlUInteger = 0x00000010;
+    const SQL_SRJO_INTERSECT_JOIN: SqlUInteger = 0x00000020;
+    const SQL_SRJO_LEFT_OUTER_JOIN: SqlUInteger = 0x00000040;
+    const SQL_SRJO_NATURAL_JOIN: SqlUInteger = 0x00000080;
+    const SQL_SRJO_RIGHT_OUTER_JOIN: SqlUInteger = 0x00000100;
+    const SQL_SRJO_UNION_JOIN: SqlUInteger = 0x00000200;
+
+    SQL_SRJO_INNER_JOIN
+        | SQL_SRJO_LEFT_OUTER_JOIN
+        | SQL_SRJO_RIGHT_OUTER_JOIN
+        | SQL_SRJO_FULL_OUTER_JOIN
+        | SQL_SRJO_CROSS_JOIN
 }
