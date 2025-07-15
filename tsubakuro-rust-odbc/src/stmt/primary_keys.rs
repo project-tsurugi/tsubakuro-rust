@@ -163,49 +163,14 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcPrimaryKeys {
         &self,
         column_index: SqlUSmallInt,
     ) -> Result<TsurugiOdbcDescribeColumn, SqlReturn> {
+        use SqlDataType::*;
         let column = match column_index {
-            0 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_CAT",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            1 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_SCHEM",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            2 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            3 => TsurugiOdbcDescribeColumn::new(
-                "COLUMN_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            4 => TsurugiOdbcDescribeColumn::new(
-                "KEY_SEQ",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            5 => TsurugiOdbcDescribeColumn::new(
-                "PK_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
+            0 => TsurugiOdbcDescribeColumn::new("TABLE_CAT", SQL_VARCHAR, SQL_NULLABLE),
+            1 => TsurugiOdbcDescribeColumn::new("TABLE_SCHEM", SQL_VARCHAR, SQL_NULLABLE),
+            2 => TsurugiOdbcDescribeColumn::new("TABLE_NAME", SQL_VARCHAR, SQL_NO_NULLS),
+            3 => TsurugiOdbcDescribeColumn::new("COLUMN_NAME", SQL_VARCHAR, SQL_NO_NULLS),
+            4 => TsurugiOdbcDescribeColumn::new("KEY_SEQ", SQL_SMALLINT, SQL_NO_NULLS),
+            5 => TsurugiOdbcDescribeColumn::new("PK_NAME", SQL_VARCHAR, SQL_NULLABLE),
             _ => unreachable!(),
         };
         Ok(column)

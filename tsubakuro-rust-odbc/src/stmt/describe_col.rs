@@ -1,4 +1,5 @@
 use log::{debug, trace};
+use tsubakuro_rust_core::prelude::{AtomType, SqlColumn};
 
 use crate::{
     check_stmt,
@@ -10,15 +11,15 @@ use crate::{
         diag::TsurugiOdbcError,
         hstmt::{HStmt, TsurugiOdbcStmt},
     },
+    stmt::columns::{char_octet_length, decimal_digits},
     util::{write_char, write_wchar},
 };
 
 #[derive(Debug)]
 pub(crate) struct TsurugiOdbcDescribeColumn {
+    column: Option<SqlColumn>,
     column_name: String,
     data_type: SqlDataType,
-    column_size: SqlULen,
-    decimal_digits: SqlSmallInt,
     nullable: SqlNullable, // SqlSmallInt
 }
 
@@ -26,17 +27,39 @@ impl TsurugiOdbcDescribeColumn {
     pub(crate) fn new(
         column_name: &str,
         data_type: SqlDataType,
-        column_size: SqlULen,
-        decimal_digits: SqlSmallInt,
         nullable: SqlNullable,
     ) -> TsurugiOdbcDescribeColumn {
         TsurugiOdbcDescribeColumn {
+            column: None,
             column_name: column_name.to_string(),
             data_type,
-            column_size,
-            decimal_digits,
             nullable,
         }
+    }
+}
+
+impl From<SqlColumn> for TsurugiOdbcDescribeColumn {
+    fn from(column: SqlColumn) -> Self {
+        let column_name = column.name().into();
+        let data_type = SqlDataType::from(&column);
+        let nullable = match column.nullable() {
+            Some(true) => SqlNullable::SQL_NULLABLE,
+            Some(false) => SqlNullable::SQL_NO_NULLS,
+            None => SqlNullable::SQL_NULLABLE_UNKNOWN,
+        };
+
+        TsurugiOdbcDescribeColumn {
+            column: Some(column),
+            column_name,
+            data_type,
+            nullable,
+        }
+    }
+}
+
+impl TsurugiOdbcDescribeColumn {
+    pub(crate) fn sql_column(&self) -> Option<&SqlColumn> {
+        self.column.as_ref()
     }
 
     pub(crate) fn column_name(&self) -> &String {
@@ -48,15 +71,34 @@ impl TsurugiOdbcDescribeColumn {
     }
 
     pub(crate) fn column_size(&self) -> SqlULen {
-        self.column_size
+        if let Some(column) = &self.column {
+            column_size(column)
+        } else {
+            0
+        }
     }
 
     pub(crate) fn decimal_digits(&self) -> SqlSmallInt {
-        self.decimal_digits
+        if let Some(column) = &self.column {
+            decimal_digits(column).unwrap_or(0) as SqlSmallInt
+        } else {
+            0
+        }
     }
 
     pub(crate) fn nullable(&self) -> SqlNullable {
         self.nullable
+    }
+
+    pub(crate) fn scale(&self) -> u32 {
+        if let Some(column) = &self.column {
+            match column.scale() {
+                Some((scale, false)) => scale,
+                _ => 0,
+            }
+        } else {
+            0
+        }
     }
 }
 
@@ -224,11 +266,37 @@ fn describe_col(
         )
     };
     write_data_type(&column.data_type, data_type_ptr);
-    write_column_size(column.column_size, column_size_ptr);
-    write_decimal_digits(column.decimal_digits, decimal_digits_ptr);
+    write_column_size(column.column_size(), column_size_ptr);
+    write_decimal_digits(column.decimal_digits(), decimal_digits_ptr);
     write_nullable(column.nullable, nullable_ptr);
 
     rc
+}
+
+fn column_size(column: &SqlColumn) -> SqlULen {
+    use AtomType::*;
+    match column.atom_type() {
+        Some(atom_type) => match atom_type {
+            Boolean => 1,
+            Int4 => 10,
+            Int8 => 19,
+            Float4 => 7,
+            Float8 => 15,
+            Decimal => match column.precision() {
+                Some((_, true)) => 38,
+                Some((precision, false)) => precision as SqlULen,
+                None => 0,
+            },
+            Character | Octet => char_octet_length(column).unwrap_or(0) as SqlULen,
+            Date => 10,             // yyyy-MM-dd
+            TimeOfDay => 8 + 1 + 9, // HH:mm:ss.nnnnnnnnn
+            TimePoint => 10 + 1 + (8 + 1 + 9),
+            TimeOfDayWithTimeZone => (8 + 1 + 9) + 6, // +hh:mm
+            TimePointWithTimeZone => 10 + 1 + (8 + 1 + 9) + 6, // +hh:mm
+            _ => 0,
+        },
+        _ => 0,
+    }
 }
 
 fn write_data_type(data_type: &SqlDataType, data_type_ptr: *mut SqlSmallInt) {

@@ -1,4 +1,5 @@
 use log::{debug, trace, warn};
+use tsubakuro_rust_core::prelude::{AtomType, SqlColumn};
 
 use crate::{
     check_stmt,
@@ -10,7 +11,13 @@ use crate::{
         diag::TsurugiOdbcError,
         hstmt::{HStmt, TsurugiOdbcStmt},
     },
-    stmt::get_type_info::unsigned_attribute,
+    stmt::{
+        columns::char_octet_length,
+        get_type_info::{
+            literal_prefix, literal_suffix, num_prec_radix, searchable, type_name,
+            unsigned_attribute,
+        },
+    },
     util::{write_char, write_wchar_bytes},
 };
 
@@ -290,6 +297,14 @@ impl TsurugiOdbcColAttributeArguments {
             wide_char,
         }
     }
+
+    fn odbc_function_name(&self) -> &'static str {
+        if self.wide_char {
+            "SQLColAttributeW()"
+        } else {
+            "SQLColAttribute()"
+        }
+    }
 }
 
 fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) -> SqlReturn {
@@ -344,11 +359,13 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
         SQL_DESC_BASE_TABLE_NAME | SQL_DESC_TABLE_NAME => write_string(stmt, &arg, ""), // TODO table name
         SQL_DESC_CASE_SENSITIVE => write_numeric(stmt, &arg, SQL_TRUE as SqlLen),
         SQL_DESC_CATALOG_NAME => write_string(stmt, &arg, ""), // TODO catalog name
-        SQL_DESC_CONCISE_TYPE => write_numeric(stmt, &arg, column.data_type() as SqlLen),
+        SQL_DESC_CONCISE_TYPE | SQL_DESC_TYPE => {
+            write_numeric(stmt, &arg, column.data_type() as SqlLen)
+        }
         SQL_DESC_COUNT | SQL_COLUMN_COUNT => unreachable!(),
         SQL_DESC_DISPLAY_SIZE => write_numeric(stmt, &arg, column.column_size() as SqlLen),
         SQL_DESC_FIXED_PREC_SCALE => {
-            let value = if column.decimal_digits() != 0 {
+            let value = if column.scale() != 0 {
                 SQL_TRUE
             } else {
                 SQL_FALSE
@@ -356,21 +373,63 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
             write_numeric(stmt, &arg, value as SqlLen)
         }
         SQL_DESC_LOCAL_TYPE_NAME => write_string(stmt, &arg, ""),
-        // TODO SQL_DESC_LENGTH | SQL_COLUMN_LENGTH
-        // TODO SQL_DESC_LITERAL_PREFIX
-        // TODO SQL_DESC_LITERAL_SUFFIX
+        SQL_DESC_LENGTH | SQL_COLUMN_LENGTH => {
+            let value = if let Some(column) = column.sql_column() {
+                char_octet_length(column).unwrap_or(0) as SqlLen
+            } else {
+                0
+            };
+            write_numeric(stmt, &arg, value)
+        }
+        SQL_DESC_LITERAL_PREFIX => write_string(
+            stmt,
+            &arg,
+            literal_prefix(&column.data_type()).unwrap_or(""),
+        ),
+        SQL_DESC_LITERAL_SUFFIX => write_string(
+            stmt,
+            &arg,
+            literal_suffix(&column.data_type()).unwrap_or(""),
+        ),
         SQL_DESC_NULLABLE | SQL_COLUMN_NULLABLE => {
             write_numeric(stmt, &arg, column.nullable() as SqlLen)
         }
-        // TODO SQL_DESC_NUM_PREC_RADIX
-        // TODO SQL_DESC_OCTET_LENGTH
-        // TODO SQL_DESC_PRECISION|SQL_COLUMN_PRECISION => write_integer(&arg, column.decimal_digits() as SqlLen),
-        // TODO SQL_DESC_SCALE|SQL_COLUMN_SCALE
+        SQL_DESC_NUM_PREC_RADIX => write_numeric(
+            stmt,
+            &arg,
+            num_prec_radix(&column.data_type()).unwrap_or(0) as SqlLen,
+        ),
+        SQL_DESC_OCTET_LENGTH => {
+            let value = if let Some(column) = column.sql_column() {
+                char_octet_length(column).unwrap_or(0) as SqlLen
+            } else {
+                0
+            };
+            write_numeric(stmt, &arg, value)
+        }
+        SQL_DESC_PRECISION | SQL_COLUMN_PRECISION => {
+            let value = if let Some(column) = column.sql_column() {
+                precision(column) as SqlLen
+            } else {
+                0
+            };
+            write_numeric(stmt, &arg, value)
+        }
+        SQL_DESC_SCALE | SQL_COLUMN_SCALE => write_numeric(stmt, &arg, column.scale() as SqlLen),
         SQL_DESC_SCHEMA_NAME => write_string(stmt, &arg, ""), // TODO schema name
-        // TODO SQL_DESC_SEARCHABLE
-        // TODO SQL_DESC_TYPE
-        // TODO SQL_DESC_TYPE_NAME
-        // TODO SQL_DESC_UNNAMED
+        SQL_DESC_SEARCHABLE => write_numeric(stmt, &arg, searchable(&column.data_type()) as SqlLen),
+        SQL_DESC_TYPE_NAME => {
+            write_string(stmt, &arg, type_name(&column.data_type()).unwrap_or(""))
+        }
+        SQL_DESC_UNNAMED => {
+            let name = column.column_name();
+            let value = if name.is_empty() {
+                1 // SQL_UNNAMED
+            } else {
+                0 // SQL_NAMED
+            };
+            write_numeric(stmt, &arg, value)
+        }
         SQL_DESC_UNSIGNED => {
             let value = match unsigned_attribute(&column.data_type()) {
                 Some(value) => value,
@@ -378,18 +437,45 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
             };
             write_numeric(stmt, &arg, value as SqlLen)
         }
-        // TODO SQL_DESC_UPDATABLE
+        SQL_DESC_UPDATABLE => write_numeric(stmt, &arg, 0 /* SQL_ATTR_READONLY */),
         _ => {
             warn!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported field_identifier: {:?}",
                 field_identifier
             );
+            let odbc_function_name = arg.odbc_function_name();
             stmt.add_diag(
                 TsurugiOdbcError::UnsupportedFieldIdentifier,
-                format!("Unsupported field_identifier: {:?}", field_identifier),
+                format!(
+                    "{odbc_function_name}: Unsupported field_identifier: {:?}",
+                    field_identifier
+                ),
             );
             SqlReturn::SQL_ERROR
         }
+    }
+}
+
+fn precision(column: &SqlColumn) -> u32 {
+    use AtomType::*;
+    match column.atom_type() {
+        Some(atom_type) => {
+            match atom_type {
+                Boolean => 1,  // bits
+                Int4 => 8 * 4, // bits
+                Int8 => 8 * 8, // bits
+                Float4 => 38,
+                Float8 => 308,
+                Decimal => match column.precision() {
+                    Some((_, true)) => 38,
+                    Some((precision, false)) => precision,
+                    _ => 0,
+                },
+                TimeOfDay | TimePoint | TimeOfDayWithTimeZone | TimePointWithTimeZone => 9,
+                _ => 0,
+            }
+        }
+        _ => 0,
     }
 }
 
@@ -398,7 +484,7 @@ fn write_string(
     arg: &TsurugiOdbcColAttributeArguments,
     value: &str,
 ) -> SqlReturn {
-    const FUNCTION_NAME: &str = "col_attribute.write_string()";
+    const FUNCTION_NAME: &str = "col_attribute().write_string()";
     debug!(
         "{stmt}.{FUNCTION_NAME}: column_number={}, {:?}={}",
         arg.column_number, arg.field_identifier, value
@@ -430,7 +516,7 @@ fn write_numeric(
     arg: &TsurugiOdbcColAttributeArguments,
     value: SqlLen,
 ) -> SqlReturn {
-    const FUNCTION_NAME: &str = "col_attribute.write_integer()";
+    const FUNCTION_NAME: &str = "col_attribute().write_numeric()";
     debug!(
         "{stmt}.{FUNCTION_NAME}: column_number={}, {:?}={}",
         arg.column_number, arg.field_identifier, value

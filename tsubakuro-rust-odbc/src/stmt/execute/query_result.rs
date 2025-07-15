@@ -2,7 +2,7 @@ use log::{debug, warn};
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
-    ctype::{SqlDataType, SqlLen, SqlNullable::SQL_NULLABLE_UNKNOWN, SqlReturn, SqlUSmallInt},
+    ctype::{SqlLen, SqlReturn, SqlUSmallInt},
     handle::{diag::TsurugiOdbcError, hstmt::TsurugiOdbcStmt},
     stmt::{describe_col::TsurugiOdbcDescribeColumn, get_data::*, TsurugiOdbcStatementProcessor},
 };
@@ -38,13 +38,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcQueryResult {
         column_index: SqlUSmallInt,
     ) -> Result<TsurugiOdbcDescribeColumn, SqlReturn> {
         let column = &self.query_result.get_metadata().unwrap().columns()[column_index as usize];
-        let column = TsurugiOdbcDescribeColumn::new(
-            column.name(),
-            SqlDataType::from(column),
-            0, // TODO SqlQueryResult column_size
-            0, // TODO SqlQueryResult decimal_digits
-            SQL_NULLABLE_UNKNOWN,
-        );
+        let column = TsurugiOdbcDescribeColumn::from(column.clone());
         Ok(column)
     }
 

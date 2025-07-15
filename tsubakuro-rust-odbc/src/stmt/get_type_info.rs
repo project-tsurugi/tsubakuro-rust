@@ -140,140 +140,27 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
         &self,
         column_index: SqlUSmallInt,
     ) -> Result<TsurugiOdbcDescribeColumn, SqlReturn> {
+        use SqlDataType::*;
         let column = match column_index {
-            0 => TsurugiOdbcDescribeColumn::new(
-                "TYPE_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            1 => TsurugiOdbcDescribeColumn::new(
-                "DATA_TYPE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            2 => TsurugiOdbcDescribeColumn::new(
-                "COLUMN_SIZE",
-                SqlDataType::SQL_INTEGER,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            3 => TsurugiOdbcDescribeColumn::new(
-                "LITERAL_PREFIX",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            4 => TsurugiOdbcDescribeColumn::new(
-                "LITERAL_SUFFIX",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            5 => TsurugiOdbcDescribeColumn::new(
-                "CREATE_PARAMS",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            6 => TsurugiOdbcDescribeColumn::new(
-                "NULLABLE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            7 => TsurugiOdbcDescribeColumn::new(
-                "CASE_SENSITIVE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            8 => TsurugiOdbcDescribeColumn::new(
-                "SEARCHABLE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            9 => TsurugiOdbcDescribeColumn::new(
-                "UNSIGNED_ATTRIBUTE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            10 => TsurugiOdbcDescribeColumn::new(
-                "FIXED_PREC_SCALE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            11 => TsurugiOdbcDescribeColumn::new(
-                "AUTO_UNIQUE_VALUE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            12 => TsurugiOdbcDescribeColumn::new(
-                "LOCAL_TYPE_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            13 => TsurugiOdbcDescribeColumn::new(
-                "MINIMUM_SCALE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            14 => TsurugiOdbcDescribeColumn::new(
-                "MAXIMUM_SCALE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            15 => TsurugiOdbcDescribeColumn::new(
-                "SQL_DATA_TYPE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            16 => TsurugiOdbcDescribeColumn::new(
-                "SQL_DATETIME_SUB",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            17 => TsurugiOdbcDescribeColumn::new(
-                "NUM_PREC_RADIX",
-                SqlDataType::SQL_INTEGER,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            18 => TsurugiOdbcDescribeColumn::new(
-                "INTERVAL_PRECISION",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
+            0 => TsurugiOdbcDescribeColumn::new("TYPE_NAME", SQL_VARCHAR, SQL_NO_NULLS),
+            1 => TsurugiOdbcDescribeColumn::new("DATA_TYPE", SQL_SMALLINT, SQL_NO_NULLS),
+            2 => TsurugiOdbcDescribeColumn::new("COLUMN_SIZE", SQL_INTEGER, SQL_NULLABLE),
+            3 => TsurugiOdbcDescribeColumn::new("LITERAL_PREFIX", SQL_VARCHAR, SQL_NULLABLE),
+            4 => TsurugiOdbcDescribeColumn::new("LITERAL_SUFFIX", SQL_VARCHAR, SQL_NULLABLE),
+            5 => TsurugiOdbcDescribeColumn::new("CREATE_PARAMS", SQL_VARCHAR, SQL_NULLABLE),
+            6 => TsurugiOdbcDescribeColumn::new("NULLABLE", SQL_SMALLINT, SQL_NO_NULLS),
+            7 => TsurugiOdbcDescribeColumn::new("CASE_SENSITIVE", SQL_SMALLINT, SQL_NO_NULLS),
+            8 => TsurugiOdbcDescribeColumn::new("SEARCHABLE", SQL_SMALLINT, SQL_NO_NULLS),
+            9 => TsurugiOdbcDescribeColumn::new("UNSIGNED_ATTRIBUTE", SQL_SMALLINT, SQL_NULLABLE),
+            10 => TsurugiOdbcDescribeColumn::new("FIXED_PREC_SCALE", SQL_SMALLINT, SQL_NO_NULLS),
+            11 => TsurugiOdbcDescribeColumn::new("AUTO_UNIQUE_VALUE", SQL_SMALLINT, SQL_NULLABLE),
+            12 => TsurugiOdbcDescribeColumn::new("LOCAL_TYPE_NAME", SQL_VARCHAR, SQL_NULLABLE),
+            13 => TsurugiOdbcDescribeColumn::new("MINIMUM_SCALE", SQL_SMALLINT, SQL_NULLABLE),
+            14 => TsurugiOdbcDescribeColumn::new("MAXIMUM_SCALE", SQL_SMALLINT, SQL_NULLABLE),
+            15 => TsurugiOdbcDescribeColumn::new("SQL_DATA_TYPE", SQL_SMALLINT, SQL_NO_NULLS),
+            16 => TsurugiOdbcDescribeColumn::new("SQL_DATETIME_SUB", SQL_SMALLINT, SQL_NULLABLE),
+            17 => TsurugiOdbcDescribeColumn::new("NUM_PREC_RADIX", SQL_INTEGER, SQL_NULLABLE),
+            18 => TsurugiOdbcDescribeColumn::new("INTERVAL_PRECISION", SQL_SMALLINT, SQL_NULLABLE),
             _ => unreachable!(),
         };
         Ok(column)
@@ -306,7 +193,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
 
         let column_index = arg.column_index();
         match column_index {
-            0 => match type_name(stmt, data_type) {
+            0 => match type_name_with_check(stmt, data_type) {
                 Ok(value) => get_data_string(stmt, arg, value),
                 Err(rc) => rc,
             }, // TYPE_NAME varchar
@@ -341,9 +228,30 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
     }
 }
 
-fn type_name(stmt: &TsurugiOdbcStmt, data_type: &SqlDataType) -> Result<&'static str, SqlReturn> {
+fn type_name_with_check(
+    stmt: &TsurugiOdbcStmt,
+    data_type: &SqlDataType,
+) -> Result<&'static str, SqlReturn> {
     const FUNCTION_NAME: &str = "type_name()";
 
+    let type_name = match type_name(data_type) {
+        Some(value) => value,
+        None => {
+            warn!(
+                "{stmt}.{FUNCTION_NAME}: Unsupported data_type {:?}",
+                data_type
+            );
+            stmt.add_diag(
+                TsurugiOdbcError::UnsupportedSqlDataType,
+                format!("Unsupported data_type {:?}", data_type),
+            );
+            return Err(SqlReturn::SQL_ERROR);
+        }
+    };
+    Ok(type_name)
+}
+
+pub(crate) fn type_name(data_type: &SqlDataType) -> Option<&'static str> {
     use SqlDataType::*;
     let type_name = match data_type {
         SQL_CHAR | SQL_WCHAR => "CHAR",
@@ -376,19 +284,9 @@ fn type_name(stmt: &TsurugiOdbcStmt, data_type: &SqlDataType) -> Result<&'static
         SQL_BIGINT => "BIGINT",
         // SQL_TINYINT => todo!(),
         SQL_BIT => "BOOLEAN",
-        _ => {
-            warn!(
-                "{stmt}.{FUNCTION_NAME}: Unsupported data_type {:?}",
-                data_type
-            );
-            stmt.add_diag(
-                TsurugiOdbcError::UnsupportedSqlDataType,
-                format!("Unsupported data_type {:?}", data_type),
-            );
-            return Err(SqlReturn::SQL_ERROR);
-        }
+        _ => return None,
     };
-    Ok(type_name)
+    Some(type_name)
 }
 
 fn column_size(data_type: &SqlDataType) -> Option<i32> {
@@ -427,7 +325,7 @@ fn column_size(data_type: &SqlDataType) -> Option<i32> {
     Some(size)
 }
 
-fn literal_prefix(data_type: &SqlDataType) -> Option<&'static str> {
+pub(crate) fn literal_prefix(data_type: &SqlDataType) -> Option<&'static str> {
     use SqlDataType::*;
     let ret = match data_type {
         SQL_CHAR | SQL_WCHAR | SQL_VARCHAR | SQL_WVARCHAR => "'",
@@ -454,7 +352,7 @@ fn literal_prefix(data_type: &SqlDataType) -> Option<&'static str> {
     Some(ret)
 }
 
-fn literal_suffix(data_type: &SqlDataType) -> Option<&'static str> {
+pub(crate) fn literal_suffix(data_type: &SqlDataType) -> Option<&'static str> {
     use SqlDataType::*;
     let ret = match data_type {
         SQL_CHAR | SQL_WCHAR | SQL_VARCHAR | SQL_WVARCHAR => "'",
@@ -502,7 +400,7 @@ fn case_sensitive(data_type: &SqlDataType) -> i32 {
 }
 
 //TODO searchable()
-fn searchable(data_type: &SqlDataType) -> i32 {
+pub(crate) fn searchable(data_type: &SqlDataType) -> i32 {
     use SqlDataType::*;
     match data_type {
         SQL_CHAR | SQL_WCHAR | SQL_VARCHAR | SQL_WVARCHAR | SQL_LONGVARBINARY => SQL_PRED_CHAR,
@@ -556,7 +454,7 @@ fn maximum_scale(data_type: &SqlDataType) -> Option<i32> {
     Some(ret)
 }
 
-fn num_prec_radix(data_type: &SqlDataType) -> Option<i32> {
+pub(crate) fn num_prec_radix(data_type: &SqlDataType) -> Option<i32> {
     use SqlDataType::*;
     let ret = match data_type {
         SQL_NUMERIC | SQL_DECIMAL => 10,

@@ -211,133 +211,26 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
         &self,
         column_index: SqlUSmallInt,
     ) -> Result<TsurugiOdbcDescribeColumn, SqlReturn> {
+        use SqlDataType::*;
         let column = match column_index {
-            0 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_CAT",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            1 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_SCHEM",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            2 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            3 => TsurugiOdbcDescribeColumn::new(
-                "COLUMN_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            4 => TsurugiOdbcDescribeColumn::new(
-                "DATA_TYPE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            5 => TsurugiOdbcDescribeColumn::new(
-                "TYPE_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            6 => TsurugiOdbcDescribeColumn::new(
-                "COLUMN_SIZE",
-                SqlDataType::SQL_INTEGER,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            7 => TsurugiOdbcDescribeColumn::new(
-                "BUFFER_LENGTH",
-                SqlDataType::SQL_INTEGER,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            8 => TsurugiOdbcDescribeColumn::new(
-                "DECIMAL_DIGITS",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            9 => TsurugiOdbcDescribeColumn::new(
-                "NUM_PREC_RADIX",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            10 => TsurugiOdbcDescribeColumn::new(
-                "NULLABLE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            11 => TsurugiOdbcDescribeColumn::new(
-                "REMARKS",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            12 => TsurugiOdbcDescribeColumn::new(
-                "COLUMN_DEF",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            13 => TsurugiOdbcDescribeColumn::new(
-                "SQL_DATA_TYPE",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            14 => TsurugiOdbcDescribeColumn::new(
-                "SQL_DATETIME_SUB",
-                SqlDataType::SQL_SMALLINT,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            15 => TsurugiOdbcDescribeColumn::new(
-                "CHAR_OCTET_LENGTH",
-                SqlDataType::SQL_INTEGER,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            16 => TsurugiOdbcDescribeColumn::new(
-                "ORDINAL_POSITION",
-                SqlDataType::SQL_INTEGER,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            17 => TsurugiOdbcDescribeColumn::new(
-                "IS_NULLABLE",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
+            0 => TsurugiOdbcDescribeColumn::new("TABLE_CAT", SQL_VARCHAR, SQL_NULLABLE),
+            1 => TsurugiOdbcDescribeColumn::new("TABLE_SCHEM", SQL_VARCHAR, SQL_NULLABLE),
+            2 => TsurugiOdbcDescribeColumn::new("TABLE_NAME", SQL_VARCHAR, SQL_NO_NULLS),
+            3 => TsurugiOdbcDescribeColumn::new("COLUMN_NAME", SQL_VARCHAR, SQL_NO_NULLS),
+            4 => TsurugiOdbcDescribeColumn::new("DATA_TYPE", SQL_SMALLINT, SQL_NO_NULLS),
+            5 => TsurugiOdbcDescribeColumn::new("TYPE_NAME", SQL_VARCHAR, SQL_NO_NULLS),
+            6 => TsurugiOdbcDescribeColumn::new("COLUMN_SIZE", SQL_INTEGER, SQL_NULLABLE),
+            7 => TsurugiOdbcDescribeColumn::new("BUFFER_LENGTH", SQL_INTEGER, SQL_NULLABLE),
+            8 => TsurugiOdbcDescribeColumn::new("DECIMAL_DIGITS", SQL_SMALLINT, SQL_NULLABLE),
+            9 => TsurugiOdbcDescribeColumn::new("NUM_PREC_RADIX", SQL_SMALLINT, SQL_NULLABLE),
+            10 => TsurugiOdbcDescribeColumn::new("NULLABLE", SQL_SMALLINT, SQL_NO_NULLS),
+            11 => TsurugiOdbcDescribeColumn::new("REMARKS", SQL_VARCHAR, SQL_NULLABLE),
+            12 => TsurugiOdbcDescribeColumn::new("COLUMN_DEF", SQL_VARCHAR, SQL_NULLABLE),
+            13 => TsurugiOdbcDescribeColumn::new("SQL_DATA_TYPE", SQL_SMALLINT, SQL_NO_NULLS),
+            14 => TsurugiOdbcDescribeColumn::new("SQL_DATETIME_SUB", SQL_SMALLINT, SQL_NULLABLE),
+            15 => TsurugiOdbcDescribeColumn::new("CHAR_OCTET_LENGTH", SQL_INTEGER, SQL_NULLABLE),
+            16 => TsurugiOdbcDescribeColumn::new("ORDINAL_POSITION", SQL_INTEGER, SQL_NO_NULLS),
+            17 => TsurugiOdbcDescribeColumn::new("IS_NULLABLE", SQL_VARCHAR, SQL_NULLABLE),
             _ => unreachable!(),
         };
         Ok(column)
@@ -474,7 +367,7 @@ fn column_buffer_length(column: &SqlColumn) -> Option<i32> {
     Some(length)
 }
 
-fn decimal_digits(column: &SqlColumn) -> Option<i32> {
+pub(crate) fn decimal_digits(column: &SqlColumn) -> Option<i32> {
     use AtomType::*;
     let scale = match column.atom_type()? {
         Decimal => match column.scale() {
@@ -512,7 +405,7 @@ fn num_prec_radix(column: &SqlColumn) -> Option<i32> {
     Some(radix)
 }
 
-fn char_octet_length(column: &SqlColumn) -> Option<i32> {
+pub(crate) fn char_octet_length(column: &SqlColumn) -> Option<i32> {
     use AtomType::*;
     let size = match column.atom_type()? {
         Character | Octet => match column.length() {

@@ -146,42 +146,13 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTableList {
         &self,
         column_index: SqlUSmallInt,
     ) -> Result<TsurugiOdbcDescribeColumn, SqlReturn> {
+        use SqlDataType::*;
         let column = match column_index {
-            0 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_CAT",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            1 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_SCHEM",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
-            2 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_NAME",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            3 => TsurugiOdbcDescribeColumn::new(
-                "TABLE_TYPE",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NO_NULLS,
-            ),
-            4 => TsurugiOdbcDescribeColumn::new(
-                "REMARKS",
-                SqlDataType::SQL_VARCHAR,
-                0,
-                0,
-                SQL_NULLABLE,
-            ),
+            0 => TsurugiOdbcDescribeColumn::new("TABLE_CAT", SQL_VARCHAR, SQL_NULLABLE),
+            1 => TsurugiOdbcDescribeColumn::new("TABLE_SCHEM", SQL_VARCHAR, SQL_NULLABLE),
+            2 => TsurugiOdbcDescribeColumn::new("TABLE_NAME", SQL_VARCHAR, SQL_NO_NULLS),
+            3 => TsurugiOdbcDescribeColumn::new("TABLE_TYPE", SQL_VARCHAR, SQL_NO_NULLS),
+            4 => TsurugiOdbcDescribeColumn::new("REMARKS", SQL_VARCHAR, SQL_NULLABLE),
             _ => unreachable!(),
         };
         Ok(column)

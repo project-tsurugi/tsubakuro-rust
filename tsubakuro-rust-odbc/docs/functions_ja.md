@@ -150,13 +150,11 @@ SQLを実行します。
 
 > [!WARNING]
 >
-> select文の実行結果の場合、現在のTsurugi ODBCドライバーでは、columnSizeやdecimalGigitsは正しい値を返しません。（常に0を返します）
+> select文の実行結果の場合、現在のTsurugi ODBCドライバーでは、columnSizeやdecimalGigitsに対応していないデータ型では0を返します。
 
 ### SQLColAttribute
 
 実行結果の列の情報を返します。
-
-- 一部のfield_identifierのみ対応しています。
 
 ### SQLRowCount
 
