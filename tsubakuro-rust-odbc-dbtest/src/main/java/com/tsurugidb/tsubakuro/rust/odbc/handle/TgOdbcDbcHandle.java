@@ -5,6 +5,7 @@ import java.lang.foreign.ValueLayout;
 
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcConnection;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
+import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst;
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcFunction;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlReturn;
 import com.tsurugidb.tsubakuro.rust.odbc.dbc.ConnectionAttribute;
@@ -89,10 +90,38 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         return new GetInfoResult<>(rc, infoType, infoValuePtr, stringLength, wideChar);
     }
 
+    public TgOdbcConnection connect(String dsn, boolean wideChar) {
+        short rc = connect0(dsn, OdbcConst.SQL_NTS, null, OdbcConst.SQL_NTS, null, OdbcConst.SQL_NTS, wideChar);
+        SqlReturn.check(wideChar ? "SQLConnectW" : "SQLConnectA", rc, this);
+
+        return new TgOdbcConnection(this, "DSN=" + dsn);
+    }
+
+    public short connect0(String dsn, int dsnLength, String userName, int userNameLength, String authentication, int authenticationLength, boolean wideChar) {
+        MemorySegment connectionHandle = handleAddress();
+        try {
+            if (wideChar) {
+                MemorySegment dsnPtr = manager.allocateUtf16(dsn);
+                MemorySegment userNamePtr = manager.allocateUtf16(userName);
+                MemorySegment authenticationPtr = manager.allocateUtf16(authentication);
+                return (short) OdbcFunction.sqlConnectW.invoke(connectionHandle, dsnPtr, (short) dsnLength, userNamePtr, (short) userNameLength, authenticationPtr, (short) authenticationLength);
+            } else {
+                MemorySegment dsnPtr = manager.allocateUtf8(dsn);
+                MemorySegment userNamePtr = manager.allocateUtf8(userName);
+                MemorySegment authenticationPtr = manager.allocateUtf8(authentication);
+                return (short) OdbcFunction.sqlConnectA.invoke(connectionHandle, dsnPtr, (short) dsnLength, userNamePtr, (short) userNameLength, authenticationPtr, (short) authenticationLength);
+            }
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public TgOdbcConnection driverConnect(String connectionString, boolean wideChar) {
         var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                 .inConnectionString(connectionString) //
-                .bufferLength(connectionString.length() * 2);
+                .bufferLength(1024);
 
         short rc = driverConnect0(arg);
         SqlReturn.check(wideChar ? "SQLDriverConnectW" : "SQLDriverConnectA", rc, this);

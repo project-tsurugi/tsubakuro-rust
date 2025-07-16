@@ -5,35 +5,34 @@ import java.util.Arrays;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcConnection;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle;
 
-public class TgOdbcExampleMain extends TgOdbcExample {
+public class TgOdbcConnectExampleMain extends TgOdbcExample {
 
     public static void main(String[] args) {
-        int exitCode = new TgOdbcExampleMain().main0(args);
+        int exitCode = new TgOdbcConnectExampleMain().main0(args);
         if (exitCode != 0) {
             System.exit(exitCode);
         }
     }
 
-    private String connectionString;
+    private String dsn;
 
     private int main0(String[] args) {
         LOG.info("start. args={}", Arrays.toString(args));
 
         if (args.length < 1) {
-            System.err.println("args: endpoint-url");
+            System.err.println("args: dsn");
             return 1;
         }
 
-        String endpoint = args[0];
-        this.connectionString = "DRIVER=Tsurugi Driver;Endpoint=" + endpoint;
+        this.dsn = args[0];
 
         return super.exampleMain();
     }
 
     @Override
     protected TgOdbcConnection connect(TgOdbcDbcHandle hdbc) {
-        LOG.info("connectionString={}", connectionString);
+        LOG.info("DSN={}", dsn);
 
-        return hdbc.driverConnect(connectionString, wideChar);
+        return hdbc.connect(dsn, wideChar);
     }
 }

@@ -49,10 +49,16 @@ public class TgOdbcManager implements AutoCloseable {
     }
 
     public MemorySegment allocateUtf8(String value) {
+        if (value == null) {
+            return MemorySegment.NULL;
+        }
         return arena.allocateFrom(value, StandardCharsets.UTF_8);
     }
 
     public MemorySegment allocateUtf16(String value) {
+        if (value == null) {
+            return MemorySegment.NULL;
+        }
         return arena.allocateFrom(value, StandardCharsets.UTF_16LE);
     }
 

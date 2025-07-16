@@ -98,6 +98,8 @@ tasks.named('test') {
     }
 
     systemProperty 'tsurugi.dbtest.odbc.lib.name', findProperty('dbtest.odbc.lib.name') ?: 'odbc32'
+    systemProperty 'tsurugi.dbtest.connection.string', findProperty('dbtest.connection.string') ?: ''
+    systemProperty 'tsurugi.dbtest.dsn', findProperty('dbtest.dsn') ?: ''
     systemProperty 'tsurugi.dbtest.endpoint', findProperty('dbtest.endpoint') ?: 'tcp://localhost:12345'
     systemProperty 'tsurugi.dbtest.endpoint.java', findProperty('dbtest.endpoint.java') ?: ''
 }

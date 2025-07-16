@@ -65,7 +65,7 @@ hstmtの属性を設定・取得します。
 
 ### SQLDriverConnect
 
-Tsurugiに接続します。
+接続文字列を指定してTsurugiに接続します。
 
 接続文字列に指定できるキーは以下の通りです。（大文字小文字は区別されません）
 
@@ -78,6 +78,16 @@ Tsurugiに接続します。
 
 ```c
 SQLCHAR connStrIn[] = "DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;";
+```
+
+### SQLConnect
+
+DSNを指定してTsurugiに接続します。
+
+#### DSNの例
+
+```c
+SQLCHAR dsn[] = "MyTsurugiDSN";
 ```
 
 ### SQLDisconnect

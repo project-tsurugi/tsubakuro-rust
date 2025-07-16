@@ -45,6 +45,13 @@ public class OdbcFunction {
      */
     public static final MethodHandle sqlColumnsW;
 
+    /** SQLRETURN SQLConnectA(SQLHDBC ConnectionHandle, SQLCHAR* ServerName, SQLSMALLINT NameLength1, SQLCHAR* UserName, SQLSMALLINT NameLength2, SQLCHAR* Authentication, SQLSMALLINT NameLength3) */
+    public static final MethodHandle sqlConnectA;
+    /**
+     * SQLRETURN SQLConnectA(SQLHDBC ConnectionHandle, SQLWCHAR* ServerName, SQLSMALLINT NameLength1, SQLWCHAR* UserName, SQLSMALLINT NameLength2, SQLWCHAR* Authentication, SQLSMALLINT NameLength3)
+     */
+    public static final MethodHandle sqlConnectW;
+
     /**
      * SQLRETURN SQLDescribeColA(SQLHSTMT StatementHandle, SQLUSMALLINT ColumnNumber, SQLCHAR* ColumnName, SQLSMALLINT BufferLength, SQLSMALLINT* NameLengthPtr, SQLSMALLINT* DataTypePtr, SQLULEN*
      * ColumnSizePtr, SQLSMALLINT* DecimalDigitsPtr, SQLSMALLINT* NullablePtr)
@@ -302,6 +309,36 @@ public class OdbcFunction {
                 );
 
                 sqlColumnsW = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLConnectA").orElseThrow(() -> new RuntimeException("SQLConnectA not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHDBC ConnectionHandle
+                        ADDRESS, // SQLCHAR* ServerName
+                        JAVA_SHORT, // SQLSMALLINT NameLength1
+                        ADDRESS, // SQLCHAR* UserName
+                        JAVA_SHORT, // SQLSMALLINT NameLength2
+                        ADDRESS, // SQLCHAR* Authentication
+                        JAVA_SHORT // SQLSMALLINT NameLength3
+                );
+
+                sqlConnectA = linker.downcallHandle(symbol, desc);
+            }
+            {
+                var symbol = lookup.find("SQLConnectW").orElseThrow(() -> new RuntimeException("SQLConnectW not found"));
+
+                var desc = FunctionDescriptor.of(JAVA_SHORT, // SQLRETURN
+                        ADDRESS, // SQLHDBC ConnectionHandle
+                        ADDRESS, // SQLWCHAR* ServerName
+                        JAVA_SHORT, // SQLSMALLINT NameLength1
+                        ADDRESS, // SQLWCHAR* UserName
+                        JAVA_SHORT, // SQLSMALLINT NameLength2
+                        ADDRESS, // SQLWCHAR* Authentication
+                        JAVA_SHORT // SQLSMALLINT NameLength3
+                );
+
+                sqlConnectW = linker.downcallHandle(symbol, desc);
             }
             {
                 var symbol = lookup.find("SQLDescribeColA").orElseThrow(() -> new RuntimeException("SQLDescribeColA not found"));

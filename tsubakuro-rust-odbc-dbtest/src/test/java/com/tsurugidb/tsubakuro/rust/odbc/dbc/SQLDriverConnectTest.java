@@ -2,6 +2,8 @@ package com.tsurugidb.tsubakuro.rust.odbc.dbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Map;
 
@@ -31,12 +33,29 @@ class SQLDriverConnectTest extends TgOdbcTester {
                 assertEquals(SqlReturn.SQL_SUCCESS, rc);
 
                 Map<String, String> map = arg.outConnectionMap();
-                assertEquals("{Tsurugi Driver}", map.get("driver"));
-                assertEquals(getEndpoint(), map.get("endpoint"));
+                String driver = map.get("driver");
+                if (driver != null) {
+                    assertEquals("{Tsurugi Driver}", map.get("driver"));
+                    assertEquals(getEndpoint(), map.get("endpoint"));
 
-                assertEquals(inConnectionString.length(), arg.outConnectionStringLength());
+                    assertEquals(inConnectionString.length(), arg.outConnectionStringLength());
+                }
             } finally {
                 dbc.disconnect();
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void dsn(boolean wideChar) {
+        try (var dbc = createDbc()) {
+            String dsn = getDsn();
+            assumeFalse(dsn.isEmpty(), "DSN not specified");
+
+            String inConnectionString = "DSN=%s;".formatted(dsn);
+
+            try (var _ = dbc.driverConnect(inConnectionString, wideChar)) {
             }
         }
     }
@@ -89,6 +108,7 @@ class SQLDriverConnectTest extends TgOdbcTester {
             var manager = dbc.manager();
 
             String inConnectionString = getConnectionString();
+            assumeTrue(inConnectionString.contains("Driver"));
             int length = inConnectionString.length();
             var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                     .inConnectionString(inConnectionString) //

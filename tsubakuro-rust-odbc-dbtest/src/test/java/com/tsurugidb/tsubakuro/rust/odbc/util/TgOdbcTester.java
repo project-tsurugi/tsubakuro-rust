@@ -14,10 +14,32 @@ import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 
 public class TgOdbcTester {
 
+    private static final String SYSPROP_DBTEST_CONNECTION_STRING = "tsurugi.dbtest.connection.string";
+    private static final String SYSPROP_DBTEST_DSN = "tsurugi.dbtest.dsn";
     private static final String SYSPROP_DBTEST_ENDPOINT = "tsurugi.dbtest.endpoint";
     private static final String SYSPROP_DBTEST_ENDPOINT_JAVA = "tsurugi.dbtest.endpoint.java";
+    private static String staticConnectionString;
+    private static String staticDsn;
     private static String staticEndpoint;
     private static String staticEndpointJava;
+
+    protected static String getConnectionString() {
+        if (staticConnectionString == null) {
+            staticConnectionString = System.getProperty(SYSPROP_DBTEST_CONNECTION_STRING);
+            if (staticConnectionString == null || staticConnectionString.isEmpty()) {
+                String endpoint = getEndpoint();
+                staticConnectionString = "Driver={Tsurugi Driver};Endpoint=%s;".formatted(endpoint);
+            }
+        }
+        return staticConnectionString;
+    }
+
+    protected static String getDsn() {
+        if (staticDsn == null) {
+            staticDsn = System.getProperty(SYSPROP_DBTEST_DSN, "");
+        }
+        return staticDsn;
+    }
 
     protected static String getEndpoint() {
         if (staticEndpoint == null) {
@@ -132,11 +154,5 @@ public class TgOdbcTester {
                 }
             }
         }
-    }
-
-    protected static String getConnectionString() {
-        String endpoint = getEndpoint();
-        String connectionString = "Driver={Tsurugi Driver};Endpoint=%s;".formatted(endpoint);
-        return connectionString;
     }
 }

@@ -1,11 +1,14 @@
-use std::{collections::HashMap, sync::Arc, time::Duration};
+use std::{collections::HashMap, sync::Arc};
 
-use log::{debug, trace, warn};
-use tsubakuro_rust_core::prelude::*;
+use log::{debug, trace};
 
 use crate::{
     check_dbc,
     ctype::{HWnd, SqlChar, SqlReturn, SqlSmallInt, SqlUSmallInt, SqlWChar},
+    dbc::connect::{
+        connect_tsurugi::{connect_tsurugi, TsurugiOdbcConnectArguments},
+        dsn::read_dsn,
+    },
     handle::{
         diag::TsurugiOdbcError,
         hdbc::{HDbc, TsurugiOdbcDbc},
@@ -60,7 +63,7 @@ pub extern "system" fn SQLDriverConnect(
         Some(&dbc.diag_collection()),
     );
 
-    let rc = connect(&dbc, map);
+    let rc = driver_connect(FUNCTION_NAME, &dbc, map);
 
     let rc = rc.or(rc1);
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
@@ -117,7 +120,7 @@ pub extern "system" fn SQLDriverConnectW(
         Some(&dbc.diag_collection()),
     );
 
-    let rc = connect(&dbc, map);
+    let rc = driver_connect(FUNCTION_NAME, &dbc, map);
 
     let rc = rc.or(rc1);
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
@@ -148,66 +151,23 @@ fn map_to_connection_string(map: &HashMap<String, String>) -> String {
         .join("")
 }
 
-fn connect(dbc: &Arc<TsurugiOdbcDbc>, map: HashMap<String, String>) -> SqlReturn {
-    const FUNCTION_NAME: &str = "connect()";
-
-    if dbc.session().is_some() {
-        warn!("{dbc}.{FUNCTION_NAME} error. session already exists");
-        dbc.add_diag(TsurugiOdbcError::ConnectError, "session already exists");
-        return SqlReturn::SQL_ERROR;
-    }
-
-    let endpoint = match map.get("endpoint") {
-        Some(endpoint) => endpoint,
-        None => {
-            debug!("{dbc}.{FUNCTION_NAME}: endpoint not found in connection string");
-            dbc.add_diag(
-                TsurugiOdbcError::InvalidConnectionString,
-                "endpoint not found in connection string",
-            );
-            return SqlReturn::SQL_ERROR;
-        }
+fn driver_connect(
+    function_name: &str,
+    dbc: &Arc<TsurugiOdbcDbc>,
+    map: HashMap<String, String>,
+) -> SqlReturn {
+    let dsn = map.get("dsn").cloned();
+    let mut arg = if let Some(dsn) = dsn {
+        read_dsn(&dsn)
+    } else {
+        TsurugiOdbcConnectArguments::new()
     };
 
-    debug!("{dbc}.{FUNCTION_NAME}: endpoint={}", endpoint);
-    let mut connection_option = ConnectionOption::new();
-    if let Err(e) = connection_option.set_endpoint_url(endpoint) {
-        debug!("{dbc}.{FUNCTION_NAME}: endpoint error. {:?}", e);
-        dbc.add_diag(TsurugiOdbcError::EndpointError, e.message());
-        return SqlReturn::SQL_ERROR;
+    if let Some(endpoint) = map.get("endpoint") {
+        arg.endpoint = Some(endpoint.clone());
     }
 
-    let runtime = dbc.runtime();
-
-    let timeout = Duration::from_secs(dbc.connection_timeout());
-    let session = runtime.block_on(Session::connect_for(&connection_option, timeout));
-    let session = match session {
-        Ok(session) => {
-            debug!("{dbc}.{FUNCTION_NAME}: Session::connect() succeeded");
-            session
-        }
-        Err(e) => {
-            warn!("{dbc}.{FUNCTION_NAME}: Session::connect() error. {:?}", e);
-            match e {
-                TgError::ClientError(message, _) => {
-                    dbc.add_diag(TsurugiOdbcError::ConnectError, message);
-                }
-                TgError::TimeoutError(message) => {
-                    dbc.add_diag(TsurugiOdbcError::ConnectTimeout, message);
-                }
-                TgError::IoError(message, _) => {
-                    dbc.add_diag(TsurugiOdbcError::ConnectError, message);
-                }
-                TgError::ServerError(_, message, _, _) => {
-                    dbc.add_diag(TsurugiOdbcError::ConnectError, message);
-                }
-            }
-            return SqlReturn::SQL_ERROR;
-        }
-    };
-    dbc.set_session(session);
-
-    SqlReturn::SQL_SUCCESS
+    connect_tsurugi(function_name, dbc, arg)
 }
 
 #[cfg(test)]
