@@ -64,6 +64,10 @@ impl DataChannel {
         size: usize,
         timeout: &Timeout,
     ) -> Result<Option<BytesMut>, TgError> {
+        if size == 0 {
+            return Ok(Some(BytesMut::new()));
+        }
+
         let mut current = self.current.lock().await;
 
         if !self.exists_current(&mut current, timeout).await? {
