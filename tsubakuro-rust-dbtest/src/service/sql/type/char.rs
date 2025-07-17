@@ -121,7 +121,7 @@ mod test {
         assert_eq!(None, c.precision());
         assert_eq!(None, c.scale());
         assert_eq!(None, c.nullable());
-        assert_eq!(None, c.varying());
+        assert_eq!(Some(false), c.varying());
 
         let mut i = 0;
         while query_result.next_row().await.unwrap() {

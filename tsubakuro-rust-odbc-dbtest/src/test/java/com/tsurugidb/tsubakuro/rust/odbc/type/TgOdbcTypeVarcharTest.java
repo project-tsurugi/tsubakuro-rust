@@ -20,7 +20,7 @@ import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcGetDataArgument;
 
-class TgOdbcTypeCharacterTest extends TgOdbcTypeTester<String> {
+class TgOdbcTypeVarcharTest extends TgOdbcTypeTester<String> {
 
     @Override
     protected String sqlType() {
@@ -29,7 +29,7 @@ class TgOdbcTypeCharacterTest extends TgOdbcTypeTester<String> {
 
     @Override
     protected SqlDataType dataType() {
-        return SqlDataType.SQL_CHAR; // TODO SQL_VARCHAR
+        return SqlDataType.SQL_VARCHAR;
     }
 
     @Override

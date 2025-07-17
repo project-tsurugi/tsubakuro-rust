@@ -21,16 +21,13 @@ import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcGetDataArgument;
 
-class TgOdbcTypeOctetTest extends TgOdbcTypeTester<byte[]> {
+class TgOdbcTypeBinaryTest extends TgOdbcTypeTester<byte[]> {
+
+    private static final int LENGTH = 8;
 
     @Override
     protected String sqlType() {
-        return "varbinary";
-    }
-
-    @Override
-    protected String expectedSqlType() {
-        return "VARBINARY(*)";
+        return "binary(" + LENGTH + ")";
     }
 
     @Override
@@ -131,7 +128,7 @@ class TgOdbcTypeOctetTest extends TgOdbcTypeTester<byte[]> {
             assertTrue(re.getMessage().contains("Unsupported"), () -> re.getMessage());
             break;
         case SQL_C_BINARY:
-            assertArrayEquals(value, (byte[]) actual);
+            assertArrayEquals(expectedBinary(value), (byte[]) actual);
             break;
         default:
             throw new InternalError("Not yet implements targetType " + targetType);
@@ -143,7 +140,8 @@ class TgOdbcTypeOctetTest extends TgOdbcTypeTester<byte[]> {
         try {
             assertEquals(expected.size(), actual.size());
             for (int i = 0; i < actual.size(); i++) {
-                assertArrayEquals(expected.get(i), actual.get(i));
+                byte[] e = expectedBinary(expected.get(i));
+                assertArrayEquals(e, actual.get(i));
             }
         } catch (Throwable e) {
             LOG.error("{}\nexpected={}\nactual=  {}", e.getMessage(), toString(expected), toString(actual));
@@ -151,8 +149,18 @@ class TgOdbcTypeOctetTest extends TgOdbcTypeTester<byte[]> {
         }
     }
 
+    private static byte[] expectedBinary(byte[] value) {
+        if (value == null) {
+            return null;
+        }
+        if (value.length >= LENGTH) {
+            return value;
+        }
+
+        return Arrays.copyOf(value, LENGTH);
+    }
+
     private static String toString(List<byte[]> list) {
         return list.stream().map(Arrays::toString).collect(Collectors.joining(", ", "[", "]"));
-
     }
 }

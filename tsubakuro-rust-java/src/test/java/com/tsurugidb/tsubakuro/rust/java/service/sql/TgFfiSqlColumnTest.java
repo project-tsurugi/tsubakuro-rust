@@ -370,14 +370,13 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                         assertNull(c.getPrecision(context));
                         assertNull(c.getScale(context));
                         assertNull(c.getNullable(context));
-                        assertNull(c.getVarying(context));
                         // TODO assertEquals(length, c.getLength(context));
                         // TODO assertEquals(precision, c.getPrecision(context));
                         // TODO assertEquals(scale, c.getScale(context));
                         // TODO assertEquals(nullable, c.getNullable(context));
-                        // TODO assertEquals(varying, c.getVarying(context));
+                        assertEquals(varying, c.getVarying(context));
                         assertNull(c.getDescription(context));
-                        // TODO assertEquals(sqlTypeName(), c.getSqlTypeName(context));
+                        assertEquals(sqlTypeName(), c.getSqlTypeName(context));
                         // TODO assertEquals(sqlType(), c.getSqlType(context));
                     }
                 }

@@ -82,7 +82,7 @@ class SQLColAttributeTest extends TgOdbcTester {
         }
         {
             long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
-            assertEquals(SqlDataType.SQL_CHAR.value(), actual); // TODO SQL_VARCHAR
+            assertEquals(SqlDataType.SQL_VARCHAR, SqlDataType.fromValue((int) actual));
         }
         {
             long actual = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_UNSIGNED, wideChar);
