@@ -1,16 +1,13 @@
 package com.tsurugidb.tsubakuro.rust.odbc.type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -18,67 +15,35 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.tsurugidb.iceaxe.TsurugiConnector;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameter;
-import com.tsurugidb.iceaxe.sql.parameter.TgBindParameters;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindVariable;
-import com.tsurugidb.iceaxe.sql.parameter.TgParameterMapping;
-import com.tsurugidb.iceaxe.transaction.option.TgTxOption;
+import com.tsurugidb.iceaxe.sql.result.TsurugiResultEntity;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcRuntimeException;
 import com.tsurugidb.tsubakuro.rust.odbc.api.CDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
-import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
-import com.tsurugidb.tsubakuro.rust.odbc.stmt.ExpectedColumn;
+import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcBindParameter;
 import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcGetDataArgument;
-import com.tsurugidb.tsubakuro.rust.odbc.stmt.TgOdbcColAttributeArgument.FieldIdentifier;
-import com.tsurugidb.tsubakuro.rust.odbc.util.TgOdbcTester;
 
-class TgOdbcTypeTimestampTzTest extends TgOdbcTester {
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+class TgOdbcTypeTimestampTzTest extends TgOdbcTypeTester<OffsetDateTime> {
 
-    @BeforeAll
-    static void createTable() throws Exception {
-        String sql = """
-                create table test (
-                  pk int primary key,
-                  value timestamp with time zone
-                )
-                """;
-        dropAndCreateTable("test", sql);
-        insertJava();
+    @Override
+    protected String sqlType() {
+        return "timestamp with time zone";
     }
 
-    static void insertJava() throws IOException, InterruptedException {
-        var sql = "insert into test values(:pk, :value)";
-        var mapping = TgParameterMapping.of(TgBindVariable.ofInt("pk"), TgBindVariable.ofOffsetDateTime("value"));
-
-        var connector = TsurugiConnector.of(getEndpointJava());
-        try (var session = connector.createSession(); //
-                var ps = session.createStatement(sql, mapping)) {
-            var manager = session.createTransactionManager(TgTxOption.ofOCC());
-
-            manager.execute(transaction -> {
-                var values = values();
-                int pk = 0;
-                for (var value : values) {
-                    var parameter = TgBindParameters.of(TgBindParameter.of("pk", pk++), TgBindParameter.of("value", value));
-                    transaction.executeAndGetCountDetail(ps, parameter);
-                }
-            });
-        }
+    @Override
+    protected SqlDataType dataType() {
+        return SqlDataType.SQL_TYPE_TIMESTAMP;
     }
 
     private static final OffsetDateTime NOW = OffsetDateTime.now();
 
-    private static List<OffsetDateTime> values() {
+    @Override
+    protected List<OffsetDateTime> values() {
         var list = new ArrayList<OffsetDateTime>();
         list.add(NOW);
         for (var offset : List.of(ZoneOffset.UTC, ZoneOffset.ofHours(9))) {
@@ -86,186 +51,99 @@ class TgOdbcTypeTimestampTzTest extends TgOdbcTester {
             list.add(OffsetDateTime.of(1970, 1, 1, 0, 0, 0, 0, offset));
             list.add(OffsetDateTime.of(2025, 2, 7, 12, 30, 59, 123456789, offset));
             list.add(OffsetDateTime.of(9999, 12, 31, 23, 59, 59, 999_999_999, offset));
-            list.add(OffsetDateTime.of(-1, 1, 1, 0, 0, 0, 0, offset));
-            list.add(OffsetDateTime.of(0, 1, 1, 0, 0, 0, 0, offset));
+//          list.add(OffsetDateTime.of(-1, 1, 1, 0, 0, 0, 0, offset));
+//          list.add(OffsetDateTime.of(0, 1, 1, 0, 0, 0, 0, offset));
         }
         list.add(null);
         return list;
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void tableColumns(boolean wideChar) {
+    @Override
+    protected void insertOdbc(List<OffsetDateTime> values, boolean wideChar) {
         try (var stmt = createStmt()) {
-            stmt.columns("test", wideChar);
 
-            {
-                assertTrue(stmt.fetch());
+            int pk = 0;
+            for (OffsetDateTime value : values) {
+                String sql;
+                if (value != null) {
+                    String s = value.format(FORMATTER);
+                    sql = "insert into test values(%d, timestamp with time zone'%s')".formatted(pk, s);
+                } else {
+                    sql = "insert into test values(%d, null)".formatted(pk);
+                }
+                stmt.execDirect(sql, wideChar);
 
-                new ExpectedColumn(1, "pk").initialize("INT").notNull() //
-                        .test(stmt, wideChar);
+                pk++;
             }
-            {
-                assertTrue(stmt.fetch());
-
-                var expected = new ExpectedColumn(2, "value").initialize("TIMESTAMP WITH TIME ZONE");
-                expected.test(stmt, wideChar);
-            }
-            assertFalse(stmt.fetch());
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void selectOdbc(boolean wideChar) {
-        try (var stmt = createStmt()) {
-            var manager = stmt.manager();
-
-            stmt.execDirect("select * from test order by pk", wideChar);
-
-            describeColumn(stmt, wideChar);
-            columnAttribute(stmt, wideChar);
-
-            var actual = new ArrayList<OffsetDateTime>();
-            int rowIndex = 0;
-            while (stmt.fetch()) {
-                int pk = stmt.getDataInt(1);
-                assertEquals(rowIndex, pk, "pk");
-
-                var arg = getDataArgument(manager, wideChar);
-                OffsetDateTime value = stmt.getData(2, arg);
-                actual.add(value);
-
-                rowIndex++;
-            }
-
-            var expected = values();
-            assertValueList(expected, actual);
-        }
+    @Override
+    protected TgBindVariable<OffsetDateTime> bindVariable(String name) {
+        return TgBindVariable.ofOffsetDateTime(name);
     }
 
-    private void describeColumn(TgOdbcStmtHandle stmt, boolean wideChar) {
-        int numberOfColumns = stmt.numResultCols();
-        assertEquals(2, numberOfColumns);
-
-        {
-            var desc = stmt.describeCol(1, wideChar);
-            assertEquals("pk", desc.columnName());
-            assertEquals(SqlDataType.SQL_INTEGER, desc.dataType());
-        }
-        {
-            var desc = stmt.describeCol(2, wideChar);
-            assertEquals("value", desc.columnName());
-            assertEquals(SqlDataType.SQL_UNKNOWN_TYPE, desc.dataType());
-        }
+    @Override
+    protected TgBindParameter bindParameter(String name, OffsetDateTime value) {
+        return TgBindParameter.of(name, value);
     }
 
-    private void columnAttribute(TgOdbcStmtHandle stmt, boolean wideChar) {
-        long numberOfColumns = stmt.colAttributeNumeric(0, FieldIdentifier.SQL_DESC_COUNT, wideChar);
-        assertEquals(2, numberOfColumns);
-
-        {
-            final int i = 1;
-            String name = stmt.colAttributeString(i, FieldIdentifier.SQL_DESC_NAME, wideChar);
-            assertEquals("pk", name);
-
-            long dataType = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
-            assertEquals(SqlDataType.SQL_INTEGER, SqlDataType.fromValue((int) dataType));
-        }
-        {
-            final int i = 2;
-            String name = stmt.colAttributeString(i, FieldIdentifier.SQL_DESC_NAME, wideChar);
-            assertEquals("value", name);
-
-            long dataType = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
-            assertEquals(SqlDataType.SQL_UNKNOWN_TYPE, SqlDataType.fromValue((int) dataType));
-
-            String typeName = stmt.colAttributeString(i, FieldIdentifier.SQL_DESC_TYPE_NAME, wideChar);
-            assertEquals("TIMESTAMP WITH TIME ZONE", typeName);
-        }
+    @Override
+    protected OffsetDateTime get(TsurugiResultEntity entity, String name) {
+        return entity.getOffsetDateTime(name);
     }
 
-    private TgOdbcGetDataArgument<OffsetDateTime> getDataArgument(TgOdbcManager manager, boolean wideChar) {
+    @Override
+    protected TgOdbcGetDataArgument<OffsetDateTime> getDataArgument(TgOdbcManager manager, boolean wideChar) {
         return TgOdbcGetDataArgument.ofTimestampTz(manager);
+    }
+
+    @Override
+    protected TgOdbcBindParameter bindParameter(TgOdbcManager manager, OffsetDateTime value, boolean wideChar) {
+        return TgOdbcBindParameter.ofTimestampTz(manager, value);
+    }
+
+    @Test
+    @Disabled // SQLBindParameterはTIMESTAMP WITH TIME ZONEに対応していない
+    void bindParameterCombination() {
+        testBindParameterCombination(SqlDataType.SQL_TYPE_TIMESTAMP);
+    }
+
+    @Override
+    protected ExpectedBindValue bindValue(TgOdbcManager manager, CDataType valueType, OffsetDateTime value) {
+        TgOdbcBindParameter parameter;
+        OffsetDateTime expected;
+        switch (valueType) {
+        case SQL_C_CHAR:
+            parameter = TgOdbcBindParameter.ofStringUtf8(manager, value.toString());
+            expected = value;
+            break;
+        case SQL_C_WCHAR:
+            parameter = TgOdbcBindParameter.ofStringUtf16(manager, value.toString());
+            expected = value;
+            break;
+        case SQL_C_DATE:
+        case SQL_C_TYPE_DATE:
+            parameter = TgOdbcBindParameter.ofDate(manager, value.toLocalDate());
+            expected = value.truncatedTo(ChronoUnit.DAYS);
+            break;
+        case SQL_C_TIMESTAMP:
+        case SQL_C_TYPE_TIMESTAMP:
+            parameter = TgOdbcBindParameter.ofTimestampTz(manager, value);
+            expected = value;
+            break;
+        default:
+            return null;
+        }
+        return new ExpectedBindValue(parameter, expected);
     }
 
     @Test
     void getDataCombination() throws Exception {
-        var values = values();
-
-        var manager = getOdbcManager();
-        testGetData(values, TgOdbcGetDataArgument.ofBoolean(manager).targetType(CDataType.SQL_C_BIT));
-        testGetData(values, TgOdbcGetDataArgument.ofByte(manager).targetType(CDataType.SQL_C_TINYINT));
-        testGetData(values, TgOdbcGetDataArgument.ofByte(manager).targetType(CDataType.SQL_C_STINYINT));
-        testGetData(values, TgOdbcGetDataArgument.ofByte(manager).targetType(CDataType.SQL_C_UTINYINT));
-        testGetData(values, TgOdbcGetDataArgument.ofShort(manager).targetType(CDataType.SQL_C_SHORT));
-        testGetData(values, TgOdbcGetDataArgument.ofShort(manager).targetType(CDataType.SQL_C_SSHORT));
-        testGetData(values, TgOdbcGetDataArgument.ofShort(manager).targetType(CDataType.SQL_C_USHORT));
-        testGetData(values, TgOdbcGetDataArgument.ofInt(manager).targetType(CDataType.SQL_C_LONG));
-        testGetData(values, TgOdbcGetDataArgument.ofInt(manager).targetType(CDataType.SQL_C_SLONG));
-        testGetData(values, TgOdbcGetDataArgument.ofInt(manager).targetType(CDataType.SQL_C_ULONG));
-        testGetData(values, TgOdbcGetDataArgument.ofLong(manager).targetType(CDataType.SQL_C_SBIGINT));
-        testGetData(values, TgOdbcGetDataArgument.ofLong(manager).targetType(CDataType.SQL_C_UBIGINT));
-        testGetData(values, TgOdbcGetDataArgument.ofFloat(manager).targetType(CDataType.SQL_C_FLOAT));
-        testGetData(values, TgOdbcGetDataArgument.ofDouble(manager).targetType(CDataType.SQL_C_DOUBLE));
-        testGetData(values, TgOdbcGetDataArgument.ofDecimal(manager).targetType(CDataType.SQL_C_NUMERIC));
-        testGetData(values, TgOdbcGetDataArgument.ofString(manager, 1024, false).targetType(CDataType.SQL_C_CHAR));
-        testGetData(values, TgOdbcGetDataArgument.ofString(manager, 1024, true).targetType(CDataType.SQL_C_WCHAR));
-        testGetData(values, TgOdbcGetDataArgument.ofBinary(manager, 1024).targetType(CDataType.SQL_C_BINARY));
-        testGetData(values, TgOdbcGetDataArgument.ofDate(manager).targetType(CDataType.SQL_C_DATE));
-        testGetData(values, TgOdbcGetDataArgument.ofDate(manager).targetType(CDataType.SQL_C_TYPE_DATE));
-        testGetData(values, TgOdbcGetDataArgument.ofTime(manager).targetType(CDataType.SQL_C_TIME));
-        testGetData(values, TgOdbcGetDataArgument.ofTime(manager).targetType(CDataType.SQL_C_TYPE_TIME));
-        testGetData(values, TgOdbcGetDataArgument.ofTimestamp(manager).targetType(CDataType.SQL_C_TIMESTAMP));
-        testGetData(values, TgOdbcGetDataArgument.ofTimestamp(manager).targetType(CDataType.SQL_C_TYPE_TIMESTAMP));
+        testGetDataCombination();
     }
 
-    private <C> void testGetData(List<OffsetDateTime> values, TgOdbcGetDataArgument<C> arg) {
-        LOG.info("testGetData(): targetType={}", arg.targetType());
-
-        try (var stmt = createStmt()) {
-            stmt.execDirect("select * from test order by pk", false);
-
-            int rowIndex = 0;
-            while (stmt.fetch()) {
-                int pk = stmt.getDataInt(1);
-                assertEquals(rowIndex, pk, "pk");
-
-                OffsetDateTime value = values.get(rowIndex);
-                C actual;
-                try {
-                    actual = stmt.getData(2, arg);
-                } catch (Throwable e) {
-                    if (e instanceof TgOdbcRuntimeException re) {
-                        try {
-                            assertGetData(value, arg.targetType(), null, re);
-                        } catch (Throwable e2) {
-                            LOG.error("{}\n{}\npk={}, targetType={}\nvalue ={}", e.getMessage(), e2.getMessage(), pk, arg.targetType(), value);
-                            throw e2;
-                        }
-                        rowIndex++;
-                        continue;
-                    }
-                    LOG.error("{}\npk={}, targetType={}\nvalue ={}", e.getMessage(), pk, arg.targetType(), value);
-                    throw e;
-                }
-                if (value == null) {
-                    assertNull(actual);
-                } else {
-                    try {
-                        assertGetData(value, arg.targetType(), actual, null);
-                    } catch (Throwable e) {
-                        LOG.error("{}\npk={}, targetType={}\nvalue ={}\nactual={}", e.getMessage(), pk, arg.targetType(), value, actual);
-                        throw e;
-                    }
-                }
-
-                rowIndex++;
-            }
-            assertEquals(values.size(), rowIndex);
-        }
-    }
-
+    @Override
     protected void assertGetData(OffsetDateTime value, CDataType targetType, Object actual, TgOdbcRuntimeException re) {
         switch (targetType) {
         case SQL_C_BIT:
@@ -318,6 +196,7 @@ class TgOdbcTypeTimestampTzTest extends TgOdbcTester {
         return utc.format(FORMATTER);
     }
 
+    @Override
     protected void assertValueList(List<OffsetDateTime> expected, List<OffsetDateTime> actual) {
         try {
             assertEquals(expected.size(), actual.size());

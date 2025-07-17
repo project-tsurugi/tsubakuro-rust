@@ -189,7 +189,7 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
         assertValueList(values, actual);
     }
 
-    private void insertOdbc(List<T> values, boolean wideChar) {
+    protected void insertOdbc(List<T> values, boolean wideChar) {
         try (var stmt = createStmt()) {
             var manager = stmt.manager();
 

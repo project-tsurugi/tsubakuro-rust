@@ -3,7 +3,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 use crate::{
     ctype::{
-        sql_date_struct::SqlDateStruct, sql_timestamp_struct::SqlTimestampStruct, CDataType,
+        sql_time_struct::SqlTimeStruct, sql_timestamp_struct::SqlTimestampStruct, CDataType,
         SqlReturn,
     },
     handle::{diag::TsurugiOdbcError, hstmt::TsurugiOdbcStmt},
@@ -11,30 +11,30 @@ use crate::{
 };
 
 impl TsurugiOdbcBindParameter {
-    pub(super) fn tg_parameter_timestamp(
+    pub(super) fn tg_parameter_time_tz(
         &self,
         name: String,
         stmt: &TsurugiOdbcStmt,
     ) -> Result<SqlParameter, SqlReturn> {
-        const FUNCTION_NAME: &str = "sql_parameter_timestamp()";
+        const FUNCTION_NAME: &str = "sql_parameter_time_tz()";
 
         let value_type = self.value_type;
         let value_ptr = self.parameter_value_ptr;
 
         use CDataType::*;
-        let value: time::PrimitiveDateTime = match value_type {
+        let value: (time::Time, time::UtcOffset) = match value_type {
             SQL_C_CHAR => {
                 let s = self.char_ptr_to_string(FUNCTION_NAME, stmt)?;
-                string_to_timestamp(FUNCTION_NAME, stmt, &s)?
+                string_to_time_tz(FUNCTION_NAME, stmt, &s)?
             }
             SQL_C_WCHAR => {
                 let s = self.wchar_ptr_to_string(FUNCTION_NAME, stmt)?;
-                string_to_timestamp(FUNCTION_NAME, stmt, &s)?
+                string_to_time_tz(FUNCTION_NAME, stmt, &s)?
             }
-            SQL_C_TYPE_DATE | SQL_C_DATE => unsafe {
-                let ptr = value_ptr as *const SqlDateStruct;
-                match time::PrimitiveDateTime::try_from(&*ptr) {
-                    Ok(value) => value,
+            SQL_C_TYPE_TIME | SQL_C_TIME => unsafe {
+                let ptr = value_ptr as *const SqlTimeStruct;
+                match time::Time::try_from(&*ptr) {
+                    Ok(value) => (value, time::UtcOffset::UTC),
                     Err(e) => {
                         debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
                         stmt.add_diag(
@@ -47,8 +47,8 @@ impl TsurugiOdbcBindParameter {
             },
             SQL_C_TYPE_TIMESTAMP | SQL_C_TIMESTAMP => unsafe {
                 let ptr = value_ptr as *const SqlTimestampStruct;
-                match time::PrimitiveDateTime::try_from(&*ptr) {
-                    Ok(value) => value,
+                match time::Time::try_from(&*ptr) {
+                    Ok(value) => (value, time::UtcOffset::UTC),
                     Err(e) => {
                         debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
                         stmt.add_diag(
@@ -66,7 +66,7 @@ impl TsurugiOdbcBindParameter {
                 );
                 stmt.add_diag(
                     TsurugiOdbcError::UnsupportedCDataType,
-                    format!("Unsupported value_type {:?} for TIMESTAMP", value_type),
+                    format!("Unsupported value_type {:?} for TIME", value_type),
                 );
                 return Err(SqlReturn::SQL_ERROR);
             }
@@ -77,13 +77,13 @@ impl TsurugiOdbcBindParameter {
     }
 }
 
-fn string_to_timestamp(
+fn string_to_time_tz(
     function_name: &str,
     stmt: &TsurugiOdbcStmt,
     value: &str,
-) -> Result<time::PrimitiveDateTime, SqlReturn> {
+) -> Result<(time::Time, time::UtcOffset), SqlReturn> {
     match do_string_to_timestamp_tz(value) {
-        Ok(value) => Ok(time::PrimitiveDateTime::new(value.date(), value.time())),
+        Ok(value) => Ok((value.time(), value.offset())),
         Err(e) => {
             debug!("{stmt}.{function_name}: convert error. {:?}", e);
             stmt.add_diag(

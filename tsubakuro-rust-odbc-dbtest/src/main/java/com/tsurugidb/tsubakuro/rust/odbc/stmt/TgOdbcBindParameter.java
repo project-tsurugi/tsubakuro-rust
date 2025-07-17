@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
@@ -237,6 +238,15 @@ public class TgOdbcBindParameter {
             return ofTime().parameterValuePtr(date.address(), date.byteSize());
         } else {
             return ofTime().nullValue();
+        }
+    }
+
+    public static TgOdbcBindParameter ofTimestampTz(TgOdbcManager manager, OffsetDateTime value) {
+        if (value != null) {
+            var date = SqlTimestampStruct.of(manager, value.toLocalDateTime());
+            return ofTimestamp().parameterValuePtr(date.address(), date.byteSize());
+        } else {
+            return ofTimestamp().nullValue();
         }
     }
 

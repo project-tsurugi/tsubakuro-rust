@@ -137,12 +137,12 @@ public class ExpectedColumn {
             this.decimalDigits = 9;
             break;
         case "TIME WITH TIME ZONE":
-            this.dataType = SqlDataType.SQL_UNKNOWN_TYPE;
+            this.dataType = SqlDataType.SQL_TYPE_TIME;
             this.columnSize = 18 + 6;
             this.decimalDigits = 9;
             break;
         case "TIMESTAMP WITH TIME ZONE":
-            this.dataType = SqlDataType.SQL_UNKNOWN_TYPE;
+            this.dataType = SqlDataType.SQL_TYPE_TIMESTAMP;
             this.columnSize = (10 + 1 + 18) + 6;
             this.decimalDigits = 9;
             break;

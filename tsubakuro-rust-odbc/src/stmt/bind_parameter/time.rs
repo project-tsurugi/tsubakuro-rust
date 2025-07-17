@@ -7,7 +7,7 @@ use crate::{
         SqlReturn,
     },
     handle::{diag::TsurugiOdbcError, hstmt::TsurugiOdbcStmt},
-    stmt::bind_parameter::TsurugiOdbcBindParameter,
+    stmt::bind_parameter::{timestamp_tz::do_string_to_timestamp_tz, TsurugiOdbcBindParameter},
 };
 
 impl TsurugiOdbcBindParameter {
@@ -82,8 +82,8 @@ fn string_to_time(
     stmt: &TsurugiOdbcStmt,
     value: &str,
 ) -> Result<time::Time, SqlReturn> {
-    match do_string_to_time(value) {
-        Ok(value) => Ok(value),
+    match do_string_to_timestamp_tz(value) {
+        Ok(value) => Ok(value.time()),
         Err(e) => {
             debug!("{stmt}.{function_name}: convert error. {:?}", e);
             stmt.add_diag(
@@ -96,6 +96,9 @@ fn string_to_time(
 }
 
 pub(crate) fn do_string_to_time(value: &str) -> Result<time::Time, Box<dyn std::error::Error>> {
+    let value = truncate_after_char(value, '+');
+    let value = truncate_after_char(value, '-');
+
     let mut count = 0;
     let mut period = false;
 
@@ -122,9 +125,24 @@ pub(crate) fn do_string_to_time(value: &str) -> Result<time::Time, Box<dyn std::
     Ok(value)
 }
 
+fn truncate_after_char(s: &str, c: char) -> &str {
+    if let Some(pos) = s.find(c) {
+        &s[..pos]
+    } else {
+        s
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_truncate_after_char() {
+        assert_eq!(truncate_after_char("abc+def", '+'), "abc");
+        assert_eq!(truncate_after_char("abc-def", '+'), "abc-def");
+        assert_eq!(truncate_after_char("abcdef", '+'), "abcdef");
+    }
 
     #[test]
     fn parse() {
@@ -178,6 +196,20 @@ mod test {
         {
             let actual = do_string_to_time("23:59:59.999999999").unwrap();
             let expected = time::Time::from_hms_nano(23, 59, 59, 999_999_999).unwrap();
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn parse_with_timezone() {
+        {
+            let actual = do_string_to_time("12:34:56.123456789+09:00").unwrap();
+            let expected = time::Time::from_hms_nano(12, 34, 56, 123456789).unwrap();
+            assert_eq!(expected, actual);
+        }
+        {
+            let actual = do_string_to_time("12:34:56.123456789-09:00").unwrap();
+            let expected = time::Time::from_hms_nano(12, 34, 56, 123456789).unwrap();
             assert_eq!(expected, actual);
         }
     }

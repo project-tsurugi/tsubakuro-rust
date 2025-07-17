@@ -24,7 +24,9 @@ mod int4;
 mod int8;
 mod octet;
 mod time;
+mod time_tz;
 mod timestamp;
+mod timestamp_tz;
 
 #[no_mangle]
 pub extern "system" fn SQLBindParameter(
@@ -262,8 +264,8 @@ impl TsurugiOdbcBindParameter {
             AtomType::TimeOfDay => self.tg_parameter_time(name, stmt),
             AtomType::TimePoint => self.tg_parameter_timestamp(name, stmt),
             // AtomType::DatetimeInterval => todo!(),
-            // AtomType::TimeOfDayWithTimeZone => todo!(),
-            // AtomType::TimePointWithTimeZone => todo!(),
+            AtomType::TimeOfDayWithTimeZone => self.tg_parameter_time_tz(name, stmt),
+            AtomType::TimePointWithTimeZone => self.tg_parameter_timestamp_tz(name, stmt),
             // AtomType::Clob => todo!(),
             // AtomType::Blob => todo!(),
             _ => {

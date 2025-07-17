@@ -7,7 +7,7 @@ use crate::{
         SqlReturn,
     },
     handle::{diag::TsurugiOdbcError, hstmt::TsurugiOdbcStmt},
-    stmt::bind_parameter::TsurugiOdbcBindParameter,
+    stmt::bind_parameter::{timestamp_tz::do_string_to_timestamp_tz, TsurugiOdbcBindParameter},
 };
 
 impl TsurugiOdbcBindParameter {
@@ -82,8 +82,8 @@ fn string_to_date(
     stmt: &TsurugiOdbcStmt,
     value: &str,
 ) -> Result<time::Date, SqlReturn> {
-    match do_string_to_date(value) {
-        Ok(value) => Ok(value),
+    match do_string_to_timestamp_tz(value) {
+        Ok(value) => Ok(value.date()),
         Err(e) => {
             debug!("{stmt}.{function_name}: convert error. {:?}", e);
             stmt.add_diag(
