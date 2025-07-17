@@ -419,7 +419,16 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
         SQL_DESC_SCHEMA_NAME => write_string(stmt, &arg, ""), // TODO schema name
         SQL_DESC_SEARCHABLE => write_numeric(stmt, &arg, searchable(&column.data_type()) as SqlLen),
         SQL_DESC_TYPE_NAME => {
-            write_string(stmt, &arg, type_name(&column.data_type()).unwrap_or(""))
+            let value = column
+                .sql_column()
+                .map(|c| c.sql_type_name())
+                .unwrap_or(None);
+            let value = if let Some(value) = value {
+                value
+            } else {
+                type_name(&column.data_type()).unwrap_or("")
+            };
+            write_string(stmt, &arg, value)
         }
         SQL_DESC_UNNAMED => {
             let name = column.column_name();

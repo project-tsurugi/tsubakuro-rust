@@ -14,6 +14,7 @@ public class ExpectedColumn {
     private String tableName = "test";
     private SqlDataType dataType;
     private String typeName;
+    private String typeBaseName;
     private Integer columnSize;
     private Integer bufferLength;
     private Short decimalDigits;
@@ -57,6 +58,7 @@ public class ExpectedColumn {
                 baseName = typeName.trim().toUpperCase();
             }
         }
+        this.typeBaseName = baseName;
 
         switch (baseName) {
         case "BOOLEAN":
@@ -280,5 +282,9 @@ public class ExpectedColumn {
         } else {
             assertEquals("NO", isNullable);
         }
+    }
+
+    public String typeBaseName() {
+        return this.typeBaseName;
     }
 }
