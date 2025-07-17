@@ -345,7 +345,7 @@ fn column_size(column: &SqlColumn) -> Option<i32> {
 fn column_buffer_length(column: &SqlColumn) -> Option<i32> {
     use AtomType::*;
     let length = match column.atom_type()? {
-        // Boolean => todo!(),
+        Boolean => 1,
         Int4 => 4,
         Int8 => 8,
         Float4 => 4,

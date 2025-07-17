@@ -287,7 +287,8 @@ fn column_size(column: &SqlColumn) -> SqlULen {
                 Some((precision, false)) => precision as SqlULen,
                 None => 0,
             },
-            Character | Octet => char_octet_length(column).unwrap_or(0) as SqlULen,
+            Character => 0, // Cannot convert to character count
+            Octet => char_octet_length(column).unwrap_or(0) as SqlULen,
             Date => 10,             // yyyy-MM-dd
             TimeOfDay => 8 + 1 + 9, // HH:mm:ss.nnnnnnnnn
             TimePoint => 10 + 1 + (8 + 1 + 9),

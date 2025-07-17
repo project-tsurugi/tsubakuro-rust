@@ -374,12 +374,7 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
         }
         SQL_DESC_LOCAL_TYPE_NAME => write_string(stmt, &arg, ""),
         SQL_DESC_LENGTH | SQL_COLUMN_LENGTH => {
-            let value = if let Some(column) = column.sql_column() {
-                char_octet_length(column).unwrap_or(0) as SqlLen
-            } else {
-                0
-            };
-            write_numeric(stmt, &arg, value)
+            write_numeric(stmt, &arg, column.column_size() as SqlLen)
         }
         SQL_DESC_LITERAL_PREFIX => write_string(
             stmt,
