@@ -8,6 +8,8 @@ import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 
 public class ExpectedColumn {
+    private static final long SQL_NO_TOTAL = -4;
+
     private final int ordinalPosition;
     private final String columnName;
 
@@ -21,6 +23,8 @@ public class ExpectedColumn {
     private Short numPrecRadix;
     private boolean nullable = true;
     private String remarks;
+
+    private long descLength;
 
     public ExpectedColumn(int ordinalPosition, String columnName) {
         this.ordinalPosition = ordinalPosition;
@@ -66,51 +70,60 @@ public class ExpectedColumn {
             this.columnSize = 1;
             this.numPrecRadix = 2;
             this.bufferLength = 1;
+            this.descLength = 1;
             break;
         case "INT":
             this.dataType = SqlDataType.SQL_INTEGER;
             this.columnSize = 32;
             this.numPrecRadix = 2;
             this.bufferLength = 4;
+            this.descLength = 10;
             break;
         case "BIGINT":
             this.dataType = SqlDataType.SQL_BIGINT;
             this.columnSize = 64;
             this.numPrecRadix = 2;
             this.bufferLength = 8;
+            this.descLength = 19;
             break;
         case "REAL":
             this.dataType = SqlDataType.SQL_REAL;
             this.columnSize = 38;
             this.numPrecRadix = 10;
             this.bufferLength = 4;
+            this.descLength = 7;
             break;
         case "DOUBLE":
             this.dataType = SqlDataType.SQL_DOUBLE;
             this.columnSize = 308;
             this.numPrecRadix = 10;
             this.bufferLength = 8;
+            this.descLength = 15;
             break;
         case "DECIMAL":
             this.dataType = SqlDataType.SQL_DECIMAL;
             this.bufferLength = 19;
             this.decimalDigits = size2.shortValue();
             this.numPrecRadix = 10;
+            this.descLength = size1;
             break;
         case "CHAR":
             this.dataType = SqlDataType.SQL_CHAR;
             this.columnSize = size1;
             this.bufferLength = size1;
+            this.descLength = SQL_NO_TOTAL;
             break;
         case "VARCHAR":
             this.dataType = SqlDataType.SQL_VARCHAR;
             this.columnSize = size1;
             this.bufferLength = size1;
+            this.descLength = SQL_NO_TOTAL;
             break;
         case "BINARY":
             this.dataType = SqlDataType.SQL_BINARY;
             this.columnSize = size1;
             this.bufferLength = size1;
+            this.descLength = SQL_NO_TOTAL;
             break;
         case "VARBINARY":
             this.dataType = SqlDataType.SQL_VARBINARY;
@@ -121,30 +134,36 @@ public class ExpectedColumn {
                 this.columnSize = size1;
                 this.bufferLength = size1;
             }
+            this.descLength = SQL_NO_TOTAL;
             break;
         case "DATE":
             this.dataType = SqlDataType.SQL_TYPE_DATE;
             this.columnSize = 10;
+            this.descLength = this.columnSize;
             break;
         case "TIME":
             this.dataType = SqlDataType.SQL_TYPE_TIME;
             this.columnSize = 18;
             this.decimalDigits = 9;
+            this.descLength = this.columnSize;
             break;
         case "TIMESTAMP":
             this.dataType = SqlDataType.SQL_TYPE_TIMESTAMP;
             this.columnSize = 10 + 1 + 18;
             this.decimalDigits = 9;
+            this.descLength = this.columnSize;
             break;
         case "TIME WITH TIME ZONE":
             this.dataType = SqlDataType.SQL_TYPE_TIME;
             this.columnSize = 18 + 6;
             this.decimalDigits = 9;
+            this.descLength = this.columnSize;
             break;
         case "TIMESTAMP WITH TIME ZONE":
             this.dataType = SqlDataType.SQL_TYPE_TIMESTAMP;
             this.columnSize = (10 + 1 + 18) + 6;
             this.decimalDigits = 9;
+            this.descLength = this.columnSize;
             break;
         default:
             throw new AssertionError("not yet implements. type=" + typeName);
@@ -286,5 +305,9 @@ public class ExpectedColumn {
 
     public String typeBaseName() {
         return this.typeBaseName;
+    }
+
+    public long descLength() {
+        return this.descLength;
     }
 }

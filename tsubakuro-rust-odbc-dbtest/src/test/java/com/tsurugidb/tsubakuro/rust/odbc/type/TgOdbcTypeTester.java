@@ -171,9 +171,13 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
             long dataType = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_CONCISE_TYPE, wideChar);
             assertEquals(dataType(), SqlDataType.fromValue((int) dataType));
 
-            String typeName = stmt.colAttributeString(i, FieldIdentifier.SQL_DESC_TYPE_NAME, wideChar);
             var expected = new ExpectedColumn(2, "value").initialize(expectedSqlType());
+
+            String typeName = stmt.colAttributeString(i, FieldIdentifier.SQL_DESC_TYPE_NAME, wideChar);
             assertEquals(expected.typeBaseName(), typeName);
+
+            long descLength = stmt.colAttributeNumeric(i, FieldIdentifier.SQL_DESC_LENGTH, wideChar);
+            assertEquals(expected.descLength(), descLength);
         }
     }
 

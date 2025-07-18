@@ -4,14 +4,14 @@ use tsubakuro_rust_core::prelude::{AtomType, SqlColumn};
 use crate::{
     check_stmt,
     ctype::{
-        SqlChar, SqlDataType, SqlNullable, SqlPointer, SqlReturn, SqlSmallInt, SqlULen,
-        SqlUSmallInt, SqlWChar,
+        SqlChar, SqlDataType, SqlLen, SqlNullable, SqlPointer, SqlReturn, SqlSmallInt, SqlULen,
+        SqlUSmallInt, SqlWChar, SQL_NO_TOTAL,
     },
     handle::{
         diag::TsurugiOdbcError,
         hstmt::{HStmt, TsurugiOdbcStmt},
     },
-    stmt::columns::{char_octet_length, decimal_digits},
+    stmt::columns::decimal_digits,
     util::{write_char, write_wchar},
 };
 
@@ -70,7 +70,7 @@ impl TsurugiOdbcDescribeColumn {
         self.data_type
     }
 
-    pub(crate) fn column_size(&self) -> SqlULen {
+    pub(crate) fn column_size(&self) -> SqlLen {
         if let Some(column) = &self.column {
             column_size(column)
         } else {
@@ -265,15 +265,25 @@ fn describe_col(
             Some(&stmt.diag_collection()),
         )
     };
+
     write_data_type(&column.data_type, data_type_ptr);
-    write_column_size(column.column_size(), column_size_ptr);
+
+    let column_size = column.column_size();
+    let column_size = if column_size == SQL_NO_TOTAL {
+        0
+    } else {
+        column_size as SqlULen
+    };
+    write_column_size(column_size, column_size_ptr);
+
     write_decimal_digits(column.decimal_digits(), decimal_digits_ptr);
+
     write_nullable(column.nullable, nullable_ptr);
 
     rc
 }
 
-fn column_size(column: &SqlColumn) -> SqlULen {
+fn column_size(column: &SqlColumn) -> SqlLen {
     use AtomType::*;
     match column.atom_type() {
         Some(atom_type) => match atom_type {
@@ -283,12 +293,11 @@ fn column_size(column: &SqlColumn) -> SqlULen {
             Float4 => 7,
             Float8 => 15,
             Decimal => match column.precision() {
-                Some((_, true)) => 38,
-                Some((precision, false)) => precision as SqlULen,
-                None => 0,
+                Some((precision, false)) => precision as SqlLen,
+                _ => 38,
             },
-            Character => 0, // Cannot convert to character count
-            Octet => char_octet_length(column).unwrap_or(0) as SqlULen,
+            Character | Octet => SQL_NO_TOTAL, // TODO lengthが取れるようになったらchar_octet_length()を呼ぶ
+            // Character | Octet => char_octet_length(column).unwrap_or(SQL_NO_TOTAL) as SqlLen,
             Date => 10,             // yyyy-MM-dd
             TimeOfDay => 8 + 1 + 9, // HH:mm:ss.nnnnnnnnn
             TimePoint => 10 + 1 + (8 + 1 + 9),

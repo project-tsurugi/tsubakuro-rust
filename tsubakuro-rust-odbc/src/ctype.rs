@@ -44,3 +44,5 @@ pub const SQL_PRED_CHAR: i32 = 1;
 pub const SQL_PRED_BASIC: i32 = 2;
 
 pub const SQL_NULL_DATA: SqlLen = -1;
+
+pub const SQL_NO_TOTAL: SqlLen = -4;
