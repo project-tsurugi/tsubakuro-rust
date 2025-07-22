@@ -6,9 +6,21 @@ Tsurugi ODBCドライバーのインストール方法を説明します。
 
 ### 手動インストール
 
+#### 前提
+
+Tsurugi ODBCドライバーのdllファイル（  `tsubakuro_rust_odbc.dll`  ）は、tsubakuro-rust-odbcをビルドして生成します。
+
+> [!NOTE]
+>
+> ビルドしたのと異なる環境でdllファイルを使用する場合、ビルド環境と同等のライブラリーが必要になることがあります。
+>
+> 例えばVisual C++ランタイムライブラリー（VC++ランタイムライブラリー）を使ってビルドされている場合、実行環境に「ビルド環境と互換性のあるバージョンのVC++ランタイムライブラリー」が必要です。
+>
+> （VC++ランタイムライブラリーに依存しているかどうかは、`rustup show` や `cargo build -v` , `dumpbin /dependents` 等で確認できます）
+
 #### ドライバーのインストール
 
-1. tsubakuro-rust-odbcをビルドして生成された `tsubakuro_rust_odbc.dll` を適当な場所に配置します。
+1. `tsubakuro_rust_odbc.dll` を適当な場所に配置します。
 
 2. Windowsのレジストリーに登録するための、拡張子regのファイルを作成します。
 
