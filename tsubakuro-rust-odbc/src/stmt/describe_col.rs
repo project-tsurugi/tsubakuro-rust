@@ -11,7 +11,7 @@ use crate::{
         diag::TsurugiOdbcError,
         hstmt::{HStmt, TsurugiOdbcStmt},
     },
-    stmt::columns::decimal_digits,
+    stmt::columns::{char_octet_length, decimal_digits},
     util::{write_char, write_wchar},
 };
 
@@ -296,8 +296,7 @@ fn column_size(column: &SqlColumn) -> SqlLen {
                 Some((precision, false)) => precision as SqlLen,
                 _ => 38,
             },
-            Character | Octet => SQL_NO_TOTAL, // TODO lengthが取れるようになったらchar_octet_length()を呼ぶ
-            // Character | Octet => char_octet_length(column).unwrap_or(SQL_NO_TOTAL) as SqlLen,
+            Character | Octet => char_octet_length(column).unwrap_or(2097132) as SqlLen,
             Date => 10,             // yyyy-MM-dd
             TimeOfDay => 8 + 1 + 9, // HH:mm:ss.nnnnnnnnn
             TimePoint => 10 + 1 + (8 + 1 + 9),

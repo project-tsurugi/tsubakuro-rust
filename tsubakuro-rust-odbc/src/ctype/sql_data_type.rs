@@ -112,14 +112,14 @@ impl From<&SqlColumn> for SqlDataType {
             AtomType::Float8 => SQL_DOUBLE,
             AtomType::Decimal => SQL_DECIMAL,
             AtomType::Character => {
-                if value.varying().unwrap_or(false) {
+                if value.length().is_none() || value.varying().unwrap_or(true) {
                     SQL_VARCHAR
                 } else {
                     SQL_CHAR
                 }
             }
             AtomType::Octet => {
-                if value.varying().unwrap_or(false) {
+                if value.length().is_none() || value.varying().unwrap_or(true) {
                     SQL_VARBINARY
                 } else {
                     SQL_BINARY

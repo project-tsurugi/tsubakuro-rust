@@ -410,13 +410,7 @@ pub(crate) fn char_octet_length(column: &SqlColumn) -> Option<i32> {
     let size = match column.atom_type()? {
         Character | Octet => match column.length() {
             Some((length, false)) => length as i32,
-            _ => {
-                if column.varying().unwrap_or(false) {
-                    2097132 // VARCHAR, VARBINARY
-                } else {
-                    1 // CHAR, BINARY
-                }
-            }
+            _ => 2097132,
         },
         _ => return None,
     };
