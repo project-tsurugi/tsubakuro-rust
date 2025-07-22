@@ -62,7 +62,7 @@ class TgOdbcTypeTimeTzTest extends TgOdbcTypeTester<OffsetTime> {
     }
 
     @Override
-    protected void insertOdbc(List<OffsetTime> values, boolean wideChar) {
+    protected CDataType insertOdbc(List<OffsetTime> values, boolean wideChar) {
         assumeTrue(false, "Unsupported time_with_time_zone literal"); // TODO remove assume
         try (var stmt = createStmt()) {
 
@@ -80,6 +80,8 @@ class TgOdbcTypeTimeTzTest extends TgOdbcTypeTester<OffsetTime> {
                 pk++;
             }
         }
+
+        return null;
     }
 
     @Override

@@ -100,6 +100,7 @@ fn string_to_timestamp_tz(
 pub(crate) fn do_string_to_timestamp_tz(
     value: &str,
 ) -> Result<time::OffsetDateTime, Box<dyn std::error::Error>> {
+    let (value, _) = split_after(value, ':', 'Z');
     let (value, offset) = split_after(value, ':', '+');
     let (value, offset) = if offset.is_empty() {
         split_after(value, ':', '-')
@@ -217,6 +218,13 @@ mod test {
 
     #[test]
     fn parse_with_timezone() {
+        {
+            let actual = do_string_to_timestamp_tz("2025-07-03 12:34:56.123456789Z").unwrap();
+            let date = time::Date::from_calendar_date(2025, time::Month::July, 3).unwrap();
+            let time = time::Time::from_hms_nano(12, 34, 56, 123456789).unwrap();
+            let expected = time::OffsetDateTime::new_in_offset(date, time, time::UtcOffset::UTC);
+            assert_eq!(expected, actual);
+        }
         {
             let actual = do_string_to_timestamp_tz("2025-07-03 12:34:56.123456789+09:00").unwrap();
             let date = time::Date::from_calendar_date(2025, time::Month::July, 3).unwrap();

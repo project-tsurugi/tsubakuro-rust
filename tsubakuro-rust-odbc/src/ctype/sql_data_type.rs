@@ -23,6 +23,8 @@ pub(crate) enum SqlDataType {
     SQL_TYPE_DATE = 91,
     SQL_TYPE_TIME = 92,
     SQL_TYPE_TIMESTAMP = 93,
+    // SQL_TYPE_TIME_WITH_TIMEZONE = 94, // dare not use
+    SQL_TYPE_TIMESTAMP_WITH_TIMEZONE = 95, // use SQLBindParameter only
 
     SQL_INTERVAL_YEAR = 101,
     SQL_INTERVAL_MONTH = 102,
@@ -72,6 +74,7 @@ impl TryFrom<i16> for SqlDataType {
             91 => Ok(SQL_TYPE_DATE),
             92 => Ok(SQL_TYPE_TIME),
             93 => Ok(SQL_TYPE_TIMESTAMP),
+            95 => Ok(SQL_TYPE_TIMESTAMP_WITH_TIMEZONE),
             101 => Ok(SQL_INTERVAL_YEAR),
             102 => Ok(SQL_INTERVAL_MONTH),
             103 => Ok(SQL_INTERVAL_DAY),
@@ -156,6 +159,7 @@ impl TryFrom<SqlDataType> for AtomType {
             SqlDataType::SQL_TYPE_DATE => Ok(AtomType::Date),
             SqlDataType::SQL_TYPE_TIME => Ok(AtomType::TimeOfDay),
             SqlDataType::SQL_TYPE_TIMESTAMP | SqlDataType::SQL_DATETIME => Ok(AtomType::TimePoint),
+            SqlDataType::SQL_TYPE_TIMESTAMP_WITH_TIMEZONE => Ok(AtomType::TimePointWithTimeZone),
             SqlDataType::SQL_LONGVARBINARY => Ok(AtomType::Blob),
             SqlDataType::SQL_LONGVARCHAR => Ok(AtomType::Clob),
             SqlDataType::SQL_WLONGVARCHAR => Ok(AtomType::Clob),

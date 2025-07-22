@@ -49,6 +49,9 @@ public enum SqlDataType {
     /** TIMESTAMP */
     SQL_TYPE_TIMESTAMP(93),
 
+    /** TIMESTAMP WITH TIME ZONE */
+    SQL_TYPE_TIMESTAMP_WITH_TIMEZONE(95),
+
     /** Interval in years */
     SQL_INTERVAL_YEAR(101),
 

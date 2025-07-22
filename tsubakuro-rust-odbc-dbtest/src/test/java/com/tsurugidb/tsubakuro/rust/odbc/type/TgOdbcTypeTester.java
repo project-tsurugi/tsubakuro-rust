@@ -85,7 +85,7 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
         insertJava(values);
         var actual = selectOdbc(wideChar);
 
-        assertValueList(values, actual);
+        assertValueList(values, actual, null);
     }
 
     private void insertJava(List<T> values) throws IOException, InterruptedException {
@@ -187,27 +187,36 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
         createTable();
 
         var values = values();
-        insertOdbc(values, wideChar);
+        var valuetype = insertOdbc(values, wideChar);
         var actual = selectJava();
 
-        assertValueList(values, actual);
+        assertValueList(values, actual, valuetype);
     }
 
-    protected void insertOdbc(List<T> values, boolean wideChar) {
+    protected CDataType insertOdbc(List<T> values, boolean wideChar) {
         try (var stmt = createStmt()) {
             var manager = stmt.manager();
 
             var sql = "insert into test values(?, ?)";
             stmt.prepare(sql, wideChar);
 
+            CDataType valueType = null;
+
             int pk = 0;
             for (T value : values) {
                 stmt.bindParameter(1, TgOdbcBindParameter.ofInt(manager, pk));
-                stmt.bindParameter(2, bindParameter(manager, value, wideChar));
+                var parameter2 = bindParameter(manager, value, wideChar);
+                stmt.bindParameter(2, parameter2);
                 stmt.execute();
+
+                if (valueType == null) {
+                    valueType = parameter2.valueType();
+                }
 
                 pk++;
             }
+
+            return valueType;
         }
     }
 
@@ -352,11 +361,11 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
 
         {
             var actual = selectJava();
-            assertValueList(expectedList, actual);
+            assertValueList(expectedList, actual, valueType);
         }
         {
             var actual = selectOdbc(false);
-            assertValueList(expectedList, actual);
+            assertValueList(expectedList, actual, valueType);
         }
     }
 
@@ -462,6 +471,10 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
     protected abstract void assertGetData(T value, CDataType targetType, Object actual, TgOdbcRuntimeException e);
 
     //
+
+    protected void assertValueList(List<T> expected, List<T> actual, CDataType valueType) {
+        assertValueList(expected, actual);
+    }
 
     protected void assertValueList(List<T> expected, List<T> actual) {
         try {

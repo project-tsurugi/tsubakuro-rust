@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -15,7 +15,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameter;
@@ -59,26 +58,6 @@ class TgOdbcTypeTimestampTzTest extends TgOdbcTypeTester<OffsetDateTime> {
     }
 
     @Override
-    protected void insertOdbc(List<OffsetDateTime> values, boolean wideChar) {
-        try (var stmt = createStmt()) {
-
-            int pk = 0;
-            for (OffsetDateTime value : values) {
-                String sql;
-                if (value != null) {
-                    String s = value.format(FORMATTER);
-                    sql = "insert into test values(%d, timestamp with time zone'%s')".formatted(pk, s);
-                } else {
-                    sql = "insert into test values(%d, null)".formatted(pk);
-                }
-                stmt.execDirect(sql, wideChar);
-
-                pk++;
-            }
-        }
-    }
-
-    @Override
     protected TgBindVariable<OffsetDateTime> bindVariable(String name) {
         return TgBindVariable.ofOffsetDateTime(name);
     }
@@ -104,9 +83,8 @@ class TgOdbcTypeTimestampTzTest extends TgOdbcTypeTester<OffsetDateTime> {
     }
 
     @Test
-    @Disabled // SQLBindParameterはTIMESTAMP WITH TIME ZONEに対応していない
     void bindParameterCombination() {
-        testBindParameterCombination(SqlDataType.SQL_TYPE_TIMESTAMP);
+        testBindParameterCombination(SqlDataType.SQL_TYPE_TIMESTAMP_WITH_TIMEZONE);
     }
 
     @Override
@@ -197,11 +175,15 @@ class TgOdbcTypeTimestampTzTest extends TgOdbcTypeTester<OffsetDateTime> {
     }
 
     @Override
-    protected void assertValueList(List<OffsetDateTime> expected, List<OffsetDateTime> actual) {
+    protected void assertValueList(List<OffsetDateTime> expected, List<OffsetDateTime> actual, CDataType valueType) {
         try {
             assertEquals(expected.size(), actual.size());
             for (int i = 0; i < actual.size(); i++) {
-                assertEquals(expectedTimestamp(expected.get(i)), actual.get(i));
+                if (valueType == null || valueType == CDataType.SQL_C_CHAR || valueType == CDataType.SQL_C_WCHAR) {
+                    assertEquals(expectedTimestamp(expected.get(i)), actual.get(i));
+                } else {
+                    assertEquals(expectedTimestampTruncate(expected.get(i)), actual.get(i));
+                }
             }
         } catch (Throwable e) {
             LOG.error("{}\nexpected={}\nactual=  {}", e.getMessage(), expected, actual);
@@ -214,5 +196,12 @@ class TgOdbcTypeTimestampTzTest extends TgOdbcTypeTester<OffsetDateTime> {
             return null;
         }
         return value.withOffsetSameInstant(ZoneOffset.UTC);
+    }
+
+    private static OffsetDateTime expectedTimestampTruncate(OffsetDateTime value) {
+        if (value == null) {
+            return null;
+        }
+        return value.withOffsetSameLocal(ZoneOffset.UTC);
     }
 }

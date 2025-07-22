@@ -241,12 +241,18 @@ public class TgOdbcBindParameter {
         }
     }
 
+    public static TgOdbcBindParameter ofTimestampTz() {
+        return new TgOdbcBindParameter() //
+                .valueType(CDataType.SQL_C_TYPE_TIMESTAMP) //
+                .parameterType(SqlDataType.SQL_TYPE_TIMESTAMP_WITH_TIMEZONE);
+    }
+
     public static TgOdbcBindParameter ofTimestampTz(TgOdbcManager manager, OffsetDateTime value) {
         if (value != null) {
             var date = SqlTimestampStruct.of(manager, value.toLocalDateTime());
-            return ofTimestamp().parameterValuePtr(date.address(), date.byteSize());
+            return ofTimestampTz().parameterValuePtr(date.address(), date.byteSize());
         } else {
-            return ofTimestamp().nullValue();
+            return ofTimestampTz().nullValue();
         }
     }
 
