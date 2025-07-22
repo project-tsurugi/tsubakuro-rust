@@ -160,8 +160,8 @@ SQLを実行します。
 
 > [!WARNING]
 >
-> select文の実行結果の場合、Tsurugi 1.5.0以前ではVARの判別が出来ないため、VARCHARであってもSQL_CHAR、VARBINARYであってもSQL_BINARYを返します。
-> また、CHAR, VARCHAR, BINARY, VARBINARYのカラムサイズも取得できないため、現在のTsurugi ODBCドライバーでは常に0を返します。同様に、DECIMALでは常に38を返します。
+> select文の実行結果の場合、Tsurugi 1.5.0以前ではVARの判別が出来ないため、CHARであってもSQL_VARCHAR、BINARYであってもSQL_VARBINARYを返します。
+> また、CHAR, VARCHAR, BINARY, VARBINARYのカラムサイズも取得できないため、現在のTsurugi ODBCドライバーでは常に2097132を返します。同様に、DECIMALでは常に38を返します。
 
 ### SQLColAttribute
 
