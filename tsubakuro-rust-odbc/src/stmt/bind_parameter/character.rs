@@ -101,7 +101,7 @@ impl TsurugiOdbcBindParameter {
                     self
                 );
                 stmt.add_diag(
-                    TsurugiOdbcError::UnsupportedCDataType,
+                    TsurugiOdbcError::BindParameterUnsupportedValueType,
                     format!("Unsupported value_type {:?} for CHARACTER", value_type),
                 );
                 return Err(SqlReturn::SQL_ERROR);

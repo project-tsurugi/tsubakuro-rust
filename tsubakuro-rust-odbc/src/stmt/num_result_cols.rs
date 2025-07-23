@@ -45,9 +45,10 @@ fn num_result_cols(stmt: &TsurugiOdbcStmt, column_count_ptr: *mut i16) -> SqlRet
 
     if column_count_ptr.is_null() {
         debug!("{stmt}.{FUNCTION_NAME}: column_count_ptr is null");
+        let odbc_function_name = "SQLNumResultCols()";
         stmt.add_diag(
-            TsurugiOdbcError::InvalidValuePtr,
-            "column_count_ptr is null",
+            TsurugiOdbcError::NumResultColsInvalidColumnCountPtr,
+            format!("{odbc_function_name}: column_count_ptr is null"),
         );
         return SqlReturn::SQL_ERROR;
     }

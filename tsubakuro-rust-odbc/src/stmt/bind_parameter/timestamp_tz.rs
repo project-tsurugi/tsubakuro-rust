@@ -40,8 +40,8 @@ impl TsurugiOdbcBindParameter {
                     Err(e) => {
                         debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
                         stmt.add_diag(
-                            TsurugiOdbcError::ConvertError,
-                            format!("convert error, {}", e),
+                            TsurugiOdbcError::BindParameterConvertDateError,
+                            format!("SQL_DATE_STRUCT to timestamp convert error, {}", e),
                         );
                         return Err(SqlReturn::SQL_ERROR);
                     }
@@ -54,8 +54,8 @@ impl TsurugiOdbcBindParameter {
                     Err(e) => {
                         debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
                         stmt.add_diag(
-                            TsurugiOdbcError::ConvertError,
-                            format!("convert error, {}", e),
+                            TsurugiOdbcError::BindParameterConvertTimestampError,
+                            format!("SQL_TIMESTAMP_STRUCT to timestamp convert error, {}", e),
                         );
                         return Err(SqlReturn::SQL_ERROR);
                     }
@@ -67,7 +67,7 @@ impl TsurugiOdbcBindParameter {
                     self
                 );
                 stmt.add_diag(
-                    TsurugiOdbcError::UnsupportedCDataType,
+                    TsurugiOdbcError::BindParameterUnsupportedValueType,
                     format!("Unsupported value_type {:?} for TIMESTAMP", value_type),
                 );
                 return Err(SqlReturn::SQL_ERROR);
@@ -89,8 +89,8 @@ fn string_to_timestamp_tz(
         Err(e) => {
             debug!("{stmt}.{function_name}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::BindParameterConvertTimestampError,
+                format!("string to timestamp convert error. {}", e),
             );
             Err(SqlReturn::SQL_ERROR)
         }

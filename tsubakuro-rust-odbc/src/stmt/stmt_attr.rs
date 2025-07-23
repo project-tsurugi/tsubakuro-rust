@@ -47,7 +47,7 @@ enum StatementAttribute {
 }
 
 impl TryFrom<i32> for StatementAttribute {
-    type Error = TsurugiOdbcError;
+    type Error = i32;
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         use StatementAttribute::*;
@@ -82,30 +82,9 @@ impl TryFrom<i32> for StatementAttribute {
             10011 => Ok(SQL_ATTR_APP_PARAM_DESC),
             10012 => Ok(SQL_ATTR_IMP_ROW_DESC),
             10013 => Ok(SQL_ATTR_IMP_PARAM_DESC),
-            _ => Err(TsurugiOdbcError::InvalidAttribute),
+            e => Err(e),
         }
     }
-}
-
-macro_rules! statement_attribute {
-    ($stmt:expr, $attribute:expr) => {
-        match StatementAttribute::try_from($attribute) {
-            Ok(value) => value,
-            Err(e) => {
-                log::debug!(
-                    "{FUNCTION_NAME} error. Unsupported attribute {:?}",
-                    $attribute
-                );
-                $stmt.add_diag(
-                    e,
-                    format!("{FUNCTION_NAME}: Unsupported attribute {:?}", $attribute),
-                );
-                let rc = SqlReturn::SQL_ERROR;
-                log::trace!("{FUNCTION_NAME} end. rc={:?}", rc);
-                return rc;
-            }
-        }
-    };
 }
 
 #[no_mangle]
@@ -128,12 +107,8 @@ pub extern "C" fn SQLSetStmtAttr(
     let mut stmt = stmt.lock().unwrap();
     stmt.clear_diag();
 
-    let attribute = statement_attribute!(stmt, attribute);
-
-    let rc = match set_stmt_attr(&mut stmt, attribute, value_ptr, string_length, false) {
-        Ok(_) => SqlReturn::SQL_SUCCESS,
-        Err(rc) => rc,
-    };
+    let delegator = SetStmtAttr::new(attribute, value_ptr, string_length, false);
+    let rc = delegator.set_stmt_attr(&mut stmt);
 
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
     rc
@@ -159,50 +134,91 @@ pub extern "C" fn SQLSetStmtAttrW(
     let mut stmt = stmt.lock().unwrap();
     stmt.clear_diag();
 
-    let attribute = statement_attribute!(stmt, attribute);
-
-    let rc = match set_stmt_attr(&mut stmt, attribute, value_ptr, string_length, true) {
-        Ok(_) => SqlReturn::SQL_SUCCESS,
-        Err(rc) => rc,
-    };
+    let delegator = SetStmtAttr::new(attribute, value_ptr, string_length, true);
+    let rc = delegator.set_stmt_attr(&mut stmt);
 
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
     rc
 }
 
-fn set_stmt_attr(
-    stmt: &mut TsurugiOdbcStmt,
-    attribute: StatementAttribute,
+struct SetStmtAttr {
+    attribute: SqlInteger,
     value_ptr: SqlPointer,
     _string_length: SqlInteger,
-    _wide_char: bool,
-) -> Result<(), SqlReturn> {
-    const FUNCTION_NAME: &str = "set_stmt_attr()";
-
-    use StatementAttribute::*;
-    match attribute {
-        SQL_ATTR_QUERY_TIMEOUT => {
-            let value = read_ulen(value_ptr) as u64;
-            debug!("{stmt}.{FUNCTION_NAME}: {:?}={}", attribute, value);
-            stmt.set_query_timeout(value);
-        }
-        _ => {
-            warn!(
-                "{stmt}.{FUNCTION_NAME}: Unsupported attribute {:?}",
-                attribute
-            );
-            stmt.add_diag(
-                TsurugiOdbcError::InvalidAttribute,
-                format!("Unsupported attribute {:?}", attribute),
-            );
-            return Err(SqlReturn::SQL_SUCCESS_WITH_INFO);
-        }
-    }
-    Ok(())
+    wide_char: bool,
 }
 
-fn read_ulen(value_ptr: SqlPointer) -> SqlULen {
-    value_ptr as SqlULen
+impl SetStmtAttr {
+    fn new(
+        attribute: SqlInteger,
+        value_ptr: SqlPointer,
+        string_length: SqlInteger,
+        wide_char: bool,
+    ) -> SetStmtAttr {
+        SetStmtAttr {
+            attribute,
+            value_ptr,
+            _string_length: string_length,
+            wide_char,
+        }
+    }
+
+    fn odbc_function_name(&self) -> &str {
+        if self.wide_char {
+            "SQLSetStmtAttrW()"
+        } else {
+            "SQLSetStmtAttr()"
+        }
+    }
+
+    fn set_stmt_attr(&self, stmt: &mut TsurugiOdbcStmt) -> SqlReturn {
+        const FUNCTION_NAME: &str = "set_stmt_attr()";
+
+        let attribute = match StatementAttribute::try_from(self.attribute) {
+            Ok(value) => value,
+            Err(attribute) => {
+                debug!(
+                    "{FUNCTION_NAME} error. Unsupported attribute {:?}",
+                    attribute
+                );
+                let odbc_function_name = self.odbc_function_name();
+                stmt.add_diag(
+                    TsurugiOdbcError::StmtAttrUnsupportedAttribute,
+                    format!(
+                        "{odbc_function_name}: Unsupported attribute {:?}",
+                        attribute
+                    ),
+                );
+                return SqlReturn::SQL_ERROR;
+            }
+        };
+
+        use StatementAttribute::*;
+        match attribute {
+            SQL_ATTR_QUERY_TIMEOUT => {
+                let value = self.read_ulen() as u64;
+                debug!("{stmt}.{FUNCTION_NAME}: {:?}={}", attribute, value);
+                stmt.set_query_timeout(value);
+            }
+            _ => {
+                warn!(
+                    "{stmt}.{FUNCTION_NAME}: Unsupported attribute {:?}",
+                    attribute
+                );
+                stmt.add_diag(
+                    TsurugiOdbcError::StmtAttrUnsupportedAttribute,
+                    format!("Unsupported attribute {:?}", attribute),
+                );
+                return SqlReturn::SQL_SUCCESS_WITH_INFO;
+            }
+        }
+
+        SqlReturn::SQL_SUCCESS
+    }
+
+    fn read_ulen(&self) -> SqlULen {
+        self.value_ptr as SqlULen
+    }
 }
 
 #[no_mangle]
@@ -222,16 +238,15 @@ pub extern "system" fn SQLGetStmtAttr(
     let stmt = check_stmt!(hstmt);
     let stmt = stmt.lock().unwrap();
     stmt.clear_diag();
-    let attribute = statement_attribute!(stmt, attribute);
 
-    let rc = get_stmt_attr(
-        &stmt,
+    let delegator = GetStmtAttr::new(
         attribute,
         value_ptr,
         buffer_length,
         string_length_ptr,
         false,
     );
+    let rc = delegator.get_stmt_attr(&stmt);
 
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
     rc
@@ -254,111 +269,150 @@ pub extern "system" fn SQLGetStmtAttrW(
     let stmt = check_stmt!(hstmt);
     let stmt = stmt.lock().unwrap();
     stmt.clear_diag();
-    let attribute = statement_attribute!(stmt, attribute);
 
-    let rc = get_stmt_attr(
-        &stmt,
-        attribute,
-        value_ptr,
-        buffer_length,
-        string_length_ptr,
-        true,
-    );
+    let delegator = GetStmtAttr::new(attribute, value_ptr, buffer_length, string_length_ptr, true);
+    let rc = delegator.get_stmt_attr(&stmt);
 
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
     rc
 }
 
-fn get_stmt_attr(
-    stmt: &TsurugiOdbcStmt,
-    attribute: StatementAttribute,
+struct GetStmtAttr {
+    attribute: SqlInteger,
     value_ptr: SqlPointer,
     _buffer_length: SqlInteger,
     _string_length_ptr: *mut SqlInteger,
     wide_char: bool,
-) -> SqlReturn {
-    const FUNCTION_NAME: &str = "get_stmt_attr()";
+}
 
-    if value_ptr.is_null() {
-        warn!("{stmt}.{FUNCTION_NAME} error. value_ptr is null");
-        stmt.add_diag(TsurugiOdbcError::InvalidValuePtr, "value_ptr is null");
-        return SqlReturn::SQL_ERROR;
+impl GetStmtAttr {
+    fn new(
+        attribute: SqlInteger,
+        value_ptr: SqlPointer,
+        buffer_length: SqlInteger,
+        string_length_ptr: *mut SqlInteger,
+        wide_char: bool,
+    ) -> GetStmtAttr {
+        GetStmtAttr {
+            attribute,
+            value_ptr,
+            _buffer_length: buffer_length,
+            _string_length_ptr: string_length_ptr,
+            wide_char,
+        }
     }
 
-    use StatementAttribute::*;
-    match attribute {
-        SQL_ATTR_APP_ROW_DESC => {
-            let value = 0x11223344 as SqlPointer;
-            write_pointer(stmt, attribute, value, value_ptr)
+    fn odbc_function_name(&self) -> &str {
+        if self.wide_char {
+            "SQLGetStmtAttrW()"
+        } else {
+            "SQLGetStmtAttr()"
         }
-        SQL_ATTR_APP_PARAM_DESC => {
-            let value = 0x11223355 as SqlPointer;
-            write_pointer(stmt, attribute, value, value_ptr)
-        }
-        SQL_ATTR_IMP_ROW_DESC => {
-            let value = 0x11223366 as SqlPointer;
-            write_pointer(stmt, attribute, value, value_ptr)
-        }
-        SQL_ATTR_IMP_PARAM_DESC => {
-            let value = 0x11223377 as SqlPointer;
-            write_pointer(stmt, attribute, value, value_ptr)
-        }
-        SQL_ATTR_QUERY_TIMEOUT => {
-            let value = stmt.query_timeout() as SqlULen;
-            write_ulen(stmt, attribute, value, value_ptr)
-        }
-        _ => {
-            debug!(
-                "{stmt}.{FUNCTION_NAME} error. Unsupported attribute {:?}",
-                attribute
-            );
-            let odbc_function_name = if wide_char {
-                "SQLGetStmtAttrW"
-            } else {
-                "SQLGetStmtAttrA"
-            };
-            stmt.add_diag(
-                TsurugiOdbcError::InvalidAttribute,
-                format!(
-                    "{odbc_function_name}: Unsupported attribute {:?}",
+    }
+
+    fn get_stmt_attr(&self, stmt: &TsurugiOdbcStmt) -> SqlReturn {
+        const FUNCTION_NAME: &str = "get_stmt_attr()";
+
+        let attribute = match StatementAttribute::try_from(self.attribute) {
+            Ok(value) => value,
+            Err(attribute) => {
+                debug!(
+                    "{FUNCTION_NAME} error. Unsupported attribute {:?}",
                     attribute
-                ),
+                );
+                let odbc_function_name = self.odbc_function_name();
+                stmt.add_diag(
+                    TsurugiOdbcError::StmtAttrUnsupportedAttribute,
+                    format!(
+                        "{odbc_function_name}: Unsupported attribute {:?}",
+                        attribute
+                    ),
+                );
+                return SqlReturn::SQL_ERROR;
+            }
+        };
+
+        if self.value_ptr.is_null() {
+            warn!("{stmt}.{FUNCTION_NAME} error. value_ptr is null");
+            let odbc_function_name = self.odbc_function_name();
+            stmt.add_diag(
+                TsurugiOdbcError::GetStmtAttrInvalidValuePtr,
+                format!("{odbc_function_name}: value_ptr is null"),
             );
-            SqlReturn::SQL_ERROR
+            return SqlReturn::SQL_ERROR;
+        }
+
+        use StatementAttribute::*;
+        match attribute {
+            SQL_ATTR_APP_ROW_DESC => {
+                let value = 0x11223344 as SqlPointer;
+                self.write_pointer(stmt, attribute, value)
+            }
+            SQL_ATTR_APP_PARAM_DESC => {
+                let value = 0x11223355 as SqlPointer;
+                self.write_pointer(stmt, attribute, value)
+            }
+            SQL_ATTR_IMP_ROW_DESC => {
+                let value = 0x11223366 as SqlPointer;
+                self.write_pointer(stmt, attribute, value)
+            }
+            SQL_ATTR_IMP_PARAM_DESC => {
+                let value = 0x11223377 as SqlPointer;
+                self.write_pointer(stmt, attribute, value)
+            }
+            SQL_ATTR_QUERY_TIMEOUT => {
+                let value = stmt.query_timeout() as SqlULen;
+                self.write_ulen(stmt, attribute, value)
+            }
+            _ => {
+                debug!(
+                    "{stmt}.{FUNCTION_NAME} error. Unsupported attribute {:?}",
+                    attribute
+                );
+                let odbc_function_name = self.odbc_function_name();
+                stmt.add_diag(
+                    TsurugiOdbcError::StmtAttrUnsupportedAttribute,
+                    format!(
+                        "{odbc_function_name}: Unsupported attribute {:?}",
+                        attribute
+                    ),
+                );
+                SqlReturn::SQL_ERROR
+            }
         }
     }
-}
 
-fn write_pointer(
-    stmt: &TsurugiOdbcStmt,
-    attribute: StatementAttribute,
-    value: SqlPointer,
-    value_ptr: SqlPointer,
-) -> SqlReturn {
-    const FUNCTION_NAME: &str = "get_stmt_attr().write_pointer()";
+    fn write_pointer(
+        &self,
+        stmt: &TsurugiOdbcStmt,
+        attribute: StatementAttribute,
+        value: SqlPointer,
+    ) -> SqlReturn {
+        const FUNCTION_NAME: &str = "get_stmt_attr().write_pointer()";
 
-    debug!("{stmt}.{FUNCTION_NAME}: {:?}={:?}", attribute, value);
+        debug!("{stmt}.{FUNCTION_NAME}: {:?}={:?}", attribute, value);
 
-    unsafe {
-        *(value_ptr as *mut SqlPointer) = value;
+        unsafe {
+            *(self.value_ptr as *mut SqlPointer) = value;
+        }
+
+        SqlReturn::SQL_SUCCESS
     }
 
-    SqlReturn::SQL_SUCCESS
-}
+    fn write_ulen(
+        &self,
+        stmt: &TsurugiOdbcStmt,
+        attribute: StatementAttribute,
+        value: SqlULen,
+    ) -> SqlReturn {
+        const FUNCTION_NAME: &str = "get_stmt_attr().write_ulen()";
 
-fn write_ulen(
-    stmt: &TsurugiOdbcStmt,
-    attribute: StatementAttribute,
-    value: SqlULen,
-    value_ptr: SqlPointer,
-) -> SqlReturn {
-    const FUNCTION_NAME: &str = "get_stmt_attr().write_ulen()";
+        debug!("{stmt}.{FUNCTION_NAME}: {:?}={}", attribute, value);
 
-    debug!("{stmt}.{FUNCTION_NAME}: {:?}={}", attribute, value);
+        unsafe {
+            *(self.value_ptr as *mut SqlULen) = value;
+        }
 
-    unsafe {
-        *(value_ptr as *mut SqlULen) = value;
+        SqlReturn::SQL_SUCCESS
     }
-
-    SqlReturn::SQL_SUCCESS
 }

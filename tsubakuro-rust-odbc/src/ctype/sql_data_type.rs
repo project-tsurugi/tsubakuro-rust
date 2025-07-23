@@ -1,7 +1,5 @@
 use tsubakuro_rust_core::prelude::{AtomType, SqlColumn};
 
-use crate::handle::diag::TsurugiOdbcError;
-
 /// SQL data type
 #[repr(i16)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,7 +53,7 @@ pub(crate) enum SqlDataType {
     SQL_GUID = -11,
 }
 impl TryFrom<i16> for SqlDataType {
-    type Error = TsurugiOdbcError;
+    type Error = i16;
 
     fn try_from(value: i16) -> Result<Self, Self::Error> {
         use SqlDataType::*;
@@ -99,7 +97,7 @@ impl TryFrom<i16> for SqlDataType {
             -9 => Ok(SQL_WVARCHAR),
             -10 => Ok(SQL_WLONGVARCHAR),
             -11 => Ok(SQL_GUID),
-            _ => Err(TsurugiOdbcError::UnsupportedSqlDataType),
+            e => Err(e),
         }
     }
 }
@@ -143,7 +141,7 @@ impl From<&SqlColumn> for SqlDataType {
 }
 
 impl TryFrom<SqlDataType> for AtomType {
-    type Error = ();
+    type Error = SqlDataType;
 
     fn try_from(value: SqlDataType) -> Result<Self, Self::Error> {
         match value {
@@ -163,7 +161,7 @@ impl TryFrom<SqlDataType> for AtomType {
             SqlDataType::SQL_LONGVARBINARY => Ok(AtomType::Blob),
             SqlDataType::SQL_LONGVARCHAR => Ok(AtomType::Clob),
             SqlDataType::SQL_WLONGVARCHAR => Ok(AtomType::Clob),
-            _ => Err(()),
+            e => Err(e),
         }
     }
 }

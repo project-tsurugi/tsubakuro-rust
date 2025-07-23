@@ -40,7 +40,10 @@ pub(crate) fn get_data_f32(
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetDataUnsupportedTargetType,
-                format!("Unsupported target type {:?}", target_type),
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target type {:?} from float",
+                    target_type
+                ),
             );
             SqlReturn::SQL_ERROR
         }
@@ -55,8 +58,11 @@ fn f32_to_decimal(stmt: &TsurugiOdbcStmt, value: f32) -> Result<SqlNumericStruct
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::DecimalError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertDecimalError,
+                format!(
+                    "{ODBC_FUNCTION_NAME}: float to decimal convert error. {}",
+                    e
+                ),
             );
             Err(SqlReturn::SQL_ERROR)
         }

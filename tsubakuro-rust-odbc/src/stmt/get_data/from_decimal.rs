@@ -73,7 +73,10 @@ pub(crate) fn get_data_decimal(
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetDataUnsupportedTargetType,
-                format!("Unsupported target type {:?}", target_type),
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target type {:?} from decimal",
+                    target_type
+                ),
             );
             SqlReturn::SQL_ERROR
         }
@@ -88,8 +91,8 @@ fn decimal_to_i128(stmt: &TsurugiOdbcStmt, value: TgDecimalResult) -> Result<i12
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME} error. convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertDecimalError,
+                format!("{ODBC_FUNCTION_NAME}: decimal convert error. {}", e),
             );
             return Err(SqlReturn::SQL_ERROR);
         }
@@ -114,8 +117,8 @@ fn decimal_to_f32(stmt: &TsurugiOdbcStmt, value: TgDecimalResult) -> Result<f32,
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertDecimalError,
+                format!("{ODBC_FUNCTION_NAME}: decimal convert error. {}", e),
             );
             return Err(SqlReturn::SQL_ERROR);
         }
@@ -138,8 +141,8 @@ fn decimal_to_f64(stmt: &TsurugiOdbcStmt, value: TgDecimalResult) -> Result<f64,
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertDecimalError,
+                format!("{ODBC_FUNCTION_NAME}: decimal convert error. {}", e),
             );
             return Err(SqlReturn::SQL_ERROR);
         }
@@ -162,8 +165,8 @@ fn decimal_to_string(stmt: &TsurugiOdbcStmt, value: TgDecimalResult) -> Result<S
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertDecimalError,
+                format!("{ODBC_FUNCTION_NAME}: decimal convert error. {}", e),
             );
             return Err(SqlReturn::SQL_ERROR);
         }

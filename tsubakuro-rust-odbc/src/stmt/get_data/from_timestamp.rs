@@ -39,7 +39,10 @@ pub(crate) fn get_data_timestamp(
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetDataUnsupportedTargetType,
-                format!("Unsupported target type {:?}", target_type),
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target type {:?} from timestamp",
+                    target_type
+                ),
             );
             SqlReturn::SQL_ERROR
         }
@@ -57,8 +60,11 @@ fn timestamp_to_string(
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertTimestampError,
+                format!(
+                    "{ODBC_FUNCTION_NAME}: timestamp to string convert error. {}",
+                    e
+                ),
             );
             return Err(SqlReturn::SQL_ERROR);
         }

@@ -95,15 +95,14 @@ pub extern "system" fn SQLAllocHandle(
 }
 
 fn alloc_handle(handle_type: HandleType, input_handle: Handle) -> Result<Handle, SqlReturn> {
+    const FUNCTION_NAME: &str = "alloc_handle()";
+
     match handle_type {
         HandleType::Env => Ok(alloc_handle_env()? as Handle),
         HandleType::Dbc => Ok(alloc_handle_dbc(input_handle as HEnv)? as Handle),
         HandleType::Stmt => Ok(alloc_handle_stmt(input_handle as HDbc)? as Handle),
         _ => {
-            warn!(
-                "SQLAllocHandle(): unsupported handle_type {:?}",
-                handle_type
-            );
+            warn!("{FUNCTION_NAME}: Unsupported handle_type {:?}", handle_type);
             Err(SqlReturn::SQL_ERROR)
         }
     }

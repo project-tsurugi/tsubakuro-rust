@@ -211,7 +211,7 @@ pub enum InfoType {
     SQL_MAXIMUM_IDENTIFIER_LENGTH = 10005, // SQL_MAX_IDENTIFIER_LEN
 }
 impl TryFrom<u16> for InfoType {
-    type Error = TsurugiOdbcError;
+    type Error = u16;
 
     fn try_from(value: u16) -> Result<Self, Self::Error> {
         use InfoType::*;
@@ -404,7 +404,7 @@ impl TryFrom<u16> for InfoType {
             10003 => Ok(SQL_CATALOG_NAME),
             10004 => Ok(SQL_COLLATION_SEQ),
             10005 => Ok(SQL_MAXIMUM_IDENTIFIER_LENGTH),
-            _ => Err(TsurugiOdbcError::UnsupportedInfoType),
+            e => Err(e),
         }
     }
 }
@@ -507,18 +507,15 @@ impl SqlGetInfo {
 
         let info_type = match InfoType::try_from(info_type) {
             Ok(value) => value,
-            Err(e) => {
+            Err(info_type) => {
                 debug!(
                     "{dbc}.{FUNCTION_NAME} error. Unsupported info_type: {}",
                     info_type
                 );
+                let odbc_function_name = self.odbc_function_name();
                 dbc.add_diag(
-                    e,
-                    format!(
-                        "{}: Unsupported info_type: {}",
-                        self.odbc_function_name(),
-                        info_type
-                    ),
+                    TsurugiOdbcError::GetInfoUnsupportedInfoType,
+                    format!("{odbc_function_name}: Unsupported info_type {}", info_type),
                 );
                 return SqlReturn::SQL_ERROR;
             }
@@ -746,11 +743,11 @@ impl SqlGetInfo {
                     "{dbc}.{FUNCTION_NAME} error. Unsupported info_type {:?}",
                     info_type
                 );
+                let odbc_function_name = self.odbc_function_name();
                 dbc.add_diag(
-                    TsurugiOdbcError::UnsupportedInfoType,
+                    TsurugiOdbcError::GetInfoUnsupportedInfoType,
                     format!(
-                        "{}: Unsupported info_type: {:?}",
-                        self.odbc_function_name(),
+                        "{odbc_function_name}: Unsupported info_type {:?}",
                         info_type
                     ),
                 );

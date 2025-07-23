@@ -22,7 +22,10 @@ pub(crate) fn get_data_bytes(
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetDataUnsupportedTargetType,
-                format!("Unsupported target type {:?}", target_type),
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target type {:?} from bytes",
+                    target_type
+                ),
             );
             SqlReturn::SQL_ERROR
         }

@@ -170,7 +170,7 @@ impl TsurugiOdbcDbc {
             debug!("{self}.{FUNCTION_NAME} error. transaction exists");
             self.add_diag(
                 TsurugiOdbcError::SetAutoCommitError,
-                "Cannot change auto_commit because transaction is in progress",
+                "Cannot change auto_commit because transaction is running",
             );
             return SqlReturn::SQL_ERROR;
         }
@@ -207,7 +207,7 @@ impl TsurugiOdbcDbc {
                     Err(e) => {
                         warn!("{self}.{FUNCTION_NAME}: start_transaction() error. {:?}", e);
                         self.add_diag(
-                            TsurugiOdbcError::StartTransactionError,
+                            TsurugiOdbcError::TransactionStartError,
                             format!("start transaction error. {}", e),
                         );
                         return Err(SqlReturn::SQL_ERROR);

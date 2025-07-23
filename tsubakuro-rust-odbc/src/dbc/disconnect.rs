@@ -37,7 +37,11 @@ fn disconnect(dbc: &Arc<TsurugiOdbcDbc>) -> SqlReturn {
             }
             Err(e) => {
                 warn!("{dbc}.{FUNCTION_NAME}: session.shutdown() error. {:?}", e);
-                dbc.add_diag(TsurugiOdbcError::DisconnectError, e.message());
+                let odbc_function_name = "SQLDisconnect()";
+                dbc.add_diag(
+                    TsurugiOdbcError::DisconnectShutdownError,
+                    format!("{odbc_function_name}: shutdown error. {}", e.message()),
+                );
                 SqlReturn::SQL_ERROR
             }
         };
@@ -48,7 +52,11 @@ fn disconnect(dbc: &Arc<TsurugiOdbcDbc>) -> SqlReturn {
             }
             Err(e) => {
                 warn!("{dbc}.{FUNCTION_NAME}: session.close() error. {:?}", e);
-                dbc.add_diag(TsurugiOdbcError::DisconnectError, e.message());
+                let odbc_function_name = "SQLDisconnect()";
+                dbc.add_diag(
+                    TsurugiOdbcError::DisconnectCloseError,
+                    format!("{odbc_function_name}: close error. {}", e.message()),
+                );
                 SqlReturn::SQL_ERROR
             }
         };

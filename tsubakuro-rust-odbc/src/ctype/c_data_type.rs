@@ -1,5 +1,3 @@
-use crate::handle::diag::TsurugiOdbcError;
-
 const SQL_SIGNED_OFFSET: i16 = -20;
 const SQL_UNSIGNED_OFFSET: i16 = -22;
 
@@ -59,7 +57,7 @@ pub(crate) enum CDataType {
 }
 
 impl TryFrom<i16> for CDataType {
-    type Error = TsurugiOdbcError;
+    type Error = i16;
 
     fn try_from(value: i16) -> Result<Self, Self::Error> {
         use CDataType::*;
@@ -102,7 +100,7 @@ impl TryFrom<i16> for CDataType {
             x if x == 4 + SQL_UNSIGNED_OFFSET => Ok(SQL_C_ULONG),
             x if x == 5 + SQL_UNSIGNED_OFFSET => Ok(SQL_C_USHORT),
             x if x == -6 + SQL_UNSIGNED_OFFSET => Ok(SQL_C_UTINYINT),
-            _ => Err(TsurugiOdbcError::UnsupportedCDataType),
+            e => Err(e),
         }
     }
 }

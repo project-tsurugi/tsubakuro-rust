@@ -34,7 +34,10 @@ pub(crate) fn get_data_bool(
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetDataUnsupportedTargetType,
-                format!("Unsupported target type {:?}", target_type),
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target type {:?} from bool",
+                    target_type
+                ),
             );
             SqlReturn::SQL_ERROR
         }

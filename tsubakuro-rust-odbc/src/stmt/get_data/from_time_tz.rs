@@ -29,7 +29,10 @@ pub(crate) fn get_data_time_tz(
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetDataUnsupportedTargetType,
-                format!("Unsupported target type {:?}", target_type),
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target type {:?} from time_tz",
+                    target_type
+                ),
             );
             SqlReturn::SQL_ERROR
         }
@@ -47,8 +50,8 @@ fn time_tz_to_string(
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertTimeError,
+                format!("{ODBC_FUNCTION_NAME}: time to string convert error. {}", e),
             );
             return Err(SqlReturn::SQL_ERROR);
         }

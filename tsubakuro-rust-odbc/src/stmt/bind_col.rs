@@ -59,19 +59,29 @@ fn bind_col(
 
     let target_type = match CDataType::try_from(target_type) {
         Ok(value) => value,
-        Err(e) => {
+        Err(target_type) => {
             debug!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported CDataType {:?}",
                 target_type
             );
-            stmt.add_diag(e, format!("Unsupported CDataType {:?}", target_type));
+            let odbc_function_name = "SQLBindCol()";
+            stmt.add_diag(
+                TsurugiOdbcError::BindColUnsupportedTargetType,
+                format!(
+                    "{odbc_function_name}: Unsupported target_type {:?}",
+                    target_type
+                ),
+            );
             return SqlReturn::SQL_ERROR;
         }
     };
 
     if str_len_or_ind_ptr.is_null() {
         debug!("{stmt}.{FUNCTION_NAME} error. str_len_or_ind_ptr is null");
-        stmt.add_diag(TsurugiOdbcError::BindColError, "str_len_or_ind_ptr is null");
+        stmt.add_diag(
+            TsurugiOdbcError::BindColInvalidStrLenOrIndPtr,
+            "str_len_or_ind_ptr is null",
+        );
         return SqlReturn::SQL_ERROR;
     };
 

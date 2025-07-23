@@ -42,9 +42,10 @@ fn row_count(stmt: &TsurugiOdbcStmt, row_count_ptr: *mut SqlLen) -> SqlReturn {
 
     if row_count_ptr.is_null() {
         debug!("{stmt}.{FUNCTION_NAME} error. row_count_ptr is null");
+        let odbc_function_name = "SQLRowCount()";
         stmt.add_diag(
-            TsurugiOdbcError::InvalidArgumentPtr,
-            "row_count_ptr is null",
+            TsurugiOdbcError::RowCountInvalidRowCountPtr,
+            format!("{odbc_function_name}: row_count_ptr is null"),
         );
         return SqlReturn::SQL_ERROR;
     }

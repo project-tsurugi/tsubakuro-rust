@@ -27,7 +27,7 @@ impl TsurugiOdbcConnectArguments {
 }
 
 pub(crate) fn connect_tsurugi(
-    function_name: &str,
+    odbc_function_name: &str,
     dbc: &Arc<TsurugiOdbcDbc>,
     arg: TsurugiOdbcConnectArguments,
 ) -> SqlReturn {
@@ -37,7 +37,7 @@ pub(crate) fn connect_tsurugi(
         warn!("{dbc}.{FUNCTION_NAME} error. session already exists");
         dbc.add_diag(
             TsurugiOdbcError::ConnectError,
-            format!("{function_name}: session already exists"),
+            format!("{odbc_function_name}: session already exists"),
         );
         return SqlReturn::SQL_ERROR;
     }
@@ -47,8 +47,8 @@ pub(crate) fn connect_tsurugi(
         None => {
             debug!("{dbc}.{FUNCTION_NAME} error. endpoint not found");
             dbc.add_diag(
-                TsurugiOdbcError::InvalidConnectionString,
-                format!("{function_name}: endpoint not found"),
+                TsurugiOdbcError::ConnectEndpointNotFound,
+                format!("{odbc_function_name}: endpoint not found"),
             );
             return SqlReturn::SQL_ERROR;
         }
@@ -59,8 +59,8 @@ pub(crate) fn connect_tsurugi(
     if let Err(e) = connection_option.set_endpoint_url(endpoint) {
         debug!("{dbc}.{FUNCTION_NAME}: endpoint error. {:?}", e);
         dbc.add_diag(
-            TsurugiOdbcError::EndpointError,
-            format!("{function_name}: {}", e.message()),
+            TsurugiOdbcError::ConnectEndpointError,
+            format!("{odbc_function_name}: endpoint error. {}", e.message()),
         );
         return SqlReturn::SQL_ERROR;
     }
@@ -80,25 +80,25 @@ pub(crate) fn connect_tsurugi(
                 TgError::ClientError(message, _) => {
                     dbc.add_diag(
                         TsurugiOdbcError::ConnectError,
-                        format!("{function_name}: {}", message),
+                        format!("{odbc_function_name}: {}", message),
                     );
                 }
                 TgError::TimeoutError(message) => {
                     dbc.add_diag(
                         TsurugiOdbcError::ConnectTimeout,
-                        format!("{function_name}: {}", message),
+                        format!("{odbc_function_name}: {}", message),
                     );
                 }
                 TgError::IoError(message, _) => {
                     dbc.add_diag(
                         TsurugiOdbcError::ConnectError,
-                        format!("{function_name}: {}", message),
+                        format!("{odbc_function_name}: {}", message),
                     );
                 }
                 TgError::ServerError(_, message, _, _) => {
                     dbc.add_diag(
                         TsurugiOdbcError::ConnectError,
-                        format!("{function_name}: {}", message),
+                        format!("{odbc_function_name}: {}", message),
                     );
                 }
             }

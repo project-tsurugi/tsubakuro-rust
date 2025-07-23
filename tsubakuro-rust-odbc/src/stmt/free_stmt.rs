@@ -20,7 +20,7 @@ enum FreeStmtOption {
 }
 
 impl TryFrom<u16> for FreeStmtOption {
-    type Error = TsurugiOdbcError;
+    type Error = u16;
 
     fn try_from(value: u16) -> Result<Self, Self::Error> {
         use FreeStmtOption::*;
@@ -29,7 +29,7 @@ impl TryFrom<u16> for FreeStmtOption {
             1 => Ok(SQL_DROP),
             2 => Ok(SQL_UNBIND),
             3 => Ok(SQL_RESET_PARAMS),
-            _ => Err(TsurugiOdbcError::UnsupportedFreeStmtOption),
+            e => Err(e),
         }
     }
 }
@@ -54,7 +54,7 @@ fn free_stmt(hstmt: HStmt, option: SqlUSmallInt) -> SqlReturn {
 
     let option = match FreeStmtOption::try_from(option) {
         Ok(value) => value,
-        Err(e) => {
+        Err(option) => {
             let stmt = check_stmt!(hstmt);
             let stmt = stmt.lock().unwrap();
             stmt.clear_diag();
@@ -63,7 +63,11 @@ fn free_stmt(hstmt: HStmt, option: SqlUSmallInt) -> SqlReturn {
                 "{stmt}.{FUNCTION_NAME} error: Unsupported option {}",
                 option
             );
-            stmt.add_diag(e, format!("SQLFreeStmt(): Unsupported option {}", option));
+            let odbc_function_name = "SQLFreeStmt()";
+            stmt.add_diag(
+                TsurugiOdbcError::FreeStmtUnsupportedOption,
+                format!("{odbc_function_name}: Unsupported option {}", option),
+            );
             return SqlReturn::SQL_ERROR;
         }
     };

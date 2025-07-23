@@ -90,7 +90,7 @@ pub(crate) enum FieldIdentifier {
 }
 
 impl TryFrom<u16> for FieldIdentifier {
-    type Error = TsurugiOdbcError;
+    type Error = u16;
 
     fn try_from(value: u16) -> Result<Self, Self::Error> {
         use FieldIdentifier::*;
@@ -144,7 +144,7 @@ impl TryFrom<u16> for FieldIdentifier {
             1012 => Ok(SQL_DESC_UNNAMED),
             1013 => Ok(SQL_DESC_OCTET_LENGTH),
             1099 => Ok(SQL_DESC_ALLOC_TYPE),
-            _ => Err(TsurugiOdbcError::UnsupportedFieldIdentifier),
+            e => Err(e),
         }
     }
 }
@@ -177,15 +177,15 @@ pub extern "system" fn SQLColAttribute(
 
     let field_identifier = match FieldIdentifier::try_from(field_identifier) {
         Ok(value) => value,
-        Err(e) => {
+        Err(field_identifier) => {
             debug!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported field_identifier: {}",
                 field_identifier
             );
             stmt.add_diag(
-                e,
+                TsurugiOdbcError::ColAttributeUnsupportedFieldIdentifier,
                 format!(
-                    "SQLColAttribute(): Unsupported field_identifier: {}",
+                    "{FUNCTION_NAME}: Unsupported field_identifier: {}",
                     field_identifier
                 ),
             );
@@ -236,15 +236,15 @@ pub extern "system" fn SQLColAttributeW(
 
     let field_identifier = match FieldIdentifier::try_from(field_identifier) {
         Ok(value) => value,
-        Err(e) => {
+        Err(field_identifier) => {
             debug!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported field_identifier: {}",
                 field_identifier
             );
             stmt.add_diag(
-                e,
+                TsurugiOdbcError::ColAttributeUnsupportedFieldIdentifier,
                 format!(
-                    "SQLColAttributeW(): Unsupported field_identifier: {}",
+                    "{FUNCTION_NAME}: Unsupported field_identifier: {}",
                     field_identifier
                 ),
             );
@@ -335,7 +335,7 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
                 column_number
             );
             stmt.add_diag(
-                TsurugiOdbcError::ColumnNumberOutOfBounds,
+                TsurugiOdbcError::ColAttributeInvalidColumnNumber,
                 format!(
                     "column_number must be between 1 and {number_of_columns}, but got {}",
                     column_number
@@ -449,7 +449,7 @@ fn col_attribute(stmt: &TsurugiOdbcStmt, arg: TsurugiOdbcColAttributeArguments) 
             );
             let odbc_function_name = arg.odbc_function_name();
             stmt.add_diag(
-                TsurugiOdbcError::UnsupportedFieldIdentifier,
+                TsurugiOdbcError::ColAttributeUnsupportedFieldIdentifier,
                 format!(
                     "{odbc_function_name}: Unsupported field_identifier: {:?}",
                     field_identifier

@@ -129,7 +129,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcQueryResult {
             );
             let column_number = column_index + 1;
             stmt.add_diag(
-                TsurugiOdbcError::ColumnNumberOutOfBounds,
+                TsurugiOdbcError::GetDataInvalidColumnNumber,
                 format!(
                     "column_number must be between 1 and {}, but got {}",
                     self.number_of_columns(),

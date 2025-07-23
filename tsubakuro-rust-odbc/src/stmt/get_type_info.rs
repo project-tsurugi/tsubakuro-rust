@@ -36,7 +36,7 @@ pub extern "system" fn SQLGetTypeInfo(hstmt: HStmt, data_type: SqlSmallInt) -> S
     stmt.clear_diag();
     stmt.set_name("SQLGetTypeInfo");
 
-    let data_types = match target_data_type(&mut stmt, data_type) {
+    let data_types = match target_data_type(&mut stmt, data_type, false) {
         Ok(value) => value,
         Err(rc) => return rc,
     };
@@ -61,7 +61,7 @@ pub extern "system" fn SQLGetTypeInfoW(hstmt: HStmt, data_type: SqlSmallInt) -> 
     stmt.clear_diag();
     stmt.set_name("SQLGetTypeInfoW");
 
-    let data_types = match target_data_type(&mut stmt, data_type) {
+    let data_types = match target_data_type(&mut stmt, data_type, true) {
         Ok(value) => value,
         Err(rc) => return rc,
     };
@@ -75,6 +75,7 @@ pub extern "system" fn SQLGetTypeInfoW(hstmt: HStmt, data_type: SqlSmallInt) -> 
 fn target_data_type(
     stmt: &mut TsurugiOdbcStmt,
     data_type: SqlSmallInt,
+    wide_char: bool,
 ) -> Result<Vec<SqlDataType>, SqlReturn> {
     const FUNCTION_NAME: &str = "target_data_type()";
 
@@ -96,12 +97,20 @@ fn target_data_type(
 
     let data_type = match SqlDataType::try_from(data_type) {
         Ok(value) => value,
-        Err(e) => {
+        Err(data_type) => {
             debug!(
-                "{stmt}.{FUNCTION_NAME} error. Unsupported SqlDataType {}",
+                "{stmt}.{FUNCTION_NAME} error. Unsupported data_type {}",
                 data_type
             );
-            stmt.add_diag(e, format!("Unsupported SqlDataType {}", data_type));
+            let odbc_function_name = if wide_char {
+                "SQLGetTypeInfoW()"
+            } else {
+                "SQLGetTypeInfo()"
+            };
+            stmt.add_diag(
+                TsurugiOdbcError::GetTypeInfoUnsupportedDataType,
+                format!("{odbc_function_name}: Unsupported data_type {}", data_type),
+            );
             let rc = SqlReturn::SQL_ERROR;
             trace!("{FUNCTION_NAME} end. rc={:?}", rc);
             return Err(rc);
@@ -241,9 +250,13 @@ fn type_name_with_check(
                 "{stmt}.{FUNCTION_NAME}: Unsupported data_type {:?}",
                 data_type
             );
+            let odbc_function_name = "SQLGetTypeInfo()";
             stmt.add_diag(
-                TsurugiOdbcError::UnsupportedSqlDataType,
-                format!("Unsupported data_type {:?}", data_type),
+                TsurugiOdbcError::GetTypeInfoUnsupportedDataType,
+                format!(
+                    "{odbc_function_name}: Unsupported data_type {:?}",
+                    data_type
+                ),
             );
             return Err(SqlReturn::SQL_ERROR);
         }

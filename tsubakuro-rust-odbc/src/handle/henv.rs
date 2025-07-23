@@ -43,12 +43,11 @@ impl TsurugiOdbcEnv {
 }
 
 pub(crate) fn alloc_handle_env() -> Result<HEnv, SqlReturn> {
+    const FUNCTION_NAME: &str = "alloc_handle_env()";
+
     let env = Arc::new(TsurugiOdbcEnv::new());
     let henv = Arc::into_raw(env);
-    debug!(
-        "alloc_handle_env(): created new TsurugiOdbcEnv at {:?}",
-        henv
-    );
+    debug!("{FUNCTION_NAME}: created new TsurugiOdbcEnv at {:?}", henv);
     Ok(henv)
 }
 
@@ -76,24 +75,33 @@ macro_rules! check_env {
     }};
 }
 
+const ODBC_SET_FUNCTION_NAME: &str = "SQLSetEnvAttr()";
+
 impl TsurugiOdbcEnv {
     pub(crate) fn set_odbc_version(&self, value: u32) -> SqlReturn {
+        const FUNCTION_NAME: &str = "set_odbc_version()";
+
         if value == SQL_OV_ODBC3 {
-            debug!("set_odbc_version(): OdbcVersion={}", value);
+            debug!("{FUNCTION_NAME}: OdbcVersion={}", value);
             SqlReturn::SQL_SUCCESS
         } else {
-            debug!("set_odbc_version(): unsupported OdbcVersion {}", value);
+            debug!("{FUNCTION_NAME}: Unsupported OdbcVersion {}", value);
             self.add_diag(
-                TsurugiOdbcError::InvalidAttribute,
-                format!("unsupported OdbcVersion {}", value),
+                TsurugiOdbcError::UnsupportedOdbcVersion,
+                format!(
+                    "{ODBC_SET_FUNCTION_NAME}: Unsupported OdbcVersion {}",
+                    value
+                ),
             );
             SqlReturn::SQL_ERROR
         }
     }
 
     pub(crate) fn odbc_version(&self) -> u32 {
+        const FUNCTION_NAME: &str = "odbc_version()";
+
         let value = SQL_OV_ODBC3;
-        debug!("odbc_version(): returning {}", value);
+        debug!("{FUNCTION_NAME}: returning {}", value);
         value
     }
 }
@@ -128,7 +136,9 @@ impl TsurugiOdbcEnv {
 }
 
 pub(crate) fn free_handle_env(henv: HEnv) -> SqlReturn {
-    debug!("free_handle_env(): henv={:?}", henv);
+    const FUNCTION_NAME: &str = "free_handle_env()";
+
+    debug!("{FUNCTION_NAME}: henv={:?}", henv);
     unsafe {
         let _ = Arc::from_raw(henv);
     }

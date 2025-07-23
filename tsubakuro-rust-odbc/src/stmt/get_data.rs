@@ -84,6 +84,8 @@ pub extern "system" fn SQLGetData(
     rc
 }
 
+const ODBC_FUNCTION_NAME: &str = "SQLGetData()";
+
 fn get_data(
     stmt: &TsurugiOdbcStmt,
     col_or_param_num: SqlUSmallInt,
@@ -96,12 +98,18 @@ fn get_data(
 
     let target_type = match CDataType::try_from(target_type) {
         Ok(value) => value,
-        Err(e) => {
+        Err(target_type) => {
             debug!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported target_type {}",
                 target_type
             );
-            stmt.add_diag(e, format!("Unsupported target_type {}", target_type));
+            stmt.add_diag(
+                TsurugiOdbcError::GetDataUnsupportedTargetType,
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target_type {}",
+                    target_type
+                ),
+            );
             return SqlReturn::SQL_ERROR;
         }
     };
@@ -165,9 +173,9 @@ pub(crate) fn do_get_data(stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArgume
             number_of_columns
         );
         stmt.add_diag(
-            TsurugiOdbcError::ColumnNumberOutOfBounds,
+            TsurugiOdbcError::GetDataInvalidColumnNumber,
             format!(
-                "column_number must be between 1 and {}, but got {}",
+                "{ODBC_FUNCTION_NAME}: column_number must be between 1 and {}, but got {}",
                 number_of_columns, column_number
             ),
         );
@@ -186,7 +194,7 @@ fn check_target_value_ptr(
         debug!("{stmt}.{function_name} error. target_value_ptr is null");
         stmt.add_diag(
             TsurugiOdbcError::GetDataInvalidTargetValuePtr,
-            "SQLGetData.target_value_ptr is null",
+            format!("{ODBC_FUNCTION_NAME}: target_value_ptr is null"),
         );
         Err(SqlReturn::SQL_ERROR)
     } else {
@@ -315,7 +323,10 @@ fn write_bytes(
     if value_len <= buffer_length {
         SqlReturn::SQL_SUCCESS
     } else {
-        stmt.add_diag(TsurugiOdbcError::DataTruncated, "Data truncated");
+        stmt.add_diag(
+            TsurugiOdbcError::DataTruncated,
+            format!("{ODBC_FUNCTION_NAME}: Data truncated"),
+        );
         SqlReturn::SQL_SUCCESS_WITH_INFO
     }
 }

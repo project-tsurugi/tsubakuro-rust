@@ -2,10 +2,7 @@ use log::{debug, trace, warn};
 
 use crate::{
     ctype::{SqlChar, SqlInteger, SqlPointer, SqlReturn, SqlSmallInt, SqlWChar},
-    handle::{
-        diag::{get_diag_collection, TsurugiOdbcError},
-        Handle, HandleType,
-    },
+    handle::{diag::get_diag_collection, Handle, HandleType},
     handle_type,
     util::{write_char, write_wchar_bytes},
     ODBC_DRIVER_NAME,
@@ -33,7 +30,7 @@ enum DiagIdentifier {
 }
 
 impl TryFrom<i16> for DiagIdentifier {
-    type Error = TsurugiOdbcError;
+    type Error = i16;
 
     fn try_from(value: i16) -> Result<Self, Self::Error> {
         use DiagIdentifier::*;
@@ -53,7 +50,7 @@ impl TryFrom<i16> for DiagIdentifier {
             10 => Ok(SQL_DIAG_CONNECTION_NAME),
             11 => Ok(SQL_DIAG_SERVER_NAME),
             12 => Ok(SQL_DIAG_DYNAMIC_FUNCTION_CODE),
-            _ => Err(TsurugiOdbcError::UnsupportedDiagIdentifier),
+            e => Err(e),
         }
     }
 }

@@ -295,10 +295,12 @@ impl TsurugiOdbcStmt {
 }
 
 pub(crate) fn free_handle_stmt(hstmt: HStmt) -> SqlReturn {
+    const FUNCTION_NAME: &str = "free_handle_stmt()";
+
     unsafe {
         let stmt = Arc::from_raw(hstmt);
         let mut stmt = stmt.lock().unwrap();
-        debug!("{stmt}.free_handle_stmt(): hdbc={:?}", hstmt);
+        debug!("{stmt}.{FUNCTION_NAME}: hdbc={:?}", hstmt);
 
         let rc1 = stmt.close_processor();
         let rc2 = stmt.close_prepare();

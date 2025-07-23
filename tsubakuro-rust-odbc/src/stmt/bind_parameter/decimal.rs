@@ -15,7 +15,7 @@ impl TsurugiOdbcBindParameter {
         name: String,
         stmt: &TsurugiOdbcStmt,
     ) -> Result<SqlParameter, SqlReturn> {
-        const FUNCTION_NAME: &str = "sql_parameter_decimal()";
+        const FUNCTION_NAME: &str = "tg_parameter_decimal()";
 
         let value_type = self.value_type;
         let value_ptr = self.parameter_value_ptr;
@@ -71,7 +71,7 @@ impl TsurugiOdbcBindParameter {
                     self
                 );
                 stmt.add_diag(
-                    TsurugiOdbcError::UnsupportedCDataType,
+                    TsurugiOdbcError::BindParameterUnsupportedValueType,
                     format!("Unsupported value_type {:?} for DECIMAL", value_type),
                 );
                 return Err(SqlReturn::SQL_ERROR);
@@ -153,8 +153,8 @@ fn string_to_decimal(
         Err(e) => {
             debug!("{stmt}.{function_name}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::DecimalError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::BindParameterConvertDecimalError,
+                format!("string to decimal convert error. {}", e),
             );
             Err(SqlReturn::SQL_ERROR)
         }

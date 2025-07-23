@@ -70,7 +70,10 @@ pub(crate) fn get_data_string(
             );
             stmt.add_diag(
                 TsurugiOdbcError::GetDataUnsupportedTargetType,
-                format!("Unsupported target type {:?}", target_type),
+                format!(
+                    "{ODBC_FUNCTION_NAME}: Unsupported target type {:?} from string",
+                    target_type
+                ),
             );
             SqlReturn::SQL_ERROR
         }
@@ -125,8 +128,8 @@ pub(crate) fn str_to_bool(stmt: &TsurugiOdbcStmt, value: &str) -> Result<bool, S
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertBoolError,
+                format!("{ODBC_FUNCTION_NAME}: string to bool convert error. {}", e),
             );
             return Err(SqlReturn::SQL_ERROR);
         }
@@ -186,8 +189,11 @@ fn str_to_i128(stmt: &TsurugiOdbcStmt, value: &str) -> Result<i128, SqlReturn> {
                 } else {
                     debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
                     stmt.add_diag(
-                        TsurugiOdbcError::ConvertError,
-                        format!("convert error. {}", e),
+                        TsurugiOdbcError::GetDataConvertI128Error,
+                        format!(
+                            "{ODBC_FUNCTION_NAME}: string to integer convert error. {}",
+                            e
+                        ),
                     );
                     return Err(SqlReturn::SQL_ERROR);
                 }
@@ -195,8 +201,11 @@ fn str_to_i128(stmt: &TsurugiOdbcStmt, value: &str) -> Result<i128, SqlReturn> {
             Err(_) => {
                 debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
                 stmt.add_diag(
-                    TsurugiOdbcError::ConvertError,
-                    format!("convert error. {}", e),
+                    TsurugiOdbcError::GetDataConvertI128Error,
+                    format!(
+                        "{ODBC_FUNCTION_NAME}: string to integer convert error. {}",
+                        e
+                    ),
                 );
                 return Err(SqlReturn::SQL_ERROR);
             }
@@ -213,8 +222,8 @@ pub(crate) fn str_to_f32(stmt: &TsurugiOdbcStmt, value: &str) -> Result<f32, Sql
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertF32Error,
+                format!("{ODBC_FUNCTION_NAME}: string to float convert error. {}", e),
             );
             return Err(SqlReturn::SQL_ERROR);
         }
@@ -230,8 +239,11 @@ pub(crate) fn str_to_f64(stmt: &TsurugiOdbcStmt, value: &str) -> Result<f64, Sql
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertF64Error,
+                format!(
+                    "{ODBC_FUNCTION_NAME}: string to double convert error. {}",
+                    e
+                ),
             );
             return Err(SqlReturn::SQL_ERROR);
         }
@@ -250,8 +262,11 @@ fn str_to_numeric_struct(
         Err(e) => {
             debug!("{stmt}.{FUNCTION_NAME}: convert error. {:?}", e);
             stmt.add_diag(
-                TsurugiOdbcError::ConvertError,
-                format!("convert error. {}", e),
+                TsurugiOdbcError::GetDataConvertDecimalError,
+                format!(
+                    "{ODBC_FUNCTION_NAME}: string to SQL_NUMERIC_STRUCT convert error. {}",
+                    e
+                ),
             );
             return Err(SqlReturn::SQL_ERROR);
         }
