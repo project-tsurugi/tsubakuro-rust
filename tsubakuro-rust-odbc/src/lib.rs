@@ -12,6 +12,12 @@ const ODBC_DRIVER_NAME: &str = "Tsurugi ODBC Driver";
 const CRATE_VERSION: &str = "0.4.0";
 const TSURUGI_VERSION: &str = "1.5.0";
 
+#[cfg(windows)]
+const ODBC_DRIVER_FILE_NAME: &str = "tsubakuro_rust_odbc.dll";
+
+#[cfg(unix)]
+const ODBC_DRIVER_FILE_NAME: &str = "libtsubakuro_rust_odbc.so";
+
 static ODBC_DRIVER_VERSION: OnceLock<String> = OnceLock::new();
 
 fn odbc_driver_version() -> &'static String {

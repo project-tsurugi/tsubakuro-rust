@@ -11,7 +11,7 @@ use crate::{
     },
     odbc_driver_version,
     util::{write_char, write_wchar_bytes},
-    TSURUGI_VERSION,
+    ODBC_DRIVER_FILE_NAME, TSURUGI_VERSION,
 };
 
 #[repr(u16)]
@@ -523,7 +523,7 @@ impl SqlGetInfo {
 
         use InfoType::*;
         match info_type {
-            SQL_DRIVER_NAME => self.write_string(info_type, "tsubakuro_rust_odbc.dll"), // TODO UNIXのときのDRIVER_NAME
+            SQL_DRIVER_NAME => self.write_string(info_type, ODBC_DRIVER_FILE_NAME),
             SQL_DRIVER_VER => self.write_string(info_type, odbc_driver_version()),
             SQL_DRIVER_ODBC_VER => self.write_string(info_type, "03.51"),
             SQL_DBMS_NAME => self.write_string(info_type, "Tsurugi"),
