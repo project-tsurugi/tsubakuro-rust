@@ -8,8 +8,6 @@ import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 
 public class ExpectedColumn {
-    private static final long SQL_NO_TOTAL = -4;
-
     private final int ordinalPosition;
     private final String columnName;
 
