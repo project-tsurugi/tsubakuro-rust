@@ -16,7 +16,7 @@ Tsurugi ODBCドライバーのdllファイル（  `tsubakuro_rust_odbc.dll`  ）
 >
 > 例えばVisual C++ランタイムライブラリー（VC++ランタイムライブラリー）を使ってビルドされている場合、実行環境に「ビルド環境と互換性のあるバージョンのVC++ランタイムライブラリー」が必要です。
 >
-> （VC++ランタイムライブラリーに依存しているかどうかは、`rustup show` や `cargo build -v` , `dumpbin /dependents` 等で確認できます）
+> （VC++ランタイムライブラリーに依存しているかどうかは、`rustup show` や `cargo build -v`, `dumpbin /dependents tsubakuro_rust_odbc.dll` 等で確認できます）
 
 #### ドライバーのインストール
 
@@ -36,9 +36,9 @@ Tsurugi ODBCドライバーのdllファイル（  `tsubakuro_rust_odbc.dll`  ）
    ```
 
    - dllファイルの場所を絶対パスで記述してください。パス区切り文字は `/` または `\\` が使用できます。
-   - この例の場合、Tsurugi ODBCドライバーの登録名は `Tsurugi Driver` です。（ODBCを使用するアプリケーションからは、接続文字列のドライバー名にこの名前を指定します）
+   - この例の場合、Tsurugi ODBCドライバーの登録名は `Tsurugi Driver` です。（接続文字列を使用するアプリケーションやDSNでは、ドライバー名にこの名前を指定します）
 
-3. regファイルを実行します。（regファイルをダブルクリックする）
+3. regファイルを実行します。（regファイルをダブルクリックする）  
    これにより、レジストリーにTsurugi ODBCドライバーが登録されます。
 
 ##### 接続文字列の例
@@ -70,5 +70,5 @@ DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;
    - 設定値は適宜変更してください。
    - この例の場合、DSNの名称は `MyTsurugiDSN` です。（ODBCを使用するアプリケーションからは、DSNにこの名前を指定します）
 
-2. regファイルを実行します。（regファイルをダブルクリックする）
+2. regファイルを実行します。（regファイルをダブルクリックする）  
    これにより、レジストリーにTsurugiのDSNが登録されます。
