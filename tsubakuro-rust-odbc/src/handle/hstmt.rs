@@ -103,6 +103,9 @@ impl TsurugiOdbcStmt {
 
     pub(crate) fn set_bind_column(&mut self, bind_column: TsurugiOdbcGetDataArguments) {
         let index = bind_column.column_index() as usize;
+        if index >= self.bind_columns.capacity() {
+            self.bind_columns.reserve(index + 8);
+        }
         while index >= self.bind_columns.len() {
             self.bind_columns.push(None);
         }
@@ -125,6 +128,9 @@ impl TsurugiOdbcStmt {
 
     pub(crate) fn set_parameter(&mut self, parameter: TsurugiOdbcBindParameter) {
         let index = parameter.parameter_number() as usize - 1;
+        if index >= self.parameters.capacity() {
+            self.parameters.reserve(index + 8);
+        }
         while index >= self.parameters.len() {
             self.parameters.push(None);
         }
