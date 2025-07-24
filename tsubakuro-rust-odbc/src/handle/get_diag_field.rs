@@ -2,7 +2,12 @@ use log::{debug, trace, warn};
 
 use crate::{
     ctype::{SqlChar, SqlInteger, SqlPointer, SqlReturn, SqlSmallInt, SqlWChar},
-    handle::{diag::get_diag_collection, Handle, HandleType},
+    handle::{
+        diag::get_diag_collection,
+        hdbc::{HDbc, TsurugiOdbcDbc},
+        hstmt::{HStmt, TsurugiOdbcStmt},
+        Handle, HandleType,
+    },
     handle_type,
     util::{write_char, write_wchar_bytes},
     ODBC_DRIVER_NAME,
@@ -199,10 +204,10 @@ fn get_diag_field(
 
     match diag_identifier {
         SQL_DIAG_CLASS_ORIGIN => write_string(ODBC_DRIVER_NAME, arg),
-        SQL_DIAG_CONNECTION_NAME => write_string("TODO SQL_DIAG_CONNECTION_NAME", arg), // TODO SQL_DIAG_CONNECTION_NAME
+        SQL_DIAG_CONNECTION_NAME => write_string(&connection_name(handle_type, handle), arg),
         SQL_DIAG_MESSAGE_TEXT => write_string(diag.message(), arg),
         SQL_DIAG_NATIVE => write_integer(diag.error_code() as SqlInteger, arg),
-        SQL_DIAG_SERVER_NAME => write_string("TODO SQL_DIAG_SERVER_NAME", arg), // TODO SQL_DIAG_SERVER_NAME
+        SQL_DIAG_SERVER_NAME => write_string(&server_name(handle_type, handle), arg),
         SQL_DIAG_SQLSTATE => write_string((&diag.error_code()).into(), arg),
         SQL_DIAG_SUBCLASS_ORIGIN => write_string(ODBC_DRIVER_NAME, arg),
         _ => {
@@ -215,10 +220,45 @@ fn get_diag_field(
     }
 }
 
+fn connection_name(handle_type: HandleType, handle: Handle) -> String {
+    match handle_type {
+        HandleType::Dbc => {
+            let dbc = TsurugiOdbcDbc::from(handle as HDbc);
+            dbc.endpoint()
+                .map(|endpoint| endpoint.to_string())
+                .unwrap_or_default()
+        }
+        HandleType::Stmt => {
+            let stmt = TsurugiOdbcStmt::from(handle as HStmt);
+            let stmt = stmt.lock().unwrap();
+            stmt.dbc()
+                .endpoint()
+                .map(|endpoint| endpoint.to_string())
+                .unwrap_or_default()
+        }
+        _ => "".to_string(),
+    }
+}
+
+fn server_name(handle_type: HandleType, handle: Handle) -> String {
+    match handle_type {
+        HandleType::Dbc => {
+            let dbc = TsurugiOdbcDbc::from(handle as HDbc);
+            dbc.server_name().unwrap_or_default()
+        }
+        HandleType::Stmt => {
+            let stmt = TsurugiOdbcStmt::from(handle as HStmt);
+            let stmt = stmt.lock().unwrap();
+            stmt.dbc().server_name().unwrap_or_default()
+        }
+        _ => "".to_string(),
+    }
+}
+
 fn write_string(value: &str, arg: TsurugiOdbcDiagFieldArguments) -> SqlReturn {
     if arg.wide_char {
         write_wchar_bytes(
-            "",
+            "SQLGetDiagFieldW.diag_info_ptr",
             value,
             arg.diag_info_ptr as *mut SqlWChar,
             arg.buffer_length,
@@ -227,7 +267,7 @@ fn write_string(value: &str, arg: TsurugiOdbcDiagFieldArguments) -> SqlReturn {
         )
     } else {
         write_char(
-            "name",
+            "SQLGetDiagField.diag_info_ptr",
             value,
             arg.diag_info_ptr as *mut SqlChar,
             arg.buffer_length,

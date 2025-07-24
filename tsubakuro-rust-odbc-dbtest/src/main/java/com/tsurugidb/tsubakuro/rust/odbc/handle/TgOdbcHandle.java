@@ -105,7 +105,19 @@ public abstract class TgOdbcHandle extends TgOdbcResource {
         return arg.diagInfoInteger();
     }
 
-    private short getDiagField0(int recNumber, TgOdbcDiagFieldArgument arg, boolean wideChar) {
+    public String getDiagFieldString(int recNumber, DiagIdentifier diagIdentifier,int bufferLength, boolean wideChar) {
+        var arg = TgOdbcDiagFieldArgument.ofString(manager, diagIdentifier, bufferLength);
+
+        short rc = getDiagField0(recNumber, arg, wideChar);
+        if (rc == SqlReturn.SQL_NO_DATA) {
+            return null;
+        }
+        SqlReturn.check(wideChar ? "SQLGetDiagFieldW" : "SQLGetDiagFieldA", rc);
+
+        return arg.diagInfoString(wideChar);
+    }
+
+    public short getDiagField0(int recNumber, TgOdbcDiagFieldArgument arg, boolean wideChar) {
         short handleType = handleType().value();
         MemorySegment handle = handleAddress();
         short recNumberShort = (short) recNumber;

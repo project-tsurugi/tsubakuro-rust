@@ -23,6 +23,8 @@ public record TgOdbcDiagFieldArgument(DiagIdentifier diagIdentifier, MemorySegme
 
     public enum DiagIdentifier {
         SQL_DIAG_NUMBER(2), //
+        SQL_DIAG_CONNECTION_NAME(10), //
+        SQL_DIAG_SERVER_NAME(11), //
         ;
 
         private final short value;

@@ -34,6 +34,10 @@ pub(crate) struct TsurugiOdbcConnectedInfo {
 }
 
 impl TsurugiOdbcConnectedInfo {
+    pub(crate) fn endpoint(&self) -> &Endpoint {
+        &self.endpoint
+    }
+
     pub(crate) fn server_name(&self) -> Option<&String> {
         match &self.endpoint {
             Endpoint::Tcp(host, _port) => Some(host),

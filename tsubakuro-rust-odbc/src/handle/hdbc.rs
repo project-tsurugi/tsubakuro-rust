@@ -170,6 +170,11 @@ macro_rules! check_dbc {
 }
 
 impl TsurugiOdbcDbc {
+    pub(crate) fn endpoint(&self) -> Option<Endpoint> {
+        let info = self.connected_info.lock().unwrap();
+        (*info).as_ref().map(|info| info.endpoint().clone())
+    }
+
     pub(crate) fn server_name(&self) -> Option<String> {
         let info = self.connected_info.lock().unwrap();
         match &*info {
