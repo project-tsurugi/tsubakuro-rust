@@ -58,16 +58,17 @@ DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;
    ```reg
    Windows Registry Editor Version 5.00
    
-   [HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\MyTsurugiDSN]
+   [HKEY_CURRENT_USER\SOFTWARE\ODBC\ODBC.INI\MyTsurugiDSN]
    "Driver"="Tsurugi Driver"
    "Description"="My Tsurugi Database"
    "Endpoint"="tcp://localhost:12345"
    
-   [HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources]
+   [HKEY_CURRENT_USER\SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources]
    "MyTsurugiDSN"="Tsurugi Driver"
    ```
 
    - 設定値は適宜変更してください。
+     - システムDSNに登録する場合はHKEY_CURRENT_USERをHKEY_LOCAL_MACHINEに変更してください。
    - この例の場合、DSNの名称は `MyTsurugiDSN` です。（ODBCを使用するアプリケーションからは、DSNにこの名前を指定します）
 
 2. regファイルを実行します。（regファイルをダブルクリックする）  
