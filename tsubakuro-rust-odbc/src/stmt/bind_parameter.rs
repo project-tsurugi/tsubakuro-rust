@@ -28,6 +28,39 @@ mod time_tz;
 mod timestamp;
 mod timestamp_tz;
 
+#[repr(i16)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+enum InputOutputType {
+    SQL_PARAM_TYPE_UNKNOWN = 0,
+    SQL_PARAM_INPUT = 1,
+    SQL_PARAM_INPUT_OUTPUT = 2,
+    SQL_RESULT_COL = 3,
+    SQL_PARAM_OUTPUT = 4,
+    SQL_RETURN_VALUE = 5,
+    SQL_PARAM_INPUT_OUTPUT_STREAM = 8,
+    SQL_PARAM_OUTPUT_STREAM = 16,
+}
+
+impl TryFrom<i16> for InputOutputType {
+    type Error = i16;
+
+    fn try_from(value: i16) -> Result<Self, Self::Error> {
+        use InputOutputType::*;
+        match value {
+            0 => Ok(SQL_PARAM_TYPE_UNKNOWN),
+            1 => Ok(SQL_PARAM_INPUT),
+            2 => Ok(SQL_PARAM_INPUT_OUTPUT),
+            3 => Ok(SQL_RESULT_COL),
+            4 => Ok(SQL_PARAM_OUTPUT),
+            5 => Ok(SQL_RETURN_VALUE),
+            8 => Ok(SQL_PARAM_INPUT_OUTPUT_STREAM),
+            16 => Ok(SQL_PARAM_OUTPUT_STREAM),
+            e => Err(e),
+        }
+    }
+}
+
 #[no_mangle]
 pub extern "system" fn SQLBindParameter(
     hstmt: HStmt,
@@ -57,11 +90,11 @@ pub extern "system" fn SQLBindParameter(
     );
 
     let stmt = check_stmt!(hstmt);
+
     let mut stmt = stmt.lock().unwrap();
     stmt.clear_diag();
 
-    let rc = bind_parameter(
-        &mut stmt,
+    let delegator = BindParameter::new(
         parameter_number,
         input_output_type,
         value_type,
@@ -72,6 +105,7 @@ pub extern "system" fn SQLBindParameter(
         buffer_length,
         str_len_or_ind_ptr,
     );
+    let rc = delegator.bind_parameter(&mut stmt);
 
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
     rc
@@ -79,11 +113,9 @@ pub extern "system" fn SQLBindParameter(
 
 const ODBC_FUNCTION_NAME: &str = "SQLBindParameter()";
 
-#[allow(clippy::too_many_arguments)]
-fn bind_parameter(
-    stmt: &mut TsurugiOdbcStmt,
+struct BindParameter {
     parameter_number: SqlUSmallInt,
-    _input_output_type: SqlSmallInt,
+    input_output_type: SqlSmallInt,
     value_type: SqlSmallInt,
     parameter_type: SqlSmallInt,
     column_size: SqlULen,
@@ -91,105 +123,163 @@ fn bind_parameter(
     parameter_value_ptr: SqlPointer,
     buffer_length: SqlLen,
     str_len_or_ind_ptr: *mut SqlLen,
-) -> SqlReturn {
-    const FUNCTION_NAME: &str = "bind_parameter()";
+}
 
-    // TODO parameter_numberの上限チェック
-    if parameter_number < 1 {
-        debug!(
-            "{stmt}.{FUNCTION_NAME} error. Out of range. parameter_number={}",
-            parameter_number
-        );
-        stmt.add_diag(
-            TsurugiOdbcError::BindParameterInvalidParameterNumber,
-            "parameter_number out of range",
-        );
-        return SqlReturn::SQL_ERROR;
+impl BindParameter {
+    #[allow(clippy::too_many_arguments)]
+    fn new(
+        parameter_number: SqlUSmallInt,
+        input_output_type: SqlSmallInt,
+        value_type: SqlSmallInt,
+        parameter_type: SqlSmallInt,
+        column_size: SqlULen,
+        decimal_digits: SqlSmallInt,
+        parameter_value_ptr: SqlPointer,
+        buffer_length: SqlLen,
+        str_len_or_ind_ptr: *mut SqlLen,
+    ) -> Self {
+        BindParameter {
+            parameter_number,
+            input_output_type,
+            value_type,
+            parameter_type,
+            column_size,
+            decimal_digits,
+            parameter_value_ptr,
+            buffer_length,
+            str_len_or_ind_ptr,
+        }
     }
+    fn bind_parameter(&self, stmt: &mut TsurugiOdbcStmt) -> SqlReturn {
+        const FUNCTION_NAME: &str = "bind_parameter()";
 
-    // TODO input_output_type（ParameterType）がSQL_PARAM_INPUT以外の場合はエラーとする
-
-    let value_type = match CDataType::try_from(value_type) {
-        Ok(value) => value,
-        Err(value_type) => {
+        let parameter_number = self.parameter_number;
+        if parameter_number < 1 {
             debug!(
-                "{stmt}.{FUNCTION_NAME} error. Unsupported value_type {}",
-                value_type
+                "{stmt}.{FUNCTION_NAME} error. Out of range. parameter_number={}",
+                parameter_number
             );
             stmt.add_diag(
-                TsurugiOdbcError::BindParameterUnsupportedValueType,
+                TsurugiOdbcError::BindParameterInvalidParameterNumber,
+                "parameter_number out of range",
+            );
+            return SqlReturn::SQL_ERROR;
+        }
+
+        let input_output_type = match InputOutputType::try_from(self.input_output_type) {
+            Ok(value) => value,
+            Err(input_output_type) => {
+                debug!(
+                    "{stmt}.{FUNCTION_NAME} error. Unsupported input_output_type {}",
+                    input_output_type
+                );
+                stmt.add_diag(
+                    TsurugiOdbcError::BindParameterUnsupportedInputOutputType,
+                    format!(
+                        "{ODBC_FUNCTION_NAME}: Unsupported input_output_type {}",
+                        input_output_type
+                    ),
+                );
+                return SqlReturn::SQL_ERROR;
+            }
+        };
+        if input_output_type != InputOutputType::SQL_PARAM_INPUT {
+            debug!(
+                "{stmt}.{FUNCTION_NAME} error. Unsupported input_output_type {:?}",
+                input_output_type
+            );
+            stmt.add_diag(
+                TsurugiOdbcError::BindParameterUnsupportedInputOutputType,
                 format!(
-                    "{ODBC_FUNCTION_NAME}: Unsupported value_type {}",
+                    "{ODBC_FUNCTION_NAME}: Unsupported input_output_type {:?}",
+                    input_output_type
+                ),
+            );
+            return SqlReturn::SQL_ERROR;
+        }
+
+        let value_type = match CDataType::try_from(self.value_type) {
+            Ok(value) => value,
+            Err(value_type) => {
+                debug!(
+                    "{stmt}.{FUNCTION_NAME} error. Unsupported value_type {}",
                     value_type
-                ),
-            );
-            return SqlReturn::SQL_ERROR;
-        }
-    };
+                );
+                stmt.add_diag(
+                    TsurugiOdbcError::BindParameterUnsupportedValueType,
+                    format!(
+                        "{ODBC_FUNCTION_NAME}: Unsupported value_type {}",
+                        value_type
+                    ),
+                );
+                return SqlReturn::SQL_ERROR;
+            }
+        };
 
-    let parameter_type = match SqlDataType::try_from(parameter_type) {
-        Ok(value) => value,
-        Err(parameter_type) => {
-            debug!(
-                "{stmt}.{FUNCTION_NAME} error. Unsupported parameter_type {}",
-                parameter_type
-            );
-            stmt.add_diag(
-                TsurugiOdbcError::BindParameterUnsupportedParameterType,
-                format!(
-                    "{ODBC_FUNCTION_NAME}: Unsupported parameter_type {}",
+        let parameter_type = match SqlDataType::try_from(self.parameter_type) {
+            Ok(value) => value,
+            Err(parameter_type) => {
+                debug!(
+                    "{stmt}.{FUNCTION_NAME} error. Unsupported parameter_type {}",
                     parameter_type
-                ),
-            );
-            return SqlReturn::SQL_ERROR;
-        }
-    };
+                );
+                stmt.add_diag(
+                    TsurugiOdbcError::BindParameterUnsupportedParameterType,
+                    format!(
+                        "{ODBC_FUNCTION_NAME}: Unsupported parameter_type {}",
+                        parameter_type
+                    ),
+                );
+                return SqlReturn::SQL_ERROR;
+            }
+        };
 
-    // TODO value_typeがSQL_C_DEFAULTの場合、parameter_typeから決定する
+        // TODO value_typeがSQL_C_DEFAULTの場合、parameter_typeから決定する
 
-    let atom_type = match AtomType::try_from(parameter_type) {
-        Ok(value) => value,
-        Err(parameter_type) => {
-            debug!(
+        let atom_type = match AtomType::try_from(parameter_type) {
+            Ok(value) => value,
+            Err(parameter_type) => {
+                debug!(
                 "{stmt}.{FUNCTION_NAME} error. Unsupported parameter_type {:?} convert to AtomType",
                 parameter_type
             );
+                stmt.add_diag(
+                    TsurugiOdbcError::BindParameterUnsupportedParameterType,
+                    format!(
+                        "{ODBC_FUNCTION_NAME}: Unsupported parameter_type {:?}",
+                        parameter_type
+                    ),
+                );
+                return SqlReturn::SQL_ERROR;
+            }
+        };
+
+        if self.str_len_or_ind_ptr.is_null() {
+            debug!("{stmt}.{FUNCTION_NAME} error. str_len_or_ind_ptr is null");
             stmt.add_diag(
-                TsurugiOdbcError::BindParameterUnsupportedParameterType,
-                format!(
-                    "{ODBC_FUNCTION_NAME}: Unsupported parameter_type {:?}",
-                    parameter_type
-                ),
+                TsurugiOdbcError::BindParameterInvalidStrLenOrIndPtr,
+                "str_len_or_ind_ptr is null",
             );
             return SqlReturn::SQL_ERROR;
-        }
-    };
+        };
+        let length_or_ind = unsafe { *self.str_len_or_ind_ptr };
 
-    if str_len_or_ind_ptr.is_null() {
-        debug!("{stmt}.{FUNCTION_NAME} error. str_len_or_ind_ptr is null");
-        stmt.add_diag(
-            TsurugiOdbcError::BindParameterInvalidStrLenOrIndPtr,
-            "str_len_or_ind_ptr is null",
+        let parameter = TsurugiOdbcBindParameter::new(
+            parameter_number,
+            value_type,
+            parameter_type,
+            atom_type,
+            self.column_size,
+            self.decimal_digits,
+            self.parameter_value_ptr,
+            self.buffer_length,
+            length_or_ind,
         );
-        return SqlReturn::SQL_ERROR;
-    };
-    let length_or_ind = unsafe { *str_len_or_ind_ptr };
 
-    let parameter = TsurugiOdbcBindParameter::new(
-        parameter_number,
-        value_type,
-        parameter_type,
-        atom_type,
-        column_size,
-        decimal_digits,
-        parameter_value_ptr,
-        buffer_length,
-        length_or_ind,
-    );
+        stmt.set_parameter(parameter);
 
-    stmt.set_parameter(parameter);
-
-    SqlReturn::SQL_SUCCESS
+        SqlReturn::SQL_SUCCESS
+    }
 }
 
 pub(crate) struct TsurugiOdbcBindParameter {
