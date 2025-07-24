@@ -124,7 +124,7 @@ fn get_data(
     do_get_data(stmt, &arg)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct TsurugiOdbcGetDataArguments {
     column_number: SqlUSmallInt,
     target_type: CDataType,

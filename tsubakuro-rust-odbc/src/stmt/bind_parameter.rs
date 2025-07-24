@@ -282,6 +282,7 @@ impl BindParameter {
     }
 }
 
+#[derive(Clone, Copy)]
 pub(crate) struct TsurugiOdbcBindParameter {
     parameter_number: SqlUSmallInt,
     value_type: CDataType,
