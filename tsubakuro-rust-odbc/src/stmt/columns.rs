@@ -277,7 +277,6 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
         }
         let column = &columns[self.row_index as usize];
 
-        // TODO SQLGetColumn() field
         let column_index = arg.column_index();
         match column_index {
             0 => get_data_string(stmt, arg, metadata.database_name()), // TABLE_CAT varchar
@@ -302,9 +301,9 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
                 }),
             ), // NULLABLE SmallInt
             11 => get_data_string_opt(stmt, arg, column.description()), // REMARKS varchar
-            12 => not_yet_implemented(stmt, arg),                      // COLUMN_DEF varchar
+            12 => not_yet_implemented(stmt, arg),                      //TODO COLUMN_DEF varchar
             13 => get_data_i32(stmt, arg, SqlDataType::from(column) as i32), // SQL_DATA_TYPE SmallInt
-            14 => not_yet_implemented(stmt, arg), // SQL_DATETIME_SUB SmallInt
+            14 => not_yet_implemented(stmt, arg), //TODO SQL_DATETIME_SUB SmallInt
             15 => get_data_i32_opt(stmt, arg, char_octet_length(column)), // CHAR_OCTET_LENGTH Integer
             16 => get_data_i32(stmt, arg, self.row_index as i32 + 1), // ORDINAL_POSITION Integer
             17 => get_data_string_opt(
