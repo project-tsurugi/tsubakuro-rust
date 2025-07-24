@@ -4,6 +4,7 @@ tsubakuro-rust-odbc is a ODBC Driver to access [Tsurugi](https://github.com/proj
 
 ## Limitation
 
+- Tsurugi 1.5.0 or later.
 - ODBC3
 - For MS-Windows, 64-bit DLL
 - transaction_type is OCC only.
@@ -16,7 +17,7 @@ tsubakuro-rust-odbc is a ODBC Driver to access [Tsurugi](https://github.com/proj
 ```bash
 cd tsubakuro-rust-odbc
 cargo build --release
-ls target/release/*tsubakuro_rust_odbc*
+dir target\release\*tsubakuro_rust_odbc*
 ```
 
 `tsubakuro_rust_odbc.dll` for MS-Windows is generated.
