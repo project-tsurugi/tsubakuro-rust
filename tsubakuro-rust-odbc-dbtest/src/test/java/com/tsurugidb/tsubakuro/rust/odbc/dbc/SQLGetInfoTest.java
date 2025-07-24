@@ -3,6 +3,8 @@ package com.tsurugidb.tsubakuro.rust.odbc.dbc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.net.URI;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -50,6 +52,24 @@ class SQLGetInfoTest extends TgOdbcTester {
 
     @ParameterizedTest
     @ValueSource(booleans = { false, true })
+    void SQL_DATA_SOURCE_NAME(boolean wideChar) {
+        String dsn = getDsn();
+        if (dsn == null || dsn.isEmpty()) {
+            var dbc = getConnection().dbc();
+
+            String actual = dbc.getInfoString(InfoType.SQL_DATA_SOURCE_NAME, 1024, wideChar);
+            assertEquals("", actual);
+        } else {
+            try (var dbc = createDbc(); //
+                    var _ = dbc.connect(dsn, wideChar)) {
+                String actual = dbc.getInfoString(InfoType.SQL_DATA_SOURCE_NAME, 1024, wideChar);
+                assertEquals(dsn, actual);
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
     void SQL_DRIVER_ODBC_VER(boolean wideChar) {
         var dbc = getConnection().dbc();
 
@@ -64,6 +84,17 @@ class SQLGetInfoTest extends TgOdbcTester {
 
         int actual = dbc.getInfoInt(InfoType.SQL_GETDATA_EXTENSIONS, wideChar);
         assertEquals(0, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void SQL_SERVER_NAME(boolean wideChar) {
+        var dbc = getConnection().dbc();
+
+        String actual = dbc.getInfoString(InfoType.SQL_SERVER_NAME, 1024, wideChar);
+        String endpoint = getEndpoint();
+        String host = URI.create(endpoint).getHost();
+        assertEquals(host, actual);
     }
 
     @Test

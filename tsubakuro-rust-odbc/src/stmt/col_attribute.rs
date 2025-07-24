@@ -298,7 +298,7 @@ impl TsurugiOdbcColAttributeArguments {
         }
     }
 
-    fn odbc_function_name(&self) -> &'static str {
+    fn odbc_function_name(&self) -> &str {
         if self.wide_char {
             "SQLColAttributeW()"
         } else {

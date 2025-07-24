@@ -10,6 +10,7 @@ use tsubakuro_rust_core::prelude::*;
 use crate::{
     check_sql_client, check_sql_client_or_err,
     ctype::SqlReturn,
+    dbc::connect::connect_tsurugi::TsurugiOdbcConnectedInfo,
     handle::{
         diag::{TsurugiOdbcDiagCollection, TsurugiOdbcError},
         end_tran::CompletionType,
@@ -26,6 +27,7 @@ pub struct TsurugiOdbcDbc {
     env: Weak<TsurugiOdbcEnv>,
     runtime: Arc<Runtime>,
     connection_timeout: AtomicU64, // seconds
+    connected_info: Mutex<Option<TsurugiOdbcConnectedInfo>>,
     session: Mutex<Option<Arc<Session>>>,
     sql_client: Mutex<Option<Arc<SqlClient>>>,
     auto_commit: AtomicBool,
@@ -61,6 +63,7 @@ impl TsurugiOdbcDbc {
             env: Arc::downgrade(&env),
             runtime: Arc::new(runtime),
             connection_timeout: AtomicU64::new(0),
+            connected_info: Mutex::new(None),
             session: Mutex::new(None),
             sql_client: Mutex::new(None),
             auto_commit: AtomicBool::new(true),
@@ -86,6 +89,11 @@ impl TsurugiOdbcDbc {
     pub(crate) fn connection_timeout(&self) -> u64 {
         self.connection_timeout
             .load(std::sync::atomic::Ordering::SeqCst)
+    }
+
+    pub(crate) fn set_connected_info(&self, info: TsurugiOdbcConnectedInfo) {
+        let mut self_info = self.connected_info.lock().unwrap();
+        *self_info = Some(info);
     }
 
     pub(crate) fn set_session(&self, session: Arc<Session>) {
@@ -159,6 +167,32 @@ macro_rules! check_dbc {
         dbc.clear_diag();
         dbc
     }};
+}
+
+impl TsurugiOdbcDbc {
+    pub(crate) fn server_name(&self) -> Option<String> {
+        let info = self.connected_info.lock().unwrap();
+        match &*info {
+            Some(info) => info.server_name().cloned(),
+            None => None,
+        }
+    }
+
+    pub(crate) fn data_source_name(&self) -> Option<String> {
+        let info = self.connected_info.lock().unwrap();
+        match &*info {
+            Some(info) => info.dsn().cloned(),
+            None => None,
+        }
+    }
+
+    pub(crate) fn user_name(&self) -> Option<String> {
+        let info = self.connected_info.lock().unwrap();
+        match &*info {
+            Some(info) => info.user_name().cloned(),
+            None => None,
+        }
+    }
 }
 
 impl TsurugiOdbcDbc {

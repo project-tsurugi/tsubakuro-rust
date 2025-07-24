@@ -26,6 +26,30 @@ impl TsurugiOdbcConnectArguments {
     }
 }
 
+#[derive(Debug)]
+pub(crate) struct TsurugiOdbcConnectedInfo {
+    endpoint: Endpoint,
+    dsn: Option<String>,
+    user_name: Option<String>,
+}
+
+impl TsurugiOdbcConnectedInfo {
+    pub(crate) fn server_name(&self) -> Option<&String> {
+        match &self.endpoint {
+            Endpoint::Tcp(host, _port) => Some(host),
+            _ => None,
+        }
+    }
+
+    pub(crate) fn dsn(&self) -> Option<&String> {
+        self.dsn.as_ref()
+    }
+
+    pub(crate) fn user_name(&self) -> Option<&String> {
+        self.user_name.as_ref()
+    }
+}
+
 pub(crate) fn connect_tsurugi(
     odbc_function_name: &str,
     dbc: &Arc<TsurugiOdbcDbc>,
@@ -53,17 +77,21 @@ pub(crate) fn connect_tsurugi(
             return SqlReturn::SQL_ERROR;
         }
     };
-
     debug!("{dbc}.{FUNCTION_NAME}: endpoint={}", endpoint);
+    let endpoint = match Endpoint::parse(endpoint) {
+        Ok(value) => value,
+        Err(e) => {
+            debug!("{dbc}.{FUNCTION_NAME}: endpoint parse error. {:?}", e);
+            dbc.add_diag(
+                TsurugiOdbcError::ConnectEndpointError,
+                format!("{odbc_function_name}: endpoint parse error. {}", e),
+            );
+            return SqlReturn::SQL_ERROR;
+        }
+    };
+
     let mut connection_option = ConnectionOption::new();
-    if let Err(e) = connection_option.set_endpoint_url(endpoint) {
-        debug!("{dbc}.{FUNCTION_NAME}: endpoint error. {:?}", e);
-        dbc.add_diag(
-            TsurugiOdbcError::ConnectEndpointError,
-            format!("{odbc_function_name}: endpoint error. {}", e.message()),
-        );
-        return SqlReturn::SQL_ERROR;
-    }
+    connection_option.set_endpoint(endpoint.clone());
 
     let runtime = dbc.runtime();
 
@@ -106,6 +134,13 @@ pub(crate) fn connect_tsurugi(
         }
     };
     dbc.set_session(session);
+
+    let info = TsurugiOdbcConnectedInfo {
+        endpoint,
+        dsn: arg.dsn,
+        user_name: arg.user_name,
+    };
+    dbc.set_connected_info(info);
 
     SqlReturn::SQL_SUCCESS
 }

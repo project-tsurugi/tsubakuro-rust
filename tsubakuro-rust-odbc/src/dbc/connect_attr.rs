@@ -130,7 +130,7 @@ impl SetConnectAttr {
         }
     }
 
-    fn odbc_function_name(&self) -> &'static str {
+    fn odbc_function_name(&self) -> &str {
         if self.wide_char {
             "SetConnectAttrW()"
         } else {
@@ -298,7 +298,7 @@ impl GetConnectAttr {
         }
     }
 
-    fn odbc_function_name(&self) -> &'static str {
+    fn odbc_function_name(&self) -> &str {
         if self.wide_char {
             "GetConnectAttrW()"
         } else {

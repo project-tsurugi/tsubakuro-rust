@@ -427,8 +427,8 @@ pub extern "system" fn SQLGetInfo(
 
     let dbc = check_dbc!(hdbc);
 
-    let info = SqlGetInfo::new(dbc, info_value_ptr, buffer_length, string_length_ptr, false);
-    let rc = info.get_info(info_type);
+    let delegator = GetInfo::new(dbc, info_value_ptr, buffer_length, string_length_ptr, false);
+    let rc = delegator.get_info(info_type);
 
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
     rc
@@ -450,8 +450,8 @@ pub extern "system" fn SQLGetInfoW(
 
     let dbc = check_dbc!(hdbc);
 
-    let info = SqlGetInfo::new(dbc, info_value_ptr, buffer_length, string_length_ptr, true);
-    let rc = info.get_info(info_type);
+    let delegator = GetInfo::new(dbc, info_value_ptr, buffer_length, string_length_ptr, true);
+    let rc = delegator.get_info(info_type);
 
     trace!("{FUNCTION_NAME} end. rc={:?}", rc);
     rc
@@ -467,7 +467,7 @@ enum SqlCursorBehavior {
     SQL_CB_PRESERVE = 2,
 }
 
-struct SqlGetInfo {
+struct GetInfo {
     dbc: Arc<TsurugiOdbcDbc>,
     info_value_ptr: SqlPointer,
     buffer_length: SqlSmallInt,
@@ -475,15 +475,15 @@ struct SqlGetInfo {
     wide_char: bool,
 }
 
-impl SqlGetInfo {
+impl GetInfo {
     fn new(
         dbc: Arc<TsurugiOdbcDbc>,
         info_value_ptr: SqlPointer,
         buffer_length: SqlSmallInt,
         string_length_ptr: *mut SqlSmallInt,
         wide_char: bool,
-    ) -> SqlGetInfo {
-        SqlGetInfo {
+    ) -> GetInfo {
+        GetInfo {
             dbc,
             info_value_ptr,
             buffer_length,
@@ -593,7 +593,10 @@ impl SqlGetInfo {
                 self.write_usmallint(info_type, SqlCursorBehavior::SQL_CB_DELETE as SqlUSmallInt)
             }
             SQL_CURSOR_SENSITIVITY => self.write_uinteger(info_type, 1 /* SQL_INSENSITIVE  */),
-            // TODO SQL_DATA_SOURCE_NAME
+            SQL_DATA_SOURCE_NAME => {
+                let value = dbc.data_source_name().unwrap_or_default();
+                self.write_string(info_type, &value)
+            }
             SQL_DATA_SOURCE_READ_ONLY => self.write_string(info_type, "N"),
             SQL_DATABASE_NAME => self.write_string(info_type, ""), // TODO データベース名
             SQL_DATETIME_LITERALS => {
@@ -699,7 +702,10 @@ impl SqlGetInfo {
             SQL_SCHEMA_USAGE => self.write_uinteger(info_type, 0), // TODO スキーマがサポートされたらビットマスクを返す
             // TODO SQL_SCROLL_OPTIONS
             SQL_SEARCH_PATTERN_ESCAPE => self.write_string(info_type, ""),
-            // TODO SQL_SERVER_NAME
+            SQL_SERVER_NAME => {
+                let value = dbc.server_name().unwrap_or_default();
+                self.write_string(info_type, &value)
+            }
             SQL_SPECIAL_CHARACTERS => self.write_string(info_type, ""),
             SQL_SQL_CONFORMANCE => self.write_uinteger(info_type, 1 /* SQL_SC_SQL92_ENTRY */),
             SQL_SQL92_DATETIME_FUNCTIONS => {
@@ -737,6 +743,10 @@ impl SqlGetInfo {
             }
             SQL_UNION_STATEMENT => {
                 self.write_uinteger(info_type, 3 /* SQL_U_UNION|SQL_U_UNION_ALL */)
+            }
+            SQL_USER_NAME => {
+                let value = dbc.user_name().unwrap_or_default();
+                self.write_string(info_type, &value)
             }
             _ => {
                 debug!(

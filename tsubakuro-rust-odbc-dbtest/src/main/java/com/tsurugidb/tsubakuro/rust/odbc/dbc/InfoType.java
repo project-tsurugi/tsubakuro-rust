@@ -7,8 +7,10 @@ import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
 
 public abstract class InfoType<T> {
 
+    public static final InfoTypeString SQL_DATA_SOURCE_NAME = new InfoTypeString(2);
     public static final InfoTypeString SQL_DRIVER_NAME = new InfoTypeString(6);
     public static final InfoTypeString SQL_DRIVER_VER = new InfoTypeString(7);
+    public static final InfoTypeString SQL_SERVER_NAME = new InfoTypeString(13);
     public static final InfoTypeString SQL_DBMS_NAME = new InfoTypeString(17);
     public static final InfoTypeString SQL_DBMS_VER = new InfoTypeString(18);
     public static final InfoTypeInteger SQL_CURSOR_COMMIT_BEHAVIOR = new InfoTypeInteger(23, 2);
