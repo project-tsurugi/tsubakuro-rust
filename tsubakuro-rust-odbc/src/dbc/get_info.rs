@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use log::{debug, trace};
+use log::{debug, trace, warn};
 
 use crate::{
     check_dbc,
@@ -209,6 +209,8 @@ pub enum InfoType {
     SQL_CATALOG_NAME = 10003,
     SQL_COLLATION_SEQ = 10004,
     SQL_MAXIMUM_IDENTIFIER_LENGTH = 10005, // SQL_MAX_IDENTIFIER_LEN
+
+    SQL_DTC_TRANSACTION_COST = 1750,
 }
 impl TryFrom<u16> for InfoType {
     type Error = u16;
@@ -404,6 +406,7 @@ impl TryFrom<u16> for InfoType {
             10003 => Ok(SQL_CATALOG_NAME),
             10004 => Ok(SQL_COLLATION_SEQ),
             10005 => Ok(SQL_MAXIMUM_IDENTIFIER_LENGTH),
+            1750 => Ok(SQL_DTC_TRANSACTION_COST),
             e => Err(e),
         }
     }
@@ -508,8 +511,8 @@ impl GetInfo {
         let info_type = match InfoType::try_from(info_type) {
             Ok(value) => value,
             Err(info_type) => {
-                debug!(
-                    "{dbc}.{FUNCTION_NAME} error. Unsupported info_type: {}",
+                warn!(
+                    "{dbc}.{FUNCTION_NAME} error. Unsupported info_type {}",
                     info_type
                 );
                 let odbc_function_name = self.odbc_function_name();
@@ -554,6 +557,7 @@ impl GetInfo {
             | SQL_CONVERT_BINARY
             | SQL_CONVERT_BIT
             | SQL_CONVERT_CHAR
+            | SQL_CONVERT_WCHAR
             | SQL_CONVERT_GUID
             | SQL_CONVERT_DATE
             | SQL_CONVERT_DECIMAL
@@ -564,6 +568,7 @@ impl GetInfo {
             | SQL_CONVERT_INTERVAL_DAY_TIME
             | SQL_CONVERT_LONGVARBINARY
             | SQL_CONVERT_LONGVARCHAR
+            | SQL_CONVERT_WLONGVARCHAR
             | SQL_CONVERT_NUMERIC
             | SQL_CONVERT_REAL
             | SQL_CONVERT_SMALLINT
@@ -571,7 +576,8 @@ impl GetInfo {
             | SQL_CONVERT_TIMESTAMP
             | SQL_CONVERT_TINYINT
             | SQL_CONVERT_VARBINARY
-            | SQL_CONVERT_VARCHAR => self.write_uinteger(info_type, 0),
+            | SQL_CONVERT_VARCHAR
+            | SQL_CONVERT_WVARCHAR => self.write_uinteger(info_type, 0),
             SQL_CONVERT_FUNCTIONS => self.write_uinteger(info_type, 0),
             // TODO SQL_CORRELATION_NAME
             SQL_CREATE_ASSERTION
@@ -748,8 +754,9 @@ impl GetInfo {
                 let value = dbc.user_name().unwrap_or_default();
                 self.write_string(info_type, &value)
             }
+            SQL_DTC_TRANSACTION_COST => self.write_uinteger(info_type, 0),
             _ => {
-                debug!(
+                warn!(
                     "{dbc}.{FUNCTION_NAME} error. Unsupported info_type {:?}",
                     info_type
                 );
