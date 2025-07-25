@@ -302,7 +302,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
                 }),
             ), // NULLABLE SmallInt
             11 => get_data_string_opt(stmt, arg, column.description()), // REMARKS varchar
-            12 => not_yet_implemented(stmt, arg),                      //TODO COLUMN_DEF varchar
+            12 => column_default(stmt, arg),                           // COLUMN_DEF varchar
             13 => get_data_i32(stmt, arg, SqlDataType::from(column) as i32), // SQL_DATA_TYPE SmallInt
             14 => get_data_i32_opt(stmt, arg, datetime_sub(&SqlDataType::from(column))), // SQL_DATETIME_SUB SmallInt
             15 => get_data_i32_opt(stmt, arg, char_octet_length(column)), // CHAR_OCTET_LENGTH Integer
@@ -405,6 +405,14 @@ fn num_prec_radix(column: &SqlColumn) -> Option<i32> {
     Some(radix)
 }
 
+// TODO COLUMN_DEF (column_default)
+fn column_default(stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
+    const FUNCTION_NAME: &str = "TsurugiOdbcColumns.get_data()";
+
+    warn!("{stmt}.{FUNCTION_NAME}: COLUMN_DEF is not supported",);
+    get_data_null(stmt, arg)
+}
+
 pub(crate) fn char_octet_length(column: &SqlColumn) -> Option<i32> {
     use AtomType::*;
     let size = match column.atom_type()? {
@@ -416,14 +424,4 @@ pub(crate) fn char_octet_length(column: &SqlColumn) -> Option<i32> {
     };
 
     Some(size)
-}
-
-fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
-    const FUNCTION_NAME: &str = "TsurugiOdbcColumns.get_data()";
-
-    warn!(
-        "{stmt}.{FUNCTION_NAME}: not yet implemented. column_index={}",
-        arg.column_index()
-    );
-    get_data_null(stmt, arg)
 }
