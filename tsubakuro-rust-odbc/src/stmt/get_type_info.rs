@@ -3,8 +3,8 @@ use log::{debug, trace, warn};
 use crate::{
     check_stmt,
     ctype::{
-        SqlDataType, SqlLen, SqlNullable::*, SqlReturn, SqlSmallInt, SqlUSmallInt, SQL_FALSE,
-        SQL_PRED_BASIC, SQL_PRED_CHAR, SQL_TRUE,
+        SqlDataType, SqlDataTypeSubCode, SqlLen, SqlNullable::*, SqlReturn, SqlSmallInt,
+        SqlUSmallInt, SQL_FALSE, SQL_PRED_BASIC, SQL_PRED_CHAR, SQL_TRUE,
     },
     handle::{
         diag::TsurugiOdbcError,
@@ -190,10 +190,12 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
     }
 
     fn get_data(&mut self, stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
+        const FUNCTION_NAME: &str = "TsurugiOdbcTypeInfo.get_data()";
+
         let data_types = &self.data_types;
         if self.row_index < 0 || self.row_index as usize >= data_types.len() {
             debug!(
-                "get_data() index out of bounds: self.row_index={}",
+                "{stmt}.{FUNCTION_NAME} error. index out of bounds: self.row_index={}",
                 self.row_index
             );
             return SqlReturn::SQL_NO_DATA;
@@ -220,14 +222,10 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcTypeInfo {
             12 => get_data_null(stmt, arg), // LOCAL_TYPE_NAME varchar
             13 => get_data_i32_opt(stmt, arg, minimum_scale(data_type)), // MINIMUM_SCALE SmallInt
             14 => get_data_i32_opt(stmt, arg, maximum_scale(data_type)), // MAXIMUM_SCALE SmallInt
-            15 => get_data_i32(
-                stmt,
-                arg,
-                *data_type as i32, // TODO SQL_DATETIME
-            ), // SQL_DATA_TYPE SmallInt
-            16 => not_yet_implemented(stmt, arg), // SQL_DATETIME_SUB SmallInt
+            15 => get_data_i32(stmt, arg, sql_data_type(data_type)), // SQL_DATA_TYPE SmallInt
+            16 => get_data_i32_opt(stmt, arg, datetime_sub(data_type)), // SQL_DATETIME_SUB SmallInt
             17 => get_data_i32_opt(stmt, arg, num_prec_radix(data_type)), // NUM_PREC_RADIX Integer
-            18 => not_yet_implemented(stmt, arg), // INTERVAL_PRECISION SmallInt
+            18 => get_data_null(stmt, arg), // INTERVAL_PRECISION SmallInt
             _ => unreachable!(),
         }
     }
@@ -467,6 +465,19 @@ fn maximum_scale(data_type: &SqlDataType) -> Option<i32> {
     Some(ret)
 }
 
+fn sql_data_type(data_type: &SqlDataType) -> i32 {
+    use SqlDataType::*;
+    match data_type {
+        SQL_TYPE_DATE | SQL_TYPE_TIME | SQL_TYPE_TIMESTAMP | SQL_DATETIME => SQL_DATETIME as i32,
+        data_type => *data_type as i32,
+    }
+}
+
+pub(crate) fn datetime_sub(data_type: &SqlDataType) -> Option<i32> {
+    let sub_code: Option<SqlDataTypeSubCode> = (*data_type).into();
+    sub_code.map(|sub_code| sub_code as i32)
+}
+
 pub(crate) fn num_prec_radix(data_type: &SqlDataType) -> Option<i32> {
     use SqlDataType::*;
     let ret = match data_type {
@@ -481,14 +492,4 @@ pub(crate) fn num_prec_radix(data_type: &SqlDataType) -> Option<i32> {
         _ => return None,
     };
     Some(ret)
-}
-
-fn not_yet_implemented(stmt: &TsurugiOdbcStmt, arg: &TsurugiOdbcGetDataArguments) -> SqlReturn {
-    const FUNCTION_NAME: &str = "TsurugiOdbcTypeInfo.get_data()";
-
-    warn!(
-        "{stmt}.{FUNCTION_NAME}: not yet implemented. column_index={}",
-        arg.column_index()
-    );
-    get_data_null(stmt, arg)
 }

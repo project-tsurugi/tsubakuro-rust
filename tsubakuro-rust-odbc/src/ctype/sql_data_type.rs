@@ -165,3 +165,26 @@ impl TryFrom<SqlDataType> for AtomType {
         }
     }
 }
+
+/// SQL date/time type subcodes
+#[repr(i16)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_camel_case_types)]
+pub(crate) enum SqlDataTypeSubCode {
+    SQL_CODE_DATE = 1,
+    SQL_CODE_TIME = 2,
+    SQL_CODE_TIMESTAMP = 3,
+}
+
+impl From<SqlDataType> for Option<SqlDataTypeSubCode> {
+    fn from(value: SqlDataType) -> Self {
+        use SqlDataType::*;
+        use SqlDataTypeSubCode::*;
+        match value {
+            SQL_TYPE_DATE => Some(SQL_CODE_DATE),
+            SQL_TYPE_TIME => Some(SQL_CODE_TIME),
+            SQL_TYPE_TIMESTAMP | SQL_DATETIME => Some(SQL_CODE_TIMESTAMP),
+            _ => None,
+        }
+    }
+}

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
+import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataTypeSubCode;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 
 public class ExpectedColumn {
@@ -21,6 +22,7 @@ public class ExpectedColumn {
     private Short numPrecRadix;
     private boolean nullable = true;
     private String remarks;
+    private Short datetimeSub;
 
     private long descLength;
 
@@ -138,30 +140,35 @@ public class ExpectedColumn {
             this.dataType = SqlDataType.SQL_TYPE_DATE;
             this.columnSize = 10;
             this.descLength = this.columnSize;
+            this.datetimeSub = SqlDataTypeSubCode.SQL_CODE_DATE.value();
             break;
         case "TIME":
             this.dataType = SqlDataType.SQL_TYPE_TIME;
             this.columnSize = 18;
             this.decimalDigits = 9;
             this.descLength = this.columnSize;
+            this.datetimeSub = SqlDataTypeSubCode.SQL_CODE_TIME.value();
             break;
         case "TIMESTAMP":
             this.dataType = SqlDataType.SQL_TYPE_TIMESTAMP;
             this.columnSize = 10 + 1 + 18;
             this.decimalDigits = 9;
             this.descLength = this.columnSize;
+            this.datetimeSub = SqlDataTypeSubCode.SQL_CODE_TIMESTAMP.value();
             break;
         case "TIME WITH TIME ZONE":
             this.dataType = SqlDataType.SQL_TYPE_TIME;
             this.columnSize = 18 + 6;
             this.decimalDigits = 9;
             this.descLength = this.columnSize;
+            this.datetimeSub = SqlDataTypeSubCode.SQL_CODE_TIME.value();
             break;
         case "TIMESTAMP WITH TIME ZONE":
             this.dataType = SqlDataType.SQL_TYPE_TIMESTAMP;
             this.columnSize = (10 + 1 + 18) + 6;
             this.decimalDigits = 9;
             this.descLength = this.columnSize;
+            this.datetimeSub = SqlDataTypeSubCode.SQL_CODE_TIMESTAMP.value();
             break;
         default:
             throw new AssertionError("not yet implements. type=" + typeName);
@@ -275,7 +282,7 @@ public class ExpectedColumn {
         assertEquals(this.dataType, sqlDataType);
 
         Short sqlDatetimeSub = stmt.getDataShort(15);
-        assertNull(sqlDatetimeSub);
+        assertEquals(this.datetimeSub, sqlDatetimeSub);
 
         Integer charOctetLength = stmt.getDataInt(16);
         switch (this.dataType) {

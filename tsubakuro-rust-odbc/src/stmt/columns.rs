@@ -17,6 +17,7 @@ use crate::{
             get_data_i32, get_data_i32_opt, get_data_null, get_data_string, get_data_string_opt,
             TsurugiOdbcGetDataArguments,
         },
+        get_type_info::datetime_sub,
         TsurugiOdbcStatementProcessor,
     },
     util::{char_to_string_opt, wchar_to_string_opt},
@@ -303,7 +304,7 @@ impl TsurugiOdbcStatementProcessor for TsurugiOdbcColumns {
             11 => get_data_string_opt(stmt, arg, column.description()), // REMARKS varchar
             12 => not_yet_implemented(stmt, arg),                      //TODO COLUMN_DEF varchar
             13 => get_data_i32(stmt, arg, SqlDataType::from(column) as i32), // SQL_DATA_TYPE SmallInt
-            14 => not_yet_implemented(stmt, arg), //TODO SQL_DATETIME_SUB SmallInt
+            14 => get_data_i32_opt(stmt, arg, datetime_sub(&SqlDataType::from(column))), // SQL_DATETIME_SUB SmallInt
             15 => get_data_i32_opt(stmt, arg, char_octet_length(column)), // CHAR_OCTET_LENGTH Integer
             16 => get_data_i32(stmt, arg, self.row_index as i32 + 1), // ORDINAL_POSITION Integer
             17 => get_data_string_opt(

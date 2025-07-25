@@ -5,8 +5,10 @@ import static com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst.SQL_NULLABLE;
 import static com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst.SQL_PRED_BASIC;
 import static com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst.SQL_TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
+import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataTypeSubCode;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 
 public class ExpectedTypeInfo {
@@ -139,6 +141,10 @@ public class ExpectedTypeInfo {
 
     public ExpectedTypeInfo sqlDatetimeSub(int sqlDatetimeSub) {
         return sqlDatetimeSub((Short) (short) sqlDatetimeSub);
+    }
+
+    public ExpectedTypeInfo sqlDatetimeSub(SqlDataTypeSubCode sqlDatetimeSub) {
+        return sqlDatetimeSub(sqlDatetimeSub.value());
     }
 
     public ExpectedTypeInfo numPrecRadix(Integer numPrecRadix) {

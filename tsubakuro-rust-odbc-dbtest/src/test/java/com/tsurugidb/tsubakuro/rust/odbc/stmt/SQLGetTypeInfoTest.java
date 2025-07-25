@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
+import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataTypeSubCode;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcStmtHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.util.TgOdbcTester;
 
@@ -55,7 +56,11 @@ class SQLGetTypeInfoTest extends TgOdbcTester {
     @ValueSource(booleans = { false, true })
     void getTypeInfo_INTEGER(boolean wideChar) {
         var dataType = SqlDataType.SQL_INTEGER;
-        var expected = expectedInt(dataType);
+        var expected = new ExpectedTypeInfo(dataType, "INT");
+        expected.columnSize(32).numPrecRadix(2);
+        expected.unsignedAttribute(false);
+        expected.autoUniqueValue(false);
+
         testGetTypeInfo(dataType, expected, wideChar);
     }
 
@@ -63,7 +68,11 @@ class SQLGetTypeInfoTest extends TgOdbcTester {
     @ValueSource(booleans = { false, true })
     void getTypeInfo_BIGINT(boolean wideChar) {
         var dataType = SqlDataType.SQL_BIGINT;
-        var expected = expectedBigint(dataType);
+        var expected = new ExpectedTypeInfo(dataType, "BIGINT");
+        expected.columnSize(64).numPrecRadix(2);
+        expected.unsignedAttribute(false);
+        expected.autoUniqueValue(false);
+
         testGetTypeInfo(dataType, expected, wideChar);
     }
 
@@ -83,11 +92,21 @@ class SQLGetTypeInfoTest extends TgOdbcTester {
         testGetTypeInfo(dataType, expected, wideChar);
     }
 
+    private static ExpectedTypeInfo expectedReal(SqlDataType dataType) {
+        var expected = new ExpectedTypeInfo(dataType, "REAL");
+        expected.columnSize(38).numPrecRadix(10);
+        expected.unsignedAttribute(false);
+        return expected;
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = { false, true })
     void getTypeInfo_DOUBLE(boolean wideChar) {
         var dataType = SqlDataType.SQL_DOUBLE;
-        var expected = expectedDouble(dataType);
+        var expected = new ExpectedTypeInfo(dataType, "DOUBLE");
+        expected.columnSize(308).numPrecRadix(10);
+        expected.unsignedAttribute(false);
+
         testGetTypeInfo(dataType, expected, wideChar);
     }
 
@@ -107,6 +126,14 @@ class SQLGetTypeInfoTest extends TgOdbcTester {
         testGetTypeInfo(dataType, expected, wideChar);
     }
 
+    private static ExpectedTypeInfo expectedDecimal(SqlDataType dataType) {
+        var expected = new ExpectedTypeInfo(dataType, "DECIMAL");
+        expected.columnSize(38).numPrecRadix(10);
+        expected.createParams("precision,scale");
+        expected.unsignedAttribute(false);
+        return expected;
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = { false, true })
     void getTypeInfo_CHAR(boolean wideChar) {
@@ -121,6 +148,16 @@ class SQLGetTypeInfoTest extends TgOdbcTester {
         var dataType = SqlDataType.SQL_WCHAR;
         var expected = expectedChar(dataType);
         testGetTypeInfo(dataType, expected, wideChar);
+    }
+
+    private static ExpectedTypeInfo expectedChar(SqlDataType dataType) {
+        var expected = new ExpectedTypeInfo(dataType, "CHAR");
+        expected.columnSize(2097132);
+        expected.literalPrefix("'").literalSuffix("'");
+        expected.createParams("length");
+        expected.caseSensitive(true);
+        expected.searchable(OdbcConst.SQL_PRED_CHAR);
+        return expected;
     }
 
     @ParameterizedTest
@@ -139,70 +176,6 @@ class SQLGetTypeInfoTest extends TgOdbcTester {
         testGetTypeInfo(dataType, expected, wideChar);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void getTypeInfo_BINARY(boolean wideChar) {
-        var dataType = SqlDataType.SQL_BINARY;
-        var expected = expectedBinary(dataType);
-        testGetTypeInfo(dataType, expected, wideChar);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = { false, true })
-    void getTypeInfo_VARBINARY(boolean wideChar) {
-        var dataType = SqlDataType.SQL_VARBINARY;
-        var expected = expectedVarbinary(dataType);
-        testGetTypeInfo(dataType, expected, wideChar);
-    }
-
-    private static ExpectedTypeInfo expectedInt(SqlDataType dataType) {
-        var expected = new ExpectedTypeInfo(dataType, "INT");
-        expected.columnSize(32).numPrecRadix(2);
-        expected.unsignedAttribute(false);
-        expected.autoUniqueValue(false);
-        return expected;
-    }
-
-    private static ExpectedTypeInfo expectedBigint(SqlDataType dataType) {
-        var expected = new ExpectedTypeInfo(dataType, "BIGINT");
-        expected.columnSize(64).numPrecRadix(2);
-        expected.unsignedAttribute(false);
-        expected.autoUniqueValue(false);
-        return expected;
-    }
-
-    private static ExpectedTypeInfo expectedReal(SqlDataType dataType) {
-        var expected = new ExpectedTypeInfo(dataType, "REAL");
-        expected.columnSize(38).numPrecRadix(10);
-        expected.unsignedAttribute(false);
-        return expected;
-    }
-
-    private static ExpectedTypeInfo expectedDouble(SqlDataType dataType) {
-        var expected = new ExpectedTypeInfo(dataType, "DOUBLE");
-        expected.columnSize(308).numPrecRadix(10);
-        expected.unsignedAttribute(false);
-        return expected;
-    }
-
-    private static ExpectedTypeInfo expectedDecimal(SqlDataType dataType) {
-        var expected = new ExpectedTypeInfo(dataType, "DECIMAL");
-        expected.columnSize(38).numPrecRadix(10);
-        expected.createParams("precision,scale");
-        expected.unsignedAttribute(false);
-        return expected;
-    }
-
-    private static ExpectedTypeInfo expectedChar(SqlDataType dataType) {
-        var expected = new ExpectedTypeInfo(dataType, "CHAR");
-        expected.columnSize(2097132);
-        expected.literalPrefix("'").literalSuffix("'");
-        expected.createParams("length");
-        expected.caseSensitive(true);
-        expected.searchable(OdbcConst.SQL_PRED_CHAR);
-        return expected;
-    }
-
     private static ExpectedTypeInfo expectedVarchar(SqlDataType dataType) {
         var expected = new ExpectedTypeInfo(dataType, "VARCHAR");
         expected.columnSize(2097132);
@@ -213,20 +186,68 @@ class SQLGetTypeInfoTest extends TgOdbcTester {
         return expected;
     }
 
-    private static ExpectedTypeInfo expectedBinary(SqlDataType dataType) {
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void getTypeInfo_BINARY(boolean wideChar) {
+        var dataType = SqlDataType.SQL_BINARY;
         var expected = new ExpectedTypeInfo(dataType, "BINARY");
         expected.columnSize(2097132);
         expected.literalPrefix("X'").literalSuffix("'");
         expected.createParams("length");
-        return expected;
+
+        testGetTypeInfo(dataType, expected, wideChar);
     }
 
-    private static ExpectedTypeInfo expectedVarbinary(SqlDataType dataType) {
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void getTypeInfo_VARBINARY(boolean wideChar) {
+        var dataType = SqlDataType.SQL_VARBINARY;
         var expected = new ExpectedTypeInfo(dataType, "VARBINARY");
         expected.columnSize(2097132);
         expected.literalPrefix("X'").literalSuffix("'");
         expected.createParams("length");
-        return expected;
+
+        testGetTypeInfo(dataType, expected, wideChar);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void getTypeInfo_DATE(boolean wideChar) {
+        var dataType = SqlDataType.SQL_TYPE_DATE;
+        var expected = new ExpectedTypeInfo(dataType, "DATE");
+        expected.literalPrefix("DATE'").literalSuffix("'");
+        expected.sqlDataType(SqlDataType.SQL_DATETIME);
+        expected.sqlDatetimeSub(SqlDataTypeSubCode.SQL_CODE_DATE);
+
+        testGetTypeInfo(dataType, expected, wideChar);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void getTypeInfo_TIME(boolean wideChar) {
+        var dataType = SqlDataType.SQL_TYPE_TIME;
+        var expected = new ExpectedTypeInfo(dataType, "TIME");
+        expected.literalPrefix("TIME'").literalSuffix("'");
+        expected.sqlDataType(SqlDataType.SQL_DATETIME);
+        expected.sqlDatetimeSub(SqlDataTypeSubCode.SQL_CODE_TIME);
+        expected.minimumScale(9);
+        expected.maximumScale(9);
+
+        testGetTypeInfo(dataType, expected, wideChar);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void getTypeInfo_TIMESTAMP(boolean wideChar) {
+        var dataType = SqlDataType.SQL_TYPE_TIMESTAMP;
+        var expected = new ExpectedTypeInfo(dataType, "TIMESTAMP");
+        expected.literalPrefix("TIMESTAMP'").literalSuffix("'");
+        expected.sqlDataType(SqlDataType.SQL_DATETIME);
+        expected.sqlDatetimeSub(SqlDataTypeSubCode.SQL_CODE_TIMESTAMP);
+        expected.minimumScale(9);
+        expected.maximumScale(9);
+
+        testGetTypeInfo(dataType, expected, wideChar);
     }
 
     private void testGetTypeInfo(SqlDataType dataType, ExpectedTypeInfo expected, boolean wideChar) {
