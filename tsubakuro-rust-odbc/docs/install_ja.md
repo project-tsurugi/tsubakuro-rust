@@ -28,7 +28,12 @@ Tsurugi ODBCドライバーのdllファイル（  `tsubakuro_rust_odbc.dll`  ）
    Windows Registry Editor Version 5.00
    
    [HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\Tsurugi Driver]
+   "APILevel"="1"
+   "ConnectFunctions"="YYN"
    "Driver"="/path/to/tsubakuro_rust_odbc.dll"
+   "DriverODBCVer"="03.51"
+   "FileUsage"="0"
+   "SQLLevel"="0"
    "UsageCount"=dword:00000001
    
    [HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers]
