@@ -20,7 +20,14 @@ pub extern "system" fn SQLFetch(hstmt: HStmt) -> SqlReturn {
 
         processor.fetch(&mut stmt)
     };
-    debug!("{stmt}.{FUNCTION_NAME}: fetch={:?}", rc);
+
+    let rows_fetched = if rc.is_success() { 1 } else { 0 };
+    stmt.set_rows_fetched(rows_fetched);
+
+    debug!(
+        "{stmt}.{FUNCTION_NAME}: fetch={:?}, rows_fetched={}",
+        rc, rows_fetched
+    );
 
     let rc1 = if stmt.has_bind_columns() && rc.is_success() {
         let mut rc = SqlReturn::SQL_SUCCESS;

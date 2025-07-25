@@ -200,6 +200,13 @@ impl SetStmtAttr {
                 debug!("{stmt}.{FUNCTION_NAME}: {:?}={}", attribute, value);
                 stmt.set_query_timeout(value);
             }
+            SQL_ATTR_ROWS_FETCHED_PTR => {
+                debug!(
+                    "{stmt}.{FUNCTION_NAME}: {:?}={:?}",
+                    attribute, self.value_ptr
+                );
+                stmt.set_rows_fetched_ptr(self.value_ptr as *mut SqlULen);
+            }
             _ => {
                 warn!(
                     "{stmt}.{FUNCTION_NAME}: Unsupported attribute {:?}",
@@ -363,6 +370,10 @@ impl GetStmtAttr {
             SQL_ATTR_QUERY_TIMEOUT => {
                 let value = stmt.query_timeout() as SqlULen;
                 self.write_ulen(stmt, attribute, value)
+            }
+            SQL_ATTR_ROWS_FETCHED_PTR => {
+                let value = stmt.rows_fetched_ptr() as SqlPointer;
+                self.write_pointer(stmt, attribute, value)
             }
             _ => {
                 debug!(

@@ -71,6 +71,9 @@ public class TgOdbcStmtHandle extends TgOdbcHandle {
         case SQLULEN:
             valuePtr = MemorySegment.ofAddress((Long) value);
             break;
+        case SQLPOINTER:
+            valuePtr = (MemorySegment) value;
+            break;
         default:
             throw new UnsupportedOperationException(attribute.name());
         }

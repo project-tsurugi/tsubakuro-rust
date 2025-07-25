@@ -5,7 +5,6 @@ import static com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst.SQL_NULLABLE;
 import static com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst.SQL_PRED_BASIC;
 import static com.tsurugidb.tsubakuro.rust.odbc.api.OdbcConst.SQL_TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataType;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlDataTypeSubCode;

@@ -9,7 +9,7 @@ use tokio::runtime::Runtime;
 use tsubakuro_rust_core::prelude::SqlClient;
 
 use crate::{
-    ctype::SqlReturn,
+    ctype::{SqlReturn, SqlULen},
     handle::{
         diag::{TsurugiOdbcDiagCollection, TsurugiOdbcError},
         hdbc::{HDbc, TsurugiOdbcDbc},
@@ -34,6 +34,7 @@ pub struct TsurugiOdbcStmt {
     prepare: Option<Rc<RefCell<TsurugiOdbcPrepare>>>,
     processor: Option<Rc<RefCell<dyn TsurugiOdbcStatementProcessor>>>,
     auto_commit: bool,
+    rows_fetched_ptr: *mut SqlULen,
     diags: Arc<TsurugiOdbcDiagCollection>,
 }
 
@@ -73,6 +74,7 @@ impl TsurugiOdbcStmt {
             prepare: None,
             processor: None,
             auto_commit: false,
+            rows_fetched_ptr: std::ptr::null_mut(),
             diags: Arc::new(TsurugiOdbcDiagCollection::new()),
         }
     }
@@ -214,6 +216,22 @@ impl TsurugiOdbcStmt {
             self.dbc().rollback(false, &self.diags)
         } else {
             SqlReturn::SQL_SUCCESS
+        }
+    }
+
+    pub(crate) fn set_rows_fetched_ptr(&mut self, ptr: *mut SqlULen) {
+        self.rows_fetched_ptr = ptr;
+    }
+
+    pub(crate) fn rows_fetched_ptr(&self) -> *mut SqlULen {
+        self.rows_fetched_ptr
+    }
+
+    pub(crate) fn set_rows_fetched(&mut self, rows_fetched: SqlULen) {
+        if !self.rows_fetched_ptr.is_null() {
+            unsafe {
+                *self.rows_fetched_ptr = rows_fetched;
+            }
         }
     }
 }

@@ -2,11 +2,13 @@ package com.tsurugidb.tsubakuro.rust.odbc.stmt;
 
 public enum StatementAttribute {
     SQL_ATTR_QUERY_TIMEOUT(0, Type.SQLULEN), //
+    SQL_ATTR_ROWS_FETCHED_PTR(26, Type.SQLPOINTER), //
 
     ;
 
     public enum Type {
-        SQLULEN
+        SQLULEN, //
+        SQLPOINTER, //
     }
 
     private final int value;
