@@ -21,7 +21,7 @@ Default feature include the following features.
 
 ## Rust version requirements
 
-The Minimum Supported Rust Version (MSRV) is currently **Rust 1.75.0**.
+The Minimum Supported Rust Version (MSRV) is currently **Rust 1.84.1**.
 
 ## How to use
 
