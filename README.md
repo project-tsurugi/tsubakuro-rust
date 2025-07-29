@@ -17,7 +17,7 @@ C ABI format library and ODBC driver are also provided.
   - For testing tsubakuro-rust-ffi.
   - Written in Java.
   - Using tsubakuro-rust-ffi.
-- [tsubakuro-rust-odbc](tsubakuro-rust-oebc)
+- [tsubakuro-rust-odbc](tsubakuro-rust-odbc)
   - ODBC Driver to access Tsurugi.
   - Written in Rust.
   - Using tsubakuro-rust-core.
