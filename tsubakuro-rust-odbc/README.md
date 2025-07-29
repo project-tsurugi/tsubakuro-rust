@@ -2,11 +2,14 @@
 
 tsubakuro-rust-odbc is a ODBC Driver to access [Tsurugi](https://github.com/project-tsurugi/tsurugidb).
 
-## Limitation
+## Target
 
 - Tsurugi 1.5.0 or later.
 - ODBC3
 - For MS-Windows, 64-bit DLL
+
+## Limitation
+
 - transaction_type is OCC only.
 - commit_option is default only.
 - shutdown_type is always GRACEFUL.
