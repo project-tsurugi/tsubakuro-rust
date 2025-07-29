@@ -4,6 +4,10 @@ tsubakuro-rust-ffi is a library providing functions in C ABI format to access [T
 
 tsubakuro-rust-ffi uses [tsubakuro-rust-core](../tsubakuro-rust-core), so refer to that for explanation.
 
+## Target
+
+- Tsurugi 1.5.0 or later.
+
 ## How to build
 
 ```bash

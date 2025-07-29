@@ -4,9 +4,12 @@ tsubakuro-rust-core is the core library to access [Tsurugi](https://github.com/p
 
 tsubakuro-rust-core is a port from [Tsubakuro/Java](https://github.com/project-tsurugi/tsubakuro), but it does not cover all functions.
 
-## Limitations
+## Target
 
 - Tsurugi 1.5.0 or later.
+
+## Limitations
+
 - Provide SQL service only.
 - Only TCP connection is available.
 
