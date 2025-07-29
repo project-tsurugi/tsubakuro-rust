@@ -20,3 +20,12 @@ rust_decimal = "1.37.2"
 time = { version = "0.3.37", features = ["formatting", "parsing", "macros"]}
 tokio = { version = "1.43.1" }
 tsubakuro-rust-core = { path = "../tsubakuro-rust-core", default-features = false, features = ["with_time"] }
+
+[build-dependencies]
+winres = "0.1.12"
+
+[package.metadata.winres]
+CompanyName = "Project Tsurugi"
+FileDescription = "ODBC Driver for Tsurugi"
+ProductName = "Tsurugi ODBC Driver"
+LegalCopyright = "Copyright 2025 Project Tsurugi"
