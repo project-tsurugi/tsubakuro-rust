@@ -1,6 +1,6 @@
 [package]
 name = "tsubakuro-rust-odbc"
-version = "0.3.0"
+version = "0.4.0"
 description = "ODBC Driver for Tsurugi"
 authors = ["Project Tsurugi <https://github.com/project-tsurugi/tsurugidb>"]
 keywords = ["database", "tsurugidb", "sql"]
