@@ -17,6 +17,10 @@ tsubakuro-rust-odbc is a ODBC Driver to access [Tsurugi](https://github.com/proj
 
 ## How to build
 
+Since it depends on [tsubakuro-rust-core](../tsubakuro-rust-core), its build environment (e.g. `protoc`) is required.
+
+Since it is using [winres](https://crates.io/crates/winres), Windows SDK (`rc.exe`) is required on MS-Windows.
+
 ```bash
 cd tsubakuro-rust-odbc
 cargo build --release

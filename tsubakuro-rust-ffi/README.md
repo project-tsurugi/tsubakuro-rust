@@ -10,6 +10,8 @@ tsubakuro-rust-ffi uses [tsubakuro-rust-core](../tsubakuro-rust-core), so refer 
 
 ## How to build
 
+Since it depends on [tsubakuro-rust-core](../tsubakuro-rust-core), its build environment (e.g. `protoc`) is required.
+
 ```bash
 cd tsubakuro-rust-ffi
 cargo build --release
