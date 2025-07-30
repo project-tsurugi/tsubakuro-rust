@@ -9,7 +9,7 @@ pub mod stmt;
 mod util;
 
 const ODBC_DRIVER_NAME: &str = "Tsurugi ODBC Driver";
-const CRATE_VERSION: &str = "0.4.0";
+const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
 const TSURUGI_VERSION: &str = "1.5.0";
 
 #[cfg(windows)]
