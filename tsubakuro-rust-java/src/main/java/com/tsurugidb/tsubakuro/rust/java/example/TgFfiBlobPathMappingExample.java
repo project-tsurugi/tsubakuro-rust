@@ -17,6 +17,7 @@ import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiBlobReference;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiLargeObjectCache;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
@@ -218,6 +219,11 @@ public class TgFfiBlobPathMappingExample {
                         case INT4 -> qr.fetchInt4(context);
                         case BLOB -> {
                             TgFfiBlobReference blob = qr.fetchBlob(context);
+
+                            TgFfiLargeObjectCache cache = client.getBlobCache(context, transaction, blob);
+                            String path = cache.getPath(context);
+                            System.out.printf("BLOB.path=%s%n", path);
+
                             byte[] bytes = client.readBlob(context, transaction, blob);
                             yield Arrays.toString(bytes);
                         }

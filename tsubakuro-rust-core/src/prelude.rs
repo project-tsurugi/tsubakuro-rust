@@ -23,6 +23,7 @@ pub use crate::service::sql::r#type::blob::*;
 pub use crate::service::sql::r#type::clob::*;
 pub use crate::service::sql::r#type::date::*;
 pub use crate::service::sql::r#type::decimal::*;
+pub use crate::service::sql::r#type::large_object::*;
 pub use crate::service::sql::r#type::time_of_day::*;
 pub use crate::service::sql::r#type::time_of_day_with_time_zone::*;
 pub use crate::service::sql::r#type::time_point::*;

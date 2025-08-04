@@ -101,7 +101,7 @@ public class TgFfiTester {
                 transactionOption.setTransactionLabel(context, "tsubakuro-rust-java/execute()");
 
                 try (var transaction = client.startTransaction(context, transactionOption)) {
-                    try (var executeResult = client.execute(context, transaction, sql)) {
+                    try (var _ = client.execute(context, transaction, sql)) {
                     }
                     try (var commitOption = TgFfiCommitOption.create(context)) {
                         client.commit(context, transaction, commitOption);

@@ -16,6 +16,7 @@ import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiBlobReference;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiClobReference;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiLargeObjectCache;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
@@ -721,6 +722,96 @@ public class TgFfiSqlClient extends TgFfiObject {
         TgFfiRcUtil.throwIfError(rc, context);
 
         return outToString(out);
+    }
+
+    public synchronized TgFfiLargeObjectCache getBlobCache(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache(ctx, handle, tx, arg1, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiLargeObjectCache(manager(), outHandle);
+    }
+
+    public synchronized TgFfiLargeObjectCache getBlobCacheFor(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var t = allocateDuration(timeout);
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_for(ctx, handle, tx, arg1, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiLargeObjectCache(manager(), outHandle);
+    }
+
+    public synchronized TgFfiJob<TgFfiLargeObjectCache> getBlobCacheAsync(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = blob.handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_async(ctx, handle, tx, arg1, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiJob<>(manager(), outHandle) {
+            @Override
+            protected TgFfiLargeObjectCache valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+                return new TgFfiLargeObjectCache(manager, valueHandle);
+            }
+        };
+    }
+
+    public synchronized TgFfiLargeObjectCache getClobCache(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_clob_cache(ctx, handle, tx, arg1, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiLargeObjectCache(manager(), outHandle);
+    }
+
+    public synchronized TgFfiLargeObjectCache getClobCacheFor(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob, Duration timeout) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var t = allocateDuration(timeout);
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_clob_cache_for(ctx, handle, tx, arg1, t, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiLargeObjectCache(manager(), outHandle);
+    }
+
+    public synchronized TgFfiJob<TgFfiLargeObjectCache> getClobCacheAsync(TgFfiContext context, TgFfiTransaction transaction, TgFfiClobReference clob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var tx = transaction.handle();
+        var arg1 = clob.handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_clob_cache_async(ctx, handle, tx, arg1, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiJob<>(manager(), outHandle) {
+            @Override
+            protected TgFfiLargeObjectCache valueToFfiObject(TgFfiObjectManager manager, MemorySegment valueHandle) {
+                return new TgFfiLargeObjectCache(manager, valueHandle);
+            }
+        };
     }
 
     public synchronized void copyBlobTo(TgFfiContext context, TgFfiTransaction transaction, TgFfiBlobReference blob, Path destination) {

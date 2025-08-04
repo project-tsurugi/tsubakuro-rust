@@ -167,6 +167,12 @@ mod test {
                     file.read_to_end(&mut v).unwrap();
                     assert_eq!(expected.1, Some(v));
 
+                    let cache = client.get_blob_cache(&transaction, &blob).await.unwrap();
+                    let mut file = std::fs::File::open(cache.path().unwrap()).unwrap();
+                    let mut v = Vec::new();
+                    file.read_to_end(&mut v).unwrap();
+                    assert_eq!(expected.1, Some(v));
+
                     let v = client.read_blob(&transaction, &blob).await.unwrap();
                     assert_eq!(expected.1, Some(v));
 

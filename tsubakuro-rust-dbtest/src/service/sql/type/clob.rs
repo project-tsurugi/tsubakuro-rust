@@ -167,6 +167,13 @@ mod test {
                     reader.read_to_string(&mut v).unwrap();
                     assert_eq!(expected.1, Some(v));
 
+                    let cache = client.get_clob_cache(&transaction, &clob).await.unwrap();
+                    let file = std::fs::File::open(cache.path().unwrap()).unwrap();
+                    let mut reader = BufReader::new(file);
+                    let mut v = String::new();
+                    reader.read_to_string(&mut v).unwrap();
+                    assert_eq!(expected.1, Some(v));
+
                     let v = client.read_clob(&transaction, &clob).await.unwrap();
                     assert_eq!(expected.1, Some(v));
 

@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.type;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,6 +37,7 @@ import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResultMetadata
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiBlobReference;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiLargeObjectCache;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRuntimeException;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
@@ -126,12 +128,15 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                 var parameters = List.of( //
                         TgFfiSqlParameter.ofInt4(context, "pk", 4), //
                         TgFfiSqlParameter.ofBlob(context, "value", path));
-                var e = assertThrows(TgFfiRuntimeException.class, () -> {
-                    try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
-                        assertEquals(1, er.getRows(context));
+                try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
+                    assertEquals(1, er.getRows(context));
+                } catch (TgFfiRuntimeException e) {
+                    if (e.getErrorType() == TgFfiRcType.CORE_SERVER_ERROR && e.getServerErrorStructuredCode().equals("SCD-00404")) {
+                        // OPERATION_DENIED
+                    } else {
+                        throw e;
                     }
-                });
-                assertEquals(TgFfiRcType.CORE_SERVER_ERROR, e.getErrorType());
+                }
             }
 
             client.rollback(context, transaction);
@@ -268,6 +273,7 @@ class TgFfiTypeBlobTest extends TgFfiTester {
             for (var pattern : List.of(DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY)) {
                 try {
                     read_blob(pattern);
+                    get_blob_cache(pattern);
                     copy_blob_to(pattern);
                 } catch (TgFfiRuntimeException e) {
                     if (e.getServerErrorStructuredCode().equals("SCD-00404")) { // OPERATION_DENIED
@@ -279,6 +285,9 @@ class TgFfiTypeBlobTest extends TgFfiTester {
 
             read_blob_argError();
             read_blob_for_argError();
+            get_blob_cache_argError();
+            get_blob_cache_for_argError();
+            get_blob_cache_async_argError();
             copy_blob_to_argError();
             copy_blob_to_for_argError();
             copy_blob_to_async_argError();
@@ -299,15 +308,33 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                 default:
                     return;
                 }
+                assertValue(value);
+            }
+        }
 
-                switch (index) {
-                case 1:
-                    assertArrayEquals(new byte[] { 1, 2, 3 }, value);
+        private void get_blob_cache(String pattern) throws IOException {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                TgFfiLargeObjectCache cache;
+                switch (pattern) {
+                case DIRECT:
+                    cache = client.getBlobCache(context, transaction, blob);
                     break;
-                case 2:
-                    assertArrayEquals(new byte[] { 0x11, 0x22, 0x33 }, value);
+                case DIRECT_FOR:
+                    cache = client.getBlobCacheFor(context, transaction, blob, Duration.ofSeconds(5));
+                    break;
+                default:
+                    try (var job = client.getBlobCacheAsync(context, transaction, blob)) {
+                        cache = jobTake(job, pattern);
+                    }
                     break;
                 }
+                String path = cache.getPath(context);
+                assertNotNull(path);
+
+                var value = Files.readAllBytes(Path.of(path));
+                assertValue(value);
             }
         }
 
@@ -332,17 +359,21 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                     }
 
                     var value = Files.readAllBytes(path);
-                    switch (index) {
-                    case 1:
-                        assertArrayEquals(new byte[] { 1, 2, 3 }, value);
-                        break;
-                    case 2:
-                        assertArrayEquals(new byte[] { 0x11, 0x22, 0x33 }, value);
-                        break;
-                    }
+                    assertValue(value);
                 } finally {
                     Files.deleteIfExists(path);
                 }
+            }
+        }
+
+        private void assertValue(byte[] value) {
+            switch (index) {
+            case 1:
+                assertArrayEquals(new byte[] { 1, 2, 3 }, value);
+                break;
+            case 2:
+                assertArrayEquals(new byte[] { 0x11, 0x22, 0x33 }, value);
+                break;
             }
         }
 
@@ -458,6 +489,133 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                 var sout = MemorySegment.NULL;
                 var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_read_blob_for(ctx, handle, tx, arg1, t, out, sout);
                 assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG6_ERROR(), rc);
+            }
+        }
+
+        private void get_blob_cache_argError() {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var tx = transaction.handle();
+                var arg1 = blob.handle();
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = MemorySegment.NULL;
+                var arg1 = blob.handle();
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = MemorySegment.NULL;
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = blob.handle();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
+            }
+        }
+
+        private void get_blob_cache_for_argError() {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var tx = transaction.handle();
+                var arg1 = blob.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_for(ctx, handle, tx, arg1, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = MemorySegment.NULL;
+                var arg1 = blob.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_for(ctx, handle, tx, arg1, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = MemorySegment.NULL;
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_for(ctx, handle, tx, arg1, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = blob.handle();
+                var t = Duration.ofSeconds(5).toNanos();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_for(ctx, handle, tx, arg1, t, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG5_ERROR(), rc);
+            }
+        }
+
+        private void get_blob_cache_async_argError() {
+            var manager = getFfiObjectManager();
+
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var tx = transaction.handle();
+                var arg1 = blob.handle();
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_async(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = MemorySegment.NULL;
+                var arg1 = blob.handle();
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_async(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = MemorySegment.NULL;
+                var out = manager.allocatePtrOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_async(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+            try (var context = TgFfiContext.create(manager)) {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var tx = transaction.handle();
+                var arg1 = blob.handle();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_get_blob_cache_async(ctx, handle, tx, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG4_ERROR(), rc);
             }
         }
 

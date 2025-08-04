@@ -16,8 +16,11 @@ use crate::{
         error_info::{transaction_error_info_processor, TransactionErrorInfo},
         execute_result_processor,
         explain::explain_processor,
-        list_tables_processor, lob_copy_to_processor, lob_open_processor,
-        prepare_dispose_processor, prepare_processor, query_result_processor,
+        list_tables_processor, prepare_dispose_processor, prepare_processor,
+        query_result_processor,
+        r#type::large_object::{
+            lob_cache_processor, lob_copy_to_processor, lob_open_processor, TgLargeObjectCache,
+        },
         table_metadata_processor, transaction_status_processor, CommitOption, ServiceClient,
         SqlExecuteResult, SqlParameter, SqlPlaceholder, SqlQueryResult, TableList, TableMetadata,
         TgBlobReference, TgClobReference, TransactionStatusWithMessage,
@@ -1311,6 +1314,164 @@ impl SqlClient {
             reference: Some(lob),
         };
         SqlCommand::GetLargeObjectData(request)
+    }
+
+    /// Get BLOB cache.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<(), TgError> {
+    ///     let blob: TgBlobReference = query_result.fetch().await?;
+    ///     let cache = client.get_blob_cache(transaction, &blob).await?;
+    ///
+    ///     println!("BLOB.path={:?}", cache.path());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
+    /// since 0.5.0
+    pub async fn get_blob_cache(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+    ) -> Result<TgLargeObjectCache, TgError> {
+        let timeout = self.default_timeout;
+        self.get_blob_cache_for(transaction, blob, timeout).await
+    }
+
+    /// Get BLOB cache.
+    ///
+    /// since 0.5.0
+    pub async fn get_blob_cache_for(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        timeout: Duration,
+    ) -> Result<TgLargeObjectCache, TgError> {
+        const FUNCTION_NAME: &str = "get_blob_cache()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let cache = self
+            .get_large_object_cache(transaction, blob, timeout)
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(cache)
+    }
+
+    /// Get BLOB cache.
+    ///
+    /// since 0.5.0
+    pub async fn get_blob_cache_async(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+    ) -> Result<Job<TgLargeObjectCache>, TgError> {
+        const FUNCTION_NAME: &str = "get_blob_cache_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let job = self.get_large_object_cache_async(transaction, blob).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    /// Get CLOB cache.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, query_result: &mut SqlQueryResult) -> Result<(), TgError> {
+    ///     let clob: TgClobReference = query_result.fetch().await?;
+    ///     let cache = client.get_clob_cache(transaction, &clob).await?;
+    ///
+    ///     println!("CLOB.path={:?}", cache.path());
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
+    /// since 0.5.0
+    pub async fn get_clob_cache(
+        &self,
+        transaction: &Transaction,
+        clob: &TgClobReference,
+    ) -> Result<TgLargeObjectCache, TgError> {
+        let timeout = self.default_timeout;
+        self.get_clob_cache_for(transaction, clob, timeout).await
+    }
+
+    /// Get CLOB cache.
+    ///
+    /// since 0.5.0
+    pub async fn get_clob_cache_for(
+        &self,
+        transaction: &Transaction,
+        clob: &TgClobReference,
+        timeout: Duration,
+    ) -> Result<TgLargeObjectCache, TgError> {
+        const FUNCTION_NAME: &str = "get_clob_cache()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let cache = self
+            .get_large_object_cache(transaction, clob, timeout)
+            .await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(cache)
+    }
+
+    /// Get CLOB cache.
+    ///
+    /// since 0.5.0
+    pub async fn get_clob_cache_async(
+        &self,
+        transaction: &Transaction,
+        clob: &TgClobReference,
+    ) -> Result<Job<TgLargeObjectCache>, TgError> {
+        const FUNCTION_NAME: &str = "get_clob_cache_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let job = self.get_large_object_cache_async(transaction, clob).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    async fn get_large_object_cache<T: TgLargeObjectReference>(
+        &self,
+        transaction: &Transaction,
+        lob: &T,
+        timeout: Duration,
+    ) -> Result<TgLargeObjectCache, TgError> {
+        let tx_handle = transaction.transaction_handle()?;
+        let command = Self::open_lob_command(tx_handle, lob);
+        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
+        let cache = lob_cache_processor(response, &self.session)?;
+        Ok(cache)
+    }
+
+    async fn get_large_object_cache_async<T: TgLargeObjectReference>(
+        &self,
+        transaction: &Transaction,
+        lob: &T,
+    ) -> Result<Job<TgLargeObjectCache>, TgError> {
+        let tx_handle = transaction.transaction_handle()?;
+        let command = Self::open_lob_command(tx_handle, lob);
+        let session = self.session.clone();
+        let job = self
+            .send_and_pull_async(
+                "LargeObjectCache",
+                command,
+                None,
+                Box::new(move |_, response| lob_cache_processor(response, &session)),
+            )
+            .await?;
+        Ok(job)
     }
 
     /// Read BLOB.

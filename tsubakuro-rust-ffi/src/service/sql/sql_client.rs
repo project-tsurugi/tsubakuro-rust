@@ -11,9 +11,12 @@ use crate::{
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{
-        execute_result::TsurugiFfiSqlExecuteResult, explain::TsurugiFfiSqlExplainResult,
+        execute_result::TsurugiFfiSqlExecuteResult,
+        explain::TsurugiFfiSqlExplainResult,
         prepare::prepared_statement::TsurugiFfiSqlPreparedStatement,
-        query_result::TsurugiFfiSqlQueryResult, table_list::TsurugiFfiTableList,
+        query_result::TsurugiFfiSqlQueryResult,
+        r#type::large_object::{TsurugiFfiLargeObjectCache, TsurugiFfiLargeObjectCacheHandle},
+        table_list::TsurugiFfiTableList,
         table_metadata::TsurugiFfiTableMetadata,
     },
     transaction::{
@@ -2682,6 +2685,421 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
         handle
     );
     rc
+}
+
+/// SqlClient: Get BLOB cache.
+///
+/// See [`SqlClient::get_blob_cache`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+///
+/// # Returns
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    large_object_cache_out: *mut TsurugiFfiLargeObjectCacheHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_blob_cache()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, large_object_cache_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        large_object_cache_out
+    );
+
+    ffi_arg_out_initialize!(large_object_cache_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, large_object_cache_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &mut *blob };
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_blob_cache(transaction, blob)
+    );
+    let value = Box::new(TsurugiFfiLargeObjectCache::new(value));
+    let handle = Box::into_raw(value);
+    unsafe {
+        *large_object_cache_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. large_object_cache={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Get BLOB cache.
+///
+/// See [`SqlClient::get_blob_cache_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    timeout: TsurugiFfiDuration,
+    large_object_cache_out: *mut TsurugiFfiLargeObjectCacheHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_blob_cache_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, timeout={:?}, large_object_cache_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        timeout,
+        large_object_cache_out
+    );
+
+    ffi_arg_out_initialize!(large_object_cache_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, large_object_cache_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &mut *blob };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_blob_cache_for(transaction, blob, timeout)
+    );
+    let value = Box::new(TsurugiFfiLargeObjectCache::new(value));
+    let handle = Box::into_raw(value);
+    unsafe {
+        *large_object_cache_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. large_object_cache={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Get BLOB cache.
+///
+/// See [`SqlClient::get_blob_cache_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+///
+/// # Returns
+/// - `large_object_cache_job_out` - Job for `TsurugiFfiLargeObjectCacheHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose) to dispose.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    large_object_cache_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_blob_cache_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, large_object_cache_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        large_object_cache_job_out
+    );
+
+    ffi_arg_out_initialize!(large_object_cache_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, large_object_cache_job_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &mut *blob };
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_blob_cache_async(transaction, blob)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(LargeObjectCacheJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *large_object_cache_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. large_object_cache_job={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Get CLOB cache.
+///
+/// See [`SqlClient::get_clob_cache`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+///
+/// # Returns
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    large_object_cache_out: *mut TsurugiFfiLargeObjectCacheHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_clob_cache()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, large_object_cache_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        large_object_cache_out
+    );
+
+    ffi_arg_out_initialize!(large_object_cache_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, large_object_cache_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &mut *clob };
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_clob_cache(transaction, clob)
+    );
+    let value = Box::new(TsurugiFfiLargeObjectCache::new(value));
+    let handle = Box::into_raw(value);
+    unsafe {
+        *large_object_cache_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. large_object_cache={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Get CLOB cache.
+///
+/// See [`SqlClient::get_clob_cache_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+///
+/// # Returns
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    timeout: TsurugiFfiDuration,
+    large_object_cache_out: *mut TsurugiFfiLargeObjectCacheHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_clob_cache_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, timeout={:?}, large_object_cache_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        timeout,
+        large_object_cache_out
+    );
+
+    ffi_arg_out_initialize!(large_object_cache_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, large_object_cache_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &mut *clob };
+
+    let runtime = client.runtime();
+    let timeout = Duration::from_nanos(timeout);
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_clob_cache_for(transaction, clob, timeout)
+    );
+    let value = Box::new(TsurugiFfiLargeObjectCache::new(value));
+    let handle = Box::into_raw(value);
+    unsafe {
+        *large_object_cache_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. large_object_cache={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Get CLOB cache.
+///
+/// See [`SqlClient::get_clob_cache_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+///
+/// # Returns
+/// - `large_object_cache_job_out` - Job for `TsurugiFfiLargeObjectCacheHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose) to dispose.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    large_object_cache_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_get_clob_cache_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, large_object_cache_job_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        large_object_cache_job_out
+    );
+
+    ffi_arg_out_initialize!(large_object_cache_job_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, large_object_cache_job_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &mut *clob };
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.get_clob_cache_async(transaction, clob)
+    );
+    let job = TsurugiFfiJob::new(
+        job,
+        Box::new(LargeObjectCacheJobDelegator {}),
+        runtime.clone(),
+    );
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *large_object_cache_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. large_object_cache_job={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+impl_job_delegator! {
+    LargeObjectCacheJobDelegator,
+    TgLargeObjectCache,
+    TsurugiFfiLargeObjectCache,
+    "large_object_cache",
+}
+
+impl LargeObjectCacheJobDelegator {
+    fn convert(
+        value: TgLargeObjectCache,
+        _runtime: Arc<tokio::runtime::Runtime>,
+    ) -> Option<TsurugiFfiLargeObjectCache> {
+        Some(TsurugiFfiLargeObjectCache::new(value))
+    }
 }
 
 /// SqlClient: Read BLOB.

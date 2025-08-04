@@ -299,6 +299,8 @@ typedef struct TsurugiFfiContext TsurugiFfiContext;
 
 typedef struct TsurugiFfiEndpoint TsurugiFfiEndpoint;
 
+typedef struct TsurugiFfiLargeObjectCache TsurugiFfiLargeObjectCache;
+
 typedef struct TsurugiFfiSession TsurugiFfiSession;
 
 typedef struct TsurugiFfiSqlClient TsurugiFfiSqlClient;
@@ -452,6 +454,8 @@ typedef struct TsurugiFfiTransactionErrorInfo *TsurugiFfiTransactionErrorInfoHan
  * Transaction status.
  */
 typedef struct TsurugiFfiTransactionStatusWithMessage *TsurugiFfiTransactionStatusWithMessageHandle;
+
+typedef struct TsurugiFfiLargeObjectCache *TsurugiFfiLargeObjectCacheHandle;
 
 /**
  * Commit option.
@@ -3713,6 +3717,137 @@ TsurugiFfiRc tsurugi_ffi_sql_client_prepared_query_async(TsurugiFfiContextHandle
                                                          TsurugiFfiJobHandle *query_result_job_out);
 
 /**
+ * SqlClient: Get BLOB cache.
+ *
+ * See [`SqlClient::get_blob_cache`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ *
+ * # Returns
+ * - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_blob_cache(TsurugiFfiContextHandle context,
+                                                   TsurugiFfiSqlClientHandle sql_client,
+                                                   TsurugiFfiTransactionHandle transaction,
+                                                   TsurugiFfiBlobReferenceHandle blob,
+                                                   TsurugiFfiLargeObjectCacheHandle *large_object_cache_out);
+
+/**
+ * SqlClient: Get BLOB cache.
+ *
+ * See [`SqlClient::get_blob_cache_for`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_blob_cache_for(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlClientHandle sql_client,
+                                                       TsurugiFfiTransactionHandle transaction,
+                                                       TsurugiFfiBlobReferenceHandle blob,
+                                                       TsurugiFfiDuration timeout,
+                                                       TsurugiFfiLargeObjectCacheHandle *large_object_cache_out);
+
+/**
+ * SqlClient: Get BLOB cache.
+ *
+ * See [`SqlClient::get_blob_cache_async`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ *
+ * # Returns
+ * - `large_object_cache_job_out` - Job for `TsurugiFfiLargeObjectCacheHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose) to dispose.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_blob_cache_async(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlClientHandle sql_client,
+                                                         TsurugiFfiTransactionHandle transaction,
+                                                         TsurugiFfiBlobReferenceHandle blob,
+                                                         TsurugiFfiJobHandle *large_object_cache_job_out);
+
+/**
+ * SqlClient: Get CLOB cache.
+ *
+ * See [`SqlClient::get_clob_cache`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ *
+ * # Returns
+ * - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_clob_cache(TsurugiFfiContextHandle context,
+                                                   TsurugiFfiSqlClientHandle sql_client,
+                                                   TsurugiFfiTransactionHandle transaction,
+                                                   TsurugiFfiClobReferenceHandle clob,
+                                                   TsurugiFfiLargeObjectCacheHandle *large_object_cache_out);
+
+/**
+ * SqlClient: Get CLOB cache.
+ *
+ * See [`SqlClient::get_clob_cache_for`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ *
+ * # Returns
+ * - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_clob_cache_for(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSqlClientHandle sql_client,
+                                                       TsurugiFfiTransactionHandle transaction,
+                                                       TsurugiFfiClobReferenceHandle clob,
+                                                       TsurugiFfiDuration timeout,
+                                                       TsurugiFfiLargeObjectCacheHandle *large_object_cache_out);
+
+/**
+ * SqlClient: Get CLOB cache.
+ *
+ * See [`SqlClient::get_clob_cache_async`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ *
+ * # Returns
+ * - `large_object_cache_job_out` - Job for `TsurugiFfiLargeObjectCacheHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose) to dispose.
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_get_clob_cache_async(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlClientHandle sql_client,
+                                                         TsurugiFfiTransactionHandle transaction,
+                                                         TsurugiFfiClobReferenceHandle clob,
+                                                         TsurugiFfiJobHandle *large_object_cache_job_out);
+
+/**
  * SqlClient: Read BLOB.
  *
  * See [`SqlClient::read_blob`].
@@ -4205,6 +4340,29 @@ void tsurugi_ffi_blob_reference_dispose(TsurugiFfiBlobReferenceHandle blob_refer
  * - `clob_reference` - clob reference.
  */
 void tsurugi_ffi_clob_reference_dispose(TsurugiFfiClobReferenceHandle clob_reference);
+
+/**
+ * LargeObjectCache: Get path.
+ *
+ * See [`TgLargeObjectCache::path`].
+ *
+ * # Receiver
+ * - `large_object_cache` - large object cache.
+ *
+ * # Returns
+ * - `path_out` - path (`null` if not exists).
+ */
+TsurugiFfiRc tsurugi_ffi_large_object_cache_get_path(TsurugiFfiContextHandle context,
+                                                     TsurugiFfiLargeObjectCacheHandle large_object_cache,
+                                                     TsurugiFfiStringHandle *path_out);
+
+/**
+ * LargeObjectCache: Dispose.
+ *
+ * # Receiver
+ * - `large_object_cache` - large object cache.
+ */
+void tsurugi_ffi_large_object_cache_dispose(TsurugiFfiLargeObjectCacheHandle large_object_cache);
 
 /**
  * Endpoint: Creates a new instance.
