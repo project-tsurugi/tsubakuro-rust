@@ -84,7 +84,7 @@ tsubakuro-rust-coreは [Tsubakuro/Java](https://github.com/project-tsurugi/tsuba
 | SQLバッチ実行（PS）            | ×                                   | Transaction#batch()                  |
 | ダンプ                         | ×                                   | Transaction#executeDump()            |
 | ロード                         | ×                                   | Transaction#executeLoad()            |
-| コミットオプション             | CommitOption                        | ×                                    |
+| コミットオプション             | CommitOption                        | CommitOption                         |
 | コミット種別                   | CommitType                          | CommitStatus                         |
 | トランザクションコミット       | SqlClient::commit()                 | Transaction#commit()                 |
 | トランザクションロールバック   | SqlClient::rollback()               | Transaction#rollback()               |
@@ -134,6 +134,7 @@ tsubakuro-rust-coreは [Tsubakuro/Java](https://github.com/project-tsurugi/tsuba
 | SELECT結果の値取得         | SqlQueryResult::fetch()                       | ResultSet#fetchBlob()                  |
 | 取得用BLOB型               | TgBlobReference                               | BlobReference                          |
 | BLOB読み込み               | SqlClient::open_blob()                        | Transaction#openInputStream()          |
+| BLOBキャッシュ取得         | SqlClient::get_blob_cache()                   | Transaction#getLargeObjectCache()      |
 | ローカルファイルへのコピー | SqlClient::copy_blob_to()                     | Transaction#copyTo()                   |
 
 ### 非同期API
