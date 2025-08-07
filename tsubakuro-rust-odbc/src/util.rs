@@ -286,8 +286,7 @@ fn write_wchar0(
     buffer_chars: usize,
     diags: Option<&Arc<TsurugiOdbcDiagCollection>>,
 ) -> (SqlReturn, usize) {
-    let mut utf16 = src.encode_utf16().collect::<Vec<u16>>();
-    utf16.push(0); // nul-terminate
+    let utf16 = string_to_utf16(src);
     let value_len = utf16.len();
 
     let rc = if dst.is_null() {
@@ -311,4 +310,18 @@ fn write_wchar0(
     };
 
     (rc, value_len - 1)
+}
+
+pub(crate) fn utf8_to_string(value: &[u8]) -> String {
+    String::from_utf8_lossy(value).into_owned()
+}
+
+pub(crate) fn string_to_utf16(value: &str) -> Vec<u16> {
+    let mut v: Vec<u16> = value.encode_utf16().collect();
+    v.push(0); // nul-terminate
+    v
+}
+
+pub(crate) fn utf16_to_string(value: &[u16]) -> String {
+    String::from_utf16_lossy(value)
 }

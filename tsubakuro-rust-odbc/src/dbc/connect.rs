@@ -14,6 +14,7 @@ use crate::{
 };
 
 pub(crate) mod connect_tsurugi;
+pub(crate) mod connection_string;
 pub(crate) mod dsn;
 
 #[no_mangle]
