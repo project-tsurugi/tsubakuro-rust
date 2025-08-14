@@ -2,21 +2,28 @@
 
 Tsurugi ODBCドライバーのインストール方法を説明します。
 
-## ドライバーのインストール（MS-Windows）
+## 前提（実行環境について）
 
-### 前提
+Tsurugi ODBCドライバーは、それを生成（ビルド）したのと異なる環境で使用する場合、ビルド環境と同等のライブラリーが必要になることがあります。
 
-Tsurugi ODBCドライバーのdllファイル（  `tsubakuro_rust_odbc.dll`  ）は、[tsubakuro-rust-odbc](../)をビルドして生成します。
+例えばMS-Windows用のTsurugi ODBCドライバー（ `tsubakuro_rust_odbc.dll`  ）がVisual C++ランタイムライブラリー（VC++ランタイムライブラリー）を使ってビルドされている場合、実行環境に「ビルド環境と互換性のあるバージョンのVC++ランタイムライブラリー」が必要です。
 
 > [!NOTE]
 >
-> ビルドしたのと異なる環境でdllファイルを使用する場合、ビルド環境と同等のライブラリーが必要になることがあります。
->
-> 例えばVisual C++ランタイムライブラリー（VC++ランタイムライブラリー）を使ってビルドされている場合、実行環境に「ビルド環境と互換性のあるバージョンのVC++ランタイムライブラリー」が必要です。
->
-> （VC++ランタイムライブラリーに依存しているかどうかは、`rustup show` や `cargo build -v`, `dumpbin /dependents tsubakuro_rust_odbc.dll` 等で確認できます）
+> VC++ランタイムライブラリーに依存しているかどうかは、ビルド環境の `rustup show` や `cargo build -v` で確認できます。
+> また、Windows SDKの `dumpbin /dependents tsubakuro_rust_odbc.dll` でも確認することができます。
+
+## ドライバーのインストール（MS-Windows）
+
+### インストーラーを使う方法
+
+Tsurugi ODBCドライバーの[インストーラー](../installer)（ `tsurugi_odbc_driver_installer.exe` ）を実行します。
+
+インストーラーの画面が表示されますので、それに従ってください。
 
 ### 手動インストール方法
+
+インストーラーを使わずにインストールする方法です。
 
 1. `tsubakuro_rust_odbc.dll` を適当な場所に配置します。
 
@@ -45,7 +52,7 @@ Tsurugi ODBCドライバーのdllファイル（  `tsubakuro_rust_odbc.dll`  ）
 3. regファイルを実行します。（regファイルをダブルクリックすると実行されます）  
    これにより、レジストリーにTsurugi ODBCドライバーが登録されます。
 
-#### 接続文字列の例
+### 接続文字列の例
 
 上記の手順でTsurugi ODBCドライバーをインストールした場合、接続文字列は以下のようになります。
 
