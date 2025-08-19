@@ -87,13 +87,18 @@ unsafe extern "system" fn dialog_proc(
     const TRUE: isize = 1;
     const FALSE: isize = 0;
 
+    let dialog_value_ptr = unsafe {
+        if message == WM_INITDIALOG {
+            SetWindowLongPtrW(hwnd, GWLP_USERDATA, lparam.0);
+            lparam.0 as *mut DsnDialogValue
+        } else {
+            GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut DsnDialogValue
+        }
+    };
+    let dialog_value = &mut *dialog_value_ptr;
+
     match message {
         WM_INITDIALOG => {
-            let dialog_value = unsafe {
-                SetWindowLongPtrW(hwnd, GWLP_USERDATA, lparam.0);
-                let dialog_value_ptr = lparam.0 as *mut DsnDialogValue;
-                &*dialog_value_ptr
-            };
             let rc = match init_dialog(hwnd, dialog_value) {
                 Ok(_) => TRUE,
                 Err(e) => {
@@ -105,34 +110,29 @@ unsafe extern "system" fn dialog_proc(
         }
         WM_COMMAND => {
             let id = wparam.0 as i32;
-            if id == IDOK.0 || id == IDCANCEL.0 {
-                if id == IDOK.0 {
-                    let dialog_value = unsafe {
-                        let dialog_value_ptr =
-                            GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut DsnDialogValue;
-                        &mut *dialog_value_ptr
-                    };
-                    update_dialog_value(hwnd, dialog_value);
+            if id == IDOK.0 {
+                update_dialog_value(hwnd, dialog_value);
 
-                    if validate_dsn(dialog_value.data_source_name()).is_err() {
-                        message_box_exclamation(hwnd, "Data Source Name Error", IDS_INVALID_DSN);
+                if validate_dsn(dialog_value.data_source_name()).is_err() {
+                    message_box_exclamation(hwnd, "Data Source Name Error", IDS_INVALID_DSN);
+                    return TRUE;
+                }
+
+                if (dialog_value.is_add() || dialog_value.is_rename_dsn())
+                    && exists_dsn(dialog_value.data_source_name())
+                {
+                    trace!(
+                        "{FUNCTION_NAME}: DSN {} already exists.",
+                        dialog_value.data_source_name()
+                    );
+                    if message_box_yesno(hwnd, "Overwrite DSN?", IDS_OVERWRITE_DSN) {
+                        // fall through
+                    } else {
                         return TRUE;
                     }
-
-                    if (dialog_value.is_add() || dialog_value.is_rename_dsn())
-                        && exists_dsn(dialog_value.data_source_name())
-                    {
-                        trace!(
-                            "{FUNCTION_NAME}: DSN {} already exists.",
-                            dialog_value.data_source_name()
-                        );
-                        if message_box_yesno(hwnd, "Overwrite DSN?", IDS_OVERWRITE_DSN) {
-                            // fall through
-                        } else {
-                            return TRUE;
-                        }
-                    }
                 }
+            }
+            if id == IDOK.0 || id == IDCANCEL.0 {
                 unsafe {
                     let _ = EndDialog(hwnd, id as isize);
                 }
