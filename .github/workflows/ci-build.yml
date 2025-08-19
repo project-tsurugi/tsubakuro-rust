@@ -98,7 +98,7 @@ jobs:
           TSUBAKURO_RUST_VERSION: ${{ github.ref_name }}
 
   Build_Windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     permissions:
       checks: write
       contents: write
@@ -129,6 +129,13 @@ jobs:
 
           cargo test
 
+      - name: Build_Installer
+        run: |
+          cd tsubakuro-rust-odbc/installer
+          ISCC.exe installer.iss
+
+          ls -l Output/
+
       - name: Lint_ODBC
         continue-on-error: true
         run: |
@@ -140,3 +147,9 @@ jobs:
         with:
           name: tsubakuro_rust_odbc.dll
           path: tsubakuro-rust-odbc/target/release/tsubakuro_rust_odbc.dll
+
+      - name: Upload_Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsurugi_odbc_driver_installer.exe
+          path: tsubakuro-rust-odbc/installer/Output/tsurugi_odbc_driver_installer.exe
