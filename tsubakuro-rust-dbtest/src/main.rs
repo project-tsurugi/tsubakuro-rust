@@ -3,6 +3,7 @@ use std::{env, process, time::Duration};
 use execute::{job::execute as job_execute, sub::execute as sub_execute};
 use tsubakuro_rust_core::prelude::*;
 
+mod credential;
 mod execute;
 mod job;
 mod service;
@@ -12,24 +13,31 @@ mod transaction;
 #[tokio::main]
 async fn main() -> Result<(), TgError> {
     let args: Vec<String> = env::args().collect();
-    if args.len() <= 1 {
-        eprintln!("Usage: {} <endpoint-url>", args[0]);
+    if args.len() <= 3 {
+        eprintln!("Usage: {} <endpoint-url> <user> <password>", args[0]);
         process::exit(1);
     }
 
     let endpoint = args.get(1).unwrap();
+    let user = args.get(2).unwrap();
+    let password = args.get(3).unwrap();
+    let credential = Credential::from_user_password(user, Some(password));
 
     // env_logger::builder().format_timestamp_millis().init();
-    sub_execute(endpoint).await?;
-    job_execute(endpoint).await?;
+    sub_execute(endpoint, credential.clone()).await?;
+    job_execute(endpoint, credential).await?;
 
     Ok(())
 }
 
-fn create_connection_option(endpoint: &str) -> Result<ConnectionOption, TgError> {
+fn create_connection_option(
+    endpoint: &str,
+    credential: Credential,
+) -> Result<ConnectionOption, TgError> {
     let mut option = ConnectionOption::new();
     option.set_application_name("tsubakuro-rust-dbtest");
     option.set_endpoint_url(endpoint)?;
+    option.set_credential(credential);
     option.set_keep_alive(Duration::ZERO); // not keep alive
     option.set_default_timeout(Duration::from_secs(10));
 
@@ -39,27 +47,101 @@ fn create_connection_option(endpoint: &str) -> Result<ConnectionOption, TgError>
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::{env, sync::Arc};
+    use std::{env, panic, sync::Arc};
 
     pub(crate) fn create_test_connection_option() -> ConnectionOption {
-        let args: Vec<String> = env::args().collect();
-
-        let endpoint = {
-            let mut i = 0;
-            loop {
-                if let Some(s) = args.get(i) {
-                    if s.starts_with("endpoint=") {
-                        break s.clone().split_off(9);
-                    }
-                } else {
-                    panic!("endpoint not specified");
-                }
-                i += 1;
-            }
-        };
-
-        let option = create_connection_option(&endpoint).unwrap();
+        let args = create_test_args();
+        let option = create_connection_option(args.endpoint(), args.credential()).unwrap();
         option
+    }
+
+    pub(crate) fn create_test_args() -> TestArgs {
+        let env_args: Vec<String> = env::args().collect();
+
+        let mut args = TestArgs::new();
+        for arg in env_args {
+            if arg.starts_with("endpoint=") {
+                args.endpoint = arg.clone().split_off(9);
+            } else if arg.starts_with("user=") {
+                args.user = Some(arg.clone().split_off(5));
+            } else if arg.starts_with("password=") {
+                args.password = Some(arg.clone().split_off(9));
+            } else if arg.starts_with("auth-token=") {
+                args.auth_token = Some(arg.clone().split_off(11));
+            } else if arg.starts_with("credentials=") {
+                args.file_path = Some(arg.clone().split_off(12));
+            }
+        }
+
+        if args.endpoint.is_empty() {
+            panic!("endpoint is not specified");
+        }
+
+        args
+    }
+
+    pub(crate) struct TestArgs {
+        endpoint: String,
+        user: Option<String>,
+        password: Option<String>,
+        auth_token: Option<String>,
+        file_path: Option<String>,
+    }
+
+    impl TestArgs {
+        fn new() -> Self {
+            Self {
+                endpoint: String::new(),
+                user: None,
+                password: None,
+                auth_token: None,
+                file_path: None,
+            }
+        }
+
+        pub fn endpoint(&self) -> &str {
+            &self.endpoint
+        }
+
+        pub fn user(&self) -> Option<&String> {
+            self.user.as_ref()
+        }
+
+        pub fn credential(&self) -> Credential {
+            if let Some(c) = self.user_password_credential() {
+                c
+            } else if let Some(c) = self.auth_token_credential() {
+                c
+            } else if let Some(c) = self.file_credential() {
+                c
+            } else {
+                Credential::null()
+            }
+        }
+
+        pub fn user_password_credential(&self) -> Option<Credential> {
+            if let Some(user) = &self.user {
+                Some(Credential::from_user_password(user, self.password.as_ref()))
+            } else {
+                None
+            }
+        }
+
+        pub fn auth_token_credential(&self) -> Option<Credential> {
+            if let Some(token) = &self.auth_token {
+                Some(Credential::from_auth_token(token))
+            } else {
+                None
+            }
+        }
+
+        pub fn file_credential(&self) -> Option<Credential> {
+            if let Some(path) = &self.file_path {
+                Some(Credential::load(path).unwrap())
+            } else {
+                None
+            }
+        }
     }
 
     pub(crate) async fn create_test_session() -> Arc<Session> {

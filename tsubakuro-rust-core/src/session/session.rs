@@ -14,8 +14,6 @@ use crate::{
         Endpoint, ShutdownType,
     },
     service::{core::core_service::CoreService, ServiceClient},
-    tateyama::proto::endpoint::request::ClientInformation,
-    util::string_to_prost_string,
 };
 
 use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
@@ -83,19 +81,12 @@ impl Session {
         connection_option: &ConnectionOption,
         timeout: Duration,
     ) -> Result<Arc<Session>, TgError> {
-        let (endpoint, client_information) = Self::create_information(connection_option)?;
+        let endpoint = Self::check_endpoint(connection_option)?;
         let default_timeout = connection_option.default_timeout();
 
         match endpoint {
-            Endpoint::Tcp(_, _) => {
-                TcpConnector::connect(
-                    endpoint,
-                    connection_option,
-                    client_information,
-                    timeout,
-                    default_timeout,
-                )
-                .await
+            Endpoint::Tcp(..) => {
+                TcpConnector::connect(connection_option, timeout, default_timeout).await
             }
             _ => Err(illegal_argument_error!("unsupported endpoint")),
         }
@@ -107,18 +98,12 @@ impl Session {
     pub async fn connect_async(
         connection_option: &ConnectionOption,
     ) -> Result<Job<Arc<Session>>, TgError> {
-        let (endpoint, client_information) = Self::create_information(connection_option)?;
+        let endpoint = Self::check_endpoint(connection_option)?;
         let default_timeout = connection_option.default_timeout();
 
         let job = match endpoint {
-            Endpoint::Tcp(_, _) => {
-                TcpConnector::connect_async(
-                    endpoint,
-                    connection_option,
-                    client_information,
-                    default_timeout,
-                )
-                .await?
+            Endpoint::Tcp(..) => {
+                TcpConnector::connect_async(connection_option, default_timeout).await?
             }
             _ => return Err(illegal_argument_error!("unsupported endpoint")),
         };
@@ -126,19 +111,28 @@ impl Session {
         Ok(job)
     }
 
-    fn create_information(
-        option: &ConnectionOption,
-    ) -> Result<(&Endpoint, ClientInformation), TgError> {
+    fn check_endpoint(option: &ConnectionOption) -> Result<&Endpoint, TgError> {
         let endpoint = option
             .endpoint()
             .ok_or(illegal_argument_error!("endpoint not specified"))?;
 
-        let client_information = ClientInformation {
-            connection_label: string_to_prost_string(option.session_label()),
-            application_name: string_to_prost_string(option.application_name()),
-            credential: None, // TODO Crendential
-        };
-        Ok((endpoint, client_information))
+        Ok(endpoint)
+    }
+
+    /// Get user name.
+    ///
+    /// since 0.5.0
+    pub fn user_name(&self) -> Option<String> {
+        self.wire.user_name()
+    }
+
+    /// Checks if the session has an encryption key.
+    ///
+    /// For internal use.
+    ///
+    /// since 0.5.0
+    pub async fn has_encryption_key(&self) -> bool {
+        self.wire.has_encryption_key().await
     }
 
     /// Set default timeout.

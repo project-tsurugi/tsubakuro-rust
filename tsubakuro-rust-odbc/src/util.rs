@@ -38,7 +38,7 @@ pub(crate) fn char_to_string_integer(
         return Err("char_to_string_integer(): src is null".into());
     }
 
-    if length == SQL_NTS.into() {
+    if length == SQL_NTS as SqlInteger {
         let s = unsafe { CStr::from_ptr(src as *const c_char) };
         s.to_str().map(|s| s.to_string()).map_err(|e| e.into())
     } else {
@@ -82,7 +82,7 @@ pub(crate) fn wchar_to_string_integer(
         return Err("wchar_to_string_integer(): src is null".into());
     }
 
-    if length == SQL_NTS.into() {
+    if length == SQL_NTS as SqlInteger {
         let mut len = 0;
         unsafe {
             while *src.add(len) != 0 {

@@ -40,10 +40,10 @@ impl std::fmt::Debug for TcpLink {
 }
 
 impl TcpLink {
-    pub(crate) async fn connect(
-        endpoint: &Endpoint,
-        connection_option: &ConnectionOption,
-    ) -> Result<TcpLink, TgError> {
+    pub(crate) async fn connect(connection_option: &ConnectionOption) -> Result<TcpLink, TgError> {
+        let endpoint = connection_option
+            .endpoint()
+            .ok_or(illegal_argument_error!("endpoint not specified"))?;
         let addr = if let Endpoint::Tcp(host, port) = endpoint {
             format!("{host}:{port}")
         } else {

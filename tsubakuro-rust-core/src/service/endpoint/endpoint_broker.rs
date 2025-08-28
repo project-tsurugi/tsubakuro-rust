@@ -1,7 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
-use log::trace;
-use prost::Message as ProstMessage;
+use log::{debug, trace};
+use prost::{bytes::BytesMut, Message as ProstMessage};
 
 use crate::{
     endpoint_service_error,
@@ -10,12 +10,9 @@ use crate::{
     job::Job,
     prost_decode_error,
     session::wire::{response::WireResponse, Wire},
-    tateyama::proto::endpoint::{
-        request::{
-            request::Command as EndpointCommand, Cancel as CancelRequest, ClientInformation,
-            Handshake as HandshakeRequest, Request as EndpointRequest, WireInformation,
-        },
-        response::{handshake::Result as HandshakeResult, Handshake as HandshakeResponse},
+    tateyama::proto::endpoint::request::{
+        request::Command as EndpointCommand, ClientInformation, Request as EndpointRequest,
+        WireInformation,
     },
 };
 
@@ -26,17 +23,43 @@ pub(crate) const SERVICE_ID_ENDPOINT_BROKER: i32 = 1;
 const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 
 /// The minor service message version for EndpointRequest.
-const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR: u64 = 0;
+const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
 
 pub(crate) struct EndpointBroker;
 
 impl EndpointBroker {
+    pub(crate) async fn encryption_key(
+        wire: &Wire,
+        timeout: Duration,
+    ) -> Result<Option<String>, TgError> {
+        const FUNCTION_NAME: &str = "encryption_key()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let command = Self::encryption_key_command();
+        let request = Self::new_request(command);
+
+        let (_, response) = wire
+            .send_and_pull_response(SERVICE_ID_ENDPOINT_BROKER, request, None, timeout)
+            .await?;
+        let encryption_key = encryption_key_processor(response)?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(encryption_key)
+    }
+
+    fn encryption_key_command() -> EndpointCommand {
+        use crate::tateyama::proto::endpoint::request::EncryptionKey as EncryptionKeyRequest;
+
+        let encryption_key = EncryptionKeyRequest {};
+        EndpointCommand::EncryptionKey(encryption_key)
+    }
+
     pub(crate) async fn handshake(
         wire: &Arc<Wire>,
         client_information: ClientInformation,
         wire_information: WireInformation,
         timeout: Duration,
-    ) -> Result<i64, TgError> {
+    ) -> Result<HandshakeResult, TgError> {
         const FUNCTION_NAME: &str = "handshake()";
         trace!("{} start", FUNCTION_NAME);
 
@@ -61,7 +84,7 @@ impl EndpointBroker {
         fail_on_drop_error: bool,
     ) -> Result<Job<T>, TgError>
     where
-        F: Fn(/*session_id*/ i64) -> Result<T, TgError> + Send + 'static,
+        F: Fn(HandshakeResult) -> Result<T, TgError> + Send + 'static,
     {
         const FUNCTION_NAME: &str = "handshake_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -92,6 +115,8 @@ impl EndpointBroker {
         client_information: ClientInformation,
         wire_information: WireInformation,
     ) -> EndpointCommand {
+        use crate::tateyama::proto::endpoint::request::Handshake as HandshakeRequest;
+
         let handshake = HandshakeRequest {
             client_information: Some(client_information),
             wire_information: Some(wire_information),
@@ -114,6 +139,8 @@ impl EndpointBroker {
     }
 
     fn cancel_command() -> EndpointCommand {
+        use crate::tateyama::proto::endpoint::request::Cancel as CancelRequest;
+
         let cancel = CancelRequest {};
         EndpointCommand::Cancel(cancel)
     }
@@ -127,36 +154,104 @@ impl EndpointBroker {
     }
 }
 
-fn handshake_processor(wire_response: WireResponse) -> Result<i64, TgError> {
+fn encryption_key_processor(wire_response: WireResponse) -> Result<Option<String>, TgError> {
+    const FUNCTION_NAME: &str = "encryption_key_processor()";
+
+    let payload = payload(FUNCTION_NAME, wire_response)?;
+
+    use crate::tateyama::proto::endpoint::response::{
+        encryption_key::Result, EncryptionKey as EncryptionKeyResponse,
+    };
+
+    let message = EncryptionKeyResponse::decode_length_delimited(payload)
+        .map_err(|e| prost_decode_error!(FUNCTION_NAME, "EncryptionKeyResponse", e))?;
+    match message.result {
+        Some(result) => match result {
+            Result::Success(success) => Ok(Some(success.encryption_key)),
+            Result::Error(error) => {
+                use crate::tateyama::proto::diagnostics::Code;
+                let code = error.code();
+                if code == Code::UnsupportedOperation {
+                    debug!("{FUNCTION_NAME}: UnsupportedOperation");
+                    Ok(None)
+                } else {
+                    Err(endpoint_service_error!(FUNCTION_NAME, error))
+                }
+            }
+        },
+        None => Err(invalid_response_error!(
+            FUNCTION_NAME,
+            "EncryptionKeyResponse.result is None",
+        )),
+    }
+}
+
+pub(crate) struct HandshakeResult {
+    session_id: i64,
+    user_name: Option<String>,
+}
+
+impl HandshakeResult {
+    fn new(session_id: i64, user_name: Option<String>) -> Self {
+        HandshakeResult {
+            session_id,
+            user_name,
+        }
+    }
+
+    pub fn session_id(&self) -> i64 {
+        self.session_id
+    }
+
+    pub fn user_name(self) -> Option<String> {
+        self.user_name
+    }
+}
+
+fn handshake_processor(wire_response: WireResponse) -> Result<HandshakeResult, TgError> {
     const FUNCTION_NAME: &str = "handshake_processor()";
 
-    let payload =
-        if let WireResponse::ResponseSessionPayload(_slot, payload, _, error) = wire_response {
-            if let Some(e) = error {
-                return Err(e.to_tg_error());
-            }
-            if let Some(payload) = payload {
-                payload
-            } else {
-                return Err(invalid_response_error!(FUNCTION_NAME, "payload is None"));
-            }
-        } else {
-            return Err(invalid_response_error!(
-                FUNCTION_NAME,
-                "response is not ResponseSessionPayload",
-            ));
-        };
+    let payload = payload(FUNCTION_NAME, wire_response)?;
+
+    use crate::tateyama::proto::endpoint::response::{
+        handshake::success::UserNameOpt, handshake::Result, Handshake as HandshakeResponse,
+    };
 
     let message = HandshakeResponse::decode_length_delimited(payload)
         .map_err(|e| prost_decode_error!(FUNCTION_NAME, "HandshakeResponse", e))?;
     match message.result {
         Some(result) => match result {
-            HandshakeResult::Success(success) => Ok(success.session_id as i64),
-            HandshakeResult::Error(error) => Err(endpoint_service_error!(FUNCTION_NAME, error)),
+            Result::Success(success) => {
+                let session_id = success.session_id as i64;
+                let user_name = match success.user_name_opt {
+                    Some(UserNameOpt::UserName(name)) => Some(name),
+                    _ => None,
+                };
+                Ok(HandshakeResult::new(session_id, user_name))
+            }
+            Result::Error(error) => Err(endpoint_service_error!(FUNCTION_NAME, error)),
         },
         None => Err(invalid_response_error!(
             FUNCTION_NAME,
             "HandshakeResponse.result is None",
         )),
+    }
+}
+
+fn payload(function_name: &str, wire_response: WireResponse) -> Result<BytesMut, TgError> {
+    if let WireResponse::ResponseSessionPayload(_slot, payload, _, error) = wire_response {
+        if let Some(e) = error {
+            return Err(e.to_tg_error());
+        }
+        if let Some(payload) = payload {
+            Ok(payload)
+        } else {
+            Err(invalid_response_error!(function_name, "payload is None"))
+        }
+    } else {
+        Err(invalid_response_error!(
+            function_name,
+            "response is not ResponseSessionPayload",
+        ))
     }
 }

@@ -2,10 +2,16 @@ use std::{path::Path, time::Duration};
 
 use crate::{
     error::TgError,
-    prelude::r#type::large_object::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
+    prelude::{
+        r#type::large_object::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
+        Credential,
+    },
 };
 
 use super::endpoint::Endpoint;
+
+/// The default validity period for UserPasswordCredential in seconds.
+const DEFAULT_VALIDITY_PERIOD_SECONDS: u64 = 300;
 
 /// Option to connect to Tsurugi server.
 ///
@@ -13,21 +19,29 @@ use super::endpoint::Endpoint;
 ///
 /// # Examples
 /// ```
+/// use std::sync::Arc;
 /// use tsubakuro_rust_core::prelude::*;
 ///
-/// async fn example() {
+/// async fn example() -> Result<Arc<Session>, TgError> {
+///     let credential = Credential::from_user_password("user", Some("password"));
+///
 ///     let mut connection_option = ConnectionOption::new();
-///     connection_option.set_endpoint_url("tcp://localhost:12345");
+///     connection_option.set_endpoint_url("tcp://localhost:12345")?;
+///     connection_option.set_credential(credential);
 ///     connection_option.set_application_name("Tsubakuro/Rust example");
 ///     connection_option.set_session_label("example session");
 ///     connection_option.set_default_timeout(std::time::Duration::from_secs(10));
 ///
-///     let session = Session::connect(&connection_option).await.unwrap();
+///     let session = Session::connect(&connection_option).await?;
+///
+///     Ok(session)
 /// }
 /// ```
 #[derive(Debug, Clone)]
 pub struct ConnectionOption {
     endpoint: Option<Endpoint>,
+    credential: Credential,
+    validity_period: Duration,
     application_name: Option<String>,
     session_label: Option<String>,
     keep_alive: Duration,
@@ -49,6 +63,8 @@ impl ConnectionOption {
     pub fn new() -> ConnectionOption {
         ConnectionOption {
             endpoint: None,
+            credential: Credential::Null,
+            validity_period: Duration::from_secs(DEFAULT_VALIDITY_PERIOD_SECONDS),
             application_name: None,
             session_label: None,
             keep_alive: Duration::from_secs(60),
@@ -78,6 +94,38 @@ impl ConnectionOption {
     /// Get endpoint.
     pub fn endpoint(&self) -> Option<&Endpoint> {
         self.endpoint.as_ref()
+    }
+
+    /// Set credential.
+    ///
+    /// since 0.5.0
+    pub fn set_credential(&mut self, credential: Credential) {
+        self.credential = credential;
+    }
+
+    /// Get credential.
+    ///
+    /// since 0.5.0
+    pub fn credential(&self) -> &Credential {
+        &self.credential
+    }
+
+    /// Set validity period for UserPasswordCredential.
+    ///
+    /// For internal use.
+    ///
+    /// since 0.5.0
+    pub fn set_validity_period(&mut self, duration: Duration) {
+        self.validity_period = duration;
+    }
+
+    /// Get validity period.
+    ///
+    /// For internal use.
+    ///
+    /// since 0.5.0
+    pub fn validity_period(&self) -> Duration {
+        self.validity_period
     }
 
     /// Set application name.

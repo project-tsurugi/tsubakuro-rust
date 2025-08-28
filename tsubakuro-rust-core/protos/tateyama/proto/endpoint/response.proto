@@ -37,5 +37,69 @@ message Handshake {
     message Success {
         // the session id.
         uint64 session_id = 11;
+
+        // the user name.
+        oneof user_name_opt {
+            string user_name = 12;
+        }
+    }
+}
+
+// get the encryption key.
+message EncryptionKey {
+    reserved 1 to 10;
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 11;
+
+        // an unknown error occurred.
+        Error error = 12;
+    }
+
+    // request is successfully completed.
+    message Success {
+        // the the encryption key.
+        string encryption_key = 11;
+    }
+}
+
+// update the credential
+message UpdateCredential {
+    reserved 1 to 10;
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 11;
+
+        // unknown error was occurred.
+        Error error = 12;
+    }
+
+    // request is successfully completed.
+    message Success {
+        // no special properties.
+    }
+}
+
+// get the expiration time of the current session credential
+message GetCredentialsExpirationTime {
+    reserved 1 to 10;
+
+    // the response body.
+    oneof result {
+        // request is successfully completed.
+        Success success = 11;
+
+        // unknown error was occurred.
+        Error error = 12;
+    }
+
+    // request is successfully completed.
+    message Success {
+        // expiration time of the session, expressed as the number of milliseconds since epoch 1970-01-01T00:00:00Z.
+        uint64 expiration_time = 1;
     }
 }

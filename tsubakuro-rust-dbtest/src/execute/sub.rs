@@ -2,10 +2,10 @@ use tsubakuro_rust_core::prelude::*;
 
 use crate::create_connection_option;
 
-pub(crate) async fn execute(endpoint: &str) -> Result<(), TgError> {
+pub(crate) async fn execute(endpoint: &str, credential: Credential) -> Result<(), TgError> {
     println!("sub::execute start");
 
-    let connection_option = create_connection_option(endpoint)?;
+    let connection_option = create_connection_option(endpoint, credential)?;
 
     let session = Session::connect(&connection_option).await?;
     println!("{session:?}");

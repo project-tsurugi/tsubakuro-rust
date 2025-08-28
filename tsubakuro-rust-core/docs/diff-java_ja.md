@@ -6,14 +6,14 @@ tsubakuro-rust-coreは [Tsubakuro/Java](https://github.com/project-tsurugi/tsuba
 
 ## サービス
 
-| サービス       | Tsubakuro/Rust | Tsubakuro/Java   | 備考                                         |
-| -------------- | -------------- | ---------------- | -------------------------------------------- |
-| エンドポイント | TCP接続        | IPC接続・TCP接続 | Tsubakuro/RustではIPC接続に対応しない        |
-| 認証           | なし           | Credential       | 現時点では、認証は実質的に機能していないため |
-| SQL            | SqlClient      | SqlClient        |                                              |
-| KVS            | ×              | KvsClient        |                                              |
-| Datastore      | ×              | DatastoreClient  |                                              |
-| デバッグ       | ×              | DebugClient      |                                              |
+| サービス       | Tsubakuro/Rust | Tsubakuro/Java   | 備考                                  |
+| -------------- | -------------- | ---------------- | ------------------------------------- |
+| エンドポイント | TCP接続        | IPC接続・TCP接続 | Tsubakuro/RustではIPC接続に対応しない |
+| 認証           | Credential     | Credential       |                                       |
+| SQL            | SqlClient      | SqlClient        |                                       |
+| KVS            | ×              | KvsClient        |                                       |
+| Datastore      | ×              | DatastoreClient  |                                       |
+| デバッグ       | ×              | DebugClient      |                                       |
 
 ## API
 

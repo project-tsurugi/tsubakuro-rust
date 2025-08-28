@@ -1,4 +1,8 @@
-use std::{collections::HashMap, sync::Arc, time::Duration};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 
 use log::trace;
 use prost::{
@@ -10,8 +14,9 @@ use crate::{
     core_service_wire_response_error,
     error::TgError,
     job::Job,
+    prelude::endpoint::endpoint_broker::{EndpointBroker, HandshakeResult},
     prost_decode_wire_response_error, return_err_if_timeout,
-    session::tcp::wire::TcpWire,
+    session::{tcp::wire::TcpWire, wire::crypt::Crypt},
     tateyama::proto::{
         diagnostics::Record as DiagnosticsRecord,
         framework::{
@@ -33,10 +38,12 @@ use super::{
 const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 
 /// The minor service message version for FrameworkRequest.Header.
-const SERVICE_MESSAGE_VERSION_MINOR: u64 = 0;
+const SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
 
 pub(crate) struct Wire {
     wire: DelegateWire,
+    crypt: tokio::sync::Mutex<Option<Crypt>>,
+    user_name: Mutex<Option<String>>,
 }
 
 impl std::fmt::Debug for Wire {
@@ -47,21 +54,65 @@ impl std::fmt::Debug for Wire {
 
 impl Wire {
     pub(crate) fn new(wire: DelegateWire) -> Arc<Wire> {
-        Arc::new(Wire { wire })
+        Arc::new(Wire {
+            wire,
+            crypt: tokio::sync::Mutex::new(None),
+            user_name: Mutex::new(None),
+        })
     }
 
-    pub(crate) fn get_delegate_wire(self: &Arc<Self>) -> &DelegateWire {
+    pub(crate) fn get_delegate_wire(&self) -> &DelegateWire {
         &self.wire
     }
 
-    pub(crate) fn set_session_id(self: &Arc<Self>, session_id: i64) -> Result<(), TgError> {
-        self.wire.set_session_id(session_id)
+    pub(crate) fn initialize(&self, handshake: HandshakeResult) -> Result<(), TgError> {
+        self.wire.set_session_id(handshake.session_id())?;
+        *self.user_name.lock().unwrap() = handshake.user_name();
+        Ok(())
     }
 
     pub(crate) fn session_id(&self) -> i64 {
         self.wire.session_id()
     }
 
+    pub(crate) fn user_name(&self) -> Option<String> {
+        self.user_name.lock().unwrap().clone()
+    }
+}
+
+impl Wire {
+    pub(crate) async fn has_encryption_key(&self) -> bool {
+        let self_crypt = self.crypt.lock().await;
+        if let Some(crypt) = &*self_crypt {
+            crypt.has_public_key()
+        } else {
+            false
+        }
+    }
+
+    pub(crate) async fn encrypt(
+        &self,
+        plain_text: &str,
+        timeout: Duration,
+    ) -> Result<Option<String>, TgError> {
+        let mut self_crypt = self.crypt.lock().await;
+        if self_crypt.is_none() {
+            let pem = EndpointBroker::encryption_key(self, timeout).await?;
+            let mut crypt = Crypt::from_pem(pem)?;
+            let encrypted = crypt.encrypt(plain_text)?;
+
+            *self_crypt = Some(crypt);
+
+            Ok(encrypted)
+        } else {
+            let crypt = self_crypt.as_mut().unwrap();
+            let encrypted = crypt.encrypt(plain_text)?;
+            Ok(encrypted)
+        }
+    }
+}
+
+impl Wire {
     pub(crate) async fn send_only<R: ProstMessage>(
         &self,
         service_id: i32,

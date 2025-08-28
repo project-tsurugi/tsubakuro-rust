@@ -15,7 +15,7 @@ rust-version = "1.84.1"
 [dependencies]
 async-trait = "0.1.83"
 bigdecimal = { version = "0.4.7", optional = true }
-chrono = { version = "0.4.39", optional = true }
+chrono = { version = "0.4.39" }
 log = "0.4.22"
 prost = "0.13.3"
 rust_decimal = { version = "1.36.0", optional = true }
@@ -25,6 +25,10 @@ url = "2.5.4"
 litemap = "=0.7.4"
 zerofrom = "=0.1.5"
 zerofrom-derive = "=0.1.5"
+pem = "3.0.5"
+rsa = "0.9.8"
+rand = "0.8.5"
+base64 = "0.22.1"
 
 [build-dependencies]
 prost-build = "0.13.3"
@@ -34,5 +38,5 @@ default = ["with_bigdecimal", "with_rust_decimal", "with_chrono", "with_time"]
 
 with_bigdecimal = ["bigdecimal"]
 with_rust_decimal = ["rust_decimal"]
-with_chrono = ["chrono"]
+with_chrono = []
 with_time = ["time"]

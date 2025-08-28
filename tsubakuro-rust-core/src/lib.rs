@@ -7,7 +7,8 @@
 //! 1. Create a [`Session`](crate::prelude::Session) (to connect to the Tsurugi DB server).
 //!    1. Create a [`ConnectionOption`](crate::prelude::ConnectionOption).
 //!    2. Set endpoint url (e.g. `tcp://localhost:12345`), etc to ConnectionOption.
-//!    3. Invoke [`Session::connect()`](crate::prelude::Session::connect).
+//!    3. Set [`Credential`](crate::prelude::Credential) to ConnectionOption.
+//!    4. Invoke [`Session::connect()`](crate::prelude::Session::connect).
 //! 2. Make a [`SqlClient`](crate::prelude::SqlClient) from Session.
 //!    1. Invoke [`Session::make_client()`](crate::prelude::Session::make_client).
 //! 3. When using prepared statement, create a [`SqlPreparedStatement`](crate::prelude::SqlPreparedStatement) from SqlClient.
