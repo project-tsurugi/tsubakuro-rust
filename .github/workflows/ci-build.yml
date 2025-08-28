@@ -58,7 +58,7 @@ jobs:
       - name: Test_DBTest
         run: |
           cd tsubakuro-rust-dbtest
-          cargo run ${DBTEST_ENDPOINT}
+          cargo run ${DBTEST_ENDPOINT} tsurugi password
           cargo test "" -- --test-threads=1 endpoint=${DBTEST_ENDPOINT}
 
       - name: Build_FFI
