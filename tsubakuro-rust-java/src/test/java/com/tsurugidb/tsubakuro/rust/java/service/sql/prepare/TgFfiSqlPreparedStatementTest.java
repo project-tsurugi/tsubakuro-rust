@@ -118,8 +118,7 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
     void close_argError() {
         var manager = getFfiObjectManager();
 
-        try (var context = TgFfiContext.create(manager); //
-                var client = createSqlClient()) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_prepared_statement_close(ctx, handle);
@@ -131,8 +130,7 @@ class TgFfiSqlPreparedStatementTest extends TgFfiTester {
     void close_for_argError() {
         var manager = getFfiObjectManager();
 
-        try (var context = TgFfiContext.create(manager); //
-                var client = createSqlClient()) {
+        try (var context = TgFfiContext.create(manager)) {
             var ctx = context.handle();
             var handle = MemorySegment.NULL;
             var t = Duration.ofSeconds(5).toNanos();

@@ -16087,6 +16087,12 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiStringArrayHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef struct TsurugiFfiCredential *TsurugiFfiCredentialHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiCredentialHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiEndpoint *TsurugiFfiEndpointHandle
      * }
      */
@@ -28493,6 +28499,303 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_credential_null {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_null");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_null(TsurugiFfiContextHandle context, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_credential_null$descriptor() {
+        return tsurugi_ffi_credential_null.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_null(TsurugiFfiContextHandle context, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_credential_null$handle() {
+        return tsurugi_ffi_credential_null.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_null(TsurugiFfiContextHandle context, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_credential_null$address() {
+        return tsurugi_ffi_credential_null.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_null(TsurugiFfiContextHandle context, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static int tsurugi_ffi_credential_null(MemorySegment context, MemorySegment credential_out) {
+        var mh$ = tsurugi_ffi_credential_null.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_credential_null", context, credential_out);
+            }
+            return (int)mh$.invokeExact(context, credential_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_credential_from_user_password {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_from_user_password");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_user_password(TsurugiFfiContextHandle context, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_credential_from_user_password$descriptor() {
+        return tsurugi_ffi_credential_from_user_password.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_user_password(TsurugiFfiContextHandle context, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_credential_from_user_password$handle() {
+        return tsurugi_ffi_credential_from_user_password.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_user_password(TsurugiFfiContextHandle context, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_credential_from_user_password$address() {
+        return tsurugi_ffi_credential_from_user_password.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_user_password(TsurugiFfiContextHandle context, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static int tsurugi_ffi_credential_from_user_password(MemorySegment context, MemorySegment user, MemorySegment password, MemorySegment credential_out) {
+        var mh$ = tsurugi_ffi_credential_from_user_password.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_credential_from_user_password", context, user, password, credential_out);
+            }
+            return (int)mh$.invokeExact(context, user, password, credential_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_credential_from_auth_token {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_from_auth_token");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_auth_token(TsurugiFfiContextHandle context, TsurugiFfiStringHandle token, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_credential_from_auth_token$descriptor() {
+        return tsurugi_ffi_credential_from_auth_token.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_auth_token(TsurugiFfiContextHandle context, TsurugiFfiStringHandle token, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_credential_from_auth_token$handle() {
+        return tsurugi_ffi_credential_from_auth_token.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_auth_token(TsurugiFfiContextHandle context, TsurugiFfiStringHandle token, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_credential_from_auth_token$address() {
+        return tsurugi_ffi_credential_from_auth_token.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_from_auth_token(TsurugiFfiContextHandle context, TsurugiFfiStringHandle token, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static int tsurugi_ffi_credential_from_auth_token(MemorySegment context, MemorySegment token, MemorySegment credential_out) {
+        var mh$ = tsurugi_ffi_credential_from_auth_token.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_credential_from_auth_token", context, token, credential_out);
+            }
+            return (int)mh$.invokeExact(context, token, credential_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_credential_load {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_load");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_load(TsurugiFfiContextHandle context, TsurugiFfiStringHandle path, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_credential_load$descriptor() {
+        return tsurugi_ffi_credential_load.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_load(TsurugiFfiContextHandle context, TsurugiFfiStringHandle path, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_credential_load$handle() {
+        return tsurugi_ffi_credential_load.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_load(TsurugiFfiContextHandle context, TsurugiFfiStringHandle path, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_credential_load$address() {
+        return tsurugi_ffi_credential_load.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_credential_load(TsurugiFfiContextHandle context, TsurugiFfiStringHandle path, TsurugiFfiCredentialHandle *credential_out)
+     * }
+     */
+    public static int tsurugi_ffi_credential_load(MemorySegment context, MemorySegment path, MemorySegment credential_out) {
+        var mh$ = tsurugi_ffi_credential_load.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_credential_load", context, path, credential_out);
+            }
+            return (int)mh$.invokeExact(context, path, credential_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_credential_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_credential_dispose(TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_credential_dispose$descriptor() {
+        return tsurugi_ffi_credential_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_credential_dispose(TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_credential_dispose$handle() {
+        return tsurugi_ffi_credential_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_credential_dispose(TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_credential_dispose$address() {
+        return tsurugi_ffi_credential_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_credential_dispose(TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static void tsurugi_ffi_credential_dispose(MemorySegment credential) {
+        var mh$ = tsurugi_ffi_credential_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_credential_dispose", credential);
+            }
+            mh$.invokeExact(credential);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_endpoint_parse {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -28844,6 +29147,66 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_endpoint_url", context, connection_option, endpoint_url_out);
             }
             return (int)mh$.invokeExact(context, connection_option, endpoint_url_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_set_credential {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_credential");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_credential(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_set_credential$descriptor() {
+        return tsurugi_ffi_connection_option_set_credential.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_credential(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_set_credential$handle() {
+        return tsurugi_ffi_connection_option_set_credential.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_credential(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_set_credential$address() {
+        return tsurugi_ffi_connection_option_set_credential.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_credential(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiCredentialHandle credential)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_set_credential(MemorySegment context, MemorySegment connection_option, MemorySegment credential) {
+        var mh$ = tsurugi_ffi_connection_option_set_credential.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_set_credential", context, connection_option, credential);
+            }
+            return (int)mh$.invokeExact(context, connection_option, credential);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29985,6 +30348,66 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_connect_async", context, connection_option, session_job_out);
             }
             return (int)mh$.invokeExact(context, connection_option, session_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_get_user_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_get_user_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_user_name(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiStringHandle *user_name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_get_user_name$descriptor() {
+        return tsurugi_ffi_session_get_user_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_user_name(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiStringHandle *user_name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_get_user_name$handle() {
+        return tsurugi_ffi_session_get_user_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_user_name(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiStringHandle *user_name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_get_user_name$address() {
+        return tsurugi_ffi_session_get_user_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_user_name(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiStringHandle *user_name_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_get_user_name(MemorySegment context, MemorySegment session, MemorySegment user_name_out) {
+        var mh$ = tsurugi_ffi_session_get_user_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_get_user_name", context, session, user_name_out);
+            }
+            return (int)mh$.invokeExact(context, session, user_name_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

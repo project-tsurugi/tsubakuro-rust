@@ -64,7 +64,7 @@ class TgFfiContextTest extends TgFfiTester {
         var client = createSqlClient();
 
         try (var context = TgFfiContext.create(manager)) {
-            try (var ps = client.prepare(context, "not sql", List.of())) {
+            try (var _ = client.prepare(context, "not sql", List.of())) {
                 fail("client.prepare() success");
             } catch (TgFfiRuntimeException ignore) {
                 // fall through

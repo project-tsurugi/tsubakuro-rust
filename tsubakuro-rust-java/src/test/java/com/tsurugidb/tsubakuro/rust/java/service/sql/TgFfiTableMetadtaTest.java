@@ -225,6 +225,7 @@ class TgFfiTableMetadtaTest extends TgFfiTester {
 
         var connectionOption = TgFfiConnectionOption.create(context);
         connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
         try (var session = TgFfiSession.connect(context, connectionOption); //
                 var client = session.makeSqlClient(context)) {

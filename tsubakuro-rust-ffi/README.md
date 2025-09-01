@@ -92,6 +92,31 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context) {
         return rc;
     }
 
+    // create Credential
+    TsurugiFfiCredentialHandle credential;
+    rc = tsurugi_ffi_credential_from_user_password(context, "user", "password", &credential);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        ～error handling～
+
+        // dispose ConnectionOption
+        tsurugi_ffi_connection_option_dispose(connection_option);
+        return rc;
+    }
+
+    // set Credential
+    rc = tsurugi_ffi_connection_option_set_credential(context, connection_option, credential);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        ～error handling～
+
+        // dispose Credential, ConnectionOption
+        tsurugi_ffi_credential_dispose(credential);
+        tsurugi_ffi_connection_option_dispose(connection_option);
+        return rc;
+    }
+
+    // dispose Credential
+    tsurugi_ffi_credential_dispose(credential);
+
     // connect (create Session)
     TsurugiFfiSessionHandle session;
     rc = tsurugi_ffi_session_connect(context, connection_option, &session);

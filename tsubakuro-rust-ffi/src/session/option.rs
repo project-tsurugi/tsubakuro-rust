@@ -11,6 +11,7 @@ use crate::{
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
     rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
+    session::credential::TsurugiFfiCredentialHandle,
     TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
@@ -203,6 +204,42 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_endpoint_url(
 
     let rc = rc_ok(context);
     trace!("{FUNCTION_NAME} end rc={:x}. (endpoint_url={:?})", rc, ptr);
+    rc
+}
+
+/// ConnectionOption: Set credential.
+///
+/// See [`ConnectionOption::set_credential`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Parameters
+/// - `credential` - credential.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_set_credential(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    credential: TsurugiFfiCredentialHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_credential()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, credential={:?}",
+        context,
+        connection_option,
+        credential
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, credential);
+
+    let credential = unsafe { &*credential };
+
+    let connection_option = unsafe { &mut *connection_option };
+    connection_option.set_credential(credential.deref().clone());
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
     rc
 }
 

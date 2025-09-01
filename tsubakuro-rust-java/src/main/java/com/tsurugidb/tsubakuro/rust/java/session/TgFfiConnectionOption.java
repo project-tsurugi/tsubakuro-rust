@@ -78,6 +78,16 @@ public class TgFfiConnectionOption extends TgFfiObject {
         return outToString(out);
     }
 
+    public synchronized void setCredential(TgFfiContext context, TgFfiCredential credential) {
+        Objects.requireNonNull(credential, "credential must not be null");
+
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = credential.handle();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_credential(ctx, handle, arg);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
     public synchronized void setApplicationName(TgFfiContext context, String applicationName) {
         Objects.requireNonNull(applicationName, "applicationName must not be null");
 

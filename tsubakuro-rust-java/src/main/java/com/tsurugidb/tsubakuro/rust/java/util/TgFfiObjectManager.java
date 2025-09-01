@@ -26,6 +26,9 @@ public class TgFfiObjectManager implements AutoCloseable {
     }
 
     public MemorySegment allocateString(String s) {
+        if (s == null) {
+            return MemorySegment.NULL;
+        }
         return arena.allocateFrom(s);
     }
 

@@ -20,10 +20,10 @@ class TgFfiEndpointTest extends TgFfiTester {
         var manager = getFfiObjectManager();
 
         try (var context = TgFfiContext.create(manager); //
-                var endpoint = TgFfiEndpoint.parse(context, "tcp://localhost:12345")) {
+                var _ = TgFfiEndpoint.parse(context, "tcp://localhost:12345")) {
         }
 
-        try (var endpoint = TgFfiEndpoint.parse(manager, "tcp://localhost:12345")) {
+        try (var _ = TgFfiEndpoint.parse(manager, "tcp://localhost:12345")) {
         }
     }
 

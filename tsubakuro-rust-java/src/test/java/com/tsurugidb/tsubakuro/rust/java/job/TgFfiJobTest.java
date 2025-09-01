@@ -115,6 +115,7 @@ class TgFfiJobTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager); //
                 var connectionOption = TgFfiConnectionOption.create(context)) {
             connectionOption.setEndpointUrl(context, getEndpoint());
+            connectionOption.setCredential(context, getCredential(context));
 
             try (var job = TgFfiSession.connectAsync(context, connectionOption)) {
                 assertEquals("Handshake", job.getName(context));
@@ -122,7 +123,7 @@ class TgFfiJobTest extends TgFfiTester {
                 assertTrue(job.wait(context, Duration.ofSeconds(5)));
                 assertTrue(job.isDone(context));
 
-                try (var session = job.take(context)) {
+                try (var _ = job.take(context)) {
                     var e = assertThrows(TgFfiRuntimeException.class, () -> {
                         job.take(context);
                     });
@@ -160,9 +161,10 @@ class TgFfiJobTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager); //
                 var connectionOption = TgFfiConnectionOption.create(context)) {
             connectionOption.setEndpointUrl(context, getEndpoint());
+            connectionOption.setCredential(context, getCredential(context));
 
             try (var job = TgFfiSession.connectAsync(context, connectionOption)) {
-                try (var session = job.takeFor(context, Duration.ofSeconds(5))) {
+                try (var _ = job.takeFor(context, Duration.ofSeconds(5))) {
                     var e = assertThrows(TgFfiRuntimeException.class, () -> {
                         job.takeFor(context, Duration.ofSeconds(5));
                     });
@@ -202,6 +204,7 @@ class TgFfiJobTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager); //
                 var connectionOption = TgFfiConnectionOption.create(context)) {
             connectionOption.setEndpointUrl(context, getEndpoint());
+            connectionOption.setCredential(context, getCredential(context));
 
             try (var job = TgFfiSession.connectAsync(context, connectionOption)) {
                 assertEquals("Handshake", job.getName(context));
@@ -212,7 +215,7 @@ class TgFfiJobTest extends TgFfiTester {
                         Thread.sleep(200);
                         continue;
                     }
-                    try (var session = sessionOpt.get()) {
+                    try (var _ = sessionOpt.get()) {
                         assertTrue(job.isDone(context));
 
                         var e = assertThrows(TgFfiRuntimeException.class, () -> {

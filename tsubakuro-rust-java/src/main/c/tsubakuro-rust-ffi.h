@@ -297,6 +297,8 @@ typedef struct TsurugiFfiConnectionOption TsurugiFfiConnectionOption;
 
 typedef struct TsurugiFfiContext TsurugiFfiContext;
 
+typedef struct TsurugiFfiCredential TsurugiFfiCredential;
+
 typedef struct TsurugiFfiEndpoint TsurugiFfiEndpoint;
 
 typedef struct TsurugiFfiLargeObjectCache TsurugiFfiLargeObjectCache;
@@ -466,6 +468,11 @@ typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
  * String array.
  */
 typedef const TsurugiFfiStringHandle *TsurugiFfiStringArrayHandle;
+
+/**
+ * Credential.
+ */
+typedef struct TsurugiFfiCredential *TsurugiFfiCredentialHandle;
 
 /**
  * Endpoint.
@@ -4365,6 +4372,72 @@ TsurugiFfiRc tsurugi_ffi_large_object_cache_get_path(TsurugiFfiContextHandle con
 void tsurugi_ffi_large_object_cache_dispose(TsurugiFfiLargeObjectCacheHandle large_object_cache);
 
 /**
+ * Credential: Creates a null credential.
+ *
+ * See [`Credential::null`].
+ *
+ * # Returns
+ * - `credential_out` - credential. To dispose, call [`tsurugi_ffi_credential_dispose`].
+ */
+TsurugiFfiRc tsurugi_ffi_credential_null(TsurugiFfiContextHandle context,
+                                         TsurugiFfiCredentialHandle *credential_out);
+
+/**
+ * Credential: Creates a new user/password credential.
+ *
+ * See [`Credential::from_user_password`].
+ *
+ * # Parameters
+ * - `user` - The user name.
+ * - `password` - The password. (nullable)
+ *
+ * # Returns
+ * - `credential_out` - credential. To dispose, call [`tsurugi_ffi_credential_dispose`].
+ */
+TsurugiFfiRc tsurugi_ffi_credential_from_user_password(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiStringHandle user,
+                                                       TsurugiFfiStringHandle password,
+                                                       TsurugiFfiCredentialHandle *credential_out);
+
+/**
+ * Credential: Creates a new authentication token credential.
+ *
+ * See [`Credential::from_auth_token`].
+ *
+ * # Parameters
+ * - `token` - The auth token.
+ *
+ * # Returns
+ * - `credential_out` - credential. To dispose, call [`tsurugi_ffi_credential_dispose`].
+ */
+TsurugiFfiRc tsurugi_ffi_credential_from_auth_token(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiStringHandle token,
+                                                    TsurugiFfiCredentialHandle *credential_out);
+
+/**
+ * Credential: Load credential from file.
+ *
+ * See [`Credential::load`].
+ *
+ * # Parameters
+ * - `path` - The credential file path.
+ *
+ * # Returns
+ * - `credential_out` - credential. To dispose, call [`tsurugi_ffi_credential_dispose`].
+ */
+TsurugiFfiRc tsurugi_ffi_credential_load(TsurugiFfiContextHandle context,
+                                         TsurugiFfiStringHandle path,
+                                         TsurugiFfiCredentialHandle *credential_out);
+
+/**
+ * Credential: Dispose.
+ *
+ * # Receiver
+ * - `credential` - credential.
+ */
+void tsurugi_ffi_credential_dispose(TsurugiFfiCredentialHandle credential);
+
+/**
  * Endpoint: Creates a new instance.
  *
  * See [`Endpoint::parse`].
@@ -4442,6 +4515,21 @@ TsurugiFfiRc tsurugi_ffi_connection_option_set_endpoint_url(TsurugiFfiContextHan
 TsurugiFfiRc tsurugi_ffi_connection_option_get_endpoint_url(TsurugiFfiContextHandle context,
                                                             TsurugiFfiConnectionOptionHandle connection_option,
                                                             TsurugiFfiStringHandle *endpoint_url_out);
+
+/**
+ * ConnectionOption: Set credential.
+ *
+ * See [`ConnectionOption::set_credential`].
+ *
+ * # Receiver
+ * - `connection_option` - Connection option.
+ *
+ * # Parameters
+ * - `credential` - credential.
+ */
+TsurugiFfiRc tsurugi_ffi_connection_option_set_credential(TsurugiFfiContextHandle context,
+                                                          TsurugiFfiConnectionOptionHandle connection_option,
+                                                          TsurugiFfiCredentialHandle credential);
 
 /**
  * ConnectionOption: Set application name.
@@ -4730,6 +4818,21 @@ TsurugiFfiRc tsurugi_ffi_session_connect_for(TsurugiFfiContextHandle context,
 TsurugiFfiRc tsurugi_ffi_session_connect_async(TsurugiFfiContextHandle context,
                                                TsurugiFfiConnectionOptionHandle connection_option,
                                                TsurugiFfiJobHandle *session_job_out);
+
+/**
+ * Session: Get user name.
+ *
+ * See [`Session::user_name`].
+ *
+ * # Receiver
+ * - `session` - Session.
+ *
+ * # Returns
+ * - `user_name_out` - user name.
+ */
+TsurugiFfiRc tsurugi_ffi_session_get_user_name(TsurugiFfiContextHandle context,
+                                               TsurugiFfiSessionHandle session,
+                                               TsurugiFfiStringHandle *user_name_out);
 
 /**
  * Session: Set default timeout.

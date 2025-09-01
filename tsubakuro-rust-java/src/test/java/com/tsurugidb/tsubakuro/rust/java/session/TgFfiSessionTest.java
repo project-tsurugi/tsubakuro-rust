@@ -25,8 +25,9 @@ class TgFfiSessionTest extends TgFfiTester {
 
         var connectionOption = TgFfiConnectionOption.create(context);
         connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
-        try (var session = TgFfiSession.connect(context, connectionOption)) {
+        try (var _ = TgFfiSession.connect(context, connectionOption)) {
         }
     }
 
@@ -56,12 +57,13 @@ class TgFfiSessionTest extends TgFfiTester {
         var manager = getFfiObjectManager();
         var context = TgFfiContext.create(manager);
 
-        var connect_forionOption = TgFfiConnectionOption.create(context);
-        connect_forionOption.setEndpointUrl(context, getEndpoint());
+        var connectionOption = TgFfiConnectionOption.create(context);
+        connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
         var timeout = Duration.ofSeconds(5);
 
-        try (var session = TgFfiSession.connectFor(context, connect_forionOption, timeout)) {
+        try (var _ = TgFfiSession.connectFor(context, connectionOption, timeout)) {
         }
     }
 
@@ -96,9 +98,10 @@ class TgFfiSessionTest extends TgFfiTester {
 
         var connectionOption = TgFfiConnectionOption.create(context);
         connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
         try (var sessionJob = TgFfiSession.connectAsync(context, connectionOption); //
-                var session = jobTake(sessionJob, pattern)) {
+                var _ = jobTake(sessionJob, pattern)) {
         }
     }
 
@@ -130,6 +133,7 @@ class TgFfiSessionTest extends TgFfiTester {
 
         var connectionOption = TgFfiConnectionOption.create(context);
         connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
         try (var session = TgFfiSession.connect(context, connectionOption)) {
             session.setDefaultTimeout(context, Duration.ofSeconds(123));
@@ -181,9 +185,10 @@ class TgFfiSessionTest extends TgFfiTester {
 
         var connectionOption = TgFfiConnectionOption.create(context);
         connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
         try (var session = TgFfiSession.connect(context, connectionOption); //
-                var client = session.makeSqlClient(context)) {
+                var _ = session.makeSqlClient(context)) {
         }
     }
 
@@ -216,6 +221,7 @@ class TgFfiSessionTest extends TgFfiTester {
 
         var connectionOption = TgFfiConnectionOption.create(context);
         connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
         try (var session = TgFfiSession.connect(context, connectionOption)) {
             var expirationTime = exists ? Duration.ofMinutes(1) : null;
@@ -245,6 +251,7 @@ class TgFfiSessionTest extends TgFfiTester {
 
         var connectionOption = TgFfiConnectionOption.create(context);
         connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
 
         try (var session = TgFfiSession.connect(context, connectionOption)) {
             var expirationTime = exists ? Duration.ofMinutes(1) : null;

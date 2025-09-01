@@ -21,10 +21,10 @@ class TgFfiCommitOptionTest extends TgFfiTester {
         var manager = getFfiObjectManager();
 
         try (var context = TgFfiContext.create(manager); //
-                var target = TgFfiCommitOption.create(context)) {
+                var _ = TgFfiCommitOption.create(context)) {
         }
 
-        try (var target = TgFfiCommitOption.create(manager)) {
+        try (var _ = TgFfiCommitOption.create(manager)) {
         }
     }
 
@@ -97,9 +97,7 @@ class TgFfiCommitOptionTest extends TgFfiTester {
     }
 
     private void setAutoDispose(boolean autoDispose, String pattern) {
-        var manager = getFfiObjectManager();
         try (var client = createSqlClient(); //
-                var context = TgFfiContext.create(manager); //
                 var transaction = createTransaction(client, pattern)) {
             doCommit(client, transaction, autoDispose, pattern);
             doClose(transaction, pattern);

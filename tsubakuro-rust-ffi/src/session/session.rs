@@ -1,15 +1,17 @@
-use std::{sync::Arc, time::Duration};
+use std::{ffi::CString, sync::Arc, time::Duration};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 use crate::{
+    cchar_field_clear, cchar_field_set,
     context::TsurugiFfiContextHandle,
-    ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async, impl_job_delegator,
+    cstring_to_cchar, ffi_arg_out_initialize, ffi_arg_require_non_null, ffi_exec_core_async,
+    impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
     service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
-    TsurugiFfiDuration,
+    TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
 use super::{option::TsurugiFfiConnectionOptionHandle, r#type::TsurugiFfiShutdownType};
@@ -17,11 +19,16 @@ use super::{option::TsurugiFfiConnectionOptionHandle, r#type::TsurugiFfiShutdown
 pub(crate) struct TsurugiFfiSession {
     session: Arc<Session>,
     runtime: Arc<tokio::runtime::Runtime>,
+    user_name: Option<CString>,
 }
 
 impl TsurugiFfiSession {
     fn new(session: Arc<Session>, runtime: Arc<tokio::runtime::Runtime>) -> TsurugiFfiSession {
-        TsurugiFfiSession { session, runtime }
+        TsurugiFfiSession {
+            session,
+            runtime,
+            user_name: None,
+        }
     }
 
     pub(crate) fn runtime(&self) -> &Arc<tokio::runtime::Runtime> {
@@ -220,6 +227,54 @@ impl ConnectJobDelegator {
     ) -> Option<TsurugiFfiSession> {
         Some(TsurugiFfiSession::new(value, runtime))
     }
+}
+
+/// Session: Get user name.
+///
+/// See [`Session::user_name`].
+///
+/// # Receiver
+/// - `session` - Session.
+///
+/// # Returns
+/// - `user_name_out` - user name.
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_get_user_name(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    user_name_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_get_user_name()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, user_name_out={:?}",
+        context,
+        session,
+        user_name_out
+    );
+
+    ffi_arg_out_initialize!(user_name_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, user_name_out);
+
+    let session = unsafe { &mut *session };
+
+    if session.user_name.is_none() {
+        match session.user_name() {
+            Some(user_name) => {
+                cchar_field_set!(context, session.user_name, user_name);
+            }
+            None => cchar_field_clear!(session.user_name),
+        }
+    }
+
+    let ptr = cstring_to_cchar!(session.user_name);
+    unsafe {
+        *user_name_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (user_name={:?})", rc, ptr);
+    rc
 }
 
 /// Session: Set default timeout.

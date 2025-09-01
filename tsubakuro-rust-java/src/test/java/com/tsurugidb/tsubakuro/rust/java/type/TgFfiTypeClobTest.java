@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.tsurugidb.iceaxe.TsurugiConnector;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameter;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameters;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindVariable;
@@ -63,7 +62,7 @@ class TgFfiTypeClobTest extends TgFfiTester {
         var sql = "insert into test values(:pk, :value)";
         var mapping = TgParameterMapping.of(TgBindVariable.ofInt("pk"), TgBindVariable.ofClob("value"));
 
-        var connector = TsurugiConnector.of(getEndpointJava());
+        var connector = getTsurugiConnector();
         try (var session = connector.createSession(); //
                 var ps = session.createStatement(sql, mapping)) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());

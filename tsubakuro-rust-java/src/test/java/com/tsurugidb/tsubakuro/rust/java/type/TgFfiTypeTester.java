@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.tsurugidb.iceaxe.TsurugiConnector;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameter;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameters;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindVariable;
@@ -98,7 +97,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
         var sql = "insert into test values(:pk, :value)";
         var mapping = TgParameterMapping.of(TgBindVariable.ofInt("pk"), bindVariable("value"));
 
-        var connector = TsurugiConnector.of(getEndpointJava());
+        var connector = getTsurugiConnector();
         try (var session = connector.createSession(); //
                 var ps = session.createStatement(sql, mapping)) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());
@@ -210,7 +209,7 @@ public abstract class TgFfiTypeTester<T> extends TgFfiTester {
     private List<T> selectJava() throws IOException, InterruptedException {
         var actual = new ArrayList<T>();
 
-        var connector = TsurugiConnector.of(getEndpointJava());
+        var connector = getTsurugiConnector();
         try (var session = connector.createSession()) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());
 

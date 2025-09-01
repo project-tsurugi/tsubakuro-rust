@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.session;
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -122,6 +123,16 @@ public class TgFfiSession extends TgFfiObject {
 
     TgFfiSession(TgFfiObjectManager manager, MemorySegment handle) {
         super(manager, handle);
+    }
+
+    public synchronized Optional<String> getUserName(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_user_name(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return Optional.ofNullable(outToString(out));
     }
 
     public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {

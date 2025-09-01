@@ -3,7 +3,10 @@ package com.tsurugidb.tsubakuro.rust.java.util;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +15,17 @@ import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import com.tsurugidb.iceaxe.TsurugiConnector;
+import com.tsurugidb.tsubakuro.channel.common.connection.Credential;
+import com.tsurugidb.tsubakuro.channel.common.connection.FileCredential;
+import com.tsurugidb.tsubakuro.channel.common.connection.RememberMeCredential;
+import com.tsurugidb.tsubakuro.channel.common.connection.UsernamePasswordCredential;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResult;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
+import com.tsurugidb.tsubakuro.rust.java.session.TgFfiCredential;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
@@ -31,8 +40,14 @@ public class TgFfiTester {
 
     private static final String SYSPROP_DBTEST_ENDPOINT = "tsurugi.dbtest.endpoint";
     private static final String SYSPROP_DBTEST_ENDPOINT_JAVA = "tsurugi.dbtest.endpoint.java";
+    private static final String SYSPROP_DBTEST_USER = "tsurugi.dbtest.user";
+    private static final String SYSPROP_DBTEST_PASSWORD = "tsurugi.dbtest.password";
+    private static final String SYSPROP_DBTEST_AUTH_TOKEN = "tsurugi.dbtest.auth-token";
+    private static final String SYSPROP_DBTEST_CREDENTIALS = "tsurugi.dbtest.credentials";
+
     private static String staticEndpoint;
     private static String staticEndpointJava;
+    private static Credential staticCredentialJava;
 
     protected static String getEndpoint() {
         if (staticEndpoint == null) {
@@ -56,6 +71,91 @@ public class TgFfiTester {
         var uri = URI.create(endpoint);
         String scheme = uri.getScheme();
         return "ipc".equals(scheme);
+    }
+
+    public static TgFfiCredential getCredential(TgFfiContext context) {
+        String user = getUser();
+        if (user != null) {
+            String password = getPassword();
+            return TgFfiCredential.fromUserPassword(context, user, password);
+        }
+
+        String authToken = getAuthToken();
+        if (authToken != null) {
+            return TgFfiCredential.fromAuthToken(context, authToken);
+        }
+
+        Path credentials = getCredentials();
+        if (credentials != null) {
+            return TgFfiCredential.load(context, credentials);
+        }
+
+//      return TgFfiCredential.nullCredential(context);
+        return TgFfiCredential.fromUserPassword(context, "tsurugi", "password");
+    }
+
+    public static Credential getCredentialJava() {
+        if (staticCredentialJava == null) {
+            staticCredentialJava = createCredentialJava();
+        }
+        return staticCredentialJava;
+    }
+
+    private static Credential createCredentialJava() {
+        String user = getUser();
+        if (user != null) {
+            String password = getPassword();
+            return new UsernamePasswordCredential(user, password);
+        }
+
+        String authToken = getAuthToken();
+        if (authToken != null) {
+            return new RememberMeCredential(authToken);
+        }
+
+        Path credentials = getCredentials();
+        if (credentials != null) {
+            try {
+                return FileCredential.load(credentials);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e.getMessage(), e);
+            }
+        }
+
+//      return NullCredential.INSTANCE;
+        return new UsernamePasswordCredential("tsurugi", "password");
+    }
+
+    public static String getUser() {
+        return getSystemProperty(SYSPROP_DBTEST_USER);
+    }
+
+    public static String getPassword() {
+        return getSystemProperty(SYSPROP_DBTEST_PASSWORD);
+    }
+
+    public static String getAuthToken() {
+        return getSystemProperty(SYSPROP_DBTEST_AUTH_TOKEN);
+    }
+
+    public static Path getCredentials() {
+        String credentials = getSystemProperty(SYSPROP_DBTEST_CREDENTIALS);
+        if (credentials == null) {
+            return null;
+        }
+        return Path.of(credentials);
+    }
+
+    private static String getSystemProperty(String key) {
+        String value = System.getProperty(key);
+        if (value != null && value.isEmpty()) {
+            return null;
+        }
+        return value;
+    }
+
+    protected static TsurugiConnector getTsurugiConnector() {
+        return TsurugiConnector.of(getEndpointJava(), getCredentialJava());
     }
 
     private TgFfiObjectManager manager;
@@ -91,6 +191,7 @@ public class TgFfiTester {
                 var context = TgFfiContext.create(manager); //
                 var connectionOption = TgFfiConnectionOption.create(context)) {
             connectionOption.setEndpointUrl(context, getEndpoint());
+            connectionOption.setCredential(context, getCredential(context));
             connectionOption.setApplicationName(context, "tsubakuro-rust-java/test");
             connectionOption.setSessionLabel(context, "tsubakuro-rust-java/test.session");
 
@@ -118,6 +219,7 @@ public class TgFfiTester {
         try (var context = TgFfiContext.create(manager); //
                 var connectionOption = TgFfiConnectionOption.create(context)) {
             connectionOption.setEndpointUrl(context, getEndpoint());
+            connectionOption.setCredential(context, getCredential(context));
 
             var session = TgFfiSession.connect(context, connectionOption);
             return session;

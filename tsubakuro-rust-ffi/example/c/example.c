@@ -14,9 +14,9 @@ insert into customer values(2, 'World', 138);
 insert into customer values(3, 'Tsurugi', 1);
 */
 
-TsurugiFfiRc example(TsurugiFfiStringHandle endpoint);
-TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint);
-TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint);
+TsurugiFfiRc example(TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password);
+TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password);
+TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password);
 TsurugiFfiRc example_sql_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session);
 TsurugiFfiRc example_transaction_option(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option);
 TsurugiFfiRc example_transaction(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client);
@@ -35,6 +35,8 @@ TsurugiFfiRc example_prepared_query1(TsurugiFfiContextHandle context, TsurugiFfi
 
 void main(int argc, char *argv[]) {
     TsurugiFfiStringHandle endpoint;
+    TsurugiFfiStringHandle user;
+    TsurugiFfiStringHandle password;
     if (argc > 1) {
         endpoint = argv[1];
     } else {
@@ -42,7 +44,18 @@ void main(int argc, char *argv[]) {
     }
     printf("endpoint=%s\n", endpoint);
 
-    example(endpoint);
+    if (argc > 2) {
+        user = argv[2];
+    } else {
+        user = NULL;
+    }
+    if (argc > 3) {
+        password = argv[3];
+    } else {
+        password = NULL;
+    }
+
+    example(endpoint, user, password);
 }
 
 /*
@@ -80,7 +93,7 @@ void example_error(TsurugiFfiContextHandle context) {
 /*
  * example main
  */
-TsurugiFfiRc example(TsurugiFfiStringHandle endpoint) {
+TsurugiFfiRc example(TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password) {
     TsurugiFfiRc rc;
 
     // enable logger for tusbakuro-rust-ffi
@@ -97,7 +110,7 @@ TsurugiFfiRc example(TsurugiFfiStringHandle endpoint) {
     }
 
     // execute SQL
-    rc = example_connect(context, endpoint);
+    rc = example_connect(context, endpoint, user, password);
 
     // dispose context object
     tsurugi_ffi_context_dispose(context);
@@ -108,7 +121,7 @@ TsurugiFfiRc example(TsurugiFfiStringHandle endpoint) {
 /*
  * Session connect
  */
-TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint) {
+TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password) {
     TsurugiFfiRc rc;
 
     // create ConnectionOption
@@ -119,7 +132,7 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHa
         return rc;
     }
 
-    rc = example_connection_option(context, connection_option, endpoint);
+    rc = example_connection_option(context, connection_option, endpoint, user, password);
     if (rc != TSURUGI_FFI_RC_OK) {
         // dispose ConnectionOption
         tsurugi_ffi_connection_option_dispose(connection_option);
@@ -152,7 +165,7 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHa
 }
 
 // ConnectionOption
-TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint) {
+TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password) {
     TsurugiFfiRc rc;
 
     // set endpoint
@@ -160,6 +173,25 @@ TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiF
     if (rc != TSURUGI_FFI_RC_OK) {
         example_error(context);
         return rc;
+    }
+
+    // set credential
+    if (user != NULL) {
+        TsurugiFfiCredentialHandle credential;
+        rc = tsurugi_ffi_credential_from_user_password(context, user, password, &credential);
+        if (rc != TSURUGI_FFI_RC_OK) {
+            example_error(context);
+            return rc;
+        }
+
+        rc = tsurugi_ffi_connection_option_set_credential(context, connection_option, credential);
+        if (rc != TSURUGI_FFI_RC_OK) {
+            example_error(context);
+            tsurugi_ffi_credential_dispose(credential);
+            return rc;
+        }
+
+        tsurugi_ffi_credential_dispose(credential);
     }
 
     // set session label

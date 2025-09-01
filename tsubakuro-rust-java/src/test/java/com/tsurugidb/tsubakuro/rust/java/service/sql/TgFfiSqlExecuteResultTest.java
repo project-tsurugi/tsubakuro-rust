@@ -133,6 +133,7 @@ class TgFfiSqlExecuteResultTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager); //
                 var connectionOption = TgFfiConnectionOption.create(context)) {
             connectionOption.setEndpointUrl(context, getEndpoint());
+            connectionOption.setCredential(context, getCredential(context));
             connectionOption.setApplicationName(context, "tsubakuro-rust-java/test");
             connectionOption.setSessionLabel(context, "tsubakuro-rust-java/test.session");
 
