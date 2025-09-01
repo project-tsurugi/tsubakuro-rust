@@ -213,7 +213,7 @@ class TgFfiCredentialTest extends TgFfiTester {
             if (noAuth) {
                 if (path == null) {
                     tempFile = Files.createTempFile("tsubakuro-rust-java.file-credential", "key");
-                    Files.writeString(path, "test");
+                    Files.writeString(tempFile, "test");
                     path = tempFile;
                 }
             } else {
