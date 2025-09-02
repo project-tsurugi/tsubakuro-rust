@@ -1,10 +1,17 @@
 package com.tsurugidb.tsubakuro.rust.odbc.util;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import com.tsurugidb.tsubakuro.channel.common.connection.Credential;
+import com.tsurugidb.tsubakuro.channel.common.connection.FileCredential;
+import com.tsurugidb.tsubakuro.channel.common.connection.RememberMeCredential;
+import com.tsurugidb.tsubakuro.channel.common.connection.UsernamePasswordCredential;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcConnection;
 import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcManager;
 import com.tsurugidb.tsubakuro.rust.odbc.api.OdbcAttrConst;
@@ -18,20 +25,58 @@ public class TgOdbcTester {
     private static final String SYSPROP_DBTEST_DSN = "tsurugi.dbtest.dsn";
     private static final String SYSPROP_DBTEST_ENDPOINT = "tsurugi.dbtest.endpoint";
     private static final String SYSPROP_DBTEST_ENDPOINT_JAVA = "tsurugi.dbtest.endpoint.java";
+    private static final String SYSPROP_DBTEST_USER = "tsurugi.dbtest.user";
+    private static final String SYSPROP_DBTEST_PASSWORD = "tsurugi.dbtest.password";
+    private static final String SYSPROP_DBTEST_AUTH_TOKEN = "tsurugi.dbtest.auth-token";
+    private static final String SYSPROP_DBTEST_CREDENTIALS = "tsurugi.dbtest.credentials";
+
     private static String staticConnectionString;
     private static String staticDsn;
     private static String staticEndpoint;
     private static String staticEndpointJava;
+    private static Credential staticCredentialJava;
+
+    protected static final String CONNECTION_STRING_DRIVER = "Driver={Tsurugi Driver};";
 
     protected static String getConnectionString() {
         if (staticConnectionString == null) {
             staticConnectionString = System.getProperty(SYSPROP_DBTEST_CONNECTION_STRING);
             if (staticConnectionString == null || staticConnectionString.isEmpty()) {
-                String endpoint = getEndpoint();
-                staticConnectionString = "Driver={Tsurugi Driver};Endpoint=%s;".formatted(endpoint);
+                var sb = new StringBuilder(CONNECTION_STRING_DRIVER);
+                appendTo(sb, "Endpoint", getEndpoint());
+
+                String user = getUser();
+                if (user != null) {
+                    appendTo(sb, "User", user);
+                    appendTo(sb, "Password", getPassword());
+                } else {
+                    String token = getAuthToken();
+                    if (token != null) {
+                        appendTo(sb, "AuthToken", token);
+                    } else {
+                        String path = getCredentials();
+                        if (path != null) {
+                            appendTo(sb, "Credentials", path);
+                        } else {
+                            appendTo(sb, "User", "tsurugi");
+                            appendTo(sb, "Password", "password");
+                        }
+                    }
+                }
+
+                staticConnectionString = sb.toString();
             }
         }
         return staticConnectionString;
+    }
+
+    protected static void appendTo(StringBuilder sb, String key, String value) {
+        if (value != null) {
+            sb.append(key);
+            sb.append("=");
+            sb.append(value);
+            sb.append(";");
+        }
     }
 
     protected static String getDsn() {
@@ -63,6 +108,62 @@ public class TgOdbcTester {
         var uri = URI.create(endpoint);
         String scheme = uri.getScheme();
         return "ipc".equals(scheme);
+    }
+
+    public static Credential getCredentialJava() {
+        if (staticCredentialJava == null) {
+            staticCredentialJava = createCredentialJava();
+        }
+        return staticCredentialJava;
+    }
+
+    private static Credential createCredentialJava() {
+        String user = getUser();
+        if (user != null) {
+            String password = getPassword();
+            return new UsernamePasswordCredential(user, password);
+        }
+
+        String authToken = getAuthToken();
+        if (authToken != null) {
+            return new RememberMeCredential(authToken);
+        }
+
+        String credentials = getCredentials();
+        if (credentials != null) {
+            try {
+                return FileCredential.load(Path.of(credentials));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e.getMessage(), e);
+            }
+        }
+
+//      return NullCredential.INSTANCE;
+        return new UsernamePasswordCredential("tsurugi", "password");
+    }
+
+    public static String getUser() {
+        return getSystemProperty(SYSPROP_DBTEST_USER);
+    }
+
+    public static String getPassword() {
+        return getSystemProperty(SYSPROP_DBTEST_PASSWORD);
+    }
+
+    public static String getAuthToken() {
+        return getSystemProperty(SYSPROP_DBTEST_AUTH_TOKEN);
+    }
+
+    public static String getCredentials() {
+        return getSystemProperty(SYSPROP_DBTEST_CREDENTIALS);
+    }
+
+    private static String getSystemProperty(String key) {
+        String value = System.getProperty(key);
+        if (value != null && value.isEmpty()) {
+            return null;
+        }
+        return value;
     }
 
     private TgOdbcManager manager;

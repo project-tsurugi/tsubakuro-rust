@@ -28,8 +28,10 @@ pub enum TsurugiOdbcError {
     // Connect
     ConnectEndpointNotFound = 30001,
     ConnectEndpointError = 30002,
+    ConnectCredentialError = 30003,
     ConnectError = 30011,
     ConnectTimeout = 30012,
+    ConnectAuthenticationError = 30013,
     // SQLSetConnectAttr/SQLGetConnectAttr
     ConnectAttrUnsupportedAttribute = 31001,
     SetAutoCommitError = 31111,
@@ -142,8 +144,10 @@ impl From<&TsurugiOdbcError> for &str {
             // Connect
             ConnectEndpointNotFound => "08001",
             ConnectEndpointError => "08001",
+            ConnectCredentialError => "08001",
             ConnectError => "08S01",
             ConnectTimeout => "HYT01",
+            ConnectAuthenticationError => "28000",
             // SQLSetConnectAttr/SQLGetConnectAttr
             ConnectAttrUnsupportedAttribute => "HY092",
             SetAutoCommitError => "HY000",

@@ -1,7 +1,6 @@
 package com.tsurugidb.tsubakuro.rust.java.session;
 
 import java.lang.foreign.MemorySegment;
-import java.nio.file.Path;
 import java.util.Objects;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -110,16 +109,16 @@ public class TgFfiCredential extends TgFfiObject {
         return new TgFfiCredential(manager, outHandle);
     }
 
-    public static TgFfiCredential load(TgFfiContext context, Path path) {
+    public static TgFfiCredential load(TgFfiContext context, String path) {
         Objects.requireNonNull(context, "context must not be null");
         return load(context.manager(), context, path);
     }
 
-    public static TgFfiCredential load(TgFfiObjectManager manager, Path path) {
+    public static TgFfiCredential load(TgFfiObjectManager manager, String path) {
         return load(manager, null, path);
     }
 
-    public static TgFfiCredential load(TgFfiObjectManager manager, TgFfiContext context, Path path) {
+    public static TgFfiCredential load(TgFfiObjectManager manager, TgFfiContext context, String path) {
         Objects.requireNonNull(manager, "manager must not be null");
         Objects.requireNonNull(path, "path must not be null");
 
@@ -132,9 +131,9 @@ public class TgFfiCredential extends TgFfiObject {
         }
     }
 
-    private static TgFfiCredential loadMain(TgFfiObjectManager manager, TgFfiContext context, Path path) {
+    private static TgFfiCredential loadMain(TgFfiObjectManager manager, TgFfiContext context, String path) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
-        var arg = manager.allocateString(path.toString());
+        var arg = manager.allocateString(path);
         var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_credential_load(ctx, arg, out);
         TgFfiRcUtil.throwIfError(rc, context);

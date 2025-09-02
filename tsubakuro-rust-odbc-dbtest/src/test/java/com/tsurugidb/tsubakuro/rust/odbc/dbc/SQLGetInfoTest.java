@@ -61,7 +61,7 @@ class SQLGetInfoTest extends TgOdbcTester {
             assertEquals("", actual);
         } else {
             try (var dbc = createDbc(); //
-                    var _ = dbc.connect(dsn, wideChar)) {
+                    var _ = dbc.connect(dsn, null, null, wideChar)) {
                 String actual = dbc.getInfoString(InfoType.SQL_DATA_SOURCE_NAME, 1024, wideChar);
                 assertEquals(dsn, actual);
             }

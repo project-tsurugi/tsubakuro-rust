@@ -51,7 +51,7 @@ class TgOdbcTypeBooleanTest extends TgOdbcTester {
         var sql = "insert into test values(:pk, :value)";
         var mapping = TgParameterMapping.of(TgBindVariable.ofInt("pk"), TgBindVariable.ofInt("value"));
 
-        var connector = TsurugiConnector.of(getEndpointJava());
+        var connector = TsurugiConnector.of(getEndpointJava(), getCredentialJava());
         try (var session = connector.createSession(); //
                 var ps = session.createStatement(sql, mapping)) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());

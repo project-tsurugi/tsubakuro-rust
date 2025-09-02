@@ -125,6 +125,15 @@ impl TsurugiOdbcDbc {
 
         session
     }
+
+    pub(crate) fn user_name(&self) -> Option<String> {
+        let session = self.session.lock().unwrap();
+        if let Some(session) = &*session {
+            session.user_name()
+        } else {
+            None
+        }
+    }
 }
 
 pub(crate) fn alloc_handle_dbc(henv: HEnv) -> Result<HDbc, SqlReturn> {
@@ -187,14 +196,6 @@ impl TsurugiOdbcDbc {
         let info = self.connected_info.lock().unwrap();
         match &*info {
             Some(info) => info.dsn().cloned(),
-            None => None,
-        }
-    }
-
-    pub(crate) fn user_name(&self) -> Option<String> {
-        let info = self.connected_info.lock().unwrap();
-        match &*info {
-            Some(info) => info.user_name().cloned(),
             None => None,
         }
     }

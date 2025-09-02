@@ -19,13 +19,15 @@ public class TgOdbcExampleMain extends TgOdbcExample {
     private int main0(String[] args) {
         LOG.info("start. args={}", Arrays.toString(args));
 
-        if (args.length < 1) {
-            System.err.println("args: endpoint-url");
+        if (args.length < 3) {
+            System.err.println("args: endpoint-url user password");
             return 1;
         }
 
         String endpoint = args[0];
-        this.connectionString = "DRIVER=Tsurugi Driver;Endpoint=" + endpoint;
+        String user = args[1];
+        String password = args[2];
+        this.connectionString = "DRIVER=Tsurugi Driver;Endpoint=%s;User=%s;Password=%s;".formatted(endpoint, user, password);
 
         return super.exampleMain();
     }

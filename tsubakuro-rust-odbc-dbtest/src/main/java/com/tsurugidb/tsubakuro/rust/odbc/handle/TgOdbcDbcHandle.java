@@ -90,8 +90,8 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         return new GetInfoResult<>(rc, infoType, infoValuePtr, stringLength, wideChar);
     }
 
-    public TgOdbcConnection connect(String dsn, boolean wideChar) {
-        short rc = connect0(dsn, OdbcConst.SQL_NTS, null, OdbcConst.SQL_NTS, null, OdbcConst.SQL_NTS, wideChar);
+    public TgOdbcConnection connect(String dsn, String user, String authentication, boolean wideChar) {
+        short rc = connect0(dsn, OdbcConst.SQL_NTS, user, OdbcConst.SQL_NTS, authentication, OdbcConst.SQL_NTS, wideChar);
         SqlReturn.check(wideChar ? "SQLConnectW" : "SQLConnectA", rc, this);
 
         return new TgOdbcConnection(this, "DSN=" + dsn);

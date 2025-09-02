@@ -69,15 +69,36 @@ hstmtの属性を設定・取得します。
 
 接続文字列に指定できるキーは以下の通りです。（大文字小文字は区別されません）
 
-- DRIVER
+- Driver
   - Tsurugi ODBCドライバーをインストールした際に登録したドライバー名を指定します。
-- ENDPOINT
-  - Tsurugiのエンドポイントを指定します。
+- Endpoint
+  - TsurugiのエンドポイントのURLを指定します。
+- User
+  - ログインするユーザーを指定します。
+- Password
+  - ログインするパスワードを指定します。
+- AuthToken
+  - 認証トークンを指定します。
+- Credentials
+  - 認証ファイルのパスを指定します。
+- DSN
+  - データソース名を指定します。
+
+DSN（データソース名）が指定された場合は、エンドポイントや認証情報をデータソースから取得します。
+
+User/Password, AuthToken, Credentialsは、そのうちひとつを指定します。  
+複数指定した場合は、以下の優先順で指定されているものを使用します。
+
+1. User, Password
+2. AuthToken
+3. Credentials
+
+ひとつも指定しない場合は、無認証で接続を試みます。
 
 #### 接続文字列の例
 
 ```c
-SQLCHAR connStrIn[] = "DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;";
+SQLCHAR connStrIn[] = "Driver={Tsurugi Driver};Endpoint=tcp://localhost:12345;User=user;Password=password;";
 ```
 
 ### SQLConnect

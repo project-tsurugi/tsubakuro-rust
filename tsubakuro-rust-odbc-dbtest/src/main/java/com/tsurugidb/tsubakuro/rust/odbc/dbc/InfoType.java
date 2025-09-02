@@ -15,6 +15,7 @@ public abstract class InfoType<T> {
     public static final InfoTypeString SQL_DBMS_VER = new InfoTypeString(18);
     public static final InfoTypeInteger SQL_CURSOR_COMMIT_BEHAVIOR = new InfoTypeInteger(23, 2);
     public static final InfoTypeInteger SQL_CURSOR_ROLLBACK_BEHAVIOR = new InfoTypeInteger(24, 2);
+    public static final InfoTypeString SQL_USER_NAME = new InfoTypeString(47);
     public static final InfoTypeString SQL_DRIVER_ODBC_VER = new InfoTypeString(77);
     public static final InfoTypeInteger SQL_GETDATA_EXTENSIONS = new InfoTypeInteger(81, 4);
 

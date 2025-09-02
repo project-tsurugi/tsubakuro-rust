@@ -33,6 +33,6 @@ public class TgOdbcConnectExampleMain extends TgOdbcExample {
     protected TgOdbcConnection connect(TgOdbcDbcHandle hdbc) {
         LOG.info("DSN={}", dsn);
 
-        return hdbc.connect(dsn, wideChar);
+        return hdbc.connect(dsn, null, null, wideChar);
     }
 }

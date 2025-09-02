@@ -2,10 +2,30 @@ use std::collections::HashMap;
 
 const DSN: &str = "DSN";
 pub(crate) const ENDPOINT: &str = "Endpoint";
+pub(crate) const USER: &str = "User";
+pub(crate) const PASSWORD: &str = "Password";
+pub(crate) const AUTH_TOKEN: &str = "AuthToken";
+pub(crate) const CREDENTIALS: &str = "Credentials";
 
-#[derive(Debug)]
 pub(crate) struct ConnectionAttributes {
     attributes: HashMap<String, String>,
+}
+
+impl std::fmt::Debug for ConnectionAttributes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let pairs: Vec<String> = self
+            .attributes
+            .iter()
+            .map(|(k, v)| {
+                if *k == PASSWORD.to_lowercase() {
+                    format!("{}=****", k)
+                } else {
+                    format!("{}={}", k, v)
+                }
+            })
+            .collect();
+        write!(f, "ConnectionAttributes {{ {} }}", pairs.join(", "))
+    }
 }
 
 impl ConnectionAttributes {
@@ -46,6 +66,22 @@ impl ConnectionAttributes {
 
     pub fn endpoint(&self) -> Option<&String> {
         self.get(ENDPOINT)
+    }
+
+    pub fn user(&self) -> Option<&String> {
+        self.get(USER)
+    }
+
+    pub fn password(&self) -> Option<&String> {
+        self.get(PASSWORD)
+    }
+
+    pub fn auth_token(&self) -> Option<&String> {
+        self.get(AUTH_TOKEN)
+    }
+
+    pub fn credentials(&self) -> Option<&String> {
+        self.get(CREDENTIALS)
     }
 }
 

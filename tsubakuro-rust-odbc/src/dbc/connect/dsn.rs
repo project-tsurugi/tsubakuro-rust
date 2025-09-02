@@ -1,5 +1,8 @@
 use crate::{
-    dbc::connect::{connect_tsurugi::TsurugiOdbcConnectArguments, connection_string::ENDPOINT},
+    dbc::connect::{
+        connect_tsurugi::{TsurugiOdbcConnectArguments, TsurugiOdbcCredential},
+        connection_string::{AUTH_TOKEN, CREDENTIALS, ENDPOINT, PASSWORD, USER},
+    },
     util::string_to_utf16,
 };
 
@@ -28,13 +31,40 @@ pub(crate) fn read_dsn(dsn: &str) -> TsurugiOdbcConnectArguments {
     let mut arg = TsurugiOdbcConnectArguments::new();
     arg.dsn = Some(dsn.into());
 
-    if let Ok(value) = get_private_profile_string(dsn, ENDPOINT, "") {
-        if !value.is_empty() {
-            arg.endpoint = Some(value);
-        }
+    if let Some(value) = get_dsn_entry(dsn, ENDPOINT) {
+        arg.endpoint = Some(value);
+    }
+    if let Some(credential) = get_credential(dsn) {
+        arg.credential = credential;
     }
 
     arg
+}
+
+fn get_credential(section: &str) -> Option<TsurugiOdbcCredential> {
+    if let Some(user) = get_dsn_entry(section, USER) {
+        let password = get_dsn_entry(section, PASSWORD);
+        return Some(TsurugiOdbcCredential::UserPassword(user, password));
+    }
+
+    if let Some(token) = get_dsn_entry(section, AUTH_TOKEN) {
+        return Some(TsurugiOdbcCredential::AuthToken(token));
+    }
+
+    if let Some(path) = get_dsn_entry(section, CREDENTIALS) {
+        return Some(TsurugiOdbcCredential::File(path));
+    }
+
+    None
+}
+
+fn get_dsn_entry(section: &str, entry: &str) -> Option<String> {
+    if let Ok(value) = get_private_profile_string(section, entry, "") {
+        if !value.is_empty() {
+            return Some(value);
+        }
+    }
+    None
 }
 
 pub(crate) fn get_private_profile_string(

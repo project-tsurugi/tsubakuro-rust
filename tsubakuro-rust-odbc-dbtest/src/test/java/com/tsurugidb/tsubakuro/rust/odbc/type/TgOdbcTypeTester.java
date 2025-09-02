@@ -92,7 +92,7 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
         var sql = "insert into test values(:pk, :value)";
         var mapping = TgParameterMapping.of(TgBindVariable.ofInt("pk"), bindVariable("value"));
 
-        var connector = TsurugiConnector.of(getEndpointJava());
+        var connector = TsurugiConnector.of(getEndpointJava(), getCredentialJava());
         try (var session = connector.createSession(); //
                 var ps = session.createStatement(sql, mapping)) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());
@@ -223,7 +223,7 @@ public abstract class TgOdbcTypeTester<T> extends TgOdbcTester {
     private List<T> selectJava() throws IOException, InterruptedException {
         var actual = new ArrayList<T>();
 
-        var connector = TsurugiConnector.of(getEndpointJava());
+        var connector = TsurugiConnector.of(getEndpointJava(), getCredentialJava());
         try (var session = connector.createSession()) {
             var manager = session.createTransactionManager(TgTxOption.ofOCC());
 

@@ -5,7 +5,10 @@ use log::{debug, trace};
 use crate::{
     check_dbc,
     ctype::{SqlChar, SqlReturn, SqlSmallInt, SqlWChar},
-    dbc::connect::{connect_tsurugi::connect_tsurugi, dsn::read_dsn},
+    dbc::connect::{
+        connect_tsurugi::{connect_tsurugi, TsurugiOdbcCredential},
+        dsn::read_dsn,
+    },
     handle::{
         diag::TsurugiOdbcError,
         hdbc::{HDbc, TsurugiOdbcDbc},
@@ -129,11 +132,8 @@ fn connect(
 
     let mut arg = read_dsn(&dsn);
 
-    match user_name {
-        Ok(Some(value)) => {
-            arg.user_name = Some(value);
-        }
-        Ok(None) => {}
+    let user_name = match user_name {
+        Ok(value) => value,
         Err(e) => {
             debug!("{dbc}.{FUNCTION_NAME} error: {:?}", e);
             dbc.add_diag(
@@ -142,12 +142,9 @@ fn connect(
             );
             return SqlReturn::SQL_ERROR;
         }
-    }
-    match authentication {
-        Ok(Some(value)) => {
-            arg.authentication = Some(value);
-        }
-        Ok(None) => {}
+    };
+    let authentication = match authentication {
+        Ok(value) => value,
         Err(e) => {
             debug!("{dbc}.{FUNCTION_NAME} error: {:?}", e);
             dbc.add_diag(
@@ -157,6 +154,9 @@ fn connect(
             return SqlReturn::SQL_ERROR;
         }
     };
+    if let Some(user) = user_name {
+        arg.credential = TsurugiOdbcCredential::UserPassword(user, authentication);
+    }
 
     connect_tsurugi(FUNCTION_NAME, &dbc, arg)
 }

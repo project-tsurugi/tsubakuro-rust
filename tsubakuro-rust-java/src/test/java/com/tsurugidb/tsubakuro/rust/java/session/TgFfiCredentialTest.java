@@ -209,18 +209,18 @@ class TgFfiCredentialTest extends TgFfiTester {
 
         Path tempFile = null;
         try {
-            Path path = getCredentials();
+            String path = getCredentials();
             if (noAuth) {
                 if (path == null) {
-                    tempFile = Files.createTempFile("tsubakuro-rust-java.file-credential", "key");
+                    tempFile = Files.createTempFile("tsubakuro-rust-java.credential", "key");
                     Files.writeString(tempFile, "test");
-                    path = tempFile;
+                    path = tempFile.toString();
                 }
             } else {
                 assumeFalse(path == null, "credential file path not specified");
             }
 
-            Optional<String> expectedUser = getExpectedUser(FileCredential.load(path));
+            Optional<String> expectedUser = getExpectedUser(FileCredential.load(Path.of(path)));
 
             try (var context = TgFfiContext.create(manager)) {
                 var credential = TgFfiCredential.load(context, path);

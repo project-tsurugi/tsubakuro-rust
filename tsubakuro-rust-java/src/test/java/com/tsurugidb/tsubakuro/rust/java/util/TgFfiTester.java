@@ -85,7 +85,7 @@ public class TgFfiTester {
             return TgFfiCredential.fromAuthToken(context, authToken);
         }
 
-        Path credentials = getCredentials();
+        String credentials = getCredentials();
         if (credentials != null) {
             return TgFfiCredential.load(context, credentials);
         }
@@ -113,10 +113,10 @@ public class TgFfiTester {
             return new RememberMeCredential(authToken);
         }
 
-        Path credentials = getCredentials();
+        String credentials = getCredentials();
         if (credentials != null) {
             try {
-                return FileCredential.load(credentials);
+                return FileCredential.load(Path.of(credentials));
             } catch (IOException e) {
                 throw new UncheckedIOException(e.getMessage(), e);
             }
@@ -138,12 +138,8 @@ public class TgFfiTester {
         return getSystemProperty(SYSPROP_DBTEST_AUTH_TOKEN);
     }
 
-    public static Path getCredentials() {
-        String credentials = getSystemProperty(SYSPROP_DBTEST_CREDENTIALS);
-        if (credentials == null) {
-            return null;
-        }
-        return Path.of(credentials);
+    public static String getCredentials() {
+        return getSystemProperty(SYSPROP_DBTEST_CREDENTIALS);
     }
 
     private static String getSystemProperty(String key) {

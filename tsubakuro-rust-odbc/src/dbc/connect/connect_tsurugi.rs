@@ -11,8 +11,7 @@ use crate::{
 pub(crate) struct TsurugiOdbcConnectArguments {
     pub dsn: Option<String>,
     pub endpoint: Option<String>,
-    pub user_name: Option<String>,
-    pub authentication: Option<String>,
+    pub credential: TsurugiOdbcCredential,
 }
 
 impl TsurugiOdbcConnectArguments {
@@ -20,8 +19,29 @@ impl TsurugiOdbcConnectArguments {
         TsurugiOdbcConnectArguments {
             dsn: None,
             endpoint: None,
-            user_name: None,
-            authentication: None,
+            credential: TsurugiOdbcCredential::Null,
+        }
+    }
+}
+
+pub(crate) enum TsurugiOdbcCredential {
+    Null,
+    UserPassword(String, Option<String>),
+    AuthToken(String),
+    File(String),
+}
+
+impl TryFrom<TsurugiOdbcCredential> for Credential {
+    type Error = TgError;
+
+    fn try_from(value: TsurugiOdbcCredential) -> Result<Self, Self::Error> {
+        match value {
+            TsurugiOdbcCredential::Null => Ok(Credential::null()),
+            TsurugiOdbcCredential::UserPassword(user, password) => {
+                Ok(Credential::from_user_password(user, password))
+            }
+            TsurugiOdbcCredential::AuthToken(token) => Ok(Credential::from_auth_token(token)),
+            TsurugiOdbcCredential::File(path) => Ok(Credential::load(path)?),
         }
     }
 }
@@ -30,7 +50,6 @@ impl TsurugiOdbcConnectArguments {
 pub(crate) struct TsurugiOdbcConnectedInfo {
     endpoint: Endpoint,
     dsn: Option<String>,
-    user_name: Option<String>,
 }
 
 impl TsurugiOdbcConnectedInfo {
@@ -47,10 +66,6 @@ impl TsurugiOdbcConnectedInfo {
 
     pub(crate) fn dsn(&self) -> Option<&String> {
         self.dsn.as_ref()
-    }
-
-    pub(crate) fn user_name(&self) -> Option<&String> {
-        self.user_name.as_ref()
     }
 }
 
@@ -94,8 +109,22 @@ pub(crate) fn connect_tsurugi(
         }
     };
 
+    let credential = match Credential::try_from(arg.credential) {
+        Ok(value) => value,
+        Err(e) => {
+            debug!("{dbc}.{FUNCTION_NAME}: credential error. {:?}", e);
+            dbc.add_diag(
+                TsurugiOdbcError::ConnectCredentialError,
+                format!("{odbc_function_name}: credential error. {}", e),
+            );
+            return SqlReturn::SQL_ERROR;
+        }
+    };
+    debug!("{dbc}.{FUNCTION_NAME}: credential={:?}", credential);
+
     let mut connection_option = ConnectionOption::new();
     connection_option.set_endpoint(endpoint.clone());
+    connection_option.set_credential(credential);
 
     let runtime = dbc.runtime();
 
@@ -109,28 +138,49 @@ pub(crate) fn connect_tsurugi(
         Err(e) => {
             warn!("{dbc}.{FUNCTION_NAME}: Session::connect() error. {:?}", e);
             match e {
-                TgError::ClientError(message, _) => {
-                    dbc.add_diag(
+                TgError::ClientError(message, cause) => match cause {
+                    Some(cause) => dbc.add_diag(
                         TsurugiOdbcError::ConnectError,
-                        format!("{odbc_function_name}: {}", message),
-                    );
-                }
+                        format!("{odbc_function_name}: {} ({})", message, cause),
+                    ),
+                    None => {
+                        dbc.add_diag(
+                            TsurugiOdbcError::ConnectError,
+                            format!("{odbc_function_name}: {}", message),
+                        );
+                    }
+                },
                 TgError::TimeoutError(message) => {
                     dbc.add_diag(
                         TsurugiOdbcError::ConnectTimeout,
                         format!("{odbc_function_name}: {}", message),
                     );
                 }
-                TgError::IoError(message, _) => {
-                    dbc.add_diag(
+                TgError::IoError(message, cause) => match cause {
+                    Some(cause) => dbc.add_diag(
+                        TsurugiOdbcError::ConnectError,
+                        format!("{odbc_function_name}: {} ({})", message, cause),
+                    ),
+                    None => dbc.add_diag(
                         TsurugiOdbcError::ConnectError,
                         format!("{odbc_function_name}: {}", message),
-                    );
-                }
-                TgError::ServerError(_, message, _, _) => {
+                    ),
+                },
+                TgError::ServerError(_, message, code, server_message) => {
+                    let odbc_error = if code.structured_code() == "SCD-00201" {
+                        TsurugiOdbcError::ConnectAuthenticationError
+                    } else {
+                        TsurugiOdbcError::ConnectError
+                    };
                     dbc.add_diag(
-                        TsurugiOdbcError::ConnectError,
-                        format!("{odbc_function_name}: {}", message),
+                        odbc_error,
+                        format!(
+                            "{odbc_function_name}: {}. {}({}): {}",
+                            message,
+                            code.structured_code(),
+                            code.name(),
+                            server_message
+                        ),
                     );
                 }
             }
@@ -142,7 +192,6 @@ pub(crate) fn connect_tsurugi(
     let info = TsurugiOdbcConnectedInfo {
         endpoint,
         dsn: arg.dsn,
-        user_name: arg.user_name,
     };
     dbc.set_connected_info(info);
 

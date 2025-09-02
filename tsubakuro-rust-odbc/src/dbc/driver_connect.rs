@@ -6,7 +6,7 @@ use crate::{
     check_dbc,
     ctype::{HWnd, SqlChar, SqlReturn, SqlSmallInt, SqlUSmallInt, SqlWChar},
     dbc::connect::{
-        connect_tsurugi::{connect_tsurugi, TsurugiOdbcConnectArguments},
+        connect_tsurugi::{connect_tsurugi, TsurugiOdbcConnectArguments, TsurugiOdbcCredential},
         connection_string::ConnectionAttributes,
         dsn::read_dsn,
     },
@@ -142,6 +142,25 @@ fn driver_connect(
     if let Some(endpoint) = attributes.endpoint() {
         arg.endpoint = Some(endpoint.clone());
     }
+    set_credential(&mut arg, &attributes);
 
     connect_tsurugi(function_name, dbc, arg)
+}
+
+fn set_credential(arg: &mut TsurugiOdbcConnectArguments, attributes: &ConnectionAttributes) {
+    if let Some(user) = attributes.user() {
+        let password = attributes.password();
+        arg.credential = TsurugiOdbcCredential::UserPassword(user.into(), password.cloned());
+        return;
+    }
+
+    if let Some(token) = attributes.auth_token() {
+        arg.credential = TsurugiOdbcCredential::AuthToken(token.into());
+        return;
+    }
+
+    if let Some(path) = attributes.credentials() {
+        arg.credential = TsurugiOdbcCredential::File(path.into());
+        return;
+    }
 }

@@ -49,10 +49,10 @@ class SQLDriverConnectTest extends TgOdbcTester {
     @ParameterizedTest
     @ValueSource(booleans = { false, true })
     void dsn(boolean wideChar) {
-        try (var dbc = createDbc()) {
-            String dsn = getDsn();
-            assumeFalse(dsn.isEmpty(), "DSN not specified");
+        String dsn = getDsn();
+        assumeFalse(dsn.isEmpty(), "DSN not specified");
 
+        try (var dbc = createDbc()) {
             String inConnectionString = "DSN=%s;".formatted(dsn);
 
             try (var _ = dbc.driverConnect(inConnectionString, wideChar)) {

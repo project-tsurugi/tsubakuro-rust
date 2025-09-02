@@ -26,7 +26,7 @@ hdbcハンドルを生成し、Tsurugiに接続します。
 SQLHDBC hdbc = NULL;
 SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
-SQLCHAR connStrIn[] = "DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;";
+SQLCHAR connStrIn[] = "Driver={Tsurugi Driver};Endpoint=tcp://localhost:12345;User=user;Password=password;";
 SQLCHAR outConnStr[1024];
 SQLSMALLINT outConnStrLen;
 SQLDriverConnectA(
@@ -41,12 +41,24 @@ SQLDriverConnectA(
 );
 ```
 
-接続文字列に記述するドライバー名には、Tsurugi ODBCドライバーをインストールするときに登録された名前を指定します。
+接続文字列に記述するドライバー名には、Tsurugi ODBCドライバーをインストールしたときに登録された名前を指定します。  
+（ [インストーラー](../installer) によってインストールした場合は `Tsurugi Driver` です）
 
-Tsurugiの接続先として、接続文字列内にエンドポイントを記述します。
+Tsurugiの接続先として、接続文字列内に `Endpoint` でエンドポイントのURLを記述します。
 
-なお、接続文字列内のキー（ `ENDPOINT` 等）は大文字小文字を無視して解釈されます。（内部では小文字に変換して扱います）  
-（ `DRIVER` はODBCドライバーマネージャーが解釈するキーですが、大文字小文字は無視されるようです）
+認証には、以下のいずれかを指定します。
+
+- `User`, `Password`
+  - ユーザー・パスワードを指定します。
+- `AuthToken`
+  - 認証トークンを指定します。
+- `Credentials`
+  - 認証ファイルのパスを指定します。
+
+認証を指定しなかった場合は無認証で接続を試みます。
+
+なお、接続文字列内のキー（ `Endpoint` 等）は大文字小文字を無視して解釈されます。（内部では小文字に変換して扱います）  
+（ `Driver` はODBCドライバーマネージャーが解釈するキーですが、大文字小文字は無視されるようです）
 
 ### 3. SQL実行
 
