@@ -4,7 +4,7 @@ pub mod config_dsn;
 pub(crate) mod dsn_dialog_value;
 #[cfg(target_os = "windows")]
 pub(crate) mod dsn_dialog_windows;
-pub(crate) mod installer;
+pub(crate) mod installer_api;
 
 type BOOL = i32;
 type WORD = u16;

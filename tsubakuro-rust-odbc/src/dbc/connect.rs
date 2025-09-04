@@ -6,7 +6,7 @@ use crate::{
     check_dbc,
     ctype::{SqlChar, SqlReturn, SqlSmallInt, SqlWChar},
     dbc::connect::{
-        connect_tsurugi::{connect_tsurugi, TsurugiOdbcCredential},
+        connect_tsurugi::{connect_tsurugi, TsurugiOdbcCredentialType},
         dsn::read_dsn,
     },
     handle::{
@@ -101,7 +101,7 @@ pub extern "system" fn SQLConnectW(
 }
 
 fn connect(
-    function_name: &str,
+    odbc_function_name: &str,
     dbc: Arc<TsurugiOdbcDbc>,
     server_name: Result<Option<String>, Box<dyn std::error::Error>>,
     user_name: Result<Option<String>, Box<dyn std::error::Error>>,
@@ -116,29 +116,27 @@ fn connect(
             debug!("{dbc}.{FUNCTION_NAME} error: server_name is null");
             dbc.add_diag(
                 TsurugiOdbcError::StringError,
-                format!("{function_name}: server_name is null"),
+                format!("{odbc_function_name}: server_name is null"),
             );
             return SqlReturn::SQL_ERROR;
         }
         Err(e) => {
-            debug!("{dbc}.{FUNCTION_NAME} error: {:?}", e);
+            debug!("{dbc}.{FUNCTION_NAME}: server_name convert error {:?}", e);
             dbc.add_diag(
                 TsurugiOdbcError::StringError,
-                format!("{function_name}: server_name convert error"),
+                format!("{odbc_function_name}: server_name convert error"),
             );
             return SqlReturn::SQL_ERROR;
         }
     };
 
-    let mut arg = read_dsn(&dsn);
-
     let user_name = match user_name {
         Ok(value) => value,
         Err(e) => {
-            debug!("{dbc}.{FUNCTION_NAME} error: {:?}", e);
+            debug!("{dbc}.{FUNCTION_NAME}: user_name convert error {:?}", e);
             dbc.add_diag(
                 TsurugiOdbcError::StringError,
-                format!("{function_name}: user_name convert error"),
+                format!("{odbc_function_name}: user_name convert error"),
             );
             return SqlReturn::SQL_ERROR;
         }
@@ -146,16 +144,25 @@ fn connect(
     let authentication = match authentication {
         Ok(value) => value,
         Err(e) => {
-            debug!("{dbc}.{FUNCTION_NAME} error: {:?}", e);
+            debug!(
+                "{dbc}.{FUNCTION_NAME}: authentication convert error {:?}",
+                e
+            );
             dbc.add_diag(
                 TsurugiOdbcError::StringError,
-                format!("{function_name}: authentication convert error"),
+                format!("{odbc_function_name}: authentication convert error"),
             );
             return SqlReturn::SQL_ERROR;
         }
     };
+
+    let mut arg = read_dsn(&dsn);
     if let Some(user) = user_name {
-        arg.credential = TsurugiOdbcCredential::UserPassword(user, authentication);
+        arg.set_user(user);
+        arg.set_credential_type(TsurugiOdbcCredentialType::UserPassword);
+    }
+    if let Some(password) = authentication {
+        arg.set_password(password);
     }
 
     connect_tsurugi(FUNCTION_NAME, &dbc, arg)

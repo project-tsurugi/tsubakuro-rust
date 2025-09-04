@@ -323,5 +323,6 @@ pub(crate) fn string_to_utf16(value: &str) -> Vec<u16> {
 }
 
 pub(crate) fn utf16_to_string(value: &[u16]) -> String {
-    String::from_utf16_lossy(value)
+    let len = value.iter().position(|&c| c == 0).unwrap_or(value.len());
+    String::from_utf16_lossy(&value[..len])
 }

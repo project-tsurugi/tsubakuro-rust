@@ -54,7 +54,7 @@ class SQLGetInfoTest extends TgOdbcTester {
     @ValueSource(booleans = { false, true })
     void SQL_DATA_SOURCE_NAME(boolean wideChar) {
         String dsn = getDsn();
-        if (dsn == null || dsn.isEmpty()) {
+        if (dsn.isEmpty()) {
             var dbc = getConnection().dbc();
 
             String actual = dbc.getInfoString(InfoType.SQL_DATA_SOURCE_NAME, 1024, wideChar);

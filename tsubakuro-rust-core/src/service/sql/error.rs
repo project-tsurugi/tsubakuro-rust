@@ -6,7 +6,11 @@ use super::SERVICE_ID_SQL;
 #[macro_export]
 macro_rules! sql_service_error {
     ($function_name:expr, $cause:expr) => {{
-        let server_message = format!("{} ({})", $cause.detail, $cause.supplemental_text);
+        let server_message = if $cause.supplemental_text.is_empty() {
+            format!("{}", $cause.detail)
+        } else {
+            format!("{} ({})", $cause.detail, $cause.supplemental_text)
+        };
         $crate::error::TgError::ServerError(
             format!("{}", $function_name),
             "SQL service error".to_string(),

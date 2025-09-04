@@ -27,7 +27,7 @@ int main(void) {
     SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
     // connection string
-    SQLCHAR connStrIn[] = "DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;User=user;Password=password;";
+    SQLCHAR connStrIn[] = "DRIVER={Tsurugi Driver};ENDPOINT=tcp://localhost:12345;UID=user;PWD=password;";
 
     // connect
     ret = SQLDriverConnectA(

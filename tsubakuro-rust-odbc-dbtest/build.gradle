@@ -102,6 +102,10 @@ tasks.named('test') {
     systemProperty 'tsurugi.dbtest.dsn', findProperty('dbtest.dsn') ?: ''
     systemProperty 'tsurugi.dbtest.endpoint', findProperty('dbtest.endpoint') ?: 'tcp://localhost:12345'
     systemProperty 'tsurugi.dbtest.endpoint.java', findProperty('dbtest.endpoint.java') ?: ''
+    systemProperty 'tsurugi.dbtest.user', findProperty('dbtest.user') ?: ''
+    systemProperty 'tsurugi.dbtest.password', findProperty('dbtest.password') ?: ''
+    systemProperty 'tsurugi.dbtest.auth-token', findProperty('dbtest.auth-token') ?: ''
+    systemProperty 'tsurugi.dbtest.credentials', findProperty('dbtest.credentials') ?: ''
 }
 
 

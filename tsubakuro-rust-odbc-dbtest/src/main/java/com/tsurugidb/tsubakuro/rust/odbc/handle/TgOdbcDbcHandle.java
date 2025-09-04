@@ -122,9 +122,12 @@ public class TgOdbcDbcHandle extends TgOdbcHandle {
         var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                 .inConnectionString(connectionString) //
                 .bufferLength(1024);
+        return driverConnect(arg);
+    }
 
+    public TgOdbcConnection driverConnect(TgOdbcDriverConnectArgument arg) {
         short rc = driverConnect0(arg);
-        SqlReturn.check(wideChar ? "SQLDriverConnectW" : "SQLDriverConnectA", rc, this);
+        SqlReturn.check(arg.wideChar() ? "SQLDriverConnectW" : "SQLDriverConnectA", rc, this);
 
         return new TgOdbcConnection(this, arg.outConnectionString());
     }

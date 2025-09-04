@@ -27,7 +27,7 @@ public class TgOdbcExampleMain extends TgOdbcExample {
         String endpoint = args[0];
         String user = args[1];
         String password = args[2];
-        this.connectionString = "DRIVER=Tsurugi Driver;Endpoint=%s;User=%s;Password=%s;".formatted(endpoint, user, password);
+        this.connectionString = "DRIVER=Tsurugi Driver;Endpoint=%s;UID=%s;PWD=%s;".formatted(endpoint, user, password);
 
         return super.exampleMain();
     }

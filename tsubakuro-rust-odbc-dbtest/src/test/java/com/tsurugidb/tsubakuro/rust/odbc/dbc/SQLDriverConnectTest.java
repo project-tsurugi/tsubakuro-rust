@@ -10,7 +10,9 @@ import java.util.Map;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.tsurugidb.tsubakuro.rust.odbc.TgOdbcRuntimeException;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlReturn;
+import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDbcHandle;
 import com.tsurugidb.tsubakuro.rust.odbc.handle.TgOdbcDiagRec;
 import com.tsurugidb.tsubakuro.rust.odbc.util.TgOdbcTester;
 
@@ -23,14 +25,13 @@ class SQLDriverConnectTest extends TgOdbcTester {
             var manager = dbc.manager();
 
             String inConnectionString = getConnectionString();
-            int length = inConnectionString.length();
             var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                     .inConnectionString(inConnectionString) //
-                    .bufferLength(length * 2);
+                    .bufferLength(4096);
 
             short rc = dbc.driverConnect0(arg);
             try {
-                assertEquals(SqlReturn.SQL_SUCCESS, rc);
+                assertSuccess(dbc, rc, wideChar);
 
                 Map<String, String> map = arg.outConnectionMap();
                 String driver = map.get("driver");
@@ -55,7 +56,12 @@ class SQLDriverConnectTest extends TgOdbcTester {
         try (var dbc = createDbc()) {
             String inConnectionString = "DSN=%s;".formatted(dsn);
 
-            try (var _ = dbc.driverConnect(inConnectionString, wideChar)) {
+            String outConnectionString;
+            try (var connection = dbc.driverConnect(inConnectionString, wideChar)) {
+                outConnectionString = connection.connectionString();
+            }
+
+            try (var _ = dbc.driverConnect(outConnectionString, wideChar)) {
             }
         }
     }
@@ -70,11 +76,11 @@ class SQLDriverConnectTest extends TgOdbcTester {
             int length = inConnectionString.length();
             var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                     .inConnectionString(inConnectionString, length) //
-                    .bufferLength(length * 2);
+                    .bufferLength(4096);
 
             short rc = dbc.driverConnect0(arg);
             try {
-                assertEquals(SqlReturn.SQL_SUCCESS, rc);
+                assertSuccess(dbc, rc, wideChar);
             } finally {
                 dbc.disconnect();
             }
@@ -87,11 +93,11 @@ class SQLDriverConnectTest extends TgOdbcTester {
             int length = inConnectionString.length() - ex.length();
             var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                     .inConnectionString(inConnectionString, length) //
-                    .bufferLength(length * 2);
+                    .bufferLength(4096);
 
             short rc = dbc.driverConnect0(arg);
             try {
-                assertEquals(SqlReturn.SQL_SUCCESS, rc);
+                assertSuccess(dbc, rc, wideChar);
 
                 Map<String, String> map = arg.outConnectionMap();
                 assertFalse(map.containsKey("zzz"), () -> map.toString());
@@ -104,19 +110,37 @@ class SQLDriverConnectTest extends TgOdbcTester {
     @ParameterizedTest
     @ValueSource(booleans = { false, true })
     void outConnectionString_length(boolean wideChar) {
+        int length;
         try (var dbc = createDbc()) {
             var manager = dbc.manager();
 
             String inConnectionString = getConnectionString();
             assumeTrue(inConnectionString.contains("Driver"));
-            int length = inConnectionString.length();
+            var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
+                    .inConnectionString(inConnectionString) //
+                    .bufferLength(inConnectionString.length() * 2);
+
+            short rc = dbc.driverConnect0(arg);
+            try {
+                assertSuccess(dbc, rc, wideChar);
+            } finally {
+                dbc.disconnect();
+            }
+            length = arg.outConnectionString().length();
+        }
+
+        try (var dbc = createDbc()) {
+            var manager = dbc.manager();
+
+            String inConnectionString = getConnectionString();
+            assumeTrue(inConnectionString.contains("Driver"));
             var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                     .inConnectionString(inConnectionString) //
                     .bufferLength(length + 1);
 
             short rc = dbc.driverConnect0(arg);
             try {
-                assertEquals(SqlReturn.SQL_SUCCESS, rc);
+                assertSuccess(dbc, rc, wideChar);
             } finally {
                 dbc.disconnect();
             }
@@ -125,7 +149,6 @@ class SQLDriverConnectTest extends TgOdbcTester {
             var manager = dbc.manager();
 
             String inConnectionString = getConnectionString();
-            int length = inConnectionString.length();
             var arg = new TgOdbcDriverConnectArgument(manager, wideChar) //
                     .inConnectionString(inConnectionString) //
                     .bufferLength(length);
@@ -139,6 +162,16 @@ class SQLDriverConnectTest extends TgOdbcTester {
             } finally {
                 dbc.disconnect();
             }
+        }
+    }
+
+    private static void assertSuccess(TgOdbcDbcHandle dbc, short rc, boolean wideChar) {
+        try {
+            assertEquals(SqlReturn.SQL_SUCCESS, rc);
+        } catch (Throwable e) {
+            var diagRec = dbc.getDiagRec(1);
+            e.addSuppressed(new TgOdbcRuntimeException(wideChar ? "SQLDriverConnectW" : "SQLDriverConnectA", rc, diagRec));
+            throw e;
         }
     }
 }

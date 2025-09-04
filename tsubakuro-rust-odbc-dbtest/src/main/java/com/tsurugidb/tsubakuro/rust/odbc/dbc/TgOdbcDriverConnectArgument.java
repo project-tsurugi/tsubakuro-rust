@@ -27,6 +27,11 @@ public class TgOdbcDriverConnectArgument {
         this.outConnectionStringLengthPtr = manager.allocateShort();
     }
 
+    public TgOdbcDriverConnectArgument windowHandle(MemorySegment windowHandle) {
+        this.windowHandle = windowHandle;
+        return this;
+    }
+
     public TgOdbcDriverConnectArgument inConnectionString(String inConnectionString) {
         return inConnectionString(inConnectionString, OdbcConst.SQL_NTS);
     }
@@ -48,6 +53,11 @@ public class TgOdbcDriverConnectArgument {
         } else {
             this.outConnectionStringPtr = manager.allocateBytes(bufferLength);
         }
+        return this;
+    }
+
+    public TgOdbcDriverConnectArgument driverCompletion(int driverCompletion) {
+        this.driverCompletion = (short) driverCompletion;
         return this;
     }
 

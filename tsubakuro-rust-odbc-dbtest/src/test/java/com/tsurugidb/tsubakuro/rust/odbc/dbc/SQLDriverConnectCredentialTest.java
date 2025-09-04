@@ -55,11 +55,14 @@ class SQLDriverConnectCredentialTest extends TgOdbcTester {
             if (noAuth) {
                 Optional<String> expectedUser = getExpectedUser(NullCredential.INSTANCE);
 
-                try {
-                    dbc.driverConnect(inConnectionString, wideChar);
+                String outConnectionString;
+                try (var connection = dbc.driverConnect(inConnectionString, wideChar)) {
+                    outConnectionString = connection.connectionString();
                     assertUser(expectedUser, dbc, wideChar);
-                } finally {
-                    dbc.disconnect();
+                }
+
+                try (var _ = dbc.driverConnect(outConnectionString, wideChar)) {
+                    assertUser(expectedUser, dbc, wideChar);
                 }
             } else {
                 var e = assertThrows(TgOdbcRuntimeException.class, () -> {
@@ -88,15 +91,18 @@ class SQLDriverConnectCredentialTest extends TgOdbcTester {
         try (var dbc = createDbc()) {
             var sb = new StringBuilder(CONNECTION_STRING_DRIVER);
             appendTo(sb, "Endpoint", getEndpoint());
-            appendTo(sb, "User", user);
-            appendTo(sb, "Password", password);
+            appendTo(sb, "UID", user);
+            appendTo(sb, "PWD", password);
             String inConnectionString = sb.toString();
 
-            try {
-                dbc.driverConnect(inConnectionString, wideChar);
+            String outConnectionString;
+            try (var connection = dbc.driverConnect(inConnectionString, wideChar)) {
+                outConnectionString = connection.connectionString();
                 assertUser(expectedUser, dbc, wideChar);
-            } finally {
-                dbc.disconnect();
+            }
+
+            try (var _ = dbc.driverConnect(outConnectionString, wideChar)) {
+                assertUser(expectedUser, dbc, wideChar);
             }
         }
     }
@@ -121,11 +127,14 @@ class SQLDriverConnectCredentialTest extends TgOdbcTester {
             appendTo(sb, "AuthToken", token);
             String inConnectionString = sb.toString();
 
-            try {
-                dbc.driverConnect(inConnectionString, wideChar);
+            String outConnectionString;
+            try (var connection = dbc.driverConnect(inConnectionString, wideChar)) {
+                outConnectionString = connection.connectionString();
                 assertUser(expectedUser, dbc, wideChar);
-            } finally {
-                dbc.disconnect();
+            }
+
+            try (var _ = dbc.driverConnect(outConnectionString, wideChar)) {
+                assertUser(expectedUser, dbc, wideChar);
             }
         }
     }
@@ -154,11 +163,14 @@ class SQLDriverConnectCredentialTest extends TgOdbcTester {
                 appendTo(sb, "Credentials", path);
                 String inConnectionString = sb.toString();
 
-                try {
-                    dbc.driverConnect(inConnectionString, wideChar);
+                String outConnectionString;
+                try (var connection = dbc.driverConnect(inConnectionString, wideChar)) {
+                    outConnectionString = connection.connectionString();
                     assertUser(expectedUser, dbc, wideChar);
-                } finally {
-                    dbc.disconnect();
+                }
+
+                try (var _ = dbc.driverConnect(outConnectionString, wideChar)) {
+                    assertUser(expectedUser, dbc, wideChar);
                 }
             }
         } finally {

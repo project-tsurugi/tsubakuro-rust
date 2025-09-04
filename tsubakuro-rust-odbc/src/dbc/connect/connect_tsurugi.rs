@@ -8,10 +8,53 @@ use crate::{
     handle::{diag::TsurugiOdbcError, hdbc::TsurugiOdbcDbc},
 };
 
+#[repr(i32)]
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum TsurugiOdbcCredentialType {
+    Null = 1,
+    UserPassword = 2,
+    AuthToken = 3,
+    File = 4,
+}
+
+impl TryFrom<&str> for TsurugiOdbcCredentialType {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        use TsurugiOdbcCredentialType::*;
+        match value {
+            "1" => Ok(Null),
+            "2" => Ok(UserPassword),
+            "3" => Ok(AuthToken),
+            "4" => Ok(File),
+            _ => Err(()),
+        }
+    }
+}
+
+#[derive(Clone)]
 pub(crate) struct TsurugiOdbcConnectArguments {
-    pub dsn: Option<String>,
-    pub endpoint: Option<String>,
-    pub credential: TsurugiOdbcCredential,
+    dsn: Option<String>,
+    endpoint: Option<String>,
+    user: Option<String>,
+    password: Option<String>,
+    auth_token: Option<String>,
+    credentials: Option<String>,
+    credential_type: TsurugiOdbcCredentialType,
+}
+
+impl std::fmt::Debug for TsurugiOdbcConnectArguments {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TsurugiOdbcConnectArguments")
+            .field("dsn", &self.dsn)
+            .field("endpoint", &self.endpoint)
+            .field("user", &self.user)
+            .field("password", &"****")
+            .field("auth_token", &"****")
+            .field("credentials", &self.credentials)
+            .field("credential_type", &self.credential_type)
+            .finish()
+    }
 }
 
 impl TsurugiOdbcConnectArguments {
@@ -19,29 +62,85 @@ impl TsurugiOdbcConnectArguments {
         TsurugiOdbcConnectArguments {
             dsn: None,
             endpoint: None,
-            credential: TsurugiOdbcCredential::Null,
+            user: None,
+            password: None,
+            auth_token: None,
+            credentials: None,
+            credential_type: TsurugiOdbcCredentialType::Null,
         }
     }
-}
 
-pub(crate) enum TsurugiOdbcCredential {
-    Null,
-    UserPassword(String, Option<String>),
-    AuthToken(String),
-    File(String),
-}
+    pub fn set_dsn(&mut self, dsn: String) {
+        self.dsn = Some(dsn);
+    }
 
-impl TryFrom<TsurugiOdbcCredential> for Credential {
-    type Error = TgError;
+    pub fn dsn(&self) -> Option<&String> {
+        self.dsn.as_ref()
+    }
 
-    fn try_from(value: TsurugiOdbcCredential) -> Result<Self, Self::Error> {
-        match value {
-            TsurugiOdbcCredential::Null => Ok(Credential::null()),
-            TsurugiOdbcCredential::UserPassword(user, password) => {
-                Ok(Credential::from_user_password(user, password))
-            }
-            TsurugiOdbcCredential::AuthToken(token) => Ok(Credential::from_auth_token(token)),
-            TsurugiOdbcCredential::File(path) => Ok(Credential::load(path)?),
+    pub fn set_endpoint(&mut self, endpoint: String) {
+        self.endpoint = Some(endpoint);
+    }
+
+    pub fn endpoint(&self) -> Option<&String> {
+        self.endpoint.as_ref()
+    }
+
+    pub fn set_user(&mut self, user: String) {
+        self.user = Some(user);
+    }
+
+    pub fn user(&self) -> Option<&String> {
+        self.user.as_ref()
+    }
+
+    pub fn set_password(&mut self, password: String) {
+        self.password = Some(password);
+    }
+
+    pub fn password(&self) -> Option<&String> {
+        self.password.as_ref()
+    }
+
+    pub fn set_auth_token(&mut self, auth_token: String) {
+        self.auth_token = Some(auth_token);
+    }
+
+    pub fn auth_token(&self) -> Option<&String> {
+        self.auth_token.as_ref()
+    }
+
+    pub fn set_credentials(&mut self, path: String) {
+        self.credentials = Some(path);
+    }
+
+    pub fn credentials(&self) -> Option<&String> {
+        self.credentials.as_ref()
+    }
+
+    pub fn set_credential_type(&mut self, credential_type: TsurugiOdbcCredentialType) {
+        self.credential_type = credential_type;
+    }
+
+    pub fn credential_type(&self) -> TsurugiOdbcCredentialType {
+        self.credential_type
+    }
+
+    #[allow(clippy::result_large_err)]
+    fn credential(&self) -> Result<Credential, TgError> {
+        use TsurugiOdbcCredentialType::*;
+        match self.credential_type {
+            Null => Ok(Credential::Null),
+            UserPassword => Ok(Credential::from_user_password(
+                self.user.as_ref().unwrap_or(&"".into()),
+                self.password.as_ref(),
+            )),
+            AuthToken => Ok(Credential::from_auth_token(
+                self.auth_token.as_ref().unwrap_or(&"".into()),
+            )),
+            File => Ok(Credential::load(
+                self.credentials.as_ref().unwrap_or(&"".into()),
+            )?),
         }
     }
 }
@@ -109,7 +208,7 @@ pub(crate) fn connect_tsurugi(
         }
     };
 
-    let credential = match Credential::try_from(arg.credential) {
+    let credential = match arg.credential() {
         Ok(value) => value,
         Err(e) => {
             debug!("{dbc}.{FUNCTION_NAME}: credential error. {:?}", e);

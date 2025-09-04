@@ -34,6 +34,7 @@ pub enum TsurugiOdbcError {
     ConnectAuthenticationError = 30013,
     // SQLSetConnectAttr/SQLGetConnectAttr
     ConnectAttrUnsupportedAttribute = 31001,
+    ConnectAttrUnsupportedDriverCompletion = 31002,
     SetAutoCommitError = 31111,
     GetConnectAttrInvalidValuePtr = 31201,
     // SQLGetInfo
@@ -150,6 +151,7 @@ impl From<&TsurugiOdbcError> for &str {
             ConnectAuthenticationError => "28000",
             // SQLSetConnectAttr/SQLGetConnectAttr
             ConnectAttrUnsupportedAttribute => "HY092",
+            ConnectAttrUnsupportedDriverCompletion => "HY092",
             SetAutoCommitError => "HY000",
             GetConnectAttrInvalidValuePtr => "HY009",
             // SQLGetInfo

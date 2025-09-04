@@ -2,11 +2,18 @@ use log::{debug, trace, warn};
 
 use crate::{
     ctype::HWnd,
-    dbc::connect::{connection_string::ConnectionAttributes, dsn::FILE_NAME},
+    dbc::connect::{
+        connect_tsurugi::TsurugiOdbcCredentialType,
+        connection_string::{
+            ConnectionAttributes, KEY_AUTH_TOKEN, KEY_CREDENTIALS, KEY_CREDENTIAL_TYPE,
+            KEY_ENDPOINT, KEY_PASSWORD, KEY_USER,
+        },
+        dsn::FILE_NAME,
+    },
     logger::env_logger_init,
     setup::{
-        dsn_dialog_value::DsnDialogValue,
-        installer::{remove_dsn_from_ini, write_dsn_to_ini, write_private_profile_string},
+        dsn_dialog_value::{DsnDialogCredentialRadio, DsnDialogValue},
+        installer_api::{remove_dsn_from_ini, write_dsn_to_ini, write_private_profile_string},
         *,
     },
     util::{utf16_to_string, utf8_to_string},
@@ -81,7 +88,7 @@ fn parse_attributes(attributes: LPCSTR) -> ConnectionAttributes {
                         attributes.add(value_start),
                         value_end - value_start,
                     ));
-                    result.set(key, value);
+                    result.set(&key, value);
                 }
 
                 first = true;
@@ -175,7 +182,7 @@ fn parse_attributesw(attributes: LPCWSTR) -> ConnectionAttributes {
                         attributes.add(value_start),
                         value_end - value_start,
                     ));
-                    result.set(key, value);
+                    result.set(&key, value);
                 }
 
                 first = true;
@@ -288,7 +295,7 @@ fn update_dsn(
 ) -> bool {
     const FUNCTION_NAME: &str = "update_dsn()";
 
-    let dialog_value = DsnDialogValue::from(driver, attributes, request.is_add());
+    let dialog_value = DsnDialogValue::from(attributes, request.is_add());
 
     let dialog_value = if parent_hwnd.is_null() {
         debug!("{FUNCTION_NAME}: dialog_value={:?}", dialog_value);
@@ -317,7 +324,7 @@ fn update_dsn(
 
     if dialog_value.is_new_dsn() {
         #[allow(clippy::collapsible_if)]
-        if write_dsn_to_ini(dialog_value.data_source_name(), dialog_value.driver()).is_err() {
+        if write_dsn_to_ini(dialog_value.data_source_name(), &driver).is_err() {
             return false;
         }
     }
@@ -325,7 +332,13 @@ fn update_dsn(
     let section = dialog_value.data_source_name();
 
     let mut rc = true;
-    rc &= write_profile(section, "Endpoint", dialog_value.endpoint());
+    rc &= write_profile(section, KEY_ENDPOINT, dialog_value.endpoint());
+    rc &= write_profile(section, KEY_USER, dialog_value.user());
+    rc &= write_profile(section, KEY_PASSWORD, dialog_value.password());
+    rc &= write_profile(section, KEY_AUTH_TOKEN, dialog_value.auth_token());
+    rc &= write_profile(section, KEY_CREDENTIALS, dialog_value.credential_file());
+    let credential_type = credential_type(dialog_value.credential_radio());
+    rc &= write_profile(section, KEY_CREDENTIAL_TYPE, &credential_type);
 
     if dialog_value.is_rename_dsn() {
         if let Some(old_dsn) = dialog_value.dsn() {
@@ -334,6 +347,17 @@ fn update_dsn(
     }
 
     rc
+}
+
+fn credential_type(radio: DsnDialogCredentialRadio) -> String {
+    use DsnDialogCredentialRadio::*;
+    let credential_type = match radio {
+        Nothing | Null => TsurugiOdbcCredentialType::Null,
+        UserPassword => TsurugiOdbcCredentialType::UserPassword,
+        AuthToken => TsurugiOdbcCredentialType::AuthToken,
+        File => TsurugiOdbcCredentialType::File,
+    };
+    (credential_type as i32).to_string()
 }
 
 fn write_profile(section: &str, entry: &str, value: &str) -> bool {

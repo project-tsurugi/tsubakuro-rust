@@ -57,7 +57,7 @@ Tsurugi ODBCドライバーの[インストーラー](../installer)（ `tsurugi_
 上記の手順でTsurugi ODBCドライバーをインストールした場合、接続文字列は以下のようになります。
 
 ```
-Driver={Tsurugi Driver};Enedpoint=tcp://localhost:12345;User=user;Password=password;
+Driver={Tsurugi Driver};Enedpoint=tcp://localhost:12345;UID=user;PWD=password;
 ```
 
 ## DSNの設定（MS-Windows）

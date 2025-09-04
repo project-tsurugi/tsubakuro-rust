@@ -26,7 +26,7 @@ hdbcハンドルを生成し、Tsurugiに接続します。
 SQLHDBC hdbc = NULL;
 SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
-SQLCHAR connStrIn[] = "Driver={Tsurugi Driver};Endpoint=tcp://localhost:12345;User=user;Password=password;";
+SQLCHAR connStrIn[] = "Driver={Tsurugi Driver};Endpoint=tcp://localhost:12345;UID=user;PWD=password;";
 SQLCHAR outConnStr[1024];
 SQLSMALLINT outConnStrLen;
 SQLDriverConnectA(
@@ -48,7 +48,7 @@ Tsurugiの接続先として、接続文字列内に `Endpoint` でエンドポ�
 
 認証には、以下のいずれかを指定します。
 
-- `User`, `Password`
+- `UID`, `PWD`
   - ユーザー・パスワードを指定します。
 - `AuthToken`
   - 認証トークンを指定します。

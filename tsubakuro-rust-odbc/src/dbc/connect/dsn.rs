@@ -1,7 +1,10 @@
 use crate::{
     dbc::connect::{
-        connect_tsurugi::{TsurugiOdbcConnectArguments, TsurugiOdbcCredential},
-        connection_string::{AUTH_TOKEN, CREDENTIALS, ENDPOINT, PASSWORD, USER},
+        connect_tsurugi::{TsurugiOdbcConnectArguments, TsurugiOdbcCredentialType},
+        connection_string::{
+            KEY_AUTH_TOKEN, KEY_CREDENTIALS, KEY_CREDENTIAL_TYPE, KEY_ENDPOINT, KEY_PASSWORD,
+            KEY_USER,
+        },
     },
     util::string_to_utf16,
 };
@@ -29,33 +32,46 @@ pub(crate) const FILE_NAME: &str = ".odbc.ini";
 
 pub(crate) fn read_dsn(dsn: &str) -> TsurugiOdbcConnectArguments {
     let mut arg = TsurugiOdbcConnectArguments::new();
-    arg.dsn = Some(dsn.into());
+    arg.set_dsn(dsn.into());
 
-    if let Some(value) = get_dsn_entry(dsn, ENDPOINT) {
-        arg.endpoint = Some(value);
+    if let Some(value) = get_dsn_entry(dsn, KEY_ENDPOINT) {
+        arg.set_endpoint(value);
     }
-    if let Some(credential) = get_credential(dsn) {
-        arg.credential = credential;
+    if let Some(value) = get_dsn_entry(dsn, KEY_USER) {
+        arg.set_user(value);
     }
+    if let Some(value) = get_dsn_entry(dsn, KEY_PASSWORD) {
+        arg.set_password(value);
+    }
+    if let Some(value) = get_dsn_entry(dsn, KEY_AUTH_TOKEN) {
+        arg.set_auth_token(value);
+    }
+    if let Some(value) = get_dsn_entry(dsn, KEY_CREDENTIALS) {
+        arg.set_credentials(value);
+    }
+    arg.set_credential_type(credential_type(dsn, &arg));
 
     arg
 }
 
-fn get_credential(section: &str) -> Option<TsurugiOdbcCredential> {
-    if let Some(user) = get_dsn_entry(section, USER) {
-        let password = get_dsn_entry(section, PASSWORD);
-        return Some(TsurugiOdbcCredential::UserPassword(user, password));
+fn credential_type(section: &str, arg: &TsurugiOdbcConnectArguments) -> TsurugiOdbcCredentialType {
+    if let Some(credential_type) = get_dsn_entry(section, KEY_CREDENTIAL_TYPE) {
+        if let Ok(value) = TsurugiOdbcCredentialType::try_from(credential_type.as_str()) {
+            return value;
+        }
     }
 
-    if let Some(token) = get_dsn_entry(section, AUTH_TOKEN) {
-        return Some(TsurugiOdbcCredential::AuthToken(token));
+    if arg.user().is_some() {
+        return TsurugiOdbcCredentialType::UserPassword;
+    }
+    if arg.auth_token().is_some() {
+        return TsurugiOdbcCredentialType::AuthToken;
+    }
+    if arg.credentials().is_some() {
+        return TsurugiOdbcCredentialType::File;
     }
 
-    if let Some(path) = get_dsn_entry(section, CREDENTIALS) {
-        return Some(TsurugiOdbcCredential::File(path));
-    }
-
-    None
+    TsurugiOdbcCredentialType::Null
 }
 
 fn get_dsn_entry(section: &str, entry: &str) -> Option<String> {

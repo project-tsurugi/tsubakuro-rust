@@ -47,8 +47,8 @@ public class TgOdbcTester {
 
                 String user = getUser();
                 if (user != null) {
-                    appendTo(sb, "User", user);
-                    appendTo(sb, "Password", getPassword());
+                    appendTo(sb, "UID", user);
+                    appendTo(sb, "PWD", getPassword());
                 } else {
                     String token = getAuthToken();
                     if (token != null) {
@@ -58,8 +58,13 @@ public class TgOdbcTester {
                         if (path != null) {
                             appendTo(sb, "Credentials", path);
                         } else {
-                            appendTo(sb, "User", "tsurugi");
-                            appendTo(sb, "Password", "password");
+                            String dsn = getDsn();
+                            if (!dsn.isEmpty()) {
+                                appendTo(sb, "DSN", dsn);
+                            } else {
+                                appendTo(sb, "UID", "tsurugi");
+                                appendTo(sb, "PWD", "password");
+                            }
                         }
                     }
                 }

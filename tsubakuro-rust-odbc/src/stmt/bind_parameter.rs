@@ -150,6 +150,7 @@ impl BindParameter {
             str_len_or_ind_ptr,
         }
     }
+
     fn bind_parameter(&self, stmt: &mut TsurugiOdbcStmt) -> SqlReturn {
         const FUNCTION_NAME: &str = "bind_parameter()";
 

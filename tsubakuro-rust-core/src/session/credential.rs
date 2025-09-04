@@ -24,20 +24,21 @@ impl std::fmt::Debug for Credential {
         match self {
             Credential::Null => write!(f, "Credential::Null"),
             Credential::UserPassword { user, .. } => {
-                write!(
-                    f,
-                    "Credential::UserPassword {{ user: {}, password: **** }}",
-                    user
-                )
+                write!(f, "Credential::UserPassword({})", user)
             }
-            Credential::AuthToken(token) => write!(f, "Credential::AuthToken({})", token),
+            Credential::AuthToken(token) => write!(
+                f,
+                "Credential::AuthToken({}****)",
+                token.chars().take(16).collect::<String>()
+            ),
             Credential::File {
                 encrypted,
                 comments,
             } => write!(
                 f,
-                "Credential::File {{ encrypted: {}, comments: {:?} }}",
-                encrypted, comments
+                "Credential::File{{ encrypted: {}****, comments: {:?} }}",
+                encrypted.chars().take(16).collect::<String>(),
+                comments
             ),
         }
     }

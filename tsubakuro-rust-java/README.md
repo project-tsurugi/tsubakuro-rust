@@ -40,3 +40,18 @@ cd tsubakuro-rust-java
 - `libtsubakuro_rust_ffi.so` (`tsubakuro_rust_ffi.dll` for MS-Windows) is a file built with [tsubakuro-rust-ffi](../tsubakuro-rust-ffi).
 - If `-Pdbtest.endpoint` is omitted, it will be `tcp://localhost:12345`.
 - If `-Pdbtest.endpoint.java` is omitted, it is same as value of `-Pdbtest.endpoint`.
+
+### test with credential
+
+```bash
+./gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.so \
+-Pdbtest.endpoint=tcp://localhost:12345 \
+-Pdbtest.user=user \
+-Pdbtest.password=password \
+-Pdbtest.auth-token=token \
+-Pdbtest.credentials=/path/to/credential-file
+```
+
+For tests other than credential, specifying only one of `user`, `auth-token`, or `credentials` is sufficient. If none of these are specified, authentication will be performed using the user `tsurugi`.
+
+In the credential test, anything not specified is skipped.

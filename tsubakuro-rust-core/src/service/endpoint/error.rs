@@ -6,7 +6,11 @@ use super::endpoint_broker::SERVICE_ID_ENDPOINT_BROKER;
 #[macro_export]
 macro_rules! endpoint_service_error {
     ($function_name:expr, $cause:expr) => {{
-        let server_message = format!("{} ({})", $cause.message, $cause.supplemental_text);
+        let server_message = if $cause.supplemental_text.is_empty() {
+            format!("{}", $cause.message)
+        } else {
+            format!("{} ({})", $cause.message, $cause.supplemental_text)
+        };
         $crate::error::TgError::ServerError(
             format!("{}", $function_name),
             "endpoint service error".to_string(),

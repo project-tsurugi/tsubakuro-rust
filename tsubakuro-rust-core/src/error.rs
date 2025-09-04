@@ -71,7 +71,7 @@ impl std::fmt::Display for TgError {
                 _ => write!(f, "{message}"),
             },
             TgError::ServerError(_function_name, message, code, server_message) => {
-                write!(f, "{message} ({code}) {server_message}")
+                write!(f, "{message}. ({code}) {server_message}")
             }
         }
     }
@@ -83,7 +83,7 @@ impl std::error::Error for TgError {
             TgError::ClientError(_, cause) => cause.as_deref(),
             TgError::TimeoutError(_) => None,
             TgError::IoError(_, cause) => cause.as_deref(),
-            TgError::ServerError(_, _, _, _) => None,
+            TgError::ServerError(..) => None,
         }
     }
 }

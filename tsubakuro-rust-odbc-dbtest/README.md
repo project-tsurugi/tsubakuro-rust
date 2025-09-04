@@ -24,3 +24,18 @@ cd tsubakuro-rust-odbc-dbtest
 - If `-Pdbtest.dsn` is omitted, skip `SQLConnectTest`.
 - If `-Pdbtest.endpoint` is omitted, it will be `tcp://localhost:12345`.
 - If `-Pdbtest.endpoint.java` is omitted, it is same as value of `-Pdbtest.endpoint`.
+
+### test with credential
+
+```bash
+./gradlew test \
+-Pdbtest.endpoint=tcp://localhost:12345 \
+-Pdbtest.user=user \
+-Pdbtest.password=password \
+-Pdbtest.auth-token=token \
+-Pdbtest.credentials=/path/to/credential-file
+```
+
+For tests other than credential, specifying only one of `user`, `auth-token`, or `credentials` is sufficient. If none of these are specified, authentication will be performed using the user `tsurugi`.
+
+In the credential test, anything not specified is skipped.

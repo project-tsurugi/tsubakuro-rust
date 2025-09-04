@@ -73,9 +73,9 @@ hstmtの属性を設定・取得します。
   - Tsurugi ODBCドライバーをインストールした際に登録したドライバー名を指定します。
 - Endpoint
   - TsurugiのエンドポイントのURLを指定します。
-- User
+- UID
   - ログインするユーザーを指定します。
-- Password
+- PWD
   - ログインするパスワードを指定します。
 - AuthToken
   - 認証トークンを指定します。
@@ -98,7 +98,7 @@ User/Password, AuthToken, Credentialsは、そのうちひとつを指定しま�
 #### 接続文字列の例
 
 ```c
-SQLCHAR connStrIn[] = "Driver={Tsurugi Driver};Endpoint=tcp://localhost:12345;User=user;Password=password;";
+SQLCHAR connStrIn[] = "Driver={Tsurugi Driver};Endpoint=tcp://localhost:12345;UID=user;PWD=password;";
 ```
 
 ### SQLConnect
