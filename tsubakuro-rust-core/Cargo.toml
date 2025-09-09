@@ -29,6 +29,7 @@ pem = "3.0.5"
 rsa = "0.9.8"
 rand = "0.8.5"
 base64 = "0.22.1"
+sha1 = "0.10.6"
 
 [build-dependencies]
 prost-build = "0.13.3"

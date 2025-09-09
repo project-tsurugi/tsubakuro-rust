@@ -16,7 +16,7 @@ use crate::{
     job::Job,
     prelude::endpoint::endpoint_broker::{EndpointBroker, HandshakeResult},
     prost_decode_wire_response_error, return_err_if_timeout,
-    session::{tcp::wire::TcpWire, wire::crypt::Crypt},
+    session::{tcp::wire::TcpWire, wire::crypto::Crypto},
     tateyama::proto::{
         diagnostics::Record as DiagnosticsRecord,
         framework::{
@@ -42,7 +42,7 @@ const SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
 
 pub(crate) struct Wire {
     wire: DelegateWire,
-    crypt: tokio::sync::Mutex<Option<Crypt>>,
+    crypto: tokio::sync::Mutex<Option<Crypto>>,
     user_name: Mutex<Option<String>>,
 }
 
@@ -56,7 +56,7 @@ impl Wire {
     pub(crate) fn new(wire: DelegateWire) -> Arc<Wire> {
         Arc::new(Wire {
             wire,
-            crypt: tokio::sync::Mutex::new(None),
+            crypto: tokio::sync::Mutex::new(None),
             user_name: Mutex::new(None),
         })
     }
@@ -82,9 +82,9 @@ impl Wire {
 
 impl Wire {
     pub(crate) async fn has_encryption_key(&self) -> bool {
-        let self_crypt = self.crypt.lock().await;
-        if let Some(crypt) = &*self_crypt {
-            crypt.has_public_key()
+        let self_crypto = self.crypto.lock().await;
+        if let Some(crypto) = &*self_crypto {
+            crypto.has_public_key()
         } else {
             false
         }
@@ -95,18 +95,18 @@ impl Wire {
         plain_text: &str,
         timeout: Duration,
     ) -> Result<Option<String>, TgError> {
-        let mut self_crypt = self.crypt.lock().await;
-        if self_crypt.is_none() {
+        let mut self_crypto = self.crypto.lock().await;
+        if self_crypto.is_none() {
             let pem = EndpointBroker::encryption_key(self, timeout).await?;
-            let mut crypt = Crypt::from_pem(pem)?;
-            let encrypted = crypt.encrypt(plain_text)?;
+            let mut crypto = Crypto::from_pem(pem)?;
+            let encrypted = crypto.encrypt(plain_text)?;
 
-            *self_crypt = Some(crypt);
+            *self_crypto = Some(crypto);
 
             Ok(encrypted)
         } else {
-            let crypt = self_crypt.as_mut().unwrap();
-            let encrypted = crypt.encrypt(plain_text)?;
+            let crypto = self_crypto.as_mut().unwrap();
+            let encrypted = crypto.encrypt(plain_text)?;
             Ok(encrypted)
         }
     }

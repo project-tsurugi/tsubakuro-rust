@@ -8,12 +8,25 @@ plugins {
 group = 'com.tsurugidb.tsubakuro.rust.java'
 version = '0.5.0'
 
-repositories {
-    mavenCentral()
-    maven {
-        url 'https://central.sonatype.com/repository/maven-snapshots/'
-        content {
-            includeGroupByRegex 'com\\.tsurugidb.*'
+if (hasProperty('mavenLocal')) {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url 'https://central.sonatype.com/repository/maven-snapshots/'
+            content {
+                includeGroupByRegex 'com\\.tsurugidb.*'
+            }
+        }
+    }
+} else {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://central.sonatype.com/repository/maven-snapshots/'
+            content {
+                includeGroupByRegex 'com\\.tsurugidb.*'
+            }
         }
     }
 }

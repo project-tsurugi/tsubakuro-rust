@@ -1,5 +1,5 @@
 pub(crate) mod cancel;
-pub(crate) mod crypt;
+pub(crate) mod crypto;
 pub(crate) mod data_channel;
 pub(crate) mod link;
 pub(crate) mod response;
