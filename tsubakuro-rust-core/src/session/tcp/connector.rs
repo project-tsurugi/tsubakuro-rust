@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use crate::client_error;
 use crate::error::TgError;
 use crate::job::Job;
 use crate::prelude::{ConnectionOption, Credential};
@@ -113,7 +114,15 @@ async fn to_proto_credential(
 
     match credential {
         Credential::Null => Ok(None),
-        Credential::UserPassword { .. } => {
+        Credential::UserPassword { user, password } => {
+            if user.len() > 60 {
+                return Err(client_error!("user too long"));
+            }
+            if let Some(password) = password {
+                if password.len() > 60 {
+                    return Err(client_error!("password too long"));
+                }
+            }
             let validity_period_in_seconds = validity_period.as_secs() as i64;
             let expiration_date = if validity_period_in_seconds > 0 {
                 Some(chrono::Utc::now() + chrono::Duration::seconds(validity_period_in_seconds))
