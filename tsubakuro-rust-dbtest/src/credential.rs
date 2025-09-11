@@ -34,13 +34,13 @@ mod test {
         }
     }
 
+    const USER_LIMIT: usize = 60;
+
     #[test]
     async fn user_password_credential_user_too_long() {
-        const LIMIT: usize = 60;
-
         let args = create_test_args();
 
-        let credential = Credential::from_user_password("*".repeat(LIMIT), None::<String>);
+        let credential = Credential::from_user_password("*".repeat(USER_LIMIT), None::<String>);
         let option = create_connection_option(args.endpoint(), credential).unwrap();
         match Session::connect(&option).await {
             Ok(_) => {}
@@ -52,7 +52,7 @@ mod test {
             },
         }
 
-        let credential = Credential::from_user_password("*".repeat(LIMIT + 1), None::<String>);
+        let credential = Credential::from_user_password("*".repeat(USER_LIMIT + 1), None::<String>);
         let option = create_connection_option(args.endpoint(), credential).unwrap();
         let error = Session::connect(&option).await.unwrap_err();
         match error {
@@ -63,13 +63,14 @@ mod test {
         }
     }
 
+    const PASSWORD_LIMIT: usize = 60;
+
     #[test]
     async fn user_password_credential_password_too_long() {
-        const LIMIT: usize = 60;
-
         let args = create_test_args();
 
-        let credential = Credential::from_user_password("tsurugi", Some("*".repeat(LIMIT)));
+        let credential =
+            Credential::from_user_password("tsurugi", Some("*".repeat(PASSWORD_LIMIT)));
         let option = create_connection_option(args.endpoint(), credential).unwrap();
         match Session::connect(&option).await {
             Ok(_) => {}
@@ -81,12 +82,46 @@ mod test {
             },
         }
 
-        let credential = Credential::from_user_password("tsurugi", Some("*".repeat(LIMIT + 1)));
+        let credential =
+            Credential::from_user_password("tsurugi", Some("*".repeat(PASSWORD_LIMIT + 1)));
         let option = create_connection_option(args.endpoint(), credential).unwrap();
         let error = Session::connect(&option).await.unwrap_err();
         match error {
             TgError::ClientError(message, _) => {
                 assert_eq!("password too long", message);
+            }
+            _ => panic!("unexpected error: {error:?}"),
+        }
+    }
+
+    #[test]
+    async fn user_password_credential_user_password_too_long() {
+        let args = create_test_args();
+
+        let credential = Credential::from_user_password(
+            "*".repeat(USER_LIMIT),
+            Some("*".repeat(PASSWORD_LIMIT)),
+        );
+        let option = create_connection_option(args.endpoint(), credential).unwrap();
+        match Session::connect(&option).await {
+            Ok(_) => {}
+            Err(error) => match error {
+                TgError::ServerError(_, _, code, _) => {
+                    assert_eq!("SCD-00201", code.structured_code());
+                }
+                _ => panic!("unexpected error: {error:?}"),
+            },
+        }
+
+        let credential = Credential::from_user_password(
+            "*".repeat(USER_LIMIT + 1),
+            Some("*".repeat(PASSWORD_LIMIT + 1)),
+        );
+        let option = create_connection_option(args.endpoint(), credential).unwrap();
+        let error = Session::connect(&option).await.unwrap_err();
+        match error {
+            TgError::ClientError(message, _) => {
+                assert_eq!("user too long", message);
             }
             _ => panic!("unexpected error: {error:?}"),
         }

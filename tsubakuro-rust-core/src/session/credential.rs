@@ -138,7 +138,7 @@ impl Credential {
                         json,
                         r#","{}":"{}""#,
                         KEY_EXPIRATION_DATE,
-                        date_time.to_rfc3339()
+                        date_time.to_rfc3339_opts(chrono::SecondsFormat::Micros, true)
                     )?;
                 }
 
@@ -159,13 +159,13 @@ mod test {
     #[test]
     fn test_credential_to_json() {
         let credential = Credential::from_user_password("user", Some("password"));
-        let date_time = DateTime::parse_from_rfc3339("2025-08-28T23:59:59.123Z")
+        let date_time = DateTime::parse_from_rfc3339("2025-08-28T23:59:59.123456789+00:00")
             .unwrap()
             .with_timezone(&Utc);
         let json = credential.to_json_text(Some(date_time)).unwrap();
         assert_eq!(
             json,
-            r#"{"format_version":1,"user":"user","password":"password","expiration_date":"2025-08-28T23:59:59.123+00:00"}"#
+            r#"{"format_version":1,"user":"user","password":"password","expiration_date":"2025-08-28T23:59:59.123456Z"}"#
         );
     }
 }
