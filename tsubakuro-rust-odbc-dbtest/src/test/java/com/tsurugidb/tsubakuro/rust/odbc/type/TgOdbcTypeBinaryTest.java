@@ -32,7 +32,7 @@ class TgOdbcTypeBinaryTest extends TgOdbcTypeTester<byte[]> {
 
     @Override
     protected SqlDataType dataType() {
-        return SqlDataType.SQL_VARBINARY; // TODO SQL_BINARY
+        return SqlDataType.SQL_BINARY;
     }
 
     @Override

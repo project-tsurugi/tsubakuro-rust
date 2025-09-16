@@ -111,19 +111,19 @@ public class ExpectedColumn {
             this.dataType = SqlDataType.SQL_CHAR;
             this.columnSize = size1;
             this.bufferLength = size1;
-            this.descLength = 2097132;
+            this.descLength = size1;
             break;
         case "VARCHAR":
             this.dataType = SqlDataType.SQL_VARCHAR;
             this.columnSize = size1;
             this.bufferLength = size1;
-            this.descLength = 2097132;
+            this.descLength = size1;
             break;
         case "BINARY":
             this.dataType = SqlDataType.SQL_BINARY;
             this.columnSize = size1;
             this.bufferLength = size1;
-            this.descLength = 2097132;
+            this.descLength = size1;
             break;
         case "VARBINARY":
             this.dataType = SqlDataType.SQL_VARBINARY;

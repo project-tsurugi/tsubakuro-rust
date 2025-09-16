@@ -141,8 +141,8 @@ mod test {
         assert_eq!("v", c.name());
         assert_eq!(Some(AtomType::Decimal), c.atom_type());
         assert_eq!(None, c.length());
-        assert_eq!(None, c.precision());
-        assert_eq!(None, c.scale());
+        assert_eq!(Some((DECIMAL_SIZE, false)), c.precision());
+        assert_eq!(Some((1, false)), c.scale());
         assert_eq!(None, c.nullable());
         assert_eq!(None, c.varying());
 

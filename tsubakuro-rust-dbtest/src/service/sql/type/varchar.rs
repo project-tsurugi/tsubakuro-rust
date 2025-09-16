@@ -117,7 +117,7 @@ mod test {
         let c = &columns[1];
         assert_eq!("v", c.name());
         assert_eq!(Some(AtomType::Character), c.atom_type());
-        assert_eq!(None, c.length());
+        assert_eq!(Some((4, false)), c.length());
         assert_eq!(None, c.precision());
         assert_eq!(None, c.scale());
         assert_eq!(None, c.nullable());

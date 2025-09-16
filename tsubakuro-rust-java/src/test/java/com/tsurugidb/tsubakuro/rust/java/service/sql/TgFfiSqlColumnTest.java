@@ -43,20 +43,9 @@ class TgFfiSqlColumnTest extends TgFfiTester {
     void decimal() {
         String sqlType = "decimal";
         var atomType = TgFfiAtomType.DECIMAL;
-        ArbitraryInt precision = null;
-        ArbitraryInt scale = null;
-        var tester = new TestMain(sqlType, atomType, precision, scale) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertNull(c.getLength(context));
-                assertEquals(ArbitraryInt.of(38), c.getPrecision(context));
-                assertEquals(ArbitraryInt.of(0), c.getScale(context));
-                assertNull(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("DECIMAL(38, 0)", c.getSqlType(context));
-            }
-        };
+        ArbitraryInt precision = ArbitraryInt.of(38);
+        ArbitraryInt scale = ArbitraryInt.of(0);
+        var tester = new TestMain(sqlType, atomType, precision, scale);
         tester.test();
     }
 
@@ -65,19 +54,8 @@ class TgFfiSqlColumnTest extends TgFfiTester {
         String sqlType = "decimal(10)";
         var atomType = TgFfiAtomType.DECIMAL;
         ArbitraryInt precision = ArbitraryInt.of(10);
-        ArbitraryInt scale = null;
-        var tester = new TestMain(sqlType, atomType, precision, scale) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertNull(c.getLength(context));
-                assertEquals(ArbitraryInt.of(10), c.getPrecision(context));
-                assertEquals(ArbitraryInt.of(0), c.getScale(context));
-                assertNull(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("DECIMAL(10, 0)", c.getSqlType(context));
-            }
-        };
+        ArbitraryInt scale = ArbitraryInt.of(0);
+        var tester = new TestMain(sqlType, atomType, precision, scale);
         tester.test();
     }
 
@@ -87,18 +65,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
         var atomType = TgFfiAtomType.DECIMAL;
         ArbitraryInt precision = ArbitraryInt.of(10);
         ArbitraryInt scale = ArbitraryInt.of(2);
-        var tester = new TestMain(sqlType, atomType, precision, scale) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertNull(c.getLength(context));
-                assertEquals(ArbitraryInt.of(10), c.getPrecision(context));
-                assertEquals(ArbitraryInt.of(2), c.getScale(context));
-                assertNull(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("DECIMAL(10, 2)", c.getSqlType(context));
-            }
-        };
+        var tester = new TestMain(sqlType, atomType, precision, scale);
         tester.test();
     }
 
@@ -106,20 +73,9 @@ class TgFfiSqlColumnTest extends TgFfiTester {
     void decimalA() {
         String sqlType = "decimal(*)";
         var atomType = TgFfiAtomType.DECIMAL;
-        ArbitraryInt precision = ArbitraryInt.ofArbitrary();
-        ArbitraryInt scale = null;
-        var tester = new TestMain(sqlType, atomType, precision, scale) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertNull(c.getLength(context));
-                assertEquals(ArbitraryInt.of(38), c.getPrecision(context));
-                assertEquals(ArbitraryInt.of(0), c.getScale(context));
-                assertNull(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("DECIMAL(38, 0)", c.getSqlType(context));
-            }
-        };
+        ArbitraryInt precision = ArbitraryInt.of(38);
+        ArbitraryInt scale = ArbitraryInt.of(0);
+        var tester = new TestMain(sqlType, atomType, precision, scale);
         tester.test();
     }
 
@@ -127,20 +83,9 @@ class TgFfiSqlColumnTest extends TgFfiTester {
     void decimalA_2() {
         String sqlType = "decimal(*,2)";
         var atomType = TgFfiAtomType.DECIMAL;
-        ArbitraryInt precision = ArbitraryInt.ofArbitrary();
+        ArbitraryInt precision = ArbitraryInt.of(38);
         ArbitraryInt scale = ArbitraryInt.of(2);
-        var tester = new TestMain(sqlType, atomType, precision, scale) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertNull(c.getLength(context));
-                assertEquals(ArbitraryInt.of(38), c.getPrecision(context));
-                assertEquals(ArbitraryInt.of(2), c.getScale(context));
-                assertNull(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("DECIMAL(38, 2)", c.getSqlType(context));
-            }
-        };
+        var tester = new TestMain(sqlType, atomType, precision, scale);
         tester.test();
     }
 
@@ -148,20 +93,9 @@ class TgFfiSqlColumnTest extends TgFfiTester {
     void character() {
         String sqlType = "char";
         var atomType = TgFfiAtomType.CHARACTER;
-        ArbitraryInt length = null;
+        ArbitraryInt length = ArbitraryInt.of(1);
         Boolean varying = false;
-        var tester = new TestMain(sqlType, atomType, length, varying) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertEquals(ArbitraryInt.of(1), c.getLength(context));
-                assertNull(c.getPrecision(context));
-                assertNull(c.getScale(context));
-                assertFalse(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("CHAR(1)", c.getSqlType(context));
-            }
-        };
+        var tester = new TestMain(sqlType, atomType, length, varying);
         tester.test();
     }
 
@@ -171,18 +105,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
         var atomType = TgFfiAtomType.CHARACTER;
         ArbitraryInt length = ArbitraryInt.of(10);
         Boolean varying = false;
-        var tester = new TestMain(sqlType, atomType, length, varying) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertEquals(ArbitraryInt.of(10), c.getLength(context));
-                assertNull(c.getPrecision(context));
-                assertNull(c.getScale(context));
-                assertFalse(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("CHAR(10)", c.getSqlType(context));
-            }
-        };
+        var tester = new TestMain(sqlType, atomType, length, varying);
         tester.test();
     }
 
@@ -190,20 +113,9 @@ class TgFfiSqlColumnTest extends TgFfiTester {
     void varchar() {
         String sqlType = "varchar";
         var atomType = TgFfiAtomType.CHARACTER;
-        ArbitraryInt length = null;
+        ArbitraryInt length = ArbitraryInt.ofArbitrary();
         Boolean varying = true;
-        var tester = new TestMain(sqlType, atomType, length, varying) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertEquals(ArbitraryInt.ofArbitrary(), c.getLength(context));
-                assertNull(c.getPrecision(context));
-                assertNull(c.getScale(context));
-                assertTrue(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("VARCHAR(*)", c.getSqlType(context));
-            }
-        };
+        var tester = new TestMain(sqlType, atomType, length, varying);
         tester.test();
     }
 
@@ -213,18 +125,7 @@ class TgFfiSqlColumnTest extends TgFfiTester {
         var atomType = TgFfiAtomType.CHARACTER;
         ArbitraryInt length = ArbitraryInt.of(10);
         Boolean varying = true;
-        var tester = new TestMain(sqlType, atomType, length, varying) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertEquals(ArbitraryInt.of(10), c.getLength(context));
-                assertNull(c.getPrecision(context));
-                assertNull(c.getScale(context));
-                assertTrue(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("VARCHAR(10)", c.getSqlType(context));
-            }
-        };
+        var tester = new TestMain(sqlType, atomType, length, varying);
         tester.test();
     }
 
@@ -234,22 +135,10 @@ class TgFfiSqlColumnTest extends TgFfiTester {
         var atomType = TgFfiAtomType.CHARACTER;
         ArbitraryInt length = ArbitraryInt.ofArbitrary();
         Boolean varying = true;
-        var tester = new TestMain(sqlType, atomType, length, varying) {
-            @Override
-            protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-                assertEquals(ArbitraryInt.ofArbitrary(), c.getLength(context));
-                assertNull(c.getPrecision(context));
-                assertNull(c.getScale(context));
-                assertTrue(c.getVarying(context));
-                assertNull(c.getDescription(context));
-                assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                assertEquals("VARCHAR(*)", c.getSqlType(context));
-            }
-        };
+        var tester = new TestMain(sqlType, atomType, length, varying);
         tester.test();
     }
 
-    @SuppressWarnings("unused")
     private class TestMain {
         private final String sqlType;
         private final TgFfiAtomType atomType;
@@ -285,6 +174,41 @@ class TgFfiSqlColumnTest extends TgFfiTester {
             } else {
                 return type.substring(0, n).toUpperCase();
             }
+        }
+
+        protected String sqlType() {
+            if (length != null) {
+                String typeName = sqlTypeName();
+                if (length.arbitrary()) {
+                    return typeName + "(*)";
+                }
+                return typeName + "(" + length.value() + ")";
+            }
+            if (precision != null) {
+                String typeName = sqlTypeName();
+                var sb = new StringBuilder(typeName);
+                sb.append("(");
+
+                if (precision.arbitrary()) {
+                    sb.append("*");
+                } else {
+                    sb.append(precision.value());
+                }
+
+                if (scale != null) {
+                    sb.append(", ");
+                    if (scale.arbitrary()) {
+                        sb.append("*");
+                    } else {
+                        sb.append(scale.value());
+                    }
+                }
+
+                sb.append(")");
+                return sb.toString();
+            }
+
+            return this.sqlType.toUpperCase();
         }
 
         public void test() {
@@ -338,13 +262,13 @@ class TgFfiSqlColumnTest extends TgFfiTester {
         }
 
         protected void assertTableColumn(TgFfiContext context, TgFfiSqlColumn c) {
-            assertNull(c.getLength(context));
-            assertNull(c.getPrecision(context));
-            assertNull(c.getScale(context));
-            assertNull(c.getVarying(context));
+            assertEquals(length, c.getLength(context));
+            assertEquals(precision, c.getPrecision(context));
+            assertEquals(scale, c.getScale(context));
+            assertEquals(varying, c.getVarying(context));
             assertNull(c.getDescription(context));
             assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-            assertEquals(sqlTypeName(), c.getSqlType(context));
+            assertEquals(sqlType(), c.getSqlType(context));
         }
 
         private void testResultSetMetadata(Boolean nullable) {
@@ -366,18 +290,15 @@ class TgFfiSqlColumnTest extends TgFfiTester {
                         var c = columns.get(1);
                         assertEquals("value", c.getName(context));
                         assertEquals(atomType, c.getAtomType(context));
-                        assertNull(c.getLength(context));
-                        assertNull(c.getPrecision(context));
-                        assertNull(c.getScale(context));
+                        assertEquals(length, c.getLength(context));
+                        assertEquals(precision, c.getPrecision(context));
+                        assertEquals(scale, c.getScale(context));
                         assertNull(c.getNullable(context));
-                        // TODO assertEquals(length, c.getLength(context));
-                        // TODO assertEquals(precision, c.getPrecision(context));
-                        // TODO assertEquals(scale, c.getScale(context));
                         // TODO assertEquals(nullable, c.getNullable(context));
                         assertEquals(varying, c.getVarying(context));
                         assertNull(c.getDescription(context));
                         assertEquals(sqlTypeName(), c.getSqlTypeName(context));
-                        // TODO assertEquals(sqlType(), c.getSqlType(context));
+                        assertEquals(sqlType(), c.getSqlType(context));
                     }
                 }
             }

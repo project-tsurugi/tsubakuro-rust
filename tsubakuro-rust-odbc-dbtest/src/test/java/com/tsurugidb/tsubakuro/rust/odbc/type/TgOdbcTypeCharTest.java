@@ -31,7 +31,7 @@ class TgOdbcTypeCharTest extends TgOdbcTypeTester<String> {
 
     @Override
     protected SqlDataType dataType() {
-        return SqlDataType.SQL_VARCHAR; // TODO SQL_CHAR
+        return SqlDataType.SQL_CHAR;
     }
 
     @Override
