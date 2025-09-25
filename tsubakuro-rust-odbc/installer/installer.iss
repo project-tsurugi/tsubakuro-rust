@@ -1,7 +1,7 @@
 ; Tsurugi ODBC Driver installer
 
 #define MyAppName "Tsurugi ODBC Driver"
-#define MyAppVersion "0.5"
+#define MyAppVersion "0.5.0"
 #define MyAppPublisher "Project Tsurugi"
 #define MyAppURL "https://github.com/project-tsurugi/tsurugidb"
 #define MyAppDllName "tsubakuro_rust_odbc.dll"

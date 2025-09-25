@@ -6,7 +6,7 @@ tsubakuro-rust-ffi uses [tsubakuro-rust-core](../tsubakuro-rust-core), so refer 
 
 ## Target
 
-- Tsurugi 1.5.0 or later.
+- Tsurugi 1.6.0 or later.
 
 ## How to build
 
