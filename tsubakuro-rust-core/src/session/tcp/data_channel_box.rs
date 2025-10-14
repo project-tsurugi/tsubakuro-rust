@@ -3,6 +3,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use log::error;
+
 use crate::{client_error, error::TgError};
 
 use super::data_channel_wire::TcpDataChannelWire;
@@ -47,6 +49,9 @@ impl TcpDataChannelBox {
         while wait_pool.len() <= index {
             wait_pool.push(None);
         }
+        if wait_pool[index].is_some() {
+            error!("rs_slot {rs_slot} already registered in TcpDataChannelBox.wait_pool");
+        }
         wait_pool[index] = Some(dc_wire);
 
         Ok(())
@@ -70,11 +75,14 @@ impl TcpDataChannelBox {
     pub(crate) fn release_data_channel_wire(
         &self,
         rs_slot: i32,
-    ) -> Result<Arc<TcpDataChannelWire>, TgError> {
+    ) -> Result<Option<Arc<TcpDataChannelWire>>, TgError> {
         let index = rs_slot as usize;
         let mut wait_pool = self.wait_pool.lock().unwrap();
         if index < wait_pool.len() {
-            let dc_wire = wait_pool[index].take().unwrap();
+            let dc_wire = wait_pool[index].take();
+            if dc_wire.is_none() {
+                error!("rs_slot {rs_slot} already released in TcpDataChannelBox.wait_pool");
+            }
             Ok(dc_wire)
         } else {
             Err(client_error!(format!(

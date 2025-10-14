@@ -182,8 +182,9 @@ impl TcpWire {
                 dc_wire.add_response(response);
             }
             WireResponse::ResponseResultSetBye(rs_slot) => {
-                let dc_wire = self.data_channel_box.release_data_channel_wire(rs_slot)?;
-                dc_wire.add_response(response);
+                if let Some(dc_wire) = self.data_channel_box.release_data_channel_wire(rs_slot)? {
+                    dc_wire.add_response(response);
+                }
                 self.send_result_set_bye_ok(rs_slot).await?;
             }
             _ => {
