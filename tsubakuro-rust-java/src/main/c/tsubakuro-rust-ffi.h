@@ -894,8 +894,25 @@ void tsurugi_ffi_job_dispose(TsurugiFfiJobHandle job);
 
 /**
  * Initialize env_logger.
+ *
+ * Use the `RUST_LOG` environment variable as filters.
+ *
+ * Calls to `tsurugi_ffi_env_logger_init` and [`tsurugi_ffi_env_logger_init_with_filters`] other than the first one are ignored.
  */
 TsurugiFfiRc tsurugi_ffi_env_logger_init(void);
+
+/**
+ * Initialize env_logger.
+ *
+ * # Parameters
+ * - `filters` - filter string. (e.g. "tsubakuro_rust_ffi=trace")
+ *               If null, do not log output.
+ * - `file_path` - log file path. If null, logs to stderr.
+ *
+ * Calls to [`tsurugi_ffi_env_logger_init`] and `tsurugi_ffi_env_logger_init_with_filters` other than the first one are ignored.
+ */
+TsurugiFfiRc tsurugi_ffi_env_logger_init_with_filters(TsurugiFfiStringHandle filters,
+                                                      TsurugiFfiStringHandle file_path);
 
 /**
  * SqlColumn: Get name.

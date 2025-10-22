@@ -17591,6 +17591,65 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_env_logger_init_with_filters {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_env_logger_init_with_filters");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_env_logger_init_with_filters(TsurugiFfiStringHandle filters, TsurugiFfiStringHandle file_path)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_env_logger_init_with_filters$descriptor() {
+        return tsurugi_ffi_env_logger_init_with_filters.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_env_logger_init_with_filters(TsurugiFfiStringHandle filters, TsurugiFfiStringHandle file_path)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_env_logger_init_with_filters$handle() {
+        return tsurugi_ffi_env_logger_init_with_filters.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_env_logger_init_with_filters(TsurugiFfiStringHandle filters, TsurugiFfiStringHandle file_path)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_env_logger_init_with_filters$address() {
+        return tsurugi_ffi_env_logger_init_with_filters.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_env_logger_init_with_filters(TsurugiFfiStringHandle filters, TsurugiFfiStringHandle file_path)
+     * }
+     */
+    public static int tsurugi_ffi_env_logger_init_with_filters(MemorySegment filters, MemorySegment file_path) {
+        var mh$ = tsurugi_ffi_env_logger_init_with_filters.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_env_logger_init_with_filters", filters, file_path);
+            }
+            return (int)mh$.invokeExact(filters, file_path);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_sql_column_get_name {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,

@@ -36,6 +36,7 @@ public class TgFfiTester {
 
     static {
         TgFfiInitializer.loadFfiLibrary();
+        TgFfiInitializer.initFfiEnvLogger("tsubakuro_rust_core=warn", null);
     }
 
     private static final String SYSPROP_DBTEST_ENDPOINT = "tsurugi.dbtest.endpoint";

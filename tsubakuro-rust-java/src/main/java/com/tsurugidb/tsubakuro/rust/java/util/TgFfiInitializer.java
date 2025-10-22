@@ -27,4 +27,12 @@ public class TgFfiInitializer {
     public static int initFfiEnvLogger() {
         return tsubakuro_rust_ffi_h.tsurugi_ffi_env_logger_init();
     }
+
+    public static int initFfiEnvLogger(String filters, String filePath) {
+        try (var manager = TgFfiObjectManager.create()) {
+            var filtersMemory = manager.allocateString(filters);
+            var filePathMemory = manager.allocateString(filePath);
+            return tsubakuro_rust_ffi_h.tsurugi_ffi_env_logger_init_with_filters(filtersMemory, filePathMemory);
+        }
+    }
 }

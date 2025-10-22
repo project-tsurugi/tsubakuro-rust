@@ -157,15 +157,19 @@ FFI関数の中には、文字列一覧や数値一覧、カラム一覧など�
   - サーバーエラーの場合、下位20ビットがエラーコード、その上がエラーカテゴリーを表す
     - 例えばSQL-02001のエラーの場合、エラーカテゴリーは3（SQL）, エラーコードは2001（十六進数で007d1）なので、リターンコードは 0xc03007d1 となる
 
-### ログ出力（tsurugi_ffi_env_logger_init関数）
+### ログ出力
 
 Tsubakuro/Rustは、logクレートを使ってログ出力を行うようになっています。
 しかしデフォルトではログ出力の実装が無いため、何も出力されません。
 
-tsubakuro-rust-ffiでは、ログ出力の実装としてenv_loggerクレートを使えるようになっています。
+tsubakuro-rust-ffiでは、ログ出力の実装として [env_loggerクレート](https://crates.io/crates/env_logger) を使えるようになっています。
+env_loggerを初期化する関数を呼ぶことで、ログが出力されるようになります。
 
-tsurugi_ffi_env_logger_init関数を呼ぶとenv_loggerが有効になります。
-env_loggerは環境変数RUST_LOGの設定に応じてコンソールにログを出力します。
+env_loggerを初期化する関数は一度のみ有効です。2回目以降の呼び出しは無視されます。（ログ出力の設定を変更することはできません）
+
+#### tsurugi_ffi_env_logger_init関数
+
+tsurugi_ffi_env_logger_init関数を呼ぶと、環境変数RUST_LOGの設定に応じてコンソールにログを出力するようになります。
 
 RUST_LOGでトレースレベルのログを出力するよう設定してtsurugi_ffi_env_logger_init関数を呼び出せば、アプリケーションを実行した際に以下のようなログが出るので、FFI関数を呼び出せているかどうかを確認することができます。
 
@@ -175,6 +179,13 @@ $ # execute application using tsubakuro-rust-ffi
 ～
 [2025-02-12T09:01:56.966Z TRACE tsubakuro_rust_ffi::logger] tsurugi_ffi_env_logger_init() end rc=0
 ```
+
+#### tsurugi_ffi_env_logger_init_with_filters関数
+
+tsurugi_ffi_env_logger_init_with_filters関数を呼ぶと、引数の設定に従ってログを出力するようになります。
+
+- 第1引数に（環境変数RUST_LOGと同内容の）フィルターを文字列で指定します。NULLの場合、ログ出力を行いません。
+- 第2引数にログ出力先となるファイルのパスを指定します。NULLの場合、ログは標準エラーに出力されます。
 
 ### コンテキスト構造体（TsurugiFfiContextHandle）
 

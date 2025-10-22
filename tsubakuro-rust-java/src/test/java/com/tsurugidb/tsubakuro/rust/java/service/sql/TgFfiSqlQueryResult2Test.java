@@ -18,10 +18,6 @@ import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;
 
 class TgFfiSqlQueryResult2Test extends TgFfiTester {
 
-    static {
-        TgFfiInitializer.initFfiEnvLogger(); // and export RUST_LOG=tsubakuro_rust_core=warn
-    }
-
     @BeforeEach
     void before() {
         dropAndCreateTable("test", """
