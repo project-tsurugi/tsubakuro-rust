@@ -19,6 +19,7 @@ use crate::{
 pub(crate) trait TgLargeObjectReference {
     fn provider(&self) -> LargeObjectProvider;
     fn object_id(&self) -> u64;
+    fn reference_tag(&self) -> u64;
 }
 
 #[derive(Debug, Clone)]

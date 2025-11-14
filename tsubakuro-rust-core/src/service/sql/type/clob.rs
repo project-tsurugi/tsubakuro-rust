@@ -35,13 +35,19 @@ impl From<String> for TgClob {
 pub struct TgClobReference {
     provider: LargeObjectProvider,
     object_id: u64,
+    reference_tag: u64,
 }
 
 impl TgClobReference {
-    pub(crate) fn new(provider: LargeObjectProvider, object_id: u64) -> TgClobReference {
+    pub(crate) fn new(
+        provider: LargeObjectProvider,
+        object_id: u64,
+        reference_tag: u64,
+    ) -> TgClobReference {
         TgClobReference {
             provider,
             object_id,
+            reference_tag,
         }
     }
 }
@@ -53,5 +59,8 @@ impl TgLargeObjectReference for TgClobReference {
 
     fn object_id(&self) -> u64 {
         self.object_id
+    }
+    fn reference_tag(&self) -> u64 {
+        self.reference_tag
     }
 }

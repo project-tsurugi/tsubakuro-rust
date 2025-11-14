@@ -49,10 +49,10 @@ use super::{
 const SERVICE_SYMBOLIC_ID: &str = "sql";
 
 /// The major service message version which this client requests.
-const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 1;
+const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 2;
 
 /// The minor service message version which this client requests.
-const SERVICE_MESSAGE_VERSION_MINOR: u64 = 6;
+const SERVICE_MESSAGE_VERSION_MINOR: u64 = 0;
 
 pub(crate) const SERVICE_ID_SQL: i32 = 3;
 
@@ -1306,6 +1306,7 @@ impl SqlClient {
         let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
             provider: lob.provider().into(),
             object_id: lob.object_id(),
+            reference_tag: lob.reference_tag(),
             contents_opt: None,
         };
 
@@ -1798,11 +1799,12 @@ impl SqlClient {
 
     fn copy_lob_to_command<T: TgLargeObjectReference>(
         transaction_handle: &ProtoTransaction,
-        clob: &T,
+        lob: &T,
     ) -> SqlCommand {
         let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
-            provider: clob.provider().into(),
-            object_id: clob.object_id(),
+            provider: lob.provider().into(),
+            object_id: lob.object_id(),
+            reference_tag: lob.reference_tag(),
             contents_opt: None,
         };
 
@@ -2116,6 +2118,6 @@ mod test {
     #[test]
     fn service_message_version() {
         let smv = SqlClient::service_message_version();
-        assert_eq!("sql-1.6", smv);
+        assert_eq!("sql-2.0", smv);
     }
 }

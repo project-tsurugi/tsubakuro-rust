@@ -488,7 +488,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_blob(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(LargeObjectProvider, u64), TgError> {
+    ) -> Result<(LargeObjectProvider, u64, u64), TgError> {
         self.require_column_type(EntryType::Blob)?;
         let value = self.read_blob(timeout).await?;
         self.column_consumed()?;
@@ -498,7 +498,7 @@ impl ResultSetValueStream {
     pub(crate) async fn fetch_clob(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(LargeObjectProvider, u64), TgError> {
+    ) -> Result<(LargeObjectProvider, u64, u64), TgError> {
         self.require_column_type(EntryType::Clob)?;
         let value = self.read_clob(timeout).await?;
         self.column_consumed()?;
@@ -831,29 +831,31 @@ impl ResultSetValueStream {
     async fn read_blob(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(LargeObjectProvider, u64), TgError> {
+    ) -> Result<(LargeObjectProvider, u64, u64), TgError> {
         self.require(EntryType::Blob)?;
         self.clear_header_info();
         let provider = self.read8(timeout).await? as i32;
         let object_id = self.read8(timeout).await?;
+        let reference_tag = self.read8(timeout).await?;
 
         let provider = LargeObjectProvider::try_from(provider)
             .map_err(|e| io_error!("invalid BLOB provider", e))?;
-        Ok((provider, object_id))
+        Ok((provider, object_id, reference_tag))
     }
 
     async fn read_clob(
         &mut self,
         timeout: &Timeout,
-    ) -> Result<(LargeObjectProvider, u64), TgError> {
+    ) -> Result<(LargeObjectProvider, u64, u64), TgError> {
         self.require(EntryType::Clob)?;
         self.clear_header_info();
         let provider = self.read8(timeout).await? as i32;
         let object_id = self.read8(timeout).await?;
+        let reference_tag = self.read8(timeout).await?;
 
         let provider = LargeObjectProvider::try_from(provider)
             .map_err(|e| io_error!("invalid CLOB provider", e))?;
-        Ok((provider, object_id))
+        Ok((provider, object_id, reference_tag))
     }
 
     pub(crate) async fn read_row_begin(&mut self, timeout: &Timeout) -> Result<usize, TgError> {
