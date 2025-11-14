@@ -640,8 +640,8 @@ impl SqlQueryResultFetch<TgBlobReference> for SqlQueryResult {
     /// See [`SqlClient::open_blob`](crate::prelude::SqlClient::open_blob), [`copy_blob_to`](crate::prelude::SqlClient::copy_blob_to).
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgBlobReference, TgError> {
         let timeout = Timeout::new(timeout);
-        let (provider, object_id) = self.value_stream.fetch_blob(&timeout).await?;
-        Ok(TgBlobReference::new(provider, object_id))
+        let (provider, object_id, reference_tag) = self.value_stream.fetch_blob(&timeout).await?;
+        Ok(TgBlobReference::new(provider, object_id, reference_tag))
     }
 }
 
@@ -667,8 +667,8 @@ impl SqlQueryResultFetch<TgClobReference> for SqlQueryResult {
     /// See [`SqlClient::open_clob`](crate::prelude::SqlClient::open_clob), [`copy_clob_to`](crate::prelude::SqlClient::copy_clob_to).
     async fn fetch_for(&mut self, timeout: Duration) -> Result<TgClobReference, TgError> {
         let timeout = Timeout::new(timeout);
-        let (provider, object_id) = self.value_stream.fetch_clob(&timeout).await?;
-        Ok(TgClobReference::new(provider, object_id))
+        let (provider, object_id, reference_tag) = self.value_stream.fetch_clob(&timeout).await?;
+        Ok(TgClobReference::new(provider, object_id, reference_tag))
     }
 }
 

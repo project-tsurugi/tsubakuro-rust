@@ -45,7 +45,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager); //
                 var client = createSqlClient()) {
             String smv = client.getServiceMessageVersion(context);
-            assertEquals("sql-1.6", smv);
+            assertEquals("sql-2.0", smv);
         }
     }
 

@@ -28,13 +28,19 @@ impl From<Vec<u8>> for TgBlob {
 pub struct TgBlobReference {
     provider: LargeObjectProvider,
     object_id: u64,
+    reference_tag: u64,
 }
 
 impl TgBlobReference {
-    pub(crate) fn new(provider: LargeObjectProvider, object_id: u64) -> TgBlobReference {
+    pub(crate) fn new(
+        provider: LargeObjectProvider,
+        object_id: u64,
+        reference_tag: u64,
+    ) -> TgBlobReference {
         TgBlobReference {
             provider,
             object_id,
+            reference_tag,
         }
     }
 }
@@ -46,5 +52,9 @@ impl TgLargeObjectReference for TgBlobReference {
 
     fn object_id(&self) -> u64 {
         self.object_id
+    }
+
+    fn reference_tag(&self) -> u64 {
+        self.reference_tag
     }
 }
