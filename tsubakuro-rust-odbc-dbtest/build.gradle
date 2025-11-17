@@ -12,6 +12,7 @@ version = '0.7.0'
 if (hasProperty('mavenLocal')) {
     repositories {
         mavenLocal()
+        mavenCentral()
     }
 } else {
     repositories {
