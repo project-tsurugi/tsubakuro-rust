@@ -9,6 +9,7 @@ use crate::{
     invalid_response_error,
     job::Job,
     prost_decode_error,
+    service::ServiceMessageVersion,
     session::wire::{response::WireResponse, Wire},
     tateyama::proto::endpoint::request::{
         request::Command as EndpointCommand, ClientInformation, Request as EndpointRequest,
@@ -24,6 +25,19 @@ const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 
 /// The minor service message version for EndpointRequest.
 const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
+
+/// Client of endpoint broker service.
+pub struct EndpointBrokerClient;
+
+impl ServiceMessageVersion for EndpointBrokerClient {
+    fn service_message_version() -> String {
+        format!(
+            "broker-{}.{}",
+            ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR,
+            ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR
+        )
+    }
+}
 
 pub(crate) struct EndpointBroker;
 

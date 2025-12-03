@@ -13,3 +13,11 @@ pub trait ServiceClient {
     /// See [Session::make_client]
     fn new(session: Arc<Session>) -> Self;
 }
+
+/// Service Message Version.
+///
+/// since 0.7.0
+pub trait ServiceMessageVersion {
+    /// Returns the service message version.
+    fn service_message_version() -> String;
+}

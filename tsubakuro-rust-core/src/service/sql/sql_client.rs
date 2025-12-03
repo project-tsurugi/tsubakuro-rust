@@ -26,6 +26,7 @@ use crate::{
         TgBlobReference, TgClobReference, TransactionStatusWithMessage,
     },
     prost_decode_error,
+    service::ServiceMessageVersion,
     session::{
         wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
         Session,
@@ -107,15 +108,16 @@ impl ServiceClient for SqlClient {
     }
 }
 
-impl SqlClient {
-    /// Get service message version.
-    pub fn service_message_version() -> String {
+impl ServiceMessageVersion for SqlClient {
+    fn service_message_version() -> String {
         format!(
             "{}-{}.{}",
             SERVICE_SYMBOLIC_ID, SERVICE_MESSAGE_VERSION_MAJOR, SERVICE_MESSAGE_VERSION_MINOR
         )
     }
+}
 
+impl SqlClient {
     /// Set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;

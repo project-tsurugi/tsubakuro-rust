@@ -14,7 +14,10 @@ use crate::{
     core_service_wire_response_error,
     error::TgError,
     job::Job,
-    prelude::endpoint::endpoint_broker::{EndpointBroker, HandshakeResult},
+    prelude::{
+        endpoint::endpoint_broker::{EndpointBroker, HandshakeResult},
+        ServiceMessageVersion,
+    },
     prost_decode_wire_response_error, return_err_if_timeout,
     session::{tcp::wire::TcpWire, wire::crypto::Crypto},
     tateyama::proto::{
@@ -39,6 +42,18 @@ const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 
 /// The minor service message version for FrameworkRequest.Header.
 const SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
+
+/// Client of session wire.
+pub struct WireClient;
+
+impl ServiceMessageVersion for WireClient {
+    fn service_message_version() -> String {
+        format!(
+            "wire-{}.{}",
+            SERVICE_MESSAGE_VERSION_MAJOR, SERVICE_MESSAGE_VERSION_MINOR
+        )
+    }
+}
 
 pub(crate) struct Wire {
     wire: DelegateWire,

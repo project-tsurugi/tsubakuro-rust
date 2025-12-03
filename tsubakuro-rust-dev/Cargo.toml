@@ -1,0 +1,7 @@
+[package]
+name = "tsubakuro-rust-dev"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tsubakuro-rust-core = { path = "../tsubakuro-rust-core" }

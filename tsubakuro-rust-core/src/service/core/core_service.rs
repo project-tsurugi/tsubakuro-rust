@@ -9,6 +9,7 @@ use crate::{
     invalid_response_error,
     job::Job,
     prost_decode_error,
+    service::ServiceMessageVersion,
     session::wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
     tateyama::proto::core::{
         request::{request::Command as CoreCommand, Request as CoreRequest, ShutdownType},
@@ -21,8 +22,22 @@ use crate::{
 // https://github.com/project-tsurugi/tsubakuro/blob/master/modules/session/src/main/java/com/tsurugidb/tsubakuro/common/impl/SessionImpl.java
 const SERVICE_ID_ROUTING: i32 = 0;
 // https://github.com/project-tsurugi/tsubakuro/blob/master/modules/session/src/main/java/com/tsurugidb/tsubakuro/common/Session.java
+/// The major service message version for routing service.
 const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
+/// The minor service message version for routing service.
 const SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
+
+/// Client of core service.
+pub struct CoreClient;
+
+impl ServiceMessageVersion for CoreClient {
+    fn service_message_version() -> String {
+        format!(
+            "core-{}.{}",
+            SERVICE_MESSAGE_VERSION_MAJOR, SERVICE_MESSAGE_VERSION_MINOR
+        )
+    }
+}
 
 pub(crate) struct CoreService;
 
