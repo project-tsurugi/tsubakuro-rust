@@ -32,6 +32,7 @@ pub struct TsurugiOdbcDbc {
     sql_client: Mutex<Option<Arc<SqlClient>>>,
     auto_commit: AtomicBool,
     transaction: Mutex<Option<Arc<Transaction>>>,
+    system_info: Mutex<Option<Arc<SystemInfo>>>,
     diags: Arc<TsurugiOdbcDiagCollection>,
 }
 
@@ -68,6 +69,7 @@ impl TsurugiOdbcDbc {
             sql_client: Mutex::new(None),
             auto_commit: AtomicBool::new(true),
             transaction: Mutex::new(None),
+            system_info: Mutex::new(None),
             diags: Arc::new(TsurugiOdbcDiagCollection::new()),
         }
     }
@@ -435,6 +437,41 @@ pub(crate) fn end_tran_dbc(hdbc: HDbc, completion_type: CompletionType) -> SqlRe
     match completion_type {
         CompletionType::SQL_COMMIT => dbc.commit(&dbc.diags),
         CompletionType::SQL_ROLLBACK => dbc.rollback(true, &dbc.diags),
+    }
+}
+
+impl TsurugiOdbcDbc {
+    pub(crate) fn get_system_info(&self) -> Option<Arc<SystemInfo>> {
+        const FUNCTION_NAME: &str = "get_system_info()";
+
+        let mut self_system_info = self.system_info.lock().unwrap();
+        if let Some(system_info) = &*self_system_info {
+            return Some(system_info.clone());
+        }
+
+        if let Some(session) = self.session() {
+            let runtime = self.runtime();
+            let system_client: SystemClient = session.make_client();
+
+            let system_info = match runtime.block_on(system_client.get_system_info()) {
+                Ok(system_info) => Arc::new(system_info),
+                Err(e) => {
+                    debug!("{self}.{FUNCTION_NAME} error. {:?}", e);
+                    self.add_diag(
+                        TsurugiOdbcError::GetInfoSystemInfoError,
+                        "Cannot get system info",
+                    );
+                    return None;
+                }
+            };
+
+            *self_system_info = Some(system_info.clone());
+            return Some(system_info);
+        }
+
+        debug!("{self}.{FUNCTION_NAME} error. not connected");
+        self.add_diag(TsurugiOdbcError::NotConnected, "not connected");
+        None
     }
 }
 

@@ -11,7 +11,6 @@ mod util;
 
 const ODBC_DRIVER_NAME: &str = "Tsurugi ODBC Driver";
 const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
-const TSURUGI_VERSION: &str = "1.5.0";
 
 #[cfg(windows)]
 const ODBC_DRIVER_FILE_NAME: &str = "tsubakuro_rust_odbc.dll";

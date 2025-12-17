@@ -3,12 +3,14 @@ package com.tsurugidb.tsubakuro.rust.odbc.dbc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.io.IOException;
 import java.net.URI;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.tsurugidb.iceaxe.TsurugiConnector;
 import com.tsurugidb.tsubakuro.rust.odbc.api.SqlReturn;
 import com.tsurugidb.tsubakuro.rust.odbc.util.TgOdbcTester;
 
@@ -30,6 +32,23 @@ class SQLGetInfoTest extends TgOdbcTester {
 
         String actual = dbc.getInfoString(InfoType.SQL_DRIVER_VER, 32, wideChar);
         assertNotNull(actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void SQL_DBMS_VERSION(boolean wideChar) throws IOException, InterruptedException {
+        var dbc = getConnection().dbc();
+
+        String name = dbc.getInfoString(InfoType.SQL_DBMS_NAME, 32, wideChar);
+        String version = dbc.getInfoString(InfoType.SQL_DBMS_VER, 128, wideChar);
+
+        var connector = TsurugiConnector.of(getEndpointJava(), getCredentialJava());
+        try (var session = connector.createSession()) {
+            var expected = session.getSystemInfo();
+
+            assertEquals(expected.getName(), name);
+            assertEquals(expected.getVersion(), version);
+        }
     }
 
     @ParameterizedTest

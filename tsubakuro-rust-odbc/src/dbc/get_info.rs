@@ -11,7 +11,7 @@ use crate::{
     },
     odbc_driver_version,
     util::{write_char, write_wchar_bytes},
-    ODBC_DRIVER_FILE_NAME, TSURUGI_VERSION,
+    ODBC_DRIVER_FILE_NAME,
 };
 
 #[repr(u16)]
@@ -529,8 +529,14 @@ impl GetInfo {
             SQL_DRIVER_NAME => self.write_string(info_type, ODBC_DRIVER_FILE_NAME),
             SQL_DRIVER_VER => self.write_string(info_type, odbc_driver_version()),
             SQL_DRIVER_ODBC_VER => self.write_string(info_type, "03.51"),
-            SQL_DBMS_NAME => self.write_string(info_type, "Tsurugi"),
-            SQL_DBMS_VER => self.write_string(info_type, TSURUGI_VERSION), // TODO 接続中のTsurugiのバージョン
+            SQL_DBMS_NAME => match dbc.get_system_info() {
+                Some(system_info) => self.write_string(info_type, system_info.name()),
+                None => SqlReturn::SQL_ERROR,
+            },
+            SQL_DBMS_VER => match dbc.get_system_info() {
+                Some(system_info) => self.write_string(info_type, system_info.version()),
+                None => SqlReturn::SQL_ERROR,
+            },
 
             SQL_ACCESSIBLE_PROCEDURES => self.write_string(info_type, "N"),
             SQL_ACCESSIBLE_TABLES => self.write_string(info_type, "Y"),

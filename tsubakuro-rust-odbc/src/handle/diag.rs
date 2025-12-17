@@ -39,6 +39,7 @@ pub enum TsurugiOdbcError {
     GetConnectAttrInvalidValuePtr = 31201,
     // SQLGetInfo
     GetInfoUnsupportedInfoType = 32001,
+    GetInfoSystemInfoError = 32002,
     // Transaction
     TransactionStartError = 33001,
     TransactionNotFound = 33002,
@@ -156,6 +157,7 @@ impl From<&TsurugiOdbcError> for &str {
             GetConnectAttrInvalidValuePtr => "HY009",
             // SQLGetInfo
             GetInfoUnsupportedInfoType => "HY096",
+            GetInfoSystemInfoError => "HY000",
             // Transaction
             TransactionStartError => "HY000",
             TransactionNotFound => "HY000",
