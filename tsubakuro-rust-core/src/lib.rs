@@ -118,5 +118,25 @@ pub(crate) mod tateyama {
                 ));
             }
         }
+        pub(crate) mod system {
+            pub(crate) mod diagnostic {
+                include!(concat!(
+                    env!("OUT_DIR"),
+                    "/tateyama.proto.system.diagnostic.rs"
+                ));
+            }
+            pub(crate) mod request {
+                include!(concat!(
+                    env!("OUT_DIR"),
+                    "/tateyama.proto.system.request.rs"
+                ));
+            }
+            pub(crate) mod response {
+                include!(concat!(
+                    env!("OUT_DIR"),
+                    "/tateyama.proto.system.response.rs"
+                ));
+            }
+        }
     }
 }

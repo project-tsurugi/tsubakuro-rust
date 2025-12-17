@@ -1,6 +1,4 @@
-use tsubakuro_rust_core::prelude::{
-    CoreClient, EndpointBrokerClient, ServiceMessageVersion, SqlClient, WireClient,
-};
+use tsubakuro_rust_core::prelude::*;
 
 fn main() {
     let wire = WireClient::service_message_version();
@@ -11,4 +9,6 @@ fn main() {
     println!("EndpointBroker SMV: {}", broker);
     let sql = SqlClient::service_message_version();
     println!("SqlClient SMV: {}", sql);
+    let system = SystemClient::service_message_version();
+    println!("SystemClient SMV: {}", system);
 }

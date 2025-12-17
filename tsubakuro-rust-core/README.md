@@ -82,11 +82,12 @@ See [example.rs](https://github.com/project-tsurugi/tsubakuro-rust/blob/master/t
 Need [protoc](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation) command since used [prost](https://crates.io/crates/prost).  
 (For example, to install `protoc` on Ubuntu 22.04, execute `apt install protobuf-compiler`)
 
-If proto files in [tsubakuro-proto](https://github.com/project-tsurugi/tsubakuro/tree/master/modules/proto) has been modified, copy from there.
+If proto files in [Tsubakuro/Java](https://github.com/project-tsurugi/tsubakuro) has been modified, copy from there.
 
 ```bash
 cd tsubakuro-rust-core
 cp -rp /path/to/tsubakuro/modules/proto/src/main/protos .
+cp -rp /path/to/tsubakuro/modules/system/src/main/proto/* protos/
 ```
 
 Then build with `cargo`.

@@ -15,6 +15,9 @@ fn main() {
             "protos/tateyama/proto/framework/common.proto",
             "protos/tateyama/proto/framework/request.proto",
             "protos/tateyama/proto/framework/response.proto",
+            "protos/tateyama/proto/system/diagnostic.proto",
+            "protos/tateyama/proto/system/request.proto",
+            "protos/tateyama/proto/system/response.proto",
         ],
         &["protos/"],
     )

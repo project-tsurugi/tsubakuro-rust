@@ -5,6 +5,7 @@ use crate::prelude::Session;
 pub mod core;
 pub(crate) mod endpoint;
 pub mod sql;
+pub mod system;
 
 /// client of service on tsurugidb.
 pub trait ServiceClient {
