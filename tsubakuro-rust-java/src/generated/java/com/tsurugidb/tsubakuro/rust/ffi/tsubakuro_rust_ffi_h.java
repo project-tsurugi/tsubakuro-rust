@@ -16087,6 +16087,18 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiStringArrayHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef struct TsurugiFfiSystemClient *TsurugiFfiSystemClientHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiSystemClientHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiSystemInfo *TsurugiFfiSystemInfoHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiSystemInfoHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiCredential *TsurugiFfiCredentialHandle
      * }
      */
@@ -28558,6 +28570,481 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_system_client_get_service_message_version {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_service_message_version");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_client_get_service_message_version$descriptor() {
+        return tsurugi_ffi_system_client_get_service_message_version.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_client_get_service_message_version$handle() {
+        return tsurugi_ffi_system_client_get_service_message_version.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_client_get_service_message_version$address() {
+        return tsurugi_ffi_system_client_get_service_message_version.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_service_message_version(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static int tsurugi_ffi_system_client_get_service_message_version(MemorySegment context, MemorySegment system_client, MemorySegment version_out) {
+        var mh$ = tsurugi_ffi_system_client_get_service_message_version.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_client_get_service_message_version", context, system_client, version_out);
+            }
+            return (int)mh$.invokeExact(context, system_client, version_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_system_client_get_system_info {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_system_info");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_client_get_system_info$descriptor() {
+        return tsurugi_ffi_system_client_get_system_info.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_client_get_system_info$handle() {
+        return tsurugi_ffi_system_client_get_system_info.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_client_get_system_info$address() {
+        return tsurugi_ffi_system_client_get_system_info.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static int tsurugi_ffi_system_client_get_system_info(MemorySegment context, MemorySegment system_client, MemorySegment system_info_out) {
+        var mh$ = tsurugi_ffi_system_client_get_system_info.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_client_get_system_info", context, system_client, system_info_out);
+            }
+            return (int)mh$.invokeExact(context, system_client, system_info_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_system_client_get_system_info_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_system_info_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_for(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiDuration timeout, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_client_get_system_info_for$descriptor() {
+        return tsurugi_ffi_system_client_get_system_info_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_for(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiDuration timeout, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_client_get_system_info_for$handle() {
+        return tsurugi_ffi_system_client_get_system_info_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_for(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiDuration timeout, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_client_get_system_info_for$address() {
+        return tsurugi_ffi_system_client_get_system_info_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_for(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiDuration timeout, TsurugiFfiSystemInfoHandle *system_info_out)
+     * }
+     */
+    public static int tsurugi_ffi_system_client_get_system_info_for(MemorySegment context, MemorySegment system_client, long timeout, MemorySegment system_info_out) {
+        var mh$ = tsurugi_ffi_system_client_get_system_info_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_client_get_system_info_for", context, system_client, timeout, system_info_out);
+            }
+            return (int)mh$.invokeExact(context, system_client, timeout, system_info_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_system_client_get_system_info_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_system_info_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_async(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiJobHandle *system_info_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_client_get_system_info_async$descriptor() {
+        return tsurugi_ffi_system_client_get_system_info_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_async(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiJobHandle *system_info_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_client_get_system_info_async$handle() {
+        return tsurugi_ffi_system_client_get_system_info_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_async(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiJobHandle *system_info_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_client_get_system_info_async$address() {
+        return tsurugi_ffi_system_client_get_system_info_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_async(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle system_client, TsurugiFfiJobHandle *system_info_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_system_client_get_system_info_async(MemorySegment context, MemorySegment system_client, MemorySegment system_info_job_out) {
+        var mh$ = tsurugi_ffi_system_client_get_system_info_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_client_get_system_info_async", context, system_client, system_info_job_out);
+            }
+            return (int)mh$.invokeExact(context, system_client, system_info_job_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_system_client_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_client_dispose(TsurugiFfiSystemClientHandle system_client)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_client_dispose$descriptor() {
+        return tsurugi_ffi_system_client_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_client_dispose(TsurugiFfiSystemClientHandle system_client)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_client_dispose$handle() {
+        return tsurugi_ffi_system_client_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_client_dispose(TsurugiFfiSystemClientHandle system_client)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_client_dispose$address() {
+        return tsurugi_ffi_system_client_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_client_dispose(TsurugiFfiSystemClientHandle system_client)
+     * }
+     */
+    public static void tsurugi_ffi_system_client_dispose(MemorySegment system_client) {
+        var mh$ = tsurugi_ffi_system_client_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_client_dispose", system_client);
+            }
+            mh$.invokeExact(system_client);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_system_info_get_name {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_info_get_name");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_name(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *name_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_info_get_name$descriptor() {
+        return tsurugi_ffi_system_info_get_name.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_name(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *name_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_info_get_name$handle() {
+        return tsurugi_ffi_system_info_get_name.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_name(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *name_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_info_get_name$address() {
+        return tsurugi_ffi_system_info_get_name.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_name(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *name_out)
+     * }
+     */
+    public static int tsurugi_ffi_system_info_get_name(MemorySegment context, MemorySegment system_info, MemorySegment name_out) {
+        var mh$ = tsurugi_ffi_system_info_get_name.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_info_get_name", context, system_info, name_out);
+            }
+            return (int)mh$.invokeExact(context, system_info, name_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_system_info_get_version {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_info_get_version");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_version(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_info_get_version$descriptor() {
+        return tsurugi_ffi_system_info_get_version.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_version(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_info_get_version$handle() {
+        return tsurugi_ffi_system_info_get_version.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_version(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_info_get_version$address() {
+        return tsurugi_ffi_system_info_get_version.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_system_info_get_version(TsurugiFfiContextHandle context, TsurugiFfiSystemInfoHandle system_info, TsurugiFfiStringHandle *version_out)
+     * }
+     */
+    public static int tsurugi_ffi_system_info_get_version(MemorySegment context, MemorySegment system_info, MemorySegment version_out) {
+        var mh$ = tsurugi_ffi_system_info_get_version.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_info_get_version", context, system_info, version_out);
+            }
+            return (int)mh$.invokeExact(context, system_info, version_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_system_info_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_info_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_info_dispose(TsurugiFfiSystemInfoHandle system_info)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_system_info_dispose$descriptor() {
+        return tsurugi_ffi_system_info_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_info_dispose(TsurugiFfiSystemInfoHandle system_info)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_system_info_dispose$handle() {
+        return tsurugi_ffi_system_info_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_info_dispose(TsurugiFfiSystemInfoHandle system_info)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_system_info_dispose$address() {
+        return tsurugi_ffi_system_info_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_system_info_dispose(TsurugiFfiSystemInfoHandle system_info)
+     * }
+     */
+    public static void tsurugi_ffi_system_info_dispose(MemorySegment system_info) {
+        var mh$ = tsurugi_ffi_system_info_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_system_info_dispose", system_info);
+            }
+            mh$.invokeExact(system_info);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_credential_null {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,
@@ -30647,6 +31134,66 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_make_sql_client", context, session, sql_client_out);
             }
             return (int)mh$.invokeExact(context, session, sql_client_out);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_make_system_client {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_make_system_client");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_system_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSystemClientHandle *system_client_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_make_system_client$descriptor() {
+        return tsurugi_ffi_session_make_system_client.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_system_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSystemClientHandle *system_client_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_make_system_client$handle() {
+        return tsurugi_ffi_session_make_system_client.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_system_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSystemClientHandle *system_client_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_make_system_client$address() {
+        return tsurugi_ffi_session_make_system_client.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_make_system_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiSystemClientHandle *system_client_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_make_system_client(MemorySegment context, MemorySegment session, MemorySegment system_client_out) {
+        var mh$ = tsurugi_ffi_session_make_system_client.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_make_system_client", context, session, system_client_out);
+            }
+            return (int)mh$.invokeExact(context, session, system_client_out);
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }

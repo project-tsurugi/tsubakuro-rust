@@ -14,6 +14,8 @@ import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiTableMetadata;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPreparedStatement;
+import com.tsurugidb.tsubakuro.rust.java.service.system.TgFfiSystemClient;
+import com.tsurugidb.tsubakuro.rust.java.service.system.TgFfiSystemInfo;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
@@ -60,6 +62,7 @@ public class TgFfiExampleMain {
 
     private Duration timeout = Duration.ofSeconds(5);
     private TgFfiSqlClient client;
+    private TgFfiSystemClient systemClient;
     private TgFfiCommitOption commitOption;
 
     TgFfiExampleMain(ExecuteType execType, TgFfiObjectManager manager, TgFfiContext context) {
@@ -70,9 +73,13 @@ public class TgFfiExampleMain {
     void execute(String endpoint) {
         try (var session = connect(endpoint); //
                 var client = session.makeSqlClient(context); //
+                var systemClient = session.makeSystemClient(context); //
                 var commitOption = TgFfiCommitOption.create(context)) {
             this.client = client;
+            this.systemClient = systemClient;
             this.commitOption = commitOption;
+
+            systemInfo();
 
             {
                 var sql = "drop table if exists test";
@@ -178,6 +185,25 @@ public class TgFfiExampleMain {
         case DIRECT_FOR:
             transaction.closeFor(context, timeout);
             return;
+        }
+    }
+
+    void systemInfo() {
+        try (var systemInfo = doSystemInfo()) {
+            String name = systemInfo.getName(context);
+            String version = systemInfo.getVersion(context);
+            System.out.printf("SystemClient.getSystemInfo()=%s %s%n", name, version);
+        }
+    }
+
+    private TgFfiSystemInfo doSystemInfo() {
+        switch (executeType) {
+        case DIRECT:
+            return systemClient.getSystemInfo(context);
+        case DIRECT_FOR:
+            return systemClient.getSystemInfoFor(context, timeout);
+        default:
+            return take(systemClient.getSystemInfoAsync(context));
         }
     }
 

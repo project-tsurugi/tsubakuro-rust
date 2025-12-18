@@ -70,7 +70,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
     }
 
-    // list_tables(), list_tables() → TgFfiTableListTest
+    // list_tables(), list_tables_for() → TgFfiTableListTest
 
     @Test
     void list_tables_argError() {

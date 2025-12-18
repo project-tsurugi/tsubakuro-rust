@@ -24,6 +24,7 @@ import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResult;
+import com.tsurugidb.tsubakuro.rust.java.service.system.TgFfiSystemClient;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiCredential;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
@@ -229,6 +230,16 @@ public class TgFfiTester {
 
         try (var context = TgFfiContext.create(manager)) {
             var client = session.makeSqlClient(context);
+            return client;
+        }
+    }
+
+    protected TgFfiSystemClient createSystemClient() {
+        var manager = getFfiObjectManager();
+        var session = createSession();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var client = session.makeSystemClient(context);
             return client;
         }
     }

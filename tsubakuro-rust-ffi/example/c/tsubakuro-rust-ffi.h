@@ -323,6 +323,10 @@ typedef struct TsurugiFfiSqlQueryResult TsurugiFfiSqlQueryResult;
 
 typedef struct TsurugiFfiSqlQueryResultMetadata TsurugiFfiSqlQueryResultMetadata;
 
+typedef struct TsurugiFfiSystemClient TsurugiFfiSystemClient;
+
+typedef struct TsurugiFfiSystemInfo TsurugiFfiSystemInfo;
+
 typedef struct TsurugiFfiTableList TsurugiFfiTableList;
 
 typedef struct TsurugiFfiTableMetadata TsurugiFfiTableMetadata;
@@ -468,6 +472,16 @@ typedef struct TsurugiFfiCommitOption *TsurugiFfiCommitOptionHandle;
  * String array.
  */
 typedef const TsurugiFfiStringHandle *TsurugiFfiStringArrayHandle;
+
+/**
+ * System client.
+ */
+typedef struct TsurugiFfiSystemClient *TsurugiFfiSystemClientHandle;
+
+/**
+ * System info.
+ */
+typedef struct TsurugiFfiSystemInfo *TsurugiFfiSystemInfoHandle;
 
 /**
  * Credential.
@@ -4389,6 +4403,117 @@ TsurugiFfiRc tsurugi_ffi_large_object_cache_get_path(TsurugiFfiContextHandle con
 void tsurugi_ffi_large_object_cache_dispose(TsurugiFfiLargeObjectCacheHandle large_object_cache);
 
 /**
+ * SystemClient: Get service message version.
+ *
+ * See [`SystemClient::service_message_version`].
+ *
+ * # Receiver
+ * - `system_client` - System client.
+ *
+ * # Returns
+ * - `version_out` - service message version.
+ */
+TsurugiFfiRc tsurugi_ffi_system_client_get_service_message_version(TsurugiFfiContextHandle context,
+                                                                   TsurugiFfiSystemClientHandle system_client,
+                                                                   TsurugiFfiStringHandle *version_out);
+
+/**
+ * SystemClient: Get system info.
+ *
+ * See [`SystemClient::get_system_info`].
+ *
+ * # Receiver
+ * - `system_client` - System client.
+ *
+ * # Returns
+ * - `system_info_out` - system info. To dispose, call [`tsurugi_ffi_system_info_dispose`](crate::service::system::system_info::tsurugi_ffi_system_info_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_system_client_get_system_info(TsurugiFfiContextHandle context,
+                                                       TsurugiFfiSystemClientHandle system_client,
+                                                       TsurugiFfiSystemInfoHandle *system_info_out);
+
+/**
+ * SystemClient: Get system info.
+ *
+ * See [`SystemClient::get_system_info_for`].
+ *
+ * # Receiver
+ * - `system_client` - System client.
+ *
+ * # Parameters
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `system_info_out` - system info. To dispose, call [`tsurugi_ffi_system_info_dispose`](crate::service::system::system_info::tsurugi_ffi_system_info_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_for(TsurugiFfiContextHandle context,
+                                                           TsurugiFfiSystemClientHandle system_client,
+                                                           TsurugiFfiDuration timeout,
+                                                           TsurugiFfiSystemInfoHandle *system_info_out);
+
+/**
+ * SystemClient: Get system info.
+ *
+ * See [`SystemClient::get_system_info_async`].
+ *
+ * # Receiver
+ * - `system_client` - System client.
+ *
+ * # Returns
+ * - `system_info_job_out` - Job for `TsurugiFfiSystemInfoHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+ *   Handle taken from Job casts to `TsurugiFfiSystemInfoHandle` and call [`tsurugi_ffi_system_info_dispose`](crate::service::system::system_info::tsurugi_ffi_system_info_dispose) to dispose.
+ */
+TsurugiFfiRc tsurugi_ffi_system_client_get_system_info_async(TsurugiFfiContextHandle context,
+                                                             TsurugiFfiSystemClientHandle system_client,
+                                                             TsurugiFfiJobHandle *system_info_job_out);
+
+/**
+ * SystemClient: Dispose.
+ *
+ * # Receiver
+ * - `system_client` - System client.
+ */
+void tsurugi_ffi_system_client_dispose(TsurugiFfiSystemClientHandle system_client);
+
+/**
+ * SystemInfo: Get tsurugidb name.
+ *
+ * See [`SystemInfo::name`].
+ *
+ * # Receiver
+ * - `system_info` - System info.
+ *
+ * # Returns
+ * - `database_name_out` - database name.
+ */
+TsurugiFfiRc tsurugi_ffi_system_info_get_name(TsurugiFfiContextHandle context,
+                                              TsurugiFfiSystemInfoHandle system_info,
+                                              TsurugiFfiStringHandle *name_out);
+
+/**
+ * SystemInfo: Get tsurugidb version.
+ *
+ * See [`SystemInfo::version`].
+ *
+ * # Receiver
+ * - `system_info` - System info.
+ *
+ * # Returns
+ * - `version_out` - version.
+ */
+TsurugiFfiRc tsurugi_ffi_system_info_get_version(TsurugiFfiContextHandle context,
+                                                 TsurugiFfiSystemInfoHandle system_info,
+                                                 TsurugiFfiStringHandle *version_out);
+
+/**
+ * SystemInfo: Dispose.
+ *
+ * # Receiver
+ * - `system_info` - System info.
+ */
+void tsurugi_ffi_system_info_dispose(TsurugiFfiSystemInfoHandle system_info);
+
+/**
  * Credential: Creates a null credential.
  *
  * See [`Credential::null`].
@@ -4895,6 +5020,21 @@ TsurugiFfiRc tsurugi_ffi_session_get_default_timeout(TsurugiFfiContextHandle con
 TsurugiFfiRc tsurugi_ffi_session_make_sql_client(TsurugiFfiContextHandle context,
                                                  TsurugiFfiSessionHandle session,
                                                  TsurugiFfiSqlClientHandle *sql_client_out);
+
+/**
+ * Session: Make SystemClient.
+ *
+ * # Receiver
+ * - `session` - Session.
+ *
+ * See [`Session::make_client`].
+ *
+ * # Returns
+ * - `system_client_out` - SystemClient. To dispose, call [`tsurugi_ffi_system_client_dispose`](crate::service::system::tsurugi_ffi_system_client_dispose).
+ */
+TsurugiFfiRc tsurugi_ffi_session_make_system_client(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiSessionHandle session,
+                                                    TsurugiFfiSystemClientHandle *system_client_out);
 
 /**
  * Session: Update expiration time.

@@ -10,7 +10,10 @@ use crate::{
     impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
-    service::sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
+    service::{
+        sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
+        system::{TsurugiFfiSystemClient, TsurugiFfiSystemClientHandle},
+    },
     TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
@@ -398,6 +401,54 @@ pub extern "C" fn tsurugi_ffi_session_make_sql_client(
 
     let rc = rc_ok(context);
     trace!("{FUNCTION_NAME} end rc={:x}. sql_client={:?}", rc, handle);
+    rc
+}
+
+/// Session: Make SystemClient.
+///
+/// # Receiver
+/// - `session` - Session.
+///
+/// See [`Session::make_client`].
+///
+/// # Returns
+/// - `system_client_out` - SystemClient. To dispose, call [`tsurugi_ffi_system_client_dispose`](crate::service::system::tsurugi_ffi_system_client_dispose).
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_make_system_client(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    system_client_out: *mut TsurugiFfiSystemClientHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_make_system_client()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, system_client_out={:?}",
+        context,
+        session,
+        system_client_out
+    );
+
+    ffi_arg_out_initialize!(system_client_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, system_client_out);
+
+    let session = unsafe { &*session };
+    let system_client: SystemClient = session.make_client();
+    let client = Box::new(TsurugiFfiSystemClient::new(
+        system_client,
+        session.runtime().clone(),
+    ));
+
+    let handle = Box::into_raw(client);
+    unsafe {
+        *system_client_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. system_client={:?}",
+        rc,
+        handle
+    );
     rc
 }
 

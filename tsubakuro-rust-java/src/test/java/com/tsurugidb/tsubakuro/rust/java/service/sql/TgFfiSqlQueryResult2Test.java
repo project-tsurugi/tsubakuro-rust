@@ -11,7 +11,6 @@ import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
-import com.tsurugidb.tsubakuro.rust.java.util.TgFfiInitializer;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiRuntimeException;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiTester;

@@ -11,6 +11,7 @@ import com.tsurugidb.tsubakuro.rust.java.job.TgFfiJob;
 import com.tsurugidb.tsubakuro.rust.java.job.TgFfiVoidJob;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlClient;
+import com.tsurugidb.tsubakuro.rust.java.service.system.TgFfiSystemClient;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
@@ -162,6 +163,17 @@ public class TgFfiSession extends TgFfiObject {
 
         var outHandle = outToHandle(out);
         return new TgFfiSqlClient(manager(), outHandle);
+    }
+
+    public synchronized TgFfiSystemClient makeSystemClient(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_make_system_client(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSystemClient(manager(), outHandle);
     }
 
     public synchronized void updateExpirationTime(TgFfiContext context, Duration expirationTime) {

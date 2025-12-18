@@ -17,6 +17,8 @@ insert into customer values(3, 'Tsurugi', 1);
 TsurugiFfiRc example(TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password);
 TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password);
 TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHandle endpoint, TsurugiFfiStringHandle user, TsurugiFfiStringHandle password);
+TsurugiFfiRc example_system_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session);
+TsurugiFfiRc example_system_info(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle client);
 TsurugiFfiRc example_sql_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session);
 TsurugiFfiRc example_transaction_option(TsurugiFfiContextHandle context, TsurugiFfiTransactionOptionHandle transaction_option);
 TsurugiFfiRc example_transaction(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client);
@@ -155,10 +157,20 @@ TsurugiFfiRc example_connect(TsurugiFfiContextHandle context, TsurugiFfiStringHa
     // dispose ConnectionOption
     tsurugi_ffi_connection_option_dispose(connection_option);
 
+    // execute SystemClient
+    rc = example_system_client(context, session);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+
+        // dispose Session
+        tsurugi_ffi_session_dispose(session);
+        return rc;
+    }
+
     // execute SQL
     rc = example_sql_client(context, session);
 
-    // dispose SqlClient, Session
+    // dispose Session
     tsurugi_ffi_session_dispose(session);
 
     return rc;
@@ -208,6 +220,69 @@ TsurugiFfiRc example_connection_option(TsurugiFfiContextHandle context, TsurugiF
         example_error(context);
         return rc;
     }
+}
+
+/*
+ * SystemClient
+ */
+TsurugiFfiRc example_system_client(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session) {
+    TsurugiFfiRc rc;
+
+    // make SystemClient
+    TsurugiFfiSystemClientHandle client;
+    rc = tsurugi_ffi_session_make_system_client(context, session, &client);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+        return rc;
+    }
+
+    // execute SQL
+    rc = example_system_info(context, client);
+
+    // dispose SystemClient, Session
+    tsurugi_ffi_system_client_dispose(client);
+
+    return rc;
+}
+
+
+/*
+ * system info
+ */
+TsurugiFfiRc example_system_info(TsurugiFfiContextHandle context, TsurugiFfiSystemClientHandle client) {
+    TsurugiFfiRc rc;
+    printf("---example_system_info---\n");
+
+    // create TransactionOption
+    TsurugiFfiSystemInfoHandle system_info;
+    rc = tsurugi_ffi_system_client_get_system_info(context, client, &system_info);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+        return rc;
+    }
+
+    TsurugiFfiStringHandle name;
+    rc = tsurugi_ffi_system_info_get_name(context, system_info, &name);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+        tsurugi_ffi_system_info_dispose(system_info);
+        return rc;
+    }
+    printf("name=%s\n", name);
+
+    TsurugiFfiStringHandle version;
+    rc = tsurugi_ffi_system_info_get_version(context, system_info, &version);
+    if (rc != TSURUGI_FFI_RC_OK) {
+        example_error(context);
+        tsurugi_ffi_system_info_dispose(system_info);
+        return rc;
+    }
+    printf("version=%s\n", version);
+
+    // dispose SystemInfo
+    tsurugi_ffi_system_info_dispose(system_info);
+
+    return rc;
 }
 
 /*
@@ -726,7 +801,7 @@ TsurugiFfiRc example_prepared_statement_query0(TsurugiFfiContextHandle context, 
     TsurugiFfiStringHandle sql = "select * from customer order by c_id";
     printf("%s\n", sql);
 
-    TsurugiFfiSqlPlaceholderHandle placeholders[] = {};
+    TsurugiFfiSqlPlaceholderHandle *placeholders = NULL;
     uint32_t placeholders_size = 0;
     TsurugiFfiSqlPreparedStatementHandle prepared_statement;
     rc = tsurugi_ffi_sql_client_prepare(context, client, sql, placeholders, placeholders_size, &prepared_statement);
@@ -747,7 +822,7 @@ TsurugiFfiRc example_prepared_statement_query0(TsurugiFfiContextHandle context, 
 TsurugiFfiRc example_prepared_query0(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle client, TsurugiFfiTransactionHandle transaction, TsurugiFfiSqlPreparedStatementHandle prepared_statement) {
     TsurugiFfiRc rc;
 
-    TsurugiFfiSqlParameterHandle parameters[] = {};
+    TsurugiFfiSqlParameterHandle *parameters = NULL;
     uint32_t parameters_size = 0;
     TsurugiFfiSqlQueryResultHandle query_result;
     rc = tsurugi_ffi_sql_client_prepared_query(context, client, transaction, prepared_statement, parameters, parameters_size, &query_result);
