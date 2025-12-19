@@ -191,6 +191,7 @@ class TgFfiTypeBlobTest extends TgFfiTester {
         try (var client = createSqlClient(); //
                 var transaction = startOcc(client)) {
 
+            boolean operationDenied = false;
             try (var qr = client.query(context, transaction, "select * from test order by pk")) {
                 queryResultMetadata(qr.getMetadata(context));
 
@@ -208,12 +209,12 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                             switch (pattern) {
                             case DIRECT:
                                 try (var value = qr.fetchBlob(context)) {
-                                    new BlobTester(client, transaction, i, value).test();
+                                    operationDenied |= new BlobTester(client, transaction, i, value).test();
                                 }
                                 break;
                             case DIRECT_FOR:
                                 try (var value = qr.fetchForBlob(context, Duration.ofSeconds(5))) {
-                                    new BlobTester(client, transaction, i, value).test();
+                                    operationDenied |= new BlobTester(client, transaction, i, value).test();
                                 }
                                 break;
                             default:
@@ -232,7 +233,16 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                 }
             }
 
-            commitAndClose(client, transaction, DIRECT_FOR);
+            if (operationDenied) {
+                var e = assertThrows(TgFfiRuntimeException.class, () -> {
+                    commitAndClose(client, transaction, DIRECT_FOR);
+                });
+                if (!e.getServerErrorStructuredCode().equals("SQL-02025")) { // INACTIVE_TRANSACTION_EXCEPTION
+                    throw e;
+                }
+            } else {
+                commitAndClose(client, transaction, DIRECT_FOR);
+            }
         }
     }
 
@@ -268,7 +278,8 @@ class TgFfiTypeBlobTest extends TgFfiTester {
             this.blob = blob;
         }
 
-        void test() throws IOException {
+        boolean test() throws IOException {
+            boolean operationDenied = false;
             for (var pattern : List.of(DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY)) {
                 try {
                     read_blob(pattern);
@@ -276,6 +287,7 @@ class TgFfiTypeBlobTest extends TgFfiTester {
                     copy_blob_to(pattern);
                 } catch (TgFfiRuntimeException e) {
                     if (e.getServerErrorStructuredCode().equals("SCD-00404")) { // OPERATION_DENIED
+                        operationDenied = true;
                         continue;
                     }
                     throw e;
@@ -290,6 +302,8 @@ class TgFfiTypeBlobTest extends TgFfiTester {
             copy_blob_to_argError();
             copy_blob_to_for_argError();
             copy_blob_to_async_argError();
+
+            return operationDenied;
         }
 
         private void read_blob(String pattern) throws IOException {
