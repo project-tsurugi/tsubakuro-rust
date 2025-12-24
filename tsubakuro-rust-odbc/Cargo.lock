@@ -1567,7 +1567,7 @@ checksum = "fcc842091f2def52017664b53082ecbbeb5c7731092bad69d2c63050401dfd64"
 
 [[package]]
 name = "tsubakuro-rust-core"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "async-trait",
  "base64",
@@ -1589,7 +1589,7 @@ dependencies = [
 
 [[package]]
 name = "tsubakuro-rust-odbc"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "dtoa",
  "embed-resource",

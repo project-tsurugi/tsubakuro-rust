@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.tsurugidb.tsubakuro.rust.odbc'
-version = '0.7.0'
+version = '0.8.0'
 
 
 if (hasProperty('mavenLocal')) {
@@ -84,7 +84,7 @@ dependencies {
 
   testImplementation platform('org.junit:junit-bom:5.10.1')
   testImplementation 'org.junit.jupiter:junit-jupiter'
-  testImplementation 'com.tsurugidb.iceaxe:iceaxe-core:1.13.0'
+  testImplementation 'com.tsurugidb.iceaxe:iceaxe-core:1.14.0-SNAPSHOT'
 
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
