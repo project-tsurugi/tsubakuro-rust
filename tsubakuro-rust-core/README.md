@@ -6,7 +6,7 @@ tsubakuro-rust-core is a port from [Tsubakuro/Java](https://github.com/project-t
 
 ## Target
 
-- Tsurugi 1.7.0 or later.
+- Tsurugi 1.8.0 or later.
 
 ## Limitations
 
@@ -32,7 +32,7 @@ Add `tsubakuro-rust-core` as a dependency to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-tsubakuro-rust-core = "0.6.0"
+tsubakuro-rust-core = "0.7.0"
 ```
 
 
