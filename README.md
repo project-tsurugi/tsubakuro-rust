@@ -21,4 +21,8 @@ C ABI format library and ODBC driver are also provided.
   - ODBC Driver to access Tsurugi.
   - Written in Rust.
   - Using tsubakuro-rust-core.
+- [tsubakuro-rust-python](tsubakuro-rust-python)
+  - Python library to access Tsurugi.
+  - Written in Rust.
+  - Using tsubakuro-rust-core.
 

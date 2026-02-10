@@ -1,0 +1,132 @@
+use pyo3::{prelude::*, types::PyTuple};
+use tsubakuro_rust_core::prelude::SqlColumn;
+
+use crate::type_code::atom_type_to_type_code;
+
+#[pyclass]
+pub struct Column {
+    inner: SqlColumn,
+}
+
+impl Column {
+    pub(crate) fn new(column: SqlColumn) -> Self {
+        Column { inner: column }
+    }
+}
+
+#[pymethods]
+impl Column {
+    #[getter]
+    pub fn name(&self) -> &str {
+        self.inner.name()
+    }
+
+    #[getter]
+    pub fn description(&self) -> Option<&String> {
+        self.inner.description()
+    }
+
+    #[getter]
+    pub fn type_code(&self) -> &'static str {
+        atom_type_to_type_code(self.inner.atom_type())
+    }
+
+    #[getter]
+    pub fn atom_type_code(&self) -> i32 {
+        if let Some(atom_type) = self.inner.atom_type() {
+            atom_type.into()
+        } else {
+            -1
+        }
+    }
+
+    #[getter]
+    pub fn sql_type(&self) -> String {
+        if let Some(t) = self.inner.sql_type() {
+            t
+        } else {
+            "Unknown".to_string()
+        }
+    }
+
+    #[getter]
+    pub fn sql_type_name(&self) -> Option<&str> {
+        self.inner.sql_type_name()
+    }
+
+    #[getter]
+    pub fn length(&self) -> Option<u32> {
+        match self.inner.length() {
+            Some((length, false)) => Some(length),
+            _ => None,
+        }
+    }
+
+    #[getter]
+    pub fn precision(&self) -> Option<u32> {
+        match self.inner.precision() {
+            Some((precision, false)) => Some(precision),
+            _ => None,
+        }
+    }
+
+    #[getter]
+    pub fn scale(&self) -> Option<u32> {
+        match self.inner.scale() {
+            Some((scale, false)) => Some(scale),
+            _ => None,
+        }
+    }
+
+    #[getter]
+    pub fn nullable(&self) -> Option<bool> {
+        self.inner.nullable()
+    }
+
+    pub fn __repr__(&self) -> PyResult<String> {
+        Ok(format!(
+            "Column(name='{}', type='{}')",
+            self.name(),
+            self.sql_type()
+        ))
+    }
+}
+
+pub(crate) fn columns_description<'py>(
+    py: Python<'py>,
+    columns: &Vec<SqlColumn>,
+) -> PyResult<Option<Bound<'py, PyTuple>>> {
+    let mut vec = Vec::with_capacity(columns.len());
+    for column in columns {
+        let name = column.name();
+        let type_code = atom_type_to_type_code(column.atom_type());
+        let length = match column.length() {
+            Some((length, false)) => Some(length),
+            _ => None,
+        };
+        let precision = match column.precision() {
+            Some((precision, false)) => Some(precision),
+            _ => None,
+        };
+        let scale = match column.scale() {
+            Some((scale, false)) => Some(scale),
+            _ => None,
+        };
+        let nullable = column.nullable();
+
+        let tuple = PyTuple::new(
+            py,
+            vec![
+                name.into_pyobject(py)?.into_any(),      // name
+                type_code.into_pyobject(py)?.into_any(), // type_code
+                py.None().into_pyobject(py)?,            // display_size
+                length.into_pyobject(py)?,               // internal_size
+                precision.into_pyobject(py)?,            // precision
+                scale.into_pyobject(py)?,                // scale
+                nullable.into_pyobject(py)?,             // null_ok
+            ],
+        )?;
+        vec.push(tuple);
+    }
+    Ok(Some(PyTuple::new(py, vec)?))
+}

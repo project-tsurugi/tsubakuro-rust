@@ -1,0 +1,255 @@
+import tsubakuro_rust_python as tsurugi
+
+
+def drop_and_create_table(connection):
+    with connection.cursor() as cursor:
+        cursor.execute("drop table if exists tsubakuro_rust_python_test")
+        cursor.execute(
+            "create table tsubakuro_rust_python_test (pk int primary key, value real)"
+        )
+        connection.commit()
+
+
+def test_real(connection):
+    drop_and_create_table(connection)
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "insert into tsubakuro_rust_python_test values (0, null), (1, 1), (2, 0), (3, -123.5), (4, 123.5) "
+        )
+        connection.commit()
+
+        metadata = connection.get_table_metadata("tsubakuro_rust_python_test")
+        description = metadata.description
+        assert description == (
+            ("pk", "Int32", None, None, None, None, False),
+            ("value", "Float32", None, None, None, None, True),
+        )
+
+        cursor.execute("select * from tsubakuro_rust_python_test order by pk")
+        rows = cursor.fetchall()
+        assert rows == [
+            (0, None),
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+        ]
+        assert type(rows[1][1]) is float
+        description = cursor.description
+        assert description == (
+            ("pk", "Int32", None, None, None, None, None),
+            ("value", "Float32", None, None, None, None, None),
+        )
+        connection.commit()
+
+
+def test_placeholder(connection):
+    drop_and_create_table(connection)
+
+    with connection.cursor() as cursor:
+        parameters = [
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+            (9, None),
+        ]
+        cursor.executemany(
+            "insert into tsubakuro_rust_python_test values (?, ?)", parameters
+        )
+        assert cursor.rowcount == 5
+        connection.commit()
+
+        cursor.execute("select * from tsubakuro_rust_python_test order by pk")
+        rows = cursor.fetchall()
+        assert rows == parameters
+        connection.commit()
+
+
+def test_wrapper():
+    value = tsurugi.Float32()
+    assert value.value is None
+    value = tsurugi.Float32(None)
+    assert value.value is None
+    value = tsurugi.Float32(123.5)
+    assert value.value == 123.5
+    value = tsurugi.Float32("123.5")
+    assert value.value == 123.5
+    try:
+        value = tsurugi.Float32("abc")
+        assert False, "must raise"
+    except ValueError:
+        pass
+
+
+def test_placeholder_wrapper(connection):
+    drop_and_create_table(connection)
+
+    with connection.cursor() as cursor:
+        parameters = [
+            (tsurugi.Int32(0), tsurugi.Float32(None)),
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+        ]
+        cursor.executemany(
+            "insert into tsubakuro_rust_python_test values (?, ?)", parameters
+        )
+        assert cursor.rowcount == 5
+        connection.commit()
+
+        cursor.execute("select * from tsubakuro_rust_python_test order by pk")
+        rows = cursor.fetchall()
+        assert rows == [
+            (0, None),
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+        ]
+        connection.commit()
+
+
+def test_named_placeholder(connection):
+    drop_and_create_table(connection)
+
+    with connection.cursor() as cursor:
+        parameters = [
+            {"pk": tsurugi.Int32(0), "value": tsurugi.Float32(None)},
+            {"pk": tsurugi.Int32(1), "value": tsurugi.Float32(1.0)},
+            {"pk": tsurugi.Int32(2), "value": tsurugi.Float32(0.0)},
+        ]
+        cursor.executemany(
+            "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
+        )
+        assert cursor.rowcount == 3
+
+        parameters = [
+            {"pk": 3, "value": -123.5},
+            {"pk": 4, "value": 123.5},
+        ]
+        cursor.executemany(
+            "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
+        )
+        assert cursor.rowcount == 2
+        connection.commit()
+
+        cursor.execute("select * from tsubakuro_rust_python_test order by pk")
+        rows = cursor.fetchall()
+        assert rows == [
+            (0, None),
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+        ]
+        connection.commit()
+
+
+def test_prepare_qmark(connection):
+    drop_and_create_table(connection)
+
+    with connection.cursor() as cursor:
+        insert = "insert into tsubakuro_rust_python_test values (?, ?)"
+        cursor.prepare(
+            insert,
+            (tsurugi.Int32, tsurugi.Float32),
+        )
+        parameters = [
+            (0, None),
+            (1, 1.0),
+            (2, 0.0),
+        ]
+        cursor.executemany(insert, parameters)
+        assert cursor.rowcount == 3
+
+        cursor.prepare(
+            insert,
+            (tsurugi.Int32(), tsurugi.Float32()),
+        )
+        parameters = [
+            (3, -123.5),
+            (4, 123.5),
+        ]
+        cursor.executemany(insert, parameters)
+        assert cursor.rowcount == 2
+        connection.commit()
+
+        cursor.execute("select * from tsubakuro_rust_python_test order by pk")
+        rows = cursor.fetchall()
+        assert rows == [
+            (0, None),
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+        ]
+
+
+def test_prepare_named(connection):
+    drop_and_create_table(connection)
+
+    with connection.cursor() as cursor:
+        insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
+        cursor.prepare(
+            insert,
+            {"pk": tsurugi.Int32, "value": tsurugi.Float32},
+        )
+        parameters = [
+            {"pk": 0, "value": None},
+            {"pk": 1, "value": 1.0},
+            {"pk": 2, "value": 0.0},
+        ]
+        cursor.executemany(insert, parameters)
+        assert cursor.rowcount == 3
+
+        cursor.prepare(
+            insert,
+            {"pk": tsurugi.Int32(), "value": tsurugi.Float32()},
+        )
+        parameters = [
+            {"pk": 3, "value": -123.5},
+            {"pk": 4, "value": 123.5},
+        ]
+        cursor.executemany(insert, parameters)
+        assert cursor.rowcount == 2
+        connection.commit()
+
+        cursor.execute("select * from tsubakuro_rust_python_test order by pk")
+        rows = cursor.fetchall()
+        assert rows == [
+            (0, None),
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+        ]
+
+
+def test_numpy(connection):
+    import numpy as np
+
+    drop_and_create_table(connection)
+
+    with connection.cursor() as cursor:
+        pk_array = np.array([1, 2, 3, 4], dtype=np.int32)
+        value_array = np.array([1.0, 0.0, -123.5, 123.5], dtype=np.float32)
+
+        parameters = list(zip(pk_array, value_array))
+        cursor.executemany(
+            "insert into tsubakuro_rust_python_test values (?, ?)", parameters
+        )
+        assert cursor.rowcount == 4
+        connection.commit()
+
+        cursor.execute("select * from tsubakuro_rust_python_test order by pk")
+        rows = cursor.fetchall()
+        assert rows == [
+            (1, 1.0),
+            (2, 0.0),
+            (3, -123.5),
+            (4, 123.5),
+        ]
+        connection.commit()

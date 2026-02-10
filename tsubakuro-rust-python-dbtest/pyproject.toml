@@ -1,0 +1,18 @@
+[project]
+name = "tsubakuro-rust-python-dbtest"
+version = "0.1.0"
+description = "test for tsubakuro-rust-python"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=2.2.6",
+    "tsubakuro-rust-python",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
+
+[tool.uv.sources]
+tsubakuro-rust-python = { path = "../tsubakuro-rust-python" }
