@@ -1,11 +1,13 @@
 use std::time::Duration;
 
 use pyo3::prelude::*;
+use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{
     CommitOption as CoreCommitOption, CommitType as CoreCommitType,
 };
 
 /// Commit type for transaction.
+#[gen_stub_pyclass_enum]
 #[pyclass]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
@@ -46,6 +48,7 @@ impl CommitType {
 }
 
 /// Commit option for transaction.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct CommitOption {
@@ -66,6 +69,7 @@ impl Default for CommitOption {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl CommitOption {
     /// Create a new `CommitOption`.

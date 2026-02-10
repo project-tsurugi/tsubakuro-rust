@@ -1,9 +1,11 @@
 use pyo3::{prelude::*, types::PyTuple};
+use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::TableMetadata as SqlTableMetadata;
 
 use crate::column::{columns_description, Column};
 
 /// Table metadata.
+#[gen_stub_pyclass]
 #[pyclass]
 pub struct TableMetadata {
     inner: SqlTableMetadata,
@@ -17,6 +19,7 @@ impl TableMetadata {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl TableMetadata {
     /// Database name.

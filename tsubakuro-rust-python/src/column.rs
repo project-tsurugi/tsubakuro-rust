@@ -1,8 +1,11 @@
 use pyo3::{prelude::*, types::PyTuple};
+use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::SqlColumn;
 
 use crate::type_code::atom_type_to_type_code;
 
+/// Column metadata.
+#[gen_stub_pyclass]
 #[pyclass]
 pub struct Column {
     inner: SqlColumn,
@@ -14,23 +17,28 @@ impl Column {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Column {
+    /// Column name.
     #[getter]
     pub fn name(&self) -> &str {
         self.inner.name()
     }
 
+    /// Column description.
     #[getter]
     pub fn description(&self) -> Option<&String> {
         self.inner.description()
     }
 
+    /// type_code.
     #[getter]
     pub fn type_code(&self) -> &'static str {
         atom_type_to_type_code(self.inner.atom_type())
     }
 
+    /// AtomType code.
     #[getter]
     pub fn atom_type_code(&self) -> i32 {
         if let Some(atom_type) = self.inner.atom_type() {
@@ -40,6 +48,7 @@ impl Column {
         }
     }
 
+    /// SQL type.
     #[getter]
     pub fn sql_type(&self) -> String {
         if let Some(t) = self.inner.sql_type() {
@@ -49,11 +58,13 @@ impl Column {
         }
     }
 
+    /// SQL type name.
     #[getter]
     pub fn sql_type_name(&self) -> Option<&str> {
         self.inner.sql_type_name()
     }
 
+    /// Length.
     #[getter]
     pub fn length(&self) -> Option<u32> {
         match self.inner.length() {
@@ -62,6 +73,7 @@ impl Column {
         }
     }
 
+    /// Precision.
     #[getter]
     pub fn precision(&self) -> Option<u32> {
         match self.inner.precision() {
@@ -70,6 +82,7 @@ impl Column {
         }
     }
 
+    /// Scale.
     #[getter]
     pub fn scale(&self) -> Option<u32> {
         match self.inner.scale() {
@@ -78,6 +91,7 @@ impl Column {
         }
     }
 
+    /// Nullable.
     #[getter]
     pub fn nullable(&self) -> Option<bool> {
         self.inner.nullable()

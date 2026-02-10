@@ -53,9 +53,20 @@ def example():
             connection.commit()
 ```
 
-## How to build (generate `.whl` file)
+## How to build
 
 Since it depends on [tsubakuro-rust-core](../tsubakuro-rust-core), its build environment (e.g. `rustc`, `cargo`, `protoc`) is required.
+
+### Generate `.pyi` file
+
+```bash
+cd tsubakuro-rust-python
+cargo run --bin stub_gen
+
+ls tsubakuro_rust_python.pyi
+```
+
+### Generate `.whl` file
 
 Install [`maturin`](https://github.com/PyO3/maturin) beforehand.
 
@@ -66,6 +77,7 @@ uv tool install maturin
 ```bash
 cd tsubakuro-rust-python
 uv run maturin build --release
+
 ls target/wheels/
 ```
 

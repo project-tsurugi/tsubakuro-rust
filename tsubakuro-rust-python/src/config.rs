@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use log::debug;
 use pyo3::{prelude::*, types::*};
+use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{
     CommitOption as CoreCommitOption, ConnectionOption, Credential,
     TransactionOption as CoreTransactionOption,
@@ -15,6 +16,7 @@ use crate::{
 };
 
 /// Configuration options for connecting to Tsurugi.
+#[gen_stub_pyclass]
 #[pyclass]
 pub struct Config {
     /// Endpoint URL of the Tsurugi server.
@@ -32,13 +34,13 @@ pub struct Config {
     /// Path to credentials file.
     #[pyo3(get, set)]
     credentials: Option<String>,
-    /// Transaction options.
+    /// Transaction option.
     #[pyo3(get, set)]
     pub transaction_option: Option<TransactionOption>,
-    /// Commit options.
+    /// Commit option.
     #[pyo3(get, set)]
     pub commit_option: Option<CommitOption>,
-    /// Shutdown options.
+    /// Shutdown option.
     #[pyo3(get, set)]
     pub shutdown_option: Option<ShutdownOption>,
     /// Default timeout in seconds.
@@ -62,6 +64,7 @@ impl Default for Config {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Config {
     /// Create a new `Config`.

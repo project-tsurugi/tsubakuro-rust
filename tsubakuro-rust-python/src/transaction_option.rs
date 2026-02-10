@@ -1,12 +1,14 @@
 use std::time::Duration;
 
 use pyo3::prelude::*;
+use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{
     TransactionOption as CoreTransactionOption, TransactionOptionSetter,
     TransactionType as CoreTransactionType,
 };
 
 /// Transaction type.
+#[gen_stub_pyclass_enum]
 #[pyclass]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
@@ -38,6 +40,7 @@ impl TransactionType {
 }
 
 /// Transaction option.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct TransactionOption {
@@ -73,6 +76,7 @@ impl Default for TransactionOption {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl TransactionOption {
     #[new]

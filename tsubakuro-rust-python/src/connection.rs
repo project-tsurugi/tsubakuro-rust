@@ -1,5 +1,6 @@
 use log::{debug, trace};
 use pyo3::{prelude::*, types::*};
+use pyo3_stub_gen::derive::*;
 use std::sync::Arc;
 use tsubakuro_rust_core::prelude::{name::TName, Session, SqlClient, TgError};
 
@@ -17,6 +18,7 @@ use crate::{
 pub(crate) mod inner_connection;
 
 /// Connection to Tsurugi.
+#[gen_stub_pyclass]
 #[pyclass]
 pub struct Connection {
     inner: Arc<InnerConnection>,
@@ -24,6 +26,7 @@ pub struct Connection {
     closed: bool,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Connection {
     /// List table names.

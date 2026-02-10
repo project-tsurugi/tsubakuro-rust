@@ -1,9 +1,11 @@
 use std::time::Duration;
 
 use pyo3::prelude::*;
+use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::ShutdownType as CoreShutdownType;
 
 /// Shutdown type for connection.
+#[gen_stub_pyclass_enum]
 #[pyclass]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
@@ -38,6 +40,7 @@ impl ShutdownType {
 }
 
 /// Shutdown option for connection.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug, Clone)]
 pub struct ShutdownOption {
@@ -55,6 +58,7 @@ impl Default for ShutdownOption {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl ShutdownOption {
     /// Create a new `ShutdownOption`.

@@ -1,5 +1,6 @@
 use log::{debug, trace};
 use pyo3::{exceptions::PyStopIteration, prelude::*, types::*};
+use pyo3_stub_gen::derive::*;
 use std::{collections::HashMap, sync::Arc, vec};
 use tsubakuro_rust_core::prelude::{AtomType, SqlPreparedStatement, SqlQueryResult};
 
@@ -32,6 +33,7 @@ impl RowNumber {
 }
 
 /// Cursor object for executing SQL statements and fetching results.
+#[gen_stub_pyclass]
 #[pyclass]
 pub struct Cursor {
     connection: Arc<InnerConnection>,
@@ -65,6 +67,7 @@ impl Cursor {
     }
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Cursor {
     /// Execute a SQL statement.

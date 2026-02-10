@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use pyo3_stub_gen::define_stub_info_gatherer;
 
 mod column;
 mod commit_option;
@@ -15,6 +16,7 @@ mod type_code;
 #[pymodule]
 mod tsubakuro_rust_python {
     use pyo3::{prelude::*, types::*};
+    use pyo3_stub_gen::{derive::*, inventory::submit};
 
     #[pymodule_export]
     #[allow(non_upper_case_globals)]
@@ -92,6 +94,7 @@ mod tsubakuro_rust_python {
     /// - `file_path` - log file path. If None, logs to stderr.
     ///
     /// Calls to `env_logger_init` other than the first one are ignored.
+    #[gen_stub_pyfunction]
     #[pyfunction]
     #[pyo3(signature = (filters="tsubakuro_rust_python=info", file_path=None))]
     fn env_logger_init(filters: &str, file_path: Option<String>) {
@@ -106,10 +109,40 @@ mod tsubakuro_rust_python {
     ///
     /// # Returns
     /// [`Connection`] object.
+    #[gen_stub_pyfunction]
     #[pyfunction]
     #[pyo3(signature = (*args, **kwargs))]
     fn connect(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Connection> {
         let connection = Connection::connect(args, kwargs)?;
         Ok(connection)
     }
+
+    submit! {
+        gen_function_from_python!{r#"
+        import tsubakuro_rust_python
+
+        @overload
+        def connect(*args: tsubakuro_rust_python.Config) -> tsubakuro_rust_python.Connection: ...
+        "#}
+    }
+
+    submit! {
+        gen_function_from_python!{r#"
+        import tsubakuro_rust_python
+
+        @overload
+        def connect(*args: tsubakuro_rust_python.TransactionOption | tsubakuro_rust_python.CommitOption | tsubakuro_rust_python.ShutdownOption | str) -> tsubakuro_rust_python.Connection: ...
+        "#}
+    }
+
+    submit! {
+        gen_function_from_python!{r#"
+        import tsubakuro_rust_python
+
+        @overload
+        def connect(**kwargs: str | int | tsubakuro_rust_python.TransactionOption | tsubakuro_rust_python.CommitOption | tsubakuro_rust_python.ShutdownOption) -> tsubakuro_rust_python.Connection: ...
+        "#}
+    }
 }
+
+define_stub_info_gatherer!(stub_info);
