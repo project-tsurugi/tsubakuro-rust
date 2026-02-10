@@ -58,6 +58,15 @@ impl TableMetadata {
 
     /// Columns description.
     #[getter]
+    #[gen_stub(override_return_type(type_repr = "Optional[Sequence[Tuple[
+        str,           # name
+        int,           # type_code
+        None,          # display_size
+        Optional[int], # internal_size
+        Optional[int], # precision
+        Optional[int], # scale
+        Optional[bool] # null_ok
+    ]]]"))]
     pub fn description<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyTuple>>> {
         let columns = self.inner.columns();
         columns_description(py, columns)

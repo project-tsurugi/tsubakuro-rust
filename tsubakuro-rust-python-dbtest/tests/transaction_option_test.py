@@ -2,6 +2,21 @@ import tsubakuro_rust_python as tsurugi
 from tsubakuro_rust_python import TransactionOption, TransactionType
 
 
+def test_default():
+    option = TransactionOption()
+    assert option.transaction_type == TransactionType.OCC
+    assert option.label is None
+    assert option.include_ddl is False
+    assert option.write_preserve is None
+    assert option.inclusive_read_area is None
+    assert option.exclusive_read_area is None
+    assert option.scan_parallel is None
+    assert option.begin_timeout is None
+
+    option.label = "my_transaction"
+    assert option.label == "my_transaction"
+
+
 def test_config_occ(endpoint):
     config = tsurugi.Config(endpoint=endpoint, user="tsurugi", password="password")
     config.transaction_option = TransactionOption(TransactionType.OCC)

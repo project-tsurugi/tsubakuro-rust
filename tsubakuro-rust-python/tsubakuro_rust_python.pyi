@@ -343,7 +343,15 @@ class Cursor:
     @property
     def closed(self) -> builtins.bool: ...
     @property
-    def description(self) -> typing.Optional[tuple]:
+    def description(self) -> Optional[Sequence[Tuple[
+        str,           # name
+        int,           # type_code
+        None,          # display_size
+        Optional[int], # internal_size
+        Optional[int], # precision
+        Optional[int], # scale
+        Optional[bool] # null_ok
+    ]]]:
         r"""
         description of the query result set.
         
@@ -519,7 +527,15 @@ class TableMetadata:
         Columns metadata.
         """
     @property
-    def description(self) -> typing.Optional[tuple]:
+    def description(self) -> Optional[Sequence[Tuple[
+        str,           # name
+        int,           # type_code
+        None,          # display_size
+        Optional[int], # internal_size
+        Optional[int], # precision
+        Optional[int], # scale
+        Optional[bool] # null_ok
+    ]]]:
         r"""
         Columns description.
         """

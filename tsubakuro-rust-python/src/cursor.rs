@@ -149,6 +149,15 @@ impl Cursor {
     /// A sequence of 7-item sequences. Each of these sequences contains information describing one result column.
     ///  The 7 items are: (name, type_code, display_size, internal_size, precision, scale, null_ok)
     #[getter]
+    #[gen_stub(override_return_type(type_repr = "Optional[Sequence[Tuple[
+        str,           # name
+        int,           # type_code
+        None,          # display_size
+        Optional[int], # internal_size
+        Optional[int], # precision
+        Optional[int], # scale
+        Optional[bool] # null_ok
+    ]]]"))]
     pub fn description<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyTuple>>> {
         const FUNCTION_NAME: &str = "Cursor.description()";
         self.check_closed(FUNCTION_NAME)?;
