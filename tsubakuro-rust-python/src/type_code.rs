@@ -7,7 +7,7 @@ use pyo3::{
 };
 use tsubakuro_rust_core::prelude::{AtomType, SqlParameter, SqlParameterOf, SqlPlaceholder};
 
-use crate::error::ProgrammingError;
+use crate::error::{to_pyerr, ProgrammingError};
 
 /// BOOLEAN type.
 #[pyclass]
@@ -625,7 +625,12 @@ fn to_parameter_qmark(
         let atom_type = if first {
             to_atom_type(&value)?
         } else {
-            *types.get(&placeholder_name).unwrap()
+            *types.get(&placeholder_name).ok_or_else(|| {
+                ProgrammingError::new_err(format!(
+                    "parameter type not found. placeholder_number={}",
+                    i
+                ))
+            })?
         };
 
         if first {
@@ -662,7 +667,12 @@ fn to_parameter_named(
         let atom_type = if first {
             to_atom_type(&value)?
         } else {
-            *types.get(&placeholder_name).unwrap()
+            *types.get(&placeholder_name).ok_or_else(|| {
+                ProgrammingError::new_err(format!(
+                    "parameter type not found. placeholder_name={}",
+                    placeholder_name
+                ))
+            })?
         };
 
         if first {

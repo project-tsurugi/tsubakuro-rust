@@ -8,7 +8,7 @@ use crate::{
     column::columns_description,
     connection::inner_connection::InnerConnection,
     cursor::query_result::next_row1,
-    error::{to_pyerr, NotSupportedError, ProgrammingError},
+    error::{to_pyerr, NotSupportedError, OperationalError, ProgrammingError},
 };
 
 mod execute;
@@ -170,7 +170,9 @@ impl Cursor {
             return Ok(None);
         };
 
-        let metadata = qr.get_metadata().unwrap();
+        let metadata = qr
+            .get_metadata()
+            .ok_or_else(|| OperationalError::new_err("Failed to get query metadata"))?;
         let columns = metadata.columns();
         let result = columns_description(py, columns);
 

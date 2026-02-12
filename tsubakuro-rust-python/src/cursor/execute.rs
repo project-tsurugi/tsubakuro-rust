@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::{AtomType, SqlPlaceholder, SqlPreparedStatemen
 
 use crate::{
     cursor::{Cursor, RowNumber},
-    error::{to_pyerr, ProgrammingError},
+    error::{to_pyerr, OperationalError, ProgrammingError},
     type_code::{to_parameters, to_parameters_only, to_placeholders},
 };
 
@@ -55,7 +55,9 @@ impl Cursor {
                 .map_err(to_pyerr)?;
             trace!("{FUNCTION_NAME}: query end");
 
-            let metadata = qr.get_metadata().unwrap();
+            let metadata = qr
+                .get_metadata()
+                .ok_or_else(|| OperationalError::new_err("failed to get query metadata"))?;
             self.query_types = metadata
                 .columns()
                 .iter()
@@ -147,7 +149,9 @@ impl Cursor {
                 .map_err(to_pyerr)?;
             trace!("{FUNCTION_NAME}: query end");
 
-            let metadata = qr.get_metadata().unwrap();
+            let metadata = qr
+                .get_metadata()
+                .ok_or_else(|| OperationalError::new_err("failed to get query metadata"))?;
             self.query_types = metadata
                 .columns()
                 .iter()
