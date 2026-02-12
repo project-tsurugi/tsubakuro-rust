@@ -74,6 +74,10 @@ Install [`maturin`](https://github.com/PyO3/maturin) beforehand.
 uv tool install maturin
 ```
 
+> [!NOTE]
+>
+> To include a stub file in the wheel file, generate `tsubakuro_rust_python.pyi` first.
+
 ```bash
 cd tsubakuro-rust-python
 uv run maturin build --release
