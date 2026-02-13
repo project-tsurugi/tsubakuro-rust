@@ -50,5 +50,6 @@ import datetime
 
      # 2026-02-06 12:34:56.123456789
      value = tsurugi.Datetime(datetime.datetime(2026, 2, 6, 12, 34, 56), 123456789)
+     value = tsurugi.Datetime.of(2026, 2, 6, 12, 34, 56, 123456789)
 ```
 

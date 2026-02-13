@@ -119,6 +119,13 @@ def test_wrapper():
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
     assert value.nanosecond == 123456789
 
+    value = tsurugi.OffsetDatetime.of(2026, 1, 27, 16, 24, 30, 123456789, JST)
+    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
+    assert value.nanosecond == 123456789
+    value = tsurugi.OffsetDatetime.of(2026, 1, 27)
+    assert value.value == datetime.datetime(2026, 1, 27, 0, 0, 0, 0, tzinfo=UTC)
+    assert value.nanosecond == 0
+
 
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)

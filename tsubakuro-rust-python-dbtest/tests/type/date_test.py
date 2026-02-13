@@ -82,6 +82,9 @@ def test_wrapper():
     value = tsurugi.Date(datetime.date(2026, 1, 27))
     assert value.value == datetime.date(2026, 1, 27)
 
+    value = tsurugi.Date.of(2026, 1, 27)
+    assert value.value == datetime.date(2026, 1, 27)
+
 
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)

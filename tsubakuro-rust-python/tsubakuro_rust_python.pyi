@@ -42,7 +42,10 @@ class Bool:
     BOOLEAN type.
     """
     @property
-    def value(self) -> typing.Optional[builtins.bool]: ...
+    def value(self) -> typing.Optional[builtins.bool]:
+        r"""
+        Value.
+        """
     def __new__(cls, value: typing.Optional[builtins.bool] = None) -> Bool:
         r"""
         Create a new `Bool`.
@@ -56,8 +59,14 @@ class Bytes:
     BINARY, VARBINARY type.
     """
     @property
-    def value(self) -> typing.Optional[builtins.list[builtins.int]]: ...
-    def __new__(cls, value: typing.Optional[typing.Sequence[builtins.int]] = None) -> Bytes: ...
+    def value(self) -> typing.Optional[builtins.list[builtins.int]]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[typing.Sequence[builtins.int]] = None) -> Bytes:
+        r"""
+        Create a new `Bytes`.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -511,8 +520,19 @@ class Date:
     DATE type.
     """
     @property
-    def value(self) -> typing.Optional[datetime.date]: ...
-    def __new__(cls, value: typing.Optional[datetime.date] = None) -> Date: ...
+    def value(self) -> typing.Optional[datetime.date]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[datetime.date] = None) -> Date:
+        r"""
+        Create a new `Date`.
+        """
+    @classmethod
+    def of(cls, _cls: type, year: builtins.int, month: builtins.int, day: builtins.int) -> Date:
+        r"""
+        Create a `Date` from year, month, and day.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -521,10 +541,24 @@ class Datetime:
     TIMESTAMP type.
     """
     @property
-    def value(self) -> typing.Optional[datetime.datetime]: ...
+    def value(self) -> typing.Optional[datetime.datetime]:
+        r"""
+        Value.
+        """
     @property
-    def nanosecond(self) -> typing.Optional[builtins.int]: ...
-    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> Datetime: ...
+    def nanosecond(self) -> typing.Optional[builtins.int]:
+        r"""
+        Nnanosecond.
+        """
+    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> Datetime:
+        r"""
+        Create a new `Datetime`.
+        """
+    @classmethod
+    def of(cls, year: builtins.int, month: builtins.int, day: builtins.int, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0) -> Datetime:
+        r"""
+        Create a `Datetime` from year, month, day, hour, minute, second, and nanosecond.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -533,8 +567,14 @@ class Decimal:
     DECIMAL type.
     """
     @property
-    def value(self) -> typing.Optional[decimal.Decimal]: ...
-    def __new__(cls, value: typing.Optional[decimal.Decimal] = None) -> Decimal: ...
+    def value(self) -> typing.Optional[decimal.Decimal]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[decimal.Decimal] = None) -> Decimal:
+        r"""
+        Create a new `Decimal`.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -543,8 +583,14 @@ class Float32:
     REAL type.
     """
     @property
-    def value(self) -> typing.Optional[builtins.float]: ...
-    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float32: ...
+    def value(self) -> typing.Optional[builtins.float]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float32:
+        r"""
+        Create a new `Float32`.
+        """
     def __float__(self) -> typing.Optional[builtins.float]: ...
     def __repr__(self) -> builtins.str: ...
 
@@ -554,8 +600,14 @@ class Float64:
     DOUBLE type.
     """
     @property
-    def value(self) -> typing.Optional[builtins.float]: ...
-    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float64: ...
+    def value(self) -> typing.Optional[builtins.float]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float64:
+        r"""
+        Create a new `Float64`.
+        """
     def __float__(self) -> typing.Optional[builtins.float]: ...
     def __repr__(self) -> builtins.str: ...
 
@@ -565,8 +617,14 @@ class Int32:
     INT type.
     """
     @property
-    def value(self) -> typing.Optional[builtins.int]: ...
-    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int32: ...
+    def value(self) -> typing.Optional[builtins.int]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int32:
+        r"""
+        Create a new `Int32`.
+        """
     def __int__(self) -> typing.Optional[builtins.int]: ...
     def __repr__(self) -> builtins.str: ...
 
@@ -576,8 +634,14 @@ class Int64:
     BIGINT type.
     """
     @property
-    def value(self) -> typing.Optional[builtins.int]: ...
-    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int64: ...
+    def value(self) -> typing.Optional[builtins.int]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int64:
+        r"""
+        Create a new `Int64`.
+        """
     def __int__(self) -> typing.Optional[builtins.int]: ...
     def __repr__(self) -> builtins.str: ...
 
@@ -587,10 +651,24 @@ class OffsetDatetime:
     TIMESTAMP WITH TIME ZONE type.
     """
     @property
-    def value(self) -> typing.Optional[datetime.datetime]: ...
+    def value(self) -> typing.Optional[datetime.datetime]:
+        r"""
+        Value.
+        """
     @property
-    def nanosecond(self) -> typing.Optional[builtins.int]: ...
-    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetDatetime: ...
+    def nanosecond(self) -> typing.Optional[builtins.int]:
+        r"""
+        Nnanosecond.
+        """
+    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetDatetime:
+        r"""
+        Create a new `OffsetDatetime`.
+        """
+    @classmethod
+    def of(cls, year: builtins.int, month: builtins.int, day: builtins.int, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0, tzinfo: typing.Optional[datetime.tzinfo] = None) -> OffsetDatetime:
+        r"""
+        Create a `OffsetDatetime` from year, month, day, hour, minute, second, nanosecond, and tzinfo.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -599,10 +677,24 @@ class OffsetTime:
     TIME WITH TIME ZONE type.
     """
     @property
-    def value(self) -> typing.Optional[datetime.time]: ...
+    def value(self) -> typing.Optional[datetime.time]:
+        r"""
+        Value.
+        """
     @property
-    def nanosecond(self) -> typing.Optional[builtins.int]: ...
-    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetTime: ...
+    def nanosecond(self) -> typing.Optional[builtins.int]:
+        r"""
+        Nnanosecond.
+        """
+    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetTime:
+        r"""
+        Create a new `OffsetTime`.
+        """
+    @classmethod
+    def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0, tzinfo: typing.Optional[datetime.tzinfo] = None) -> OffsetTime:
+        r"""
+        Create a `OffsetTime` from hour, minute, second, nanosecond, and tzinfo.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -641,8 +733,14 @@ class Str:
     CHAR, VARCHAR type.
     """
     @property
-    def value(self) -> typing.Optional[builtins.str]: ...
-    def __new__(cls, value: typing.Optional[builtins.str] = None) -> Str: ...
+    def value(self) -> typing.Optional[builtins.str]:
+        r"""
+        Value.
+        """
+    def __new__(cls, value: typing.Optional[builtins.str] = None) -> Str:
+        r"""
+        Create a new `Str`.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -701,10 +799,24 @@ class Time:
     TIME type.
     """
     @property
-    def value(self) -> typing.Optional[datetime.time]: ...
+    def value(self) -> typing.Optional[datetime.time]:
+        r"""
+        Value.
+        """
     @property
-    def nanosecond(self) -> typing.Optional[builtins.int]: ...
-    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> Time: ...
+    def nanosecond(self) -> typing.Optional[builtins.int]:
+        r"""
+        Nnanosecond.
+        """
+    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> Time:
+        r"""
+        Create a new `Time`.
+        """
+    @classmethod
+    def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0) -> Time:
+        r"""
+        Create a `Time` from hour, minute, second, and nanosecond.
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
