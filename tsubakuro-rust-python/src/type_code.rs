@@ -1,15 +1,14 @@
-use std::{collections::HashMap, str::FromStr};
+use std::collections::HashMap;
 
-use pyo3::{
-    exceptions::PyValueError,
-    prelude::*,
-    types::{PyDateTime, PyDict, PyTime, PyType},
-};
+use chrono::Timelike;
+use pyo3::{exceptions::PyValueError, prelude::*, types::*};
+use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{AtomType, SqlParameter, SqlParameterOf, SqlPlaceholder};
 
-use crate::error::{to_pyerr, ProgrammingError};
+use crate::error::ProgrammingError;
 
 /// BOOLEAN type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Bool {
@@ -17,6 +16,7 @@ pub struct Bool {
     value: Option<bool>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Bool {
     /// Create a new `Bool`.
@@ -40,6 +40,7 @@ impl Bool {
 }
 
 /// INT type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Int32 {
@@ -47,29 +48,13 @@ pub struct Int32 {
     value: Option<i32>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Int32 {
     #[new]
     #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
-        } else {
-            return Ok(Int32 { value: None });
-        };
-
-        let err;
-        match value.extract::<i32>() {
-            Ok(v) => return Ok(Int32 { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match v.parse::<i32>() {
-                Ok(v) => return Ok(Int32 { value: Some(v) }),
-                Err(e) => return Err(e.into()),
-            }
-        }
-        Err(err)
+    pub fn new(value: Option<i32>) -> PyResult<Self> {
+        Ok(Int32 { value })
     }
 
     pub fn __int__(&self) -> Option<i32> {
@@ -86,6 +71,7 @@ impl Int32 {
 }
 
 /// BIGINT type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Int64 {
@@ -93,29 +79,13 @@ pub struct Int64 {
     value: Option<i64>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Int64 {
     #[new]
     #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
-        } else {
-            return Ok(Int64 { value: None });
-        };
-
-        let err;
-        match value.extract::<i64>() {
-            Ok(v) => return Ok(Int64 { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match v.parse::<i64>() {
-                Ok(v) => return Ok(Int64 { value: Some(v) }),
-                Err(e) => return Err(e.into()),
-            }
-        }
-        Err(err)
+    pub fn new(value: Option<i64>) -> PyResult<Self> {
+        Ok(Int64 { value })
     }
 
     pub fn __int__(&self) -> Option<i64> {
@@ -132,6 +102,7 @@ impl Int64 {
 }
 
 /// REAL type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Float32 {
@@ -139,29 +110,13 @@ pub struct Float32 {
     value: Option<f32>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Float32 {
     #[new]
     #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
-        } else {
-            return Ok(Float32 { value: None });
-        };
-
-        let err;
-        match value.extract::<f32>() {
-            Ok(v) => return Ok(Float32 { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match v.parse::<f32>() {
-                Ok(v) => return Ok(Float32 { value: Some(v) }),
-                Err(e) => return Err(e.into()),
-            }
-        }
-        Err(err)
+    pub fn new(value: Option<f32>) -> PyResult<Self> {
+        Ok(Float32 { value })
     }
 
     pub fn __float__(&self) -> Option<f32> {
@@ -178,6 +133,7 @@ impl Float32 {
 }
 
 /// DOUBLE type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Float64 {
@@ -185,29 +141,13 @@ pub struct Float64 {
     value: Option<f64>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Float64 {
     #[new]
     #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
-        } else {
-            return Ok(Float64 { value: None });
-        };
-
-        let err;
-        match value.extract::<f64>() {
-            Ok(v) => return Ok(Float64 { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match v.parse::<f64>() {
-                Ok(v) => return Ok(Float64 { value: Some(v) }),
-                Err(e) => return Err(e.into()),
-            }
-        }
-        Err(err)
+    pub fn new(value: Option<f64>) -> PyResult<Self> {
+        Ok(Float64 { value })
     }
 
     pub fn __float__(&self) -> Option<f64> {
@@ -224,6 +164,7 @@ impl Float64 {
 }
 
 /// DECIMAL type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Decimal {
@@ -231,6 +172,7 @@ pub struct Decimal {
     value: Option<rust_decimal::Decimal>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Decimal {
     #[new]
@@ -249,6 +191,7 @@ impl Decimal {
 }
 
 /// CHAR, VARCHAR type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Str {
@@ -256,6 +199,7 @@ pub struct Str {
     value: Option<String>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Str {
     #[new]
@@ -274,6 +218,7 @@ impl Str {
 }
 
 /// BINARY, VARBINARY type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Bytes {
@@ -281,6 +226,7 @@ pub struct Bytes {
     value: Option<Vec<u8>>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Bytes {
     #[new]
@@ -299,6 +245,7 @@ impl Bytes {
 }
 
 /// DATE type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Date {
@@ -306,29 +253,13 @@ pub struct Date {
     value: Option<chrono::NaiveDate>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Date {
     #[new]
     #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
-        } else {
-            return Ok(Date { value: None });
-        };
-
-        let err;
-        match value.extract::<chrono::NaiveDate>() {
-            Ok(v) => return Ok(Date { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match chrono::NaiveDate::parse_from_str(&v, "%Y-%m-%d") {
-                Ok(v) => return Ok(Date { value: Some(v) }),
-                Err(e) => return Err(PyValueError::new_err(e.to_string())),
-            }
-        }
-        Err(err)
+    pub fn new(value: Option<chrono::NaiveDate>) -> PyResult<Self> {
+        Ok(Date { value })
     }
 
     pub fn __repr__(&self) -> String {
@@ -341,6 +272,7 @@ impl Date {
 }
 
 /// TIME type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Time {
@@ -348,29 +280,28 @@ pub struct Time {
     value: Option<chrono::NaiveTime>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Time {
     #[new]
-    #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
+    #[pyo3(signature = (value=None, nanosecond=None))]
+    pub fn new(value: Option<chrono::NaiveTime>, nanosecond: Option<u32>) -> PyResult<Self> {
+        if let Some(v) = value {
+            let v = if let Some(ns) = nanosecond {
+                v.with_nanosecond(ns)
+                    .ok_or_else(|| PyValueError::new_err("invalid nanosecond value"))?
+            } else {
+                v
+            };
+            Ok(Time { value: Some(v) })
         } else {
-            return Ok(Time { value: None });
-        };
+            Ok(Time { value: None })
+        }
+    }
 
-        let err;
-        match value.extract::<chrono::NaiveTime>() {
-            Ok(v) => return Ok(Time { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match chrono::NaiveTime::parse_from_str(&v, "%H:%M:%S%.f") {
-                Ok(v) => return Ok(Time { value: Some(v) }),
-                Err(e) => return Err(PyValueError::new_err(e.to_string())),
-            }
-        }
-        Err(err)
+    #[getter]
+    pub fn nanosecond(&self) -> Option<u32> {
+        self.value.map(|v| v.nanosecond())
     }
 
     pub fn __repr__(&self) -> String {
@@ -383,6 +314,7 @@ impl Time {
 }
 
 /// TIMESTAMP type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Datetime {
@@ -390,29 +322,28 @@ pub struct Datetime {
     value: Option<chrono::NaiveDateTime>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl Datetime {
     #[new]
-    #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
+    #[pyo3(signature = (value=None, nanosecond=None))]
+    pub fn new(value: Option<chrono::NaiveDateTime>, nanosecond: Option<u32>) -> PyResult<Self> {
+        if let Some(v) = value {
+            let v = if let Some(ns) = nanosecond {
+                v.with_nanosecond(ns)
+                    .ok_or_else(|| PyValueError::new_err("invalid nanosecond value"))?
+            } else {
+                v
+            };
+            Ok(Datetime { value: Some(v) })
         } else {
-            return Ok(Datetime { value: None });
-        };
+            Ok(Datetime { value: None })
+        }
+    }
 
-        let err;
-        match value.extract::<chrono::NaiveDateTime>() {
-            Ok(v) => return Ok(Datetime { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match chrono::NaiveDateTime::parse_from_str(&v, "%Y-%m-%d %H:%M:%S%.f") {
-                Ok(v) => return Ok(Datetime { value: Some(v) }),
-                Err(e) => return Err(PyValueError::new_err(e.to_string())),
-            }
-        }
-        Err(err)
+    #[getter]
+    pub fn nanosecond(&self) -> Option<u32> {
+        self.value.map(|v| v.nanosecond())
     }
 
     pub fn __repr__(&self) -> String {
@@ -425,44 +356,59 @@ impl Datetime {
 }
 
 /// TIME WITH TIME ZONE type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct OffsetTime {
-    #[pyo3(get)]
     value: Option<(chrono::NaiveTime, chrono::FixedOffset)>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl OffsetTime {
     #[new]
-    #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
-        } else {
-            return Ok(OffsetTime { value: None });
-        };
-
-        if value.is_instance_of::<PyTime>() {
-            let time: chrono::NaiveTime = value.extract()?;
-            let tzinfo = value.getattr("tzinfo")?;
-            let offset: chrono::FixedOffset = if tzinfo.is_none() {
-                chrono::FixedOffset::east_opt(0).unwrap()
+    #[pyo3(signature = (value=None, nanosecond=None))]
+    pub fn new(value: Option<Bound<PyTime>>, nanosecond: Option<u32>) -> PyResult<Self> {
+        if let Some(v) = value {
+            let time: chrono::NaiveTime = v.extract()?;
+            let time = if let Some(ns) = nanosecond {
+                time.with_nanosecond(ns)
+                    .ok_or_else(|| PyValueError::new_err("invalid nanosecond value"))?
             } else {
-                tzinfo.extract()?
+                time
             };
-            return Ok(OffsetTime {
+            let tzinfo = v.get_tzinfo();
+            let offset: chrono::FixedOffset = if let Some(tzinfo) = tzinfo {
+                tzinfo.extract()?
+            } else {
+                chrono::FixedOffset::east_opt(0).unwrap()
+            };
+            Ok(OffsetTime {
                 value: Some((time, offset)),
-            });
+            })
+        } else {
+            Ok(OffsetTime { value: None })
         }
+    }
 
-        if let Ok(v) = value.extract::<String>() {
-            match parse_offset_time(&v) {
-                Ok(v) => return Ok(OffsetTime { value: Some(v) }),
-                Err(e) => return Err(e),
-            }
+    #[getter]
+    pub fn value<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyTime>>> {
+        if let Some((time, offset)) = &self.value {
+            let hour = time.hour() as u8;
+            let minute = time.minute() as u8;
+            let second = time.second() as u8;
+            let microsecond = time.nanosecond() / 1000;
+            let tzinfo = offset.into_pyobject(py)?;
+            let time = PyTime::new(py, hour, minute, second, microsecond, Some(&tzinfo))?;
+            Ok(Some(time))
+        } else {
+            Ok(None)
         }
-        Err(PyValueError::new_err("Invalid OffsetTime value"))
+    }
+
+    #[getter]
+    pub fn nanosecond(&self) -> Option<u32> {
+        self.value.map(|(time, _)| time.nanosecond())
     }
 
     pub fn __repr__(&self) -> String {
@@ -474,35 +420,8 @@ impl OffsetTime {
     }
 }
 
-fn parse_offset_time(s: &str) -> PyResult<(chrono::NaiveTime, chrono::FixedOffset)> {
-    let time_str;
-    let offset_str;
-    match s.rfind(|c| c == '+' || c == '-' || c == 'Z') {
-        Some(pos) => {
-            time_str = s[..pos].trim();
-            let offset = s[pos..].trim();
-            offset_str = if offset == "Z" { "+00:00" } else { offset };
-        }
-        None => {
-            time_str = s;
-            offset_str = "+00:00";
-        }
-    }
-
-    let time = match chrono::NaiveTime::parse_from_str(time_str, "%H:%M:%S%.f") {
-        Ok(t) => t,
-        Err(e) => return Err(PyValueError::new_err(e.to_string())),
-    };
-
-    let offset = match chrono::FixedOffset::from_str(offset_str) {
-        Ok(o) => o,
-        Err(e) => return Err(PyValueError::new_err(e.to_string())),
-    };
-
-    Ok((time, offset))
-}
-
 /// TIMESTAMP WITH TIME ZONE type.
+#[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct OffsetDatetime {
@@ -510,29 +429,31 @@ pub struct OffsetDatetime {
     value: Option<chrono::DateTime<chrono::FixedOffset>>,
 }
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl OffsetDatetime {
     #[new]
-    #[pyo3(signature = (value=None))]
-    pub fn new(value: Option<Bound<PyAny>>) -> PyResult<Self> {
-        let value = if let Some(v) = value {
-            v
+    #[pyo3(signature = (value=None, nanosecond=None))]
+    pub fn new(
+        value: Option<chrono::DateTime<chrono::FixedOffset>>,
+        nanosecond: Option<u32>,
+    ) -> PyResult<Self> {
+        if let Some(v) = value {
+            let v = if let Some(ns) = nanosecond {
+                v.with_nanosecond(ns)
+                    .ok_or_else(|| PyValueError::new_err("invalid nanosecond value"))?
+            } else {
+                v
+            };
+            Ok(OffsetDatetime { value: Some(v) })
         } else {
-            return Ok(OffsetDatetime { value: None });
-        };
+            Ok(OffsetDatetime { value: None })
+        }
+    }
 
-        let err;
-        match value.extract::<chrono::DateTime<chrono::FixedOffset>>() {
-            Ok(v) => return Ok(OffsetDatetime { value: Some(v) }),
-            Err(e) => err = e,
-        }
-        if let Ok(v) = value.extract::<String>() {
-            match chrono::DateTime::parse_from_rfc3339(&v) {
-                Ok(v) => return Ok(OffsetDatetime { value: Some(v) }),
-                Err(e) => return Err(PyValueError::new_err(e.to_string())),
-            }
-        }
-        Err(err)
+    #[getter]
+    pub fn nanosecond(&self) -> Option<u32> {
+        self.value.map(|v| v.nanosecond())
     }
 
     pub fn __repr__(&self) -> String {

@@ -2,24 +2,63 @@
 # ruff: noqa: E501, F401, F403, F405
 
 import builtins
+import datetime
+import decimal
 import enum
 import tsubakuro_rust_python
 import typing
 __all__ = [
+    "Bool",
+    "Bytes",
     "Column",
     "CommitOption",
     "CommitType",
     "Config",
     "Connection",
     "Cursor",
+    "Date",
+    "Datetime",
+    "Decimal",
+    "Float32",
+    "Float64",
+    "Int32",
+    "Int64",
+    "OffsetDatetime",
+    "OffsetTime",
     "ShutdownOption",
     "ShutdownType",
+    "Str",
     "TableMetadata",
+    "Time",
     "TransactionOption",
     "TransactionType",
     "connect",
     "env_logger_init",
 ]
+
+@typing.final
+class Bool:
+    r"""
+    BOOLEAN type.
+    """
+    @property
+    def value(self) -> typing.Optional[builtins.bool]: ...
+    def __new__(cls, value: typing.Optional[builtins.bool] = None) -> Bool:
+        r"""
+        Create a new `Bool`.
+        """
+    def __bool__(self) -> builtins.bool: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Bytes:
+    r"""
+    BINARY, VARBINARY type.
+    """
+    @property
+    def value(self) -> typing.Optional[builtins.list[builtins.int]]: ...
+    def __new__(cls, value: typing.Optional[typing.Sequence[builtins.int]] = None) -> Bytes: ...
+    def __repr__(self) -> builtins.str: ...
 
 @typing.final
 class Column:
@@ -467,6 +506,106 @@ class Cursor:
         """
 
 @typing.final
+class Date:
+    r"""
+    DATE type.
+    """
+    @property
+    def value(self) -> typing.Optional[datetime.date]: ...
+    def __new__(cls, value: typing.Optional[datetime.date] = None) -> Date: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Datetime:
+    r"""
+    TIMESTAMP type.
+    """
+    @property
+    def value(self) -> typing.Optional[datetime.datetime]: ...
+    @property
+    def nanosecond(self) -> typing.Optional[builtins.int]: ...
+    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> Datetime: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Decimal:
+    r"""
+    DECIMAL type.
+    """
+    @property
+    def value(self) -> typing.Optional[decimal.Decimal]: ...
+    def __new__(cls, value: typing.Optional[decimal.Decimal] = None) -> Decimal: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Float32:
+    r"""
+    REAL type.
+    """
+    @property
+    def value(self) -> typing.Optional[builtins.float]: ...
+    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float32: ...
+    def __float__(self) -> typing.Optional[builtins.float]: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Float64:
+    r"""
+    DOUBLE type.
+    """
+    @property
+    def value(self) -> typing.Optional[builtins.float]: ...
+    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float64: ...
+    def __float__(self) -> typing.Optional[builtins.float]: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Int32:
+    r"""
+    INT type.
+    """
+    @property
+    def value(self) -> typing.Optional[builtins.int]: ...
+    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int32: ...
+    def __int__(self) -> typing.Optional[builtins.int]: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Int64:
+    r"""
+    BIGINT type.
+    """
+    @property
+    def value(self) -> typing.Optional[builtins.int]: ...
+    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int64: ...
+    def __int__(self) -> typing.Optional[builtins.int]: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class OffsetDatetime:
+    r"""
+    TIMESTAMP WITH TIME ZONE type.
+    """
+    @property
+    def value(self) -> typing.Optional[datetime.datetime]: ...
+    @property
+    def nanosecond(self) -> typing.Optional[builtins.int]: ...
+    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetDatetime: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class OffsetTime:
+    r"""
+    TIME WITH TIME ZONE type.
+    """
+    @property
+    def value(self) -> typing.Optional[datetime.time]: ...
+    @property
+    def nanosecond(self) -> typing.Optional[builtins.int]: ...
+    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetTime: ...
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
 class ShutdownOption:
     r"""
     Shutdown option for connection.
@@ -495,6 +634,16 @@ class ShutdownOption:
         r"""
         Create a new `ShutdownOption`.
         """
+
+@typing.final
+class Str:
+    r"""
+    CHAR, VARCHAR type.
+    """
+    @property
+    def value(self) -> typing.Optional[builtins.str]: ...
+    def __new__(cls, value: typing.Optional[builtins.str] = None) -> Str: ...
+    def __repr__(self) -> builtins.str: ...
 
 @typing.final
 class TableMetadata:
@@ -544,6 +693,18 @@ class TableMetadata:
         r"""
         Primary keys.
         """
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Time:
+    r"""
+    TIME type.
+    """
+    @property
+    def value(self) -> typing.Optional[datetime.time]: ...
+    @property
+    def nanosecond(self) -> typing.Optional[builtins.int]: ...
+    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> Time: ...
     def __repr__(self) -> builtins.str: ...
 
 @typing.final

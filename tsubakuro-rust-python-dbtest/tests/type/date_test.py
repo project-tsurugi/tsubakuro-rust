@@ -81,8 +81,6 @@ def test_wrapper():
     assert value.value is None
     value = tsurugi.Date(datetime.date(2026, 1, 27))
     assert value.value == datetime.date(2026, 1, 27)
-    value = tsurugi.Date("2026-01-27")
-    assert value.value == datetime.date(2026, 1, 27)
 
 
 def test_placeholder_wrapper(connection):

@@ -55,29 +55,31 @@ def test_wrapper():
     assert value.value is None
     value = tsurugi.OffsetTime(None)
     assert value.value is None
+    assert value.nanosecond is None
 
     JST = datetime.timezone(datetime.timedelta(hours=9))
     UTC = datetime.timezone(datetime.timedelta(hours=0))
     value = tsurugi.OffsetTime(datetime.time(12, 34, 56, 123456, tzinfo=JST))
-    assert value.value == (datetime.time(12, 34, 56, 123456), JST)
+    assert value.value == datetime.time(12, 34, 56, 123456, tzinfo=JST)
+    assert value.nanosecond == 123456000
     value = tsurugi.OffsetTime(datetime.time(12, 34, 56, 123456, tzinfo=UTC))
-    assert value.value == (datetime.time(12, 34, 56, 123456), UTC)
+    assert value.value == datetime.time(12, 34, 56, 123456, tzinfo=UTC)
+    assert value.nanosecond == 123456000
     value = tsurugi.OffsetTime(datetime.time(12, 34, 56, 123456))
-    assert value.value == (datetime.time(12, 34, 56, 123456), UTC)
+    assert value.value == datetime.time(12, 34, 56, 123456, tzinfo=UTC)
+    assert value.nanosecond == 123456000
 
-    value = tsurugi.OffsetTime("12:34:56.123456789+09:00")
-    assert value.value == (datetime.time(12, 34, 56, 123456), JST)
+    value = tsurugi.OffsetTime(datetime.time(12, 34, 56, tzinfo=JST), 123456789)
+    assert value.value == datetime.time(12, 34, 56, 123456, tzinfo=JST)
+    assert value.nanosecond == 123456789
     assert value.__repr__() == "OffsetTime(12:34:56.123456789 +09:00)"
 
-    value = tsurugi.OffsetTime("12:34:56.123456789+00:00")
-    assert value.value == (datetime.time(12, 34, 56, 123456), UTC)
-    assert value.__repr__() == "OffsetTime(12:34:56.123456789 +00:00)"
-    value = tsurugi.OffsetTime("12:34:56.123456789Z")
-    assert value.value == (datetime.time(12, 34, 56, 123456), UTC)
-    assert value.__repr__() == "OffsetTime(12:34:56.123456789 +00:00)"
-    value = tsurugi.OffsetTime("12:34:56.123456789")
-    assert value.value == (datetime.time(12, 34, 56, 123456), UTC)
-    assert value.__repr__() == "OffsetTime(12:34:56.123456789 +00:00)"
+    value = tsurugi.OffsetTime(datetime.time(12, 34, 56, tzinfo=UTC), 123456789)
+    assert value.value == datetime.time(12, 34, 56, 123456, tzinfo=UTC)
+    assert value.nanosecond == 123456789
+    value = tsurugi.OffsetTime(datetime.time(12, 34, 56), 123456789)
+    assert value.value == datetime.time(12, 34, 56, 123456, tzinfo=UTC)
+    assert value.nanosecond == 123456789
 
 
 def test_placeholder_wrapper(connection):

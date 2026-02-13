@@ -73,13 +73,6 @@ def test_wrapper():
     assert value.value is None
     value = tsurugi.Float64(123.5)
     assert value.value == 123.5
-    value = tsurugi.Float64("123.5")
-    assert value.value == 123.5
-    try:
-        value = tsurugi.Float64("abc")
-        assert False, "must raise"
-    except ValueError:
-        pass
 
 
 def test_placeholder_wrapper(connection):

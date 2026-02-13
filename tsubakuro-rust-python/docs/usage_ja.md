@@ -163,6 +163,8 @@ select文の実行結果は `fetch` 系メソッドで取得します。
         connection.commit()
 ```
 
+select結果の1行はタプルで返ります。
+
 ### 更新系SQL・DDLの例
 
 更新系SQL（insert, update, delete）やDDLを実行するには、Cursorの `execute` メソッドを使用します。

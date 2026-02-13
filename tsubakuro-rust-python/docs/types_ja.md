@@ -42,11 +42,13 @@ TsurugiのTIMEやTIMESTAMPはナノ秒（9桁）まで保持できますが、Py
 selectの実行結果として返るtimeやdatetimeでは、マイクロ秒より下の桁は切り捨てられます。
 
 `execute`, `executemany` メソッドのパラメーターでtimeやdatetimeを使用する場合も、マイクロ秒までしか指定できません。  
-ラッパークラスを使って引数を文字列にすると、ナノ秒まで指定することができます。
+ラッパークラスを使うと、ナノ秒まで指定することができます。
 
 ```python
 import tsubakuro_rust_python as tsurugi
+import datetime
 
-     value = tsurugi.Datetime("2026-02-06 12:34:56.123456789")
+     # 2026-02-06 12:34:56.123456789
+     value = tsurugi.Datetime(datetime.datetime(2026, 2, 6, 12, 34, 56), 123456789)
 ```
 

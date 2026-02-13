@@ -82,10 +82,15 @@ def test_wrapper():
     assert value.value is None
     value = tsurugi.Time(None)
     assert value.value is None
+    assert value.nanosecond is None
+
     value = tsurugi.Time(datetime.time(12, 34, 56, 123456))
     assert value.value == datetime.time(12, 34, 56, 123456)
-    value = tsurugi.Time("12:34:56.123456789")
+    assert value.nanosecond == 123456000
+
+    value = tsurugi.Time(datetime.time(12, 34, 56), 123456789)
     assert value.value == datetime.time(12, 34, 56, 123456)
+    assert value.nanosecond == 123456789
     assert value.__repr__() == "Time(12:34:56.123456789)"
 
 

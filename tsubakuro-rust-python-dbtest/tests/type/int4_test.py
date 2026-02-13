@@ -74,13 +74,6 @@ def test_wrapper():
     assert value.value is None
     value = tsurugi.Int32(123)
     assert value.value == 123
-    value = tsurugi.Int32("123")
-    assert value.value == 123
-    try:
-        value = tsurugi.Int32("abc")
-        assert False, "must raise"
-    except ValueError:
-        pass
 
 
 def test_placeholder_wrapper(connection):

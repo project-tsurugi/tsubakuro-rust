@@ -90,6 +90,7 @@ def test_wrapper():
     assert value.value is None
     value = tsurugi.OffsetDatetime(None)
     assert value.value is None
+    assert value.nanosecond is None
 
     JST = datetime.timezone(datetime.timedelta(hours=9))
     UTC = datetime.timezone(datetime.timedelta(hours=0))
@@ -97,28 +98,26 @@ def test_wrapper():
         datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
     )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
+    assert value.nanosecond == 123456000
 
     value = tsurugi.OffsetDatetime(
         datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
     )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
+    assert value.nanosecond == 123456000
 
-    value = tsurugi.OffsetDatetime("2026-01-27 16:24:30.123456789+09:00")
+    value = tsurugi.OffsetDatetime(
+        datetime.datetime(2026, 1, 27, 16, 24, 30, tzinfo=JST), 123456789
+    )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
+    assert value.nanosecond == 123456789
     assert value.__repr__() == "OffsetDatetime(2026-01-27 16:24:30.123456789 +09:00)"
 
-    value = tsurugi.OffsetDatetime("2026-01-27 16:24:30.123456789+00:00")
+    value = tsurugi.OffsetDatetime(
+        datetime.datetime(2026, 1, 27, 16, 24, 30, tzinfo=UTC), 123456789
+    )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
-    assert value.__repr__() == "OffsetDatetime(2026-01-27 16:24:30.123456789 +00:00)"
-    value = tsurugi.OffsetDatetime("2026-01-27 16:24:30.123456789Z")
-    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
-    assert value.__repr__() == "OffsetDatetime(2026-01-27 16:24:30.123456789 +00:00)"
-
-    try:
-        tsurugi.OffsetDatetime("2026-01-27 16:24:30.123456789")
-        assert False, "ValueError not raised"
-    except ValueError:
-        pass
+    assert value.nanosecond == 123456789
 
 
 def test_placeholder_wrapper(connection):
