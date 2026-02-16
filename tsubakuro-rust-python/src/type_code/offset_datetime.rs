@@ -1,6 +1,7 @@
 use chrono::{TimeZone, Timelike};
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// TIMESTAMP WITH TIME ZONE type.
 #[gen_stub_pyclass]
@@ -82,7 +83,12 @@ impl OffsetDatetime {
 }
 
 impl OffsetDatetime {
-    pub const fn value(&self) -> &Option<chrono::DateTime<chrono::FixedOffset>> {
-        &self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<OffsetDatetime>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            let v: Option<chrono::DateTime<chrono::FixedOffset>> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

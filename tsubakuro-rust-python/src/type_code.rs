@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use pyo3::{prelude::*, types::*};
-use tsubakuro_rust_core::prelude::{AtomType, SqlParameter, SqlParameterOf, SqlPlaceholder};
+use tsubakuro_rust_core::prelude::{AtomType, SqlParameter, SqlPlaceholder};
 
 use crate::{
     error::ProgrammingError,
@@ -327,150 +327,22 @@ fn create_parameter(
     atom_type: AtomType,
 ) -> PyResult<SqlParameter> {
     match atom_type {
-        AtomType::Boolean => {
-            let v: Option<bool> = if let Ok(v) = value.extract::<PyRef<Bool>>() {
-                v.value()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Int4 => {
-            let v: Option<i32> = if let Ok(v) = value.extract::<PyRef<Int32>>() {
-                v.value()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Int8 => {
-            let v: Option<i64> = if let Ok(v) = value.extract::<PyRef<Int64>>() {
-                v.value()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Float4 => {
-            let v: Option<f32> = if let Ok(v) = value.extract::<PyRef<Float32>>() {
-                v.value()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Float8 => {
-            let v: Option<f64> = if let Ok(v) = value.extract::<PyRef<Float64>>() {
-                v.value()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Decimal => {
-            let v: Option<rust_decimal::Decimal> = if let Ok(v) = value.extract::<PyRef<Decimal>>()
-            {
-                v.value()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Character => {
-            let v: Option<String> = if let Ok(v) = value.extract::<PyRef<Str>>() {
-                v.value().clone()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Octet => {
-            let v: Option<Vec<u8>> = if let Ok(v) = value.extract::<PyRef<Bytes>>() {
-                v.value().clone()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::Date => {
-            let v: Option<chrono::NaiveDate> = if let Ok(v) = value.extract::<PyRef<Date>>() {
-                v.value().clone()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::TimeOfDay => {
-            let v: Option<chrono::NaiveTime> = if let Ok(v) = value.extract::<PyRef<Time>>() {
-                v.value().clone()
-            } else {
-                value.extract()?
-            };
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::TimePoint => {
-            let v: Option<chrono::NaiveDateTime> = convert_datetime(value)?;
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::TimeOfDayWithTimeZone => {
-            let v: Option<(chrono::NaiveTime, chrono::FixedOffset)> = convert_offset_time(value)?;
-            Ok(SqlParameter::of(name, v))
-        }
-        AtomType::TimePointWithTimeZone => {
-            let v: Option<chrono::DateTime<chrono::FixedOffset>> =
-                if let Ok(v) = value.extract::<PyRef<OffsetDatetime>>() {
-                    v.value().clone()
-                } else {
-                    value.extract()?
-                };
-            Ok(SqlParameter::of(name, v))
-        }
+        AtomType::Boolean => Bool::create_parameter(name, value),
+        AtomType::Int4 => Int32::create_parameter(name, value),
+        AtomType::Int8 => Int64::create_parameter(name, value),
+        AtomType::Float4 => Float32::create_parameter(name, value),
+        AtomType::Float8 => Float64::create_parameter(name, value),
+        AtomType::Decimal => Decimal::create_parameter(name, value),
+        AtomType::Character => Str::create_parameter(name, value),
+        AtomType::Octet => Bytes::create_parameter(name, value),
+        AtomType::Date => Date::create_parameter(name, value),
+        AtomType::TimeOfDay => Time::create_parameter(name, value),
+        AtomType::TimePoint => Datetime::create_parameter(name, value),
+        AtomType::TimeOfDayWithTimeZone => OffsetTime::create_parameter(name, value),
+        AtomType::TimePointWithTimeZone => OffsetDatetime::create_parameter(name, value),
         _ => Err(ProgrammingError::new_err(format!(
             "create_parameter: unsupported AtomType: {:?}",
             atom_type
         ))),
     }
-}
-
-fn convert_datetime(value: &Bound<PyAny>) -> PyResult<Option<chrono::NaiveDateTime>> {
-    if value.is_none() {
-        return Ok(None);
-    }
-
-    if let Ok(v) = value.extract::<PyRef<Datetime>>() {
-        return Ok(v.value().clone());
-    }
-    if let Ok(v) = value.call_method1("astype", ("datetime64[ns]",)) {
-        let v = v.call_method1("astype", ("int64",))?;
-        let epoch: i64 = v.extract()?;
-        let dt = chrono::DateTime::<chrono::Utc>::from_timestamp_nanos(epoch);
-        return Ok(Some(dt.naive_utc()));
-    }
-
-    Ok(value.extract()?)
-}
-
-fn convert_offset_time(
-    value: &Bound<PyAny>,
-) -> PyResult<Option<(chrono::NaiveTime, chrono::FixedOffset)>> {
-    if value.is_none() {
-        return Ok(None);
-    }
-
-    if let Ok(v) = value.extract::<PyRef<OffsetTime>>() {
-        return Ok(v.value().clone());
-    }
-
-    if value.is_instance_of::<PyTime>() {
-        let time: chrono::NaiveTime = value.extract()?;
-        let tzinfo = value.getattr("tzinfo")?;
-        let offset: chrono::FixedOffset = if tzinfo.is_none() {
-            chrono::FixedOffset::east_opt(0).unwrap()
-        } else {
-            tzinfo.extract()?
-        };
-        return Ok(Some((time, offset)));
-    }
-
-    Ok(value.extract()?)
 }

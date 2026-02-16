@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// DECIMAL type.
 #[gen_stub_pyclass]
@@ -31,7 +32,12 @@ impl Decimal {
 }
 
 impl Decimal {
-    pub const fn value(&self) -> Option<rust_decimal::Decimal> {
-        self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<Decimal>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            let v: Option<rust_decimal::Decimal> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

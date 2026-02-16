@@ -1,6 +1,7 @@
 use chrono::Timelike;
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// TIME WITH TIME ZONE type.
 #[gen_stub_pyclass]
@@ -94,7 +95,28 @@ impl OffsetTime {
 }
 
 impl OffsetTime {
-    pub const fn value(&self) -> &Option<(chrono::NaiveTime, chrono::FixedOffset)> {
-        &self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<OffsetTime>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            if value.is_none() {
+                return Ok(SqlParameter::null(name));
+            }
+
+            if value.is_instance_of::<PyTime>() {
+                let time: chrono::NaiveTime = value.extract()?;
+                let tzinfo = value.getattr("tzinfo")?;
+                let offset: chrono::FixedOffset = if tzinfo.is_none() {
+                    chrono::FixedOffset::east_opt(0).unwrap()
+                } else {
+                    tzinfo.extract()?
+                };
+                let v = (time, offset);
+                return Ok(SqlParameter::of(name, v));
+            }
+
+            let v: Option<(chrono::NaiveTime, chrono::FixedOffset)> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

@@ -1,6 +1,7 @@
 use chrono::Timelike;
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// TIME type.
 #[gen_stub_pyclass]
@@ -63,7 +64,12 @@ impl Time {
 }
 
 impl Time {
-    pub const fn value(&self) -> &Option<chrono::NaiveTime> {
-        &self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<Time>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            let v: Option<chrono::NaiveTime> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

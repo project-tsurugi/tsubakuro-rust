@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// BIGINT type.
 #[gen_stub_pyclass]
@@ -35,7 +36,12 @@ impl Int64 {
 }
 
 impl Int64 {
-    pub const fn value(&self) -> Option<i64> {
-        self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<Int64>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            let v: Option<i64> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

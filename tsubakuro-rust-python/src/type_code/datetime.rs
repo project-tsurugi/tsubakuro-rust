@@ -1,6 +1,7 @@
 use chrono::Timelike;
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// TIMESTAMP type.
 #[gen_stub_pyclass]
@@ -69,7 +70,23 @@ impl Datetime {
 }
 
 impl Datetime {
-    pub const fn value(&self) -> &Option<chrono::NaiveDateTime> {
-        &self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<Datetime>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            if value.is_none() {
+                return Ok(SqlParameter::null(name));
+            }
+
+            if let Ok(v) = value.call_method1("astype", ("datetime64[ns]",)) {
+                let v = v.call_method1("astype", ("int64",))?;
+                let epoch: i64 = v.extract()?;
+                let dt = chrono::DateTime::<chrono::Utc>::from_timestamp_nanos(epoch);
+                return Ok(SqlParameter::of(name, Some(dt.naive_utc())));
+            }
+
+            let v: Option<chrono::NaiveDateTime> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

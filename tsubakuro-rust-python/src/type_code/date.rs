@@ -1,5 +1,6 @@
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// DATE type.
 #[gen_stub_pyclass]
@@ -39,7 +40,12 @@ impl Date {
 }
 
 impl Date {
-    pub const fn value(&self) -> &Option<chrono::NaiveDate> {
-        &self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<Date>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            let v: Option<chrono::NaiveDate> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

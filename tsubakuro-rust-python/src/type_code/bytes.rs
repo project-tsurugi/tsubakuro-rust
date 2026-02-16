@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// BINARY, VARBINARY type.
 #[gen_stub_pyclass]
@@ -31,7 +32,12 @@ impl Bytes {
 }
 
 impl Bytes {
-    pub const fn value(&self) -> &Option<Vec<u8>> {
-        &self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<Bytes>>() {
+            Ok(SqlParameter::of(name, v.value.clone()))
+        } else {
+            let v: Option<Vec<u8>> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }

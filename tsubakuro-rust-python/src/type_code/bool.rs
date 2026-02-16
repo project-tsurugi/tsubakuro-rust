@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3_stub_gen::derive::*;
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// BOOLEAN type.
 #[gen_stub_pyclass]
@@ -35,7 +36,12 @@ impl Bool {
 }
 
 impl Bool {
-    pub const fn value(&self) -> Option<bool> {
-        self.value
+    pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
+        if let Ok(v) = value.extract::<PyRef<Bool>>() {
+            Ok(SqlParameter::of(name, v.value))
+        } else {
+            let v: Option<bool> = value.extract()?;
+            Ok(SqlParameter::of(name, v))
+        }
     }
 }
