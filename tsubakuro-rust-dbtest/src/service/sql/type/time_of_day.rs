@@ -64,7 +64,7 @@ mod test {
     }
 
     fn time(hour: u8, min: u8, sec: u8, nanos: u32) -> TgTimeOfDay {
-        TgTimeOfDay::from(hour, min, sec, nanos)
+        TgTimeOfDay::from_hms_nano(hour, min, sec, nanos)
     }
 
     async fn insert_literal(client: &SqlClient, values: &Vec<(i32, Option<TgTimeOfDay>)>) {

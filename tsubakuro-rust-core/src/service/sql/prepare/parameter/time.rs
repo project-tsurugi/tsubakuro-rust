@@ -3,6 +3,7 @@ use crate::jogasaki::proto::sql::common::{
     TimePointWithTimeZone as ProtoTimePointWithTimeZone,
 };
 use crate::jogasaki::proto::sql::request::{parameter::Value, Parameter as SqlParameter};
+use crate::prelude::r#type::feature::time::{date_to_epoch_days, time_to_seconds};
 use crate::prelude::SqlParameterOf;
 
 impl SqlParameterOf<time::Date> for SqlParameter {
@@ -13,20 +14,11 @@ impl SqlParameterOf<time::Date> for SqlParameter {
 
 impl SqlParameterOf<&time::Date> for SqlParameter {
     fn of(name: &str, value: &time::Date) -> SqlParameter {
-        let days = date_to_days(value);
+        let epoch_days = date_to_epoch_days(value);
 
-        let value = Value::DateValue(days);
+        let value = Value::DateValue(epoch_days);
         SqlParameter::new(name, Some(value))
     }
-}
-
-// const TIME_EPOCH_START_DATE: Result<time::Date, time::error::ComponentRange> =
-//     time::Date::from_ordinal_date(1970, 1);
-
-fn date_to_days(value: &time::Date) -> i64 {
-    // let days = *value - TIME_EPOCH_START_DATE.unwrap();
-    // let days = days.whole_days();
-    value.to_julian_day() as i64 - /* Date(1970-01-01).to_julian_day() */ 2440588
 }
 
 impl SqlParameterOf<time::Time> for SqlParameter {
@@ -45,13 +37,6 @@ impl SqlParameterOf<&time::Time> for SqlParameter {
     }
 }
 
-fn time_to_seconds(value: &time::Time) -> (u64, u32) {
-    let (hour, min, sec, nanos) = value.as_hms_nano();
-    let seconds = ((hour as u64) * 60 + min as u64) * 60 + sec as u64;
-
-    (seconds, nanos)
-}
-
 impl SqlParameterOf<time::PrimitiveDateTime> for SqlParameter {
     fn of(name: &str, value: time::PrimitiveDateTime) -> SqlParameter {
         Self::of(name, &value)
@@ -60,23 +45,10 @@ impl SqlParameterOf<time::PrimitiveDateTime> for SqlParameter {
 
 impl SqlParameterOf<&time::PrimitiveDateTime> for SqlParameter {
     fn of(name: &str, value: &time::PrimitiveDateTime) -> SqlParameter {
-        let (seconds, nanos) = date_time_to_seconds(&value.date(), &value.time());
-
-        let value = ProtoTimePoint {
-            offset_seconds: seconds,
-            nano_adjustment: nanos,
-        };
+        let value: ProtoTimePoint = value.into();
         let value = Value::TimePointValue(value);
         SqlParameter::new(name, Some(value))
     }
-}
-
-fn date_time_to_seconds(date: &time::Date, time: &time::Time) -> (i64, u32) {
-    let days = date_to_days(date);
-    let (seconds, nanos) = time_to_seconds(time);
-    let seconds = days * 24 * 60 * 60 + seconds as i64;
-
-    (seconds, nanos)
 }
 
 impl SqlParameterOf<(time::Time, time::UtcOffset)> for SqlParameter {
@@ -87,23 +59,10 @@ impl SqlParameterOf<(time::Time, time::UtcOffset)> for SqlParameter {
 
 impl SqlParameterOf<&(time::Time, time::UtcOffset)> for SqlParameter {
     fn of(name: &str, value: &(time::Time, time::UtcOffset)) -> SqlParameter {
-        let (time, offset) = value;
-
-        let (seconds, nanos) = time_to_seconds(time);
-        let offset_minutes = utc_offset_to_minutes(offset);
-
-        let value = ProtoTimeOfDayWithTimeZone {
-            offset_nanoseconds: seconds * 1_000_000_000 + nanos as u64,
-            time_zone_offset: offset_minutes,
-        };
+        let value: ProtoTimeOfDayWithTimeZone = value.into();
         let value = Value::TimeOfDayWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
-}
-
-fn utc_offset_to_minutes(offset: &time::UtcOffset) -> i32 {
-    let (hour, min, _sec) = offset.as_hms();
-    hour as i32 * 60 + min as i32
 }
 
 impl SqlParameterOf<time::OffsetDateTime> for SqlParameter {
@@ -114,14 +73,7 @@ impl SqlParameterOf<time::OffsetDateTime> for SqlParameter {
 
 impl SqlParameterOf<&time::OffsetDateTime> for SqlParameter {
     fn of(name: &str, value: &time::OffsetDateTime) -> SqlParameter {
-        let (seconds, nanos) = date_time_to_seconds(&value.date(), &value.time());
-        let offset_minutes = utc_offset_to_minutes(&value.offset());
-
-        let value = ProtoTimePointWithTimeZone {
-            offset_seconds: seconds,
-            nano_adjustment: nanos,
-            time_zone_offset: offset_minutes,
-        };
+        let value: ProtoTimePointWithTimeZone = value.into();
         let value = Value::TimePointWithTimeZoneValue(value);
         SqlParameter::new(name, Some(value))
     }
@@ -357,7 +309,7 @@ mod test {
 
     #[test]
     fn offset_date_time() {
-        let value = offset_date_time0(2025, 1, 16, 17, 42, 30, 123456789, 9);
+        let value = create_offset_date_time(2025, 1, 16, 17, 42, 30, 123456789, 9);
 
         let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
@@ -382,7 +334,7 @@ mod test {
 
     #[test]
     fn offset_date_time_ref() {
-        let value = offset_date_time0(2025, 1, 16, 17, 42, 30, 123456789, 9);
+        let value = create_offset_date_time(2025, 1, 16, 17, 42, 30, 123456789, 9);
 
         let target0 = SqlParameter::of("test", &value);
         assert_eq!("test", target0.name().unwrap());
@@ -405,7 +357,7 @@ mod test {
         assert_eq!(target0, target);
     }
 
-    fn offset_date_time0(
+    fn create_offset_date_time(
         year: i32,
         month: u8,
         day: u8,

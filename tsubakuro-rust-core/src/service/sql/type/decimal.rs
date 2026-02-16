@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
+use crate::error::TgError;
 pub use crate::jogasaki::proto::sql::common::Decimal as TgDecimal;
-use crate::{client_error, error::TgError};
 
 impl TgDecimal {
     /// Creates a new instance.
@@ -143,30 +143,33 @@ impl TryFrom<TgDecimalResult> for TgDecimalI128 {
 
     fn try_from(value: TgDecimalResult) -> Result<Self, Self::Error> {
         if let Some(bytes) = value.unscaled_value_bytes {
-            let size = bytes.len();
-            if size == 0 {
-                return Ok(TgDecimalI128::new(0, value.exponent));
-            }
-            if 16 < size {
-                return Err(client_error!("unsupported unscaled_value_bytes size"));
-            }
-            if (bytes[0] as i8) >= 0 {
-                let mut array = [0u8; 16];
-                array[16 - size..].copy_from_slice(&bytes);
-                let unscaled_value = i128::from_be_bytes(array);
-                return Ok(TgDecimalI128::new(unscaled_value, value.exponent));
-            } else {
-                let mut array = [0xffu8; 16];
-                array[16 - size..].copy_from_slice(&bytes);
-                let unscaled_value = i128::from_be_bytes(array);
-                return Ok(TgDecimalI128::new(unscaled_value, value.exponent));
-            }
+            let unscaled_value = bytes_to_i128(&bytes);
+            return Ok(TgDecimalI128::new(unscaled_value, value.exponent));
         }
 
         Ok(TgDecimalI128::new(
             value.unscaled_value as i128,
             value.exponent,
         ))
+    }
+}
+
+pub(crate) fn bytes_to_i128(bytes: &[u8]) -> i128 {
+    let size = bytes.len();
+    if size == 0 {
+        return 0;
+    }
+    if 16 < size {
+        panic!("unsupported bytes size. size={}", size);
+    }
+    if (bytes[0] as i8) >= 0 {
+        let mut array = [0u8; 16];
+        array[16 - size..].copy_from_slice(bytes);
+        i128::from_be_bytes(array)
+    } else {
+        let mut array = [0xffu8; 16];
+        array[16 - size..].copy_from_slice(bytes);
+        i128::from_be_bytes(array)
     }
 }
 

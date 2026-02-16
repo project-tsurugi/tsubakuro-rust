@@ -10,11 +10,7 @@ impl SqlParameterOf<bigdecimal::BigDecimal> for SqlParameter {
 
 impl SqlParameterOf<&bigdecimal::BigDecimal> for SqlParameter {
     fn of(name: &str, value: &bigdecimal::BigDecimal) -> SqlParameter {
-        let (value, scale) = value.as_bigint_and_exponent();
-        let value = ProtoDecimal {
-            unscaled_value: value.to_signed_bytes_be(),
-            exponent: -scale as i32,
-        };
+        let value: ProtoDecimal = value.into();
         let value = Value::DecimalValue(value);
         SqlParameter::new(name, Some(value))
     }

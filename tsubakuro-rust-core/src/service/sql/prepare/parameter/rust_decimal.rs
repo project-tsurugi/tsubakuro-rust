@@ -10,10 +10,7 @@ impl SqlParameterOf<rust_decimal::Decimal> for SqlParameter {
 
 impl SqlParameterOf<&rust_decimal::Decimal> for SqlParameter {
     fn of(name: &str, value: &rust_decimal::Decimal) -> SqlParameter {
-        let value = ProtoDecimal {
-            unscaled_value: value.mantissa().to_be_bytes().to_vec(),
-            exponent: -(value.scale() as i32),
-        };
+        let value: ProtoDecimal = value.into();
         let value = Value::DecimalValue(value);
         SqlParameter::new(name, Some(value))
     }
