@@ -1,14 +1,14 @@
 use chrono::Timelike;
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
-use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimeOfDayWithTimeZone};
 
 /// TIME WITH TIME ZONE type.
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct OffsetTime {
-    value: Option<(chrono::NaiveTime, chrono::FixedOffset)>,
+    value: Option<TgTimeOfDayWithTimeZone>,
 }
 
 #[gen_stub_pymethods]
@@ -32,9 +32,8 @@ impl OffsetTime {
             } else {
                 chrono::FixedOffset::east_opt(0).unwrap()
             };
-            Ok(OffsetTime {
-                value: Some((time, offset)),
-            })
+            let value = TgTimeOfDayWithTimeZone::from((time, offset));
+            Ok(OffsetTime { value: Some(value) })
         } else {
             Ok(OffsetTime { value: None })
         }
@@ -44,7 +43,7 @@ impl OffsetTime {
     #[classmethod]
     #[pyo3(signature = (hour=0, minute=0, second=0, nanosecond=0, tzinfo=None))]
     pub fn of(
-        _cls: Bound<PyType>,
+        _cls: &Bound<PyType>,
         hour: u32,
         minute: u32,
         second: u32,
@@ -53,25 +52,43 @@ impl OffsetTime {
     ) -> PyResult<Self> {
         let time = chrono::NaiveTime::from_hms_nano_opt(hour, minute, second, nanosecond)
             .ok_or_else(|| PyValueError::new_err("invalid time value"))?;
-        let tzinfo = if let Some(tz) = tzinfo {
+        let offset = if let Some(tz) = tzinfo {
             tz
         } else {
             chrono::FixedOffset::east_opt(0).unwrap()
         };
-        Ok(OffsetTime {
-            value: Some((time, tzinfo)),
-        })
+        let value = TgTimeOfDayWithTimeZone::from((time, offset));
+        Ok(OffsetTime { value: Some(value) })
+    }
+
+    /// Create a `OffsetTime` from epoch nanoseconds of day and time zone offset.
+    ///
+    /// # Parameters
+    /// - `nanoseconds_of_day` - offset nano-seconds from epoch (00:00:00) in the time zone
+    /// - `time_zone_offset` - timezone offset in minute
+    #[classmethod]
+    pub fn raw(
+        _cls: &Bound<PyType>,
+        nanoseconds_of_day: u64,
+        time_zone_offset: i32,
+    ) -> PyResult<Self> {
+        let value = TgTimeOfDayWithTimeZone::new(nanoseconds_of_day, time_zone_offset);
+        Ok(OffsetTime { value: Some(value) })
     }
 
     /// Value.
     #[getter]
-    pub fn get_value<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyTime>>> {
-        if let Some((time, offset)) = &self.value {
-            let hour = time.hour() as u8;
-            let minute = time.minute() as u8;
-            let second = time.second() as u8;
-            let microsecond = time.nanosecond() / 1000;
+    pub fn value<'py>(&self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyTime>>> {
+        if let Some(v) = &self.value {
+            let epoch_nanos = v.offset_nanoseconds;
+            let hour = (epoch_nanos / 3_600_000_000_000) as u8;
+            let minute = ((epoch_nanos % 3_600_000_000_000) / 60_000_000_000) as u8;
+            let second = ((epoch_nanos % 60_000_000_000) / 1_000_000_000) as u8;
+            let microsecond = ((epoch_nanos % 1_000_000_000) / 1000) as u32;
+
+            let offset = chrono::FixedOffset::east_opt((v.time_zone_offset * 60) as i32).unwrap();
             let tzinfo = offset.into_pyobject(py)?;
+
             let time = PyTime::new(py, hour, minute, second, microsecond, Some(&tzinfo))?;
             Ok(Some(time))
         } else {
@@ -82,11 +99,13 @@ impl OffsetTime {
     /// Nnanosecond.
     #[getter]
     pub fn nanosecond(&self) -> Option<u32> {
-        self.value.map(|(time, _)| time.nanosecond())
+        self.value
+            .map(|v| (v.offset_nanoseconds % 1_000_000_000) as u32)
     }
 
     pub fn __repr__(&self) -> String {
-        if let Some((time, offset)) = &self.value {
+        if let Some(v) = &self.value {
+            let (time, offset): (chrono::NaiveTime, chrono::FixedOffset) = v.into();
             format!("OffsetTime({} {})", time, offset)
         } else {
             "OffsetTime(None)".to_string()

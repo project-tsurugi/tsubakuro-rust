@@ -1,15 +1,13 @@
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyType};
 use pyo3_stub_gen::derive::*;
-use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDecimal};
 
 /// DECIMAL type.
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Decimal {
-    /// Value.
-    #[pyo3(get)]
-    value: Option<rust_decimal::Decimal>,
+    value: Option<TgDecimal>,
 }
 
 #[gen_stub_pymethods]
@@ -19,11 +17,25 @@ impl Decimal {
     #[new]
     #[pyo3(signature = (value=None))]
     pub fn new(value: Option<rust_decimal::Decimal>) -> Self {
+        let value = value.map(TgDecimal::from);
         Decimal { value }
     }
 
+    /// Create a `Decimal` from unscaled value and exponent.
+    #[classmethod]
+    pub fn raw(_cls: &Bound<PyType>, unscaled_value: Vec<u8>, exponent: i32) -> PyResult<Self> {
+        let value = TgDecimal::new(unscaled_value, exponent);
+        Ok(Decimal { value: Some(value) })
+    }
+
+    /// Value.
+    #[getter]
+    pub fn value(&self) -> Option<rust_decimal::Decimal> {
+        self.value.as_ref().map(|v| v.into())
+    }
+
     pub fn __repr__(&self) -> String {
-        if let Some(v) = &self.value {
+        if let Some(v) = self.value() {
             format!("Decimal({})", v)
         } else {
             "Decimal(None)".to_string()
@@ -34,7 +46,7 @@ impl Decimal {
 impl Decimal {
     pub(crate) fn create_parameter(name: &str, value: &Bound<PyAny>) -> PyResult<SqlParameter> {
         if let Ok(v) = value.extract::<PyRef<Decimal>>() {
-            Ok(SqlParameter::of(name, v.value))
+            Ok(SqlParameter::of(name, v.value.clone()))
         } else {
             let v: Option<rust_decimal::Decimal> = value.extract()?;
             Ok(SqlParameter::of(name, v))

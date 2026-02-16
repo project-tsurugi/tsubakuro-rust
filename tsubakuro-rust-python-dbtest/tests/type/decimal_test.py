@@ -72,6 +72,7 @@ def test_wrapper():
     assert value.value is None
     value = tsurugi.Decimal(None)
     assert value.value is None
+
     value = tsurugi.Decimal(123)
     assert value.value == decimal.Decimal(123)
     value = tsurugi.Decimal(123.5)
@@ -79,6 +80,9 @@ def test_wrapper():
     value = tsurugi.Decimal(decimal.Decimal("123.4"))
     assert value.value == decimal.Decimal("123.4")
     value = tsurugi.Decimal("123.4")
+    assert value.value == decimal.Decimal("123.4")
+
+    value = tsurugi.Decimal.raw([0x04, 0xD2], -1)
     assert value.value == decimal.Decimal("123.4")
 
 

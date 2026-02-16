@@ -1,16 +1,14 @@
 use chrono::Timelike;
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
-use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimeOfDay};
 
 /// TIME type.
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Time {
-    /// Value.
-    #[pyo3(get)]
-    value: Option<chrono::NaiveTime>,
+    value: Option<TgTimeOfDay>,
 }
 
 #[gen_stub_pymethods]
@@ -27,7 +25,8 @@ impl Time {
             } else {
                 v
             };
-            Ok(Time { value: Some(v) })
+            let value = TgTimeOfDay::from(v);
+            Ok(Time { value: Some(value) })
         } else {
             Ok(Time { value: None })
         }
@@ -37,7 +36,7 @@ impl Time {
     #[classmethod]
     #[pyo3(signature = (hour=0, minute=0, second=0, nanosecond=0))]
     pub fn of(
-        _cls: Bound<PyType>,
+        _cls: &Bound<PyType>,
         hour: u32,
         minute: u32,
         second: u32,
@@ -45,13 +44,35 @@ impl Time {
     ) -> PyResult<Self> {
         let time = chrono::NaiveTime::from_hms_nano_opt(hour, minute, second, nanosecond)
             .ok_or_else(|| PyValueError::new_err("invalid time value"))?;
-        Ok(Time { value: Some(time) })
+        let value = TgTimeOfDay::from(time);
+        Ok(Time { value: Some(value) })
+    }
+
+    /// Create a `Time` from nanoseconds of day.
+    ///
+    /// # Parameters
+    /// - `nanoseconds_of_day` - time of day (nanoseconds since 00:00:00)
+    #[classmethod]
+    pub fn raw(_cls: &Bound<PyType>, nanoseconds_of_day: u64) -> PyResult<Self> {
+        let value = TgTimeOfDay::new(nanoseconds_of_day);
+        Ok(Time { value: Some(value) })
+    }
+
+    /// Value.
+    #[getter]
+    pub fn value(&self) -> Option<chrono::NaiveTime> {
+        self.value.as_ref().map(|v| v.into())
     }
 
     /// Nnanosecond.
     #[getter]
     pub fn nanosecond(&self) -> Option<u32> {
-        self.value.map(|v| v.nanosecond())
+        if let Some(v) = self.value {
+            let nanos = v.offset_nanoseconds % 1_000_000_000;
+            Some(nanos as u32)
+        } else {
+            None
+        }
     }
 
     pub fn __repr__(&self) -> String {

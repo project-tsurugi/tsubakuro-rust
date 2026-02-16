@@ -1,15 +1,13 @@
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
-use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDate};
 
 /// DATE type.
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Date {
-    /// Value.
-    #[pyo3(get)]
-    value: Option<chrono::NaiveDate>,
+    value: Option<TgDate>,
 }
 
 #[gen_stub_pymethods]
@@ -19,19 +17,37 @@ impl Date {
     #[new]
     #[pyo3(signature = (value=None))]
     pub fn new(value: Option<chrono::NaiveDate>) -> PyResult<Self> {
+        let value = value.map(TgDate::from);
         Ok(Date { value })
     }
 
     /// Create a `Date` from year, month, and day.
     #[classmethod]
-    pub fn of(_cls: Bound<PyType>, year: i32, month: u32, day: u32) -> PyResult<Self> {
+    pub fn of(_cls: &Bound<PyType>, year: i32, month: u32, day: u32) -> PyResult<Self> {
         let date = chrono::NaiveDate::from_ymd_opt(year, month, day)
             .ok_or_else(|| PyValueError::new_err("invalid date value"))?;
-        Ok(Date { value: Some(date) })
+        let value = TgDate::from(date);
+        Ok(Date { value: Some(value) })
+    }
+
+    /// Create a `Date` from epoch days.
+    ///
+    /// # Parameters
+    /// - `epoch_days` - number of days offset of epoch 1970-01-01
+    #[classmethod]
+    pub fn raw(_cls: &Bound<PyType>, epoch_days: i64) -> PyResult<Self> {
+        let value = TgDate::new(epoch_days);
+        Ok(Date { value: Some(value) })
+    }
+
+    /// Value.
+    #[getter]
+    pub fn value(&self) -> Option<chrono::NaiveDate> {
+        self.value.as_ref().map(|v| v.into())
     }
 
     pub fn __repr__(&self) -> String {
-        if let Some(v) = &self.value {
+        if let Some(v) = self.value() {
             format!("Date({})", v)
         } else {
             "Date(None)".to_string()

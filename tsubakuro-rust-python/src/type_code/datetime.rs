@@ -1,16 +1,14 @@
 use chrono::Timelike;
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
-use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimePoint};
 
 /// TIMESTAMP type.
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct Datetime {
-    /// Value.
-    #[pyo3(get)]
-    value: Option<chrono::NaiveDateTime>,
+    value: Option<TgTimePoint>,
 }
 
 #[gen_stub_pymethods]
@@ -27,7 +25,8 @@ impl Datetime {
             } else {
                 v
             };
-            Ok(Datetime { value: Some(v) })
+            let value = TgTimePoint::from(v);
+            Ok(Datetime { value: Some(value) })
         } else {
             Ok(Datetime { value: None })
         }
@@ -37,7 +36,7 @@ impl Datetime {
     #[classmethod]
     #[pyo3(signature = (year, month, day, hour=0, minute=0, second=0, nanosecond=0))]
     pub fn of(
-        _cls: Bound<PyType>,
+        _cls: &Bound<PyType>,
         year: i32,
         month: u32,
         day: u32,
@@ -51,17 +50,35 @@ impl Datetime {
         let time = chrono::NaiveTime::from_hms_nano_opt(hour, minute, second, nanosecond)
             .ok_or_else(|| PyValueError::new_err("invalid time value"))?;
         let v = chrono::NaiveDateTime::new(date, time);
-        Ok(Datetime { value: Some(v) })
+        let value = TgTimePoint::from(v);
+        Ok(Datetime { value: Some(value) })
+    }
+
+    /// Create a `Datetime` from epoch seconds and nanoseconds.
+    ///
+    /// # Parameters
+    /// - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
+    /// - `nanos` - nanosecond part of the time (0-999,999,999)
+    #[classmethod]
+    pub fn raw(_cls: &Bound<PyType>, epoch_seconds: i64, nanos: u32) -> PyResult<Self> {
+        let value = TgTimePoint::new(epoch_seconds, nanos);
+        Ok(Datetime { value: Some(value) })
+    }
+
+    /// Value.
+    #[getter]
+    pub fn value(&self) -> Option<chrono::NaiveDateTime> {
+        self.value.as_ref().map(|v| v.into())
     }
 
     /// Nnanosecond.
     #[getter]
     pub fn nanosecond(&self) -> Option<u32> {
-        self.value.map(|v| v.nanosecond())
+        self.value.map(|v| v.nano_adjustment)
     }
 
     pub fn __repr__(&self) -> String {
-        if let Some(v) = &self.value {
+        if let Some(v) = self.value() {
             format!("Datetime({})", v)
         } else {
             "Datetime(None)".to_string()

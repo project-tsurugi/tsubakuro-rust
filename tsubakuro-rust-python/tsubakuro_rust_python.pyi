@@ -529,9 +529,17 @@ class Date:
         Create a new `Date`.
         """
     @classmethod
-    def of(cls, _cls: type, year: builtins.int, month: builtins.int, day: builtins.int) -> Date:
+    def of(cls, year: builtins.int, month: builtins.int, day: builtins.int) -> Date:
         r"""
         Create a `Date` from year, month, and day.
+        """
+    @classmethod
+    def raw(cls, epoch_days: builtins.int) -> Date:
+        r"""
+        Create a `Date` from epoch days.
+        
+        # Parameters
+        - `epoch_days` - number of days offset of epoch 1970-01-01
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -559,6 +567,15 @@ class Datetime:
         r"""
         Create a `Datetime` from year, month, day, hour, minute, second, and nanosecond.
         """
+    @classmethod
+    def raw(cls, epoch_seconds: builtins.int, nanos: builtins.int) -> Datetime:
+        r"""
+        Create a `Datetime` from epoch seconds and nanoseconds.
+        
+        # Parameters
+        - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
+        - `nanos` - nanosecond part of the time (0-999,999,999)
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -574,6 +591,11 @@ class Decimal:
     def __new__(cls, value: typing.Optional[decimal.Decimal] = None) -> Decimal:
         r"""
         Create a new `Decimal`.
+        """
+    @classmethod
+    def raw(cls, unscaled_value: typing.Sequence[builtins.int], exponent: builtins.int) -> Decimal:
+        r"""
+        Create a `Decimal` from unscaled value and exponent.
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -669,6 +691,16 @@ class OffsetDatetime:
         r"""
         Create a `OffsetDatetime` from year, month, day, hour, minute, second, nanosecond, and tzinfo.
         """
+    @classmethod
+    def raw(cls, epoch_seconds: builtins.int, nanos: builtins.int, time_zone_offset: builtins.int) -> OffsetDatetime:
+        r"""
+        Create a `OffsetDatetime` from epoch seconds, nanoseconds, and time zone offset.
+        
+        # Parameters
+        - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
+        - `nanos` - nanosecond part of the time (0-999,999,999)
+        - `time_zone_offset` - time zone offset in minutes
+        """
     def __repr__(self) -> builtins.str: ...
 
 @typing.final
@@ -694,6 +726,15 @@ class OffsetTime:
     def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0, tzinfo: typing.Optional[datetime.tzinfo] = None) -> OffsetTime:
         r"""
         Create a `OffsetTime` from hour, minute, second, nanosecond, and tzinfo.
+        """
+    @classmethod
+    def raw(cls, nanoseconds_of_day: builtins.int, time_zone_offset: builtins.int) -> OffsetTime:
+        r"""
+        Create a `OffsetTime` from epoch nanoseconds of day and time zone offset.
+        
+        # Parameters
+        - `nanoseconds_of_day` - offset nano-seconds from epoch (00:00:00) in the time zone
+        - `time_zone_offset` - timezone offset in minute
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -816,6 +857,14 @@ class Time:
     def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0) -> Time:
         r"""
         Create a `Time` from hour, minute, second, and nanosecond.
+        """
+    @classmethod
+    def raw(cls, nanoseconds_of_day: builtins.int) -> Time:
+        r"""
+        Create a `Time` from nanoseconds of day.
+        
+        # Parameters
+        - `nanoseconds_of_day` - time of day (nanoseconds since 00:00:00)
         """
     def __repr__(self) -> builtins.str: ...
 

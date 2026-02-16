@@ -99,6 +99,10 @@ def test_wrapper():
     assert value.value == datetime.datetime(2026, 1, 27, 0, 0, 0, 0)
     assert value.nanosecond == 0
 
+    value = tsurugi.Datetime.raw(1769531070, 123456789)
+    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)
+    assert value.nanosecond == 123456789
+
 
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)

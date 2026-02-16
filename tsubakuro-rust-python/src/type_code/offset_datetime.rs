@@ -1,16 +1,14 @@
 use chrono::{TimeZone, Timelike};
 use pyo3::{exceptions::PyValueError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
-use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
+use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimePointWithTimeZone};
 
 /// TIMESTAMP WITH TIME ZONE type.
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
 pub struct OffsetDatetime {
-    /// Value.
-    #[pyo3(get)]
-    value: Option<chrono::DateTime<chrono::FixedOffset>>,
+    value: Option<TgTimePointWithTimeZone>,
 }
 
 #[gen_stub_pymethods]
@@ -30,7 +28,8 @@ impl OffsetDatetime {
             } else {
                 v
             };
-            Ok(OffsetDatetime { value: Some(v) })
+            let value = TgTimePointWithTimeZone::from(v);
+            Ok(OffsetDatetime { value: Some(value) })
         } else {
             Ok(OffsetDatetime { value: None })
         }
@@ -40,7 +39,7 @@ impl OffsetDatetime {
     #[classmethod]
     #[pyo3(signature = (year, month, day, hour=0, minute=0, second=0, nanosecond=0, tzinfo=None))]
     pub fn of(
-        _cls: Bound<PyType>,
+        _cls: &Bound<PyType>,
         year: i32,
         month: u32,
         day: u32,
@@ -64,17 +63,41 @@ impl OffsetDatetime {
             .from_local_datetime(&datetime)
             .single()
             .ok_or_else(|| PyValueError::new_err("ambiguous or invalid local datetime"))?;
-        Ok(OffsetDatetime { value: Some(v) })
+        let value = TgTimePointWithTimeZone::from(v);
+        Ok(OffsetDatetime { value: Some(value) })
+    }
+
+    /// Create a `OffsetDatetime` from epoch seconds, nanoseconds, and time zone offset.
+    ///
+    /// # Parameters
+    /// - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
+    /// - `nanos` - nanosecond part of the time (0-999,999,999)
+    /// - `time_zone_offset` - time zone offset in minutes
+    #[classmethod]
+    pub fn raw(
+        _cls: &Bound<PyType>,
+        epoch_seconds: i64,
+        nanos: u32,
+        time_zone_offset: i32,
+    ) -> PyResult<Self> {
+        let value = TgTimePointWithTimeZone::new(epoch_seconds, nanos, time_zone_offset);
+        Ok(OffsetDatetime { value: Some(value) })
+    }
+
+    /// Value.
+    #[getter]
+    pub fn value(&self) -> Option<chrono::DateTime<chrono::FixedOffset>> {
+        self.value.map(|v| v.into())
     }
 
     /// Nnanosecond.
     #[getter]
     pub fn nanosecond(&self) -> Option<u32> {
-        self.value.map(|v| v.nanosecond())
+        self.value.map(|v| v.nano_adjustment)
     }
 
     pub fn __repr__(&self) -> String {
-        if let Some(v) = &self.value {
+        if let Some(v) = self.value() {
             format!("OffsetDatetime({})", v)
         } else {
             "OffsetDatetime(None)".to_string()
