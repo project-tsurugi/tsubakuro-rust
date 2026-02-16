@@ -20,6 +20,15 @@ use std::{sync::Arc, time::Duration};
 
 use super::value_stream::ResultSetValueStream;
 
+#[cfg(feature = "with_bigdecimal")]
+mod bigdecimal;
+#[cfg(feature = "with_chrono")]
+mod chrono;
+#[cfg(feature = "with_rust_decimal")]
+mod rust_decimal;
+#[cfg(feature = "with_time")]
+mod time;
+
 /// Represents a server side SQL result set.
 ///
 /// A `SqlQueryResult` instance can only be used while the transaction is alive.
