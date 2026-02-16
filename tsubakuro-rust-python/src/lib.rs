@@ -82,8 +82,9 @@ mod tsubakuro_rust_python {
 
     #[pymodule_export]
     use crate::type_code::{
-        Bool, Bytes, Date, Datetime, Decimal, Float32, Float64, Int32, Int64, OffsetDatetime,
-        OffsetTime, Str, Time,
+        bool::Bool, bytes::Bytes, date::Date, datetime::Datetime, decimal::Decimal,
+        float32::Float32, float64::Float64, int32::Int32, int64::Int64,
+        offset_datetime::OffsetDatetime, offset_time::OffsetTime, str::Str, time::Time,
     };
 
     /// Initialize env_logger.

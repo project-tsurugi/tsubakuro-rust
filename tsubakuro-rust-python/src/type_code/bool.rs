@@ -1,0 +1,41 @@
+use pyo3::prelude::*;
+use pyo3_stub_gen::derive::*;
+
+/// BOOLEAN type.
+#[gen_stub_pyclass]
+#[pyclass]
+#[derive(Debug)]
+pub struct Bool {
+    /// Value.
+    #[pyo3(get)]
+    value: Option<bool>,
+}
+
+#[gen_stub_pymethods]
+#[pymethods]
+impl Bool {
+    /// Create a new `Bool`.
+    #[new]
+    #[pyo3(signature = (value=None))]
+    pub fn new(value: Option<bool>) -> Self {
+        Bool { value }
+    }
+
+    pub fn __bool__(&self) -> bool {
+        self.value.unwrap_or(false)
+    }
+
+    pub fn __repr__(&self) -> String {
+        if let Some(v) = self.value {
+            format!("Bool({})", v)
+        } else {
+            "Bool(None)".to_string()
+        }
+    }
+}
+
+impl Bool {
+    pub const fn value(&self) -> Option<bool> {
+        self.value
+    }
+}
