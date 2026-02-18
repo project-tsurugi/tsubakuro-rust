@@ -4,6 +4,10 @@ use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimeOfDay};
 
 /// TIME type.
+///
+/// Attributes:
+///     value (Optional[datetime.time]): time value. (read only)
+///     nanosecond (Optional[int]): nanosecond part of the time. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
@@ -33,6 +37,15 @@ impl Time {
     }
 
     /// Create a `Time` from hour, minute, second, and nanosecond.
+    ///
+    /// Args:
+    ///     hour (int, optional): hour (0-23)
+    ///     minute (int, optional): minute (0-59)
+    ///     second (int, optional): second (0-59)
+    ///     nanosecond (int, optional): nanosecond (0-999,999,999)
+    ///
+    /// Returns:
+    ///     Time: created `Time` object
     #[classmethod]
     #[pyo3(signature = (hour=0, minute=0, second=0, nanosecond=0))]
     pub fn of(
@@ -50,8 +63,11 @@ impl Time {
 
     /// Create a `Time` from nanoseconds of day.
     ///
-    /// # Parameters
-    /// - `nanoseconds_of_day` - time of day (nanoseconds since 00:00:00)
+    /// Args:
+    ///     nanoseconds_of_day (int): time of day (nanoseconds since 00:00:00)
+    ///
+    /// Returns:
+    ///     Time: created `Time` object
     #[classmethod]
     pub fn raw(_cls: &Bound<PyType>, nanoseconds_of_day: u64) -> PyResult<Self> {
         let value = TgTimeOfDay::new(nanoseconds_of_day);

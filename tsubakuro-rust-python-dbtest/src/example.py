@@ -14,6 +14,7 @@ def example1():
     config.endpoint = "tcp://localhost:12345"
     config.user = "tsurugi"
     config.password = "password"
+    config.default_timeout = 30  # seconds
     print(config)
     with tsurugi.connect(config) as connection:
         print("table_names:", connection.list_tables())
@@ -22,7 +23,10 @@ def example1():
 
 def example2():
     config = tsurugi.Config(
-        endpoint="tcp://localhost:12345", user="tsurugi", password="password"
+        endpoint="tcp://localhost:12345",
+        user="tsurugi",
+        password="password",
+        default_timeout=30,  # seconds
     )
     with tsurugi.connect(config) as connection:
         print("table_names:", connection.list_tables())

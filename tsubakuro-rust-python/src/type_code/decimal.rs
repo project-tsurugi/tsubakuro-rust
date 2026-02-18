@@ -3,6 +3,9 @@ use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDecimal};
 
 /// DECIMAL type.
+///
+/// Attributes:
+///     value (Optional[decimal.Decimal]): decimal value. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
@@ -22,6 +25,13 @@ impl Decimal {
     }
 
     /// Create a `Decimal` from unscaled value and exponent.
+    ///
+    /// Args:
+    ///     unscaled_value (bytes): unscaled value as big-endian byte array
+    ///     exponent (int): exponent
+    ///
+    /// Returns:
+    ///     Decimal: created `Decimal` object
     #[classmethod]
     pub fn raw(_cls: &Bound<PyType>, unscaled_value: Vec<u8>, exponent: i32) -> PyResult<Self> {
         let value = TgDecimal::new(unscaled_value, exponent);

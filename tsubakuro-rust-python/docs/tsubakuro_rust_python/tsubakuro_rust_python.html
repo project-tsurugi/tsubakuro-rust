@@ -1,0 +1,3164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>tsubakuro_rust_python.tsubakuro_rust_python API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>tsubakuro_rust_python.tsubakuro_rust_python</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.connect"><code class="name flex">
+<span>def <span class="ident">connect</span></span>(<span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructor for creating a connection to the Tsurugi.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>*args</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config">Config</a></code>, optional</dt>
+<dd>configuration object.</dd>
+<dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>e.g. <code>endpoint="tcp://localhost:12345"</code>, <code>user="tsurugi"</code></dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection">Connection</a></code></dt>
+<dd>Connection object.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+config = tsurugi.Config()
+config.endpoint = &quot;tcp://localhost:12345&quot;
+config.user = &quot;tsurugi&quot;
+config.password = &quot;password&quot;
+config.default_timeout = 30 // seconds
+with tsurugi.connect(config) as connection:
+    pass
+</code></pre>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+with tsurugi.connect(endpoint=&quot;tcp://localhost:12345&quot;, user=&quot;tsurugi&quot;, password=&quot;password&quot;, default_timeout=30) as connection:
+    pass
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.env_logger_init"><code class="name flex">
+<span>def <span class="ident">env_logger_init</span></span>(<span>filters='tsubakuro_rust_python=info', file_path=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Initialize env_logger.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filters</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>filter string. If ommitted, <code>"tsubakuro_rust_python=info"</code> is used.</dd>
+<dt><strong><code>file_path</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>log file path. If None, logs to stderr.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tsurugi.env_logger_init(&quot;tsubakuro_rust_python=trace&quot;)
+</code></pre>
+<h2 id="note">Note</h2>
+<p>Calls to <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.env_logger_init" href="#tsubakuro_rust_python.tsubakuro_rust_python.env_logger_init">env_logger_init()</a></code> other than the first one are ignored.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.AnalyzeException"><code class="flex name class">
+<span>class <span class="ident">AnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>AnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CompileException" href="index.html#tsubakuro_rust_python.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SymbolAnalyzeException" href="index.html#tsubakuro_rust_python.SymbolAnalyzeException">SymbolAnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.TypeAnalyzeException" href="index.html#tsubakuro_rust_python.TypeAnalyzeException">TypeAnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.ValueAnalyzeException" href="index.html#tsubakuro_rust_python.ValueAnalyzeException">ValueAnalyzeException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.BlockedByConcurrentOperationException"><code class="flex name class">
+<span>class <span class="ident">BlockedByConcurrentOperationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>BlockedByConcurrentOperationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.BlockedByHighPriorityTransactionException"><code class="flex name class">
+<span>class <span class="ident">BlockedByHighPriorityTransactionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>BlockedByHighPriorityTransactionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Bool"><code class="flex name class">
+<span>class <span class="ident">Bool</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>BOOLEAN type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[bool]</code></dt>
+<dd>boolean value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Bool.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Bytes"><code class="flex name class">
+<span>class <span class="ident">Bytes</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>BINARY, VARBINARY type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[bytes]</code></dt>
+<dd>binary data. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Bytes.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CcException"><code class="flex name class">
+<span>class <span class="ident">CcException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CcException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.BlockedByConcurrentOperationException" href="index.html#tsubakuro_rust_python.BlockedByConcurrentOperationException">BlockedByConcurrentOperationException</a></li>
+<li><a title="tsubakuro_rust_python.LtxException" href="index.html#tsubakuro_rust_python.LtxException">LtxException</a></li>
+<li><a title="tsubakuro_rust_python.OccException" href="index.html#tsubakuro_rust_python.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.RtxException" href="index.html#tsubakuro_rust_python.RtxException">RtxException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CheckConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">CheckConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CheckConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ConstraintViolationException" href="index.html#tsubakuro_rust_python.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.IntegrityError" href="index.html#tsubakuro_rust_python.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column"><code class="flex name class">
+<span>class <span class="ident">Column</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Column metadata.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Column name. (read only)</dd>
+<dt><strong><code>description</code></strong> :&ensp;<code>Optional[str]</code></dt>
+<dd>Column description. (read only)</dd>
+<dt><strong><code>type_code</code></strong> :&ensp;<code>str</code></dt>
+<dd>Type code. (read only)</dd>
+<dt><strong><code>atom_type_code</code></strong> :&ensp;<code>int</code></dt>
+<dd>AtomType code. -1 if unknown. (read only)</dd>
+<dt><strong><code>sql_type</code></strong> :&ensp;<code>str</code></dt>
+<dd>SQL type. (read only)</dd>
+<dt><strong><code>sql_type_name</code></strong> :&ensp;<code>Optional[str]</code></dt>
+<dd>SQL type name. (read only)</dd>
+<dt><strong><code>length</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>Length for string types. (read only)</dd>
+<dt><strong><code>precision</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>Precision for numeric types. (read only)</dd>
+<dt><strong><code>scale</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>Scale for numeric types. (read only)</dd>
+<dt><strong><code>nullable</code></strong> :&ensp;<code>Optional[bool]</code></dt>
+<dd>Nullable flag. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.atom_type_code"><code class="name">var <span class="ident">atom_type_code</span></code></dt>
+<dd>
+<div class="desc"><p>AtomType code.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.description"><code class="name">var <span class="ident">description</span></code></dt>
+<dd>
+<div class="desc"><p>Column description.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.length"><code class="name">var <span class="ident">length</span></code></dt>
+<dd>
+<div class="desc"><p>Length.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<div class="desc"><p>Column name.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.nullable"><code class="name">var <span class="ident">nullable</span></code></dt>
+<dd>
+<div class="desc"><p>Nullable.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.precision"><code class="name">var <span class="ident">precision</span></code></dt>
+<dd>
+<div class="desc"><p>Precision.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.scale"><code class="name">var <span class="ident">scale</span></code></dt>
+<dd>
+<div class="desc"><p>Scale.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.sql_type"><code class="name">var <span class="ident">sql_type</span></code></dt>
+<dd>
+<div class="desc"><p>SQL type.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.sql_type_name"><code class="name">var <span class="ident">sql_type_name</span></code></dt>
+<dd>
+<div class="desc"><p>SQL type name.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Column.type_code"><code class="name">var <span class="ident">type_code</span></code></dt>
+<dd>
+<div class="desc"><p>type_code.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption"><code class="flex name class">
+<span>class <span class="ident">CommitOption</span></span>
+<span>(</span><span>commit_type=Ellipsis, auto_dispose=False, timeout=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Commit option for transaction.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>commit_type</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType">CommitType</a></code></dt>
+<dd>Commit type. Default is <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.DEFAULT" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType.DEFAULT">CommitType.DEFAULT</a></code>.</dd>
+<dt><strong><code>auto_dispose</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Auto dispose flag. Default is <code>False</code>.</dd>
+<dt><strong><code>commit_timeout</code></strong> :&ensp;<code>int</code></dt>
+<dd>Commit timeout in seconds.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
+</code></pre></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.auto_dispose"><code class="name">var <span class="ident">auto_dispose</span></code></dt>
+<dd>
+<div class="desc"><p>Auto dispose flag.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.commit_timeout"><code class="name">var <span class="ident">commit_timeout</span></code></dt>
+<dd>
+<div class="desc"><p>Commit timeout in seconds.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.commit_type"><code class="name">var <span class="ident">commit_type</span></code></dt>
+<dd>
+<div class="desc"><p>Commit type.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitType"><code class="flex name class">
+<span>class <span class="ident">CommitType</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Commit type for transaction.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.ACCEPTED"><code class="name">var <span class="ident">ACCEPTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.AVAILABLE"><code class="name">var <span class="ident">AVAILABLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.DEFAULT"><code class="name">var <span class="ident">DEFAULT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.PROPAGATED"><code class="name">var <span class="ident">PROPAGATED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.STORED"><code class="name">var <span class="ident">STORED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.CompileException"><code class="flex name class">
+<span>class <span class="ident">CompileException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CompileException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.AnalyzeException" href="index.html#tsubakuro_rust_python.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.SyntaxException" href="index.html#tsubakuro_rust_python.SyntaxException">SyntaxException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config"><code class="flex name class">
+<span>class <span class="ident">Config</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Configuration options for connecting to Tsurugi.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>endpoint</code></strong> :&ensp;<code>str</code></dt>
+<dd>Endpoint URL of the Tsurugi server.</dd>
+<dt><strong><code>user</code></strong> :&ensp;<code>str</code></dt>
+<dd>Username for authentication.</dd>
+<dt><strong><code>password</code></strong> :&ensp;<code>str</code></dt>
+<dd>Password for authentication.</dd>
+<dt><strong><code>auth_token</code></strong> :&ensp;<code>str</code></dt>
+<dd>Authentication token.</dd>
+<dt><strong><code>credentials</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to credentials file.</dd>
+<dt><strong><code>transaction_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></dt>
+<dd>Transaction option.</dd>
+<dt><strong><code>commit_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitOption">CommitOption</a></code></dt>
+<dd>Commit option.</dd>
+<dt><strong><code>shutdown_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption">ShutdownOption</a></code></dt>
+<dd>Shutdown option.</dd>
+<dt><strong><code>default_timeout</code></strong> :&ensp;<code>int</code></dt>
+<dd>Default timeout in seconds.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+config = tsurugi.Config()
+config.endpoint = &quot;tcp://localhost:12345&quot;
+config.user = &quot;tsurugi&quot;
+config.password = &quot;password&quot;
+config.default_timeout = 30  # seconds
+</code></pre>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+config = tsurugi.Config(
+    endpoint=&quot;tcp://localhost:12345&quot;,
+    user=&quot;tsurugi&quot;,
+    password=&quot;password&quot;,
+    default_timeout=30,  # seconds
+)
+</code></pre></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.auth_token"><code class="name">var <span class="ident">auth_token</span></code></dt>
+<dd>
+<div class="desc"><p>Authentication token.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.commit_option"><code class="name">var <span class="ident">commit_option</span></code></dt>
+<dd>
+<div class="desc"><p>Commit option.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.credentials"><code class="name">var <span class="ident">credentials</span></code></dt>
+<dd>
+<div class="desc"><p>Path to credentials file.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.default_timeout"><code class="name">var <span class="ident">default_timeout</span></code></dt>
+<dd>
+<div class="desc"><p>Default timeout in seconds.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.endpoint"><code class="name">var <span class="ident">endpoint</span></code></dt>
+<dd>
+<div class="desc"><p>Endpoint URL of the Tsurugi server.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.password"><code class="name">var <span class="ident">password</span></code></dt>
+<dd>
+<div class="desc"><p>Password for authentication.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.shutdown_option"><code class="name">var <span class="ident">shutdown_option</span></code></dt>
+<dd>
+<div class="desc"><p>Shutdown option.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.transaction_option"><code class="name">var <span class="ident">transaction_option</span></code></dt>
+<dd>
+<div class="desc"><p>Transaction option.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.user"><code class="name">var <span class="ident">user</span></code></dt>
+<dd>
+<div class="desc"><p>Username for authentication.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.merge"><code class="name flex">
+<span>def <span class="ident">merge</span></span>(<span>self, /, other)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Merge another <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config">Config</a></code> into this one.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>other</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config">Config</a></code></dt>
+<dd>other configuration object.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Config.set"><code class="name flex">
+<span>def <span class="ident">set</span></span>(<span>self, /, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set configuration options.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>*args</code></strong> :&ensp;<code>Config | TransactionOption | CommitOption | ShutdownOption | str</code>, optional</dt>
+<dd>other configuration object.</dd>
+<dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict</code>, optional</dt>
+<dd>e.g. <code>endpoint="tcp://localhost:12345"</code>, <code>user="tsurugi"</code></dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ConflictOnWritePreserveException"><code class="flex name class">
+<span>class <span class="ident">ConflictOnWritePreserveException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ConflictOnWritePreserveException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.OccReadException" href="index.html#tsubakuro_rust_python.OccReadException">OccReadException</a></li>
+<li><a title="tsubakuro_rust_python.OccException" href="index.html#tsubakuro_rust_python.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection"><code class="flex name class">
+<span>class <span class="ident">Connection</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Connection to Tsurugi.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>transaction_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></dt>
+<dd>Transaction option. (write only)</dd>
+<dt><strong><code>commit_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitOption">CommitOption</a></code></dt>
+<dd>Commit option. (write only)</dd>
+<dt><strong><code>shutdown_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption">ShutdownOption</a></code></dt>
+<dd>Shutdown option. (write only)</dd>
+<dt><strong><code>closed</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether the connection is closed. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.closed"><code class="name">var <span class="ident">closed</span></code></dt>
+<dd>
+<div class="desc"><p>Whether the connection is closed.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.commit_option"><code class="name">var <span class="ident">commit_option</span></code></dt>
+<dd>
+<div class="desc"><p>Commit option.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.shutdown_option"><code class="name">var <span class="ident">shutdown_option</span></code></dt>
+<dd>
+<div class="desc"><p>Shutdown option.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.transaction_option"><code class="name">var <span class="ident">transaction_option</span></code></dt>
+<dd>
+<div class="desc"><p>Transaction option.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Close the connection.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.commit"><code class="name flex">
+<span>def <span class="ident">commit</span></span>(<span>self, /, option=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Commit the current transaction.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitOption">CommitOption</a></code>, optional</dt>
+<dd>CommitOption object.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">connection.commit()
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.cursor"><code class="name flex">
+<span>def <span class="ident">cursor</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new cursor object using the connection.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor">Cursor</a></code></dt>
+<dd>Cursor object.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">with connection.cursor() as cursor:
+   pass
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.find_table_metadata"><code class="name flex">
+<span>def <span class="ident">find_table_metadata</span></span>(<span>self, /, table_name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find table metadata.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>table_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Table name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Optional[<a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata">TableMetadata</a>]</code></dt>
+<dd>Table metadata, or None if the table does not exist.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">metadata = connection.find_table_metadata(&quot;my_table&quot;)
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.get_table_metadata"><code class="name flex">
+<span>def <span class="ident">get_table_metadata</span></span>(<span>self, /, table_name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get table metadata.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>table_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Table name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata">TableMetadata</a></code></dt>
+<dd>Table metadata.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TargetNotFoundException" href="#tsubakuro_rust_python.tsubakuro_rust_python.TargetNotFoundException">TargetNotFoundException</a></code></dt>
+<dd>If the table does not exist.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">metadata = connection.get_table_metadata(&quot;my_table&quot;)
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.list_tables"><code class="name flex">
+<span>def <span class="ident">list_tables</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List table names.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[str]</code></dt>
+<dd>List of table names.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">table_names = connection.list_tables()
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Connection.rollback"><code class="name flex">
+<span>def <span class="ident">rollback</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Rollback the current transaction.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">connection.rollback()
+</code></pre></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">ConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.IntegrityError" href="index.html#tsubakuro_rust_python.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CheckConstraintViolationException" href="index.html#tsubakuro_rust_python.CheckConstraintViolationException">CheckConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.NotNullConstraintViolationException" href="index.html#tsubakuro_rust_python.NotNullConstraintViolationException">NotNullConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.ReferentialIntegrityConstraintViolationException" href="index.html#tsubakuro_rust_python.ReferentialIntegrityConstraintViolationException">ReferentialIntegrityConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.UniqueConstraintViolationException" href="index.html#tsubakuro_rust_python.UniqueConstraintViolationException">UniqueConstraintViolationException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor"><code class="flex name class">
+<span>class <span class="ident">Cursor</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Cursor object for executing SQL statements and fetching results.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>description</code></strong> :&ensp;<code>Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]</code></dt>
+<dd>Description of the query result set.
+<code>(name, type_code, display_size, internal_size, precision, scale, null_ok)</code>.
+(read only)</dd>
+<dt><strong><code>arraysize</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of rows to fetch at a time with <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany">Cursor.fetchmany()</a></code>. Default is 1.</dd>
+<dt><strong><code>rowcount</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of rows affected by the last <code>Cursor.execute*()</code> method. -1 if not applicable. (read only)</dd>
+<dt><strong><code>closed</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether the cursor is closed. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.arraysize"><code class="name">var <span class="ident">arraysize</span></code></dt>
+<dd>
+<div class="desc"><p>Number of rows to fetch at a time with <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany">Cursor.fetchmany()</a></code>.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.closed"><code class="name">var <span class="ident">closed</span></code></dt>
+<dd>
+<div class="desc"><p>Whether the cursor is closed.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.description"><code class="name">var <span class="ident">description</span></code></dt>
+<dd>
+<div class="desc"><p>Description of the query result set.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany_async"><code class="name">var <span class="ident">executemany_async</span></code></dt>
+<dd>
+<div class="desc"><p>Whether to execute <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany">Cursor.executemany()</a></code> asynchronously. Default is <code>True</code>.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.rowcount"><code class="name">var <span class="ident">rowcount</span></code></dt>
+<dd>
+<div class="desc"><p>Number of rows affected by the last <code>Cursor.execute*()</code> method.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.rownumber"><code class="name">var <span class="ident">rownumber</span></code></dt>
+<dd>
+<div class="desc"><p>Current row number (0-based).</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.callproc"><code class="name flex">
+<span>def <span class="ident">callproc</span></span>(<span>self, /, _procname)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Not supported in this implementation.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.clear"><code class="name flex">
+<span>def <span class="ident">clear</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Clear the current query result and prepared statements.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Close the cursor.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.execute"><code class="name flex">
+<span>def <span class="ident">execute</span></span>(<span>self, /, operation, parameters=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Execute a SQL statement.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>operation</code></strong> :&ensp;<code>str</code></dt>
+<dd>SQL statement to be executed.</dd>
+<dt><strong><code>parameters</code></strong> :&ensp;<code>Tuple[Any, ...] | dict[str, Any]</code>, optional</dt>
+<dd>Parameters for the SQL statement.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany"><code class="name flex">
+<span>def <span class="ident">executemany</span></span>(<span>self, /, operation, seq_of_parameters)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Execute a prepared SQL statement multiple times.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>operation</code></strong> :&ensp;<code>str</code></dt>
+<dd>SQL statement to be executed.</dd>
+<dt><strong><code>seq_of_parameters</code></strong> :&ensp;<code>Sequence[Tuple[Any, ...] | dict[str, Any]]</code></dt>
+<dd>Sequence of parameters for the SQL statement.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchall"><code class="name flex">
+<span>def <span class="ident">fetchall</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch all (remaining) rows of a query result set.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[Tuple[Any, &hellip;]]</code></dt>
+<dd>A list of sequences, each representing a row of the result set.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany"><code class="name flex">
+<span>def <span class="ident">fetchmany</span></span>(<span>self, /, size=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch the next set of rows of a query result set.</p>
+<h2 id="args">Args</h2>
+<p>size (int, optional) - Number of rows to fetch. If not specified, use the cursor's <code>arraysize</code> attribute.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[Tuple[Any, &hellip;]]</code></dt>
+<dd>A list of sequences, each representing a row of the result set.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchone"><code class="name flex">
+<span>def <span class="ident">fetchone</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch the next row of a query result set.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Optional[Tuple[Any, &hellip;]]</code></dt>
+<dd>A single sequence representing the next row of the result set, or <code>None</code> if no more data is available.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.next"><code class="name flex">
+<span>def <span class="ident">next</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch the next row of a query result set.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Tuple[Any, &hellip;]</code></dt>
+<dd>A single sequence representing the next row of the result set.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>StopIteration</code></dt>
+<dd>When no more data is available.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.nextset"><code class="name flex">
+<span>def <span class="ident">nextset</span></span>(<span>self, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Not supported in this implementation.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.prepare"><code class="name flex">
+<span>def <span class="ident">prepare</span></span>(<span>self, /, operation, parameters)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Prepare a SQL statement for execution.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>operation</code></strong> :&ensp;<code>str</code></dt>
+<dd>SQL statement to be prepared.</dd>
+<dt><strong><code>parameters</code></strong> :&ensp;<code>Tuple[Any, ...] | dict[str, Any]</code></dt>
+<dd>Parameters for the SQL statement.</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.setinputsizes"><code class="name flex">
+<span>def <span class="ident">setinputsizes</span></span>(<span>self, /, _sizes)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is a no-op in this implementation.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.setoutputsize"><code class="name flex">
+<span>def <span class="ident">setoutputsize</span></span>(<span>self, /, _size)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method is a no-op in this implementation.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.DataCorruptionException"><code class="flex name class">
+<span>class <span class="ident">DataCorruptionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DataCorruptionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SecondaryIndexCorruptionException" href="index.html#tsubakuro_rust_python.SecondaryIndexCorruptionException">SecondaryIndexCorruptionException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.DataError"><code class="flex name class">
+<span>class <span class="ident">DataError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>data error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.EvaluationException" href="index.html#tsubakuro_rust_python.EvaluationException">EvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.SqlLimitReachedException" href="index.html#tsubakuro_rust_python.SqlLimitReachedException">SqlLimitReachedException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.DatabaseError"><code class="flex name class">
+<span>class <span class="ident">DatabaseError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>database error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.IntegrityError" href="index.html#tsubakuro_rust_python.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.InternalError" href="index.html#tsubakuro_rust_python.InternalError">InternalError</a></li>
+<li><a title="tsubakuro_rust_python.NotSupportedError" href="index.html#tsubakuro_rust_python.NotSupportedError">NotSupportedError</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Date"><code class="flex name class">
+<span>class <span class="ident">Date</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DATE type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[datetime.date]</code></dt>
+<dd>date value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Date.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Date.of"><code class="name flex">
+<span>def <span class="ident">of</span></span>(<span>year, month, day)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date">Date</a></code> from year, month, and day.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>year</code></strong> :&ensp;<code>int</code></dt>
+<dd>year</dd>
+<dt><strong><code>month</code></strong> :&ensp;<code>int</code></dt>
+<dd>month (1-12)</dd>
+<dt><strong><code>day</code></strong> :&ensp;<code>int</code></dt>
+<dd>day (1-31)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date">Date</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date">Date</a></code> object</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Date.raw"><code class="name flex">
+<span>def <span class="ident">raw</span></span>(<span>epoch_days)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date">Date</a></code> from epoch days.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>epoch_days</code></strong> :&ensp;<code>int</code></dt>
+<dd>number of days offset of epoch 1970-01-01</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date">Date</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date">Date</a></code> object</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Datetime"><code class="flex name class">
+<span>class <span class="ident">Datetime</span></span>
+<span>(</span><span>value=None, nanosecond=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TIMESTAMP type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[datetime.datetime]</code></dt>
+<dd>datetime value. (read only)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>nanosecond part of the time. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dd>
+<div class="desc"><p>Nnanosecond.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.of"><code class="name flex">
+<span>def <span class="ident">of</span></span>(<span>year, month, day, hour=0, minute=0, second=0, nanosecond=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime">Datetime</a></code> from year, month, day, hour, minute, second, and nanosecond.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>year</code></strong> :&ensp;<code>int</code></dt>
+<dd>year</dd>
+<dt><strong><code>month</code></strong> :&ensp;<code>int</code></dt>
+<dd>month (1-12)</dd>
+<dt><strong><code>day</code></strong> :&ensp;<code>int</code></dt>
+<dd>day (1-31)</dd>
+<dt><strong><code>hour</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>hour (0-23)</dd>
+<dt><strong><code>minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>minute (0-59)</dd>
+<dt><strong><code>second</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>second (0-59)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>nanosecond (0-999,999,999)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime">Datetime</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime">Datetime</a></code> object</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.raw"><code class="name flex">
+<span>def <span class="ident">raw</span></span>(<span>epoch_seconds, nanos)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime">Datetime</a></code> from epoch seconds and nanoseconds.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>epoch_seconds</code></strong> :&ensp;<code>int</code></dt>
+<dd>offset seconds from epoch (1970-01-01 00:00:00)</dd>
+<dt><strong><code>nanos</code></strong> :&ensp;<code>int</code></dt>
+<dd>nanosecond part of the time (0-999,999,999)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime">Datetime</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime">Datetime</a></code> object</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Decimal"><code class="flex name class">
+<span>class <span class="ident">Decimal</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DECIMAL type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[decimal.Decimal]</code></dt>
+<dd>decimal value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Decimal.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Decimal.raw"><code class="name flex">
+<span>def <span class="ident">raw</span></span>(<span>unscaled_value, exponent)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Decimal" href="#tsubakuro_rust_python.tsubakuro_rust_python.Decimal">Decimal</a></code> from unscaled value and exponent.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>unscaled_value</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>unscaled value as big-endian byte array</dd>
+<dt><strong><code>exponent</code></strong> :&ensp;<code>int</code></dt>
+<dd>exponent</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Decimal" href="#tsubakuro_rust_python.tsubakuro_rust_python.Decimal">Decimal</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Decimal" href="#tsubakuro_rust_python.tsubakuro_rust_python.Decimal">Decimal</a></code> object</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.DependenciesViolationException"><code class="flex name class">
+<span>class <span class="ident">DependenciesViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DependenciesViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.RestrictedOperationException" href="index.html#tsubakuro_rust_python.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.DumpDirectoryInaccessibleException"><code class="flex name class">
+<span>class <span class="ident">DumpDirectoryInaccessibleException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DumpDirectoryInaccessibleException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DumpFileException" href="index.html#tsubakuro_rust_python.DumpFileException">DumpFileException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.DumpFileException"><code class="flex name class">
+<span>class <span class="ident">DumpFileException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DumpFileException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DumpDirectoryInaccessibleException" href="index.html#tsubakuro_rust_python.DumpDirectoryInaccessibleException">DumpDirectoryInaccessibleException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Error"><code class="flex name class">
+<span>class <span class="ident">Error</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>base class of all other exceptions</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.InterfaceError" href="index.html#tsubakuro_rust_python.InterfaceError">InterfaceError</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.EvaluationException"><code class="flex name class">
+<span>class <span class="ident">EvaluationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>data error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ScalarSubqueryEvaluationException" href="index.html#tsubakuro_rust_python.ScalarSubqueryEvaluationException">ScalarSubqueryEvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.ValueEvaluationException" href="index.html#tsubakuro_rust_python.ValueEvaluationException">ValueEvaluationException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Float32"><code class="flex name class">
+<span>class <span class="ident">Float32</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>REAL type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[float]</code></dt>
+<dd>float value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Float32.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Float64"><code class="flex name class">
+<span>class <span class="ident">Float64</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>DOUBLE type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[float]</code></dt>
+<dd>float value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Float64.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.InactiveTransactionException"><code class="flex name class">
+<span>class <span class="ident">InactiveTransactionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>InactiveTransactionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.RestrictedOperationException" href="index.html#tsubakuro_rust_python.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.InconsistentStatementException"><code class="flex name class">
+<span>class <span class="ident">InconsistentStatementException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>InconsistentStatementException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Int32"><code class="flex name class">
+<span>class <span class="ident">Int32</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>INT type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>integer value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Int32.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Int64"><code class="flex name class">
+<span>class <span class="ident">Int64</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>BIGINT type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>integer value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Int64.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.IntegrityError"><code class="flex name class">
+<span>class <span class="ident">IntegrityError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>integrity error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ConstraintViolationException" href="index.html#tsubakuro_rust_python.ConstraintViolationException">ConstraintViolationException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.InterfaceError"><code class="flex name class">
+<span>class <span class="ident">InterfaceError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>interface error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.InternalError"><code class="flex name class">
+<span>class <span class="ident">InternalError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>internal error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.InternalException" href="index.html#tsubakuro_rust_python.InternalException">InternalException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.InternalException"><code class="flex name class">
+<span>class <span class="ident">InternalException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>InternalException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.InternalError" href="index.html#tsubakuro_rust_python.InternalError">InternalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.InvalidDecimalValueException"><code class="flex name class">
+<span>class <span class="ident">InvalidDecimalValueException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>InvalidDecimalValueException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.InvalidRuntimeValueException" href="index.html#tsubakuro_rust_python.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.SqlLimitReachedException" href="index.html#tsubakuro_rust_python.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.InvalidRuntimeValueException"><code class="flex name class">
+<span>class <span class="ident">InvalidRuntimeValueException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>InvalidRuntimeValueException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlLimitReachedException" href="index.html#tsubakuro_rust_python.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.InvalidDecimalValueException" href="index.html#tsubakuro_rust_python.InvalidDecimalValueException">InvalidDecimalValueException</a></li>
+<li><a title="tsubakuro_rust_python.ValueOutOfRangeException" href="index.html#tsubakuro_rust_python.ValueOutOfRangeException">ValueOutOfRangeException</a></li>
+<li><a title="tsubakuro_rust_python.ValueTooLongException" href="index.html#tsubakuro_rust_python.ValueTooLongException">ValueTooLongException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.LoadFileException"><code class="flex name class">
+<span>class <span class="ident">LoadFileException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LoadFileException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.LoadFileFormatException" href="index.html#tsubakuro_rust_python.LoadFileFormatException">LoadFileFormatException</a></li>
+<li><a title="tsubakuro_rust_python.LoadFileNotFoundException" href="index.html#tsubakuro_rust_python.LoadFileNotFoundException">LoadFileNotFoundException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.LoadFileFormatException"><code class="flex name class">
+<span>class <span class="ident">LoadFileFormatException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LoadFileFormatException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.LoadFileException" href="index.html#tsubakuro_rust_python.LoadFileException">LoadFileException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.LoadFileNotFoundException"><code class="flex name class">
+<span>class <span class="ident">LoadFileNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LoadFileNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.LoadFileException" href="index.html#tsubakuro_rust_python.LoadFileException">LoadFileException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.LtxException"><code class="flex name class">
+<span>class <span class="ident">LtxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LtxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.LtxReadException" href="index.html#tsubakuro_rust_python.LtxReadException">LtxReadException</a></li>
+<li><a title="tsubakuro_rust_python.LtxWriteException" href="index.html#tsubakuro_rust_python.LtxWriteException">LtxWriteException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.LtxReadException"><code class="flex name class">
+<span>class <span class="ident">LtxReadException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LtxReadException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.LtxException" href="index.html#tsubakuro_rust_python.LtxException">LtxException</a></li>
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.LtxWriteException"><code class="flex name class">
+<span>class <span class="ident">LtxWriteException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LtxWriteException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.LtxException" href="index.html#tsubakuro_rust_python.LtxException">LtxException</a></li>
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.LtxWriteOperationWithoutWritePreserveException"><code class="flex name class">
+<span>class <span class="ident">LtxWriteOperationWithoutWritePreserveException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>LtxWriteOperationWithoutWritePreserveException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.RestrictedOperationException" href="index.html#tsubakuro_rust_python.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.NotNullConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">NotNullConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NotNullConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ConstraintViolationException" href="index.html#tsubakuro_rust_python.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.IntegrityError" href="index.html#tsubakuro_rust_python.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.NotSupportedError"><code class="flex name class">
+<span>class <span class="ident">NotSupportedError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>not supported error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.UnsupportedCompilerFeatureException" href="index.html#tsubakuro_rust_python.UnsupportedCompilerFeatureException">UnsupportedCompilerFeatureException</a></li>
+<li><a title="tsubakuro_rust_python.UnsupportedRuntimeFeatureException" href="index.html#tsubakuro_rust_python.UnsupportedRuntimeFeatureException">UnsupportedRuntimeFeatureException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OccException"><code class="flex name class">
+<span>class <span class="ident">OccException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OccException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.OccReadException" href="index.html#tsubakuro_rust_python.OccReadException">OccReadException</a></li>
+<li><a title="tsubakuro_rust_python.OccWriteException" href="index.html#tsubakuro_rust_python.OccWriteException">OccWriteException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OccReadException"><code class="flex name class">
+<span>class <span class="ident">OccReadException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OccReadException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.OccException" href="index.html#tsubakuro_rust_python.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ConflictOnWritePreserveException" href="index.html#tsubakuro_rust_python.ConflictOnWritePreserveException">ConflictOnWritePreserveException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OccWriteException"><code class="flex name class">
+<span>class <span class="ident">OccWriteException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OccWriteException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.OccException" href="index.html#tsubakuro_rust_python.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime"><code class="flex name class">
+<span>class <span class="ident">OffsetDatetime</span></span>
+<span>(</span><span>value=None, nanosecond=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TIMESTAMP WITH TIME ZONE type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[datetime.datetime]</code></dt>
+<dd>datetime value with time zone. (read only)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>nanosecond part of the time. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dd>
+<div class="desc"><p>Nnanosecond.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.of"><code class="name flex">
+<span>def <span class="ident">of</span></span>(<span>year, month, day, hour=0, minute=0, second=0, nanosecond=0, tzinfo=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code> from year, month, day, hour, minute, second, nanosecond, and tzinfo.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>year</code></strong> :&ensp;<code>int</code></dt>
+<dd>year</dd>
+<dt><strong><code>month</code></strong> :&ensp;<code>int</code></dt>
+<dd>month (1-12)</dd>
+<dt><strong><code>day</code></strong> :&ensp;<code>int</code></dt>
+<dd>day (1-31)</dd>
+<dt><strong><code>hour</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>hour (0-23)</dd>
+<dt><strong><code>minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>minute (0-59)</dd>
+<dt><strong><code>second</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>second (0-59)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>nanosecond (0-999,999,999)</dd>
+<dt><strong><code>tzinfo</code></strong> :&ensp;<code>datetime.tzinfo</code>, optional</dt>
+<dd>time zone info (default: UTC)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code> instance</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.raw"><code class="name flex">
+<span>def <span class="ident">raw</span></span>(<span>epoch_seconds, nanos, time_zone_offset)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code> from epoch seconds, nanoseconds, and time zone offset.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>epoch_seconds</code></strong> :&ensp;<code>int</code></dt>
+<dd>offset seconds from epoch (1970-01-01 00:00:00)</dd>
+<dt><strong><code>nanos</code></strong> :&ensp;<code>int</code></dt>
+<dd>nanosecond part of the time (0-999,999,999)</dd>
+<dt><strong><code>time_zone_offset</code></strong> :&ensp;<code>int</code></dt>
+<dd>time zone offset in minutes</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code> object</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime"><code class="flex name class">
+<span>class <span class="ident">OffsetTime</span></span>
+<span>(</span><span>value=None, nanosecond=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TIME WITH TIME ZONE type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[datetime.time]</code></dt>
+<dd>time value with time zone. (read only)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>nanosecond part of the time. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dd>
+<div class="desc"><p>Nnanosecond.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.of"><code class="name flex">
+<span>def <span class="ident">of</span></span>(<span>hour=0, minute=0, second=0, nanosecond=0, tzinfo=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime">OffsetTime</a></code> from hour, minute, second, nanosecond, and tzinfo.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>hour</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>hour (0-23)</dd>
+<dt><strong><code>minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>minute (0-59)</dd>
+<dt><strong><code>second</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>second (0-59)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>nanosecond (0-999,999,999)</dd>
+<dt><strong><code>tzinfo</code></strong> :&ensp;<code>datetime.tzinfo</code>, optional</dt>
+<dd>time zone info (Default: UTC)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime">OffsetTime</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime">OffsetTime</a></code> object</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.raw"><code class="name flex">
+<span>def <span class="ident">raw</span></span>(<span>nanoseconds_of_day, time_zone_offset)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime">OffsetTime</a></code> from epoch nanoseconds of day and time zone offset.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>nanoseconds_of_day</code></strong> :&ensp;<code>int</code></dt>
+<dd>offset nano-seconds from epoch (00:00:00) in the time zone</dd>
+<dt><strong><code>time_zone_offset</code></strong> :&ensp;<code>int</code></dt>
+<dd>timezone offset in minute</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime">OffsetTime</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime">OffsetTime</a></code> object</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.OperationalError"><code class="flex name class">
+<span>class <span class="ident">OperationalError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>operation error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ParameterException"><code class="flex name class">
+<span>class <span class="ident">ParameterException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ParameterException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.UnresolvedPlaceholderException" href="index.html#tsubakuro_rust_python.UnresolvedPlaceholderException">UnresolvedPlaceholderException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ProgrammingError"><code class="flex name class">
+<span>class <span class="ident">ProgrammingError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>programming error</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CompileException" href="index.html#tsubakuro_rust_python.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.ParameterException" href="index.html#tsubakuro_rust_python.ParameterException">ParameterException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ReadOperationOnRestrictedReadAreaException"><code class="flex name class">
+<span>class <span class="ident">ReadOperationOnRestrictedReadAreaException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ReadOperationOnRestrictedReadAreaException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.RestrictedOperationException" href="index.html#tsubakuro_rust_python.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ReferentialIntegrityConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">ReferentialIntegrityConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ReferentialIntegrityConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ConstraintViolationException" href="index.html#tsubakuro_rust_python.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.IntegrityError" href="index.html#tsubakuro_rust_python.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.RequestFailureException"><code class="flex name class">
+<span>class <span class="ident">RequestFailureException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>RequestFailureException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.StatementNotFoundException" href="index.html#tsubakuro_rust_python.StatementNotFoundException">StatementNotFoundException</a></li>
+<li><a title="tsubakuro_rust_python.TransactionNotFoundException" href="index.html#tsubakuro_rust_python.TransactionNotFoundException">TransactionNotFoundException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.RestrictedOperationException"><code class="flex name class">
+<span>class <span class="ident">RestrictedOperationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>RestrictedOperationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DependenciesViolationException" href="index.html#tsubakuro_rust_python.DependenciesViolationException">DependenciesViolationException</a></li>
+<li><a title="tsubakuro_rust_python.InactiveTransactionException" href="index.html#tsubakuro_rust_python.InactiveTransactionException">InactiveTransactionException</a></li>
+<li><a title="tsubakuro_rust_python.LtxWriteOperationWithoutWritePreserveException" href="index.html#tsubakuro_rust_python.LtxWriteOperationWithoutWritePreserveException">LtxWriteOperationWithoutWritePreserveException</a></li>
+<li><a title="tsubakuro_rust_python.ReadOperationOnRestrictedReadAreaException" href="index.html#tsubakuro_rust_python.ReadOperationOnRestrictedReadAreaException">ReadOperationOnRestrictedReadAreaException</a></li>
+<li><a title="tsubakuro_rust_python.WriteOperationByRtxException" href="index.html#tsubakuro_rust_python.WriteOperationByRtxException">WriteOperationByRtxException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.RtxException"><code class="flex name class">
+<span>class <span class="ident">RtxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>RtxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ScalarSubqueryEvaluationException"><code class="flex name class">
+<span>class <span class="ident">ScalarSubqueryEvaluationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ScalarSubqueryEvaluationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.EvaluationException" href="index.html#tsubakuro_rust_python.EvaluationException">EvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.SecondaryIndexCorruptionException"><code class="flex name class">
+<span>class <span class="ident">SecondaryIndexCorruptionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SecondaryIndexCorruptionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DataCorruptionException" href="index.html#tsubakuro_rust_python.DataCorruptionException">DataCorruptionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ServerException"><code class="flex name class">
+<span>class <span class="ident">ServerException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ServerException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption"><code class="flex name class">
+<span>class <span class="ident">ShutdownOption</span></span>
+<span>(</span><span>shutdown_type=Ellipsis, timeout=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Shutdown option for connection.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>shutdown_type</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType">ShutdownType</a></code></dt>
+<dd>Shutdown type. Default is <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.GRACEFUL" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.GRACEFUL">ShutdownType.GRACEFUL</a></code>.</dd>
+<dt><strong><code>shutdown_timeout</code></strong> :&ensp;<code>int</code></dt>
+<dd>Shutdown timeout in seconds.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+shutdown_option = tsurugi.ShutdownOption(tsurugi.ShutdownType.GRACEFUL, 30)
+</code></pre></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption.shutdown_timeout"><code class="name">var <span class="ident">shutdown_timeout</span></code></dt>
+<dd>
+<div class="desc"><p>Shutdown timeout in seconds.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption.shutdown_type"><code class="name">var <span class="ident">shutdown_type</span></code></dt>
+<dd>
+<div class="desc"><p>Shutdown type.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType"><code class="flex name class">
+<span>class <span class="ident">ShutdownType</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Shutdown type for connection.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.FORCEFUL"><code class="name">var <span class="ident">FORCEFUL</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.GRACEFUL"><code class="name">var <span class="ident">GRACEFUL</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.NOTHING"><code class="name">var <span class="ident">NOTHING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.SqlExecutionException"><code class="flex name class">
+<span>class <span class="ident">SqlExecutionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SqlExecutionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.BlockedByHighPriorityTransactionException" href="index.html#tsubakuro_rust_python.BlockedByHighPriorityTransactionException">BlockedByHighPriorityTransactionException</a></li>
+<li><a title="tsubakuro_rust_python.DataCorruptionException" href="index.html#tsubakuro_rust_python.DataCorruptionException">DataCorruptionException</a></li>
+<li><a title="tsubakuro_rust_python.DumpFileException" href="index.html#tsubakuro_rust_python.DumpFileException">DumpFileException</a></li>
+<li><a title="tsubakuro_rust_python.InconsistentStatementException" href="index.html#tsubakuro_rust_python.InconsistentStatementException">InconsistentStatementException</a></li>
+<li><a title="tsubakuro_rust_python.LoadFileException" href="index.html#tsubakuro_rust_python.LoadFileException">LoadFileException</a></li>
+<li><a title="tsubakuro_rust_python.RequestFailureException" href="index.html#tsubakuro_rust_python.RequestFailureException">RequestFailureException</a></li>
+<li><a title="tsubakuro_rust_python.RestrictedOperationException" href="index.html#tsubakuro_rust_python.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.SqlRequestTimeoutException" href="index.html#tsubakuro_rust_python.SqlRequestTimeoutException">SqlRequestTimeoutException</a></li>
+<li><a title="tsubakuro_rust_python.TargetAlreadyExistsException" href="index.html#tsubakuro_rust_python.TargetAlreadyExistsException">TargetAlreadyExistsException</a></li>
+<li><a title="tsubakuro_rust_python.TargetNotFoundException" href="index.html#tsubakuro_rust_python.TargetNotFoundException">TargetNotFoundException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.SqlLimitReachedException"><code class="flex name class">
+<span>class <span class="ident">SqlLimitReachedException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SqlLimitReachedException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.InvalidRuntimeValueException" href="index.html#tsubakuro_rust_python.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.TransactionExceededLimitException" href="index.html#tsubakuro_rust_python.TransactionExceededLimitException">TransactionExceededLimitException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.SqlRequestTimeoutException"><code class="flex name class">
+<span>class <span class="ident">SqlRequestTimeoutException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SqlRequestTimeoutException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.SqlServiceException"><code class="flex name class">
+<span>class <span class="ident">SqlServiceException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SqlServiceException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CcException" href="index.html#tsubakuro_rust_python.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.StatementNotFoundException"><code class="flex name class">
+<span>class <span class="ident">StatementNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>StatementNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.RequestFailureException" href="index.html#tsubakuro_rust_python.RequestFailureException">RequestFailureException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Str"><code class="flex name class">
+<span>class <span class="ident">Str</span></span>
+<span>(</span><span>value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>CHAR, VARCHAR type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[str]</code></dt>
+<dd>string value. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Str.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.SymbolAnalyzeException"><code class="flex name class">
+<span>class <span class="ident">SymbolAnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SymbolAnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.AnalyzeException" href="index.html#tsubakuro_rust_python.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.CompileException" href="index.html#tsubakuro_rust_python.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.SyntaxException"><code class="flex name class">
+<span>class <span class="ident">SyntaxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SyntaxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.CompileException" href="index.html#tsubakuro_rust_python.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata"><code class="flex name class">
+<span>class <span class="ident">TableMetadata</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Table metadata.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>database_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Database name. (read only)</dd>
+<dt><strong><code>schema_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Schema name. (read only)</dd>
+<dt><strong><code>table_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Table name. (read only)</dd>
+<dt><strong><code>table_description</code></strong> :&ensp;<code>Optional[str]</code></dt>
+<dd>Table description. (read only)</dd>
+<dt><strong><code>columns</code></strong> :&ensp;<code>List[<a title="tsubakuro_rust_python.tsubakuro_rust_python.Column" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column">Column</a>]</code></dt>
+<dd>Columns metadata. (read only)</dd>
+<dt><strong><code>description</code></strong> :&ensp;<code>Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]</code></dt>
+<dd>Columns description.
+<code>(name, type_code, display_size, internal_size, precision, scale, null_ok)</code>. (read only)</dd>
+<dt><strong><code>primary_keys</code></strong> :&ensp;<code>List[str]</code></dt>
+<dd>Primary keys. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.columns"><code class="name">var <span class="ident">columns</span></code></dt>
+<dd>
+<div class="desc"><p>Columns metadata.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.database_name"><code class="name">var <span class="ident">database_name</span></code></dt>
+<dd>
+<div class="desc"><p>Database name.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.description"><code class="name">var <span class="ident">description</span></code></dt>
+<dd>
+<div class="desc"><p>Columns description.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.primary_keys"><code class="name">var <span class="ident">primary_keys</span></code></dt>
+<dd>
+<div class="desc"><p>Primary keys.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.schema_name"><code class="name">var <span class="ident">schema_name</span></code></dt>
+<dd>
+<div class="desc"><p>Schema name.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.table_description"><code class="name">var <span class="ident">table_description</span></code></dt>
+<dd>
+<div class="desc"><p>Table description.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.table_name"><code class="name">var <span class="ident">table_name</span></code></dt>
+<dd>
+<div class="desc"><p>Table name.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TargetAlreadyExistsException"><code class="flex name class">
+<span>class <span class="ident">TargetAlreadyExistsException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TargetAlreadyExistsException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TargetNotFoundException"><code class="flex name class">
+<span>class <span class="ident">TargetNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TargetNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Time"><code class="flex name class">
+<span>class <span class="ident">Time</span></span>
+<span>(</span><span>value=None, nanosecond=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TIME type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Optional[datetime.time]</code></dt>
+<dd>time value. (read only)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
+<dd>nanosecond part of the time. (read only)</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Time.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dd>
+<div class="desc"><p>Nnanosecond.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Time.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<div class="desc"><p>Value.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Time.of"><code class="name flex">
+<span>def <span class="ident">of</span></span>(<span>hour=0, minute=0, second=0, nanosecond=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time">Time</a></code> from hour, minute, second, and nanosecond.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>hour</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>hour (0-23)</dd>
+<dt><strong><code>minute</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>minute (0-59)</dd>
+<dt><strong><code>second</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>second (0-59)</dd>
+<dt><strong><code>nanosecond</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>nanosecond (0-999,999,999)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time">Time</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time">Time</a></code> object</dd>
+</dl></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Time.raw"><code class="name flex">
+<span>def <span class="ident">raw</span></span>(<span>nanoseconds_of_day)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time">Time</a></code> from nanoseconds of day.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>nanoseconds_of_day</code></strong> :&ensp;<code>int</code></dt>
+<dd>time of day (nanoseconds since 00:00:00)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time">Time</a></code></dt>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time">Time</a></code> object</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionExceededLimitException"><code class="flex name class">
+<span>class <span class="ident">TransactionExceededLimitException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TransactionExceededLimitException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.SqlLimitReachedException" href="index.html#tsubakuro_rust_python.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionNotFoundException"><code class="flex name class">
+<span>class <span class="ident">TransactionNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TransactionNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.RequestFailureException" href="index.html#tsubakuro_rust_python.RequestFailureException">RequestFailureException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption"><code class="flex name class">
+<span>class <span class="ident">TransactionOption</span></span>
+<span>(</span><span>type=Ellipsis)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Transaction option.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>transaction_type</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType">TransactionType</a></code></dt>
+<dd>Transaction type. Default is <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.OCC" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.OCC">TransactionType.OCC</a></code>.</dd>
+<dt><strong><code>label</code></strong> :&ensp;<code>str</code></dt>
+<dd>Transaction label.</dd>
+<dt><strong><code>include_ddl</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Whether the transaction modifies definitions (DDL). Default is <code>False</code>. Only applicable for <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX">TransactionType.LTX</a></code>.</dd>
+<dt><strong><code>write_preserve</code></strong> :&ensp;<code>List[str]</code></dt>
+<dd>List of table names to preserve for write operations. Only applicable for <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX">TransactionType.LTX</a></code>.</dd>
+<dt><strong><code>inclusive_read_area</code></strong> :&ensp;<code>List[str]</code></dt>
+<dd>List of table names to include in the read area. Only applicable for <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX">TransactionType.LTX</a></code>.</dd>
+<dt><strong><code>exclusive_read_area</code></strong> :&ensp;<code>List[str]</code></dt>
+<dd>List of table names to exclude from the read area. Only applicable for <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX">TransactionType.LTX</a></code>.</dd>
+<dt><strong><code>scan_parallel</code></strong> :&ensp;<code>int</code></dt>
+<dd>Degree of parallelism for scanning. Only applicable for <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.RTX" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.RTX">TransactionType.RTX</a></code>.</dd>
+<dt><strong><code>begin_timeout</code></strong> :&ensp;<code>int</code></dt>
+<dd>Begin transaction timeout in seconds</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.OCC)
+tx_option.label = &quot;tsubakuro-rust-python OCC example&quot;
+</code></pre>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
+tx_option.label = &quot;tsubakuro-rust-python LTX example&quot;
+tx_option.write_preserve = [&quot;table1&quot;, &quot;table2&quot;]
+</code></pre>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.RTX)
+tx_option.label = &quot;tsubakuro-rust-python RTX example&quot;
+tx_option.scan_parallel = 4
+</code></pre></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.begin_timeout"><code class="name">var <span class="ident">begin_timeout</span></code></dt>
+<dd>
+<div class="desc"><p>Begin transaction timeout in seconds.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.exclusive_read_area"><code class="name">var <span class="ident">exclusive_read_area</span></code></dt>
+<dd>
+<div class="desc"><p>Exclusive read area.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.include_ddl"><code class="name">var <span class="ident">include_ddl</span></code></dt>
+<dd>
+<div class="desc"><p>Include DDL flag.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.inclusive_read_area"><code class="name">var <span class="ident">inclusive_read_area</span></code></dt>
+<dd>
+<div class="desc"><p>Inclusive read area.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.label"><code class="name">var <span class="ident">label</span></code></dt>
+<dd>
+<div class="desc"><p>Transaction label.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.scan_parallel"><code class="name">var <span class="ident">scan_parallel</span></code></dt>
+<dd>
+<div class="desc"><p>Scan parallel.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.transaction_type"><code class="name">var <span class="ident">transaction_type</span></code></dt>
+<dd>
+<div class="desc"><p>Transaction type.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.write_preserve"><code class="name">var <span class="ident">write_preserve</span></code></dt>
+<dd>
+<div class="desc"><p>Write preserve.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType"><code class="flex name class">
+<span>class <span class="ident">TransactionType</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Transaction type.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX"><code class="name">var <span class="ident">LTX</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.OCC"><code class="name">var <span class="ident">OCC</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.RTX"><code class="name">var <span class="ident">RTX</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TypeAnalyzeException"><code class="flex name class">
+<span>class <span class="ident">TypeAnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TypeAnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.AnalyzeException" href="index.html#tsubakuro_rust_python.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.CompileException" href="index.html#tsubakuro_rust_python.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.UniqueConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">UniqueConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>UniqueConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ConstraintViolationException" href="index.html#tsubakuro_rust_python.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.IntegrityError" href="index.html#tsubakuro_rust_python.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.UnresolvedPlaceholderException"><code class="flex name class">
+<span>class <span class="ident">UnresolvedPlaceholderException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>UnresolvedPlaceholderException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.ParameterException" href="index.html#tsubakuro_rust_python.ParameterException">ParameterException</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.UnsupportedCompilerFeatureException"><code class="flex name class">
+<span>class <span class="ident">UnsupportedCompilerFeatureException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>UnsupportedCompilerFeatureException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.NotSupportedError" href="index.html#tsubakuro_rust_python.NotSupportedError">NotSupportedError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.UnsupportedRuntimeFeatureException"><code class="flex name class">
+<span>class <span class="ident">UnsupportedRuntimeFeatureException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>UnsupportedRuntimeFeatureException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.NotSupportedError" href="index.html#tsubakuro_rust_python.NotSupportedError">NotSupportedError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ValueAnalyzeException"><code class="flex name class">
+<span>class <span class="ident">ValueAnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ValueAnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.AnalyzeException" href="index.html#tsubakuro_rust_python.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.CompileException" href="index.html#tsubakuro_rust_python.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="index.html#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ValueEvaluationException"><code class="flex name class">
+<span>class <span class="ident">ValueEvaluationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ValueEvaluationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.EvaluationException" href="index.html#tsubakuro_rust_python.EvaluationException">EvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ValueOutOfRangeException"><code class="flex name class">
+<span>class <span class="ident">ValueOutOfRangeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ValueOutOfRangeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.InvalidRuntimeValueException" href="index.html#tsubakuro_rust_python.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.SqlLimitReachedException" href="index.html#tsubakuro_rust_python.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.ValueTooLongException"><code class="flex name class">
+<span>class <span class="ident">ValueTooLongException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>ValueTooLongException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.InvalidRuntimeValueException" href="index.html#tsubakuro_rust_python.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.SqlLimitReachedException" href="index.html#tsubakuro_rust_python.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.DataError" href="index.html#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.Warning"><code class="flex name class">
+<span>class <span class="ident">Warning</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>important warning</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.WriteOperationByRtxException"><code class="flex name class">
+<span>class <span class="ident">WriteOperationByRtxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>WriteOperationByRtxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.RestrictedOperationException" href="index.html#tsubakuro_rust_python.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.SqlExecutionException" href="index.html#tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.SqlServiceException" href="index.html#tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.ServerException" href="index.html#tsubakuro_rust_python.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="index.html#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.DatabaseError" href="index.html#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="index.html#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="tsubakuro_rust_python" href="index.html">tsubakuro_rust_python</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.connect" href="#tsubakuro_rust_python.tsubakuro_rust_python.connect">connect</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.env_logger_init" href="#tsubakuro_rust_python.tsubakuro_rust_python.env_logger_init">env_logger_init</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.AnalyzeException" href="#tsubakuro_rust_python.tsubakuro_rust_python.AnalyzeException">AnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.BlockedByConcurrentOperationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.BlockedByConcurrentOperationException">BlockedByConcurrentOperationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.BlockedByHighPriorityTransactionException" href="#tsubakuro_rust_python.tsubakuro_rust_python.BlockedByHighPriorityTransactionException">BlockedByHighPriorityTransactionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Bool" href="#tsubakuro_rust_python.tsubakuro_rust_python.Bool">Bool</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Bool.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Bool.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Bytes" href="#tsubakuro_rust_python.tsubakuro_rust_python.Bytes">Bytes</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Bytes.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Bytes.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CcException" href="#tsubakuro_rust_python.tsubakuro_rust_python.CcException">CcException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CheckConstraintViolationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.CheckConstraintViolationException">CheckConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column">Column</a></code></h4>
+<ul class="two-column">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.atom_type_code" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.atom_type_code">atom_type_code</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.description" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.description">description</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.length" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.length">length</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.name" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.name">name</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.nullable" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.nullable">nullable</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.precision" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.precision">precision</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.scale" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.scale">scale</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.sql_type" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.sql_type">sql_type</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.sql_type_name" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.sql_type_name">sql_type_name</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Column.type_code" href="#tsubakuro_rust_python.tsubakuro_rust_python.Column.type_code">type_code</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitOption">CommitOption</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.auto_dispose" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.auto_dispose">auto_dispose</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.commit_timeout" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.commit_timeout">commit_timeout</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.commit_type" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitOption.commit_type">commit_type</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType">CommitType</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.ACCEPTED" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType.ACCEPTED">ACCEPTED</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.AVAILABLE" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType.AVAILABLE">AVAILABLE</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.DEFAULT" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType.DEFAULT">DEFAULT</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.PROPAGATED" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType.PROPAGATED">PROPAGATED</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CommitType.STORED" href="#tsubakuro_rust_python.tsubakuro_rust_python.CommitType.STORED">STORED</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.CompileException" href="#tsubakuro_rust_python.tsubakuro_rust_python.CompileException">CompileException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config">Config</a></code></h4>
+<ul class="two-column">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.auth_token" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.auth_token">auth_token</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.commit_option" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.commit_option">commit_option</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.credentials" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.credentials">credentials</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.default_timeout" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.default_timeout">default_timeout</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.endpoint" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.endpoint">endpoint</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.merge" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.merge">merge</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.password" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.password">password</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.set" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.set">set</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.shutdown_option" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.shutdown_option">shutdown_option</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.transaction_option" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.transaction_option">transaction_option</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Config.user" href="#tsubakuro_rust_python.tsubakuro_rust_python.Config.user">user</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ConflictOnWritePreserveException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ConflictOnWritePreserveException">ConflictOnWritePreserveException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection">Connection</a></code></h4>
+<ul class="two-column">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.close" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.close">close</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.closed" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.closed">closed</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.commit" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.commit">commit</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.commit_option" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.commit_option">commit_option</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.cursor" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.cursor">cursor</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.find_table_metadata" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.find_table_metadata">find_table_metadata</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.get_table_metadata" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.get_table_metadata">get_table_metadata</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.list_tables" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.list_tables">list_tables</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.rollback" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.rollback">rollback</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.shutdown_option" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.shutdown_option">shutdown_option</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Connection.transaction_option" href="#tsubakuro_rust_python.tsubakuro_rust_python.Connection.transaction_option">transaction_option</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ConstraintViolationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ConstraintViolationException">ConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor">Cursor</a></code></h4>
+<ul class="two-column">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.arraysize" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.arraysize">arraysize</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.callproc" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.callproc">callproc</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.clear" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.clear">clear</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.close" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.close">close</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.closed" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.closed">closed</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.description" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.description">description</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.execute" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.execute">execute</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany">executemany</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany_async" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany_async">executemany_async</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchall" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchall">fetchall</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany">fetchmany</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchone" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchone">fetchone</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.next" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.next">next</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.nextset" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.nextset">nextset</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.prepare" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.prepare">prepare</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.rowcount" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.rowcount">rowcount</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.rownumber" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.rownumber">rownumber</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.setinputsizes" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.setinputsizes">setinputsizes</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.setoutputsize" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.setoutputsize">setoutputsize</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.DataCorruptionException" href="#tsubakuro_rust_python.tsubakuro_rust_python.DataCorruptionException">DataCorruptionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.DataError" href="#tsubakuro_rust_python.tsubakuro_rust_python.DataError">DataError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.tsubakuro_rust_python.DatabaseError">DatabaseError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date">Date</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date.of" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date.of">of</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date.raw" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date.raw">raw</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Date.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Date.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime">Datetime</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.nanosecond" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.of" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime.of">of</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.raw" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime.raw">raw</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Datetime.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Datetime.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Decimal" href="#tsubakuro_rust_python.tsubakuro_rust_python.Decimal">Decimal</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Decimal.raw" href="#tsubakuro_rust_python.tsubakuro_rust_python.Decimal.raw">raw</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Decimal.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Decimal.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.DependenciesViolationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.DependenciesViolationException">DependenciesViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.DumpDirectoryInaccessibleException" href="#tsubakuro_rust_python.tsubakuro_rust_python.DumpDirectoryInaccessibleException">DumpDirectoryInaccessibleException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.DumpFileException" href="#tsubakuro_rust_python.tsubakuro_rust_python.DumpFileException">DumpFileException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.tsubakuro_rust_python.Error">Error</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.EvaluationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.EvaluationException">EvaluationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Float32" href="#tsubakuro_rust_python.tsubakuro_rust_python.Float32">Float32</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Float32.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Float32.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Float64" href="#tsubakuro_rust_python.tsubakuro_rust_python.Float64">Float64</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Float64.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Float64.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.InactiveTransactionException" href="#tsubakuro_rust_python.tsubakuro_rust_python.InactiveTransactionException">InactiveTransactionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.InconsistentStatementException" href="#tsubakuro_rust_python.tsubakuro_rust_python.InconsistentStatementException">InconsistentStatementException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Int32" href="#tsubakuro_rust_python.tsubakuro_rust_python.Int32">Int32</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Int32.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Int32.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Int64" href="#tsubakuro_rust_python.tsubakuro_rust_python.Int64">Int64</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Int64.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Int64.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.IntegrityError" href="#tsubakuro_rust_python.tsubakuro_rust_python.IntegrityError">IntegrityError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.InterfaceError" href="#tsubakuro_rust_python.tsubakuro_rust_python.InterfaceError">InterfaceError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.InternalError" href="#tsubakuro_rust_python.tsubakuro_rust_python.InternalError">InternalError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.InternalException" href="#tsubakuro_rust_python.tsubakuro_rust_python.InternalException">InternalException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.InvalidDecimalValueException" href="#tsubakuro_rust_python.tsubakuro_rust_python.InvalidDecimalValueException">InvalidDecimalValueException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.InvalidRuntimeValueException" href="#tsubakuro_rust_python.tsubakuro_rust_python.InvalidRuntimeValueException">InvalidRuntimeValueException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.LoadFileException" href="#tsubakuro_rust_python.tsubakuro_rust_python.LoadFileException">LoadFileException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.LoadFileFormatException" href="#tsubakuro_rust_python.tsubakuro_rust_python.LoadFileFormatException">LoadFileFormatException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.LoadFileNotFoundException" href="#tsubakuro_rust_python.tsubakuro_rust_python.LoadFileNotFoundException">LoadFileNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.LtxException" href="#tsubakuro_rust_python.tsubakuro_rust_python.LtxException">LtxException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.LtxReadException" href="#tsubakuro_rust_python.tsubakuro_rust_python.LtxReadException">LtxReadException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.LtxWriteException" href="#tsubakuro_rust_python.tsubakuro_rust_python.LtxWriteException">LtxWriteException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.LtxWriteOperationWithoutWritePreserveException" href="#tsubakuro_rust_python.tsubakuro_rust_python.LtxWriteOperationWithoutWritePreserveException">LtxWriteOperationWithoutWritePreserveException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.NotNullConstraintViolationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.NotNullConstraintViolationException">NotNullConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.NotSupportedError" href="#tsubakuro_rust_python.tsubakuro_rust_python.NotSupportedError">NotSupportedError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OccException" href="#tsubakuro_rust_python.tsubakuro_rust_python.OccException">OccException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OccReadException" href="#tsubakuro_rust_python.tsubakuro_rust_python.OccReadException">OccReadException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OccWriteException" href="#tsubakuro_rust_python.tsubakuro_rust_python.OccWriteException">OccWriteException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.nanosecond" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.of" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.of">of</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.raw" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.raw">raw</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime">OffsetTime</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.nanosecond" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.of" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.of">of</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.raw" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.raw">raw</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetTime.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OperationalError" href="#tsubakuro_rust_python.tsubakuro_rust_python.OperationalError">OperationalError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ParameterException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ParameterException">ParameterException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ProgrammingError" href="#tsubakuro_rust_python.tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ReadOperationOnRestrictedReadAreaException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ReadOperationOnRestrictedReadAreaException">ReadOperationOnRestrictedReadAreaException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ReferentialIntegrityConstraintViolationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ReferentialIntegrityConstraintViolationException">ReferentialIntegrityConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.RequestFailureException" href="#tsubakuro_rust_python.tsubakuro_rust_python.RequestFailureException">RequestFailureException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.RestrictedOperationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.RestrictedOperationException">RestrictedOperationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.RtxException" href="#tsubakuro_rust_python.tsubakuro_rust_python.RtxException">RtxException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ScalarSubqueryEvaluationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ScalarSubqueryEvaluationException">ScalarSubqueryEvaluationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.SecondaryIndexCorruptionException" href="#tsubakuro_rust_python.tsubakuro_rust_python.SecondaryIndexCorruptionException">SecondaryIndexCorruptionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ServerException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ServerException">ServerException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption">ShutdownOption</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption.shutdown_timeout" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption.shutdown_timeout">shutdown_timeout</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption.shutdown_type" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownOption.shutdown_type">shutdown_type</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType">ShutdownType</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.FORCEFUL" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.FORCEFUL">FORCEFUL</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.GRACEFUL" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.GRACEFUL">GRACEFUL</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.NOTHING" href="#tsubakuro_rust_python.tsubakuro_rust_python.ShutdownType.NOTHING">NOTHING</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.SqlExecutionException" href="#tsubakuro_rust_python.tsubakuro_rust_python.SqlExecutionException">SqlExecutionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.SqlLimitReachedException" href="#tsubakuro_rust_python.tsubakuro_rust_python.SqlLimitReachedException">SqlLimitReachedException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.SqlRequestTimeoutException" href="#tsubakuro_rust_python.tsubakuro_rust_python.SqlRequestTimeoutException">SqlRequestTimeoutException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.SqlServiceException" href="#tsubakuro_rust_python.tsubakuro_rust_python.SqlServiceException">SqlServiceException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.StatementNotFoundException" href="#tsubakuro_rust_python.tsubakuro_rust_python.StatementNotFoundException">StatementNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Str" href="#tsubakuro_rust_python.tsubakuro_rust_python.Str">Str</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Str.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Str.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.SymbolAnalyzeException" href="#tsubakuro_rust_python.tsubakuro_rust_python.SymbolAnalyzeException">SymbolAnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.SyntaxException" href="#tsubakuro_rust_python.tsubakuro_rust_python.SyntaxException">SyntaxException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata">TableMetadata</a></code></h4>
+<ul class="two-column">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.columns" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.columns">columns</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.database_name" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.database_name">database_name</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.description" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.description">description</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.primary_keys" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.primary_keys">primary_keys</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.schema_name" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.schema_name">schema_name</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.table_description" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.table_description">table_description</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.table_name" href="#tsubakuro_rust_python.tsubakuro_rust_python.TableMetadata.table_name">table_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TargetAlreadyExistsException" href="#tsubakuro_rust_python.tsubakuro_rust_python.TargetAlreadyExistsException">TargetAlreadyExistsException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TargetNotFoundException" href="#tsubakuro_rust_python.tsubakuro_rust_python.TargetNotFoundException">TargetNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time">Time</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time.nanosecond" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time.of" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time.of">of</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time.raw" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time.raw">raw</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Time.value" href="#tsubakuro_rust_python.tsubakuro_rust_python.Time.value">value</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionExceededLimitException" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionExceededLimitException">TransactionExceededLimitException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionNotFoundException" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionNotFoundException">TransactionNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></h4>
+<ul class="two-column">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.begin_timeout" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.begin_timeout">begin_timeout</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.exclusive_read_area" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.exclusive_read_area">exclusive_read_area</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.include_ddl" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.include_ddl">include_ddl</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.inclusive_read_area" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.inclusive_read_area">inclusive_read_area</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.label" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.label">label</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.scan_parallel" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.scan_parallel">scan_parallel</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.transaction_type" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.transaction_type">transaction_type</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.write_preserve" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.write_preserve">write_preserve</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType">TransactionType</a></code></h4>
+<ul class="">
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.LTX">LTX</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.OCC" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.OCC">OCC</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.RTX" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionType.RTX">RTX</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TypeAnalyzeException" href="#tsubakuro_rust_python.tsubakuro_rust_python.TypeAnalyzeException">TypeAnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.UniqueConstraintViolationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.UniqueConstraintViolationException">UniqueConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.UnresolvedPlaceholderException" href="#tsubakuro_rust_python.tsubakuro_rust_python.UnresolvedPlaceholderException">UnresolvedPlaceholderException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.UnsupportedCompilerFeatureException" href="#tsubakuro_rust_python.tsubakuro_rust_python.UnsupportedCompilerFeatureException">UnsupportedCompilerFeatureException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.UnsupportedRuntimeFeatureException" href="#tsubakuro_rust_python.tsubakuro_rust_python.UnsupportedRuntimeFeatureException">UnsupportedRuntimeFeatureException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ValueAnalyzeException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ValueAnalyzeException">ValueAnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ValueEvaluationException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ValueEvaluationException">ValueEvaluationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ValueOutOfRangeException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ValueOutOfRangeException">ValueOutOfRangeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.ValueTooLongException" href="#tsubakuro_rust_python.tsubakuro_rust_python.ValueTooLongException">ValueTooLongException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Warning" href="#tsubakuro_rust_python.tsubakuro_rust_python.Warning">Warning</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.WriteOperationByRtxException" href="#tsubakuro_rust_python.tsubakuro_rust_python.WriteOperationByRtxException">WriteOperationByRtxException</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

@@ -4,6 +4,10 @@ use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimePointWithTimeZone};
 
 /// TIMESTAMP WITH TIME ZONE type.
+///
+/// Attributes:
+///     value (Optional[datetime.datetime]): datetime value with time zone. (read only)
+///     nanosecond (Optional[int]): nanosecond part of the time. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
@@ -36,6 +40,19 @@ impl OffsetDatetime {
     }
 
     /// Create a `OffsetDatetime` from year, month, day, hour, minute, second, nanosecond, and tzinfo.
+    ///
+    /// Args:
+    ///     year (int): year
+    ///     month (int): month (1-12)
+    ///     day (int): day (1-31)
+    ///     hour (int, optional): hour (0-23)
+    ///     minute (int, optional): minute (0-59)
+    ///     second (int, optional): second (0-59)
+    ///     nanosecond (int, optional): nanosecond (0-999,999,999)
+    ///     tzinfo (datetime.tzinfo, optional): time zone info (default: UTC)
+    ///
+    /// Returns:
+    ///     OffsetDatetime: created `OffsetDatetime` instance
     #[classmethod]
     #[pyo3(signature = (year, month, day, hour=0, minute=0, second=0, nanosecond=0, tzinfo=None))]
     pub fn of(
@@ -69,10 +86,13 @@ impl OffsetDatetime {
 
     /// Create a `OffsetDatetime` from epoch seconds, nanoseconds, and time zone offset.
     ///
-    /// # Parameters
-    /// - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
-    /// - `nanos` - nanosecond part of the time (0-999,999,999)
-    /// - `time_zone_offset` - time zone offset in minutes
+    /// Args:
+    ///     epoch_seconds (int): offset seconds from epoch (1970-01-01 00:00:00)
+    ///     nanos (int): nanosecond part of the time (0-999,999,999)
+    ///     time_zone_offset (int): time zone offset in minutes
+    ///
+    /// Returns:
+    ///     OffsetDatetime: created `OffsetDatetime` object
     #[classmethod]
     pub fn raw(
         _cls: &Bound<PyType>,

@@ -48,6 +48,18 @@ impl CommitType {
 }
 
 /// Commit option for transaction.
+///
+/// Attributes:
+///     commit_type (CommitType): Commit type. Default is `CommitType.DEFAULT`.
+///     auto_dispose (bool): Auto dispose flag. Default is `False`.
+///     commit_timeout (int): Commit timeout in seconds.
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
+///     ```
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug, Clone)]

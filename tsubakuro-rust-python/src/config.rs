@@ -16,6 +16,39 @@ use crate::{
 };
 
 /// Configuration options for connecting to Tsurugi.
+///
+/// Attributes:
+///     endpoint (str): Endpoint URL of the Tsurugi server.
+///     user (str): Username for authentication.
+///     password (str): Password for authentication.
+///     auth_token (str): Authentication token.
+///     credentials (str): Path to credentials file.
+///     transaction_option (TransactionOption): Transaction option.
+///     commit_option (CommitOption): Commit option.
+///     shutdown_option (ShutdownOption): Shutdown option.
+///     default_timeout (int): Default timeout in seconds.
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     config = tsurugi.Config()
+///     config.endpoint = "tcp://localhost:12345"
+///     config.user = "tsurugi"
+///     config.password = "password"
+///     config.default_timeout = 30  # seconds
+///     ```
+///
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     config = tsurugi.Config(
+///         endpoint="tcp://localhost:12345",
+///         user="tsurugi",
+///         password="password",
+///         default_timeout=30,  # seconds
+///     )
+///     ```
 #[gen_stub_pyclass]
 #[pyclass]
 pub struct Config {
@@ -68,6 +101,13 @@ impl Default for Config {
 #[pymethods]
 impl Config {
     /// Create a new `Config`.
+    ///
+    /// Args:
+    ///     *args (Config | TransactionOption | CommitOption | ShutdownOption | str, optional): other configuration object.
+    ///     **kwargs (dict, optional): e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"`
+    ///
+    /// Returns:
+    ///     Config: configuration object.
     #[new]
     #[pyo3(signature = (*args, **kwargs))]
     pub fn new(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Self> {
@@ -78,6 +118,10 @@ impl Config {
     }
 
     /// Set configuration options.
+    ///
+    /// Args:
+    ///     *args (Config | TransactionOption | CommitOption | ShutdownOption | str, optional): other configuration object.
+    ///     **kwargs (dict, optional): e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"`
     #[pyo3(signature = (*args, **kwargs))]
     pub fn set(&mut self, args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<()> {
         self.from_args(args)?;
@@ -86,6 +130,9 @@ impl Config {
     }
 
     /// Merge another `Config` into this one.
+    ///
+    /// Args:
+    ///     other (Config): other configuration object.
     pub fn merge(&mut self, other: &Config) {
         if let Some(endpoint) = &other.endpoint {
             self.endpoint = Some(endpoint.clone());

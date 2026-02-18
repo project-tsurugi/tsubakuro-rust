@@ -40,6 +40,17 @@ impl ShutdownType {
 }
 
 /// Shutdown option for connection.
+///
+/// Attributes:
+///     shutdown_type (ShutdownType): Shutdown type. Default is `ShutdownType.GRACEFUL`.
+///     shutdown_timeout (int): Shutdown timeout in seconds.
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     shutdown_option = tsurugi.ShutdownOption(tsurugi.ShutdownType.GRACEFUL, 30)
+///     ```
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug, Clone)]

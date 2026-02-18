@@ -40,6 +40,9 @@ __all__ = [
 class Bool:
     r"""
     BOOLEAN type.
+    
+    Attributes:
+        value (Optional[bool]): boolean value. (read only)
     """
     @property
     def value(self) -> typing.Optional[builtins.bool]:
@@ -57,6 +60,9 @@ class Bool:
 class Bytes:
     r"""
     BINARY, VARBINARY type.
+    
+    Attributes:
+        value (Optional[bytes]): binary data. (read only)
     """
     @property
     def value(self) -> typing.Optional[builtins.list[builtins.int]]:
@@ -73,6 +79,18 @@ class Bytes:
 class Column:
     r"""
     Column metadata.
+    
+    Attributes:
+        name (str): Column name. (read only)
+        description (Optional[str]): Column description. (read only)
+        type_code (str): Type code. (read only)
+        atom_type_code (int): AtomType code. -1 if unknown. (read only)
+        sql_type (str): SQL type. (read only)
+        sql_type_name (Optional[str]): SQL type name. (read only)
+        length (Optional[int]): Length for string types. (read only)
+        precision (Optional[int]): Precision for numeric types. (read only)
+        scale (Optional[int]): Scale for numeric types. (read only)
+        nullable (Optional[bool]): Nullable flag. (read only)
     """
     @property
     def name(self) -> builtins.str:
@@ -130,6 +148,18 @@ class Column:
 class CommitOption:
     r"""
     Commit option for transaction.
+    
+    Attributes:
+        commit_type (CommitType): Commit type. Default is `CommitType.DEFAULT`.
+        auto_dispose (bool): Auto dispose flag. Default is `False`.
+        commit_timeout (int): Commit timeout in seconds.
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
+        ```
     """
     @property
     def commit_type(self) -> tsubakurorustpython.CommitType:
@@ -170,6 +200,39 @@ class CommitOption:
 class Config:
     r"""
     Configuration options for connecting to Tsurugi.
+    
+    Attributes:
+        endpoint (str): Endpoint URL of the Tsurugi server.
+        user (str): Username for authentication.
+        password (str): Password for authentication.
+        auth_token (str): Authentication token.
+        credentials (str): Path to credentials file.
+        transaction_option (TransactionOption): Transaction option.
+        commit_option (CommitOption): Commit option.
+        shutdown_option (ShutdownOption): Shutdown option.
+        default_timeout (int): Default timeout in seconds.
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        config = tsurugi.Config()
+        config.endpoint = "tcp://localhost:12345"
+        config.user = "tsurugi"
+        config.password = "password"
+        config.default_timeout = 30  # seconds
+        ```
+    
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        config = tsurugi.Config(
+            endpoint="tcp://localhost:12345",
+            user="tsurugi",
+            password="password",
+            default_timeout=30,  # seconds
+        )
+        ```
     """
     @property
     def endpoint(self) -> typing.Optional[builtins.str]:
@@ -264,14 +327,28 @@ class Config:
     def __new__(cls, *args: typing.Any, **kwargs: typing.Any) -> Config:
         r"""
         Create a new `Config`.
+        
+        Args:
+            *args (Config | TransactionOption | CommitOption | ShutdownOption | str, optional): other configuration object.
+            **kwargs (dict, optional): e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"`
+        
+        Returns:
+            Config: configuration object.
         """
     def set(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         r"""
         Set configuration options.
+        
+        Args:
+            *args (Config | TransactionOption | CommitOption | ShutdownOption | str, optional): other configuration object.
+            **kwargs (dict, optional): e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"`
         """
     def merge(self, other: Config) -> None:
         r"""
         Merge another `Config` into this one.
+        
+        Args:
+            other (Config): other configuration object.
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -279,80 +356,111 @@ class Config:
 class Connection:
     r"""
     Connection to Tsurugi.
+    
+    Attributes:
+        transaction_option (TransactionOption): Transaction option. (write only)
+        commit_option (CommitOption): Commit option. (write only)
+        shutdown_option (ShutdownOption): Shutdown option. (write only)
+        closed (bool): Whether the connection is closed. (read only)
     """
     @property
-    def closed(self) -> builtins.bool: ...
+    def closed(self) -> builtins.bool:
+        r"""
+        Whether the connection is closed.
+        """
     @transaction_option.setter
     def transaction_option(self, value: TransactionOption) -> None:
         r"""
-        Set transaction option.
-        
-        # Parameters
-        - `option` - [`TransactionOption`] object.
+        Transaction option.
         """
     @commit_option.setter
     def commit_option(self, value: CommitOption) -> None:
         r"""
-        Set commit option.
-        
-        # Parameters
-        - `option` - [`CommitOption`] object.
+        Commit option.
         """
     @shutdown_option.setter
     def shutdown_option(self, value: ShutdownOption) -> None:
         r"""
-        Set shutdown option.
-        
-        # Parameters
-        - `option` - [`ShutdownOption`] object.
+        Shutdown option.
         """
     def list_tables(self) -> builtins.list[builtins.str]:
         r"""
         List table names.
         
-        # Returns
-        List of table names.
+        Returns:
+            List[str]: List of table names.
+        
+        Examples:
+            ```python
+            table_names = connection.list_tables()
+            ```
         """
     def get_table_metadata(self, table_name: builtins.str) -> TableMetadata:
         r"""
         Get table metadata.
         
-        # Parameters
-        - `table_name` - table name.
+        Args:
+            table_name (str): Table name.
         
-        # Returns
-        Table metadata.
+        Returns:
+           TableMetadata: Table metadata.
         
-        # Errors
-        Raises an exception if the table does not exist.
+        Raises:
+            TargetNotFoundException: If the table does not exist.
+        
+        Examples:
+            ```python
+            metadata = connection.get_table_metadata("my_table")
+            ```
         """
     def find_table_metadata(self, table_name: builtins.str) -> typing.Optional[TableMetadata]:
         r"""
         Find table metadata.
         
-        # Parameters
-        - `table_name` - table name.
+        Args:
+            table_name (str): Table name.
         
-        # Returns
-        Table metadata, or None if the table does not exist.
+        Returns:
+            Optional[TableMetadata]: Table metadata, or None if the table does not exist.
+        
+        Examples:
+            ```python
+            metadata = connection.find_table_metadata("my_table")
+            ```
         """
     def cursor(self) -> Cursor:
         r"""
         Create a new cursor object using the connection.
         
-        # Returns
-        [`Cursor`] object.
+        Returns:
+            Cursor: Cursor object.
+        
+        Examples:
+            ```python
+            with connection.cursor() as cursor:
+               pass
+            ```
         """
     def commit(self, option: typing.Optional[CommitOption] = None) -> None:
         r"""
         Commit the current transaction.
         
-        # Parameters
-        - `option` - Optional [`CommitOption`] object to override the connection's commit option.
+        Args:
+            option (CommitOption, optional): CommitOption object.
+        
+        Examples:
+            ```python
+            connection.commit()
+            ```
         """
     def rollback(self) -> None:
         r"""
         Rollback the current transaction.
+        
+        Examples:
+            ```python
+            connection.rollback()
+            ```
         """
     def __enter__(self, slf: Connection) -> Connection:
         r"""
@@ -371,29 +479,48 @@ class Connection:
 class Cursor:
     r"""
     Cursor object for executing SQL statements and fetching results.
+    
+    Attributes:
+        description (Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]): Description of the query result set.
+            `(name, type_code, display_size, internal_size, precision, scale, null_ok)`.  (read only)
+        arraysize (int): Number of rows to fetch at a time with `Cursor.fetchmany()`. Default is 1.
+        rowcount (int): Number of rows affected by the last `Cursor.execute*()` method. -1 if not applicable. (read only)
+        closed (bool): Whether the cursor is closed. (read only)
     """
     @property
-    def executemany_async(self) -> builtins.bool: ...
+    def executemany_async(self) -> builtins.bool:
+        r"""
+        Whether to execute `Cursor.executemany()` asynchronously. Default is `True`.
+        """
     @executemany_async.setter
-    def executemany_async(self, value: builtins.bool) -> None: ...
+    def executemany_async(self, value: builtins.bool) -> None:
+        r"""
+        Whether to execute `Cursor.executemany()` asynchronously. Default is `True`.
+        """
     @property
-    def arraysize(self) -> builtins.int: ...
+    def arraysize(self) -> builtins.int:
+        r"""
+        Number of rows to fetch at a time with `Cursor.fetchmany()`.
+        """
     @arraysize.setter
     def arraysize(self, value: builtins.int) -> None:
         r"""
-        Set the number of rows to fetch at a time with [`fetchmany`].
-        
-        # Parameters
-        - `size` - Number of rows to fetch at a time. If less than 1 is specified, use 1.
+        Number of rows to fetch at a time with `Cursor.fetchmany()`.
         """
     @property
-    def rowcount(self) -> builtins.int: ...
+    def rowcount(self) -> builtins.int:
+        r"""
+        Number of rows affected by the last `Cursor.execute*()` method.
+        """
     @property
-    def closed(self) -> builtins.bool: ...
+    def closed(self) -> builtins.bool:
+        r"""
+        Whether the cursor is closed.
+        """
     @property
     def description(self) -> Optional[Sequence[Tuple[
         str,           # name
-        int,           # type_code
+        str,           # type_code
         None,          # display_size
         Optional[int], # internal_size
         Optional[int], # precision
@@ -401,77 +528,70 @@ class Cursor:
         Optional[bool] # null_ok
     ]]]:
         r"""
-        description of the query result set.
-        
-        # Returns
-        A sequence of 7-item sequences. Each of these sequences contains information describing one result column.
-         The 7 items are: (name, type_code, display_size, internal_size, precision, scale, null_ok)
+        Description of the query result set.
         """
     @property
     def rownumber(self) -> typing.Optional[builtins.int]:
         r"""
         Current row number (0-based).
-        
-        # Returns
-        An optional integer representing the current row number. If no rows have been fetched, returns `None`.
         """
     def execute(self, operation: builtins.str, parameters: typing.Optional[typing.Any] = None) -> None:
         r"""
         Execute a SQL statement.
         
-        # Parameters
-        - `operation` - SQL statement to be executed.
-        - `parameters` - parameters for the SQL statement.
+        Args:
+            operation (str): SQL statement to be executed.
+            parameters (Tuple[Any, ...] | dict[str, Any], optional): Parameters for the SQL statement.
         """
     def prepare(self, operation: builtins.str, parameters: typing.Any) -> None:
         r"""
         Prepare a SQL statement for execution.
         
-        # Parameters
-        - `operation` - SQL statement to be prepared.
-        - `parameters` - parameters for the SQL statement.
+        Args:
+            operation (str): SQL statement to be prepared.
+            parameters (Tuple[Any, ...] | dict[str, Any]): Parameters for the SQL statement.
         """
     def executemany(self, operation: builtins.str, seq_of_parameters: typing.Any) -> None:
         r"""
         Execute a prepared SQL statement multiple times.
         
-        # Parameters
-        - `operation` - SQL statement to be executed.
-        - `seq_of_parameters` - sequence of parameters for the SQL statement.
+        Args:
+            operation (str): SQL statement to be executed.
+            seq_of_parameters (Sequence[Tuple[Any, ...] | dict[str, Any]]): Sequence of parameters for the SQL statement.
         """
     def fetchone(self) -> typing.Optional[tuple]:
         r"""
         Fetch the next row of a query result set.
         
-        # Returns
-        A single sequence representing the next row of the result set, or `None` if no more data is available.
+        Returns:
+              Optional[Tuple[Any, ...]]: A single sequence representing the next row of the result set, or `None` if no more data is available.
         """
     def next(self) -> tuple:
         r"""
         Fetch the next row of a query result set.
         
-        # Returns
-        A single sequence representing the next row of the result set.
+        Returns:
+             Tuple[Any, ...]: A single sequence representing the next row of the result set.
         
-        # Errors
-        Raises `StopIteration` when no more data is available.
+        Raises:
+            StopIteration: When no more data is available.
         """
     def fetchmany(self, size: typing.Optional[builtins.int] = None) -> builtins.list[tuple]:
         r"""
         Fetch the next set of rows of a query result set.
         
-        # Parameters
-        - `size` - Number of rows to fetch. If not specified, use the cursor's `arraysize` attribute.
+        Args:
+            size (int, optional) - Number of rows to fetch. If not specified, use the cursor's `arraysize` attribute.
         
-        # Returns
-        A list of sequences, each representing a row of the result set.
+        Returns:
+             List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
         """
     def fetchall(self) -> builtins.list[tuple]:
         r"""
         Fetch all (remaining) rows of a query result set.
         
-        # Returns
-        A list of sequences, each representing a row of the result set.
+        Returns:
+             List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
         """
     def callproc(self, _procname: builtins.str, _parameters: typing.Optional[typing.Any] = None) -> None:
         r"""
@@ -518,6 +638,9 @@ class Cursor:
 class Date:
     r"""
     DATE type.
+    
+    Attributes:
+        value (Optional[datetime.date]): date value. (read only)
     """
     @property
     def value(self) -> typing.Optional[datetime.date]:
@@ -532,14 +655,25 @@ class Date:
     def of(cls, year: builtins.int, month: builtins.int, day: builtins.int) -> Date:
         r"""
         Create a `Date` from year, month, and day.
+        
+        Args:
+            year (int): year
+            month (int): month (1-12)
+            day (int): day (1-31)
+        
+        Returns:
+            Date: created `Date` object
         """
     @classmethod
     def raw(cls, epoch_days: builtins.int) -> Date:
         r"""
         Create a `Date` from epoch days.
         
-        # Parameters
-        - `epoch_days` - number of days offset of epoch 1970-01-01
+        Args:
+            epoch_days (int): number of days offset of epoch 1970-01-01
+        
+        Returns:
+            Date: created `Date` object
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -547,6 +681,10 @@ class Date:
 class Datetime:
     r"""
     TIMESTAMP type.
+    
+    Attributes:
+        value (Optional[datetime.datetime]): datetime value. (read only)
+        nanosecond (Optional[int]): nanosecond part of the time. (read only)
     """
     @property
     def value(self) -> typing.Optional[datetime.datetime]:
@@ -566,15 +704,30 @@ class Datetime:
     def of(cls, year: builtins.int, month: builtins.int, day: builtins.int, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0) -> Datetime:
         r"""
         Create a `Datetime` from year, month, day, hour, minute, second, and nanosecond.
+        
+        Args:
+            year (int): year
+            month (int): month (1-12)
+            day (int): day (1-31)
+            hour (int, optional): hour (0-23)
+            minute (int, optional): minute (0-59)
+            second (int, optional): second (0-59)
+            nanosecond (int, optional): nanosecond (0-999,999,999)
+        
+        Returns:
+            Datetime: created `Datetime` object
         """
     @classmethod
     def raw(cls, epoch_seconds: builtins.int, nanos: builtins.int) -> Datetime:
         r"""
         Create a `Datetime` from epoch seconds and nanoseconds.
         
-        # Parameters
-        - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
-        - `nanos` - nanosecond part of the time (0-999,999,999)
+        Args:
+            epoch_seconds (int): offset seconds from epoch (1970-01-01 00:00:00)
+            nanos (int): nanosecond part of the time (0-999,999,999)
+        
+        Returns:
+            Datetime: created `Datetime` object
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -582,6 +735,9 @@ class Datetime:
 class Decimal:
     r"""
     DECIMAL type.
+    
+    Attributes:
+        value (Optional[decimal.Decimal]): decimal value. (read only)
     """
     @property
     def value(self) -> typing.Optional[decimal.Decimal]:
@@ -596,6 +752,13 @@ class Decimal:
     def raw(cls, unscaled_value: typing.Sequence[builtins.int], exponent: builtins.int) -> Decimal:
         r"""
         Create a `Decimal` from unscaled value and exponent.
+        
+        Args:
+            unscaled_value (bytes): unscaled value as big-endian byte array
+            exponent (int): exponent
+        
+        Returns:
+            Decimal: created `Decimal` object
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -603,6 +766,9 @@ class Decimal:
 class Float32:
     r"""
     REAL type.
+    
+    Attributes:
+        value (Optional[float]): float value. (read only)
     """
     @property
     def value(self) -> typing.Optional[builtins.float]:
@@ -620,6 +786,9 @@ class Float32:
 class Float64:
     r"""
     DOUBLE type.
+    
+    Attributes:
+        value (Optional[float]): float value. (read only)
     """
     @property
     def value(self) -> typing.Optional[builtins.float]:
@@ -637,6 +806,9 @@ class Float64:
 class Int32:
     r"""
     INT type.
+    
+    Attributes:
+        value (Optional[int]): integer value. (read only)
     """
     @property
     def value(self) -> typing.Optional[builtins.int]:
@@ -654,6 +826,9 @@ class Int32:
 class Int64:
     r"""
     BIGINT type.
+    
+    Attributes:
+        value (Optional[int]): integer value. (read only)
     """
     @property
     def value(self) -> typing.Optional[builtins.int]:
@@ -671,6 +846,10 @@ class Int64:
 class OffsetDatetime:
     r"""
     TIMESTAMP WITH TIME ZONE type.
+    
+    Attributes:
+        value (Optional[datetime.datetime]): datetime value with time zone. (read only)
+        nanosecond (Optional[int]): nanosecond part of the time. (read only)
     """
     @property
     def value(self) -> typing.Optional[datetime.datetime]:
@@ -690,16 +869,32 @@ class OffsetDatetime:
     def of(cls, year: builtins.int, month: builtins.int, day: builtins.int, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0, tzinfo: typing.Optional[datetime.tzinfo] = None) -> OffsetDatetime:
         r"""
         Create a `OffsetDatetime` from year, month, day, hour, minute, second, nanosecond, and tzinfo.
+        
+        Args:
+            year (int): year
+            month (int): month (1-12)
+            day (int): day (1-31)
+            hour (int, optional): hour (0-23)
+            minute (int, optional): minute (0-59)
+            second (int, optional): second (0-59)
+            nanosecond (int, optional): nanosecond (0-999,999,999)
+            tzinfo (datetime.tzinfo, optional): time zone info (default: UTC)
+        
+        Returns:
+            OffsetDatetime: created `OffsetDatetime` instance
         """
     @classmethod
     def raw(cls, epoch_seconds: builtins.int, nanos: builtins.int, time_zone_offset: builtins.int) -> OffsetDatetime:
         r"""
         Create a `OffsetDatetime` from epoch seconds, nanoseconds, and time zone offset.
         
-        # Parameters
-        - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
-        - `nanos` - nanosecond part of the time (0-999,999,999)
-        - `time_zone_offset` - time zone offset in minutes
+        Args:
+            epoch_seconds (int): offset seconds from epoch (1970-01-01 00:00:00)
+            nanos (int): nanosecond part of the time (0-999,999,999)
+            time_zone_offset (int): time zone offset in minutes
+        
+        Returns:
+            OffsetDatetime: created `OffsetDatetime` object
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -707,6 +902,10 @@ class OffsetDatetime:
 class OffsetTime:
     r"""
     TIME WITH TIME ZONE type.
+    
+    Attributes:
+        value (Optional[datetime.time]): time value with time zone. (read only)
+        nanosecond (Optional[int]): nanosecond part of the time. (read only)
     """
     @property
     def value(self) -> typing.Optional[datetime.time]:
@@ -726,15 +925,28 @@ class OffsetTime:
     def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0, tzinfo: typing.Optional[datetime.tzinfo] = None) -> OffsetTime:
         r"""
         Create a `OffsetTime` from hour, minute, second, nanosecond, and tzinfo.
+        
+        Args:
+            hour (int, optional): hour (0-23)
+            minute (int, optional): minute (0-59)
+            second (int, optional): second (0-59)
+            nanosecond (int, optional): nanosecond (0-999,999,999)
+            tzinfo (datetime.tzinfo, optional): time zone info (Default: UTC)
+        
+        Returns:
+            OffsetTime: created `OffsetTime` object
         """
     @classmethod
     def raw(cls, nanoseconds_of_day: builtins.int, time_zone_offset: builtins.int) -> OffsetTime:
         r"""
         Create a `OffsetTime` from epoch nanoseconds of day and time zone offset.
         
-        # Parameters
-        - `nanoseconds_of_day` - offset nano-seconds from epoch (00:00:00) in the time zone
-        - `time_zone_offset` - timezone offset in minute
+        Args:
+            nanoseconds_of_day (int): offset nano-seconds from epoch (00:00:00) in the time zone
+            time_zone_offset (int): timezone offset in minute
+        
+        Returns:
+            OffsetTime: created `OffsetTime` object
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -742,6 +954,17 @@ class OffsetTime:
 class ShutdownOption:
     r"""
     Shutdown option for connection.
+    
+    Attributes:
+        shutdown_type (ShutdownType): Shutdown type. Default is `ShutdownType.GRACEFUL`.
+        shutdown_timeout (int): Shutdown timeout in seconds.
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        shutdown_option = tsurugi.ShutdownOption(tsurugi.ShutdownType.GRACEFUL, 30)
+        ```
     """
     @property
     def shutdown_type(self) -> tsubakurorustpython.ShutdownType:
@@ -772,6 +995,9 @@ class ShutdownOption:
 class Str:
     r"""
     CHAR, VARCHAR type.
+    
+    Attributes:
+        value (Optional[str]): string value. (read only)
     """
     @property
     def value(self) -> typing.Optional[builtins.str]:
@@ -788,6 +1014,16 @@ class Str:
 class TableMetadata:
     r"""
     Table metadata.
+    
+    Attributes:
+        database_name (str): Database name. (read only)
+        schema_name (str): Schema name. (read only)
+        table_name (str): Table name. (read only)
+        table_description (Optional[str]): Table description. (read only)
+        columns (List[Column]): Columns metadata. (read only)
+        description (Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]): Columns description.
+          `(name, type_code, display_size, internal_size, precision, scale, null_ok)`. (read only)
+        primary_keys (List[str]): Primary keys. (read only)
     """
     @property
     def database_name(self) -> builtins.str:
@@ -815,15 +1051,15 @@ class TableMetadata:
         Columns metadata.
         """
     @property
-    def description(self) -> Optional[Sequence[Tuple[
+    def description(self) -> Sequence[Tuple[
         str,           # name
-        int,           # type_code
+        str,           # type_code
         None,          # display_size
         Optional[int], # internal_size
         Optional[int], # precision
         Optional[int], # scale
         Optional[bool] # null_ok
-    ]]]:
+    ]]:
         r"""
         Columns description.
         """
@@ -838,6 +1074,10 @@ class TableMetadata:
 class Time:
     r"""
     TIME type.
+    
+    Attributes:
+        value (Optional[datetime.time]): time value. (read only)
+        nanosecond (Optional[int]): nanosecond part of the time. (read only)
     """
     @property
     def value(self) -> typing.Optional[datetime.time]:
@@ -857,14 +1097,26 @@ class Time:
     def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0) -> Time:
         r"""
         Create a `Time` from hour, minute, second, and nanosecond.
+        
+        Args:
+            hour (int, optional): hour (0-23)
+            minute (int, optional): minute (0-59)
+            second (int, optional): second (0-59)
+            nanosecond (int, optional): nanosecond (0-999,999,999)
+        
+        Returns:
+            Time: created `Time` object
         """
     @classmethod
     def raw(cls, nanoseconds_of_day: builtins.int) -> Time:
         r"""
         Create a `Time` from nanoseconds of day.
         
-        # Parameters
-        - `nanoseconds_of_day` - time of day (nanoseconds since 00:00:00)
+        Args:
+            nanoseconds_of_day (int): time of day (nanoseconds since 00:00:00)
+        
+        Returns:
+            Time: created `Time` object
         """
     def __repr__(self) -> builtins.str: ...
 
@@ -872,6 +1124,40 @@ class Time:
 class TransactionOption:
     r"""
     Transaction option.
+    
+    Attributes:
+        transaction_type (TransactionType): Transaction type. Default is `TransactionType.OCC`.
+        label (str): Transaction label.
+        include_ddl (bool): Whether the transaction modifies definitions (DDL). Default is `False`. Only applicable for `TransactionType.LTX`.
+        write_preserve (List[str]): List of table names to preserve for write operations. Only applicable for `TransactionType.LTX`.
+        inclusive_read_area (List[str]): List of table names to include in the read area. Only applicable for `TransactionType.LTX`.
+        exclusive_read_area (List[str]): List of table names to exclude from the read area. Only applicable for `TransactionType.LTX`.
+        scan_parallel (int): Degree of parallelism for scanning. Only applicable for `TransactionType.RTX`.
+        begin_timeout (int): Begin transaction timeout in seconds
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.OCC)
+        tx_option.label = "tsubakuro-rust-python OCC example"
+        ```
+    
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
+        tx_option.label = "tsubakuro-rust-python LTX example"
+        tx_option.write_preserve = ["table1", "table2"]
+        ```
+    
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.RTX)
+        tx_option.label = "tsubakuro-rust-python RTX example"
+        tx_option.scan_parallel = 4
+        ```
     """
     @property
     def transaction_type(self) -> tsubakurorustpython.TransactionType:
@@ -1005,20 +1291,49 @@ class TransactionType(enum.Enum):
     Transaction type.
     """
     OCC = ...
+    r"""
+    Optimistic concurrency control (OCC) transaction.
+    """
     LTX = ...
+    r"""
+    Long transaction (LTX).
+    """
     RTX = ...
+    r"""
+    Read-only transaction (RTX).
+    """
 
 @typing.overload
 def connect(*args: typing.Any, **kwargs: typing.Any) -> tsubakurorustpython.Connection:
     r"""
     Constructor for creating a connection to the Tsurugi.
     
-    # Parameters
-    - `args` - see [`Config`].
-    - `kwargs` - e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"``
+    Args:
+        *args (Config, optional): configuration object.
+        **kwargs (dict, optional): e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"`
     
-    # Returns
-    [`Connection`] object.
+    Returns:
+        Connection: Connection object.
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        config = tsurugi.Config()
+        config.endpoint = "tcp://localhost:12345"
+        config.user = "tsurugi"
+        config.password = "password"
+        config.default_timeout = 30 // seconds
+        with tsurugi.connect(config) as connection:
+            pass
+        ```
+    
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        with tsurugi.connect(endpoint="tcp://localhost:12345", user="tsurugi", password="password", default_timeout=30) as connection:
+            pass
+        ```
     """
 
 @typing.overload
@@ -1034,11 +1349,18 @@ def env_logger_init(filters: builtins.str = 'tsubakuro_rust_python=info', file_p
     r"""
     Initialize env_logger.
     
-    # Parameters
-    - `filters` - filter string. (e.g. "tsubakuro_rust_python=trace")
-                  If ommitted, "tsubakuro_rust_python=info" is used.
-    - `file_path` - log file path. If None, logs to stderr.
+    Args:
+        filters (str, optional): filter string. If ommitted, `"tsubakuro_rust_python=info"` is used.
+        file_path (str, optional): log file path. If None, logs to stderr.
     
-    Calls to `env_logger_init` other than the first one are ignored.
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        tsurugi.env_logger_init("tsubakuro_rust_python=trace")
+        ```
+    
+    Note:
+        Calls to `env_logger_init` other than the first one are ignored.
     """
 

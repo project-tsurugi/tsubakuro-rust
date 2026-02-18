@@ -33,20 +33,31 @@ impl RowNumber {
 }
 
 /// Cursor object for executing SQL statements and fetching results.
+///
+/// Attributes:
+///     description (Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]): Description of the query result set.
+///         `(name, type_code, display_size, internal_size, precision, scale, null_ok)`.  (read only)
+///     arraysize (int): Number of rows to fetch at a time with `Cursor.fetchmany()`. Default is 1.
+///     rowcount (int): Number of rows affected by the last `Cursor.execute*()` method. -1 if not applicable. (read only)
+///     closed (bool): Whether the cursor is closed. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 pub struct Cursor {
     connection: Arc<InnerConnection>,
+    /// Whether to execute `Cursor.executemany()` asynchronously. Default is `True`.
     #[pyo3(set, get)]
-    executemany_async: bool,
+    executemany_async: bool, // internally used
     ps_map: HashMap<String, (SqlPreparedStatement, HashMap<String, AtomType>)>,
     query_result: Option<SqlQueryResult>,
     query_types: Vec<AtomType>,
     row_number: Option<RowNumber>,
+    /// Number of rows to fetch at a time with `Cursor.fetchmany()`.
     #[pyo3(get)]
     arraysize: usize,
+    /// Number of rows affected by the last `Cursor.execute*()` method.
     #[pyo3(get)]
     rowcount: isize,
+    /// Whether the cursor is closed.
     #[pyo3(get)]
     closed: bool,
 }
@@ -72,9 +83,9 @@ impl Cursor {
 impl Cursor {
     /// Execute a SQL statement.
     ///
-    /// # Parameters
-    /// - `operation` - SQL statement to be executed.
-    /// - `parameters` - parameters for the SQL statement.
+    /// Args:
+    ///     operation (str): SQL statement to be executed.
+    ///     parameters (Tuple[Any, ...] | dict[str, Any], optional): Parameters for the SQL statement.
     #[pyo3(signature = (operation, parameters=None))]
     pub fn execute(
         &mut self,
@@ -103,9 +114,9 @@ impl Cursor {
 
     /// Prepare a SQL statement for execution.
     ///
-    /// # Parameters
-    /// - `operation` - SQL statement to be prepared.
-    /// - `parameters` - parameters for the SQL statement.
+    /// Args:
+    ///     operation (str): SQL statement to be prepared.
+    ///     parameters (Tuple[Any, ...] | dict[str, Any]): Parameters for the SQL statement.
     pub fn prepare(&mut self, operation: &str, parameters: Bound<PyAny>) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Cursor.prepare()";
         self.check_closed(FUNCTION_NAME)?;
@@ -122,9 +133,9 @@ impl Cursor {
 
     /// Execute a prepared SQL statement multiple times.
     ///
-    /// # Parameters
-    /// - `operation` - SQL statement to be executed.
-    /// - `seq_of_parameters` - sequence of parameters for the SQL statement.
+    /// Args:
+    ///     operation (str): SQL statement to be executed.
+    ///     seq_of_parameters (Sequence[Tuple[Any, ...] | dict[str, Any]]): Sequence of parameters for the SQL statement.
     pub fn executemany(
         &mut self,
         operation: &str,
@@ -143,15 +154,11 @@ impl Cursor {
         result
     }
 
-    /// description of the query result set.
-    ///
-    /// # Returns
-    /// A sequence of 7-item sequences. Each of these sequences contains information describing one result column.
-    ///  The 7 items are: (name, type_code, display_size, internal_size, precision, scale, null_ok)
+    /// Description of the query result set.
     #[getter]
     #[gen_stub(override_return_type(type_repr = "Optional[Sequence[Tuple[
         str,           # name
-        int,           # type_code
+        str,           # type_code
         None,          # display_size
         Optional[int], # internal_size
         Optional[int], # precision
@@ -180,13 +187,13 @@ impl Cursor {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
             Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
         }
-        result
+        result.map(Some)
     }
 
     /// Fetch the next row of a query result set.
     ///
-    /// # Returns
-    /// A single sequence representing the next row of the result set, or `None` if no more data is available.
+    /// Returns:
+    ///       Optional[Tuple[Any, ...]]: A single sequence representing the next row of the result set, or `None` if no more data is available.
     pub fn fetchone<'py>(&mut self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyTuple>>> {
         const FUNCTION_NAME: &str = "Cursor.fetchone()";
         self.check_closed(FUNCTION_NAME)?;
@@ -214,11 +221,11 @@ impl Cursor {
 
     /// Fetch the next row of a query result set.
     ///
-    /// # Returns
-    /// A single sequence representing the next row of the result set.
+    /// Returns:
+    ///      Tuple[Any, ...]: A single sequence representing the next row of the result set.
     ///
-    /// # Errors
-    /// Raises `StopIteration` when no more data is available.
+    /// Raises:
+    ///     StopIteration: When no more data is available.
     pub fn next<'py>(&mut self, py: Python<'py>) -> PyResult<Bound<'py, PyTuple>> {
         const FUNCTION_NAME: &str = "Cursor.next()";
         self.check_closed(FUNCTION_NAME)?;
@@ -253,10 +260,7 @@ impl Cursor {
         }
     }
 
-    /// Set the number of rows to fetch at a time with [`fetchmany`].
-    ///
-    /// # Parameters
-    /// - `size` - Number of rows to fetch at a time. If less than 1 is specified, use 1.
+    /// Number of rows to fetch at a time with `Cursor.fetchmany()`.
     #[setter]
     pub fn set_arraysize(&mut self, size: isize) {
         const FUNCTION_NAME: &str = "Cursor.set_arraysize()";
@@ -269,11 +273,11 @@ impl Cursor {
 
     /// Fetch the next set of rows of a query result set.
     ///
-    /// # Parameters
-    /// - `size` - Number of rows to fetch. If not specified, use the cursor's `arraysize` attribute.
+    /// Args:
+    ///     size (int, optional) - Number of rows to fetch. If not specified, use the cursor's `arraysize` attribute.
     ///
-    /// # Returns
-    /// A list of sequences, each representing a row of the result set.
+    /// Returns:
+    ///      List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
     #[pyo3(signature = (size=None))]
     fn fetchmany<'py>(
         &mut self,
@@ -314,8 +318,8 @@ impl Cursor {
 
     /// Fetch all (remaining) rows of a query result set.
     ///
-    /// # Returns
-    /// A list of sequences, each representing a row of the result set.
+    /// Returns:
+    ///      List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
     pub fn fetchall<'py>(&mut self, py: Python<'py>) -> PyResult<Vec<Bound<'py, PyTuple>>> {
         const FUNCTION_NAME: &str = "Cursor.fetchall()";
         self.check_closed(FUNCTION_NAME)?;
@@ -347,9 +351,6 @@ impl Cursor {
     }
 
     /// Current row number (0-based).
-    ///
-    /// # Returns
-    /// An optional integer representing the current row number. If no rows have been fetched, returns `None`.
     #[getter]
     pub fn rownumber(&self) -> Option<usize> {
         self.row_number.as_ref().map(RowNumber::get)

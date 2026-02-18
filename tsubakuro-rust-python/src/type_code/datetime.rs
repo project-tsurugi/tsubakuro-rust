@@ -4,6 +4,10 @@ use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimePoint};
 
 /// TIMESTAMP type.
+///
+/// Attributes:
+///     value (Optional[datetime.datetime]): datetime value. (read only)
+///     nanosecond (Optional[int]): nanosecond part of the time. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
@@ -33,6 +37,18 @@ impl Datetime {
     }
 
     /// Create a `Datetime` from year, month, day, hour, minute, second, and nanosecond.
+    ///
+    /// Args:
+    ///     year (int): year
+    ///     month (int): month (1-12)
+    ///     day (int): day (1-31)
+    ///     hour (int, optional): hour (0-23)
+    ///     minute (int, optional): minute (0-59)
+    ///     second (int, optional): second (0-59)
+    ///     nanosecond (int, optional): nanosecond (0-999,999,999)
+    ///
+    /// Returns:
+    ///     Datetime: created `Datetime` object
     #[classmethod]
     #[pyo3(signature = (year, month, day, hour=0, minute=0, second=0, nanosecond=0))]
     pub fn of(
@@ -56,9 +72,12 @@ impl Datetime {
 
     /// Create a `Datetime` from epoch seconds and nanoseconds.
     ///
-    /// # Parameters
-    /// - `epoch_seconds` - offset seconds from epoch (1970-01-01 00:00:00)
-    /// - `nanos` - nanosecond part of the time (0-999,999,999)
+    /// Args:
+    ///     epoch_seconds (int): offset seconds from epoch (1970-01-01 00:00:00)
+    ///     nanos (int): nanosecond part of the time (0-999,999,999)
+    ///
+    /// Returns:
+    ///     Datetime: created `Datetime` object
     #[classmethod]
     pub fn raw(_cls: &Bound<PyType>, epoch_seconds: i64, nanos: u32) -> PyResult<Self> {
         let value = TgTimePoint::new(epoch_seconds, nanos);

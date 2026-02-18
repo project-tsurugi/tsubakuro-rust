@@ -85,6 +85,22 @@ uv run maturin build --release
 ls target/wheels/
 ```
 
+### Generate API html
+
+Install [pdoc3](https://github.com/pdoc3/pdoc) beforehand.
+
+```bash
+cd tsubakuro-rust-python
+uv pip install pdoc3
+```
+
+```bash
+cd tsubakuro-rust-python
+uv run pdoc tsubakuro_rust_python --html -o docs/ --force
+
+ls docs/tsubakuro_rust_python/
+```
+
 ## License
 
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)

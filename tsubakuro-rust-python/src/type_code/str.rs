@@ -3,6 +3,9 @@ use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 
 /// CHAR, VARCHAR type.
+///
+/// Attributes:
+///     value (Optional[str]): string value. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]

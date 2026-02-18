@@ -13,8 +13,11 @@ use tsubakuro_rust_core::prelude::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TransactionType {
+    /// Optimistic concurrency control (OCC) transaction.
     OCC = 1,
+    /// Long transaction (LTX).
     LTX = 2,
+    /// Read-only transaction (RTX).
     RTX = 3,
 }
 
@@ -40,6 +43,40 @@ impl TransactionType {
 }
 
 /// Transaction option.
+///
+/// Attributes:
+///     transaction_type (TransactionType): Transaction type. Default is `TransactionType.OCC`.
+///     label (str): Transaction label.
+///     include_ddl (bool): Whether the transaction modifies definitions (DDL). Default is `False`. Only applicable for `TransactionType.LTX`.
+///     write_preserve (List[str]): List of table names to preserve for write operations. Only applicable for `TransactionType.LTX`.
+///     inclusive_read_area (List[str]): List of table names to include in the read area. Only applicable for `TransactionType.LTX`.
+///     exclusive_read_area (List[str]): List of table names to exclude from the read area. Only applicable for `TransactionType.LTX`.
+///     scan_parallel (int): Degree of parallelism for scanning. Only applicable for `TransactionType.RTX`.
+///     begin_timeout (int): Begin transaction timeout in seconds
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.OCC)
+///     tx_option.label = "tsubakuro-rust-python OCC example"
+///     ```
+///
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
+///     tx_option.label = "tsubakuro-rust-python LTX example"
+///     tx_option.write_preserve = ["table1", "table2"]
+///     ```
+///
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.RTX)
+///     tx_option.label = "tsubakuro-rust-python RTX example"
+///     tx_option.scan_parallel = 4
+///     ```
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug, Clone)]

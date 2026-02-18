@@ -5,6 +5,18 @@ use tsubakuro_rust_core::prelude::SqlColumn;
 use crate::type_code::atom_type_to_type_code;
 
 /// Column metadata.
+///
+/// Attributes:
+///     name (str): Column name. (read only)
+///     description (Optional[str]): Column description. (read only)
+///     type_code (str): Type code. (read only)
+///     atom_type_code (int): AtomType code. -1 if unknown. (read only)
+///     sql_type (str): SQL type. (read only)
+///     sql_type_name (Optional[str]): SQL type name. (read only)
+///     length (Optional[int]): Length for string types. (read only)
+///     precision (Optional[int]): Precision for numeric types. (read only)
+///     scale (Optional[int]): Scale for numeric types. (read only)
+///     nullable (Optional[bool]): Nullable flag. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 pub struct Column {
@@ -109,7 +121,7 @@ impl Column {
 pub(crate) fn columns_description<'py>(
     py: Python<'py>,
     columns: &Vec<SqlColumn>,
-) -> PyResult<Option<Bound<'py, PyTuple>>> {
+) -> PyResult<Bound<'py, PyTuple>> {
     let mut vec = Vec::with_capacity(columns.len());
     for column in columns {
         let name = column.name();
@@ -142,5 +154,5 @@ pub(crate) fn columns_description<'py>(
         )?;
         vec.push(tuple);
     }
-    Ok(Some(PyTuple::new(py, vec)?))
+    Ok(PyTuple::new(py, vec)?)
 }

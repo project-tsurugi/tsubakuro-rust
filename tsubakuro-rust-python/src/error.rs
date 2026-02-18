@@ -67,234 +67,356 @@ create_exception!(
 );
 
 // ServerException
-create_exception!(tsubakuro_rust_python, ServerException, OperationalError);
+create_exception!(
+    tsubakuro_rust_python,
+    ServerException,
+    OperationalError,
+    "ServerException"
+);
 
 // SqlServiceException
-create_exception!(tsubakuro_rust_python, SqlServiceException, ServerException);
+create_exception!(
+    tsubakuro_rust_python,
+    SqlServiceException,
+    ServerException,
+    "SqlServiceException"
+);
 create_exception!(
     tsubakuro_rust_python,
     SqlExecutionException,
-    SqlServiceException
+    SqlServiceException,
+    "SqlExecutionException"
 );
 create_exception!(
     tsubakuro_rust_python,
     ConstraintViolationException,
-    IntegrityError
+    IntegrityError,
+    "ConstraintViolationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     UniqueConstraintViolationException,
-    ConstraintViolationException
+    ConstraintViolationException,
+    "UniqueConstraintViolationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     NotNullConstraintViolationException,
-    ConstraintViolationException
+    ConstraintViolationException,
+    "NotNullConstraintViolationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     ReferentialIntegrityConstraintViolationException,
-    ConstraintViolationException
+    ConstraintViolationException,
+    "ReferentialIntegrityConstraintViolationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     CheckConstraintViolationException,
-    ConstraintViolationException
+    ConstraintViolationException,
+    "CheckConstraintViolationException"
 );
 create_exception!(tsubakuro_rust_python, EvaluationException, DataError);
 create_exception!(
     tsubakuro_rust_python,
     ValueEvaluationException,
-    EvaluationException
+    EvaluationException,
+    "ValueEvaluationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     ScalarSubqueryEvaluationException,
-    EvaluationException
+    EvaluationException,
+    "ScalarSubqueryEvaluationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     TargetNotFoundException,
-    SqlExecutionException
+    SqlExecutionException,
+    "TargetNotFoundException"
 );
 create_exception!(
     tsubakuro_rust_python,
     TargetAlreadyExistsException,
-    SqlExecutionException
+    SqlExecutionException,
+    "TargetAlreadyExistsException"
 );
 create_exception!(
     tsubakuro_rust_python,
     InconsistentStatementException,
-    SqlExecutionException
+    SqlExecutionException,
+    "InconsistentStatementException"
 );
 create_exception!(
     tsubakuro_rust_python,
     RestrictedOperationException,
-    SqlExecutionException
+    SqlExecutionException,
+    "RestrictedOperationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     DependenciesViolationException,
-    RestrictedOperationException
+    RestrictedOperationException,
+    "DependenciesViolationException"
 );
 create_exception!(
     tsubakuro_rust_python,
     WriteOperationByRtxException,
-    RestrictedOperationException
+    RestrictedOperationException,
+    "WriteOperationByRtxException"
 );
 create_exception!(
     tsubakuro_rust_python,
     LtxWriteOperationWithoutWritePreserveException,
-    RestrictedOperationException
+    RestrictedOperationException,
+    "LtxWriteOperationWithoutWritePreserveException"
 );
 create_exception!(
     tsubakuro_rust_python,
     ReadOperationOnRestrictedReadAreaException,
-    RestrictedOperationException
+    RestrictedOperationException,
+    "ReadOperationOnRestrictedReadAreaException"
 );
 create_exception!(
     tsubakuro_rust_python,
     InactiveTransactionException,
-    RestrictedOperationException
+    RestrictedOperationException,
+    "InactiveTransactionException"
 );
-create_exception!(tsubakuro_rust_python, ParameterException, ProgrammingError);
+create_exception!(
+    tsubakuro_rust_python,
+    ParameterException,
+    ProgrammingError,
+    "ParameterException"
+);
 create_exception!(
     tsubakuro_rust_python,
     UnresolvedPlaceholderException,
-    ParameterException
+    ParameterException,
+    "UnresolvedPlaceholderException"
 );
 create_exception!(
     tsubakuro_rust_python,
     LoadFileException,
-    SqlExecutionException
+    SqlExecutionException,
+    "LoadFileException"
 );
 create_exception!(
     tsubakuro_rust_python,
     LoadFileNotFoundException,
-    LoadFileException
+    LoadFileException,
+    "LoadFileNotFoundException"
 );
 create_exception!(
     tsubakuro_rust_python,
     LoadFileFormatException,
-    LoadFileException
+    LoadFileException,
+    "LoadFileFormatException"
 );
 create_exception!(
     tsubakuro_rust_python,
     DumpFileException,
-    SqlExecutionException
+    SqlExecutionException,
+    "DumpFileException"
 );
 create_exception!(
     tsubakuro_rust_python,
     DumpDirectoryInaccessibleException,
-    DumpFileException
+    DumpFileException,
+    "DumpDirectoryInaccessibleException"
 );
-create_exception!(tsubakuro_rust_python, SqlLimitReachedException, DataError);
+create_exception!(
+    tsubakuro_rust_python,
+    SqlLimitReachedException,
+    DataError,
+    "SqlLimitReachedException"
+);
 create_exception!(
     tsubakuro_rust_python,
     TransactionExceededLimitException,
-    SqlLimitReachedException
+    SqlLimitReachedException,
+    "TransactionExceededLimitException"
 );
 create_exception!(
     tsubakuro_rust_python,
     SqlRequestTimeoutException,
-    SqlExecutionException
+    SqlExecutionException,
+    "SqlRequestTimeoutException"
 );
 create_exception!(
     tsubakuro_rust_python,
     DataCorruptionException,
-    SqlExecutionException
+    SqlExecutionException,
+    "DataCorruptionException"
 );
 create_exception!(
     tsubakuro_rust_python,
     SecondaryIndexCorruptionException,
-    DataCorruptionException
+    DataCorruptionException,
+    "SecondaryIndexCorruptionException"
 );
 create_exception!(
     tsubakuro_rust_python,
     RequestFailureException,
-    SqlExecutionException
+    SqlExecutionException,
+    "RequestFailureException"
 );
 create_exception!(
     tsubakuro_rust_python,
     TransactionNotFoundException,
-    RequestFailureException
+    RequestFailureException,
+    "TransactionNotFoundException"
 );
 create_exception!(
     tsubakuro_rust_python,
     StatementNotFoundException,
-    RequestFailureException
+    RequestFailureException,
+    "StatementNotFoundException"
 );
-create_exception!(tsubakuro_rust_python, InternalException, InternalError);
+create_exception!(
+    tsubakuro_rust_python,
+    InternalException,
+    InternalError,
+    "InternalException"
+);
 create_exception!(
     tsubakuro_rust_python,
     UnsupportedRuntimeFeatureException,
-    NotSupportedError
+    NotSupportedError,
+    "UnsupportedRuntimeFeatureException"
 );
 create_exception!(
     tsubakuro_rust_python,
     BlockedByHighPriorityTransactionException,
-    SqlExecutionException
+    SqlExecutionException,
+    "BlockedByHighPriorityTransactionException"
 );
 create_exception!(
     tsubakuro_rust_python,
     InvalidRuntimeValueException,
-    SqlLimitReachedException
+    SqlLimitReachedException,
+    "InvalidRuntimeValueException"
 );
 create_exception!(
     tsubakuro_rust_python,
     ValueOutOfRangeException,
-    InvalidRuntimeValueException
+    InvalidRuntimeValueException,
+    "ValueOutOfRangeException"
 );
 create_exception!(
     tsubakuro_rust_python,
     ValueTooLongException,
-    InvalidRuntimeValueException
+    InvalidRuntimeValueException,
+    "ValueTooLongException"
 );
 create_exception!(
     tsubakuro_rust_python,
     InvalidDecimalValueException,
-    InvalidRuntimeValueException
+    InvalidRuntimeValueException,
+    "InvalidDecimalValueException"
 );
-create_exception!(tsubakuro_rust_python, CompileException, ProgrammingError);
-create_exception!(tsubakuro_rust_python, SyntaxException, CompileException);
-create_exception!(tsubakuro_rust_python, AnalyzeException, CompileException);
+create_exception!(
+    tsubakuro_rust_python,
+    CompileException,
+    ProgrammingError,
+    "CompileException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    SyntaxException,
+    CompileException,
+    "SyntaxException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    AnalyzeException,
+    CompileException,
+    "AnalyzeException"
+);
 create_exception!(
     tsubakuro_rust_python,
     TypeAnalyzeException,
-    AnalyzeException
+    AnalyzeException,
+    "TypeAnalyzeException"
 );
 create_exception!(
     tsubakuro_rust_python,
     SymbolAnalyzeException,
-    AnalyzeException
+    AnalyzeException,
+    "SymbolAnalyzeException"
 );
 create_exception!(
     tsubakuro_rust_python,
     ValueAnalyzeException,
-    AnalyzeException
+    AnalyzeException,
+    "ValueAnalyzeException"
 );
 create_exception!(
     tsubakuro_rust_python,
     UnsupportedCompilerFeatureException,
-    NotSupportedError
+    NotSupportedError,
+    "UnsupportedCompilerFeatureException"
 );
-create_exception!(tsubakuro_rust_python, CcException, SqlServiceException);
-create_exception!(tsubakuro_rust_python, OccException, CcException);
-create_exception!(tsubakuro_rust_python, OccReadException, OccException);
+create_exception!(
+    tsubakuro_rust_python,
+    CcException,
+    SqlServiceException,
+    "CcException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    OccException,
+    CcException,
+    "OccException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    OccReadException,
+    OccException,
+    "OccReadException"
+);
 create_exception!(
     tsubakuro_rust_python,
     ConflictOnWritePreserveException,
-    OccReadException
+    OccReadException,
+    "ConflictOnWritePreserveException"
 );
-create_exception!(tsubakuro_rust_python, OccWriteException, OccException);
-create_exception!(tsubakuro_rust_python, LtxException, CcException);
-create_exception!(tsubakuro_rust_python, LtxReadException, LtxException);
-create_exception!(tsubakuro_rust_python, LtxWriteException, LtxException);
-create_exception!(tsubakuro_rust_python, RtxException, CcException);
+create_exception!(
+    tsubakuro_rust_python,
+    OccWriteException,
+    OccException,
+    "OccWriteException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    LtxException,
+    CcException,
+    "LtxException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    LtxReadException,
+    LtxException,
+    "LtxReadException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    LtxWriteException,
+    LtxException,
+    "LtxWriteException"
+);
+create_exception!(
+    tsubakuro_rust_python,
+    RtxException,
+    CcException,
+    "RtxException"
+);
 create_exception!(
     tsubakuro_rust_python,
     BlockedByConcurrentOperationException,
-    CcException
+    CcException,
+    "BlockedByConcurrentOperationException"
 );
 
 pub(crate) fn to_pyerr(err: TgError) -> PyErr {

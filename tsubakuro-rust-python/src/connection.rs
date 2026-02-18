@@ -18,10 +18,17 @@ use crate::{
 pub(crate) mod inner_connection;
 
 /// Connection to Tsurugi.
+///
+/// Attributes:
+///     transaction_option (TransactionOption): Transaction option. (write only)
+///     commit_option (CommitOption): Commit option. (write only)
+///     shutdown_option (ShutdownOption): Shutdown option. (write only)
+///     closed (bool): Whether the connection is closed. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 pub struct Connection {
     inner: Arc<InnerConnection>,
+    /// Whether the connection is closed.
     #[pyo3(get)]
     closed: bool,
 }
@@ -31,8 +38,13 @@ pub struct Connection {
 impl Connection {
     /// List table names.
     ///
-    /// # Returns
-    /// List of table names.
+    /// Returns:
+    ///     List[str]: List of table names.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     table_names = connection.list_tables()
+    ///     ```
     pub fn list_tables(&self) -> PyResult<Vec<String>> {
         const FUNCTION_NAME: &str = "Connection.list_tables()";
         self.check_closed(FUNCTION_NAME)?;
@@ -62,14 +74,19 @@ impl Connection {
 
     /// Get table metadata.
     ///
-    /// # Parameters
-    /// - `table_name` - table name.
+    /// Args:
+    ///     table_name (str): Table name.
     ///
-    /// # Returns
-    /// Table metadata.
+    /// Returns:
+    ///    TableMetadata: Table metadata.
     ///
-    /// # Errors
-    /// Raises an exception if the table does not exist.
+    /// Raises:
+    ///     TargetNotFoundException: If the table does not exist.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     metadata = connection.get_table_metadata("my_table")
+    ///     ```
     pub fn get_table_metadata(&self, table_name: &str) -> PyResult<TableMetadata> {
         const FUNCTION_NAME: &str = "Connection.get_table_metadata()";
         self.check_closed(FUNCTION_NAME)?;
@@ -88,11 +105,16 @@ impl Connection {
 
     /// Find table metadata.
     ///
-    /// # Parameters
-    /// - `table_name` - table name.
+    /// Args:
+    ///     table_name (str): Table name.
     ///
-    /// # Returns
-    /// Table metadata, or None if the table does not exist.
+    /// Returns:
+    ///     Optional[TableMetadata]: Table metadata, or None if the table does not exist.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     metadata = connection.find_table_metadata("my_table")
+    ///     ```
     pub fn find_table_metadata(&self, table_name: &str) -> PyResult<Option<TableMetadata>> {
         const FUNCTION_NAME: &str = "Connection.find_table_metadata()";
         self.check_closed(FUNCTION_NAME)?;
@@ -120,8 +142,14 @@ impl Connection {
 
     /// Create a new cursor object using the connection.
     ///
-    /// # Returns
-    /// [`Cursor`] object.
+    /// Returns:
+    ///     Cursor: Cursor object.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     with connection.cursor() as cursor:
+    ///        pass
+    ///     ```
     pub fn cursor(&self) -> PyResult<Cursor> {
         const FUNCTION_NAME: &str = "Connection.cursor()";
         self.check_closed(FUNCTION_NAME)?;
@@ -133,10 +161,7 @@ impl Connection {
         Ok(cursor)
     }
 
-    /// Set transaction option.
-    ///
-    /// # Parameters
-    /// - `option` - [`TransactionOption`] object.
+    /// Transaction option.
     #[setter]
     pub fn set_transaction_option(&mut self, option: TransactionOption) {
         const FUNCTION_NAME: &str = "Connection.set_transaction_option()";
@@ -148,10 +173,7 @@ impl Connection {
         trace!("{FUNCTION_NAME} end");
     }
 
-    /// Set commit option.
-    ///
-    /// # Parameters
-    /// - `option` - [`CommitOption`] object.
+    /// Commit option.
     #[setter]
     pub fn set_commit_option(&mut self, option: CommitOption) {
         const FUNCTION_NAME: &str = "Connection.set_commit_option()";
@@ -165,8 +187,13 @@ impl Connection {
 
     /// Commit the current transaction.
     ///
-    /// # Parameters
-    /// - `option` - Optional [`CommitOption`] object to override the connection's commit option.
+    /// Args:
+    ///     option (CommitOption, optional): CommitOption object.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     connection.commit()
+    ///     ```
     #[pyo3(signature = (option=None))]
     pub fn commit(&mut self, option: Option<CommitOption>) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.commit()";
@@ -190,6 +217,11 @@ impl Connection {
     }
 
     /// Rollback the current transaction.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     connection.rollback()
+    ///     ```
     pub fn rollback(&mut self) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.rollback()";
         self.check_closed(FUNCTION_NAME)?;
@@ -230,10 +262,7 @@ impl Connection {
         result
     }
 
-    /// Set shutdown option.
-    ///
-    /// # Parameters
-    /// - `option` - [`ShutdownOption`] object.
+    /// Shutdown option.
     #[setter]
     pub fn set_shutdown_option(&mut self, option: ShutdownOption) {
         const FUNCTION_NAME: &str = "Connection.set_shutdown_option()";

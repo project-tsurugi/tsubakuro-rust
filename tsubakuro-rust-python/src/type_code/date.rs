@@ -3,6 +3,9 @@ use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDate};
 
 /// DATE type.
+///
+/// Attributes:
+///     value (Optional[datetime.date]): date value. (read only)
 #[gen_stub_pyclass]
 #[pyclass]
 #[derive(Debug)]
@@ -22,6 +25,14 @@ impl Date {
     }
 
     /// Create a `Date` from year, month, and day.
+    ///
+    /// Args:
+    ///     year (int): year
+    ///     month (int): month (1-12)
+    ///     day (int): day (1-31)
+    ///
+    /// Returns:
+    ///     Date: created `Date` object
     #[classmethod]
     pub fn of(_cls: &Bound<PyType>, year: i32, month: u32, day: u32) -> PyResult<Self> {
         let date = chrono::NaiveDate::from_ymd_opt(year, month, day)
@@ -32,8 +43,11 @@ impl Date {
 
     /// Create a `Date` from epoch days.
     ///
-    /// # Parameters
-    /// - `epoch_days` - number of days offset of epoch 1970-01-01
+    /// Args:
+    ///     epoch_days (int): number of days offset of epoch 1970-01-01
+    ///
+    /// Returns:
+    ///     Date: created `Date` object
     #[classmethod]
     pub fn raw(_cls: &Bound<PyType>, epoch_days: i64) -> PyResult<Self> {
         let value = TgDate::new(epoch_days);

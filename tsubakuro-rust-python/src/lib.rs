@@ -52,14 +52,14 @@ mod tsubakuro_rust_python {
         ParameterException, ReadOperationOnRestrictedReadAreaException,
         ReferentialIntegrityConstraintViolationException, RequestFailureException,
         RestrictedOperationException, RtxException, ScalarSubqueryEvaluationException,
-        SecondaryIndexCorruptionException, SqlExecutionException, SqlLimitReachedException,
-        SqlRequestTimeoutException, SqlServiceException, StatementNotFoundException,
-        SymbolAnalyzeException, SyntaxException, TargetAlreadyExistsException,
-        TargetNotFoundException, TransactionExceededLimitException, TransactionNotFoundException,
-        TypeAnalyzeException, UniqueConstraintViolationException, UnresolvedPlaceholderException,
-        UnsupportedCompilerFeatureException, UnsupportedRuntimeFeatureException,
-        ValueAnalyzeException, ValueEvaluationException, ValueOutOfRangeException,
-        ValueTooLongException, WriteOperationByRtxException,
+        SecondaryIndexCorruptionException, ServerException, SqlExecutionException,
+        SqlLimitReachedException, SqlRequestTimeoutException, SqlServiceException,
+        StatementNotFoundException, SymbolAnalyzeException, SyntaxException,
+        TargetAlreadyExistsException, TargetNotFoundException, TransactionExceededLimitException,
+        TransactionNotFoundException, TypeAnalyzeException, UniqueConstraintViolationException,
+        UnresolvedPlaceholderException, UnsupportedCompilerFeatureException,
+        UnsupportedRuntimeFeatureException, ValueAnalyzeException, ValueEvaluationException,
+        ValueOutOfRangeException, ValueTooLongException, WriteOperationByRtxException,
     };
 
     #[pymodule_export]
@@ -78,6 +78,11 @@ mod tsubakuro_rust_python {
     use crate::connection::Connection;
 
     #[pymodule_export]
+    use crate::column::Column;
+    #[pymodule_export]
+    use crate::table_metadata::TableMetadata;
+
+    #[pymodule_export]
     use crate::cursor::Cursor;
 
     #[pymodule_export]
@@ -89,12 +94,19 @@ mod tsubakuro_rust_python {
 
     /// Initialize env_logger.
     ///
-    /// # Parameters
-    /// - `filters` - filter string. (e.g. "tsubakuro_rust_python=trace")
-    ///               If ommitted, "tsubakuro_rust_python=info" is used.
-    /// - `file_path` - log file path. If None, logs to stderr.
+    /// Args:
+    ///     filters (str, optional): filter string. If ommitted, `"tsubakuro_rust_python=info"` is used.
+    ///     file_path (str, optional): log file path. If None, logs to stderr.
     ///
-    /// Calls to `env_logger_init` other than the first one are ignored.
+    /// Examples:
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     tsurugi.env_logger_init("tsubakuro_rust_python=trace")
+    ///     ```
+    ///
+    /// Note:
+    ///     Calls to `env_logger_init` other than the first one are ignored.
     #[gen_stub_pyfunction]
     #[pyfunction]
     #[pyo3(signature = (filters="tsubakuro_rust_python=info", file_path=None))]
@@ -104,12 +116,32 @@ mod tsubakuro_rust_python {
 
     /// Constructor for creating a connection to the Tsurugi.
     ///
-    /// # Parameters
-    /// - `args` - see [`Config`].
-    /// - `kwargs` - e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"``
+    /// Args:
+    ///     *args (Config, optional): configuration object.
+    ///     **kwargs (dict, optional): e.g. `endpoint="tcp://localhost:12345"`, `user="tsurugi"`
     ///
-    /// # Returns
-    /// [`Connection`] object.
+    /// Returns:
+    ///     Connection: Connection object.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     config = tsurugi.Config()
+    ///     config.endpoint = "tcp://localhost:12345"
+    ///     config.user = "tsurugi"
+    ///     config.password = "password"
+    ///     config.default_timeout = 30 // seconds
+    ///     with tsurugi.connect(config) as connection:
+    ///         pass
+    ///     ```
+    ///
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     with tsurugi.connect(endpoint="tcp://localhost:12345", user="tsurugi", password="password", default_timeout=30) as connection:
+    ///         pass
+    ///     ```
     #[gen_stub_pyfunction]
     #[pyfunction]
     #[pyo3(signature = (*args, **kwargs))]
