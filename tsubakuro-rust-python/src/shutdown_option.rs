@@ -5,6 +5,11 @@ use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::ShutdownType as CoreShutdownType;
 
 /// Shutdown type for connection.
+///
+/// Attributes:
+///     NOTHING: Do nothing special during shutdown.
+///     GRACEFUL: Waits for the ongoing requests and safely shutdown the session.
+///     FORCEFUL: Cancelling the ongoing requests and safely shutdown the session.
 #[gen_stub_pyclass_enum]
 #[pyclass]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

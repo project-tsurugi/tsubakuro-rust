@@ -7,6 +7,13 @@ use tsubakuro_rust_core::prelude::{
 };
 
 /// Commit type for transaction.
+///
+/// Attributes:
+///     DEFAULT: the default commit type (rely on the database settings).
+///     ACCEPTED: commit operation has accepted, and the transaction will never abort except system errors.
+///     AVAILABLE: commit data has been visible for others.
+///     STORED: commit data has been saved on the local disk.
+///     PROPAGATED: commit data has been propagated to the all suitable nodes.
 #[gen_stub_pyclass_enum]
 #[pyclass]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

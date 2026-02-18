@@ -8,6 +8,11 @@ use tsubakuro_rust_core::prelude::{
 };
 
 /// Transaction type.
+///
+/// Attributes:
+///     OCC: Optimistic concurrency control (OCC) transaction.
+///     LTX: Long transaction (LTX).
+///     RTX: Read-only transaction (RTX).
 #[gen_stub_pyclass_enum]
 #[pyclass]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

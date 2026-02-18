@@ -358,7 +358,20 @@ commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
 <span>class <span class="ident">CommitType</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Commit type for transaction.</p></div>
+<div class="desc"><p>Commit type for transaction.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>DEFAULT</code></strong></dt>
+<dd>the default commit type (rely on the database settings).</dd>
+<dt><strong><code>ACCEPTED</code></strong></dt>
+<dd>commit operation has accepted, and the transaction will never abort except system errors.</dd>
+<dt><strong><code>AVAILABLE</code></strong></dt>
+<dd>commit data has been visible for others.</dd>
+<dt><strong><code>STORED</code></strong></dt>
+<dd>commit data has been saved on the local disk.</dd>
+<dt><strong><code>PROPAGATED</code></strong></dt>
+<dd>commit data has been propagated to the all suitable nodes.</dd>
+</dl></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.CommitType.ACCEPTED"><code class="name">var <span class="ident">ACCEPTED</span></code></dt>
@@ -2055,7 +2068,16 @@ shutdown_option = tsurugi.ShutdownOption(tsurugi.ShutdownType.GRACEFUL, 30)
 <span>class <span class="ident">ShutdownType</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Shutdown type for connection.</p></div>
+<div class="desc"><p>Shutdown type for connection.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>NOTHING</code></strong></dt>
+<dd>Do nothing special during shutdown.</dd>
+<dt><strong><code>GRACEFUL</code></strong></dt>
+<dd>Waits for the ongoing requests and safely shutdown the session.</dd>
+<dt><strong><code>FORCEFUL</code></strong></dt>
+<dd>Cancelling the ongoing requests and safely shutdown the session.</dd>
+</dl></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.ShutdownType.FORCEFUL"><code class="name">var <span class="ident">FORCEFUL</span></code></dt>
@@ -2507,7 +2529,16 @@ tx_option.scan_parallel = 4
 <span>class <span class="ident">TransactionType</span></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Transaction type.</p></div>
+<div class="desc"><p>Transaction type.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>OCC</code></strong></dt>
+<dd>Optimistic concurrency control (OCC) transaction.</dd>
+<dt><strong><code>LTX</code></strong></dt>
+<dd>Long transaction (LTX).</dd>
+<dt><strong><code>RTX</code></strong></dt>
+<dd>Read-only transaction (RTX).</dd>
+</dl></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.TransactionType.LTX"><code class="name">var <span class="ident">LTX</span></code></dt>

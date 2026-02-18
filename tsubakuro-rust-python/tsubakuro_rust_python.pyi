@@ -1245,6 +1245,13 @@ class TransactionOption:
 class CommitType(enum.Enum):
     r"""
     Commit type for transaction.
+    
+    Attributes:
+        DEFAULT: the default commit type (rely on the database settings).
+        ACCEPTED: commit operation has accepted, and the transaction will never abort except system errors.
+        AVAILABLE: commit data has been visible for others.
+        STORED: commit data has been saved on the local disk.
+        PROPAGATED: commit data has been propagated to the all suitable nodes.
     """
     DEFAULT = ...
     r"""
@@ -1271,6 +1278,11 @@ class CommitType(enum.Enum):
 class ShutdownType(enum.Enum):
     r"""
     Shutdown type for connection.
+    
+    Attributes:
+        NOTHING: Do nothing special during shutdown.
+        GRACEFUL: Waits for the ongoing requests and safely shutdown the session.
+        FORCEFUL: Cancelling the ongoing requests and safely shutdown the session.
     """
     NOTHING = ...
     r"""
@@ -1289,6 +1301,11 @@ class ShutdownType(enum.Enum):
 class TransactionType(enum.Enum):
     r"""
     Transaction type.
+    
+    Attributes:
+        OCC: Optimistic concurrency control (OCC) transaction.
+        LTX: Long transaction (LTX).
+        RTX: Read-only transaction (RTX).
     """
     OCC = ...
     r"""
