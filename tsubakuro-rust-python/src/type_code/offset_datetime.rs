@@ -52,7 +52,7 @@ impl OffsetDatetime {
     ///     tzinfo (datetime.tzinfo, optional): time zone info (default: UTC)
     ///
     /// Returns:
-    ///     OffsetDatetime: created `OffsetDatetime` instance
+    ///     OffsetDatetime: created `OffsetDatetime` object
     #[classmethod]
     #[pyo3(signature = (year, month, day, hour=0, minute=0, second=0, nanosecond=0, tzinfo=None))]
     pub fn of(

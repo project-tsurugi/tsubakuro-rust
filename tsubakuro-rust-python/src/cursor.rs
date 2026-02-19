@@ -87,6 +87,22 @@ impl Cursor {
     /// Args:
     ///     operation (str): SQL statement to be executed.
     ///     parameters (Tuple[Any, ...] | dict[str, Any], optional): Parameters for the SQL statement.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     cursor.execute("insert into example values (1, 'Hello')")
+    ///     connection.commit()
+    ///     ```
+    ///
+    ///     ```python
+    ///     cursor.execute("insert into example values (?, ?)", (1, "Hello"))
+    ///     connection.commit()
+    ///     ```
+    ///
+    ///     ```python
+    ///     cursor.execute("insert into example values (:id, :name)", {"id": 1, "name": "Hello"})
+    ///     connection.commit()
+    ///     ```
     #[pyo3(signature = (operation, parameters=None))]
     pub fn execute(
         &mut self,
@@ -118,6 +134,25 @@ impl Cursor {
     /// Args:
     ///     operation (str): SQL statement to be prepared.
     ///     parameters (Tuple[Any, ...] | dict[str, Any]): Parameters for the SQL statement.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     sql = "insert into example values (?, ?)"
+    ///     cursor.prepare(sql, (tsurugi.Int64, tsurugi.Str))
+    ///     cursor.execute(sql, (1, "Hello"))
+    ///     connection.commit()
+    ///     ```
+    ///
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     sql = "insert into example values (:id, :name)"
+    ///     cursor.prepare(sql, {"id": tsurugi.Int64, "name": tsurugi.Str})
+    ///     cursor.execute(sql, {"id": 1, "name": "Hello"})
+    ///     connection.commit()
+    ///     ```
     pub fn prepare(&mut self, operation: &str, parameters: Bound<PyAny>) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Cursor.prepare()";
         self.check_closed(FUNCTION_NAME)?;
@@ -137,6 +172,17 @@ impl Cursor {
     /// Args:
     ///     operation (str): SQL statement to be executed.
     ///     seq_of_parameters (Sequence[Tuple[Any, ...] | dict[str, Any]]): Sequence of parameters for the SQL statement.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     cursor.executemany("insert into example values (?, ?)", [(1, "Hello"), (2, "World")])
+    ///     connection.commit()
+    ///     ```
+    ///
+    ///     ```python
+    ///     cursor.executemany("insert into example values (:id, :name)", [{"id": 1, "name": "Hello"}, {"id": 2, "name": "World"}])
+    ///     connection.commit()
+    ///     ```
     pub fn executemany(
         &mut self,
         operation: &str,
@@ -195,6 +241,13 @@ impl Cursor {
     ///
     /// Returns:
     ///       Optional[Tuple[Any, ...]]: A single sequence representing the next row of the result set, or `None` if no more data is available.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     cursor.execute("select * from example where id = 1")
+    ///     row = cursor.fetchone()
+    ///     connection.commit()
+    ///     ```
     pub fn fetchone<'py>(&mut self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyTuple>>> {
         const FUNCTION_NAME: &str = "Cursor.fetchone()";
         self.check_closed(FUNCTION_NAME)?;
@@ -279,6 +332,16 @@ impl Cursor {
     ///
     /// Returns:
     ///      List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     cursor.execute("select * from example")
+    ///     rows = cursor.fetchmany(10)
+    ///     connection.commit()
+    ///     ```
+    ///
+    /// Note:
+    ///     See also `Cursor.arraysize` for setting the default number of rows to fetch with `fetchmany()`.
     #[pyo3(signature = (size=None))]
     fn fetchmany<'py>(
         &mut self,
@@ -321,6 +384,13 @@ impl Cursor {
     ///
     /// Returns:
     ///      List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     cursor.execute("select * from example")
+    ///     rows = cursor.fetchall()
+    ///     connection.commit()
+    ///     ```
     pub fn fetchall<'py>(&mut self, py: Python<'py>) -> PyResult<Vec<Bound<'py, PyTuple>>> {
         const FUNCTION_NAME: &str = "Cursor.fetchall()";
         self.check_closed(FUNCTION_NAME)?;

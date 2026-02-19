@@ -92,6 +92,14 @@ impl Default for CommitOption {
 #[pymethods]
 impl CommitOption {
     /// Create a new `CommitOption`.
+    ///
+    /// Args:
+    ///     commit_type (CommitType): Commit type. Default is `CommitType.DEFAULT`.
+    ///     auto_dispose (bool, optional): Auto dispose flag. Default is `False`.
+    ///     timeout (int, optional): Commit timeout in seconds.
+    ///
+    /// Returns:
+    ///     CommitOption: A new `CommitOption` instance.
     #[new]
     #[pyo3(signature = (commit_type=CommitType::DEFAULT, auto_dispose=false, timeout=None))]
     pub fn new(commit_type: CommitType, auto_dispose: bool, timeout: Option<u64>) -> Self {

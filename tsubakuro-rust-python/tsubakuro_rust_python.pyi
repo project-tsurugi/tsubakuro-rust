@@ -194,6 +194,14 @@ class CommitOption:
     def __new__(cls, commit_type: CommitType = CommitType.DEFAULT, auto_dispose: builtins.bool = False, timeout: typing.Optional[builtins.int] = None) -> CommitOption:
         r"""
         Create a new `CommitOption`.
+        
+        Args:
+            commit_type (CommitType): Commit type. Default is `CommitType.DEFAULT`.
+            auto_dispose (bool, optional): Auto dispose flag. Default is `False`.
+            timeout (int, optional): Commit timeout in seconds.
+        
+        Returns:
+            CommitOption: A new `CommitOption` instance.
         """
 
 @typing.final
@@ -554,6 +562,22 @@ class Cursor:
         Args:
             operation (str): SQL statement to be executed.
             parameters (Tuple[Any, ...] | dict[str, Any], optional): Parameters for the SQL statement.
+        
+        Examples:
+            ```python
+            cursor.execute("insert into example values (1, 'Hello')")
+            connection.commit()
+            ```
+        
+            ```python
+            cursor.execute("insert into example values (?, ?)", (1, "Hello"))
+            connection.commit()
+            ```
+        
+            ```python
+            cursor.execute("insert into example values (:id, :name)", {"id": 1, "name": "Hello"})
+            connection.commit()
+            ```
         """
     def prepare(self, operation: builtins.str, parameters: typing.Any) -> None:
         r"""
@@ -562,6 +586,25 @@ class Cursor:
         Args:
             operation (str): SQL statement to be prepared.
             parameters (Tuple[Any, ...] | dict[str, Any]): Parameters for the SQL statement.
+        
+        Examples:
+            ```python
+            import tsubakuro_rust_python as tsurugi
+        
+            sql = "insert into example values (?, ?)"
+            cursor.prepare(sql, (tsurugi.Int64, tsurugi.Str))
+            cursor.execute(sql, (1, "Hello"))
+            connection.commit()
+            ```
+        
+            ```python
+            import tsubakuro_rust_python as tsurugi
+        
+            sql = "insert into example values (:id, :name)"
+            cursor.prepare(sql, {"id": tsurugi.Int64, "name": tsurugi.Str})
+            cursor.execute(sql, {"id": 1, "name": "Hello"})
+            connection.commit()
+            ```
         """
     def executemany(self, operation: builtins.str, seq_of_parameters: typing.Any) -> None:
         r"""
@@ -570,6 +613,17 @@ class Cursor:
         Args:
             operation (str): SQL statement to be executed.
             seq_of_parameters (Sequence[Tuple[Any, ...] | dict[str, Any]]): Sequence of parameters for the SQL statement.
+        
+        Examples:
+            ```python
+            cursor.executemany("insert into example values (?, ?)", [(1, "Hello"), (2, "World")])
+            connection.commit()
+            ```
+        
+            ```python
+            cursor.executemany("insert into example values (:id, :name)", [{"id": 1, "name": "Hello"}, {"id": 2, "name": "World"}])
+            connection.commit()
+            ```
         """
     def fetchone(self) -> typing.Optional[tuple]:
         r"""
@@ -577,6 +631,13 @@ class Cursor:
         
         Returns:
               Optional[Tuple[Any, ...]]: A single sequence representing the next row of the result set, or `None` if no more data is available.
+        
+        Examples:
+            ```python
+            cursor.execute("select * from example where id = 1")
+            row = cursor.fetchone()
+            connection.commit()
+            ```
         """
     def next(self) -> tuple:
         r"""
@@ -597,6 +658,16 @@ class Cursor:
         
         Returns:
              List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
+        
+        Examples:
+            ```python
+            cursor.execute("select * from example")
+            rows = cursor.fetchmany(10)
+            connection.commit()
+            ```
+        
+        Note:
+            See also `Cursor.arraysize` for setting the default number of rows to fetch with `fetchmany()`.
         """
     def fetchall(self) -> builtins.list[tuple]:
         r"""
@@ -604,6 +675,13 @@ class Cursor:
         
         Returns:
              List[Tuple[Any, ...]]: A list of sequences, each representing a row of the result set.
+        
+        Examples:
+            ```python
+            cursor.execute("select * from example")
+            rows = cursor.fetchall()
+            connection.commit()
+            ```
         """
     def callproc(self, _procname: builtins.str, _parameters: typing.Optional[typing.Any] = None) -> None:
         r"""
@@ -893,7 +971,7 @@ class OffsetDatetime:
             tzinfo (datetime.tzinfo, optional): time zone info (default: UTC)
         
         Returns:
-            OffsetDatetime: created `OffsetDatetime` instance
+            OffsetDatetime: created `OffsetDatetime` object
         """
     @classmethod
     def raw(cls, epoch_seconds: builtins.int, nanos: builtins.int, time_zone_offset: builtins.int) -> OffsetDatetime:
@@ -1001,6 +1079,13 @@ class ShutdownOption:
     def __new__(cls, shutdown_type: ShutdownType = ShutdownType.GRACEFUL, timeout: typing.Optional[builtins.int] = None) -> ShutdownOption:
         r"""
         Create a new `ShutdownOption`.
+        
+        Args:
+            shutdown_type (ShutdownType): Shutdown type. Default is `ShutdownType.GRACEFUL`.
+            timeout (int, optional): Shutdown timeout in seconds.
+        
+        Returns:
+            ShutdownOption: A new `ShutdownOption` instance.
         """
 
 @typing.final

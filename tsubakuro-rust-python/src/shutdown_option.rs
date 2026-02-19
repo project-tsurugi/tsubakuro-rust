@@ -78,6 +78,13 @@ impl Default for ShutdownOption {
 #[pymethods]
 impl ShutdownOption {
     /// Create a new `ShutdownOption`.
+    ///
+    /// Args:
+    ///     shutdown_type (ShutdownType): Shutdown type. Default is `ShutdownType.GRACEFUL`.
+    ///     timeout (int, optional): Shutdown timeout in seconds.
+    ///
+    /// Returns:
+    ///     ShutdownOption: A new `ShutdownOption` instance.
     #[new]
     #[pyo3(signature = (shutdown_type=ShutdownType::GRACEFUL, timeout=None))]
     pub fn new(shutdown_type: ShutdownType, timeout: Option<u64>) -> Self {

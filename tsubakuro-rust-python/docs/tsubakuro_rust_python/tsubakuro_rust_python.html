@@ -808,7 +808,17 @@ config = tsurugi.Config(
 <dd>SQL statement to be executed.</dd>
 <dt><strong><code>parameters</code></strong> :&ensp;<code>Tuple[Any, ...] | dict[str, Any]</code>, optional</dt>
 <dd>Parameters for the SQL statement.</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">cursor.execute(&quot;insert into example values (1, 'Hello')&quot;)
+connection.commit()
+</code></pre>
+<pre><code class="language-python">cursor.execute(&quot;insert into example values (?, ?)&quot;, (1, &quot;Hello&quot;))
+connection.commit()
+</code></pre>
+<pre><code class="language-python">cursor.execute(&quot;insert into example values (:id, :name)&quot;, {&quot;id&quot;: 1, &quot;name&quot;: &quot;Hello&quot;})
+connection.commit()
+</code></pre></div>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.executemany"><code class="name flex">
 <span>def <span class="ident">executemany</span></span>(<span>self, /, operation, seq_of_parameters)</span>
@@ -821,7 +831,14 @@ config = tsurugi.Config(
 <dd>SQL statement to be executed.</dd>
 <dt><strong><code>seq_of_parameters</code></strong> :&ensp;<code>Sequence[Tuple[Any, ...] | dict[str, Any]]</code></dt>
 <dd>Sequence of parameters for the SQL statement.</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">cursor.executemany(&quot;insert into example values (?, ?)&quot;, [(1, &quot;Hello&quot;), (2, &quot;World&quot;)])
+connection.commit()
+</code></pre>
+<pre><code class="language-python">cursor.executemany(&quot;insert into example values (:id, :name)&quot;, [{&quot;id&quot;: 1, &quot;name&quot;: &quot;Hello&quot;}, {&quot;id&quot;: 2, &quot;name&quot;: &quot;World&quot;}])
+connection.commit()
+</code></pre></div>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchall"><code class="name flex">
 <span>def <span class="ident">fetchall</span></span>(<span>self, /)</span>
@@ -832,7 +849,12 @@ config = tsurugi.Config(
 <dl>
 <dt><code>List[Tuple[Any, &hellip;]]</code></dt>
 <dd>A list of sequences, each representing a row of the result set.</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">cursor.execute(&quot;select * from example&quot;)
+rows = cursor.fetchall()
+connection.commit()
+</code></pre></div>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchmany"><code class="name flex">
 <span>def <span class="ident">fetchmany</span></span>(<span>self, /, size=None)</span>
@@ -845,7 +867,14 @@ config = tsurugi.Config(
 <dl>
 <dt><code>List[Tuple[Any, &hellip;]]</code></dt>
 <dd>A list of sequences, each representing a row of the result set.</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">cursor.execute(&quot;select * from example&quot;)
+rows = cursor.fetchmany(10)
+connection.commit()
+</code></pre>
+<h2 id="note">Note</h2>
+<p>See also <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.arraysize" href="#tsubakuro_rust_python.tsubakuro_rust_python.Cursor.arraysize">Cursor.arraysize</a></code> for setting the default number of rows to fetch with <code>fetchmany()</code>.</p></div>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.fetchone"><code class="name flex">
 <span>def <span class="ident">fetchone</span></span>(<span>self, /)</span>
@@ -856,7 +885,12 @@ config = tsurugi.Config(
 <dl>
 <dt><code>Optional[Tuple[Any, &hellip;]]</code></dt>
 <dd>A single sequence representing the next row of the result set, or <code>None</code> if no more data is available.</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">cursor.execute(&quot;select * from example where id = 1&quot;)
+row = cursor.fetchone()
+connection.commit()
+</code></pre></div>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.next"><code class="name flex">
 <span>def <span class="ident">next</span></span>(<span>self, /)</span>
@@ -891,7 +925,22 @@ config = tsurugi.Config(
 <dd>SQL statement to be prepared.</dd>
 <dt><strong><code>parameters</code></strong> :&ensp;<code>Tuple[Any, ...] | dict[str, Any]</code></dt>
 <dd>Parameters for the SQL statement.</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+sql = &quot;insert into example values (?, ?)&quot;
+cursor.prepare(sql, (tsurugi.Int64, tsurugi.Str))
+cursor.execute(sql, (1, &quot;Hello&quot;))
+connection.commit()
+</code></pre>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+sql = &quot;insert into example values (:id, :name)&quot;
+cursor.prepare(sql, {&quot;id&quot;: tsurugi.Int64, &quot;name&quot;: tsurugi.Str})
+cursor.execute(sql, {&quot;id&quot;: 1, &quot;name&quot;: &quot;Hello&quot;})
+connection.commit()
+</code></pre></div>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.Cursor.setinputsizes"><code class="name flex">
 <span>def <span class="ident">setinputsizes</span></span>(<span>self, /, _sizes)</span>
@@ -1749,7 +1798,7 @@ config = tsurugi.Config(
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code> instance</dd>
+<dd>created <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime" href="#tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime">OffsetDatetime</a></code> object</dd>
 </dl></div>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.OffsetDatetime.raw"><code class="name flex">
