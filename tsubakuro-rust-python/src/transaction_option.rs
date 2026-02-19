@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyType};
 use pyo3_stub_gen::derive::*;
 use tsubakuro_rust_core::prelude::{
     TransactionOption as CoreTransactionOption, TransactionOptionSetter,
@@ -121,6 +121,13 @@ impl Default for TransactionOption {
 #[gen_stub_pymethods]
 #[pymethods]
 impl TransactionOption {
+    /// Create a new `TransactionOption`.
+    ///
+    /// Args:
+    ///     type (TransactionType): Transaction type. Default is `TransactionType.OCC`.
+    ///
+    /// Returns:
+    ///     TransactionOption: A new `TransactionOption` instance.
     #[new]
     #[pyo3(signature = (r#type=TransactionType::OCC))]
     pub fn new(r#type: TransactionType) -> Self {
@@ -134,6 +141,116 @@ impl TransactionOption {
             scan_parallel: None,
             begin_timeout: None,
         }
+    }
+
+    /// Create a new `TransactionOption` for OCC transaction.
+    ///
+    /// Args:
+    ///     label (str, optional): Transaction label.
+    ///
+    /// Returns:
+    ///     TransactionOption: A new `TransactionOption` instance for OCC transaction.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     tx_option = tsurugi.TransactionOption.occ(label="OCC transaction")
+    ///     ```
+    #[classmethod]
+    #[pyo3(signature = (label=None))]
+    pub fn occ(_cls: &Bound<PyType>, label: Option<String>) -> Self {
+        let mut option = Self::new(TransactionType::OCC);
+        option.label = label;
+        option
+    }
+
+    /// Create a new `TransactionOption` for LTX transaction.
+    ///
+    /// Args:
+    ///     label (str, optional): Transaction label.
+    ///     write_preserve (List[str], optional): List of table names to preserve for write operations.
+    ///     inclusive_read_area (List[str], optional): List of table names to include in the read area.
+    ///     exclusive_read_area (List[str], optional): List of table names to exclude from the read area.
+    ///
+    /// Returns:
+    ///     TransactionOption: A new `TransactionOption` instance for LTX transaction.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     tx_option = tsurugi.TransactionOption.ltx(
+    ///         label="LTX transaction",
+    ///         write_preserve=["table1", "table2"],
+    ///     )
+    ///     ```
+    #[classmethod]
+    #[pyo3(signature = (label=None, write_preserve=None, inclusive_read_area=None, exclusive_read_area=None))]
+    pub fn ltx(
+        _cls: &Bound<PyType>,
+        label: Option<String>,
+        write_preserve: Option<Vec<String>>,
+        inclusive_read_area: Option<Vec<String>>,
+        exclusive_read_area: Option<Vec<String>>,
+    ) -> Self {
+        let mut option = Self::new(TransactionType::LTX);
+        option.label = label;
+        option.write_preserve = write_preserve;
+        option.inclusive_read_area = inclusive_read_area;
+        option.exclusive_read_area = exclusive_read_area;
+        option.include_ddl = false;
+        option
+    }
+
+    /// Create a new `TransactionOption` for LTX transaction for DDL.
+    ///
+    /// Args:
+    ///     label (str, optional): Transaction label.
+    ///
+    /// Returns:
+    ///     TransactionOption: A new `TransactionOption` instance for LTX transaction for DDL.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     tx_option = tsurugi.TransactionOption.ddl(label="LTX transaction for DDL")
+    ///     ```
+    #[classmethod]
+    #[pyo3(signature = (label=None))]
+    pub fn ddl(_cls: &Bound<PyType>, label: Option<String>) -> Self {
+        let mut option = Self::new(TransactionType::LTX);
+        option.label = label;
+        option.include_ddl = true;
+        option
+    }
+
+    /// Create a new `TransactionOption` for RTX transaction.
+    ///
+    /// Args:
+    ///     label (str, optional): Transaction label.
+    ///     scan_parallel (int, optional): Degree of parallelism for scanning.
+    ///
+    /// Returns:
+    ///     TransactionOption: A new `TransactionOption` instance for RTX transaction.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     tx_option = tsurugi.TransactionOption.rtx(
+    ///         label="RTX transaction",
+    ///         scan_parallel=4,
+    ///     )
+    ///     ```
+    #[classmethod]
+    #[pyo3(signature = (label=None, scan_parallel=None))]
+    pub fn rtx(_cls: &Bound<PyType>, label: Option<String>, scan_parallel: Option<i32>) -> Self {
+        let mut option = Self::new(TransactionType::RTX);
+        option.label = label;
+        option.scan_parallel = scan_parallel;
+        option
     }
 }
 

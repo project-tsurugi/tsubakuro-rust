@@ -1251,7 +1251,98 @@ class TransactionOption:
         r"""
         Begin transaction timeout in seconds.
         """
-    def __new__(cls, r#type: TransactionType = TransactionType.OCC) -> TransactionOption: ...
+    def __new__(cls, r#type: TransactionType = TransactionType.OCC) -> TransactionOption:
+        r"""
+        Create a new `TransactionOption`.
+        
+        Args:
+            type (TransactionType): Transaction type. Default is `TransactionType.OCC`.
+        
+        Returns:
+            TransactionOption: A new `TransactionOption` instance.
+        """
+    @classmethod
+    def occ(cls, label: typing.Optional[builtins.str] = None) -> TransactionOption:
+        r"""
+        Create a new `TransactionOption` for OCC transaction.
+        
+        Args:
+            label (str, optional): Transaction label.
+        
+        Returns:
+            TransactionOption: A new `TransactionOption` instance for OCC transaction.
+        
+        Examples:
+            ```python
+            import tsubakuro_rust_python as tsurugi
+        
+            tx_option = tsurugi.TransactionOption.occ(label="OCC transaction")
+            ```
+        """
+    @classmethod
+    def ltx(cls, label: typing.Optional[builtins.str] = None, write_preserve: typing.Optional[typing.Sequence[builtins.str]] = None, inclusive_read_area: typing.Optional[typing.Sequence[builtins.str]] = None, exclusive_read_area: typing.Optional[typing.Sequence[builtins.str]] = None) -> TransactionOption:
+        r"""
+        Create a new `TransactionOption` for LTX transaction.
+        
+        Args:
+            label (str, optional): Transaction label.
+            write_preserve (List[str], optional): List of table names to preserve for write operations.
+            inclusive_read_area (List[str], optional): List of table names to include in the read area.
+            exclusive_read_area (List[str], optional): List of table names to exclude from the read area.
+        
+        Returns:
+            TransactionOption: A new `TransactionOption` instance for LTX transaction.
+        
+        Examples:
+            ```python
+            import tsubakuro_rust_python as tsurugi
+        
+            tx_option = tsurugi.TransactionOption.ltx(
+                label="LTX transaction",
+                write_preserve=["table1", "table2"],
+            )
+            ```
+        """
+    @classmethod
+    def ddl(cls, label: typing.Optional[builtins.str] = None) -> TransactionOption:
+        r"""
+        Create a new `TransactionOption` for LTX transaction for DDL.
+        
+        Args:
+            label (str, optional): Transaction label.
+        
+        Returns:
+            TransactionOption: A new `TransactionOption` instance for LTX transaction for DDL.
+        
+        Examples:
+            ```python
+            import tsubakuro_rust_python as tsurugi
+        
+            tx_option = tsurugi.TransactionOption.ddl(label="LTX transaction for DDL")
+            ```
+        """
+    @classmethod
+    def rtx(cls, label: typing.Optional[builtins.str] = None, scan_parallel: typing.Optional[builtins.int] = None) -> TransactionOption:
+        r"""
+        Create a new `TransactionOption` for RTX transaction.
+        
+        Args:
+            label (str, optional): Transaction label.
+            scan_parallel (int, optional): Degree of parallelism for scanning.
+        
+        Returns:
+            TransactionOption: A new `TransactionOption` instance for RTX transaction.
+        
+        Examples:
+            ```python
+            import tsubakuro_rust_python as tsurugi
+        
+            tx_option = tsurugi.TransactionOption.rtx(
+                label="RTX transaction",
+                scan_parallel=4,
+            )
+            ```
+        """
 
 @typing.final
 class CommitType(enum.Enum):

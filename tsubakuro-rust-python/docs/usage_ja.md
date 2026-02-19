@@ -100,18 +100,14 @@ Connectionの `commit` または `rollback` メソッドを実行することに
 #### トランザクションオプションをConfigで設定しておく例
 
 ```python
-    tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
-    tx_option.include_ddl = False
-    tx_option.write_preserve = ["example"]
+    tx_option = tsurugi.TransactionOption.ltx(write_preserve=["example"])
     config.transaction_option = tx_option
 ```
 
 #### トランザクションオプションをConnectionに設定する例
 
 ```python
-    tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
-    tx_option.include_ddl = False
-    tx_option.write_preserve = ["example"]
+    tx_option = tsurugi.TransactionOption.ltx(write_preserve=["example"])
     connection.transaction_option = tx_option
 ```
 

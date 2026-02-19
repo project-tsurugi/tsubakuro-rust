@@ -2546,6 +2546,107 @@ tx_option.scan_parallel = 4
 <div class="desc"><p>Write preserve.</p></div>
 </dd>
 </dl>
+<h3>Methods</h3>
+<dl>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.ddl"><code class="name flex">
+<span>def <span class="ident">ddl</span></span>(<span>label=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> for LTX transaction for DDL.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>label</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Transaction label.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></dt>
+<dd>A new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> instance for LTX transaction for DDL.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tx_option = tsurugi.TransactionOption.ddl(label=&quot;LTX transaction for DDL&quot;)
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.ltx"><code class="name flex">
+<span>def <span class="ident">ltx</span></span>(<span>label=None,<br>write_preserve=None,<br>inclusive_read_area=None,<br>exclusive_read_area=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> for LTX transaction.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>label</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Transaction label.</dd>
+<dt><strong><code>write_preserve</code></strong> :&ensp;<code>List[str]</code>, optional</dt>
+<dd>List of table names to preserve for write operations.</dd>
+<dt><strong><code>inclusive_read_area</code></strong> :&ensp;<code>List[str]</code>, optional</dt>
+<dd>List of table names to include in the read area.</dd>
+<dt><strong><code>exclusive_read_area</code></strong> :&ensp;<code>List[str]</code>, optional</dt>
+<dd>List of table names to exclude from the read area.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></dt>
+<dd>A new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> instance for LTX transaction.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tx_option = tsurugi.TransactionOption.ltx(
+    label=&quot;LTX transaction&quot;,
+    write_preserve=[&quot;table1&quot;, &quot;table2&quot;],
+)
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.occ"><code class="name flex">
+<span>def <span class="ident">occ</span></span>(<span>label=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> for OCC transaction.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>label</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Transaction label.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></dt>
+<dd>A new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> instance for OCC transaction.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tx_option = tsurugi.TransactionOption.occ(label=&quot;OCC transaction&quot;)
+</code></pre></div>
+</dd>
+<dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.rtx"><code class="name flex">
+<span>def <span class="ident">rtx</span></span>(<span>label=None, scan_parallel=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> for RTX transaction.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>label</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Transaction label.</dd>
+<dt><strong><code>scan_parallel</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Degree of parallelism for scanning.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></dt>
+<dd>A new <code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code> instance for RTX transaction.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+tx_option = tsurugi.TransactionOption.rtx(
+    label=&quot;RTX transaction&quot;,
+    scan_parallel=4,
+)
+</code></pre></div>
+</dd>
+</dl>
 </dd>
 <dt id="tsubakuro_rust_python.tsubakuro_rust_python.TransactionType"><code class="flex name class">
 <span>class <span class="ident">TransactionType</span></span>
@@ -3163,10 +3264,14 @@ tx_option.scan_parallel = 4
 <h4><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></h4>
 <ul class="two-column">
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.begin_timeout" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.begin_timeout">begin_timeout</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.ddl" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.ddl">ddl</a></code></li>
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.exclusive_read_area" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.exclusive_read_area">exclusive_read_area</a></code></li>
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.include_ddl" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.include_ddl">include_ddl</a></code></li>
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.inclusive_read_area" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.inclusive_read_area">inclusive_read_area</a></code></li>
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.label" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.label">label</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.ltx" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.ltx">ltx</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.occ" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.occ">occ</a></code></li>
+<li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.rtx" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.rtx">rtx</a></code></li>
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.scan_parallel" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.scan_parallel">scan_parallel</a></code></li>
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.transaction_type" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.transaction_type">transaction_type</a></code></li>
 <li><code><a title="tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.write_preserve" href="#tsubakuro_rust_python.tsubakuro_rust_python.TransactionOption.write_preserve">write_preserve</a></code></li>
