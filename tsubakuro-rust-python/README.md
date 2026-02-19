@@ -41,6 +41,7 @@ def example():
     config.endpoint = "tcp://localhost:12345"
     config.user = "tsurugi"
     config.password = "password"
+    config.default_timeout = 30  # seconds
     with tsurugi.connect(config) as connection:
         with connection.cursor() as cursor:
             cursor.execute("insert into example values (1, 100, 'abc')")

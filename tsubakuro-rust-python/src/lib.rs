@@ -13,6 +13,30 @@ mod table_metadata;
 mod transaction_option;
 mod type_code;
 
+/// Python library for Tsurugi.
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     config = tsurugi.Config()
+///     config.endpoint = "tcp://localhost:12345"
+///     config.user = "tsurugi"
+///     config.password = "password"
+///     config.default_timeout = 30  # seconds
+///     with tsurugi.connect(config) as connection:
+///         with connection.cursor() as cursor:
+///             cursor.execute("insert into example values (1, 100, 'abc')")
+///             print("insert rowcount:", cursor.rowcount)
+///             connection.commit()
+///
+///             cursor.execute("select * from example")
+///             for row in cursor:
+///                 print("row:", row)
+///             connection.commit()
+///     ```
+///
+/// See `Config`, `connect()`, `Connection`, and `Cursor` for more details.
 #[pymodule]
 mod tsubakuro_rust_python {
     use pyo3::{prelude::*, types::*};

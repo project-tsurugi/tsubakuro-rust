@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
 <title>tsubakuro_rust_python API documentation</title>
-<meta name="description" content="">
+<meta name="description" content="Python library for Tsurugi …">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -36,13 +36,34 @@ el.replaceWith(d);
 <h1 class="title">Package <code>tsubakuro_rust_python</code></h1>
 </header>
 <section id="section-intro">
+<p>Python library for Tsurugi.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+config = tsurugi.Config()
+config.endpoint = &quot;tcp://localhost:12345&quot;
+config.user = &quot;tsurugi&quot;
+config.password = &quot;password&quot;
+config.default_timeout = 30  # seconds
+with tsurugi.connect(config) as connection:
+    with connection.cursor() as cursor:
+        cursor.execute(&quot;insert into example values (1, 100, 'abc')&quot;)
+        print(&quot;insert rowcount:&quot;, cursor.rowcount)
+        connection.commit()
+
+        cursor.execute(&quot;select * from example&quot;)
+        for row in cursor:
+            print(&quot;row:&quot;, row)
+        connection.commit()
+</code></pre>
+<p>See <code><a title="tsubakuro_rust_python.Config" href="#tsubakuro_rust_python.Config">Config</a></code>, <code><a title="tsubakuro_rust_python.connect" href="#tsubakuro_rust_python.connect">connect()</a></code>, <code><a title="tsubakuro_rust_python.Connection" href="#tsubakuro_rust_python.Connection">Connection</a></code>, and <code><a title="tsubakuro_rust_python.Cursor" href="#tsubakuro_rust_python.Cursor">Cursor</a></code> for more details.</p>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
 <dt><code class="name"><a title="tsubakuro_rust_python.tsubakuro_rust_python" href="tsubakuro_rust_python.html">tsubakuro_rust_python.tsubakuro_rust_python</a></code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Python library for Tsurugi …</p></div>
 </dd>
 </dl>
 </section>
@@ -723,6 +744,8 @@ config = tsurugi.Config(
 (read only)</dd>
 <dt><strong><code>arraysize</code></strong> :&ensp;<code>int</code></dt>
 <dd>Number of rows to fetch at a time with <code><a title="tsubakuro_rust_python.Cursor.fetchmany" href="#tsubakuro_rust_python.Cursor.fetchmany">Cursor.fetchmany()</a></code>. Default is 1.</dd>
+<dt><strong><code>rownumber</code></strong> :&ensp;<code>int</code></dt>
+<dd>Current row number (0-based). (read only)</dd>
 <dt><strong><code>rowcount</code></strong> :&ensp;<code>int</code></dt>
 <dd>Number of rows affected by the last <code>Cursor.execute*()</code> method. -1 if not applicable. (read only)</dd>
 <dt><strong><code>closed</code></strong> :&ensp;<code>bool</code></dt>

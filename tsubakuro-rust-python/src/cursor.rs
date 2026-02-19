@@ -38,6 +38,7 @@ impl RowNumber {
 ///     description (Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]): Description of the query result set.
 ///         `(name, type_code, display_size, internal_size, precision, scale, null_ok)`.  (read only)
 ///     arraysize (int): Number of rows to fetch at a time with `Cursor.fetchmany()`. Default is 1.
+///     rownumber (int): Current row number (0-based). (read only)
 ///     rowcount (int): Number of rows affected by the last `Cursor.execute*()` method. -1 if not applicable. (read only)
 ///     closed (bool): Whether the cursor is closed. (read only)
 #[gen_stub_pyclass]
