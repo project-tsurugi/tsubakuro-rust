@@ -18,6 +18,7 @@ use crate::{
 /// Configuration options for connecting to Tsurugi.
 ///
 /// Attributes:
+///     application_name (str): Application name.
 ///     endpoint (str): Endpoint URL of the Tsurugi server.
 ///     user (str): Username for authentication.
 ///     password (str): Password for authentication.
@@ -52,6 +53,9 @@ use crate::{
 #[gen_stub_pyclass]
 #[pyclass]
 pub struct Config {
+    /// Application name.
+    #[pyo3(get, set)]
+    application_name: Option<String>,
     /// Endpoint URL of the Tsurugi server.
     #[pyo3(get, set)]
     endpoint: Option<String>,
@@ -84,6 +88,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
+            application_name: None,
             endpoint: None,
             user: None,
             password: None,
@@ -134,6 +139,9 @@ impl Config {
     /// Args:
     ///     other (Config): other configuration object.
     pub fn merge(&mut self, other: &Config) {
+        if let Some(application_name) = &other.application_name {
+            self.application_name = Some(application_name.clone());
+        }
         if let Some(endpoint) = &other.endpoint {
             self.endpoint = Some(endpoint.clone());
         }
@@ -167,7 +175,8 @@ impl Config {
         let none = &"None".to_string();
         let mask = &"****".to_string();
         format!(
-            "Config(endpoint={}, user={}, password={}, auth_token={}, credentials={}, default_timeout={})",
+            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, default_timeout={})",
+            self.application_name.as_ref().unwrap_or(none),
             self.endpoint.as_ref().unwrap_or(none),
             self.user.as_ref().unwrap_or(none),
             self.password.as_ref().map_or(none, |_| mask),
@@ -239,6 +248,7 @@ impl Config {
 
     fn set_by_string(&mut self, key: &str, value: &str) -> PyResult<()> {
         match key {
+            "application_name" => self.application_name = Some(value.to_string()),
             "endpoint" => self.endpoint = Some(value.to_string()),
             "user" => self.user = Some(value.to_string()),
             "password" => self.password = Some(value.to_string()),
@@ -257,6 +267,7 @@ impl Config {
 
     fn set_by_any(&mut self, key: &str, value: Bound<PyAny>) -> PyResult<()> {
         match key {
+            "application_name" => self.application_name = Some(value.extract()?),
             "endpoint" => self.endpoint = Some(value.extract()?),
             "user" => self.user = Some(value.extract()?),
             "password" => self.password = Some(value.extract()?),
@@ -272,6 +283,10 @@ impl Config {
 impl Config {
     pub(crate) fn connection_option(&self) -> PyResult<ConnectionOption> {
         let mut connection_option = ConnectionOption::new();
+        if let Some(application_name) = &self.application_name {
+            connection_option.set_application_name(application_name);
+        }
+
         if let Some(endpoint) = &self.endpoint {
             connection_option
                 .set_endpoint_url(endpoint)

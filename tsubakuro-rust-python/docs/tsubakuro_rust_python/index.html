@@ -445,6 +445,8 @@ commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
 <div class="desc"><p>Configuration options for connecting to Tsurugi.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
+<dt><strong><code>application_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>Application name.</dd>
 <dt><strong><code>endpoint</code></strong> :&ensp;<code>str</code></dt>
 <dd>Endpoint URL of the Tsurugi server.</dd>
 <dt><strong><code>user</code></strong> :&ensp;<code>str</code></dt>
@@ -484,6 +486,10 @@ config = tsurugi.Config(
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
+<dt id="tsubakuro_rust_python.Config.application_name"><code class="name">var <span class="ident">application_name</span></code></dt>
+<dd>
+<div class="desc"><p>Application name.</p></div>
+</dd>
 <dt id="tsubakuro_rust_python.Config.auth_token"><code class="name">var <span class="ident">auth_token</span></code></dt>
 <dd>
 <div class="desc"><p>Authentication token.</p></div>
@@ -2842,6 +2848,7 @@ tx_option.scan_parallel = 4
 <li>
 <h4><code><a title="tsubakuro_rust_python.Config" href="#tsubakuro_rust_python.Config">Config</a></code></h4>
 <ul class="two-column">
+<li><code><a title="tsubakuro_rust_python.Config.application_name" href="#tsubakuro_rust_python.Config.application_name">application_name</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.auth_token" href="#tsubakuro_rust_python.Config.auth_token">auth_token</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.commit_option" href="#tsubakuro_rust_python.Config.commit_option">commit_option</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.credentials" href="#tsubakuro_rust_python.Config.credentials">credentials</a></code></li>

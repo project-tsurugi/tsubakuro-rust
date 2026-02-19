@@ -202,6 +202,7 @@ class Config:
     Configuration options for connecting to Tsurugi.
     
     Attributes:
+        application_name (str): Application name.
         endpoint (str): Endpoint URL of the Tsurugi server.
         user (str): Username for authentication.
         password (str): Password for authentication.
@@ -234,6 +235,16 @@ class Config:
         )
         ```
     """
+    @property
+    def application_name(self) -> typing.Optional[builtins.str]:
+        r"""
+        Application name.
+        """
+    @application_name.setter
+    def application_name(self, value: typing.Optional[builtins.str]) -> None:
+        r"""
+        Application name.
+        """
     @property
     def endpoint(self) -> typing.Optional[builtins.str]:
         r"""
