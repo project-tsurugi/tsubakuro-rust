@@ -14,31 +14,8 @@ mod transaction_option;
 mod type_code;
 
 /// Python library for Tsurugi.
-///
-/// Examples:
-///     ```python
-///     import tsubakuro_rust_python as tsurugi
-///
-///     config = tsurugi.Config()
-///     config.endpoint = "tcp://localhost:12345"
-///     config.user = "tsurugi"
-///     config.password = "password"
-///     config.default_timeout = 30  # seconds
-///     with tsurugi.connect(config) as connection:
-///         with connection.cursor() as cursor:
-///             cursor.execute("insert into example values (1, 100, 'abc')")
-///             print("insert rowcount:", cursor.rowcount)
-///             connection.commit()
-///
-///             cursor.execute("select * from example")
-///             for row in cursor:
-///                 print("row:", row)
-///             connection.commit()
-///     ```
-///
-/// See `Config`, `connect()`, `Connection`, and `Cursor` for more details.
 #[pymodule]
-mod tsubakuro_rust_python {
+mod _tsubakuro_rust_python {
     use pyo3::{prelude::*, types::*};
     use pyo3_stub_gen::{derive::*, inventory::submit};
 
@@ -131,7 +108,7 @@ mod tsubakuro_rust_python {
     ///
     /// Note:
     ///     Calls to `env_logger_init` other than the first one are ignored.
-    #[gen_stub_pyfunction]
+    #[gen_stub_pyfunction(module = "tsubakuro_rust_python")]
     #[pyfunction]
     #[pyo3(signature = (filters="tsubakuro_rust_python=info", file_path=None))]
     fn env_logger_init(filters: &str, file_path: Option<String>) {
@@ -166,7 +143,7 @@ mod tsubakuro_rust_python {
     ///     with tsurugi.connect(endpoint="tcp://localhost:12345", user="tsurugi", password="password", default_timeout=30) as connection:
     ///         pass
     ///     ```
-    #[gen_stub_pyfunction]
+    #[gen_stub_pyfunction(module = "tsubakuro_rust_python")]
     #[pyfunction]
     #[pyo3(signature = (*args, **kwargs))]
     fn connect(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Connection> {

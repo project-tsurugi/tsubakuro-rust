@@ -12,7 +12,7 @@ edition = "2021"
 rust-version = "1.84.1"
 
 [lib]
-name = "tsubakuro_rust_python"
+name = "_tsubakuro_rust_python"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

@@ -1,4 +1,5 @@
-use pyo3::{create_exception, exceptions::PyException, PyErr};
+use pyo3::{exceptions::PyException, PyErr};
+use pyo3_stub_gen::create_exception;
 use tsubakuro_rust_core::prelude::{DiagnosticCode, TgError};
 
 create_exception!(

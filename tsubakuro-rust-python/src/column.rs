@@ -18,7 +18,7 @@ use crate::type_code::atom_type_to_type_code;
 ///     scale (Optional[int]): Scale for numeric types. (read only)
 ///     nullable (Optional[bool]): Nullable flag. (read only)
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 pub struct Column {
     inner: SqlColumn,
 }

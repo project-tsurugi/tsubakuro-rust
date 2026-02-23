@@ -51,7 +51,7 @@ use crate::{
 ///     )
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 pub struct Config {
     /// Application name.
     #[pyo3(get, set)]

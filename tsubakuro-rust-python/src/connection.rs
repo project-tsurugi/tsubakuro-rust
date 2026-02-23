@@ -25,7 +25,7 @@ pub(crate) mod inner_connection;
 ///     shutdown_option (ShutdownOption): Shutdown option. (write only)
 ///     closed (bool): Whether the connection is closed. (read only)
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 pub struct Connection {
     inner: Arc<InnerConnection>,
     /// Whether the connection is closed.

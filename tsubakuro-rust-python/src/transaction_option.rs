@@ -14,7 +14,7 @@ use tsubakuro_rust_core::prelude::{
 ///     LTX: Long transaction (LTX).
 ///     RTX: Read-only transaction (RTX).
 #[gen_stub_pyclass_enum]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TransactionType {
@@ -83,7 +83,7 @@ impl TransactionType {
 ///     tx_option.scan_parallel = 4
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 #[derive(Debug, Clone)]
 pub struct TransactionOption {
     /// Transaction type.

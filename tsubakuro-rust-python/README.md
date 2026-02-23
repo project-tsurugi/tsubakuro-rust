@@ -37,12 +37,12 @@ uv run python
 import tsubakuro_rust_python as tsurugi
 
 def example():
-    config = tsurugi.Config()
-    config.endpoint = "tcp://localhost:12345"
-    config.user = "tsurugi"
-    config.password = "password"
-    config.default_timeout = 30  # seconds
-    with tsurugi.connect(config) as connection:
+    with tsurugi.connect(
+        endpoint="tcp://localhost:12345",
+        user="tsurugi",
+        password="password",
+        default_timeout=30,  # seconds
+    ) as connection:
         with connection.cursor() as cursor:
             cursor.execute("insert into example values (1, 100, 'abc')")
             print("insert rowcount:", cursor.rowcount)

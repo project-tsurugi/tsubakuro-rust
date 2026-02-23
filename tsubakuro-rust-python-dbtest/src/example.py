@@ -34,7 +34,10 @@ def example2():
 
 def example3():
     with tsurugi.connect(
-        endpoint="tcp://localhost:12345", user="tsurugi", password="password"
+        endpoint="tcp://localhost:12345",
+        user="tsurugi",
+        password="password",
+        default_timeout=30,  # seconds
     ) as connection:
         print("table_names:", connection.list_tables())
 

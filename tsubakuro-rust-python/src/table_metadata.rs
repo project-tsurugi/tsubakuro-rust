@@ -16,7 +16,7 @@ use crate::column::{columns_description, Column};
 ///       `(name, type_code, display_size, internal_size, precision, scale, null_ok)`. (read only)
 ///     primary_keys (List[str]): Primary keys. (read only)
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 pub struct TableMetadata {
     inner: SqlTableMetadata,
 }

@@ -9,7 +9,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimePoint};
 ///     value (Optional[datetime.datetime]): datetime value. (read only)
 ///     nanosecond (Optional[int]): nanosecond part of the time. (read only)
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 #[derive(Debug)]
 pub struct Datetime {
     value: Option<TgTimePoint>,

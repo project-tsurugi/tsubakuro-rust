@@ -7,7 +7,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 /// Attributes:
 ///     value (Optional[float]): float value. (read only)
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 #[derive(Debug)]
 pub struct Float32 {
     /// Value.

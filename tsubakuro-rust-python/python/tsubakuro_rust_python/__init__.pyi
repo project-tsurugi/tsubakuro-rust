@@ -5,36 +5,123 @@ import builtins
 import datetime
 import decimal
 import enum
-import tsubakuro_rust_python
 import typing
+from . import _tsubakuro_rust_python
 __all__ = [
+    "AnalyzeException",
+    "BlockedByConcurrentOperationException",
+    "BlockedByHighPriorityTransactionException",
     "Bool",
     "Bytes",
+    "CcException",
+    "CheckConstraintViolationException",
     "Column",
     "CommitOption",
     "CommitType",
+    "CompileException",
     "Config",
+    "ConflictOnWritePreserveException",
     "Connection",
+    "ConstraintViolationException",
     "Cursor",
+    "DataCorruptionException",
+    "DataError",
+    "DatabaseError",
     "Date",
     "Datetime",
     "Decimal",
+    "DependenciesViolationException",
+    "DumpDirectoryInaccessibleException",
+    "DumpFileException",
+    "Error",
+    "EvaluationException",
     "Float32",
     "Float64",
+    "InactiveTransactionException",
+    "InconsistentStatementException",
     "Int32",
     "Int64",
+    "IntegrityError",
+    "InterfaceError",
+    "InternalError",
+    "InternalException",
+    "InvalidDecimalValueException",
+    "InvalidRuntimeValueException",
+    "LoadFileException",
+    "LoadFileFormatException",
+    "LoadFileNotFoundException",
+    "LtxException",
+    "LtxReadException",
+    "LtxWriteException",
+    "LtxWriteOperationWithoutWritePreserveException",
+    "NotNullConstraintViolationException",
+    "NotSupportedError",
+    "OccException",
+    "OccReadException",
+    "OccWriteException",
     "OffsetDatetime",
     "OffsetTime",
+    "OperationalError",
+    "ParameterException",
+    "ProgrammingError",
+    "ReadOperationOnRestrictedReadAreaException",
+    "ReferentialIntegrityConstraintViolationException",
+    "RequestFailureException",
+    "RestrictedOperationException",
+    "RtxException",
+    "ScalarSubqueryEvaluationException",
+    "SecondaryIndexCorruptionException",
+    "ServerException",
     "ShutdownOption",
     "ShutdownType",
+    "SqlExecutionException",
+    "SqlLimitReachedException",
+    "SqlRequestTimeoutException",
+    "SqlServiceException",
+    "StatementNotFoundException",
     "Str",
+    "SymbolAnalyzeException",
+    "SyntaxException",
     "TableMetadata",
+    "TargetAlreadyExistsException",
+    "TargetNotFoundException",
     "Time",
+    "TransactionExceededLimitException",
+    "TransactionNotFoundException",
     "TransactionOption",
     "TransactionType",
+    "TypeAnalyzeException",
+    "UniqueConstraintViolationException",
+    "UnresolvedPlaceholderException",
+    "UnsupportedCompilerFeatureException",
+    "UnsupportedRuntimeFeatureException",
+    "ValueAnalyzeException",
+    "ValueEvaluationException",
+    "ValueOutOfRangeException",
+    "ValueTooLongException",
+    "Warning",
+    "WriteOperationByRtxException",
     "connect",
     "env_logger_init",
 ]
+
+class AnalyzeException(builtins.CompileException):
+    r"""
+    AnalyzeException
+    """
+    ...
+
+class BlockedByConcurrentOperationException(builtins.CcException):
+    r"""
+    BlockedByConcurrentOperationException
+    """
+    ...
+
+class BlockedByHighPriorityTransactionException(builtins.SqlExecutionException):
+    r"""
+    BlockedByHighPriorityTransactionException
+    """
+    ...
 
 @typing.final
 class Bool:
@@ -74,6 +161,18 @@ class Bytes:
         Create a new `Bytes`.
         """
     def __repr__(self) -> builtins.str: ...
+
+class CcException(builtins.SqlServiceException):
+    r"""
+    CcException
+    """
+    ...
+
+class CheckConstraintViolationException(builtins.ConstraintViolationException):
+    r"""
+    CheckConstraintViolationException
+    """
+    ...
 
 @typing.final
 class Column:
@@ -162,12 +261,12 @@ class CommitOption:
         ```
     """
     @property
-    def commit_type(self) -> tsubakurorustpython.CommitType:
+    def commit_type(self) -> CommitType:
         r"""
         Commit type.
         """
     @commit_type.setter
-    def commit_type(self, value: tsubakurorustpython.CommitType) -> None:
+    def commit_type(self, value: CommitType) -> None:
         r"""
         Commit type.
         """
@@ -203,6 +302,12 @@ class CommitOption:
         Returns:
             CommitOption: A new `CommitOption` instance.
         """
+
+class CompileException(builtins.ProgrammingError):
+    r"""
+    CompileException
+    """
+    ...
 
 @typing.final
 class Config:
@@ -371,6 +476,12 @@ class Config:
         """
     def __repr__(self) -> builtins.str: ...
 
+class ConflictOnWritePreserveException(builtins.OccReadException):
+    r"""
+    ConflictOnWritePreserveException
+    """
+    ...
+
 @typing.final
 class Connection:
     r"""
@@ -493,6 +604,12 @@ class Connection:
         r"""
         Close the connection.
         """
+
+class ConstraintViolationException(builtins.IntegrityError):
+    r"""
+    ConstraintViolationException
+    """
+    ...
 
 @typing.final
 class Cursor:
@@ -724,6 +841,24 @@ class Cursor:
         Close the cursor.
         """
 
+class DataCorruptionException(builtins.SqlExecutionException):
+    r"""
+    DataCorruptionException
+    """
+    ...
+
+class DataError(builtins.DatabaseError):
+    r"""
+    data error
+    """
+    ...
+
+class DatabaseError(builtins.Error):
+    r"""
+    database error
+    """
+    ...
+
 @typing.final
 class Date:
     r"""
@@ -852,6 +987,33 @@ class Decimal:
         """
     def __repr__(self) -> builtins.str: ...
 
+class DependenciesViolationException(builtins.RestrictedOperationException):
+    r"""
+    DependenciesViolationException
+    """
+    ...
+
+class DumpDirectoryInaccessibleException(builtins.DumpFileException):
+    r"""
+    DumpDirectoryInaccessibleException
+    """
+    ...
+
+class DumpFileException(builtins.SqlExecutionException):
+    r"""
+    DumpFileException
+    """
+    ...
+
+class Error(builtins.Exception):
+    r"""
+    base class of all other exceptions
+    """
+    ...
+
+class EvaluationException(builtins.DataError):
+    ...
+
 @typing.final
 class Float32:
     r"""
@@ -892,6 +1054,18 @@ class Float64:
     def __float__(self) -> typing.Optional[builtins.float]: ...
     def __repr__(self) -> builtins.str: ...
 
+class InactiveTransactionException(builtins.RestrictedOperationException):
+    r"""
+    InactiveTransactionException
+    """
+    ...
+
+class InconsistentStatementException(builtins.SqlExecutionException):
+    r"""
+    InconsistentStatementException
+    """
+    ...
+
 @typing.final
 class Int32:
     r"""
@@ -931,6 +1105,114 @@ class Int64:
         """
     def __int__(self) -> typing.Optional[builtins.int]: ...
     def __repr__(self) -> builtins.str: ...
+
+class IntegrityError(builtins.DatabaseError):
+    r"""
+    integrity error
+    """
+    ...
+
+class InterfaceError(builtins.Error):
+    r"""
+    interface error
+    """
+    ...
+
+class InternalError(builtins.DatabaseError):
+    r"""
+    internal error
+    """
+    ...
+
+class InternalException(builtins.InternalError):
+    r"""
+    InternalException
+    """
+    ...
+
+class InvalidDecimalValueException(builtins.InvalidRuntimeValueException):
+    r"""
+    InvalidDecimalValueException
+    """
+    ...
+
+class InvalidRuntimeValueException(builtins.SqlLimitReachedException):
+    r"""
+    InvalidRuntimeValueException
+    """
+    ...
+
+class LoadFileException(builtins.SqlExecutionException):
+    r"""
+    LoadFileException
+    """
+    ...
+
+class LoadFileFormatException(builtins.LoadFileException):
+    r"""
+    LoadFileFormatException
+    """
+    ...
+
+class LoadFileNotFoundException(builtins.LoadFileException):
+    r"""
+    LoadFileNotFoundException
+    """
+    ...
+
+class LtxException(builtins.CcException):
+    r"""
+    LtxException
+    """
+    ...
+
+class LtxReadException(builtins.LtxException):
+    r"""
+    LtxReadException
+    """
+    ...
+
+class LtxWriteException(builtins.LtxException):
+    r"""
+    LtxWriteException
+    """
+    ...
+
+class LtxWriteOperationWithoutWritePreserveException(builtins.RestrictedOperationException):
+    r"""
+    LtxWriteOperationWithoutWritePreserveException
+    """
+    ...
+
+class NotNullConstraintViolationException(builtins.ConstraintViolationException):
+    r"""
+    NotNullConstraintViolationException
+    """
+    ...
+
+class NotSupportedError(builtins.DatabaseError):
+    r"""
+    not supported error
+    """
+    ...
+
+class OccException(builtins.CcException):
+    r"""
+    OccException
+    """
+    ...
+
+class OccReadException(builtins.OccException):
+    r"""
+    OccReadException
+    """
+    ...
+
+class OccWriteException(builtins.OccException):
+    r"""
+    OccWriteException
+    """
+    ...
 
 @typing.final
 class OffsetDatetime:
@@ -1040,6 +1322,72 @@ class OffsetTime:
         """
     def __repr__(self) -> builtins.str: ...
 
+class OperationalError(builtins.DatabaseError):
+    r"""
+    operation error
+    """
+    ...
+
+class ParameterException(builtins.ProgrammingError):
+    r"""
+    ParameterException
+    """
+    ...
+
+class ProgrammingError(builtins.DatabaseError):
+    r"""
+    programming error
+    """
+    ...
+
+class ReadOperationOnRestrictedReadAreaException(builtins.RestrictedOperationException):
+    r"""
+    ReadOperationOnRestrictedReadAreaException
+    """
+    ...
+
+class ReferentialIntegrityConstraintViolationException(builtins.ConstraintViolationException):
+    r"""
+    ReferentialIntegrityConstraintViolationException
+    """
+    ...
+
+class RequestFailureException(builtins.SqlExecutionException):
+    r"""
+    RequestFailureException
+    """
+    ...
+
+class RestrictedOperationException(builtins.SqlExecutionException):
+    r"""
+    RestrictedOperationException
+    """
+    ...
+
+class RtxException(builtins.CcException):
+    r"""
+    RtxException
+    """
+    ...
+
+class ScalarSubqueryEvaluationException(builtins.EvaluationException):
+    r"""
+    ScalarSubqueryEvaluationException
+    """
+    ...
+
+class SecondaryIndexCorruptionException(builtins.DataCorruptionException):
+    r"""
+    SecondaryIndexCorruptionException
+    """
+    ...
+
+class ServerException(builtins.OperationalError):
+    r"""
+    ServerException
+    """
+    ...
+
 @typing.final
 class ShutdownOption:
     r"""
@@ -1057,12 +1405,12 @@ class ShutdownOption:
         ```
     """
     @property
-    def shutdown_type(self) -> tsubakurorustpython.ShutdownType:
+    def shutdown_type(self) -> ShutdownType:
         r"""
         Shutdown type.
         """
     @shutdown_type.setter
-    def shutdown_type(self, value: tsubakurorustpython.ShutdownType) -> None:
+    def shutdown_type(self, value: ShutdownType) -> None:
         r"""
         Shutdown type.
         """
@@ -1088,6 +1436,36 @@ class ShutdownOption:
             ShutdownOption: A new `ShutdownOption` instance.
         """
 
+class SqlExecutionException(builtins.SqlServiceException):
+    r"""
+    SqlExecutionException
+    """
+    ...
+
+class SqlLimitReachedException(builtins.DataError):
+    r"""
+    SqlLimitReachedException
+    """
+    ...
+
+class SqlRequestTimeoutException(builtins.SqlExecutionException):
+    r"""
+    SqlRequestTimeoutException
+    """
+    ...
+
+class SqlServiceException(builtins.ServerException):
+    r"""
+    SqlServiceException
+    """
+    ...
+
+class StatementNotFoundException(builtins.RequestFailureException):
+    r"""
+    StatementNotFoundException
+    """
+    ...
+
 @typing.final
 class Str:
     r"""
@@ -1106,6 +1484,18 @@ class Str:
         Create a new `Str`.
         """
     def __repr__(self) -> builtins.str: ...
+
+class SymbolAnalyzeException(builtins.AnalyzeException):
+    r"""
+    SymbolAnalyzeException
+    """
+    ...
+
+class SyntaxException(builtins.CompileException):
+    r"""
+    SyntaxException
+    """
+    ...
 
 @typing.final
 class TableMetadata:
@@ -1167,6 +1557,18 @@ class TableMetadata:
         """
     def __repr__(self) -> builtins.str: ...
 
+class TargetAlreadyExistsException(builtins.SqlExecutionException):
+    r"""
+    TargetAlreadyExistsException
+    """
+    ...
+
+class TargetNotFoundException(builtins.SqlExecutionException):
+    r"""
+    TargetNotFoundException
+    """
+    ...
+
 @typing.final
 class Time:
     r"""
@@ -1217,6 +1619,18 @@ class Time:
         """
     def __repr__(self) -> builtins.str: ...
 
+class TransactionExceededLimitException(builtins.SqlLimitReachedException):
+    r"""
+    TransactionExceededLimitException
+    """
+    ...
+
+class TransactionNotFoundException(builtins.RequestFailureException):
+    r"""
+    TransactionNotFoundException
+    """
+    ...
+
 @typing.final
 class TransactionOption:
     r"""
@@ -1257,12 +1671,12 @@ class TransactionOption:
         ```
     """
     @property
-    def transaction_type(self) -> tsubakurorustpython.TransactionType:
+    def transaction_type(self) -> TransactionType:
         r"""
         Transaction type.
         """
     @transaction_type.setter
-    def transaction_type(self, value: tsubakurorustpython.TransactionType) -> None:
+    def transaction_type(self, value: TransactionType) -> None:
         r"""
         Transaction type.
         """
@@ -1429,6 +1843,72 @@ class TransactionOption:
             ```
         """
 
+class TypeAnalyzeException(builtins.AnalyzeException):
+    r"""
+    TypeAnalyzeException
+    """
+    ...
+
+class UniqueConstraintViolationException(builtins.ConstraintViolationException):
+    r"""
+    UniqueConstraintViolationException
+    """
+    ...
+
+class UnresolvedPlaceholderException(builtins.ParameterException):
+    r"""
+    UnresolvedPlaceholderException
+    """
+    ...
+
+class UnsupportedCompilerFeatureException(builtins.NotSupportedError):
+    r"""
+    UnsupportedCompilerFeatureException
+    """
+    ...
+
+class UnsupportedRuntimeFeatureException(builtins.NotSupportedError):
+    r"""
+    UnsupportedRuntimeFeatureException
+    """
+    ...
+
+class ValueAnalyzeException(builtins.AnalyzeException):
+    r"""
+    ValueAnalyzeException
+    """
+    ...
+
+class ValueEvaluationException(builtins.EvaluationException):
+    r"""
+    ValueEvaluationException
+    """
+    ...
+
+class ValueOutOfRangeException(builtins.InvalidRuntimeValueException):
+    r"""
+    ValueOutOfRangeException
+    """
+    ...
+
+class ValueTooLongException(builtins.InvalidRuntimeValueException):
+    r"""
+    ValueTooLongException
+    """
+    ...
+
+class Warning(builtins.Exception):
+    r"""
+    important warning
+    """
+    ...
+
+class WriteOperationByRtxException(builtins.RestrictedOperationException):
+    r"""
+    WriteOperationByRtxException
+    """
+    ...
+
 @typing.final
 class CommitType(enum.Enum):
     r"""
@@ -1508,8 +1988,7 @@ class TransactionType(enum.Enum):
     Read-only transaction (RTX).
     """
 
-@typing.overload
-def connect(*args: typing.Any, **kwargs: typing.Any) -> tsubakurorustpython.Connection:
+def connect(*args: typing.Any, **kwargs: typing.Any) -> Connection:
     r"""
     Constructor for creating a connection to the Tsurugi.
     
@@ -1540,15 +2019,6 @@ def connect(*args: typing.Any, **kwargs: typing.Any) -> tsubakurorustpython.Conn
             pass
         ```
     """
-
-@typing.overload
-def connect(*args: tsubakuro_rust_python.Config) -> tsubakuro_rust_python.Connection: ...
-
-@typing.overload
-def connect(*args: Any) -> tsubakuro_rust_python.Connection: ...
-
-@typing.overload
-def connect(**kwargs: Any) -> tsubakuro_rust_python.Connection: ...
 
 def env_logger_init(filters: builtins.str = 'tsubakuro_rust_python=info', file_path: typing.Optional[builtins.str] = None) -> None:
     r"""

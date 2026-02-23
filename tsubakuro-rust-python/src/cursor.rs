@@ -42,7 +42,7 @@ impl RowNumber {
 ///     rowcount (int): Number of rows affected by the last `Cursor.execute*()` method. -1 if not applicable. (read only)
 ///     closed (bool): Whether the cursor is closed. (read only)
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 pub struct Cursor {
     connection: Arc<InnerConnection>,
     /// Whether to execute `Cursor.executemany()` asynchronously. Default is `True`.

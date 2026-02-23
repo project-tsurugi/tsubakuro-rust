@@ -7,7 +7,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDate};
 /// Attributes:
 ///     value (Optional[datetime.date]): date value. (read only)
 #[gen_stub_pyclass]
-#[pyclass]
+#[pyclass(module = "tsubakuro_rust_python")]
 #[derive(Debug)]
 pub struct Date {
     value: Option<TgDate>,
