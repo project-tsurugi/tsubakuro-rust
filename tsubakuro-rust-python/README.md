@@ -54,6 +54,8 @@ def example():
             connection.commit()
 ```
 
+See [examples](examples) for more examples.
+
 ## How to build
 
 Since it depends on [tsubakuro-rust-core](../tsubakuro-rust-core), its build environment (e.g. `rustc`, `cargo`, `protoc`) is required.

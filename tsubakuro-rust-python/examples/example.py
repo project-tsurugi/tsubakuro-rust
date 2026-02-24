@@ -58,7 +58,7 @@ def execute(connection):
         cursor.execute(
             "create table tsubakuro_rust_python_example (foo int primary key, bar bigint, zzz varchar(10))"
         )
-        connection.commit()
+        connection.commit()  # You must commit even with DDL.
 
         cursor.execute(
             "insert into tsubakuro_rust_python_example values (1, 100, 'abc'), (2, 200, 'def'), (3, 300, 'ghi')"
