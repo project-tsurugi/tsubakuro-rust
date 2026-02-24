@@ -9,10 +9,13 @@ pub fn env_logger_init(filters: &str, file_path: Option<String>) {
     const FUNCTION_NAME: &str = "env_logger_init()";
     trace!("{FUNCTION_NAME} start");
 
+    let filters = filters.replace("tsubakuro_rust_python", "_tsubakuro_rust_python");
+    let filters = filters.replace("__tsubakuro_rust_python", "_tsubakuro_rust_python");
+
     ENV_LOGGER_INIT.call_once(|| {
         let mut builder = Builder::new();
 
-        builder.parse_filters(filters);
+        builder.parse_filters(&filters);
 
         if let Some(file_path) = file_path {
             env_logger_init_file(&mut builder, &file_path);
