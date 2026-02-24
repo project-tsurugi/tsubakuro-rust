@@ -140,7 +140,7 @@ impl Cursor {
     ///     import tsubakuro_rust_python as tsurugi
     ///
     ///     sql = "insert into example values (?, ?)"
-    ///     cursor.prepare(sql, (tsurugi.Int64, tsurugi.Str))
+    ///     cursor.prepare(sql, (tsurugi.type_code.Int64, tsurugi.type_code.Str))
     ///     cursor.execute(sql, (1, "Hello"))
     ///     connection.commit()
     ///     ```
@@ -149,7 +149,7 @@ impl Cursor {
     ///     import tsubakuro_rust_python as tsurugi
     ///
     ///     sql = "insert into example values (:id, :name)"
-    ///     cursor.prepare(sql, {"id": tsurugi.Int64, "name": tsurugi.Str})
+    ///     cursor.prepare(sql, {"id": tsurugi.type_code.Int64, "name": tsurugi.type_code.Str})
     ///     cursor.execute(sql, {"id": 1, "name": "Hello"})
     ///     connection.commit()
     ///     ```

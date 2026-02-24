@@ -86,47 +86,47 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.OffsetDatetime()
+    value = tsurugi.type_code.OffsetDatetime()
     assert value.value is None
-    value = tsurugi.OffsetDatetime(None)
+    value = tsurugi.type_code.OffsetDatetime(None)
     assert value.value is None
     assert value.nanosecond is None
 
     JST = datetime.timezone(datetime.timedelta(hours=9))
     UTC = datetime.timezone(datetime.timedelta(hours=0))
-    value = tsurugi.OffsetDatetime(
+    value = tsurugi.type_code.OffsetDatetime(
         datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
     )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
     assert value.nanosecond == 123456000
 
-    value = tsurugi.OffsetDatetime(
+    value = tsurugi.type_code.OffsetDatetime(
         datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
     )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
     assert value.nanosecond == 123456000
 
-    value = tsurugi.OffsetDatetime(
+    value = tsurugi.type_code.OffsetDatetime(
         datetime.datetime(2026, 1, 27, 16, 24, 30, tzinfo=JST), 123456789
     )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
     assert value.nanosecond == 123456789
     assert value.__repr__() == "OffsetDatetime(2026-01-27 16:24:30.123456789 +09:00)"
 
-    value = tsurugi.OffsetDatetime(
+    value = tsurugi.type_code.OffsetDatetime(
         datetime.datetime(2026, 1, 27, 16, 24, 30, tzinfo=UTC), 123456789
     )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
     assert value.nanosecond == 123456789
 
-    value = tsurugi.OffsetDatetime.of(2026, 1, 27, 16, 24, 30, 123456789, JST)
+    value = tsurugi.type_code.OffsetDatetime.of(2026, 1, 27, 16, 24, 30, 123456789, JST)
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
     assert value.nanosecond == 123456789
-    value = tsurugi.OffsetDatetime.of(2026, 1, 27)
+    value = tsurugi.type_code.OffsetDatetime.of(2026, 1, 27)
     assert value.value == datetime.datetime(2026, 1, 27, 0, 0, 0, 0, tzinfo=UTC)
     assert value.nanosecond == 0
 
-    value = tsurugi.OffsetDatetime.raw(1769531070, 123456789, 9 * 60)
+    value = tsurugi.type_code.OffsetDatetime.raw(1769531070, 123456789, 9 * 60)
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
     assert value.nanosecond == 123456789
 
@@ -139,7 +139,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.OffsetDatetime(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.OffsetDatetime(None)),
             (1, datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)),
             (2, datetime.datetime(2026, 1, 27, 23, 59, 59, 123456, tzinfo=JST)),
         ]
@@ -178,16 +178,16 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.OffsetDatetime(None)},
+            {"pk": tsurugi.type_code.Int32(0), "value": tsurugi.type_code.OffsetDatetime(None)},
             {
-                "pk": tsurugi.Int32(1),
-                "value": tsurugi.OffsetDatetime(
+                "pk": tsurugi.type_code.Int32(1),
+                "value": tsurugi.type_code.OffsetDatetime(
                     datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
                 ),
             },
             {
-                "pk": tsurugi.Int32(2),
-                "value": tsurugi.OffsetDatetime(
+                "pk": tsurugi.type_code.Int32(2),
+                "value": tsurugi.type_code.OffsetDatetime(
                     datetime.datetime(2026, 1, 27, 23, 59, 59, 123456, tzinfo=JST)
                 ),
             },
@@ -235,7 +235,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.OffsetDatetime),
+            (tsurugi.type_code.Int32, tsurugi.type_code.OffsetDatetime),
         )
         parameters = [
             (0, None),
@@ -247,7 +247,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.OffsetDatetime()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.OffsetDatetime()),
         )
         parameters = [
             (3, datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)),
@@ -279,7 +279,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.OffsetDatetime},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.OffsetDatetime},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -297,7 +297,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.OffsetDatetime()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.OffsetDatetime()},
         )
         parameters = [
             {

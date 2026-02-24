@@ -78,29 +78,31 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Time()
+    value = tsurugi.type_code.Time()
     assert value.value is None
-    value = tsurugi.Time(None)
+    value = tsurugi.type_code.Time(None)
     assert value.value is None
     assert value.nanosecond is None
 
-    value = tsurugi.Time(datetime.time(12, 34, 56, 123456))
+    value = tsurugi.type_code.Time(datetime.time(12, 34, 56, 123456))
     assert value.value == datetime.time(12, 34, 56, 123456)
     assert value.nanosecond == 123456000
 
-    value = tsurugi.Time(datetime.time(12, 34, 56), 123456789)
+    value = tsurugi.type_code.Time(datetime.time(12, 34, 56), 123456789)
     assert value.value == datetime.time(12, 34, 56, 123456)
     assert value.nanosecond == 123456789
     assert value.__repr__() == "Time(12:34:56.123456789)"
 
-    value = tsurugi.Time.of(12, 34, 56, 123456789)
+    value = tsurugi.type_code.Time.of(12, 34, 56, 123456789)
     assert value.value == datetime.time(12, 34, 56, 123456)
     assert value.nanosecond == 123456789
-    value = tsurugi.Time.of()
+    value = tsurugi.type_code.Time.of()
     assert value.value == datetime.time(0, 0, 0, 0)
     assert value.nanosecond == 0
 
-    value = tsurugi.Time.raw(((12 * 60 + 34) * 60 + 56) * 1_000_000_000 + 123456789)
+    value = tsurugi.type_code.Time.raw(
+        ((12 * 60 + 34) * 60 + 56) * 1_000_000_000 + 123456789
+    )
     assert value.value == datetime.time(12, 34, 56, 123456)
     assert value.nanosecond == 123456789
 
@@ -110,7 +112,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Time(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Time(None)),
             (1, datetime.time(0, 0, 0)),
             (2, datetime.time(12, 34, 56, 123456)),
         ]
@@ -144,8 +146,11 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Time(None)},
-            {"pk": tsurugi.Int32(1), "value": tsurugi.Time(datetime.time(0, 0, 0))},
+            {"pk": tsurugi.type_code.Int32(0), "value": tsurugi.type_code.Time(None)},
+            {
+                "pk": tsurugi.type_code.Int32(1),
+                "value": tsurugi.type_code.Time(datetime.time(0, 0, 0)),
+            },
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
@@ -178,7 +183,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Time),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Time),
         )
         parameters = [
             (0, None),
@@ -190,7 +195,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Time()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Time()),
         )
         parameters = [
             (3, datetime.time(0, 0, 0)),
@@ -219,7 +224,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Time},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Time},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -231,7 +236,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Time()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Time()},
         )
         parameters = [
             {"pk": 3, "value": datetime.time(0, 0, 0)},

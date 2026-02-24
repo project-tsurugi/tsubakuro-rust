@@ -11,6 +11,7 @@ def main():
 
 def example1():
     config = tsurugi.Config()
+    config.application_name = "tsubakuro-rust-python example"
     config.endpoint = "tcp://localhost:12345"
     config.user = "tsurugi"
     config.password = "password"
@@ -23,6 +24,7 @@ def example1():
 
 def example2():
     config = tsurugi.Config(
+        application_name="tsubakuro-rust-python example",
         endpoint="tcp://localhost:12345",
         user="tsurugi",
         password="password",
@@ -34,6 +36,7 @@ def example2():
 
 def example3():
     with tsurugi.connect(
+        application_name="tsubakuro-rust-python example",
         endpoint="tcp://localhost:12345",
         user="tsurugi",
         password="password",

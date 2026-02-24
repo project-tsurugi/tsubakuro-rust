@@ -9,7 +9,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimeOfDayWith
 ///     value (Optional[datetime.time]): time value with time zone. (read only)
 ///     nanosecond (Optional[int]): nanosecond part of the time. (read only)
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python")]
+#[pyclass(module = "tsubakuro_rust_python.type_code")]
 #[derive(Debug)]
 pub struct OffsetTime {
     value: Option<TgTimeOfDayWithTimeZone>,

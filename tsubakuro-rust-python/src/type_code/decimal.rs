@@ -7,7 +7,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDecimal};
 /// Attributes:
 ///     value (Optional[decimal.Decimal]): decimal value. (read only)
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python")]
+#[pyclass(module = "tsubakuro_rust_python.type_code")]
 #[derive(Debug)]
 pub struct Decimal {
     value: Option<TgDecimal>,

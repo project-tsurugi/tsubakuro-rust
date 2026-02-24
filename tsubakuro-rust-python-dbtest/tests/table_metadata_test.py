@@ -1,5 +1,5 @@
 import tsubakuro_rust_python as tsurugi
-from tsubakuro_rust_python import ProgrammingError
+from tsubakuro_rust_python.error import ProgrammingError
 
 
 def test_table_metadata(connection):
@@ -10,7 +10,7 @@ def test_table_metadata(connection):
         try:
             metadata = connection.get_table_metadata("tsubakuro_rust_python_test")
             assert False, "Expected TargetNotFoundException"
-        except tsurugi.TargetNotFoundException:
+        except tsurugi.error.TargetNotFoundException:
             pass
 
         metadata = connection.find_table_metadata("tsubakuro_rust_python_test")

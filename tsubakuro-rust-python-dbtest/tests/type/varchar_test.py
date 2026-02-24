@@ -74,7 +74,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Str(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Str(None)),
             (1, "abc"),
             (2, "def"),
             (3, ""),
@@ -101,9 +101,9 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Str(None)},
-            {"pk": tsurugi.Int32(1), "value": tsurugi.Str("abc")},
-            {"pk": tsurugi.Int32(2), "value": tsurugi.Str("def")},
+            {"pk": tsurugi.type_code.Int32(0), "value": tsurugi.type_code.Str(None)},
+            {"pk": tsurugi.type_code.Int32(1), "value": tsurugi.type_code.Str("abc")},
+            {"pk": tsurugi.type_code.Int32(2), "value": tsurugi.type_code.Str("def")},
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
@@ -139,7 +139,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Str),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Str),
         )
         parameters = [
             (0, None),
@@ -150,7 +150,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Str()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Str()),
         )
         parameters = [
             (2, "def"),
@@ -177,7 +177,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Str},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Str},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -188,7 +188,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Str()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Str()},
         )
         parameters = [
             {"pk": 2, "value": "def"},

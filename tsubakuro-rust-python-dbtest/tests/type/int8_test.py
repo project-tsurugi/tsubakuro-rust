@@ -67,11 +67,11 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Int64()
+    value = tsurugi.type_code.Int64()
     assert value.value is None
-    value = tsurugi.Int64(None)
+    value = tsurugi.type_code.Int64(None)
     assert value.value is None
-    value = tsurugi.Int64(123)
+    value = tsurugi.type_code.Int64(123)
     assert value.value == 123
 
 
@@ -80,7 +80,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Int64(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Int64(None)),
             (1, 1),
             (2, 0),
             (3, -9223372036854775808),
@@ -108,7 +108,7 @@ def test_placeholder_wrapper2(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(1), tsurugi.Int64(1)),
+            (tsurugi.type_code.Int32(1), tsurugi.type_code.Int64(1)),
             (2, 0),
             (3, -9223372036854775808),
             (4, 9223372036854775807),
@@ -136,9 +136,9 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Int64(None)},
-            {"pk": tsurugi.Int32(1), "value": tsurugi.Int64(1)},
-            {"pk": tsurugi.Int32(2), "value": tsurugi.Int64(0)},
+            {"pk": tsurugi.type_code.Int32(0), "value": tsurugi.type_code.Int64(None)},
+            {"pk": tsurugi.type_code.Int32(1), "value": tsurugi.type_code.Int64(1)},
+            {"pk": tsurugi.type_code.Int32(2), "value": tsurugi.type_code.Int64(0)},
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
@@ -174,7 +174,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Int64),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Int64),
         )
         parameters = [
             (0, None),
@@ -186,7 +186,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Int64()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Int64()),
         )
         parameters = [
             (3, -9223372036854775808),
@@ -215,7 +215,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Int64},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Int64},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -227,7 +227,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Int64()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Int64()},
         )
         parameters = [
             {"pk": 3, "value": -9223372036854775808},

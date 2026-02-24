@@ -34,6 +34,7 @@ use crate::{
 ///     import tsubakuro_rust_python as tsurugi
 ///
 ///     config = tsurugi.Config()
+///     config.application_name = "tsubakuro-rust-python example"
 ///     config.endpoint = "tcp://localhost:12345"
 ///     config.user = "tsurugi"
 ///     config.password = "password"
@@ -44,6 +45,7 @@ use crate::{
 ///     import tsubakuro_rust_python as tsurugi
 ///
 ///     config = tsurugi.Config(
+///         application_name="tsurugi-rust-python example",
 ///         endpoint="tcp://localhost:12345",
 ///         user="tsurugi",
 ///         password="password",

@@ -21,7 +21,7 @@ dynamic = ["version"]
 [tool.maturin]
 module-name = "tsubakuro_rust_python._tsubakuro_rust_python"
 python-source = "python"
-features = ["pyo3/extension-module"]
+exclude = ["**/__pycache__", "**/*.pyc"]
 
 [tool.uv]
 cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }, { file = "python/**/*.py" }]

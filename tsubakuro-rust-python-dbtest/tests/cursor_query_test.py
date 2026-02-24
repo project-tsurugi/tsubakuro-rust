@@ -1,4 +1,4 @@
-from tsubakuro_rust_python import ProgrammingError
+from tsubakuro_rust_python.error import ProgrammingError
 
 
 def drop_and_create_table(connection):
@@ -39,7 +39,6 @@ def test_description(connection):
 
 def test_fetchone(connection):
     drop_and_create_table(connection)
-
     with connection.cursor() as cursor:
         cursor.execute("select * from tsubakuro_rust_python_test order by foo")
         assert cursor.rownumber == 0

@@ -58,16 +58,19 @@ def example():
 
 Since it depends on [tsubakuro-rust-core](../tsubakuro-rust-core), its build environment (e.g. `rustc`, `cargo`, `protoc`) is required.
 
-### Generate `.pyi` file
+### Generate type stub file
+
+After generating the type stub file using `stub_gen`, make changes using `modify_pyi.py`.
 
 ```bash
 cd tsubakuro-rust-python
 cargo run --bin stub_gen
+uv run tools/modify_pyi.py -d python
 
-ls tsubakuro_rust_python.pyi
+find python -name "*.pyi"
 ```
 
-### Generate `.whl` file
+### Generate wheel file
 
 Install [`maturin`](https://github.com/PyO3/maturin) beforehand.
 
@@ -77,7 +80,7 @@ uv tool install maturin
 
 > [!NOTE]
 >
-> To include a stub file in the wheel file, generate `tsubakuro_rust_python.pyi` first.
+> To include type stub files in the wheel file, generate stub files first.
 
 ```bash
 cd tsubakuro-rust-python

@@ -2,177 +2,27 @@
 # ruff: noqa: E501, F401, F403, F405
 
 import builtins
-import datetime
-import decimal
 import enum
 import typing
-from . import _tsubakuro_rust_python
+from . import error
+from . import type_code
 __all__ = [
-    "AnalyzeException",
-    "BlockedByConcurrentOperationException",
-    "BlockedByHighPriorityTransactionException",
-    "Bool",
-    "Bytes",
-    "CcException",
-    "CheckConstraintViolationException",
     "Column",
     "CommitOption",
     "CommitType",
-    "CompileException",
     "Config",
-    "ConflictOnWritePreserveException",
     "Connection",
-    "ConstraintViolationException",
     "Cursor",
-    "DataCorruptionException",
-    "DataError",
-    "DatabaseError",
-    "Date",
-    "Datetime",
-    "Decimal",
-    "DependenciesViolationException",
-    "DumpDirectoryInaccessibleException",
-    "DumpFileException",
-    "Error",
-    "EvaluationException",
-    "Float32",
-    "Float64",
-    "InactiveTransactionException",
-    "InconsistentStatementException",
-    "Int32",
-    "Int64",
-    "IntegrityError",
-    "InterfaceError",
-    "InternalError",
-    "InternalException",
-    "InvalidDecimalValueException",
-    "InvalidRuntimeValueException",
-    "LoadFileException",
-    "LoadFileFormatException",
-    "LoadFileNotFoundException",
-    "LtxException",
-    "LtxReadException",
-    "LtxWriteException",
-    "LtxWriteOperationWithoutWritePreserveException",
-    "NotNullConstraintViolationException",
-    "NotSupportedError",
-    "OccException",
-    "OccReadException",
-    "OccWriteException",
-    "OffsetDatetime",
-    "OffsetTime",
-    "OperationalError",
-    "ParameterException",
-    "ProgrammingError",
-    "ReadOperationOnRestrictedReadAreaException",
-    "ReferentialIntegrityConstraintViolationException",
-    "RequestFailureException",
-    "RestrictedOperationException",
-    "RtxException",
-    "ScalarSubqueryEvaluationException",
-    "SecondaryIndexCorruptionException",
-    "ServerException",
     "ShutdownOption",
     "ShutdownType",
-    "SqlExecutionException",
-    "SqlLimitReachedException",
-    "SqlRequestTimeoutException",
-    "SqlServiceException",
-    "StatementNotFoundException",
-    "Str",
-    "SymbolAnalyzeException",
-    "SyntaxException",
     "TableMetadata",
-    "TargetAlreadyExistsException",
-    "TargetNotFoundException",
-    "Time",
-    "TransactionExceededLimitException",
-    "TransactionNotFoundException",
     "TransactionOption",
     "TransactionType",
-    "TypeAnalyzeException",
-    "UniqueConstraintViolationException",
-    "UnresolvedPlaceholderException",
-    "UnsupportedCompilerFeatureException",
-    "UnsupportedRuntimeFeatureException",
-    "ValueAnalyzeException",
-    "ValueEvaluationException",
-    "ValueOutOfRangeException",
-    "ValueTooLongException",
-    "Warning",
-    "WriteOperationByRtxException",
     "connect",
     "env_logger_init",
+    "error",
+    "type_code",
 ]
-
-class AnalyzeException(builtins.CompileException):
-    r"""
-    AnalyzeException
-    """
-    ...
-
-class BlockedByConcurrentOperationException(builtins.CcException):
-    r"""
-    BlockedByConcurrentOperationException
-    """
-    ...
-
-class BlockedByHighPriorityTransactionException(builtins.SqlExecutionException):
-    r"""
-    BlockedByHighPriorityTransactionException
-    """
-    ...
-
-@typing.final
-class Bool:
-    r"""
-    BOOLEAN type.
-    
-    Attributes:
-        value (Optional[bool]): boolean value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[builtins.bool]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[builtins.bool] = None) -> Bool:
-        r"""
-        Create a new `Bool`.
-        """
-    def __bool__(self) -> builtins.bool: ...
-    def __repr__(self) -> builtins.str: ...
-
-@typing.final
-class Bytes:
-    r"""
-    BINARY, VARBINARY type.
-    
-    Attributes:
-        value (Optional[bytes]): binary data. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[builtins.list[builtins.int]]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[typing.Sequence[builtins.int]] = None) -> Bytes:
-        r"""
-        Create a new `Bytes`.
-        """
-    def __repr__(self) -> builtins.str: ...
-
-class CcException(builtins.SqlServiceException):
-    r"""
-    CcException
-    """
-    ...
-
-class CheckConstraintViolationException(builtins.ConstraintViolationException):
-    r"""
-    CheckConstraintViolationException
-    """
-    ...
 
 @typing.final
 class Column:
@@ -303,12 +153,6 @@ class CommitOption:
             CommitOption: A new `CommitOption` instance.
         """
 
-class CompileException(builtins.ProgrammingError):
-    r"""
-    CompileException
-    """
-    ...
-
 @typing.final
 class Config:
     r"""
@@ -331,6 +175,7 @@ class Config:
         import tsubakuro_rust_python as tsurugi
     
         config = tsurugi.Config()
+        config.application_name = "tsubakuro-rust-python example"
         config.endpoint = "tcp://localhost:12345"
         config.user = "tsurugi"
         config.password = "password"
@@ -341,6 +186,7 @@ class Config:
         import tsubakuro_rust_python as tsurugi
     
         config = tsurugi.Config(
+            application_name="tsurugi-rust-python example",
             endpoint="tcp://localhost:12345",
             user="tsurugi",
             password="password",
@@ -476,12 +322,6 @@ class Config:
         """
     def __repr__(self) -> builtins.str: ...
 
-class ConflictOnWritePreserveException(builtins.OccReadException):
-    r"""
-    ConflictOnWritePreserveException
-    """
-    ...
-
 @typing.final
 class Connection:
     r"""
@@ -540,7 +380,12 @@ class Connection:
         
         Examples:
             ```python
-            metadata = connection.get_table_metadata("my_table")
+            import tsubakuro_rust_python as tsurugi
+        
+            try:
+                metadata = connection.get_table_metadata("my_table")
+            except tsurugi.error.TargetNotFoundException:
+                pass
             ```
         """
     def find_table_metadata(self, table_name: builtins.str) -> typing.Optional[TableMetadata]:
@@ -604,12 +449,6 @@ class Connection:
         r"""
         Close the connection.
         """
-
-class ConstraintViolationException(builtins.IntegrityError):
-    r"""
-    ConstraintViolationException
-    """
-    ...
 
 @typing.final
 class Cursor:
@@ -709,7 +548,7 @@ class Cursor:
             import tsubakuro_rust_python as tsurugi
         
             sql = "insert into example values (?, ?)"
-            cursor.prepare(sql, (tsurugi.Int64, tsurugi.Str))
+            cursor.prepare(sql, (tsurugi.type_code.Int64, tsurugi.type_code.Str))
             cursor.execute(sql, (1, "Hello"))
             connection.commit()
             ```
@@ -718,7 +557,7 @@ class Cursor:
             import tsubakuro_rust_python as tsurugi
         
             sql = "insert into example values (:id, :name)"
-            cursor.prepare(sql, {"id": tsurugi.Int64, "name": tsurugi.Str})
+            cursor.prepare(sql, {"id": tsurugi.type_code.Int64, "name": tsurugi.type_code.Str})
             cursor.execute(sql, {"id": 1, "name": "Hello"})
             connection.commit()
             ```
@@ -841,553 +680,6 @@ class Cursor:
         Close the cursor.
         """
 
-class DataCorruptionException(builtins.SqlExecutionException):
-    r"""
-    DataCorruptionException
-    """
-    ...
-
-class DataError(builtins.DatabaseError):
-    r"""
-    data error
-    """
-    ...
-
-class DatabaseError(builtins.Error):
-    r"""
-    database error
-    """
-    ...
-
-@typing.final
-class Date:
-    r"""
-    DATE type.
-    
-    Attributes:
-        value (Optional[datetime.date]): date value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[datetime.date]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[datetime.date] = None) -> Date:
-        r"""
-        Create a new `Date`.
-        """
-    @classmethod
-    def of(cls, year: builtins.int, month: builtins.int, day: builtins.int) -> Date:
-        r"""
-        Create a `Date` from year, month, and day.
-        
-        Args:
-            year (int): year
-            month (int): month (1-12)
-            day (int): day (1-31)
-        
-        Returns:
-            Date: created `Date` object
-        """
-    @classmethod
-    def raw(cls, epoch_days: builtins.int) -> Date:
-        r"""
-        Create a `Date` from epoch days.
-        
-        Args:
-            epoch_days (int): number of days offset of epoch 1970-01-01
-        
-        Returns:
-            Date: created `Date` object
-        """
-    def __repr__(self) -> builtins.str: ...
-
-@typing.final
-class Datetime:
-    r"""
-    TIMESTAMP type.
-    
-    Attributes:
-        value (Optional[datetime.datetime]): datetime value. (read only)
-        nanosecond (Optional[int]): nanosecond part of the time. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[datetime.datetime]:
-        r"""
-        Value.
-        """
-    @property
-    def nanosecond(self) -> typing.Optional[builtins.int]:
-        r"""
-        Nnanosecond.
-        """
-    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> Datetime:
-        r"""
-        Create a new `Datetime`.
-        """
-    @classmethod
-    def of(cls, year: builtins.int, month: builtins.int, day: builtins.int, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0) -> Datetime:
-        r"""
-        Create a `Datetime` from year, month, day, hour, minute, second, and nanosecond.
-        
-        Args:
-            year (int): year
-            month (int): month (1-12)
-            day (int): day (1-31)
-            hour (int, optional): hour (0-23)
-            minute (int, optional): minute (0-59)
-            second (int, optional): second (0-59)
-            nanosecond (int, optional): nanosecond (0-999,999,999)
-        
-        Returns:
-            Datetime: created `Datetime` object
-        """
-    @classmethod
-    def raw(cls, epoch_seconds: builtins.int, nanos: builtins.int) -> Datetime:
-        r"""
-        Create a `Datetime` from epoch seconds and nanoseconds.
-        
-        Args:
-            epoch_seconds (int): offset seconds from epoch (1970-01-01 00:00:00)
-            nanos (int): nanosecond part of the time (0-999,999,999)
-        
-        Returns:
-            Datetime: created `Datetime` object
-        """
-    def __repr__(self) -> builtins.str: ...
-
-@typing.final
-class Decimal:
-    r"""
-    DECIMAL type.
-    
-    Attributes:
-        value (Optional[decimal.Decimal]): decimal value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[decimal.Decimal]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[decimal.Decimal] = None) -> Decimal:
-        r"""
-        Create a new `Decimal`.
-        """
-    @classmethod
-    def raw(cls, unscaled_value: typing.Sequence[builtins.int], exponent: builtins.int) -> Decimal:
-        r"""
-        Create a `Decimal` from unscaled value and exponent.
-        
-        Args:
-            unscaled_value (bytes): unscaled value as big-endian byte array
-            exponent (int): exponent
-        
-        Returns:
-            Decimal: created `Decimal` object
-        """
-    def __repr__(self) -> builtins.str: ...
-
-class DependenciesViolationException(builtins.RestrictedOperationException):
-    r"""
-    DependenciesViolationException
-    """
-    ...
-
-class DumpDirectoryInaccessibleException(builtins.DumpFileException):
-    r"""
-    DumpDirectoryInaccessibleException
-    """
-    ...
-
-class DumpFileException(builtins.SqlExecutionException):
-    r"""
-    DumpFileException
-    """
-    ...
-
-class Error(builtins.Exception):
-    r"""
-    base class of all other exceptions
-    """
-    ...
-
-class EvaluationException(builtins.DataError):
-    ...
-
-@typing.final
-class Float32:
-    r"""
-    REAL type.
-    
-    Attributes:
-        value (Optional[float]): float value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[builtins.float]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float32:
-        r"""
-        Create a new `Float32`.
-        """
-    def __float__(self) -> typing.Optional[builtins.float]: ...
-    def __repr__(self) -> builtins.str: ...
-
-@typing.final
-class Float64:
-    r"""
-    DOUBLE type.
-    
-    Attributes:
-        value (Optional[float]): float value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[builtins.float]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[builtins.float] = None) -> Float64:
-        r"""
-        Create a new `Float64`.
-        """
-    def __float__(self) -> typing.Optional[builtins.float]: ...
-    def __repr__(self) -> builtins.str: ...
-
-class InactiveTransactionException(builtins.RestrictedOperationException):
-    r"""
-    InactiveTransactionException
-    """
-    ...
-
-class InconsistentStatementException(builtins.SqlExecutionException):
-    r"""
-    InconsistentStatementException
-    """
-    ...
-
-@typing.final
-class Int32:
-    r"""
-    INT type.
-    
-    Attributes:
-        value (Optional[int]): integer value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[builtins.int]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int32:
-        r"""
-        Create a new `Int32`.
-        """
-    def __int__(self) -> typing.Optional[builtins.int]: ...
-    def __repr__(self) -> builtins.str: ...
-
-@typing.final
-class Int64:
-    r"""
-    BIGINT type.
-    
-    Attributes:
-        value (Optional[int]): integer value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[builtins.int]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[builtins.int] = None) -> Int64:
-        r"""
-        Create a new `Int64`.
-        """
-    def __int__(self) -> typing.Optional[builtins.int]: ...
-    def __repr__(self) -> builtins.str: ...
-
-class IntegrityError(builtins.DatabaseError):
-    r"""
-    integrity error
-    """
-    ...
-
-class InterfaceError(builtins.Error):
-    r"""
-    interface error
-    """
-    ...
-
-class InternalError(builtins.DatabaseError):
-    r"""
-    internal error
-    """
-    ...
-
-class InternalException(builtins.InternalError):
-    r"""
-    InternalException
-    """
-    ...
-
-class InvalidDecimalValueException(builtins.InvalidRuntimeValueException):
-    r"""
-    InvalidDecimalValueException
-    """
-    ...
-
-class InvalidRuntimeValueException(builtins.SqlLimitReachedException):
-    r"""
-    InvalidRuntimeValueException
-    """
-    ...
-
-class LoadFileException(builtins.SqlExecutionException):
-    r"""
-    LoadFileException
-    """
-    ...
-
-class LoadFileFormatException(builtins.LoadFileException):
-    r"""
-    LoadFileFormatException
-    """
-    ...
-
-class LoadFileNotFoundException(builtins.LoadFileException):
-    r"""
-    LoadFileNotFoundException
-    """
-    ...
-
-class LtxException(builtins.CcException):
-    r"""
-    LtxException
-    """
-    ...
-
-class LtxReadException(builtins.LtxException):
-    r"""
-    LtxReadException
-    """
-    ...
-
-class LtxWriteException(builtins.LtxException):
-    r"""
-    LtxWriteException
-    """
-    ...
-
-class LtxWriteOperationWithoutWritePreserveException(builtins.RestrictedOperationException):
-    r"""
-    LtxWriteOperationWithoutWritePreserveException
-    """
-    ...
-
-class NotNullConstraintViolationException(builtins.ConstraintViolationException):
-    r"""
-    NotNullConstraintViolationException
-    """
-    ...
-
-class NotSupportedError(builtins.DatabaseError):
-    r"""
-    not supported error
-    """
-    ...
-
-class OccException(builtins.CcException):
-    r"""
-    OccException
-    """
-    ...
-
-class OccReadException(builtins.OccException):
-    r"""
-    OccReadException
-    """
-    ...
-
-class OccWriteException(builtins.OccException):
-    r"""
-    OccWriteException
-    """
-    ...
-
-@typing.final
-class OffsetDatetime:
-    r"""
-    TIMESTAMP WITH TIME ZONE type.
-    
-    Attributes:
-        value (Optional[datetime.datetime]): datetime value with time zone. (read only)
-        nanosecond (Optional[int]): nanosecond part of the time. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[datetime.datetime]:
-        r"""
-        Value.
-        """
-    @property
-    def nanosecond(self) -> typing.Optional[builtins.int]:
-        r"""
-        Nnanosecond.
-        """
-    def __new__(cls, value: typing.Optional[datetime.datetime] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetDatetime:
-        r"""
-        Create a new `OffsetDatetime`.
-        """
-    @classmethod
-    def of(cls, year: builtins.int, month: builtins.int, day: builtins.int, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0, tzinfo: typing.Optional[datetime.tzinfo] = None) -> OffsetDatetime:
-        r"""
-        Create a `OffsetDatetime` from year, month, day, hour, minute, second, nanosecond, and tzinfo.
-        
-        Args:
-            year (int): year
-            month (int): month (1-12)
-            day (int): day (1-31)
-            hour (int, optional): hour (0-23)
-            minute (int, optional): minute (0-59)
-            second (int, optional): second (0-59)
-            nanosecond (int, optional): nanosecond (0-999,999,999)
-            tzinfo (datetime.tzinfo, optional): time zone info (default: UTC)
-        
-        Returns:
-            OffsetDatetime: created `OffsetDatetime` object
-        """
-    @classmethod
-    def raw(cls, epoch_seconds: builtins.int, nanos: builtins.int, time_zone_offset: builtins.int) -> OffsetDatetime:
-        r"""
-        Create a `OffsetDatetime` from epoch seconds, nanoseconds, and time zone offset.
-        
-        Args:
-            epoch_seconds (int): offset seconds from epoch (1970-01-01 00:00:00)
-            nanos (int): nanosecond part of the time (0-999,999,999)
-            time_zone_offset (int): time zone offset in minutes
-        
-        Returns:
-            OffsetDatetime: created `OffsetDatetime` object
-        """
-    def __repr__(self) -> builtins.str: ...
-
-@typing.final
-class OffsetTime:
-    r"""
-    TIME WITH TIME ZONE type.
-    
-    Attributes:
-        value (Optional[datetime.time]): time value with time zone. (read only)
-        nanosecond (Optional[int]): nanosecond part of the time. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[datetime.time]:
-        r"""
-        Value.
-        """
-    @property
-    def nanosecond(self) -> typing.Optional[builtins.int]:
-        r"""
-        Nnanosecond.
-        """
-    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> OffsetTime:
-        r"""
-        Create a new `OffsetTime`.
-        """
-    @classmethod
-    def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0, tzinfo: typing.Optional[datetime.tzinfo] = None) -> OffsetTime:
-        r"""
-        Create a `OffsetTime` from hour, minute, second, nanosecond, and tzinfo.
-        
-        Args:
-            hour (int, optional): hour (0-23)
-            minute (int, optional): minute (0-59)
-            second (int, optional): second (0-59)
-            nanosecond (int, optional): nanosecond (0-999,999,999)
-            tzinfo (datetime.tzinfo, optional): time zone info (Default: UTC)
-        
-        Returns:
-            OffsetTime: created `OffsetTime` object
-        """
-    @classmethod
-    def raw(cls, nanoseconds_of_day: builtins.int, time_zone_offset: builtins.int) -> OffsetTime:
-        r"""
-        Create a `OffsetTime` from epoch nanoseconds of day and time zone offset.
-        
-        Args:
-            nanoseconds_of_day (int): offset nano-seconds from epoch (00:00:00) in the time zone
-            time_zone_offset (int): timezone offset in minute
-        
-        Returns:
-            OffsetTime: created `OffsetTime` object
-        """
-    def __repr__(self) -> builtins.str: ...
-
-class OperationalError(builtins.DatabaseError):
-    r"""
-    operation error
-    """
-    ...
-
-class ParameterException(builtins.ProgrammingError):
-    r"""
-    ParameterException
-    """
-    ...
-
-class ProgrammingError(builtins.DatabaseError):
-    r"""
-    programming error
-    """
-    ...
-
-class ReadOperationOnRestrictedReadAreaException(builtins.RestrictedOperationException):
-    r"""
-    ReadOperationOnRestrictedReadAreaException
-    """
-    ...
-
-class ReferentialIntegrityConstraintViolationException(builtins.ConstraintViolationException):
-    r"""
-    ReferentialIntegrityConstraintViolationException
-    """
-    ...
-
-class RequestFailureException(builtins.SqlExecutionException):
-    r"""
-    RequestFailureException
-    """
-    ...
-
-class RestrictedOperationException(builtins.SqlExecutionException):
-    r"""
-    RestrictedOperationException
-    """
-    ...
-
-class RtxException(builtins.CcException):
-    r"""
-    RtxException
-    """
-    ...
-
-class ScalarSubqueryEvaluationException(builtins.EvaluationException):
-    r"""
-    ScalarSubqueryEvaluationException
-    """
-    ...
-
-class SecondaryIndexCorruptionException(builtins.DataCorruptionException):
-    r"""
-    SecondaryIndexCorruptionException
-    """
-    ...
-
-class ServerException(builtins.OperationalError):
-    r"""
-    ServerException
-    """
-    ...
-
 @typing.final
 class ShutdownOption:
     r"""
@@ -1435,67 +727,6 @@ class ShutdownOption:
         Returns:
             ShutdownOption: A new `ShutdownOption` instance.
         """
-
-class SqlExecutionException(builtins.SqlServiceException):
-    r"""
-    SqlExecutionException
-    """
-    ...
-
-class SqlLimitReachedException(builtins.DataError):
-    r"""
-    SqlLimitReachedException
-    """
-    ...
-
-class SqlRequestTimeoutException(builtins.SqlExecutionException):
-    r"""
-    SqlRequestTimeoutException
-    """
-    ...
-
-class SqlServiceException(builtins.ServerException):
-    r"""
-    SqlServiceException
-    """
-    ...
-
-class StatementNotFoundException(builtins.RequestFailureException):
-    r"""
-    StatementNotFoundException
-    """
-    ...
-
-@typing.final
-class Str:
-    r"""
-    CHAR, VARCHAR type.
-    
-    Attributes:
-        value (Optional[str]): string value. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[builtins.str]:
-        r"""
-        Value.
-        """
-    def __new__(cls, value: typing.Optional[builtins.str] = None) -> Str:
-        r"""
-        Create a new `Str`.
-        """
-    def __repr__(self) -> builtins.str: ...
-
-class SymbolAnalyzeException(builtins.AnalyzeException):
-    r"""
-    SymbolAnalyzeException
-    """
-    ...
-
-class SyntaxException(builtins.CompileException):
-    r"""
-    SyntaxException
-    """
-    ...
 
 @typing.final
 class TableMetadata:
@@ -1556,80 +787,6 @@ class TableMetadata:
         Primary keys.
         """
     def __repr__(self) -> builtins.str: ...
-
-class TargetAlreadyExistsException(builtins.SqlExecutionException):
-    r"""
-    TargetAlreadyExistsException
-    """
-    ...
-
-class TargetNotFoundException(builtins.SqlExecutionException):
-    r"""
-    TargetNotFoundException
-    """
-    ...
-
-@typing.final
-class Time:
-    r"""
-    TIME type.
-    
-    Attributes:
-        value (Optional[datetime.time]): time value. (read only)
-        nanosecond (Optional[int]): nanosecond part of the time. (read only)
-    """
-    @property
-    def value(self) -> typing.Optional[datetime.time]:
-        r"""
-        Value.
-        """
-    @property
-    def nanosecond(self) -> typing.Optional[builtins.int]:
-        r"""
-        Nnanosecond.
-        """
-    def __new__(cls, value: typing.Optional[datetime.time] = None, nanosecond: typing.Optional[builtins.int] = None) -> Time:
-        r"""
-        Create a new `Time`.
-        """
-    @classmethod
-    def of(cls, hour: builtins.int = 0, minute: builtins.int = 0, second: builtins.int = 0, nanosecond: builtins.int = 0) -> Time:
-        r"""
-        Create a `Time` from hour, minute, second, and nanosecond.
-        
-        Args:
-            hour (int, optional): hour (0-23)
-            minute (int, optional): minute (0-59)
-            second (int, optional): second (0-59)
-            nanosecond (int, optional): nanosecond (0-999,999,999)
-        
-        Returns:
-            Time: created `Time` object
-        """
-    @classmethod
-    def raw(cls, nanoseconds_of_day: builtins.int) -> Time:
-        r"""
-        Create a `Time` from nanoseconds of day.
-        
-        Args:
-            nanoseconds_of_day (int): time of day (nanoseconds since 00:00:00)
-        
-        Returns:
-            Time: created `Time` object
-        """
-    def __repr__(self) -> builtins.str: ...
-
-class TransactionExceededLimitException(builtins.SqlLimitReachedException):
-    r"""
-    TransactionExceededLimitException
-    """
-    ...
-
-class TransactionNotFoundException(builtins.RequestFailureException):
-    r"""
-    TransactionNotFoundException
-    """
-    ...
 
 @typing.final
 class TransactionOption:
@@ -1842,72 +999,6 @@ class TransactionOption:
             )
             ```
         """
-
-class TypeAnalyzeException(builtins.AnalyzeException):
-    r"""
-    TypeAnalyzeException
-    """
-    ...
-
-class UniqueConstraintViolationException(builtins.ConstraintViolationException):
-    r"""
-    UniqueConstraintViolationException
-    """
-    ...
-
-class UnresolvedPlaceholderException(builtins.ParameterException):
-    r"""
-    UnresolvedPlaceholderException
-    """
-    ...
-
-class UnsupportedCompilerFeatureException(builtins.NotSupportedError):
-    r"""
-    UnsupportedCompilerFeatureException
-    """
-    ...
-
-class UnsupportedRuntimeFeatureException(builtins.NotSupportedError):
-    r"""
-    UnsupportedRuntimeFeatureException
-    """
-    ...
-
-class ValueAnalyzeException(builtins.AnalyzeException):
-    r"""
-    ValueAnalyzeException
-    """
-    ...
-
-class ValueEvaluationException(builtins.EvaluationException):
-    r"""
-    ValueEvaluationException
-    """
-    ...
-
-class ValueOutOfRangeException(builtins.InvalidRuntimeValueException):
-    r"""
-    ValueOutOfRangeException
-    """
-    ...
-
-class ValueTooLongException(builtins.InvalidRuntimeValueException):
-    r"""
-    ValueTooLongException
-    """
-    ...
-
-class Warning(builtins.Exception):
-    r"""
-    important warning
-    """
-    ...
-
-class WriteOperationByRtxException(builtins.RestrictedOperationException):
-    r"""
-    WriteOperationByRtxException
-    """
-    ...
 
 @typing.final
 class CommitType(enum.Enum):

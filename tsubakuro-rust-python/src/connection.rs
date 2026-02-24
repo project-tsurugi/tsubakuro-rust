@@ -85,7 +85,12 @@ impl Connection {
     ///
     /// Examples:
     ///     ```python
-    ///     metadata = connection.get_table_metadata("my_table")
+    ///     import tsubakuro_rust_python as tsurugi
+    ///
+    ///     try:
+    ///         metadata = connection.get_table_metadata("my_table")
+    ///     except tsurugi.error.TargetNotFoundException:
+    ///         pass
     ///     ```
     pub fn get_table_metadata(&self, table_name: &str) -> PyResult<TableMetadata> {
         const FUNCTION_NAME: &str = "Connection.get_table_metadata()";

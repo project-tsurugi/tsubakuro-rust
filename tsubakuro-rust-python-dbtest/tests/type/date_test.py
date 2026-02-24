@@ -75,17 +75,17 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Date()
+    value = tsurugi.type_code.Date()
     assert value.value is None
-    value = tsurugi.Date(None)
+    value = tsurugi.type_code.Date(None)
     assert value.value is None
-    value = tsurugi.Date(datetime.date(2026, 1, 27))
+    value = tsurugi.type_code.Date(datetime.date(2026, 1, 27))
     assert value.value == datetime.date(2026, 1, 27)
 
-    value = tsurugi.Date.of(2026, 1, 27)
+    value = tsurugi.type_code.Date.of(2026, 1, 27)
     assert value.value == datetime.date(2026, 1, 27)
 
-    value = tsurugi.Date.raw(20480)
+    value = tsurugi.type_code.Date.raw(20480)
     assert value.value == datetime.date(2026, 1, 27)
 
 
@@ -94,7 +94,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Date(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Date(None)),
             (1, datetime.date(2026, 1, 27)),
         ]
         cursor.executemany(
@@ -103,7 +103,7 @@ def test_placeholder_wrapper(connection):
         assert cursor.rowcount == 2
 
         parameters = [
-            (2, tsurugi.Date(datetime.date(9999, 12, 31))),
+            (2, tsurugi.type_code.Date(datetime.date(9999, 12, 31))),
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (?, ?)", parameters
@@ -126,8 +126,11 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Date(None)},
-            {"pk": tsurugi.Int32(1), "value": tsurugi.Date(datetime.date(2026, 1, 27))},
+            {"pk": tsurugi.type_code.Int32(0), "value": tsurugi.type_code.Date(None)},
+            {
+                "pk": tsurugi.type_code.Int32(1),
+                "value": tsurugi.type_code.Date(datetime.date(2026, 1, 27)),
+            },
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
@@ -160,7 +163,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Date),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Date),
         )
         parameters = [
             (0, None),
@@ -172,7 +175,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Date()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Date()),
         )
         parameters = [
             (3, datetime.date(1, 1, 1)),
@@ -201,7 +204,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Date},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Date},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -213,7 +216,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Date()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Date()},
         )
         parameters = [
             {"pk": 3, "value": datetime.date(1, 1, 1)},

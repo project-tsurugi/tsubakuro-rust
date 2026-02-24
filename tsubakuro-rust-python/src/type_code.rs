@@ -26,6 +26,16 @@ pub mod offset_time;
 pub mod str;
 pub mod time;
 
+#[pymodule]
+pub(crate) mod type_code {
+    #[pymodule_export]
+    use super::{
+        bool::Bool, bytes::Bytes, date::Date, datetime::Datetime, decimal::Decimal,
+        float32::Float32, float64::Float64, int32::Int32, int64::Int64,
+        offset_datetime::OffsetDatetime, offset_time::OffsetTime, str::Str, time::Time,
+    };
+}
+
 pub(crate) fn atom_type_to_type_code(atom_type: Option<AtomType>) -> &'static str {
     match atom_type {
         Some(t) => match t {

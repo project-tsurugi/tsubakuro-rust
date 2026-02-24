@@ -30,15 +30,15 @@ def test_closed(connection):
 
     try:
         connection.cursor()
-    except tsurugi.ProgrammingError as e:
+    except tsurugi.error.ProgrammingError as e:
         assert str(e) == "Connection is already closed"
 
     try:
         connection.commit()
-    except tsurugi.ProgrammingError as e:
+    except tsurugi.error.ProgrammingError as e:
         assert str(e) == "Connection is already closed"
 
     try:
         connection.rollback()
-    except tsurugi.ProgrammingError as e:
+    except tsurugi.error.ProgrammingError as e:
         assert str(e) == "Connection is already closed"

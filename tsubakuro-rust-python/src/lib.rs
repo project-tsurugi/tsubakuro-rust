@@ -17,7 +17,7 @@ mod type_code;
 #[pymodule]
 mod _tsubakuro_rust_python {
     use pyo3::{prelude::*, types::*};
-    use pyo3_stub_gen::{derive::*, inventory::submit};
+    use pyo3_stub_gen::derive::*;
 
     #[pymodule_export]
     #[allow(non_upper_case_globals)]
@@ -32,36 +32,7 @@ mod _tsubakuro_rust_python {
     const paramstyle: &str = "qmark";
 
     #[pymodule_export]
-    use crate::error::{
-        DataError, DatabaseError, Error, IntegrityError, InterfaceError, InternalError,
-        NotSupportedError, OperationalError, ProgrammingError, Warning,
-    };
-
-    // SqlServiceException
-    #[pymodule_export]
-    use crate::error::{
-        AnalyzeException, BlockedByConcurrentOperationException,
-        BlockedByHighPriorityTransactionException, CcException, CheckConstraintViolationException,
-        CompileException, ConflictOnWritePreserveException, ConstraintViolationException,
-        DataCorruptionException, DependenciesViolationException,
-        DumpDirectoryInaccessibleException, DumpFileException, EvaluationException,
-        InactiveTransactionException, InconsistentStatementException, InternalException,
-        InvalidDecimalValueException, InvalidRuntimeValueException, LoadFileException,
-        LoadFileFormatException, LoadFileNotFoundException, LtxException, LtxReadException,
-        LtxWriteException, LtxWriteOperationWithoutWritePreserveException,
-        NotNullConstraintViolationException, OccException, OccReadException, OccWriteException,
-        ParameterException, ReadOperationOnRestrictedReadAreaException,
-        ReferentialIntegrityConstraintViolationException, RequestFailureException,
-        RestrictedOperationException, RtxException, ScalarSubqueryEvaluationException,
-        SecondaryIndexCorruptionException, ServerException, SqlExecutionException,
-        SqlLimitReachedException, SqlRequestTimeoutException, SqlServiceException,
-        StatementNotFoundException, SymbolAnalyzeException, SyntaxException,
-        TargetAlreadyExistsException, TargetNotFoundException, TransactionExceededLimitException,
-        TransactionNotFoundException, TypeAnalyzeException, UniqueConstraintViolationException,
-        UnresolvedPlaceholderException, UnsupportedCompilerFeatureException,
-        UnsupportedRuntimeFeatureException, ValueAnalyzeException, ValueEvaluationException,
-        ValueOutOfRangeException, ValueTooLongException, WriteOperationByRtxException,
-    };
+    use crate::error::error;
 
     #[pymodule_export]
     use crate::config::Config;
@@ -87,11 +58,7 @@ mod _tsubakuro_rust_python {
     use crate::cursor::Cursor;
 
     #[pymodule_export]
-    use crate::type_code::{
-        bool::Bool, bytes::Bytes, date::Date, datetime::Datetime, decimal::Decimal,
-        float32::Float32, float64::Float64, int32::Int32, int64::Int64,
-        offset_datetime::OffsetDatetime, offset_time::OffsetTime, str::Str, time::Time,
-    };
+    use crate::type_code::type_code;
 
     /// Initialize env_logger.
     ///
@@ -149,33 +116,6 @@ mod _tsubakuro_rust_python {
     fn connect(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Connection> {
         let connection = Connection::connect(args, kwargs)?;
         Ok(connection)
-    }
-
-    submit! {
-        gen_function_from_python!{r#"
-        import tsubakuro_rust_python
-
-        @overload
-        def connect(*args: tsubakuro_rust_python.Config) -> tsubakuro_rust_python.Connection: ...
-        "#}
-    }
-
-    submit! {
-        gen_function_from_python!{r#"
-        import tsubakuro_rust_python
-
-        @overload
-        def connect(*args: tsubakuro_rust_python.TransactionOption | tsubakuro_rust_python.CommitOption | tsubakuro_rust_python.ShutdownOption | str) -> tsubakuro_rust_python.Connection: ...
-        "#}
-    }
-
-    submit! {
-        gen_function_from_python!{r#"
-        import tsubakuro_rust_python
-
-        @overload
-        def connect(**kwargs: str | int | tsubakuro_rust_python.TransactionOption | tsubakuro_rust_python.CommitOption | tsubakuro_rust_python.ShutdownOption) -> tsubakuro_rust_python.Connection: ...
-        "#}
     }
 }
 

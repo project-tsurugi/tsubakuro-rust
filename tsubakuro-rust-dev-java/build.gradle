@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation 'com.tsurugidb.iceaxe:iceaxe-core:1.13.0-SNAPSHOT'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+}
+
+task runTsubakuroRustPythonExceptionGenerator(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.tsurugidb.tsubakuro.rust.dev.TsubakuroRustPythonExceptionGenerator'
+}

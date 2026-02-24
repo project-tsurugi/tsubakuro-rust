@@ -1,0 +1,1582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>tsubakuro_rust_python.error API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>tsubakuro_rust_python.error</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="tsubakuro_rust_python.error.AnalyzeException"><code class="flex name class">
+<span>class <span class="ident">AnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi AnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CompileException" href="#tsubakuro_rust_python.error.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SymbolAnalyzeException" href="#tsubakuro_rust_python.error.SymbolAnalyzeException">SymbolAnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.error.TypeAnalyzeException" href="#tsubakuro_rust_python.error.TypeAnalyzeException">TypeAnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.error.ValueAnalyzeException" href="#tsubakuro_rust_python.error.ValueAnalyzeException">ValueAnalyzeException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.BlockedByConcurrentOperationException"><code class="flex name class">
+<span>class <span class="ident">BlockedByConcurrentOperationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi BlockedByConcurrentOperationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.BlockedByHighPriorityTransactionException"><code class="flex name class">
+<span>class <span class="ident">BlockedByHighPriorityTransactionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi BlockedByHighPriorityTransactionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.CcException"><code class="flex name class">
+<span>class <span class="ident">CcException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi CcException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.BlockedByConcurrentOperationException" href="#tsubakuro_rust_python.error.BlockedByConcurrentOperationException">BlockedByConcurrentOperationException</a></li>
+<li><a title="tsubakuro_rust_python.error.LtxException" href="#tsubakuro_rust_python.error.LtxException">LtxException</a></li>
+<li><a title="tsubakuro_rust_python.error.OccException" href="#tsubakuro_rust_python.error.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.error.RtxException" href="#tsubakuro_rust_python.error.RtxException">RtxException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.CheckConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">CheckConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi CheckConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ConstraintViolationException" href="#tsubakuro_rust_python.error.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.IntegrityError" href="#tsubakuro_rust_python.error.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.CompileException"><code class="flex name class">
+<span>class <span class="ident">CompileException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi CompileException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.AnalyzeException" href="#tsubakuro_rust_python.error.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.error.SyntaxException" href="#tsubakuro_rust_python.error.SyntaxException">SyntaxException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ConflictOnWritePreserveException"><code class="flex name class">
+<span>class <span class="ident">ConflictOnWritePreserveException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ConflictOnWritePreserveException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.OccReadException" href="#tsubakuro_rust_python.error.OccReadException">OccReadException</a></li>
+<li><a title="tsubakuro_rust_python.error.OccException" href="#tsubakuro_rust_python.error.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">ConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.IntegrityError" href="#tsubakuro_rust_python.error.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CheckConstraintViolationException" href="#tsubakuro_rust_python.error.CheckConstraintViolationException">CheckConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.NotNullConstraintViolationException" href="#tsubakuro_rust_python.error.NotNullConstraintViolationException">NotNullConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.ReferentialIntegrityConstraintViolationException" href="#tsubakuro_rust_python.error.ReferentialIntegrityConstraintViolationException">ReferentialIntegrityConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.UniqueConstraintViolationException" href="#tsubakuro_rust_python.error.UniqueConstraintViolationException">UniqueConstraintViolationException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.DataCorruptionException"><code class="flex name class">
+<span>class <span class="ident">DataCorruptionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi DataCorruptionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SecondaryIndexCorruptionException" href="#tsubakuro_rust_python.error.SecondaryIndexCorruptionException">SecondaryIndexCorruptionException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.DataError"><code class="flex name class">
+<span>class <span class="ident">DataError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>data error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.EvaluationException" href="#tsubakuro_rust_python.error.EvaluationException">EvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.DatabaseError"><code class="flex name class">
+<span>class <span class="ident">DatabaseError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>database error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.IntegrityError" href="#tsubakuro_rust_python.error.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.error.InternalError" href="#tsubakuro_rust_python.error.InternalError">InternalError</a></li>
+<li><a title="tsubakuro_rust_python.error.NotSupportedError" href="#tsubakuro_rust_python.error.NotSupportedError">NotSupportedError</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.DependenciesViolationException"><code class="flex name class">
+<span>class <span class="ident">DependenciesViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi DependenciesViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.RestrictedOperationException" href="#tsubakuro_rust_python.error.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.DumpDirectoryInaccessibleException"><code class="flex name class">
+<span>class <span class="ident">DumpDirectoryInaccessibleException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi DumpDirectoryInaccessibleException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DumpFileException" href="#tsubakuro_rust_python.error.DumpFileException">DumpFileException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.DumpFileException"><code class="flex name class">
+<span>class <span class="ident">DumpFileException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi DumpFileException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DumpDirectoryInaccessibleException" href="#tsubakuro_rust_python.error.DumpDirectoryInaccessibleException">DumpDirectoryInaccessibleException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.Error"><code class="flex name class">
+<span>class <span class="ident">Error</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>base class of all other exceptions (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.InterfaceError" href="#tsubakuro_rust_python.error.InterfaceError">InterfaceError</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.EvaluationException"><code class="flex name class">
+<span>class <span class="ident">EvaluationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi EvaluationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ScalarSubqueryEvaluationException" href="#tsubakuro_rust_python.error.ScalarSubqueryEvaluationException">ScalarSubqueryEvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.error.ValueEvaluationException" href="#tsubakuro_rust_python.error.ValueEvaluationException">ValueEvaluationException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.InactiveTransactionException"><code class="flex name class">
+<span>class <span class="ident">InactiveTransactionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi InactiveTransactionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.RestrictedOperationException" href="#tsubakuro_rust_python.error.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.InconsistentStatementException"><code class="flex name class">
+<span>class <span class="ident">InconsistentStatementException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi InconsistentStatementException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.IntegrityError"><code class="flex name class">
+<span>class <span class="ident">IntegrityError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>integrity error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ConstraintViolationException" href="#tsubakuro_rust_python.error.ConstraintViolationException">ConstraintViolationException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.InterfaceError"><code class="flex name class">
+<span>class <span class="ident">InterfaceError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>interface error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.InternalError"><code class="flex name class">
+<span>class <span class="ident">InternalError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>internal error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InternalException" href="#tsubakuro_rust_python.error.InternalException">InternalException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.InternalException"><code class="flex name class">
+<span>class <span class="ident">InternalException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi InternalException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InternalError" href="#tsubakuro_rust_python.error.InternalError">InternalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.InvalidDecimalValueException"><code class="flex name class">
+<span>class <span class="ident">InvalidDecimalValueException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi InvalidDecimalValueException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InvalidRuntimeValueException" href="#tsubakuro_rust_python.error.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.InvalidRuntimeValueException"><code class="flex name class">
+<span>class <span class="ident">InvalidRuntimeValueException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi InvalidRuntimeValueException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InvalidDecimalValueException" href="#tsubakuro_rust_python.error.InvalidDecimalValueException">InvalidDecimalValueException</a></li>
+<li><a title="tsubakuro_rust_python.error.ValueOutOfRangeException" href="#tsubakuro_rust_python.error.ValueOutOfRangeException">ValueOutOfRangeException</a></li>
+<li><a title="tsubakuro_rust_python.error.ValueTooLongException" href="#tsubakuro_rust_python.error.ValueTooLongException">ValueTooLongException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.LoadFileException"><code class="flex name class">
+<span>class <span class="ident">LoadFileException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi LoadFileException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.LoadFileFormatException" href="#tsubakuro_rust_python.error.LoadFileFormatException">LoadFileFormatException</a></li>
+<li><a title="tsubakuro_rust_python.error.LoadFileNotFoundException" href="#tsubakuro_rust_python.error.LoadFileNotFoundException">LoadFileNotFoundException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.LoadFileFormatException"><code class="flex name class">
+<span>class <span class="ident">LoadFileFormatException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi LoadFileFormatException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.LoadFileException" href="#tsubakuro_rust_python.error.LoadFileException">LoadFileException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.LoadFileNotFoundException"><code class="flex name class">
+<span>class <span class="ident">LoadFileNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi LoadFileNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.LoadFileException" href="#tsubakuro_rust_python.error.LoadFileException">LoadFileException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.LtxException"><code class="flex name class">
+<span>class <span class="ident">LtxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi LtxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.LtxReadException" href="#tsubakuro_rust_python.error.LtxReadException">LtxReadException</a></li>
+<li><a title="tsubakuro_rust_python.error.LtxWriteException" href="#tsubakuro_rust_python.error.LtxWriteException">LtxWriteException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.LtxReadException"><code class="flex name class">
+<span>class <span class="ident">LtxReadException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi LtxReadException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.LtxException" href="#tsubakuro_rust_python.error.LtxException">LtxException</a></li>
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.LtxWriteException"><code class="flex name class">
+<span>class <span class="ident">LtxWriteException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi LtxWriteException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.LtxException" href="#tsubakuro_rust_python.error.LtxException">LtxException</a></li>
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.LtxWriteOperationWithoutWritePreserveException"><code class="flex name class">
+<span>class <span class="ident">LtxWriteOperationWithoutWritePreserveException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi LtxWriteOperationWithoutWritePreserveException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.RestrictedOperationException" href="#tsubakuro_rust_python.error.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.NotNullConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">NotNullConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi NotNullConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ConstraintViolationException" href="#tsubakuro_rust_python.error.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.IntegrityError" href="#tsubakuro_rust_python.error.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.NotSupportedError"><code class="flex name class">
+<span>class <span class="ident">NotSupportedError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>not supported error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.UnsupportedCompilerFeatureException" href="#tsubakuro_rust_python.error.UnsupportedCompilerFeatureException">UnsupportedCompilerFeatureException</a></li>
+<li><a title="tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException" href="#tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException">UnsupportedRuntimeFeatureException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.OccException"><code class="flex name class">
+<span>class <span class="ident">OccException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi OccException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.OccReadException" href="#tsubakuro_rust_python.error.OccReadException">OccReadException</a></li>
+<li><a title="tsubakuro_rust_python.error.OccWriteException" href="#tsubakuro_rust_python.error.OccWriteException">OccWriteException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.OccReadException"><code class="flex name class">
+<span>class <span class="ident">OccReadException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi OccReadException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.OccException" href="#tsubakuro_rust_python.error.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ConflictOnWritePreserveException" href="#tsubakuro_rust_python.error.ConflictOnWritePreserveException">ConflictOnWritePreserveException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.OccWriteException"><code class="flex name class">
+<span>class <span class="ident">OccWriteException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi OccWriteException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.OccException" href="#tsubakuro_rust_python.error.OccException">OccException</a></li>
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.OperationalError"><code class="flex name class">
+<span>class <span class="ident">OperationalError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>operation error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ParameterException"><code class="flex name class">
+<span>class <span class="ident">ParameterException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ParameterException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.UnresolvedPlaceholderException" href="#tsubakuro_rust_python.error.UnresolvedPlaceholderException">UnresolvedPlaceholderException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ProgrammingError"><code class="flex name class">
+<span>class <span class="ident">ProgrammingError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>programming error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CompileException" href="#tsubakuro_rust_python.error.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.error.ParameterException" href="#tsubakuro_rust_python.error.ParameterException">ParameterException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ReadOperationOnRestrictedReadAreaException"><code class="flex name class">
+<span>class <span class="ident">ReadOperationOnRestrictedReadAreaException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ReadOperationOnRestrictedReadAreaException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.RestrictedOperationException" href="#tsubakuro_rust_python.error.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ReferentialIntegrityConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">ReferentialIntegrityConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ReferentialIntegrityConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ConstraintViolationException" href="#tsubakuro_rust_python.error.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.IntegrityError" href="#tsubakuro_rust_python.error.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.RequestFailureException"><code class="flex name class">
+<span>class <span class="ident">RequestFailureException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi RequestFailureException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.StatementNotFoundException" href="#tsubakuro_rust_python.error.StatementNotFoundException">StatementNotFoundException</a></li>
+<li><a title="tsubakuro_rust_python.error.TransactionNotFoundException" href="#tsubakuro_rust_python.error.TransactionNotFoundException">TransactionNotFoundException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.RestrictedOperationException"><code class="flex name class">
+<span>class <span class="ident">RestrictedOperationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi RestrictedOperationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DependenciesViolationException" href="#tsubakuro_rust_python.error.DependenciesViolationException">DependenciesViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.InactiveTransactionException" href="#tsubakuro_rust_python.error.InactiveTransactionException">InactiveTransactionException</a></li>
+<li><a title="tsubakuro_rust_python.error.LtxWriteOperationWithoutWritePreserveException" href="#tsubakuro_rust_python.error.LtxWriteOperationWithoutWritePreserveException">LtxWriteOperationWithoutWritePreserveException</a></li>
+<li><a title="tsubakuro_rust_python.error.ReadOperationOnRestrictedReadAreaException" href="#tsubakuro_rust_python.error.ReadOperationOnRestrictedReadAreaException">ReadOperationOnRestrictedReadAreaException</a></li>
+<li><a title="tsubakuro_rust_python.error.WriteOperationByRtxException" href="#tsubakuro_rust_python.error.WriteOperationByRtxException">WriteOperationByRtxException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.RtxException"><code class="flex name class">
+<span>class <span class="ident">RtxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi RtxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ScalarSubqueryEvaluationException"><code class="flex name class">
+<span>class <span class="ident">ScalarSubqueryEvaluationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ScalarSubqueryEvaluationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.EvaluationException" href="#tsubakuro_rust_python.error.EvaluationException">EvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.SecondaryIndexCorruptionException"><code class="flex name class">
+<span>class <span class="ident">SecondaryIndexCorruptionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi SecondaryIndexCorruptionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DataCorruptionException" href="#tsubakuro_rust_python.error.DataCorruptionException">DataCorruptionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ServerException"><code class="flex name class">
+<span>class <span class="ident">ServerException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ServerException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.SqlExecutionException"><code class="flex name class">
+<span>class <span class="ident">SqlExecutionException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi SqlExecutionException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.BlockedByHighPriorityTransactionException" href="#tsubakuro_rust_python.error.BlockedByHighPriorityTransactionException">BlockedByHighPriorityTransactionException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataCorruptionException" href="#tsubakuro_rust_python.error.DataCorruptionException">DataCorruptionException</a></li>
+<li><a title="tsubakuro_rust_python.error.DumpFileException" href="#tsubakuro_rust_python.error.DumpFileException">DumpFileException</a></li>
+<li><a title="tsubakuro_rust_python.error.InconsistentStatementException" href="#tsubakuro_rust_python.error.InconsistentStatementException">InconsistentStatementException</a></li>
+<li><a title="tsubakuro_rust_python.error.LoadFileException" href="#tsubakuro_rust_python.error.LoadFileException">LoadFileException</a></li>
+<li><a title="tsubakuro_rust_python.error.RequestFailureException" href="#tsubakuro_rust_python.error.RequestFailureException">RequestFailureException</a></li>
+<li><a title="tsubakuro_rust_python.error.RestrictedOperationException" href="#tsubakuro_rust_python.error.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlRequestTimeoutException" href="#tsubakuro_rust_python.error.SqlRequestTimeoutException">SqlRequestTimeoutException</a></li>
+<li><a title="tsubakuro_rust_python.error.TargetAlreadyExistsException" href="#tsubakuro_rust_python.error.TargetAlreadyExistsException">TargetAlreadyExistsException</a></li>
+<li><a title="tsubakuro_rust_python.error.TargetNotFoundException" href="#tsubakuro_rust_python.error.TargetNotFoundException">TargetNotFoundException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.SqlLimitReachedException"><code class="flex name class">
+<span>class <span class="ident">SqlLimitReachedException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi SqlLimitReachedException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InvalidRuntimeValueException" href="#tsubakuro_rust_python.error.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.error.TransactionExceededLimitException" href="#tsubakuro_rust_python.error.TransactionExceededLimitException">TransactionExceededLimitException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.SqlRequestTimeoutException"><code class="flex name class">
+<span>class <span class="ident">SqlRequestTimeoutException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi SqlRequestTimeoutException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.SqlServiceException"><code class="flex name class">
+<span>class <span class="ident">SqlServiceException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi SqlServiceException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.StatementNotFoundException"><code class="flex name class">
+<span>class <span class="ident">StatementNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi StatementNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.RequestFailureException" href="#tsubakuro_rust_python.error.RequestFailureException">RequestFailureException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.SymbolAnalyzeException"><code class="flex name class">
+<span>class <span class="ident">SymbolAnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi SymbolAnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.AnalyzeException" href="#tsubakuro_rust_python.error.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.error.CompileException" href="#tsubakuro_rust_python.error.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.SyntaxException"><code class="flex name class">
+<span>class <span class="ident">SyntaxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi SyntaxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CompileException" href="#tsubakuro_rust_python.error.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.TargetAlreadyExistsException"><code class="flex name class">
+<span>class <span class="ident">TargetAlreadyExistsException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi TargetAlreadyExistsException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.TargetNotFoundException"><code class="flex name class">
+<span>class <span class="ident">TargetNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi TargetNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.TransactionExceededLimitException"><code class="flex name class">
+<span>class <span class="ident">TransactionExceededLimitException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi TransactionExceededLimitException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.TransactionNotFoundException"><code class="flex name class">
+<span>class <span class="ident">TransactionNotFoundException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi TransactionNotFoundException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.RequestFailureException" href="#tsubakuro_rust_python.error.RequestFailureException">RequestFailureException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.TypeAnalyzeException"><code class="flex name class">
+<span>class <span class="ident">TypeAnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi TypeAnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.AnalyzeException" href="#tsubakuro_rust_python.error.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.error.CompileException" href="#tsubakuro_rust_python.error.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.UniqueConstraintViolationException"><code class="flex name class">
+<span>class <span class="ident">UniqueConstraintViolationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi UniqueConstraintViolationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ConstraintViolationException" href="#tsubakuro_rust_python.error.ConstraintViolationException">ConstraintViolationException</a></li>
+<li><a title="tsubakuro_rust_python.error.IntegrityError" href="#tsubakuro_rust_python.error.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.UnresolvedPlaceholderException"><code class="flex name class">
+<span>class <span class="ident">UnresolvedPlaceholderException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi UnresolvedPlaceholderException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ParameterException" href="#tsubakuro_rust_python.error.ParameterException">ParameterException</a></li>
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.UnsupportedCompilerFeatureException"><code class="flex name class">
+<span>class <span class="ident">UnsupportedCompilerFeatureException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi UnsupportedCompilerFeatureException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.NotSupportedError" href="#tsubakuro_rust_python.error.NotSupportedError">NotSupportedError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException"><code class="flex name class">
+<span>class <span class="ident">UnsupportedRuntimeFeatureException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi UnsupportedRuntimeFeatureException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.NotSupportedError" href="#tsubakuro_rust_python.error.NotSupportedError">NotSupportedError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ValueAnalyzeException"><code class="flex name class">
+<span>class <span class="ident">ValueAnalyzeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ValueAnalyzeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.AnalyzeException" href="#tsubakuro_rust_python.error.AnalyzeException">AnalyzeException</a></li>
+<li><a title="tsubakuro_rust_python.error.CompileException" href="#tsubakuro_rust_python.error.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ValueEvaluationException"><code class="flex name class">
+<span>class <span class="ident">ValueEvaluationException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ValueEvaluationException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.EvaluationException" href="#tsubakuro_rust_python.error.EvaluationException">EvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ValueOutOfRangeException"><code class="flex name class">
+<span>class <span class="ident">ValueOutOfRangeException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ValueOutOfRangeException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InvalidRuntimeValueException" href="#tsubakuro_rust_python.error.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.ValueTooLongException"><code class="flex name class">
+<span>class <span class="ident">ValueTooLongException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi ValueTooLongException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InvalidRuntimeValueException" href="#tsubakuro_rust_python.error.InvalidRuntimeValueException">InvalidRuntimeValueException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></li>
+<li><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.Warning"><code class="flex name class">
+<span>class <span class="ident">Warning</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>important warning (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.error.WriteOperationByRtxException"><code class="flex name class">
+<span>class <span class="ident">WriteOperationByRtxException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tsurugi WriteOperationByRtxException</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.RestrictedOperationException" href="#tsubakuro_rust_python.error.RestrictedOperationException">RestrictedOperationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></li>
+<li><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+<li><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="tsubakuro_rust_python" href="../index.html">tsubakuro_rust_python</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.AnalyzeException" href="#tsubakuro_rust_python.error.AnalyzeException">AnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.BlockedByConcurrentOperationException" href="#tsubakuro_rust_python.error.BlockedByConcurrentOperationException">BlockedByConcurrentOperationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.BlockedByHighPriorityTransactionException" href="#tsubakuro_rust_python.error.BlockedByHighPriorityTransactionException">BlockedByHighPriorityTransactionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.CcException" href="#tsubakuro_rust_python.error.CcException">CcException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.CheckConstraintViolationException" href="#tsubakuro_rust_python.error.CheckConstraintViolationException">CheckConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.CompileException" href="#tsubakuro_rust_python.error.CompileException">CompileException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ConflictOnWritePreserveException" href="#tsubakuro_rust_python.error.ConflictOnWritePreserveException">ConflictOnWritePreserveException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ConstraintViolationException" href="#tsubakuro_rust_python.error.ConstraintViolationException">ConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.DataCorruptionException" href="#tsubakuro_rust_python.error.DataCorruptionException">DataCorruptionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.DataError" href="#tsubakuro_rust_python.error.DataError">DataError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.DatabaseError" href="#tsubakuro_rust_python.error.DatabaseError">DatabaseError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.DependenciesViolationException" href="#tsubakuro_rust_python.error.DependenciesViolationException">DependenciesViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.DumpDirectoryInaccessibleException" href="#tsubakuro_rust_python.error.DumpDirectoryInaccessibleException">DumpDirectoryInaccessibleException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.DumpFileException" href="#tsubakuro_rust_python.error.DumpFileException">DumpFileException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.Error" href="#tsubakuro_rust_python.error.Error">Error</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.EvaluationException" href="#tsubakuro_rust_python.error.EvaluationException">EvaluationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.InactiveTransactionException" href="#tsubakuro_rust_python.error.InactiveTransactionException">InactiveTransactionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.InconsistentStatementException" href="#tsubakuro_rust_python.error.InconsistentStatementException">InconsistentStatementException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.IntegrityError" href="#tsubakuro_rust_python.error.IntegrityError">IntegrityError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.InterfaceError" href="#tsubakuro_rust_python.error.InterfaceError">InterfaceError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.InternalError" href="#tsubakuro_rust_python.error.InternalError">InternalError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.InternalException" href="#tsubakuro_rust_python.error.InternalException">InternalException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.InvalidDecimalValueException" href="#tsubakuro_rust_python.error.InvalidDecimalValueException">InvalidDecimalValueException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.InvalidRuntimeValueException" href="#tsubakuro_rust_python.error.InvalidRuntimeValueException">InvalidRuntimeValueException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.LoadFileException" href="#tsubakuro_rust_python.error.LoadFileException">LoadFileException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.LoadFileFormatException" href="#tsubakuro_rust_python.error.LoadFileFormatException">LoadFileFormatException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.LoadFileNotFoundException" href="#tsubakuro_rust_python.error.LoadFileNotFoundException">LoadFileNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.LtxException" href="#tsubakuro_rust_python.error.LtxException">LtxException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.LtxReadException" href="#tsubakuro_rust_python.error.LtxReadException">LtxReadException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.LtxWriteException" href="#tsubakuro_rust_python.error.LtxWriteException">LtxWriteException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.LtxWriteOperationWithoutWritePreserveException" href="#tsubakuro_rust_python.error.LtxWriteOperationWithoutWritePreserveException">LtxWriteOperationWithoutWritePreserveException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.NotNullConstraintViolationException" href="#tsubakuro_rust_python.error.NotNullConstraintViolationException">NotNullConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.NotSupportedError" href="#tsubakuro_rust_python.error.NotSupportedError">NotSupportedError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.OccException" href="#tsubakuro_rust_python.error.OccException">OccException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.OccReadException" href="#tsubakuro_rust_python.error.OccReadException">OccReadException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.OccWriteException" href="#tsubakuro_rust_python.error.OccWriteException">OccWriteException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.OperationalError" href="#tsubakuro_rust_python.error.OperationalError">OperationalError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ParameterException" href="#tsubakuro_rust_python.error.ParameterException">ParameterException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ProgrammingError" href="#tsubakuro_rust_python.error.ProgrammingError">ProgrammingError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ReadOperationOnRestrictedReadAreaException" href="#tsubakuro_rust_python.error.ReadOperationOnRestrictedReadAreaException">ReadOperationOnRestrictedReadAreaException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ReferentialIntegrityConstraintViolationException" href="#tsubakuro_rust_python.error.ReferentialIntegrityConstraintViolationException">ReferentialIntegrityConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.RequestFailureException" href="#tsubakuro_rust_python.error.RequestFailureException">RequestFailureException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.RestrictedOperationException" href="#tsubakuro_rust_python.error.RestrictedOperationException">RestrictedOperationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.RtxException" href="#tsubakuro_rust_python.error.RtxException">RtxException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ScalarSubqueryEvaluationException" href="#tsubakuro_rust_python.error.ScalarSubqueryEvaluationException">ScalarSubqueryEvaluationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.SecondaryIndexCorruptionException" href="#tsubakuro_rust_python.error.SecondaryIndexCorruptionException">SecondaryIndexCorruptionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ServerException" href="#tsubakuro_rust_python.error.ServerException">ServerException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.SqlExecutionException" href="#tsubakuro_rust_python.error.SqlExecutionException">SqlExecutionException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.SqlRequestTimeoutException" href="#tsubakuro_rust_python.error.SqlRequestTimeoutException">SqlRequestTimeoutException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.SqlServiceException" href="#tsubakuro_rust_python.error.SqlServiceException">SqlServiceException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.StatementNotFoundException" href="#tsubakuro_rust_python.error.StatementNotFoundException">StatementNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.SymbolAnalyzeException" href="#tsubakuro_rust_python.error.SymbolAnalyzeException">SymbolAnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.SyntaxException" href="#tsubakuro_rust_python.error.SyntaxException">SyntaxException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.TargetAlreadyExistsException" href="#tsubakuro_rust_python.error.TargetAlreadyExistsException">TargetAlreadyExistsException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.TargetNotFoundException" href="#tsubakuro_rust_python.error.TargetNotFoundException">TargetNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.TransactionExceededLimitException" href="#tsubakuro_rust_python.error.TransactionExceededLimitException">TransactionExceededLimitException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.TransactionNotFoundException" href="#tsubakuro_rust_python.error.TransactionNotFoundException">TransactionNotFoundException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.TypeAnalyzeException" href="#tsubakuro_rust_python.error.TypeAnalyzeException">TypeAnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.UniqueConstraintViolationException" href="#tsubakuro_rust_python.error.UniqueConstraintViolationException">UniqueConstraintViolationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.UnresolvedPlaceholderException" href="#tsubakuro_rust_python.error.UnresolvedPlaceholderException">UnresolvedPlaceholderException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.UnsupportedCompilerFeatureException" href="#tsubakuro_rust_python.error.UnsupportedCompilerFeatureException">UnsupportedCompilerFeatureException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException" href="#tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException">UnsupportedRuntimeFeatureException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ValueAnalyzeException" href="#tsubakuro_rust_python.error.ValueAnalyzeException">ValueAnalyzeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ValueEvaluationException" href="#tsubakuro_rust_python.error.ValueEvaluationException">ValueEvaluationException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ValueOutOfRangeException" href="#tsubakuro_rust_python.error.ValueOutOfRangeException">ValueOutOfRangeException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.ValueTooLongException" href="#tsubakuro_rust_python.error.ValueTooLongException">ValueTooLongException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.Warning" href="#tsubakuro_rust_python.error.Warning">Warning</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.error.WriteOperationByRtxException" href="#tsubakuro_rust_python.error.WriteOperationByRtxException">WriteOperationByRtxException</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

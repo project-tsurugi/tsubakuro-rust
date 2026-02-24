@@ -40,11 +40,11 @@ def test_bool(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Bool()
+    value = tsurugi.type_code.Bool()
     assert value.value is None
-    value = tsurugi.Bool(None)
+    value = tsurugi.type_code.Bool(None)
     assert value.value is None
-    value = tsurugi.Bool(True)
+    value = tsurugi.type_code.Bool(True)
     assert value.value is True
-    value = tsurugi.Bool(False)
+    value = tsurugi.type_code.Bool(False)
     assert value.value is False

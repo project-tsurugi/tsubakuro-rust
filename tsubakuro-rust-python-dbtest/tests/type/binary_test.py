@@ -70,13 +70,13 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Bytes()
+    value = tsurugi.type_code.Bytes()
     assert value.value is None
-    value = tsurugi.Bytes(None)
+    value = tsurugi.type_code.Bytes(None)
     assert value.value is None
-    value = tsurugi.Bytes(b"\x12\x34\x56")
+    value = tsurugi.type_code.Bytes(b"\x12\x34\x56")
     assert value.value == b"\x12\x34\x56"
-    value = tsurugi.Bytes(b"")
+    value = tsurugi.type_code.Bytes(b"")
     assert value.value == b""
 
 
@@ -85,7 +85,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Bytes(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Bytes(None)),
             (1, b"\x12\x34\x56"),
             (2, b"\xab\xcd\xef"),
             (3, b""),
@@ -112,9 +112,15 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Bytes(None)},
-            {"pk": tsurugi.Int32(1), "value": tsurugi.Bytes(b"\x12\x34\x56")},
-            {"pk": tsurugi.Int32(2), "value": tsurugi.Bytes(b"\xab\xcd\xef")},
+            {"pk": tsurugi.type_code.Int32(0), "value": tsurugi.type_code.Bytes(None)},
+            {
+                "pk": tsurugi.type_code.Int32(1),
+                "value": tsurugi.type_code.Bytes(b"\x12\x34\x56"),
+            },
+            {
+                "pk": tsurugi.type_code.Int32(2),
+                "value": tsurugi.type_code.Bytes(b"\xab\xcd\xef"),
+            },
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
@@ -150,7 +156,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Bytes),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Bytes),
         )
         parameters = [
             (0, None),
@@ -161,7 +167,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Bytes()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Bytes()),
         )
         parameters = [
             (2, b"\xab\xcd\xef"),
@@ -188,7 +194,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Bytes},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Bytes},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -199,7 +205,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Bytes()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Bytes()},
         )
         parameters = [
             {"pk": 2, "value": b"\xab\xcd\xef"},

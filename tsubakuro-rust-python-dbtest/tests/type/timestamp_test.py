@@ -78,28 +78,32 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Datetime()
+    value = tsurugi.type_code.Datetime()
     assert value.value is None
-    value = tsurugi.Datetime(None)
+    value = tsurugi.type_code.Datetime(None)
     assert value.value is None
     assert value.nanosecond is None
 
-    value = tsurugi.Datetime(datetime.datetime(2026, 1, 27, 16, 24, 30, 123456))
+    value = tsurugi.type_code.Datetime(
+        datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)
+    )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)
     assert value.nanosecond == 123456000
-    value = tsurugi.Datetime(datetime.datetime(2026, 1, 27, 16, 24, 30), 123456789)
+    value = tsurugi.type_code.Datetime(
+        datetime.datetime(2026, 1, 27, 16, 24, 30), 123456789
+    )
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)
     assert value.nanosecond == 123456789
     assert value.__repr__() == "Datetime(2026-01-27 16:24:30.123456789)"
 
-    value = tsurugi.Datetime.of(2026, 1, 27, 16, 24, 30, 123456789)
+    value = tsurugi.type_code.Datetime.of(2026, 1, 27, 16, 24, 30, 123456789)
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)
     assert value.nanosecond == 123456789
-    value = tsurugi.Datetime.of(2026, 1, 27)
+    value = tsurugi.type_code.Datetime.of(2026, 1, 27)
     assert value.value == datetime.datetime(2026, 1, 27, 0, 0, 0, 0)
     assert value.nanosecond == 0
 
-    value = tsurugi.Datetime.raw(1769531070, 123456789)
+    value = tsurugi.type_code.Datetime.raw(1769531070, 123456789)
     assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)
     assert value.nanosecond == 123456789
 
@@ -109,7 +113,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Datetime(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Datetime(None)),
             (1, datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)),
             (2, datetime.datetime(2026, 1, 27, 23, 59, 59, 123456)),
         ]
@@ -143,10 +147,13 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Datetime(None)},
             {
-                "pk": tsurugi.Int32(1),
-                "value": tsurugi.Datetime(
+                "pk": tsurugi.type_code.Int32(0),
+                "value": tsurugi.type_code.Datetime(None),
+            },
+            {
+                "pk": tsurugi.type_code.Int32(1),
+                "value": tsurugi.type_code.Datetime(
                     datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)
                 ),
             },
@@ -182,7 +189,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Datetime),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Datetime),
         )
         parameters = [
             (0, None),
@@ -194,7 +201,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Datetime()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Datetime()),
         )
         parameters = [
             (3, datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)),
@@ -223,7 +230,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Datetime},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Datetime},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -235,7 +242,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Datetime()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Datetime()},
         )
         parameters = [
             {"pk": 3, "value": datetime.datetime(2026, 1, 27, 16, 24, 30, 123456)},

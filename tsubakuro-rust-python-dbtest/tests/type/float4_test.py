@@ -68,11 +68,11 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Float32()
+    value = tsurugi.type_code.Float32()
     assert value.value is None
-    value = tsurugi.Float32(None)
+    value = tsurugi.type_code.Float32(None)
     assert value.value is None
-    value = tsurugi.Float32(123.5)
+    value = tsurugi.type_code.Float32(123.5)
     assert value.value == 123.5
 
 
@@ -81,7 +81,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Float32(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Float32(None)),
             (1, 1.0),
             (2, 0.0),
             (3, -123.5),
@@ -110,9 +110,12 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Float32(None)},
-            {"pk": tsurugi.Int32(1), "value": tsurugi.Float32(1.0)},
-            {"pk": tsurugi.Int32(2), "value": tsurugi.Float32(0.0)},
+            {
+                "pk": tsurugi.type_code.Int32(0),
+                "value": tsurugi.type_code.Float32(None),
+            },
+            {"pk": tsurugi.type_code.Int32(1), "value": tsurugi.type_code.Float32(1.0)},
+            {"pk": tsurugi.type_code.Int32(2), "value": tsurugi.type_code.Float32(0.0)},
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
@@ -148,7 +151,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Float32),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Float32),
         )
         parameters = [
             (0, None),
@@ -160,7 +163,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Float32()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Float32()),
         )
         parameters = [
             (3, -123.5),
@@ -188,7 +191,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Float32},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Float32},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -200,7 +203,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Float32()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Float32()},
         )
         parameters = [
             {"pk": 3, "value": -123.5},

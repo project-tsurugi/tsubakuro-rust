@@ -68,21 +68,21 @@ def test_placeholder(connection):
 
 
 def test_wrapper():
-    value = tsurugi.Decimal()
+    value = tsurugi.type_code.Decimal()
     assert value.value is None
-    value = tsurugi.Decimal(None)
+    value = tsurugi.type_code.Decimal(None)
     assert value.value is None
 
-    value = tsurugi.Decimal(123)
+    value = tsurugi.type_code.Decimal(123)
     assert value.value == decimal.Decimal(123)
-    value = tsurugi.Decimal(123.5)
+    value = tsurugi.type_code.Decimal(123.5)
     assert value.value == decimal.Decimal(123.5)
-    value = tsurugi.Decimal(decimal.Decimal("123.4"))
+    value = tsurugi.type_code.Decimal(decimal.Decimal("123.4"))
     assert value.value == decimal.Decimal("123.4")
-    value = tsurugi.Decimal("123.4")
+    value = tsurugi.type_code.Decimal("123.4")
     assert value.value == decimal.Decimal("123.4")
 
-    value = tsurugi.Decimal.raw([0x04, 0xD2], -1)
+    value = tsurugi.type_code.Decimal.raw([0x04, 0xD2], -1)
     assert value.value == decimal.Decimal("123.4")
 
 
@@ -91,7 +91,7 @@ def test_placeholder_wrapper(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            (tsurugi.Int32(0), tsurugi.Decimal(None)),
+            (tsurugi.type_code.Int32(0), tsurugi.type_code.Decimal(None)),
             (1, 1),
             (2, 0),
             (3, -123.5),
@@ -120,9 +120,12 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.Int32(0), "value": tsurugi.Decimal(None)},
-            {"pk": tsurugi.Int32(1), "value": tsurugi.Decimal(1)},
-            {"pk": tsurugi.Int32(2), "value": tsurugi.Decimal(0)},
+            {
+                "pk": tsurugi.type_code.Int32(0),
+                "value": tsurugi.type_code.Decimal(None),
+            },
+            {"pk": tsurugi.type_code.Int32(1), "value": tsurugi.type_code.Decimal(1)},
+            {"pk": tsurugi.type_code.Int32(2), "value": tsurugi.type_code.Decimal(0)},
         ]
         cursor.executemany(
             "insert into tsubakuro_rust_python_test values (:pk, :value)", parameters
@@ -158,7 +161,7 @@ def test_prepare_qmark(connection):
         insert = "insert into tsubakuro_rust_python_test values (?, ?)"
         cursor.prepare(
             insert,
-            (tsurugi.Int32, tsurugi.Decimal),
+            (tsurugi.type_code.Int32, tsurugi.type_code.Decimal),
         )
         parameters = [
             (0, None),
@@ -170,7 +173,7 @@ def test_prepare_qmark(connection):
 
         cursor.prepare(
             insert,
-            (tsurugi.Int32(), tsurugi.Decimal()),
+            (tsurugi.type_code.Int32(), tsurugi.type_code.Decimal()),
         )
         parameters = [
             (3, -123.5),
@@ -198,7 +201,7 @@ def test_prepare_named(connection):
         insert = "insert into tsubakuro_rust_python_test values (:pk, :value)"
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32, "value": tsurugi.Decimal},
+            {"pk": tsurugi.type_code.Int32, "value": tsurugi.type_code.Decimal},
         )
         parameters = [
             {"pk": 0, "value": None},
@@ -210,7 +213,7 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.Int32(), "value": tsurugi.Decimal()},
+            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.Decimal()},
         )
         parameters = [
             {"pk": 3, "value": -123.5},
