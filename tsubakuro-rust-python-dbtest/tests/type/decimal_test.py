@@ -67,25 +67,6 @@ def test_placeholder(connection):
         connection.commit()
 
 
-def test_wrapper():
-    value = tsurugi.type_code.Decimal()
-    assert value.value is None
-    value = tsurugi.type_code.Decimal(None)
-    assert value.value is None
-
-    value = tsurugi.type_code.Decimal(123)
-    assert value.value == decimal.Decimal(123)
-    value = tsurugi.type_code.Decimal(123.5)
-    assert value.value == decimal.Decimal(123.5)
-    value = tsurugi.type_code.Decimal(decimal.Decimal("123.4"))
-    assert value.value == decimal.Decimal("123.4")
-    value = tsurugi.type_code.Decimal("123.4")
-    assert value.value == decimal.Decimal("123.4")
-
-    value = tsurugi.type_code.Decimal.raw([0x04, 0xD2], -1)
-    assert value.value == decimal.Decimal("123.4")
-
-
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)
 

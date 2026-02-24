@@ -74,21 +74,6 @@ def test_placeholder(connection):
         connection.commit()
 
 
-def test_wrapper():
-    value = tsurugi.type_code.Date()
-    assert value.value is None
-    value = tsurugi.type_code.Date(None)
-    assert value.value is None
-    value = tsurugi.type_code.Date(datetime.date(2026, 1, 27))
-    assert value.value == datetime.date(2026, 1, 27)
-
-    value = tsurugi.type_code.Date.of(2026, 1, 27)
-    assert value.value == datetime.date(2026, 1, 27)
-
-    value = tsurugi.type_code.Date.raw(20480)
-    assert value.value == datetime.date(2026, 1, 27)
-
-
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)
 

@@ -9,6 +9,14 @@ Classes
     
     Attributes:
         value (Optional[bool]): boolean value. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        value = tsurugi.type_code.Bool(True)
+        value = tsurugi.type_code.Bool(None)
+        ```
 
     ### Instance variables
 
@@ -20,6 +28,14 @@ Classes
     
     Attributes:
         value (Optional[bytes]): binary data. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        value = tsurugi.type_code.Bytes(b"0x01\x02\x03")
+        value = tsurugi.type_code.Bytes(None)
+        ```
 
     ### Instance variables
 
@@ -31,6 +47,15 @@ Classes
     
     Attributes:
         value (Optional[datetime.date]): date value. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+        import datetime
+    
+        value = tsurugi.type_code.Date(datetime.date(2026, 2, 24))
+        value = tsurugi.type_code.Date(None)
+        ```
 
     ### Instance variables
 
@@ -65,6 +90,16 @@ Classes
     Attributes:
         value (Optional[datetime.datetime]): datetime value. (read only)
         nanosecond (Optional[int]): nanosecond part of the time. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+        import datetime
+    
+        value = tsurugi.type_code.Datetime(datetime.datetime(2026, 2, 24, 12, 34, 56, 123456)) # microsecond precision
+        value = tsurugi.type_code.Datetime(datetime.datetime(2026, 2, 24, 12, 34, 56), 123456879) # nanosecond precision
+        value = tsurugi.type_code.Datetime(None)
+        ```
 
     ### Instance variables
 
@@ -106,6 +141,15 @@ Classes
     
     Attributes:
         value (Optional[decimal.Decimal]): decimal value. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+        import decimal
+    
+        value = tsurugi.type_code.Decimal(decimal.Decimal("123.45"))
+        value = tsurugi.type_code.Decimal(None)
+        ```
 
     ### Instance variables
 
@@ -129,6 +173,14 @@ Classes
     
     Attributes:
         value (Optional[float]): float value. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        value = tsurugi.type_code.Float32(123.5)
+        value = tsurugi.type_code.Float32(None)
+        ```
 
     ### Instance variables
 
@@ -140,6 +192,14 @@ Classes
     
     Attributes:
         value (Optional[float]): float value. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        value = tsurugi.type_code.Float64(123.5)
+        value = tsurugi.type_code.Float64(None)
+        ```
 
     ### Instance variables
 
@@ -151,6 +211,14 @@ Classes
     
     Attributes:
         value (Optional[int]): integer value. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        value = tsurugi.type_code.Int32(123)
+        value = tsurugi.type_code.Int32(None)
+        ```
 
     ### Instance variables
 
@@ -162,6 +230,14 @@ Classes
     
     Attributes:
         value (Optional[int]): integer value. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+    
+        value = tsurugi.type_code.Int64(123)
+        value = tsurugi.type_code.Int64(None)
+        ```
 
     ### Instance variables
 
@@ -174,6 +250,17 @@ Classes
     Attributes:
         value (Optional[datetime.datetime]): datetime value with time zone. (read only)
         nanosecond (Optional[int]): nanosecond part of the time. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+        import datetime
+    
+        JST = datetime.timezone(datetime.timedelta(hours=9))
+        value = tsurugi.type_code.OffsetDatetime(datetime.datetime(2026, 2, 24, 12, 34, 56, 123456, tzinfo=JST)) # microsecond precision
+        value = tsurugi.type_code.OffsetDatetime(datetime.datetime(2026, 2, 24, 12, 34, 56, tzinfo=JST), 123456879) # nanosecond precision
+        value = tsurugi.type_code.OffsetDatetime(None)
+        ```
 
     ### Instance variables
 
@@ -218,6 +305,17 @@ Classes
     Attributes:
         value (Optional[datetime.time]): time value with time zone. (read only)
         nanosecond (Optional[int]): nanosecond part of the time. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+        import datetime
+    
+        JST = datetime.timezone(datetime.timedelta(hours=9))
+        value = tsurugi.type_code.OffsetTime(datetime.time(12, 34, 56, 123456, tzinfo=JST)) # microsecond precision
+        value = tsurugi.type_code.OffsetTime(datetime.time(12, 34, 56, tzinfo=JST), 123456879) # nanosecond precision
+        value = tsurugi.type_code.OffsetTime(None)
+        ```
 
     ### Instance variables
 
@@ -269,6 +367,16 @@ Classes
     Attributes:
         value (Optional[datetime.time]): time value. (read only)
         nanosecond (Optional[int]): nanosecond part of the time. (read only)
+    
+    Examples:
+        ```python
+        import tsubakuro_rust_python as tsurugi
+        import datetime
+    
+        value = tsurugi.type_code.Time(datetime.time(12, 34, 56, 123456)) # microsecond precision
+        value = tsurugi.type_code.Time(datetime.time(12, 34, 56), 123456879) # nanosecond precision
+        value = tsurugi.type_code.Time(None)
+        ```
 
     ### Instance variables
 

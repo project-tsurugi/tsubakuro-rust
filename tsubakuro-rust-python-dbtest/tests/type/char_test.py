@@ -69,17 +69,6 @@ def test_placeholder(connection):
         connection.commit()
 
 
-def test_wrapper():
-    value = tsurugi.type_code.Str()
-    assert value.value is None
-    value = tsurugi.type_code.Str(None)
-    assert value.value is None
-    value = tsurugi.type_code.Str("abc")
-    assert value.value == "abc"
-    value = tsurugi.type_code.Str("")
-    assert value.value == ""
-
-
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)
 

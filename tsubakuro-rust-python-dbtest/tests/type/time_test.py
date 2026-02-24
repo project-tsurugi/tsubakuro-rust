@@ -77,36 +77,6 @@ def test_placeholder(connection):
         connection.commit()
 
 
-def test_wrapper():
-    value = tsurugi.type_code.Time()
-    assert value.value is None
-    value = tsurugi.type_code.Time(None)
-    assert value.value is None
-    assert value.nanosecond is None
-
-    value = tsurugi.type_code.Time(datetime.time(12, 34, 56, 123456))
-    assert value.value == datetime.time(12, 34, 56, 123456)
-    assert value.nanosecond == 123456000
-
-    value = tsurugi.type_code.Time(datetime.time(12, 34, 56), 123456789)
-    assert value.value == datetime.time(12, 34, 56, 123456)
-    assert value.nanosecond == 123456789
-    assert value.__repr__() == "Time(12:34:56.123456789)"
-
-    value = tsurugi.type_code.Time.of(12, 34, 56, 123456789)
-    assert value.value == datetime.time(12, 34, 56, 123456)
-    assert value.nanosecond == 123456789
-    value = tsurugi.type_code.Time.of()
-    assert value.value == datetime.time(0, 0, 0, 0)
-    assert value.nanosecond == 0
-
-    value = tsurugi.type_code.Time.raw(
-        ((12 * 60 + 34) * 60 + 56) * 1_000_000_000 + 123456789
-    )
-    assert value.value == datetime.time(12, 34, 56, 123456)
-    assert value.nanosecond == 123456789
-
-
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)
 

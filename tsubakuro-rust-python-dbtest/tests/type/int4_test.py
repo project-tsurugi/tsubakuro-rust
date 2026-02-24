@@ -67,15 +67,6 @@ def test_placeholder(connection):
         connection.commit()
 
 
-def test_wrapper():
-    value = tsurugi.type_code.Int32()
-    assert value.value is None
-    value = tsurugi.type_code.Int32(None)
-    assert value.value is None
-    value = tsurugi.type_code.Int32(123)
-    assert value.value == 123
-
-
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)
 

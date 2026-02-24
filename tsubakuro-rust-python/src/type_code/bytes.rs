@@ -6,6 +6,14 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 ///
 /// Attributes:
 ///     value (Optional[bytes]): binary data. (read only)
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     value = tsurugi.type_code.Bytes(b"0x01\x02\x03")
+///     value = tsurugi.type_code.Bytes(None)
+///     ```
 #[gen_stub_pyclass]
 #[pyclass(module = "tsubakuro_rust_python.type_code")]
 #[derive(Debug)]

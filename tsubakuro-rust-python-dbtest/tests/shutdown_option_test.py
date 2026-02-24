@@ -2,20 +2,6 @@ import tsubakuro_rust_python as tsurugi
 from tsubakuro_rust_python import ShutdownOption, ShutdownType
 
 
-def test_shutdown_option():
-    option = ShutdownOption()
-    assert option.shutdown_type == ShutdownType.GRACEFUL
-    assert option.shutdown_timeout is None
-
-    option = ShutdownOption(ShutdownType.NOTHING)
-    assert option.shutdown_type == ShutdownType.NOTHING
-    assert option.shutdown_timeout is None
-
-    option = ShutdownOption(ShutdownType.FORCEFUL, 30)
-    assert option.shutdown_type == ShutdownType.FORCEFUL
-    assert option.shutdown_timeout == 30
-
-
 def test_config(endpoint):
     config = tsurugi.Config(endpoint=endpoint, user="tsurugi", password="password")
     config.shutdown_option = ShutdownOption(ShutdownType.GRACEFUL, 10)

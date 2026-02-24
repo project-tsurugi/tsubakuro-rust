@@ -1,6 +1,3 @@
-import tsubakuro_rust_python as tsurugi
-
-
 def test_bool(connection):
     with connection.cursor() as cursor:
         cursor.execute("drop table if exists tsubakuro_rust_python_test")
@@ -37,14 +34,3 @@ def test_bool(connection):
             ("value", "Bool", None, None, None, None, None),
         )
         connection.commit()
-
-
-def test_wrapper():
-    value = tsurugi.type_code.Bool()
-    assert value.value is None
-    value = tsurugi.type_code.Bool(None)
-    assert value.value is None
-    value = tsurugi.type_code.Bool(True)
-    assert value.value is True
-    value = tsurugi.type_code.Bool(False)
-    assert value.value is False

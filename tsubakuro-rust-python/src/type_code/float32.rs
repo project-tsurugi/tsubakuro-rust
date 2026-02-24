@@ -6,6 +6,14 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 ///
 /// Attributes:
 ///     value (Optional[float]): float value. (read only)
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///
+///     value = tsurugi.type_code.Float32(123.5)
+///     value = tsurugi.type_code.Float32(None)
+///     ```
 #[gen_stub_pyclass]
 #[pyclass(module = "tsubakuro_rust_python.type_code")]
 #[derive(Debug)]

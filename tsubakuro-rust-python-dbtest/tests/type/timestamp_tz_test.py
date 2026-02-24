@@ -85,52 +85,6 @@ def test_placeholder(connection):
         connection.commit()
 
 
-def test_wrapper():
-    value = tsurugi.type_code.OffsetDatetime()
-    assert value.value is None
-    value = tsurugi.type_code.OffsetDatetime(None)
-    assert value.value is None
-    assert value.nanosecond is None
-
-    JST = datetime.timezone(datetime.timedelta(hours=9))
-    UTC = datetime.timezone(datetime.timedelta(hours=0))
-    value = tsurugi.type_code.OffsetDatetime(
-        datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
-    )
-    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
-    assert value.nanosecond == 123456000
-
-    value = tsurugi.type_code.OffsetDatetime(
-        datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
-    )
-    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
-    assert value.nanosecond == 123456000
-
-    value = tsurugi.type_code.OffsetDatetime(
-        datetime.datetime(2026, 1, 27, 16, 24, 30, tzinfo=JST), 123456789
-    )
-    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
-    assert value.nanosecond == 123456789
-    assert value.__repr__() == "OffsetDatetime(2026-01-27 16:24:30.123456789 +09:00)"
-
-    value = tsurugi.type_code.OffsetDatetime(
-        datetime.datetime(2026, 1, 27, 16, 24, 30, tzinfo=UTC), 123456789
-    )
-    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=UTC)
-    assert value.nanosecond == 123456789
-
-    value = tsurugi.type_code.OffsetDatetime.of(2026, 1, 27, 16, 24, 30, 123456789, JST)
-    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
-    assert value.nanosecond == 123456789
-    value = tsurugi.type_code.OffsetDatetime.of(2026, 1, 27)
-    assert value.value == datetime.datetime(2026, 1, 27, 0, 0, 0, 0, tzinfo=UTC)
-    assert value.nanosecond == 0
-
-    value = tsurugi.type_code.OffsetDatetime.raw(1769531070, 123456789, 9 * 60)
-    assert value.value == datetime.datetime(2026, 1, 27, 16, 24, 30, 123456, tzinfo=JST)
-    assert value.nanosecond == 123456789
-
-
 def test_placeholder_wrapper(connection):
     drop_and_create_table(connection)
 
@@ -178,7 +132,10 @@ def test_named_placeholder(connection):
 
     with connection.cursor() as cursor:
         parameters = [
-            {"pk": tsurugi.type_code.Int32(0), "value": tsurugi.type_code.OffsetDatetime(None)},
+            {
+                "pk": tsurugi.type_code.Int32(0),
+                "value": tsurugi.type_code.OffsetDatetime(None),
+            },
             {
                 "pk": tsurugi.type_code.Int32(1),
                 "value": tsurugi.type_code.OffsetDatetime(
@@ -297,7 +254,10 @@ def test_prepare_named(connection):
 
         cursor.prepare(
             insert,
-            {"pk": tsurugi.type_code.Int32(), "value": tsurugi.type_code.OffsetDatetime()},
+            {
+                "pk": tsurugi.type_code.Int32(),
+                "value": tsurugi.type_code.OffsetDatetime(),
+            },
         )
         parameters = [
             {

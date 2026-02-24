@@ -26,6 +26,11 @@ exclude = ["**/__pycache__", "**/*.pyc"]
 [tool.uv]
 cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }, { file = "python/**/*.py" }]
 
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
+
 [project.urls]
 Homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python"
 Documentation = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python/docs/tsubakuro_rust_python/"

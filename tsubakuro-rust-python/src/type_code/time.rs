@@ -8,6 +8,16 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimeOfDay};
 /// Attributes:
 ///     value (Optional[datetime.time]): time value. (read only)
 ///     nanosecond (Optional[int]): nanosecond part of the time. (read only)
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///     import datetime
+///
+///     value = tsurugi.type_code.Time(datetime.time(12, 34, 56, 123456)) # microsecond precision
+///     value = tsurugi.type_code.Time(datetime.time(12, 34, 56), 123456879) # nanosecond precision
+///     value = tsurugi.type_code.Time(None)
+///     ```
 #[gen_stub_pyclass]
 #[pyclass(module = "tsubakuro_rust_python.type_code")]
 #[derive(Debug)]

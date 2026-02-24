@@ -105,6 +105,13 @@ uv run pdoc tsubakuro_rust_python --html -o docs/ --force
 ls docs/tsubakuro_rust_python/
 ```
 
+## How to test
+
+```bash
+cd tsubakuro-rust-python
+uv run pytest
+```
+
 ## License
 
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)

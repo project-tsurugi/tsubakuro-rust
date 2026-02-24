@@ -8,6 +8,17 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimePointWith
 /// Attributes:
 ///     value (Optional[datetime.datetime]): datetime value with time zone. (read only)
 ///     nanosecond (Optional[int]): nanosecond part of the time. (read only)
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///     import datetime
+///
+///     JST = datetime.timezone(datetime.timedelta(hours=9))
+///     value = tsurugi.type_code.OffsetDatetime(datetime.datetime(2026, 2, 24, 12, 34, 56, 123456, tzinfo=JST)) # microsecond precision
+///     value = tsurugi.type_code.OffsetDatetime(datetime.datetime(2026, 2, 24, 12, 34, 56, tzinfo=JST), 123456879) # nanosecond precision
+///     value = tsurugi.type_code.OffsetDatetime(None)
+///     ```
 #[gen_stub_pyclass]
 #[pyclass(module = "tsubakuro_rust_python.type_code")]
 #[derive(Debug)]

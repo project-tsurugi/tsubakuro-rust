@@ -6,6 +6,15 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDecimal};
 ///
 /// Attributes:
 ///     value (Optional[decimal.Decimal]): decimal value. (read only)
+///
+/// Examples:
+///     ```python
+///     import tsubakuro_rust_python as tsurugi
+///     import decimal
+///
+///     value = tsurugi.type_code.Decimal(decimal.Decimal("123.45"))
+///     value = tsurugi.type_code.Decimal(None)
+///     ```
 #[gen_stub_pyclass]
 #[pyclass(module = "tsubakuro_rust_python.type_code")]
 #[derive(Debug)]

@@ -281,6 +281,11 @@ wheels = [
 name = "tsubakuro-rust-python"
 source = { directory = "../tsubakuro-rust-python" }
 
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.0.2" }]
+
 [[package]]
 name = "tsubakuro-rust-python-dbtest"
 version = "0.1.0"

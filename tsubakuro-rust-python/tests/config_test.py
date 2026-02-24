@@ -1,14 +1,14 @@
 import tsubakuro_rust_python as tsurugi
 
 
-def test_config(endpoint):
+def test_config():
     tx1_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
     tx1_option.label = "ltx"
     commit_option1 = tsurugi.CommitOption(tsurugi.CommitType.STORED, True, 20)
     shutdown_option1 = tsurugi.ShutdownOption(tsurugi.ShutdownType.FORCEFUL, 10)
     config1 = tsurugi.Config()
     config1.application_name = "app"
-    config1.endpoint = endpoint
+    config1.endpoint = "http://localhost:8080"
     config1.user = "tsurugi"
     config1.password = "password"
     config1.auth_token = "token"
@@ -24,7 +24,7 @@ def test_config(endpoint):
     shutdown_option2 = tsurugi.ShutdownOption(tsurugi.ShutdownType.FORCEFUL, 10)
     config2 = tsurugi.Config(
         application_name="app",
-        endpoint=endpoint,
+        endpoint="http://localhost:8080",
         user="tsurugi",
         password="password",
         auth_token="token",
@@ -44,7 +44,7 @@ def test_config(endpoint):
         commit_option3,
         shutdown_option3,
         application_name="app",
-        endpoint=endpoint,
+        endpoint="http://localhost:8080",
         user="tsurugi",
         password="password",
         auth_token="token",

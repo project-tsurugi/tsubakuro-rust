@@ -56,7 +56,13 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[bool]</code></dt>
 <dd>boolean value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+value = tsurugi.type_code.Bool(True)
+value = tsurugi.type_code.Bool(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Bool.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -75,7 +81,13 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[bytes]</code></dt>
 <dd>binary data. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+value = tsurugi.type_code.Bytes(b&quot;0x01\x02\x03&quot;)
+value = tsurugi.type_code.Bytes(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Bytes.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -94,7 +106,14 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[datetime.date]</code></dt>
 <dd>date value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+import datetime
+
+value = tsurugi.type_code.Date(datetime.date(2026, 2, 24))
+value = tsurugi.type_code.Date(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Date.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -154,7 +173,15 @@ el.replaceWith(d);
 <dd>datetime value. (read only)</dd>
 <dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
 <dd>nanosecond part of the time. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+import datetime
+
+value = tsurugi.type_code.Datetime(datetime.datetime(2026, 2, 24, 12, 34, 56, 123456)) # microsecond precision
+value = tsurugi.type_code.Datetime(datetime.datetime(2026, 2, 24, 12, 34, 56), 123456879) # nanosecond precision
+value = tsurugi.type_code.Datetime(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Datetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
@@ -226,7 +253,14 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[decimal.Decimal]</code></dt>
 <dd>decimal value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+import decimal
+
+value = tsurugi.type_code.Decimal(decimal.Decimal(&quot;123.45&quot;))
+value = tsurugi.type_code.Decimal(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Decimal.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -266,7 +300,13 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[float]</code></dt>
 <dd>float value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+value = tsurugi.type_code.Float32(123.5)
+value = tsurugi.type_code.Float32(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Float32.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -285,7 +325,13 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[float]</code></dt>
 <dd>float value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+value = tsurugi.type_code.Float64(123.5)
+value = tsurugi.type_code.Float64(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Float64.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -304,7 +350,13 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[int]</code></dt>
 <dd>integer value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+value = tsurugi.type_code.Int32(123)
+value = tsurugi.type_code.Int32(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Int32.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -323,7 +375,13 @@ el.replaceWith(d);
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[int]</code></dt>
 <dd>integer value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+
+value = tsurugi.type_code.Int64(123)
+value = tsurugi.type_code.Int64(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Int64.value"><code class="name">var <span class="ident">value</span></code></dt>
@@ -344,7 +402,16 @@ el.replaceWith(d);
 <dd>datetime value with time zone. (read only)</dd>
 <dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
 <dd>nanosecond part of the time. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+import datetime
+
+JST = datetime.timezone(datetime.timedelta(hours=9))
+value = tsurugi.type_code.OffsetDatetime(datetime.datetime(2026, 2, 24, 12, 34, 56, 123456, tzinfo=JST)) # microsecond precision
+value = tsurugi.type_code.OffsetDatetime(datetime.datetime(2026, 2, 24, 12, 34, 56, tzinfo=JST), 123456879) # nanosecond precision
+value = tsurugi.type_code.OffsetDatetime(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.OffsetDatetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
@@ -422,7 +489,16 @@ el.replaceWith(d);
 <dd>time value with time zone. (read only)</dd>
 <dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
 <dd>nanosecond part of the time. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+import datetime
+
+JST = datetime.timezone(datetime.timedelta(hours=9))
+value = tsurugi.type_code.OffsetTime(datetime.time(12, 34, 56, 123456, tzinfo=JST)) # microsecond precision
+value = tsurugi.type_code.OffsetTime(datetime.time(12, 34, 56, tzinfo=JST), 123456879) # nanosecond precision
+value = tsurugi.type_code.OffsetTime(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.OffsetTime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
@@ -511,7 +587,15 @@ el.replaceWith(d);
 <dd>time value. (read only)</dd>
 <dt><strong><code>nanosecond</code></strong> :&ensp;<code>Optional[int]</code></dt>
 <dd>nanosecond part of the time. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+import datetime
+
+value = tsurugi.type_code.Time(datetime.time(12, 34, 56, 123456)) # microsecond precision
+value = tsurugi.type_code.Time(datetime.time(12, 34, 56), 123456879) # nanosecond precision
+value = tsurugi.type_code.Time(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
 <dt id="tsubakuro_rust_python.type_code.Time.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
