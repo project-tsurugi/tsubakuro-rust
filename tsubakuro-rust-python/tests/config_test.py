@@ -13,6 +13,7 @@ def test_config():
     config1.password = "password"
     config1.auth_token = "token"
     config1.credentials = "credentials"
+    config1.session_label = "session"
     config1.transaction_option = tx1_option
     config1.commit_option = commit_option1
     config1.shutdown_option = shutdown_option1
@@ -29,6 +30,7 @@ def test_config():
         password="password",
         auth_token="token",
         credentials="credentials",
+        session_label="session",
         transaction_option=tx2_option,
         commit_option=commit_option2,
         shutdown_option=shutdown_option2,
@@ -49,6 +51,7 @@ def test_config():
         password="password",
         auth_token="token",
         credentials="credentials",
+        session_label="session",
         default_timeout=30,
     )
 
@@ -63,6 +66,7 @@ def assert_compare(config1, config2):
     assert config1.password == config2.password
     assert config1.auth_token == config2.auth_token
     assert config1.credentials == config2.credentials
+    assert config1.session_label == config2.session_label
     assert (
         config1.transaction_option.transaction_type
         == config2.transaction_option.transaction_type

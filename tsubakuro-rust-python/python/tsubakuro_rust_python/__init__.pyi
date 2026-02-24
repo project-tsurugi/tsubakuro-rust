@@ -165,6 +165,7 @@ class Config:
         password (str): Password for authentication.
         auth_token (str): Authentication token.
         credentials (str): Path to credentials file.
+        session_label (str): Session label for the connection.
         transaction_option (TransactionOption): Transaction option.
         commit_option (CommitOption): Commit option.
         shutdown_option (ShutdownOption): Shutdown option.
@@ -179,6 +180,7 @@ class Config:
         config.endpoint = "tcp://localhost:12345"
         config.user = "tsurugi"
         config.password = "password"
+        config.session_label = "tsubakuro-rust-python session"
         config.default_timeout = 30  # seconds
         ```
     
@@ -186,10 +188,11 @@ class Config:
         import tsubakuro_rust_python as tsurugi
     
         config = tsurugi.Config(
-            application_name="tsurugi-rust-python example",
+            application_name="tsubakuro-rust-python example",
             endpoint="tcp://localhost:12345",
             user="tsurugi",
             password="password",
+            session_label="tsubakuro-rust-python session",
             default_timeout=30,  # seconds
         )
         ```
@@ -253,6 +256,16 @@ class Config:
     def credentials(self, value: typing.Optional[builtins.str]) -> None:
         r"""
         Path to credentials file.
+        """
+    @property
+    def session_label(self) -> typing.Optional[builtins.str]:
+        r"""
+        Session label for the connection.
+        """
+    @session_label.setter
+    def session_label(self, value: typing.Optional[builtins.str]) -> None:
+        r"""
+        Session label for the connection.
         """
     @property
     def transaction_option(self) -> typing.Optional[TransactionOption]:
@@ -1098,7 +1111,7 @@ def connect(*args: typing.Any, **kwargs: typing.Any) -> Connection:
         config.endpoint = "tcp://localhost:12345"
         config.user = "tsurugi"
         config.password = "password"
-        config.default_timeout = 30 // seconds
+        config.default_timeout = 30  # seconds
         with tsurugi.connect(config) as connection:
             pass
         ```
@@ -1106,7 +1119,12 @@ def connect(*args: typing.Any, **kwargs: typing.Any) -> Connection:
         ```python
         import tsubakuro_rust_python as tsurugi
     
-        with tsurugi.connect(endpoint="tcp://localhost:12345", user="tsurugi", password="password", default_timeout=30) as connection:
+        with tsurugi.connect(
+            endpoint="tcp://localhost:12345",
+            user="tsurugi",
+            password="password",
+            default_timeout=30,  # seconds
+        ) as connection:
             pass
         ```
     """

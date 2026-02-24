@@ -1,11 +1,13 @@
 import tsubakuro_rust_python as tsurugi
 
 
-def test_connect1(endpoint):
+def test_connect(endpoint):
     config = tsurugi.Config()
+    config.application_name = "tsubakuro-rust-python-dbtest.pytest"
     config.endpoint = endpoint
     config.user = "tsurugi"
     config.password = "password"
+    config.session_label = "tsubakuro-rust-python-dbteset.session"
     with tsurugi.connect(config) as connection:
         assert isinstance(connection.list_tables(), list)
 

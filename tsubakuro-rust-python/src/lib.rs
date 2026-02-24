@@ -99,7 +99,7 @@ mod _tsubakuro_rust_python {
     ///     config.endpoint = "tcp://localhost:12345"
     ///     config.user = "tsurugi"
     ///     config.password = "password"
-    ///     config.default_timeout = 30 // seconds
+    ///     config.default_timeout = 30  # seconds
     ///     with tsurugi.connect(config) as connection:
     ///         pass
     ///     ```
@@ -107,7 +107,12 @@ mod _tsubakuro_rust_python {
     ///     ```python
     ///     import tsubakuro_rust_python as tsurugi
     ///
-    ///     with tsurugi.connect(endpoint="tcp://localhost:12345", user="tsurugi", password="password", default_timeout=30) as connection:
+    ///     with tsurugi.connect(
+    ///         endpoint="tcp://localhost:12345",
+    ///         user="tsurugi",
+    ///         password="password",
+    ///         default_timeout=30,  # seconds
+    ///     ) as connection:
     ///         pass
     ///     ```
     #[gen_stub_pyfunction(module = "tsubakuro_rust_python")]

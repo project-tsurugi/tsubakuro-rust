@@ -24,6 +24,7 @@ use crate::{
 ///     password (str): Password for authentication.
 ///     auth_token (str): Authentication token.
 ///     credentials (str): Path to credentials file.
+///     session_label (str): Session label for the connection.
 ///     transaction_option (TransactionOption): Transaction option.
 ///     commit_option (CommitOption): Commit option.
 ///     shutdown_option (ShutdownOption): Shutdown option.
@@ -38,6 +39,7 @@ use crate::{
 ///     config.endpoint = "tcp://localhost:12345"
 ///     config.user = "tsurugi"
 ///     config.password = "password"
+///     config.session_label = "tsubakuro-rust-python session"
 ///     config.default_timeout = 30  # seconds
 ///     ```
 ///
@@ -45,10 +47,11 @@ use crate::{
 ///     import tsubakuro_rust_python as tsurugi
 ///
 ///     config = tsurugi.Config(
-///         application_name="tsurugi-rust-python example",
+///         application_name="tsubakuro-rust-python example",
 ///         endpoint="tcp://localhost:12345",
 ///         user="tsurugi",
 ///         password="password",
+///         session_label="tsubakuro-rust-python session",
 ///         default_timeout=30,  # seconds
 ///     )
 ///     ```
@@ -73,6 +76,9 @@ pub struct Config {
     /// Path to credentials file.
     #[pyo3(get, set)]
     credentials: Option<String>,
+    /// Session label for the connection.
+    #[pyo3(get, set)]
+    session_label: Option<String>,
     /// Transaction option.
     #[pyo3(get, set)]
     pub transaction_option: Option<TransactionOption>,
@@ -96,6 +102,7 @@ impl Default for Config {
             password: None,
             auth_token: None,
             credentials: None,
+            session_label: None,
             transaction_option: None,
             commit_option: None,
             shutdown_option: None,
@@ -159,6 +166,9 @@ impl Config {
         if let Some(credentials) = &other.credentials {
             self.credentials = Some(credentials.clone());
         }
+        if let Some(session_label) = &other.session_label {
+            self.session_label = Some(session_label.clone());
+        }
         if let Some(transaction_option) = &other.transaction_option {
             self.transaction_option = Some(transaction_option.clone());
         }
@@ -177,13 +187,14 @@ impl Config {
         let none = &"None".to_string();
         let mask = &"****".to_string();
         format!(
-            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, default_timeout={})",
+            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, session_label={}, default_timeout={})",
             self.application_name.as_ref().unwrap_or(none),
             self.endpoint.as_ref().unwrap_or(none),
             self.user.as_ref().unwrap_or(none),
             self.password.as_ref().map_or(none, |_| mask),
             self.auth_token.as_ref().map_or(none, |_| mask),
             self.credentials.as_ref().unwrap_or(none),
+            self.session_label.as_ref().unwrap_or(none),
             self.default_timeout.as_ref().map_or(none.to_string(), |v| v.to_string())
         )
     }
@@ -256,6 +267,7 @@ impl Config {
             "password" => self.password = Some(value.to_string()),
             "auth_token" => self.auth_token = Some(value.to_string()),
             "credentials" => self.credentials = Some(value.to_string()),
+            "session_label" => self.session_label = Some(value.to_string()),
             "default_timeout" | "timeout" => {
                 let timeout: u64 = value.parse().map_err(|_| {
                     InterfaceError::new_err("Invalid value for default_timeout/timeout")
@@ -275,6 +287,7 @@ impl Config {
             "password" => self.password = Some(value.extract()?),
             "auth_token" => self.auth_token = Some(value.extract()?),
             "credentials" => self.credentials = Some(value.extract()?),
+            "session_label" => self.session_label = Some(value.extract()?),
             "default_timeout" | "timeout" => self.default_timeout = Some(value.extract()?),
             _ => debug!("Unknown key: {}", key),
         }
@@ -307,6 +320,10 @@ impl Config {
         } else if let Some(credentials) = &self.credentials {
             let credential = Credential::load(credentials).map_err(to_pyerr)?;
             connection_option.set_credential(credential);
+        }
+
+        if let Some(session_label) = &self.session_label {
+            connection_option.set_session_label(session_label);
         }
 
         connection_option.set_default_timeout(self.default_timeout());

@@ -53,7 +53,7 @@ Functions
         config.endpoint = "tcp://localhost:12345"
         config.user = "tsurugi"
         config.password = "password"
-        config.default_timeout = 30 // seconds
+        config.default_timeout = 30  # seconds
         with tsurugi.connect(config) as connection:
             pass
         ```
@@ -61,7 +61,12 @@ Functions
         ```python
         import tsubakuro_rust_python as tsurugi
     
-        with tsurugi.connect(endpoint="tcp://localhost:12345", user="tsurugi", password="password", default_timeout=30) as connection:
+        with tsurugi.connect(
+            endpoint="tcp://localhost:12345",
+            user="tsurugi",
+            password="password",
+            default_timeout=30,  # seconds
+        ) as connection:
             pass
         ```
 
@@ -195,6 +200,7 @@ Classes
         password (str): Password for authentication.
         auth_token (str): Authentication token.
         credentials (str): Path to credentials file.
+        session_label (str): Session label for the connection.
         transaction_option (TransactionOption): Transaction option.
         commit_option (CommitOption): Commit option.
         shutdown_option (ShutdownOption): Shutdown option.
@@ -209,6 +215,7 @@ Classes
         config.endpoint = "tcp://localhost:12345"
         config.user = "tsurugi"
         config.password = "password"
+        config.session_label = "tsubakuro-rust-python session"
         config.default_timeout = 30  # seconds
         ```
     
@@ -216,10 +223,11 @@ Classes
         import tsubakuro_rust_python as tsurugi
     
         config = tsurugi.Config(
-            application_name="tsurugi-rust-python example",
+            application_name="tsubakuro-rust-python example",
             endpoint="tcp://localhost:12345",
             user="tsurugi",
             password="password",
+            session_label="tsubakuro-rust-python session",
             default_timeout=30,  # seconds
         )
         ```
@@ -246,6 +254,9 @@ Classes
 
     `password`
     :   Password for authentication.
+
+    `session_label`
+    :   Session label for the connection.
 
     `shutdown_option`
     :   Shutdown option.

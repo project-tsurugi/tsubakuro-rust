@@ -101,13 +101,18 @@ config = tsurugi.Config()
 config.endpoint = &quot;tcp://localhost:12345&quot;
 config.user = &quot;tsurugi&quot;
 config.password = &quot;password&quot;
-config.default_timeout = 30 // seconds
+config.default_timeout = 30  # seconds
 with tsurugi.connect(config) as connection:
     pass
 </code></pre>
 <pre><code class="language-python">import tsubakuro_rust_python as tsurugi
 
-with tsurugi.connect(endpoint=&quot;tcp://localhost:12345&quot;, user=&quot;tsurugi&quot;, password=&quot;password&quot;, default_timeout=30) as connection:
+with tsurugi.connect(
+    endpoint=&quot;tcp://localhost:12345&quot;,
+    user=&quot;tsurugi&quot;,
+    password=&quot;password&quot;,
+    default_timeout=30,  # seconds
+) as connection:
     pass
 </code></pre></div>
 </dd>
@@ -306,6 +311,8 @@ commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
 <dd>Authentication token.</dd>
 <dt><strong><code>credentials</code></strong> :&ensp;<code>str</code></dt>
 <dd>Path to credentials file.</dd>
+<dt><strong><code>session_label</code></strong> :&ensp;<code>str</code></dt>
+<dd>Session label for the connection.</dd>
 <dt><strong><code>transaction_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.TransactionOption" href="#tsubakuro_rust_python.TransactionOption">TransactionOption</a></code></dt>
 <dd>Transaction option.</dd>
 <dt><strong><code>commit_option</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.CommitOption" href="#tsubakuro_rust_python.CommitOption">CommitOption</a></code></dt>
@@ -323,15 +330,17 @@ config.application_name = &quot;tsubakuro-rust-python example&quot;
 config.endpoint = &quot;tcp://localhost:12345&quot;
 config.user = &quot;tsurugi&quot;
 config.password = &quot;password&quot;
+config.session_label = &quot;tsubakuro-rust-python session&quot;
 config.default_timeout = 30  # seconds
 </code></pre>
 <pre><code class="language-python">import tsubakuro_rust_python as tsurugi
 
 config = tsurugi.Config(
-    application_name=&quot;tsurugi-rust-python example&quot;,
+    application_name=&quot;tsubakuro-rust-python example&quot;,
     endpoint=&quot;tcp://localhost:12345&quot;,
     user=&quot;tsurugi&quot;,
     password=&quot;password&quot;,
+    session_label=&quot;tsubakuro-rust-python session&quot;,
     default_timeout=30,  # seconds
 )
 </code></pre></div>
@@ -364,6 +373,10 @@ config = tsurugi.Config(
 <dt id="tsubakuro_rust_python.Config.password"><code class="name">var <span class="ident">password</span></code></dt>
 <dd>
 <div class="desc"><p>Password for authentication.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.Config.session_label"><code class="name">var <span class="ident">session_label</span></code></dt>
+<dd>
+<div class="desc"><p>Session label for the connection.</p></div>
 </dd>
 <dt id="tsubakuro_rust_python.Config.shutdown_option"><code class="name">var <span class="ident">shutdown_option</span></code></dt>
 <dd>
@@ -1168,6 +1181,7 @@ tx_option = tsurugi.TransactionOption.rtx(
 <li><code><a title="tsubakuro_rust_python.Config.endpoint" href="#tsubakuro_rust_python.Config.endpoint">endpoint</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.merge" href="#tsubakuro_rust_python.Config.merge">merge</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.password" href="#tsubakuro_rust_python.Config.password">password</a></code></li>
+<li><code><a title="tsubakuro_rust_python.Config.session_label" href="#tsubakuro_rust_python.Config.session_label">session_label</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.set" href="#tsubakuro_rust_python.Config.set">set</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.shutdown_option" href="#tsubakuro_rust_python.Config.shutdown_option">shutdown_option</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Config.transaction_option" href="#tsubakuro_rust_python.Config.transaction_option">transaction_option</a></code></li>
