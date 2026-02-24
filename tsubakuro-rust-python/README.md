@@ -91,13 +91,6 @@ ls target/wheels/
 
 ### Generate API html
 
-Install [pdoc3](https://github.com/pdoc3/pdoc) beforehand.
-
-```bash
-cd tsubakuro-rust-python
-uv pip install pdoc3
-```
-
 ```bash
 cd tsubakuro-rust-python
 uv run pdoc tsubakuro_rust_python --html -o docs/ --force
