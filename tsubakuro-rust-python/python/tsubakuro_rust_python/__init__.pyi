@@ -458,6 +458,14 @@ class Connection:
         r"""
         Exit the runtime context related to this object.
         """
+    def __eq__(self, other: Connection) -> builtins.bool:
+        r"""
+        Compare if two Connection objects are the same connection.
+        """
+    def __hash__(self) -> builtins.int:
+        r"""
+        Get the hash value of the connection object.
+        """
     def close(self) -> None:
         r"""
         Close the connection.
@@ -469,6 +477,7 @@ class Cursor:
     Cursor object for executing SQL statements and fetching results.
     
     Attributes:
+        connection (Connection): Connection object associated with the cursor. (read only)
         description (Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]): Description of the query result set.
             `(name, type_code, display_size, internal_size, precision, scale, null_ok)`.  (read only)
         arraysize (int): Number of rows to fetch at a time with `Cursor.fetchmany()`. Default is 1.
@@ -505,6 +514,11 @@ class Cursor:
     def closed(self) -> builtins.bool:
         r"""
         Whether the cursor is closed.
+        """
+    @property
+    def connection(self) -> Connection:
+        r"""
+        Connection object associated with the cursor. (read only)
         """
     @property
     def description(self) -> Optional[Sequence[Tuple[

@@ -571,6 +571,8 @@ except tsurugi.error.TargetNotFoundException:
 <div class="desc"><p>Cursor object for executing SQL statements and fetching results.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
+<dt><strong><code>connection</code></strong> :&ensp;<code><a title="tsubakuro_rust_python.Connection" href="#tsubakuro_rust_python.Connection">Connection</a></code></dt>
+<dd>Connection object associated with the cursor. (read only)</dd>
 <dt><strong><code>description</code></strong> :&ensp;<code>Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]</code></dt>
 <dd>Description of the query result set.
 <code>(name, <a title="tsubakuro_rust_python.type_code" href="type_code/index.html">tsubakuro_rust_python.type_code</a>, display_size, internal_size, precision, scale, null_ok)</code>.
@@ -593,6 +595,10 @@ except tsurugi.error.TargetNotFoundException:
 <dt id="tsubakuro_rust_python.Cursor.closed"><code class="name">var <span class="ident">closed</span></code></dt>
 <dd>
 <div class="desc"><p>Whether the cursor is closed.</p></div>
+</dd>
+<dt id="tsubakuro_rust_python.Cursor.connection"><code class="name">var <span class="ident">connection</span></code></dt>
+<dd>
+<div class="desc"><p>Connection object associated with the cursor. (read only)</p></div>
 </dd>
 <dt id="tsubakuro_rust_python.Cursor.description"><code class="name">var <span class="ident">description</span></code></dt>
 <dd>
@@ -1212,6 +1218,7 @@ tx_option = tsurugi.TransactionOption.rtx(
 <li><code><a title="tsubakuro_rust_python.Cursor.clear" href="#tsubakuro_rust_python.Cursor.clear">clear</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Cursor.close" href="#tsubakuro_rust_python.Cursor.close">close</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Cursor.closed" href="#tsubakuro_rust_python.Cursor.closed">closed</a></code></li>
+<li><code><a title="tsubakuro_rust_python.Cursor.connection" href="#tsubakuro_rust_python.Cursor.connection">connection</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Cursor.description" href="#tsubakuro_rust_python.Cursor.description">description</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Cursor.execute" href="#tsubakuro_rust_python.Cursor.execute">execute</a></code></li>
 <li><code><a title="tsubakuro_rust_python.Cursor.executemany" href="#tsubakuro_rust_python.Cursor.executemany">executemany</a></code></li>

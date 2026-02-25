@@ -226,4 +226,8 @@ impl InnerConnection {
         *transaction = None;
         result
     }
+
+    pub(crate) fn is_closed(&self) -> bool {
+        self.closed.load(Ordering::Acquire)
+    }
 }

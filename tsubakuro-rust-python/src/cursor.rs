@@ -6,7 +6,7 @@ use tsubakuro_rust_core::prelude::{AtomType, SqlPreparedStatement, SqlQueryResul
 
 use crate::{
     column::columns_description,
-    connection::inner_connection::InnerConnection,
+    connection::{inner_connection::InnerConnection, Connection},
     cursor::query_result::next_row1,
     error::{to_pyerr, NotSupportedError, OperationalError, ProgrammingError},
 };
@@ -35,6 +35,7 @@ impl RowNumber {
 /// Cursor object for executing SQL statements and fetching results.
 ///
 /// Attributes:
+///     connection (Connection): Connection object associated with the cursor. (read only)
 ///     description (Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]): Description of the query result set.
 ///         `(name, type_code, display_size, internal_size, precision, scale, null_ok)`.  (read only)
 ///     arraysize (int): Number of rows to fetch at a time with `Cursor.fetchmany()`. Default is 1.
@@ -82,6 +83,12 @@ impl Cursor {
 #[gen_stub_pymethods]
 #[pymethods]
 impl Cursor {
+    /// Connection object associated with the cursor. (read only)
+    #[getter]
+    pub fn connection(&self) -> Connection {
+        Connection::new(self.connection.clone())
+    }
+
     /// Execute a SQL statement.
     ///
     /// Args:

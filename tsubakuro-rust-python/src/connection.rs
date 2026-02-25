@@ -28,9 +28,12 @@ pub(crate) mod inner_connection;
 #[pyclass(module = "tsubakuro_rust_python")]
 pub struct Connection {
     inner: Arc<InnerConnection>,
-    /// Whether the connection is closed.
-    #[pyo3(get)]
-    closed: bool,
+}
+
+impl Connection {
+    pub(crate) fn new(inner: Arc<InnerConnection>) -> Self {
+        Connection { inner }
+    }
 }
 
 #[gen_stub_pymethods]
@@ -267,6 +270,17 @@ impl Connection {
         result
     }
 
+    // ==
+    /// Compare if two Connection objects are the same connection.
+    pub fn __eq__(&self, other: &Self) -> bool {
+        self == other
+    }
+
+    /// Get the hash value of the connection object.
+    pub fn __hash__(&self) -> usize {
+        Arc::as_ptr(&self.inner) as usize
+    }
+
     /// Shutdown option.
     #[setter]
     pub fn set_shutdown_option(&mut self, option: ShutdownOption) {
@@ -292,6 +306,12 @@ impl Connection {
         };
         result
     }
+
+    /// Whether the connection is closed.
+    #[getter]
+    pub fn closed(&self) -> bool {
+        self.inner.is_closed()
+    }
 }
 
 impl Connection {
@@ -314,10 +334,7 @@ impl Connection {
         let connection = InnerConnection::new(config, runtime, session, sql_client);
 
         trace!("{FUNCTION_NAME} end");
-        Ok(Connection {
-            inner: Arc::new(connection),
-            closed: false,
-        })
+        Ok(Connection::new(Arc::new(connection)))
     }
 
     fn create_config(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Config> {
@@ -348,14 +365,12 @@ impl Connection {
     }
 
     fn close_internal(&mut self) -> PyResult<()> {
-        self.closed = true;
-
         let connection = &self.inner;
         connection.close()
     }
 
     fn check_closed(&self, function_name: &str) -> PyResult<()> {
-        if self.closed {
+        if self.closed() {
             trace!("{}: Connection is already closed", function_name);
             return Err(ProgrammingError::new_err("Connection is already closed"));
         }
@@ -363,10 +378,18 @@ impl Connection {
     }
 }
 
+impl PartialEq for Connection {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.inner, &other.inner)
+    }
+}
+
+impl Eq for Connection {}
+
 impl Drop for Connection {
     fn drop(&mut self) {
         const FUNCTION_NAME: &str = "Connection.drop()";
-        trace!("{FUNCTION_NAME} start. closed={}", self.closed);
+        trace!("{FUNCTION_NAME} start. closed={}", self.closed());
 
         match self.close_internal() {
             Ok(_) => trace!("{FUNCTION_NAME} end"),

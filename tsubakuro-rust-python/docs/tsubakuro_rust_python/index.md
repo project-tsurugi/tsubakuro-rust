@@ -392,6 +392,7 @@ Classes
 :   Cursor object for executing SQL statements and fetching results.
     
     Attributes:
+        connection (Connection): Connection object associated with the cursor. (read only)
         description (Optional[Sequence[Tuple[str, str, None, Optional[int], Optional[int], Optional[int], Optional[bool]]]]): Description of the query result set.
             `(name, type_code, display_size, internal_size, precision, scale, null_ok)`.  (read only)
         arraysize (int): Number of rows to fetch at a time with `Cursor.fetchmany()`. Default is 1.
@@ -406,6 +407,9 @@ Classes
 
     `closed`
     :   Whether the cursor is closed.
+
+    `connection`
+    :   Connection object associated with the cursor. (read only)
 
     `description`
     :   Description of the query result set.
