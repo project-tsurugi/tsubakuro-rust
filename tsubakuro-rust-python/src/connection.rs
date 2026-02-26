@@ -28,11 +28,15 @@ pub(crate) mod inner_connection;
 #[pyclass(module = "tsubakuro_rust_python")]
 pub struct Connection {
     inner: Arc<InnerConnection>,
+    close_on_drop: bool,
 }
 
 impl Connection {
-    pub(crate) fn new(inner: Arc<InnerConnection>) -> Self {
-        Connection { inner }
+    pub(crate) fn new(inner: Arc<InnerConnection>, close_on_drop: bool) -> Self {
+        Connection {
+            inner,
+            close_on_drop,
+        }
     }
 }
 
@@ -334,7 +338,7 @@ impl Connection {
         let connection = InnerConnection::new(config, runtime, session, sql_client);
 
         trace!("{FUNCTION_NAME} end");
-        Ok(Connection::new(Arc::new(connection)))
+        Ok(Connection::new(Arc::new(connection), true))
     }
 
     fn create_config(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Config> {
@@ -389,11 +393,16 @@ impl Eq for Connection {}
 impl Drop for Connection {
     fn drop(&mut self) {
         const FUNCTION_NAME: &str = "Connection.drop()";
-        trace!("{FUNCTION_NAME} start. closed={}", self.closed());
 
-        match self.close_internal() {
-            Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
+        if self.close_on_drop {
+            trace!("{FUNCTION_NAME} start. closed={}", self.closed());
+
+            match self.close_internal() {
+                Ok(_) => trace!("{FUNCTION_NAME} end"),
+                Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
+            }
+        } else {
+            trace!("{FUNCTION_NAME} skip");
         }
     }
 }

@@ -86,7 +86,7 @@ impl Cursor {
     /// Connection object associated with the cursor. (read only)
     #[getter]
     pub fn connection(&self) -> Connection {
-        Connection::new(self.connection.clone())
+        Connection::new(self.connection.clone(), false)
     }
 
     /// Execute a SQL statement.
