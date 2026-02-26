@@ -45,6 +45,7 @@ impl RowNumber {
 #[gen_stub_pyclass]
 #[pyclass(module = "tsubakuro_rust_python")]
 pub struct Cursor {
+    py_connection: Py<Connection>,
     connection: Arc<InnerConnection>,
     /// Whether to execute `Cursor.executemany()` asynchronously. Default is `True`.
     #[pyo3(set, get)]
@@ -65,8 +66,9 @@ pub struct Cursor {
 }
 
 impl Cursor {
-    pub(crate) fn new(connection: Arc<InnerConnection>) -> Self {
+    pub(crate) fn new(py_connection: Py<Connection>, connection: Arc<InnerConnection>) -> Self {
         Self {
+            py_connection,
             connection,
             executemany_async: true,
             ps_map: HashMap::new(),
@@ -85,8 +87,8 @@ impl Cursor {
 impl Cursor {
     /// Connection object associated with the cursor. (read only)
     #[getter]
-    pub fn connection(&self) -> Connection {
-        Connection::new(self.connection.clone(), false)
+    pub fn connection(&self) -> &Py<Connection> {
+        &self.py_connection
     }
 
     /// Execute a SQL statement.

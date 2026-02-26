@@ -4,7 +4,7 @@ import tsubakuro_rust_python as tsurugi
 def test_connection(connection, endpoint):
     with connection.cursor() as cursor:
         c = cursor.connection
-        assert c is not connection
+        assert c is connection
         assert c == connection
         assert c.__hash__() == connection.__hash__()
 
