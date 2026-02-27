@@ -6,13 +6,13 @@ def test_connection(connection, endpoint):
         c = cursor.connection
         assert c is connection
         assert c == connection
-        assert c.__hash__() == connection.__hash__()
+        assert hash(c) == hash(connection)
 
         with tsurugi.connect(
             endpoint=endpoint, user="tsurugi", password="password"
         ) as new_connection:
+            assert new_connection is not c
             assert new_connection != c
-            assert new_connection.__hash__() != c.__hash__()
 
         assert c.closed is False
         assert connection.closed is False

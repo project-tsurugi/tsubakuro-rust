@@ -161,10 +161,16 @@ impl Connection {
     pub fn cursor(py_self: Py<Self>, py: Python) -> PyResult<Cursor> {
         const FUNCTION_NAME: &str = "Connection.cursor()";
         trace!("{FUNCTION_NAME} start");
-        let slf = py_self.borrow(py);
-        slf.check_closed(FUNCTION_NAME)?;
 
-        let cursor = Cursor::new(py_self.clone_ref(py), slf.inner.clone());
+        let connection;
+        {
+            let slf = py_self.borrow(py);
+            slf.check_closed(FUNCTION_NAME)?;
+
+            connection = slf.inner.clone();
+        }
+
+        let cursor = Cursor::new(py_self, connection);
 
         trace!("{FUNCTION_NAME} end");
         Ok(cursor)
