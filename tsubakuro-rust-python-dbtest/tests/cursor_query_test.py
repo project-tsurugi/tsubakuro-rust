@@ -1,4 +1,4 @@
-from tsubakuro_rust_python.error import ProgrammingError
+from tsubakuro_rust_python import ProgrammingError
 
 
 def drop_and_create_table(connection):

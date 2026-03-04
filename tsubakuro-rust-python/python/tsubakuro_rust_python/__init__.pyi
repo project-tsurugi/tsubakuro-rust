@@ -13,11 +13,21 @@ __all__ = [
     "Config",
     "Connection",
     "Cursor",
+    "DataError",
+    "DatabaseError",
+    "Error",
+    "IntegrityError",
+    "InterfaceError",
+    "InternalError",
+    "NotSupportedError",
+    "OperationalError",
+    "ProgrammingError",
     "ShutdownOption",
     "ShutdownType",
     "TableMetadata",
     "TransactionOption",
     "TransactionType",
+    "Warning",
     "connect",
     "env_logger_init",
     "error",
@@ -416,7 +426,7 @@ class Connection:
             metadata = connection.find_table_metadata("my_table")
             ```
         """
-    def cursor(self) -> Cursor:
+    def cursor(self, py_self: Connection) -> Cursor:
         r"""
         Create a new cursor object using the connection.
         
@@ -457,14 +467,6 @@ class Connection:
     def __exit__(self, _exc_type: typing.Optional[typing.Any], _exc_value: typing.Optional[typing.Any], _traceback: typing.Optional[typing.Any]) -> None:
         r"""
         Exit the runtime context related to this object.
-        """
-    def __eq__(self, other: Connection) -> builtins.bool:
-        r"""
-        Compare if two Connection objects are the same connection.
-        """
-    def __hash__(self) -> builtins.int:
-        r"""
-        Get the hash value of the connection object.
         """
     def close(self) -> None:
         r"""
@@ -706,6 +708,60 @@ class Cursor:
         r"""
         Close the cursor.
         """
+
+class DataError(DatabaseError):
+    r"""
+    data error (PEP 249)
+    """
+    ...
+
+class DatabaseError(Error):
+    r"""
+    database error (PEP 249)
+    """
+    ...
+
+class Error(builtins.Exception):
+    r"""
+    base class of all other exceptions (PEP 249)
+    """
+    ...
+
+class IntegrityError(DatabaseError):
+    r"""
+    integrity error (PEP 249)
+    """
+    ...
+
+class InterfaceError(Error):
+    r"""
+    interface error (PEP 249)
+    """
+    ...
+
+class InternalError(DatabaseError):
+    r"""
+    internal error (PEP 249)
+    """
+    ...
+
+class NotSupportedError(DatabaseError):
+    r"""
+    not supported error (PEP 249)
+    """
+    ...
+
+class OperationalError(DatabaseError):
+    r"""
+    operation error (PEP 249)
+    """
+    ...
+
+class ProgrammingError(DatabaseError):
+    r"""
+    programming error (PEP 249)
+    """
+    ...
 
 @typing.final
 class ShutdownOption:
@@ -1026,6 +1082,12 @@ class TransactionOption:
             )
             ```
         """
+
+class Warning(builtins.Exception):
+    r"""
+    important warning (PEP 249)
+    """
+    ...
 
 @typing.final
 class CommitType(enum.Enum):

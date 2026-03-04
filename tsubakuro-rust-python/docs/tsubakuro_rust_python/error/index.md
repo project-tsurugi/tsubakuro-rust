@@ -10,9 +10,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.CompileException
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -30,9 +30,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -44,9 +44,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -57,9 +57,9 @@ Classes
 
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -76,9 +76,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.ConstraintViolationException
-    * tsubakuro_rust_python.error.IntegrityError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.IntegrityError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -87,9 +87,9 @@ Classes
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -108,9 +108,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -119,9 +119,9 @@ Classes
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.IntegrityError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.IntegrityError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -140,48 +140,15 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
     ### Descendants
 
     * tsubakuro_rust_python.error.SecondaryIndexCorruptionException
-
-`DataError(*args, **kwargs)`
-:   data error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.EvaluationException
-    * tsubakuro_rust_python.error.SqlLimitReachedException
-
-`DatabaseError(*args, **kwargs)`
-:   database error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.IntegrityError
-    * tsubakuro_rust_python.error.InternalError
-    * tsubakuro_rust_python.error.NotSupportedError
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.ProgrammingError
 
 `DependenciesViolationException(*args, **kwargs)`
 :   Tsurugi DependenciesViolationException
@@ -192,9 +159,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -207,9 +174,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -221,9 +188,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -231,27 +198,14 @@ Classes
 
     * tsubakuro_rust_python.error.DumpDirectoryInaccessibleException
 
-`Error(*args, **kwargs)`
-:   base class of all other exceptions (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.InterfaceError
-
 `EvaluationException(*args, **kwargs)`
 :   Tsurugi EvaluationException
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -269,9 +223,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -283,57 +237,20 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
-
-`IntegrityError(*args, **kwargs)`
-:   integrity error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.ConstraintViolationException
-
-`InterfaceError(*args, **kwargs)`
-:   interface error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-`InternalError(*args, **kwargs)`
-:   internal error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.InternalException
 
 `InternalException(*args, **kwargs)`
 :   Tsurugi InternalException
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.InternalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.InternalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -344,9 +261,9 @@ Classes
 
     * tsubakuro_rust_python.error.InvalidRuntimeValueException
     * tsubakuro_rust_python.error.SqlLimitReachedException
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -356,9 +273,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.SqlLimitReachedException
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -376,9 +293,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -396,9 +313,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -411,9 +328,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -425,9 +342,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -445,9 +362,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -460,9 +377,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -475,9 +392,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -487,26 +404,11 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.ConstraintViolationException
-    * tsubakuro_rust_python.error.IntegrityError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.IntegrityError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
-
-`NotSupportedError(*args, **kwargs)`
-:   not supported error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.UnsupportedCompilerFeatureException
-    * tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException
 
 `OccException(*args, **kwargs)`
 :   Tsurugi OccException
@@ -516,9 +418,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -536,9 +438,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -555,55 +457,26 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
-
-`OperationalError(*args, **kwargs)`
-:   operation error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.ServerException
 
 `ParameterException(*args, **kwargs)`
 :   Tsurugi ParameterException
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
     ### Descendants
 
     * tsubakuro_rust_python.error.UnresolvedPlaceholderException
-
-`ProgrammingError(*args, **kwargs)`
-:   programming error (PEP 249)
-
-    ### Ancestors (in MRO)
-
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-    ### Descendants
-
-    * tsubakuro_rust_python.error.CompileException
-    * tsubakuro_rust_python.error.ParameterException
 
 `ReadOperationOnRestrictedReadAreaException(*args, **kwargs)`
 :   Tsurugi ReadOperationOnRestrictedReadAreaException
@@ -614,9 +487,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -626,9 +499,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.ConstraintViolationException
-    * tsubakuro_rust_python.error.IntegrityError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.IntegrityError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -640,9 +513,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -659,9 +532,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -681,9 +554,9 @@ Classes
     * tsubakuro_rust_python.error.CcException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -693,9 +566,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.EvaluationException
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -708,9 +581,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -719,9 +592,9 @@ Classes
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -736,9 +609,9 @@ Classes
 
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -760,9 +633,9 @@ Classes
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -779,9 +652,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -791,9 +664,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -811,9 +684,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -824,9 +697,9 @@ Classes
 
     * tsubakuro_rust_python.error.AnalyzeException
     * tsubakuro_rust_python.error.CompileException
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -836,9 +709,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.CompileException
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -850,9 +723,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -864,9 +737,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -876,9 +749,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.SqlLimitReachedException
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -891,9 +764,9 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -904,9 +777,9 @@ Classes
 
     * tsubakuro_rust_python.error.AnalyzeException
     * tsubakuro_rust_python.error.CompileException
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -916,9 +789,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.ConstraintViolationException
-    * tsubakuro_rust_python.error.IntegrityError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.IntegrityError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -928,9 +801,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.ParameterException
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -939,9 +812,9 @@ Classes
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.NotSupportedError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.NotSupportedError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -950,9 +823,9 @@ Classes
 
     ### Ancestors (in MRO)
 
-    * tsubakuro_rust_python.error.NotSupportedError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.NotSupportedError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -963,9 +836,9 @@ Classes
 
     * tsubakuro_rust_python.error.AnalyzeException
     * tsubakuro_rust_python.error.CompileException
-    * tsubakuro_rust_python.error.ProgrammingError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.ProgrammingError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -975,9 +848,9 @@ Classes
     ### Ancestors (in MRO)
 
     * tsubakuro_rust_python.error.EvaluationException
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -988,9 +861,9 @@ Classes
 
     * tsubakuro_rust_python.error.InvalidRuntimeValueException
     * tsubakuro_rust_python.error.SqlLimitReachedException
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -1001,17 +874,9 @@ Classes
 
     * tsubakuro_rust_python.error.InvalidRuntimeValueException
     * tsubakuro_rust_python.error.SqlLimitReachedException
-    * tsubakuro_rust_python.error.DataError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
-    * builtins.Exception
-    * builtins.BaseException
-
-`Warning(*args, **kwargs)`
-:   important warning (PEP 249)
-
-    ### Ancestors (in MRO)
-
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException
 
@@ -1024,8 +889,8 @@ Classes
     * tsubakuro_rust_python.error.SqlExecutionException
     * tsubakuro_rust_python.error.SqlServiceException
     * tsubakuro_rust_python.error.ServerException
-    * tsubakuro_rust_python.error.OperationalError
-    * tsubakuro_rust_python.error.DatabaseError
-    * tsubakuro_rust_python.error.Error
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
     * builtins.Exception
     * builtins.BaseException

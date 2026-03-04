@@ -1,4 +1,4 @@
-from tsubakuro_rust_python.error import ProgrammingError
+from tsubakuro_rust_python import ProgrammingError
 from tsubakuro_rust_python.type_code import Int32, Int64, Str, Decimal
 
 

@@ -31,6 +31,14 @@ mod _tsubakuro_rust_python {
     #[allow(non_upper_case_globals)]
     const paramstyle: &str = "qmark";
 
+    // PEP 249
+    #[pymodule_export]
+    use crate::error::{
+        DataError, DatabaseError, Error, IntegrityError, InterfaceError, InternalError,
+        NotSupportedError, OperationalError, ProgrammingError, Warning,
+    };
+
+    // Tsurugi server exception
     #[pymodule_export]
     use crate::error::error;
 

@@ -1,5 +1,5 @@
 import tsubakuro_rust_python as tsurugi
-from tsubakuro_rust_python.error import ProgrammingError
+from tsubakuro_rust_python import ProgrammingError
 
 
 def test_table_metadata(connection):

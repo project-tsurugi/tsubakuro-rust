@@ -796,6 +796,169 @@ connection.commit()
 </dd>
 </dl>
 </dd>
+<dt id="tsubakuro_rust_python.DataError"><code class="flex name class">
+<span>class <span class="ident">DataError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>data error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.EvaluationException" href="error/index.html#tsubakuro_rust_python.error.EvaluationException">EvaluationException</a></li>
+<li><a title="tsubakuro_rust_python.error.SqlLimitReachedException" href="error/index.html#tsubakuro_rust_python.error.SqlLimitReachedException">SqlLimitReachedException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.DatabaseError"><code class="flex name class">
+<span>class <span class="ident">DatabaseError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>database error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DataError" href="#tsubakuro_rust_python.DataError">DataError</a></li>
+<li><a title="tsubakuro_rust_python.IntegrityError" href="#tsubakuro_rust_python.IntegrityError">IntegrityError</a></li>
+<li><a title="tsubakuro_rust_python.InternalError" href="#tsubakuro_rust_python.InternalError">InternalError</a></li>
+<li><a title="tsubakuro_rust_python.NotSupportedError" href="#tsubakuro_rust_python.NotSupportedError">NotSupportedError</a></li>
+<li><a title="tsubakuro_rust_python.OperationalError" href="#tsubakuro_rust_python.OperationalError">OperationalError</a></li>
+<li><a title="tsubakuro_rust_python.ProgrammingError" href="#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.Error"><code class="flex name class">
+<span>class <span class="ident">Error</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>base class of all other exceptions (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.InterfaceError" href="#tsubakuro_rust_python.InterfaceError">InterfaceError</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.IntegrityError"><code class="flex name class">
+<span>class <span class="ident">IntegrityError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>integrity error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ConstraintViolationException" href="error/index.html#tsubakuro_rust_python.error.ConstraintViolationException">ConstraintViolationException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.InterfaceError"><code class="flex name class">
+<span>class <span class="ident">InterfaceError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>interface error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.InternalError"><code class="flex name class">
+<span>class <span class="ident">InternalError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>internal error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.InternalException" href="error/index.html#tsubakuro_rust_python.error.InternalException">InternalException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.NotSupportedError"><code class="flex name class">
+<span>class <span class="ident">NotSupportedError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>not supported error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.UnsupportedCompilerFeatureException" href="error/index.html#tsubakuro_rust_python.error.UnsupportedCompilerFeatureException">UnsupportedCompilerFeatureException</a></li>
+<li><a title="tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException" href="error/index.html#tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException">UnsupportedRuntimeFeatureException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.OperationalError"><code class="flex name class">
+<span>class <span class="ident">OperationalError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>operation error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.ServerException" href="error/index.html#tsubakuro_rust_python.error.ServerException">ServerException</a></li>
+</ul>
+</dd>
+<dt id="tsubakuro_rust_python.ProgrammingError"><code class="flex name class">
+<span>class <span class="ident">ProgrammingError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>programming error (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></li>
+<li><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="tsubakuro_rust_python.error.CompileException" href="error/index.html#tsubakuro_rust_python.error.CompileException">CompileException</a></li>
+<li><a title="tsubakuro_rust_python.error.ParameterException" href="error/index.html#tsubakuro_rust_python.error.ParameterException">ParameterException</a></li>
+</ul>
+</dd>
 <dt id="tsubakuro_rust_python.ShutdownOption"><code class="flex name class">
 <span>class <span class="ident">ShutdownOption</span></span>
 <span>(</span><span>shutdown_type=Ellipsis, timeout=None)</span>
@@ -1121,6 +1284,18 @@ tx_option = tsurugi.TransactionOption.rtx(
 </dd>
 </dl>
 </dd>
+<dt id="tsubakuro_rust_python.Warning"><code class="flex name class">
+<span>class <span class="ident">Warning</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>important warning (PEP 249)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
 </dl>
 </section>
 </article>
@@ -1236,6 +1411,33 @@ tx_option = tsurugi.TransactionOption.rtx(
 </ul>
 </li>
 <li>
+<h4><code><a title="tsubakuro_rust_python.DataError" href="#tsubakuro_rust_python.DataError">DataError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.DatabaseError" href="#tsubakuro_rust_python.DatabaseError">DatabaseError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.Error" href="#tsubakuro_rust_python.Error">Error</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.IntegrityError" href="#tsubakuro_rust_python.IntegrityError">IntegrityError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.InterfaceError" href="#tsubakuro_rust_python.InterfaceError">InterfaceError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.InternalError" href="#tsubakuro_rust_python.InternalError">InternalError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.NotSupportedError" href="#tsubakuro_rust_python.NotSupportedError">NotSupportedError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.OperationalError" href="#tsubakuro_rust_python.OperationalError">OperationalError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.ProgrammingError" href="#tsubakuro_rust_python.ProgrammingError">ProgrammingError</a></code></h4>
+</li>
+<li>
 <h4><code><a title="tsubakuro_rust_python.ShutdownOption" href="#tsubakuro_rust_python.ShutdownOption">ShutdownOption</a></code></h4>
 <ul class="">
 <li><code><a title="tsubakuro_rust_python.ShutdownOption.shutdown_timeout" href="#tsubakuro_rust_python.ShutdownOption.shutdown_timeout">shutdown_timeout</a></code></li>
@@ -1286,6 +1488,9 @@ tx_option = tsurugi.TransactionOption.rtx(
 <li><code><a title="tsubakuro_rust_python.TransactionType.OCC" href="#tsubakuro_rust_python.TransactionType.OCC">OCC</a></code></li>
 <li><code><a title="tsubakuro_rust_python.TransactionType.RTX" href="#tsubakuro_rust_python.TransactionType.RTX">RTX</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="tsubakuro_rust_python.Warning" href="#tsubakuro_rust_python.Warning">Warning</a></code></h4>
 </li>
 </ul>
 </li>

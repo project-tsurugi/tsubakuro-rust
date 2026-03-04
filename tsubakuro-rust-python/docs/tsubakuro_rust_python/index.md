@@ -564,6 +564,133 @@ Classes
     `setoutputsize(self, /, _size)`
     :   This method is a no-op in this implementation.
 
+`DataError(*args, **kwargs)`
+:   data error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.error.EvaluationException
+    * tsubakuro_rust_python.error.SqlLimitReachedException
+
+`DatabaseError(*args, **kwargs)`
+:   database error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.DataError
+    * tsubakuro_rust_python.IntegrityError
+    * tsubakuro_rust_python.InternalError
+    * tsubakuro_rust_python.NotSupportedError
+    * tsubakuro_rust_python.OperationalError
+    * tsubakuro_rust_python.ProgrammingError
+
+`Error(*args, **kwargs)`
+:   base class of all other exceptions (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.InterfaceError
+
+`IntegrityError(*args, **kwargs)`
+:   integrity error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.error.ConstraintViolationException
+
+`InterfaceError(*args, **kwargs)`
+:   interface error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+`InternalError(*args, **kwargs)`
+:   internal error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.error.InternalException
+
+`NotSupportedError(*args, **kwargs)`
+:   not supported error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.error.UnsupportedCompilerFeatureException
+    * tsubakuro_rust_python.error.UnsupportedRuntimeFeatureException
+
+`OperationalError(*args, **kwargs)`
+:   operation error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.error.ServerException
+
+`ProgrammingError(*args, **kwargs)`
+:   programming error (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * tsubakuro_rust_python.DatabaseError
+    * tsubakuro_rust_python.Error
+    * builtins.Exception
+    * builtins.BaseException
+
+    ### Descendants
+
+    * tsubakuro_rust_python.error.CompileException
+    * tsubakuro_rust_python.error.ParameterException
+
 `ShutdownOption(shutdown_type=Ellipsis, timeout=None)`
 :   Shutdown option for connection.
     
@@ -798,3 +925,11 @@ Classes
 
     `RTX`
     :
+
+`Warning(*args, **kwargs)`
+:   important warning (PEP 249)
+
+    ### Ancestors (in MRO)
+
+    * builtins.Exception
+    * builtins.BaseException

@@ -12,18 +12,12 @@ __all__ = [
     "ConflictOnWritePreserveException",
     "ConstraintViolationException",
     "DataCorruptionException",
-    "DataError",
-    "DatabaseError",
     "DependenciesViolationException",
     "DumpDirectoryInaccessibleException",
     "DumpFileException",
-    "Error",
     "EvaluationException",
     "InactiveTransactionException",
     "InconsistentStatementException",
-    "IntegrityError",
-    "InterfaceError",
-    "InternalError",
     "InternalException",
     "InvalidDecimalValueException",
     "InvalidRuntimeValueException",
@@ -35,13 +29,10 @@ __all__ = [
     "LtxWriteException",
     "LtxWriteOperationWithoutWritePreserveException",
     "NotNullConstraintViolationException",
-    "NotSupportedError",
     "OccException",
     "OccReadException",
     "OccWriteException",
-    "OperationalError",
     "ParameterException",
-    "ProgrammingError",
     "ReadOperationOnRestrictedReadAreaException",
     "ReferentialIntegrityConstraintViolationException",
     "RequestFailureException",
@@ -70,7 +61,6 @@ __all__ = [
     "ValueEvaluationException",
     "ValueOutOfRangeException",
     "ValueTooLongException",
-    "Warning",
     "WriteOperationByRtxException",
 ]
 
@@ -128,18 +118,6 @@ class DataCorruptionException(SqlExecutionException):
     """
     ...
 
-class DataError(DatabaseError):
-    r"""
-    data error (PEP 249)
-    """
-    ...
-
-class DatabaseError(Error):
-    r"""
-    database error (PEP 249)
-    """
-    ...
-
 class DependenciesViolationException(RestrictedOperationException):
     r"""
     Tsurugi DependenciesViolationException
@@ -158,12 +136,6 @@ class DumpFileException(SqlExecutionException):
     """
     ...
 
-class Error(builtins.Exception):
-    r"""
-    base class of all other exceptions (PEP 249)
-    """
-    ...
-
 class EvaluationException(DataError):
     r"""
     Tsurugi EvaluationException
@@ -179,24 +151,6 @@ class InactiveTransactionException(RestrictedOperationException):
 class InconsistentStatementException(SqlExecutionException):
     r"""
     Tsurugi InconsistentStatementException
-    """
-    ...
-
-class IntegrityError(DatabaseError):
-    r"""
-    integrity error (PEP 249)
-    """
-    ...
-
-class InterfaceError(Error):
-    r"""
-    interface error (PEP 249)
-    """
-    ...
-
-class InternalError(DatabaseError):
-    r"""
-    internal error (PEP 249)
     """
     ...
 
@@ -266,12 +220,6 @@ class NotNullConstraintViolationException(ConstraintViolationException):
     """
     ...
 
-class NotSupportedError(DatabaseError):
-    r"""
-    not supported error (PEP 249)
-    """
-    ...
-
 class OccException(CcException):
     r"""
     Tsurugi OccException
@@ -290,21 +238,9 @@ class OccWriteException(OccException):
     """
     ...
 
-class OperationalError(DatabaseError):
-    r"""
-    operation error (PEP 249)
-    """
-    ...
-
 class ParameterException(ProgrammingError):
     r"""
     Tsurugi ParameterException
-    """
-    ...
-
-class ProgrammingError(DatabaseError):
-    r"""
-    programming error (PEP 249)
     """
     ...
 
@@ -473,12 +409,6 @@ class ValueOutOfRangeException(InvalidRuntimeValueException):
 class ValueTooLongException(InvalidRuntimeValueException):
     r"""
     Tsurugi ValueTooLongException
-    """
-    ...
-
-class Warning(builtins.Exception):
-    r"""
-    important warning (PEP 249)
     """
     ...
 

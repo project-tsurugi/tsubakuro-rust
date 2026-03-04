@@ -3,13 +3,13 @@ use pyo3_stub_gen::create_exception;
 use tsubakuro_rust_core::prelude::{DiagnosticCode, TgError};
 
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     Warning,
     PyException,
     "important warning (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     Error,
     PyException,
     "base class of all other exceptions (PEP 249)"
@@ -17,13 +17,13 @@ create_exception!(
 
 // Subclass of Error
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     InterfaceError,
     Error,
     "interface error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     DatabaseError,
     Error,
     "database error (PEP 249)"
@@ -31,37 +31,37 @@ create_exception!(
 
 // Subclasses of DatabaseError
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     DataError,
     DatabaseError,
     "data error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     OperationalError,
     DatabaseError,
     "operation error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     IntegrityError,
     DatabaseError,
     "integrity error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     InternalError,
     DatabaseError,
     "internal error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     ProgrammingError,
     DatabaseError,
     "programming error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsubakuro_rust_python,
     NotSupportedError,
     DatabaseError,
     "not supported error (PEP 249)"
@@ -549,13 +549,6 @@ fn server_error_to_pyerr(message: String, code: DiagnosticCode) -> PyErr {
 
 #[pymodule]
 pub(crate) mod error {
-
-    #[pymodule_export]
-    use super::{
-        DataError, DatabaseError, Error, IntegrityError, InterfaceError, InternalError,
-        NotSupportedError, OperationalError, ProgrammingError, Warning,
-    };
-
     // ServerException
     #[pymodule_export]
     use super::ServerException;
