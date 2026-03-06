@@ -4,7 +4,7 @@ tsubakuro-rust-odbc is a ODBC Driver to access [Tsurugi](https://github.com/proj
 
 ## Target
 
-- Tsurugi 1.8.0 or later.
+- Tsurugi 1.9.0 or later.
 - ODBC3
 - For MS-Windows, 64-bit DLL
 
