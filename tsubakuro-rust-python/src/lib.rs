@@ -29,7 +29,8 @@ mod _tsubakuro_rust_python {
 
     #[pymodule_export]
     #[allow(non_upper_case_globals)]
-    const paramstyle: &str = "qmark";
+    // const paramstyle: &str = "qmark";
+    const paramstyle: &str = "named";
 
     // PEP 249
     #[pymodule_export]
