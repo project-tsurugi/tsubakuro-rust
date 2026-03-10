@@ -14,9 +14,18 @@ on:
       tsurugi_loglevel:
         type: number
         default: 30
+      jobs_to_run:
+        type: choice
+        options:
+          - Build
+          - Build_Python
+          - Build_Windows
+          - All
+        default: All
 
 jobs:
   Build:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs_to_run == 'Build' || inputs.jobs_to_run == 'All' }}
     runs-on: ${{ inputs.os || 'ubuntu-22.04' }}
     permissions:
       checks: write
@@ -97,7 +106,64 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TSUBAKURO_RUST_VERSION: ${{ github.ref_name }}
 
+  Build_Python:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs_to_run == 'Build_Python' || inputs.jobs_to_run == 'All' }}
+    runs-on: ${{ inputs.os || 'ubuntu-22.04' }}
+    permissions:
+      checks: write
+      contents: read
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      DBTEST_ENDPOINT      : tcp://localhost:12345
+      GLOG_v               : ${{ inputs.tsurugi_loglevel || 30 }}
+
+    services:
+      tsurugi:
+        image: ghcr.io/project-tsurugi/tsurugidb:${{ inputs.tsurugi_version || 'snapshot' }}-${{ inputs.os || 'ubuntu-22.04' }}
+        ports:
+          - 12345:12345
+        env:
+          GLOG_v: ${{ inputs.tsurugi_loglevel || 30 }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apt_Install
+        run: |
+          if command -v apt-get > /dev/null; then
+            sudo apt-get update -y
+            sudo apt-get install -y protobuf-compiler
+          fi
+
+      - name: Install_uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Test_Python
+        run: |
+          cd tsubakuro-rust-python
+          uv run pytest
+
+      - name: Test_Python_DBTest_With_Minimum_Python_Version
+        run: |
+          cd tsubakuro-rust-python-dbtest
+          uv run --python 3.10 pytest --endpoint=${DBTEST_ENDPOINT}
+
+      - name: Test_Python_DBTest_With_Latest_Python_Version
+        run: |
+          cd tsubakuro-rust-python-dbtest
+          uv run --python 3.14 pytest --endpoint=${DBTEST_ENDPOINT}
+
+      - name: Lint_Python
+        run: |
+          cd tsubakuro-rust-python
+          cargo clippy
+
   Build_Windows:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.jobs_to_run == 'Build_Windows' || inputs.jobs_to_run == 'All' }}
     runs-on: windows-2022
     permissions:
       checks: write
