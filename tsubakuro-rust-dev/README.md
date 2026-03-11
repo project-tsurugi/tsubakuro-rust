@@ -1,4 +1,4 @@
-# Tsubakuro/Rust development tool
+# Tsubakuro/Rust development tool for Rust
 
 ## Usage
 

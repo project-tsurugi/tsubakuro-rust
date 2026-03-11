@@ -1,0 +1,38 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "tsubakuro-rust-python"
+requires-python = ">=3.10"
+authors = [
+  {name = "Project Tsurugi"},
+]
+description = "Python library for Tsurugi"
+license = "Apache-2.0"
+keywords = ["database", "tsurugidb", "sql"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
+
+[tool.maturin]
+module-name = "tsubakuro_rust_python._tsubakuro_rust_python"
+python-source = "python"
+exclude = ["**/__pycache__", "**/*.pyc"]
+
+[tool.uv]
+cache-keys = [{ file = "pyproject.toml" }, { file = "src/**/*.rs" }, { file = "Cargo.toml" }, { file = "Cargo.lock" }, { file = "python/**/*.py" }]
+
+[dependency-groups]
+dev = [
+    "pdoc3>=0.11.6",
+    "pytest>=9.0.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python"
+Documentation = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python/docs/tsubakuro_rust_python/"
+Repository = "https://github.com/project-tsurugi/tsubakuro-rust.git"

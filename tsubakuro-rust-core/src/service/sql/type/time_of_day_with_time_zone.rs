@@ -10,7 +10,7 @@ impl TgTimeOfDayWithTimeZone {
     }
 
     /// Creates a new instance.
-    pub fn from(
+    pub fn from_hms_nano(
         hour: u8,
         min: u8,
         sec: u8,
@@ -50,15 +50,15 @@ mod test {
 
     #[test]
     fn display_time_of_day() {
-        let value = TgTimeOfDayWithTimeZone::from(0, 0, 0, 0, 0);
+        let value = TgTimeOfDayWithTimeZone::from_hms_nano(0, 0, 0, 0, 0);
         assert_eq!("00:00:00.000000000+00:00", value.to_string());
 
-        let value = TgTimeOfDayWithTimeZone::from(1, 2, 3, 12345678, 9 * 60);
+        let value = TgTimeOfDayWithTimeZone::from_hms_nano(1, 2, 3, 12345678, 9 * 60);
         assert_eq!("01:02:03.012345678+09:00", value.to_string());
-        let value = TgTimeOfDayWithTimeZone::from(1, 2, 3, 12345678, -9 * 60);
+        let value = TgTimeOfDayWithTimeZone::from_hms_nano(1, 2, 3, 12345678, -9 * 60);
         assert_eq!("01:02:03.012345678-09:00", value.to_string());
 
-        let value = TgTimeOfDayWithTimeZone::from(23, 59, 59, 999_999_999, 0);
+        let value = TgTimeOfDayWithTimeZone::from_hms_nano(23, 59, 59, 999_999_999, 0);
         assert_eq!("23:59:59.999999999+00:00", value.to_string());
     }
 }

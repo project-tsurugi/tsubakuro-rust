@@ -14,7 +14,7 @@ impl TgTimeOfDay {
     }
 
     /// Creates a new instance.
-    pub fn from(hour: u8, min: u8, sec: u8, nanoseconds: u32) -> TgTimeOfDay {
+    pub fn from_hms_nano(hour: u8, min: u8, sec: u8, nanoseconds: u32) -> TgTimeOfDay {
         let value = (((hour as u64) * 60 + min as u64) * 60 + sec as u64) * 1_000_000_000
             + nanoseconds as u64;
         TgTimeOfDay::new(value)
@@ -39,13 +39,13 @@ mod test {
 
     #[test]
     fn display_time_of_day() {
-        let value = TgTimeOfDay::from(0, 0, 0, 0);
+        let value = TgTimeOfDay::from_hms_nano(0, 0, 0, 0);
         assert_eq!("00:00:00.000000000", value.to_string());
 
-        let value = TgTimeOfDay::from(1, 2, 3, 12345678);
+        let value = TgTimeOfDay::from_hms_nano(1, 2, 3, 12345678);
         assert_eq!("01:02:03.012345678", value.to_string());
 
-        let value = TgTimeOfDay::from(23, 59, 59, 999_999_999);
+        let value = TgTimeOfDay::from_hms_nano(23, 59, 59, 999_999_999);
         assert_eq!("23:59:59.999999999", value.to_string());
     }
 }
