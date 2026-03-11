@@ -2,7 +2,7 @@
 
 Tsubakuro/Rust is a Rust library that accesses the [Tsurugi](https://github.com/project-tsurugi/tsurugidb).
 
-C ABI format library and ODBC driver are also provided.
+C ABI format library and ODBC driver, Python library are also provided.
 
 ## libraries
 
