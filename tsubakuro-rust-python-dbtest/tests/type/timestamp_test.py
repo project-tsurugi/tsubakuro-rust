@@ -1,5 +1,5 @@
 import datetime
-import tsubakuro_rust_python as tsurugi
+import tsurugi_dbapi as tsurugi
 
 
 def drop_and_create_table(connection):

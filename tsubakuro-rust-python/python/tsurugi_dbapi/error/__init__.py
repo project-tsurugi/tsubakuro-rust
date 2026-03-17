@@ -1,4 +1,4 @@
-from tsubakuro_rust_python._tsubakuro_rust_python import error as _rust
+from tsurugi_dbapi._tsubakuro_rust_python import error as _rust
 
 for name in _rust.__all__:
     globals()[name] = getattr(_rust, name)

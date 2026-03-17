@@ -1,5 +1,5 @@
-import tsubakuro_rust_python as tsurugi
-from tsubakuro_rust_python import CommitOption, CommitType
+import tsurugi_dbapi as tsurugi
+from tsurugi_dbapi import CommitOption, CommitType
 
 
 def test_config(endpoint):

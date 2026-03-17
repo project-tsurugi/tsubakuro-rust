@@ -1,5 +1,5 @@
-from tsubakuro_rust_python import ProgrammingError
-from tsubakuro_rust_python.type_code import Int32, Int64, Str, Decimal
+from tsurugi_dbapi import ProgrammingError
+from tsurugi_dbapi.type_code import Int32, Int64, Str, Decimal
 
 
 def test_insert(connection):

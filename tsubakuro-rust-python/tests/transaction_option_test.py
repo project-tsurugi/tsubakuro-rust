@@ -1,4 +1,4 @@
-from tsubakuro_rust_python import TransactionOption, TransactionType
+from tsurugi_dbapi import TransactionOption, TransactionType
 
 
 def test_default():

@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=2.2.6",
-    "tsubakuro-rust-python",
+    "tsurugi-dbapi",
 ]
 
 [dependency-groups]
@@ -15,4 +15,4 @@ dev = [
 ]
 
 [tool.uv.sources]
-tsubakuro-rust-python = { path = "../tsubakuro-rust-python" }
+tsurugi-dbapi = { path = "../tsubakuro-rust-python" }

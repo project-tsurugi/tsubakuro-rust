@@ -251,7 +251,7 @@ wheels = [
 ]
 
 [[package]]
-name = "tsubakuro-rust-python"
+name = "tsurugi-dbapi"
 source = { editable = "." }
 
 [package.dev-dependencies]

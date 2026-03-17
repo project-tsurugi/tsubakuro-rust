@@ -278,25 +278,13 @@ wheels = [
 ]
 
 [[package]]
-name = "tsubakuro-rust-python"
-source = { directory = "../tsubakuro-rust-python" }
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pdoc3", specifier = ">=0.11.6" },
-    { name = "pytest", specifier = ">=9.0.2" },
-]
-
-[[package]]
 name = "tsubakuro-rust-python-dbtest"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "tsubakuro-rust-python" },
+    { name = "tsurugi-dbapi" },
 ]
 
 [package.dev-dependencies]
@@ -307,11 +295,23 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "numpy", specifier = ">=2.2.6" },
-    { name = "tsubakuro-rust-python", directory = "../tsubakuro-rust-python" },
+    { name = "tsurugi-dbapi", directory = "../tsubakuro-rust-python" },
 ]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=9.0.2" }]
+
+[[package]]
+name = "tsurugi-dbapi"
+source = { directory = "../tsubakuro-rust-python" }
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pdoc3", specifier = ">=0.11.6" },
+    { name = "pytest", specifier = ">=9.0.2" },
+]
 
 [[package]]
 name = "typing-extensions"

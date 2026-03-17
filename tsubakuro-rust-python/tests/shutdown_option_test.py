@@ -1,4 +1,4 @@
-from tsubakuro_rust_python import ShutdownOption, ShutdownType
+from tsurugi_dbapi import ShutdownOption, ShutdownType
 
 
 def test_shutdown_option():

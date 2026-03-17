@@ -1,5 +1,5 @@
-import tsubakuro_rust_python as tsurugi
-from tsubakuro_rust_python import ShutdownOption, ShutdownType
+import tsurugi_dbapi as tsurugi
+from tsurugi_dbapi import ShutdownOption, ShutdownType
 
 
 def test_config(endpoint):

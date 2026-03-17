@@ -1,5 +1,5 @@
-import tsubakuro_rust_python as tsurugi
-from tsubakuro_rust_python import TransactionOption, TransactionType
+import tsurugi_dbapi as tsurugi
+from tsurugi_dbapi import TransactionOption, TransactionType
 
 
 def test_config_occ(endpoint):

@@ -1,4 +1,4 @@
-from tsubakuro_rust_python import CommitOption, CommitType
+from tsurugi_dbapi import CommitOption, CommitType
 
 
 def test_commit_option():

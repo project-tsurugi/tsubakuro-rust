@@ -39,7 +39,7 @@ public class TsubakuroRustPythonExceptionGenerator {
             }
             String doc = "Tsurugi %s".formatted(simpleName);
             System.out.printf("""
-                    create_exception!(tsubakuro_rust_python.error, %s, %s, "%s");
+                    create_exception!(tsurugi_dbapi.error, %s, %s, "%s");
                     """, simpleName, parent, doc);
         }
 

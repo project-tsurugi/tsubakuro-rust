@@ -1,4 +1,4 @@
-import tsubakuro_rust_python as tsurugi
+import tsurugi_dbapi as tsurugi
 import datetime
 
 JST = datetime.timezone(datetime.timedelta(hours=9))

@@ -3,13 +3,13 @@ use pyo3_stub_gen::create_exception;
 use tsubakuro_rust_core::prelude::{DiagnosticCode, TgError};
 
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     Warning,
     PyException,
     "important warning (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     Error,
     PyException,
     "base class of all other exceptions (PEP 249)"
@@ -17,13 +17,13 @@ create_exception!(
 
 // Subclass of Error
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     InterfaceError,
     Error,
     "interface error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     DatabaseError,
     Error,
     "database error (PEP 249)"
@@ -31,37 +31,37 @@ create_exception!(
 
 // Subclasses of DatabaseError
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     DataError,
     DatabaseError,
     "data error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     OperationalError,
     DatabaseError,
     "operation error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     IntegrityError,
     DatabaseError,
     "integrity error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     InternalError,
     DatabaseError,
     "internal error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     ProgrammingError,
     DatabaseError,
     "programming error (PEP 249)"
 );
 create_exception!(
-    tsubakuro_rust_python,
+    tsurugi_dbapi,
     NotSupportedError,
     DatabaseError,
     "not supported error (PEP 249)"
@@ -69,7 +69,7 @@ create_exception!(
 
 // ServerException
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ServerException,
     OperationalError,
     "Tsurugi ServerException"
@@ -77,349 +77,349 @@ create_exception!(
 
 // SqlServiceException
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     SqlServiceException,
     ServerException,
     "Tsurugi SqlServiceException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     SqlExecutionException,
     SqlServiceException,
     "Tsurugi SqlExecutionException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ConstraintViolationException,
     IntegrityError,
     "Tsurugi ConstraintViolationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     UniqueConstraintViolationException,
     ConstraintViolationException,
     "Tsurugi UniqueConstraintViolationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     NotNullConstraintViolationException,
     ConstraintViolationException,
     "Tsurugi NotNullConstraintViolationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ReferentialIntegrityConstraintViolationException,
     ConstraintViolationException,
     "Tsurugi ReferentialIntegrityConstraintViolationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     CheckConstraintViolationException,
     ConstraintViolationException,
     "Tsurugi CheckConstraintViolationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     EvaluationException,
     DataError,
     "Tsurugi EvaluationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ValueEvaluationException,
     EvaluationException,
     "Tsurugi ValueEvaluationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ScalarSubqueryEvaluationException,
     EvaluationException,
     "Tsurugi ScalarSubqueryEvaluationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     TargetNotFoundException,
     SqlExecutionException,
     "Tsurugi TargetNotFoundException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     TargetAlreadyExistsException,
     SqlExecutionException,
     "Tsurugi TargetAlreadyExistsException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     InconsistentStatementException,
     SqlExecutionException,
     "Tsurugi InconsistentStatementException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     RestrictedOperationException,
     SqlExecutionException,
     "Tsurugi RestrictedOperationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     DependenciesViolationException,
     RestrictedOperationException,
     "Tsurugi DependenciesViolationException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     WriteOperationByRtxException,
     RestrictedOperationException,
     "Tsurugi WriteOperationByRtxException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     LtxWriteOperationWithoutWritePreserveException,
     RestrictedOperationException,
     "Tsurugi LtxWriteOperationWithoutWritePreserveException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ReadOperationOnRestrictedReadAreaException,
     RestrictedOperationException,
     "Tsurugi ReadOperationOnRestrictedReadAreaException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     InactiveTransactionException,
     RestrictedOperationException,
     "Tsurugi InactiveTransactionException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ParameterException,
     ProgrammingError,
     "Tsurugi ParameterException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     UnresolvedPlaceholderException,
     ParameterException,
     "Tsurugi UnresolvedPlaceholderException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     LoadFileException,
     SqlExecutionException,
     "Tsurugi LoadFileException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     LoadFileNotFoundException,
     LoadFileException,
     "Tsurugi LoadFileNotFoundException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     LoadFileFormatException,
     LoadFileException,
     "Tsurugi LoadFileFormatException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     DumpFileException,
     SqlExecutionException,
     "Tsurugi DumpFileException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     DumpDirectoryInaccessibleException,
     DumpFileException,
     "Tsurugi DumpDirectoryInaccessibleException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     SqlLimitReachedException,
     DataError,
     "Tsurugi SqlLimitReachedException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     TransactionExceededLimitException,
     SqlLimitReachedException,
     "Tsurugi TransactionExceededLimitException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     SqlRequestTimeoutException,
     SqlExecutionException,
     "Tsurugi SqlRequestTimeoutException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     DataCorruptionException,
     SqlExecutionException,
     "Tsurugi DataCorruptionException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     SecondaryIndexCorruptionException,
     DataCorruptionException,
     "Tsurugi SecondaryIndexCorruptionException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     RequestFailureException,
     SqlExecutionException,
     "Tsurugi RequestFailureException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     TransactionNotFoundException,
     RequestFailureException,
     "Tsurugi TransactionNotFoundException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     StatementNotFoundException,
     RequestFailureException,
     "Tsurugi StatementNotFoundException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     InternalException,
     InternalError,
     "Tsurugi InternalException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     UnsupportedRuntimeFeatureException,
     NotSupportedError,
     "Tsurugi UnsupportedRuntimeFeatureException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     BlockedByHighPriorityTransactionException,
     SqlExecutionException,
     "Tsurugi BlockedByHighPriorityTransactionException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     InvalidRuntimeValueException,
     SqlLimitReachedException,
     "Tsurugi InvalidRuntimeValueException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ValueOutOfRangeException,
     InvalidRuntimeValueException,
     "Tsurugi ValueOutOfRangeException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ValueTooLongException,
     InvalidRuntimeValueException,
     "Tsurugi ValueTooLongException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     InvalidDecimalValueException,
     InvalidRuntimeValueException,
     "Tsurugi InvalidDecimalValueException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     CompileException,
     ProgrammingError,
     "Tsurugi CompileException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     SyntaxException,
     CompileException,
     "Tsurugi SyntaxException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     AnalyzeException,
     CompileException,
     "Tsurugi AnalyzeException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     TypeAnalyzeException,
     AnalyzeException,
     "Tsurugi TypeAnalyzeException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     SymbolAnalyzeException,
     AnalyzeException,
     "Tsurugi SymbolAnalyzeException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ValueAnalyzeException,
     AnalyzeException,
     "Tsurugi ValueAnalyzeException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     UnsupportedCompilerFeatureException,
     NotSupportedError,
     "Tsurugi UnsupportedCompilerFeatureException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     CcException,
     SqlServiceException,
     "Tsurugi CcException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     OccException,
     CcException,
     "Tsurugi OccException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     OccReadException,
     OccException,
     "Tsurugi OccReadException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     ConflictOnWritePreserveException,
     OccReadException,
     "Tsurugi ConflictOnWritePreserveException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     OccWriteException,
     OccException,
     "Tsurugi OccWriteException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     LtxException,
     CcException,
     "Tsurugi LtxException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     LtxReadException,
     LtxException,
     "Tsurugi LtxReadException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     LtxWriteException,
     LtxException,
     "Tsurugi LtxWriteException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     RtxException,
     CcException,
     "Tsurugi RtxException"
 );
 create_exception!(
-    tsubakuro_rust_python.error,
+    tsurugi_dbapi.error,
     BlockedByConcurrentOperationException,
     CcException,
     "Tsurugi BlockedByConcurrentOperationException"

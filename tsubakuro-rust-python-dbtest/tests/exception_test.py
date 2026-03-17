@@ -1,4 +1,4 @@
-import tsubakuro_rust_python as tsurugi
+import tsurugi_dbapi as tsurugi
 
 
 def test_cc_exception(endpoint):

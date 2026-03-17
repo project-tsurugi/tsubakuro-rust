@@ -25,7 +25,7 @@ pub(crate) mod inner_connection;
 ///     shutdown_option (ShutdownOption): Shutdown option. (write only)
 ///     closed (bool): Whether the connection is closed. (read only)
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python")]
+#[pyclass(module = "tsurugi_dbapi")]
 pub struct Connection {
     inner: Arc<InnerConnection>,
 }
@@ -88,7 +88,7 @@ impl Connection {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     try:
     ///         metadata = connection.get_table_metadata("my_table")

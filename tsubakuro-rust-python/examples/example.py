@@ -1,4 +1,4 @@
-import tsubakuro_rust_python as tsurugi
+import tsurugi_dbapi as tsurugi
 
 
 def main():
@@ -13,7 +13,7 @@ def example1():
     print("==== example1 ====")
 
     config = tsurugi.Config()
-    config.application_name = "tsubakuro-rust-python example"
+    config.application_name = "tsurugi-dbapi example"
     config.endpoint = "tcp://localhost:12345"
     config.user = "tsurugi"
     config.password = "password"
@@ -27,7 +27,7 @@ def example2():
     print("==== example2 ====")
 
     config = tsurugi.Config(
-        application_name="tsubakuro-rust-python example",
+        application_name="tsurugi-dbapi example",
         endpoint="tcp://localhost:12345",
         user="tsurugi",
         password="password",
@@ -41,7 +41,7 @@ def example3():
     print("==== example3 ====")
 
     with tsurugi.connect(
-        application_name="tsubakuro-rust-python example",
+        application_name="tsurugi-dbapi example",
         endpoint="tcp://localhost:12345",
         user="tsurugi",
         password="password",
@@ -54,19 +54,19 @@ def execute(connection):
     print("table_names:", connection.list_tables())
 
     with connection.cursor() as cursor:
-        cursor.execute("drop table if exists tsubakuro_rust_python_example")
+        cursor.execute("drop table if exists tsurugi_dbapi_example")
         cursor.execute(
-            "create table tsubakuro_rust_python_example (foo int primary key, bar bigint, zzz varchar(10))"
+            "create table tsurugi_dbapi_example (foo int primary key, bar bigint, zzz varchar(10))"
         )
         connection.commit()  # You must commit even with DDL.
 
         cursor.execute(
-            "insert into tsubakuro_rust_python_example values (1, 100, 'abc'), (2, 200, 'def'), (3, 300, 'ghi')"
+            "insert into tsurugi_dbapi_example values (1, 100, 'abc'), (2, 200, 'def'), (3, 300, 'ghi')"
         )
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
-        cursor.execute("select * from tsubakuro_rust_python_example")
+        cursor.execute("select * from tsurugi_dbapi_example")
         print("description:", cursor.description)
 
         for row in cursor:

@@ -9,14 +9,14 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDecimal};
 ///
 /// Examples:
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///     import decimal
 ///
 ///     value = tsurugi.type_code.Decimal(decimal.Decimal("123.45"))
 ///     value = tsurugi.type_code.Decimal(None)
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python.type_code")]
+#[pyclass(module = "tsurugi_dbapi.type_code")]
 #[derive(Debug)]
 pub struct Decimal {
     value: Option<TgDecimal>,

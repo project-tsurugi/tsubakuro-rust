@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>tsubakuro_rust_python.type_code API documentation</title>
+<title>tsurugi_dbapi.type_code API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,7 +33,7 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>tsubakuro_rust_python.type_code</code></h1>
+<h1 class="title">Module <code>tsurugi_dbapi.type_code</code></h1>
 </header>
 <section id="section-intro">
 </section>
@@ -46,7 +46,7 @@ el.replaceWith(d);
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Bool"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Bool"><code class="flex name class">
 <span>class <span class="ident">Bool</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -58,20 +58,20 @@ el.replaceWith(d);
 <dd>boolean value. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 
 value = tsurugi.type_code.Bool(True)
 value = tsurugi.type_code.Bool(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Bool.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Bool.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Bytes"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Bytes"><code class="flex name class">
 <span>class <span class="ident">Bytes</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -83,20 +83,20 @@ value = tsurugi.type_code.Bool(None)
 <dd>binary data. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 
 value = tsurugi.type_code.Bytes(b&quot;0x01\x02\x03&quot;)
 value = tsurugi.type_code.Bytes(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Bytes.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Bytes.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Date"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Date"><code class="flex name class">
 <span>class <span class="ident">Date</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -108,7 +108,7 @@ value = tsurugi.type_code.Bytes(None)
 <dd>date value. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 import datetime
 
 value = tsurugi.type_code.Date(datetime.date(2026, 2, 24))
@@ -116,18 +116,18 @@ value = tsurugi.type_code.Date(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Date.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Date.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Date.of"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.Date.of"><code class="name flex">
 <span>def <span class="ident">of</span></span>(<span>year, month, day)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.Date" href="#tsubakuro_rust_python.type_code.Date">Date</a></code> from year, month, and day.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.Date" href="#tsurugi_dbapi.type_code.Date">Date</a></code> from year, month, and day.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>year</code></strong> :&ensp;<code>int</code></dt>
@@ -139,15 +139,15 @@ value = tsurugi.type_code.Date(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.Date" href="#tsubakuro_rust_python.type_code.Date">Date</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.Date" href="#tsubakuro_rust_python.type_code.Date">Date</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.Date" href="#tsurugi_dbapi.type_code.Date">Date</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.Date" href="#tsurugi_dbapi.type_code.Date">Date</a></code> object</dd>
 </dl></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Date.raw"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.Date.raw"><code class="name flex">
 <span>def <span class="ident">raw</span></span>(<span>epoch_days)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.Date" href="#tsubakuro_rust_python.type_code.Date">Date</a></code> from epoch days.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.Date" href="#tsurugi_dbapi.type_code.Date">Date</a></code> from epoch days.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>epoch_days</code></strong> :&ensp;<code>int</code></dt>
@@ -155,13 +155,13 @@ value = tsurugi.type_code.Date(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.Date" href="#tsubakuro_rust_python.type_code.Date">Date</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.Date" href="#tsubakuro_rust_python.type_code.Date">Date</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.Date" href="#tsurugi_dbapi.type_code.Date">Date</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.Date" href="#tsurugi_dbapi.type_code.Date">Date</a></code> object</dd>
 </dl></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Datetime"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Datetime"><code class="flex name class">
 <span>class <span class="ident">Datetime</span></span>
 <span>(</span><span>value=None, nanosecond=None)</span>
 </code></dt>
@@ -175,7 +175,7 @@ value = tsurugi.type_code.Date(None)
 <dd>nanosecond part of the time. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 import datetime
 
 value = tsurugi.type_code.Datetime(datetime.datetime(2026, 2, 24, 12, 34, 56, 123456)) # microsecond precision
@@ -184,22 +184,22 @@ value = tsurugi.type_code.Datetime(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Datetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Datetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
 <dd>
 <div class="desc"><p>Nnanosecond.</p></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Datetime.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Datetime.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Datetime.of"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.Datetime.of"><code class="name flex">
 <span>def <span class="ident">of</span></span>(<span>year, month, day, hour=0, minute=0, second=0, nanosecond=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.Datetime" href="#tsubakuro_rust_python.type_code.Datetime">Datetime</a></code> from year, month, day, hour, minute, second, and nanosecond.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.Datetime" href="#tsurugi_dbapi.type_code.Datetime">Datetime</a></code> from year, month, day, hour, minute, second, and nanosecond.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>year</code></strong> :&ensp;<code>int</code></dt>
@@ -219,15 +219,15 @@ value = tsurugi.type_code.Datetime(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.Datetime" href="#tsubakuro_rust_python.type_code.Datetime">Datetime</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.Datetime" href="#tsubakuro_rust_python.type_code.Datetime">Datetime</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.Datetime" href="#tsurugi_dbapi.type_code.Datetime">Datetime</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.Datetime" href="#tsurugi_dbapi.type_code.Datetime">Datetime</a></code> object</dd>
 </dl></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Datetime.raw"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.Datetime.raw"><code class="name flex">
 <span>def <span class="ident">raw</span></span>(<span>epoch_seconds, nanos)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.Datetime" href="#tsubakuro_rust_python.type_code.Datetime">Datetime</a></code> from epoch seconds and nanoseconds.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.Datetime" href="#tsurugi_dbapi.type_code.Datetime">Datetime</a></code> from epoch seconds and nanoseconds.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>epoch_seconds</code></strong> :&ensp;<code>int</code></dt>
@@ -237,13 +237,13 @@ value = tsurugi.type_code.Datetime(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.Datetime" href="#tsubakuro_rust_python.type_code.Datetime">Datetime</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.Datetime" href="#tsubakuro_rust_python.type_code.Datetime">Datetime</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.Datetime" href="#tsurugi_dbapi.type_code.Datetime">Datetime</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.Datetime" href="#tsurugi_dbapi.type_code.Datetime">Datetime</a></code> object</dd>
 </dl></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Decimal"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Decimal"><code class="flex name class">
 <span>class <span class="ident">Decimal</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -255,7 +255,7 @@ value = tsurugi.type_code.Datetime(None)
 <dd>decimal value. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 import decimal
 
 value = tsurugi.type_code.Decimal(decimal.Decimal(&quot;123.45&quot;))
@@ -263,18 +263,18 @@ value = tsurugi.type_code.Decimal(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Decimal.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Decimal.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Decimal.raw"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.Decimal.raw"><code class="name flex">
 <span>def <span class="ident">raw</span></span>(<span>unscaled_value, exponent)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.Decimal" href="#tsubakuro_rust_python.type_code.Decimal">Decimal</a></code> from unscaled value and exponent.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.Decimal" href="#tsurugi_dbapi.type_code.Decimal">Decimal</a></code> from unscaled value and exponent.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>unscaled_value</code></strong> :&ensp;<code>bytes</code></dt>
@@ -284,13 +284,13 @@ value = tsurugi.type_code.Decimal(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.Decimal" href="#tsubakuro_rust_python.type_code.Decimal">Decimal</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.Decimal" href="#tsubakuro_rust_python.type_code.Decimal">Decimal</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.Decimal" href="#tsurugi_dbapi.type_code.Decimal">Decimal</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.Decimal" href="#tsurugi_dbapi.type_code.Decimal">Decimal</a></code> object</dd>
 </dl></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Float32"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Float32"><code class="flex name class">
 <span>class <span class="ident">Float32</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -302,20 +302,20 @@ value = tsurugi.type_code.Decimal(None)
 <dd>float value. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 
 value = tsurugi.type_code.Float32(123.5)
 value = tsurugi.type_code.Float32(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Float32.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Float32.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Float64"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Float64"><code class="flex name class">
 <span>class <span class="ident">Float64</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -327,20 +327,20 @@ value = tsurugi.type_code.Float32(None)
 <dd>float value. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 
 value = tsurugi.type_code.Float64(123.5)
 value = tsurugi.type_code.Float64(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Float64.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Float64.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Int32"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Int32"><code class="flex name class">
 <span>class <span class="ident">Int32</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -352,20 +352,20 @@ value = tsurugi.type_code.Float64(None)
 <dd>integer value. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 
 value = tsurugi.type_code.Int32(123)
 value = tsurugi.type_code.Int32(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Int32.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Int32.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Int64"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Int64"><code class="flex name class">
 <span>class <span class="ident">Int64</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -377,20 +377,20 @@ value = tsurugi.type_code.Int32(None)
 <dd>integer value. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 
 value = tsurugi.type_code.Int64(123)
 value = tsurugi.type_code.Int64(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Int64.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Int64.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.OffsetDatetime"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.OffsetDatetime"><code class="flex name class">
 <span>class <span class="ident">OffsetDatetime</span></span>
 <span>(</span><span>value=None, nanosecond=None)</span>
 </code></dt>
@@ -404,7 +404,7 @@ value = tsurugi.type_code.Int64(None)
 <dd>nanosecond part of the time. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 import datetime
 
 JST = datetime.timezone(datetime.timedelta(hours=9))
@@ -414,22 +414,22 @@ value = tsurugi.type_code.OffsetDatetime(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.OffsetDatetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.OffsetDatetime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
 <dd>
 <div class="desc"><p>Nnanosecond.</p></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.OffsetDatetime.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.OffsetDatetime.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.OffsetDatetime.of"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.OffsetDatetime.of"><code class="name flex">
 <span>def <span class="ident">of</span></span>(<span>year, month, day, hour=0, minute=0, second=0, nanosecond=0, tzinfo=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.OffsetDatetime" href="#tsubakuro_rust_python.type_code.OffsetDatetime">OffsetDatetime</a></code> from year, month, day, hour, minute, second, nanosecond, and tzinfo.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.OffsetDatetime" href="#tsurugi_dbapi.type_code.OffsetDatetime">OffsetDatetime</a></code> from year, month, day, hour, minute, second, nanosecond, and tzinfo.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>year</code></strong> :&ensp;<code>int</code></dt>
@@ -451,15 +451,15 @@ value = tsurugi.type_code.OffsetDatetime(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.OffsetDatetime" href="#tsubakuro_rust_python.type_code.OffsetDatetime">OffsetDatetime</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.OffsetDatetime" href="#tsubakuro_rust_python.type_code.OffsetDatetime">OffsetDatetime</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.OffsetDatetime" href="#tsurugi_dbapi.type_code.OffsetDatetime">OffsetDatetime</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.OffsetDatetime" href="#tsurugi_dbapi.type_code.OffsetDatetime">OffsetDatetime</a></code> object</dd>
 </dl></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.OffsetDatetime.raw"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.OffsetDatetime.raw"><code class="name flex">
 <span>def <span class="ident">raw</span></span>(<span>epoch_seconds, nanos, time_zone_offset)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.OffsetDatetime" href="#tsubakuro_rust_python.type_code.OffsetDatetime">OffsetDatetime</a></code> from epoch seconds, nanoseconds, and time zone offset.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.OffsetDatetime" href="#tsurugi_dbapi.type_code.OffsetDatetime">OffsetDatetime</a></code> from epoch seconds, nanoseconds, and time zone offset.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>epoch_seconds</code></strong> :&ensp;<code>int</code></dt>
@@ -471,13 +471,13 @@ value = tsurugi.type_code.OffsetDatetime(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.OffsetDatetime" href="#tsubakuro_rust_python.type_code.OffsetDatetime">OffsetDatetime</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.OffsetDatetime" href="#tsubakuro_rust_python.type_code.OffsetDatetime">OffsetDatetime</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.OffsetDatetime" href="#tsurugi_dbapi.type_code.OffsetDatetime">OffsetDatetime</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.OffsetDatetime" href="#tsurugi_dbapi.type_code.OffsetDatetime">OffsetDatetime</a></code> object</dd>
 </dl></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.OffsetTime"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.OffsetTime"><code class="flex name class">
 <span>class <span class="ident">OffsetTime</span></span>
 <span>(</span><span>value=None, nanosecond=None)</span>
 </code></dt>
@@ -491,7 +491,7 @@ value = tsurugi.type_code.OffsetDatetime(None)
 <dd>nanosecond part of the time. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 import datetime
 
 JST = datetime.timezone(datetime.timedelta(hours=9))
@@ -501,22 +501,22 @@ value = tsurugi.type_code.OffsetTime(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.OffsetTime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.OffsetTime.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
 <dd>
 <div class="desc"><p>Nnanosecond.</p></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.OffsetTime.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.OffsetTime.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.OffsetTime.of"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.OffsetTime.of"><code class="name flex">
 <span>def <span class="ident">of</span></span>(<span>hour=0, minute=0, second=0, nanosecond=0, tzinfo=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.OffsetTime" href="#tsubakuro_rust_python.type_code.OffsetTime">OffsetTime</a></code> from hour, minute, second, nanosecond, and tzinfo.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.OffsetTime" href="#tsurugi_dbapi.type_code.OffsetTime">OffsetTime</a></code> from hour, minute, second, nanosecond, and tzinfo.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>hour</code></strong> :&ensp;<code>int</code>, optional</dt>
@@ -532,15 +532,15 @@ value = tsurugi.type_code.OffsetTime(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.OffsetTime" href="#tsubakuro_rust_python.type_code.OffsetTime">OffsetTime</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.OffsetTime" href="#tsubakuro_rust_python.type_code.OffsetTime">OffsetTime</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.OffsetTime" href="#tsurugi_dbapi.type_code.OffsetTime">OffsetTime</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.OffsetTime" href="#tsurugi_dbapi.type_code.OffsetTime">OffsetTime</a></code> object</dd>
 </dl></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.OffsetTime.raw"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.OffsetTime.raw"><code class="name flex">
 <span>def <span class="ident">raw</span></span>(<span>nanoseconds_of_day, time_zone_offset)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.OffsetTime" href="#tsubakuro_rust_python.type_code.OffsetTime">OffsetTime</a></code> from epoch nanoseconds of day and time zone offset.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.OffsetTime" href="#tsurugi_dbapi.type_code.OffsetTime">OffsetTime</a></code> from epoch nanoseconds of day and time zone offset.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>nanoseconds_of_day</code></strong> :&ensp;<code>int</code></dt>
@@ -550,13 +550,13 @@ value = tsurugi.type_code.OffsetTime(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.OffsetTime" href="#tsubakuro_rust_python.type_code.OffsetTime">OffsetTime</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.OffsetTime" href="#tsubakuro_rust_python.type_code.OffsetTime">OffsetTime</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.OffsetTime" href="#tsurugi_dbapi.type_code.OffsetTime">OffsetTime</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.OffsetTime" href="#tsurugi_dbapi.type_code.OffsetTime">OffsetTime</a></code> object</dd>
 </dl></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Str"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Str"><code class="flex name class">
 <span>class <span class="ident">Str</span></span>
 <span>(</span><span>value=None)</span>
 </code></dt>
@@ -566,16 +566,22 @@ value = tsurugi.type_code.OffsetTime(None)
 <dl>
 <dt><strong><code>value</code></strong> :&ensp;<code>Optional[str]</code></dt>
 <dd>string value. (read only)</dd>
-</dl></div>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
+
+value = tsurugi.type_code.Str(&quot;abc&quot;)
+value = tsurugi.type_code.Str(None)
+</code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Str.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Str.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Time"><code class="flex name class">
+<dt id="tsurugi_dbapi.type_code.Time"><code class="flex name class">
 <span>class <span class="ident">Time</span></span>
 <span>(</span><span>value=None, nanosecond=None)</span>
 </code></dt>
@@ -589,7 +595,7 @@ value = tsurugi.type_code.OffsetTime(None)
 <dd>nanosecond part of the time. (read only)</dd>
 </dl>
 <h2 id="examples">Examples</h2>
-<pre><code class="language-python">import tsubakuro_rust_python as tsurugi
+<pre><code class="language-python">import tsurugi_dbapi as tsurugi
 import datetime
 
 value = tsurugi.type_code.Time(datetime.time(12, 34, 56, 123456)) # microsecond precision
@@ -598,22 +604,22 @@ value = tsurugi.type_code.Time(None)
 </code></pre></div>
 <h3>Instance variables</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Time.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Time.nanosecond"><code class="name">var <span class="ident">nanosecond</span></code></dt>
 <dd>
 <div class="desc"><p>Nnanosecond.</p></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Time.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dt id="tsurugi_dbapi.type_code.Time.value"><code class="name">var <span class="ident">value</span></code></dt>
 <dd>
 <div class="desc"><p>Value.</p></div>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="tsubakuro_rust_python.type_code.Time.of"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.Time.of"><code class="name flex">
 <span>def <span class="ident">of</span></span>(<span>hour=0, minute=0, second=0, nanosecond=0)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.Time" href="#tsubakuro_rust_python.type_code.Time">Time</a></code> from hour, minute, second, and nanosecond.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.Time" href="#tsurugi_dbapi.type_code.Time">Time</a></code> from hour, minute, second, and nanosecond.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>hour</code></strong> :&ensp;<code>int</code>, optional</dt>
@@ -627,15 +633,15 @@ value = tsurugi.type_code.Time(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.Time" href="#tsubakuro_rust_python.type_code.Time">Time</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.Time" href="#tsubakuro_rust_python.type_code.Time">Time</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.Time" href="#tsurugi_dbapi.type_code.Time">Time</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.Time" href="#tsurugi_dbapi.type_code.Time">Time</a></code> object</dd>
 </dl></div>
 </dd>
-<dt id="tsubakuro_rust_python.type_code.Time.raw"><code class="name flex">
+<dt id="tsurugi_dbapi.type_code.Time.raw"><code class="name flex">
 <span>def <span class="ident">raw</span></span>(<span>nanoseconds_of_day)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a <code><a title="tsubakuro_rust_python.type_code.Time" href="#tsubakuro_rust_python.type_code.Time">Time</a></code> from nanoseconds of day.</p>
+<div class="desc"><p>Create a <code><a title="tsurugi_dbapi.type_code.Time" href="#tsurugi_dbapi.type_code.Time">Time</a></code> from nanoseconds of day.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>nanoseconds_of_day</code></strong> :&ensp;<code>int</code></dt>
@@ -643,8 +649,8 @@ value = tsurugi.type_code.Time(None)
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code><a title="tsubakuro_rust_python.type_code.Time" href="#tsubakuro_rust_python.type_code.Time">Time</a></code></dt>
-<dd>created <code><a title="tsubakuro_rust_python.type_code.Time" href="#tsubakuro_rust_python.type_code.Time">Time</a></code> object</dd>
+<dt><code><a title="tsurugi_dbapi.type_code.Time" href="#tsurugi_dbapi.type_code.Time">Time</a></code></dt>
+<dd>created <code><a title="tsurugi_dbapi.type_code.Time" href="#tsurugi_dbapi.type_code.Time">Time</a></code> object</dd>
 </dl></div>
 </dd>
 </dl>
@@ -659,102 +665,102 @@ value = tsurugi.type_code.Time(None)
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="tsubakuro_rust_python" href="../index.html">tsubakuro_rust_python</a></code></li>
+<li><code><a title="tsurugi_dbapi" href="../index.html">tsurugi_dbapi</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Bool" href="#tsubakuro_rust_python.type_code.Bool">Bool</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Bool" href="#tsurugi_dbapi.type_code.Bool">Bool</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Bool.value" href="#tsubakuro_rust_python.type_code.Bool.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Bool.value" href="#tsurugi_dbapi.type_code.Bool.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Bytes" href="#tsubakuro_rust_python.type_code.Bytes">Bytes</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Bytes" href="#tsurugi_dbapi.type_code.Bytes">Bytes</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Bytes.value" href="#tsubakuro_rust_python.type_code.Bytes.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Bytes.value" href="#tsurugi_dbapi.type_code.Bytes.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Date" href="#tsubakuro_rust_python.type_code.Date">Date</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Date" href="#tsurugi_dbapi.type_code.Date">Date</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Date.of" href="#tsubakuro_rust_python.type_code.Date.of">of</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Date.raw" href="#tsubakuro_rust_python.type_code.Date.raw">raw</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Date.value" href="#tsubakuro_rust_python.type_code.Date.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Date.of" href="#tsurugi_dbapi.type_code.Date.of">of</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Date.raw" href="#tsurugi_dbapi.type_code.Date.raw">raw</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Date.value" href="#tsurugi_dbapi.type_code.Date.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Datetime" href="#tsubakuro_rust_python.type_code.Datetime">Datetime</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Datetime" href="#tsurugi_dbapi.type_code.Datetime">Datetime</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Datetime.nanosecond" href="#tsubakuro_rust_python.type_code.Datetime.nanosecond">nanosecond</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Datetime.of" href="#tsubakuro_rust_python.type_code.Datetime.of">of</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Datetime.raw" href="#tsubakuro_rust_python.type_code.Datetime.raw">raw</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Datetime.value" href="#tsubakuro_rust_python.type_code.Datetime.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Datetime.nanosecond" href="#tsurugi_dbapi.type_code.Datetime.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Datetime.of" href="#tsurugi_dbapi.type_code.Datetime.of">of</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Datetime.raw" href="#tsurugi_dbapi.type_code.Datetime.raw">raw</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Datetime.value" href="#tsurugi_dbapi.type_code.Datetime.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Decimal" href="#tsubakuro_rust_python.type_code.Decimal">Decimal</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Decimal" href="#tsurugi_dbapi.type_code.Decimal">Decimal</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Decimal.raw" href="#tsubakuro_rust_python.type_code.Decimal.raw">raw</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Decimal.value" href="#tsubakuro_rust_python.type_code.Decimal.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Decimal.raw" href="#tsurugi_dbapi.type_code.Decimal.raw">raw</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Decimal.value" href="#tsurugi_dbapi.type_code.Decimal.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Float32" href="#tsubakuro_rust_python.type_code.Float32">Float32</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Float32" href="#tsurugi_dbapi.type_code.Float32">Float32</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Float32.value" href="#tsubakuro_rust_python.type_code.Float32.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Float32.value" href="#tsurugi_dbapi.type_code.Float32.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Float64" href="#tsubakuro_rust_python.type_code.Float64">Float64</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Float64" href="#tsurugi_dbapi.type_code.Float64">Float64</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Float64.value" href="#tsubakuro_rust_python.type_code.Float64.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Float64.value" href="#tsurugi_dbapi.type_code.Float64.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Int32" href="#tsubakuro_rust_python.type_code.Int32">Int32</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Int32" href="#tsurugi_dbapi.type_code.Int32">Int32</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Int32.value" href="#tsubakuro_rust_python.type_code.Int32.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Int32.value" href="#tsurugi_dbapi.type_code.Int32.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Int64" href="#tsubakuro_rust_python.type_code.Int64">Int64</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Int64" href="#tsurugi_dbapi.type_code.Int64">Int64</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Int64.value" href="#tsubakuro_rust_python.type_code.Int64.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Int64.value" href="#tsurugi_dbapi.type_code.Int64.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.OffsetDatetime" href="#tsubakuro_rust_python.type_code.OffsetDatetime">OffsetDatetime</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.OffsetDatetime" href="#tsurugi_dbapi.type_code.OffsetDatetime">OffsetDatetime</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetDatetime.nanosecond" href="#tsubakuro_rust_python.type_code.OffsetDatetime.nanosecond">nanosecond</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetDatetime.of" href="#tsubakuro_rust_python.type_code.OffsetDatetime.of">of</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetDatetime.raw" href="#tsubakuro_rust_python.type_code.OffsetDatetime.raw">raw</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetDatetime.value" href="#tsubakuro_rust_python.type_code.OffsetDatetime.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetDatetime.nanosecond" href="#tsurugi_dbapi.type_code.OffsetDatetime.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetDatetime.of" href="#tsurugi_dbapi.type_code.OffsetDatetime.of">of</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetDatetime.raw" href="#tsurugi_dbapi.type_code.OffsetDatetime.raw">raw</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetDatetime.value" href="#tsurugi_dbapi.type_code.OffsetDatetime.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.OffsetTime" href="#tsubakuro_rust_python.type_code.OffsetTime">OffsetTime</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.OffsetTime" href="#tsurugi_dbapi.type_code.OffsetTime">OffsetTime</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetTime.nanosecond" href="#tsubakuro_rust_python.type_code.OffsetTime.nanosecond">nanosecond</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetTime.of" href="#tsubakuro_rust_python.type_code.OffsetTime.of">of</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetTime.raw" href="#tsubakuro_rust_python.type_code.OffsetTime.raw">raw</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.OffsetTime.value" href="#tsubakuro_rust_python.type_code.OffsetTime.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetTime.nanosecond" href="#tsurugi_dbapi.type_code.OffsetTime.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetTime.of" href="#tsurugi_dbapi.type_code.OffsetTime.of">of</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetTime.raw" href="#tsurugi_dbapi.type_code.OffsetTime.raw">raw</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.OffsetTime.value" href="#tsurugi_dbapi.type_code.OffsetTime.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Str" href="#tsubakuro_rust_python.type_code.Str">Str</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Str" href="#tsurugi_dbapi.type_code.Str">Str</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Str.value" href="#tsubakuro_rust_python.type_code.Str.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Str.value" href="#tsurugi_dbapi.type_code.Str.value">value</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="tsubakuro_rust_python.type_code.Time" href="#tsubakuro_rust_python.type_code.Time">Time</a></code></h4>
+<h4><code><a title="tsurugi_dbapi.type_code.Time" href="#tsurugi_dbapi.type_code.Time">Time</a></code></h4>
 <ul class="">
-<li><code><a title="tsubakuro_rust_python.type_code.Time.nanosecond" href="#tsubakuro_rust_python.type_code.Time.nanosecond">nanosecond</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Time.of" href="#tsubakuro_rust_python.type_code.Time.of">of</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Time.raw" href="#tsubakuro_rust_python.type_code.Time.raw">raw</a></code></li>
-<li><code><a title="tsubakuro_rust_python.type_code.Time.value" href="#tsubakuro_rust_python.type_code.Time.value">value</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Time.nanosecond" href="#tsurugi_dbapi.type_code.Time.nanosecond">nanosecond</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Time.of" href="#tsurugi_dbapi.type_code.Time.of">of</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Time.raw" href="#tsurugi_dbapi.type_code.Time.raw">raw</a></code></li>
+<li><code><a title="tsurugi_dbapi.type_code.Time.value" href="#tsurugi_dbapi.type_code.Time.value">value</a></code></li>
 </ul>
 </li>
 </ul>

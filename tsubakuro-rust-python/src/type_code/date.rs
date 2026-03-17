@@ -9,14 +9,14 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgDate};
 ///
 /// Examples:
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///     import datetime
 ///
 ///     value = tsurugi.type_code.Date(datetime.date(2026, 2, 24))
 ///     value = tsurugi.type_code.Date(None)
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python.type_code")]
+#[pyclass(module = "tsurugi_dbapi.type_code")]
 #[derive(Debug)]
 pub struct Date {
     value: Option<TgDate>,

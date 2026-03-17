@@ -6,8 +6,16 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf};
 ///
 /// Attributes:
 ///     value (Optional[str]): string value. (read only)
+///
+/// Examples:
+///     ```python
+///     import tsurugi_dbapi as tsurugi
+///
+///     value = tsurugi.type_code.Str("abc")
+///     value = tsurugi.type_code.Str(None)
+///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python.type_code")]
+#[pyclass(module = "tsurugi_dbapi.type_code")]
 #[derive(Debug)]
 pub struct Str {
     /// Value.

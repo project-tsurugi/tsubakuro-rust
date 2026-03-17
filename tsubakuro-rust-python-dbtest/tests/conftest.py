@@ -1,5 +1,5 @@
 import pytest
-import tsubakuro_rust_python as tsurugi
+import tsurugi_dbapi as tsurugi
 
 
 def pytest_addoption(parser):

@@ -11,7 +11,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimeOfDayWith
 ///
 /// Examples:
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///     import datetime
 ///
 ///     JST = datetime.timezone(datetime.timedelta(hours=9))
@@ -20,7 +20,7 @@ use tsubakuro_rust_core::prelude::{SqlParameter, SqlParameterOf, TgTimeOfDayWith
 ///     value = tsurugi.type_code.OffsetTime(None)
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python.type_code")]
+#[pyclass(module = "tsurugi_dbapi.type_code")]
 #[derive(Debug)]
 pub struct OffsetTime {
     value: Option<TgTimeOfDayWithTimeZone>,

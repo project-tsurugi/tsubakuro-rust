@@ -1,9 +1,9 @@
-import tsubakuro_rust_python as tsurugi
+import tsurugi_dbapi as tsurugi
 
 
 def main():
     config = tsurugi.Config()
-    config.application_name = "tsubakuro-rust-python example"
+    config.application_name = "tsurugi-dbapi example"
     config.endpoint = "tcp://localhost:12345"
     config.user = "tsurugi"
     config.password = "password"
@@ -20,9 +20,9 @@ def main():
 
 def create_bigint_table(connection):
     with connection.cursor() as cursor:
-        cursor.execute("drop table if exists tsubakuro_rust_python_example")
+        cursor.execute("drop table if exists tsurugi_dbapi_example")
         cursor.execute(
-            "create table tsubakuro_rust_python_example (foo bigint primary key, bar double, zzz varchar(10))"
+            "create table tsurugi_dbapi_example (foo bigint primary key, bar double, zzz varchar(10))"
         )
         connection.commit()  # You must commit even with DDL.
 
@@ -31,7 +31,7 @@ def execute_qmark(connection):
     create_bigint_table(connection)
 
     with connection.cursor() as cursor:
-        insert_sql = "insert into tsubakuro_rust_python_example values (?, ?, ?)"
+        insert_sql = "insert into tsurugi_dbapi_example values (?, ?, ?)"
         # Python's int is treated as a BIGINT, float as a DOUBLE, and str as a CHAR or VARCHAR.
         parameters_list = [
             (1, 1.5, "abc"),
@@ -42,7 +42,7 @@ def execute_qmark(connection):
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
-        select_sql = "select * from tsubakuro_rust_python_example where foo = ?"
+        select_sql = "select * from tsurugi_dbapi_example where foo = ?"
         cursor.execute(select_sql, (2,))
         row = cursor.fetchone()
         print("row:", row)
@@ -56,9 +56,7 @@ def execute_named(connection):
     create_bigint_table(connection)
 
     with connection.cursor() as cursor:
-        insert_sql = (
-            "insert into tsubakuro_rust_python_example values (:foo, :bar, :zzz)"
-        )
+        insert_sql = "insert into tsurugi_dbapi_example values (:foo, :bar, :zzz)"
         # Python's int is treated as a BIGINT, float as a DOUBLE, and str as a CHAR or VARCHAR.
         parameters_list = [
             {"foo": 1, "bar": 1.5, "zzz": "abc"},
@@ -69,7 +67,7 @@ def execute_named(connection):
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
-        select_sql = "select * from tsubakuro_rust_python_example where foo = :foo"
+        select_sql = "select * from tsurugi_dbapi_example where foo = :foo"
         cursor.execute(select_sql, {"foo": 2})
         row = cursor.fetchone()
         print("row:", row)
@@ -81,9 +79,9 @@ def execute_named(connection):
 
 def create_int_table(connection):
     with connection.cursor() as cursor:
-        cursor.execute("drop table if exists tsubakuro_rust_python_example")
+        cursor.execute("drop table if exists tsurugi_dbapi_example")
         cursor.execute(
-            "create table tsubakuro_rust_python_example (foo int primary key, bar bigint, zzz decimal(5))"
+            "create table tsurugi_dbapi_example (foo int primary key, bar bigint, zzz decimal(5))"
         )
         connection.commit()  # You must commit even with DDL.
 
@@ -92,7 +90,7 @@ def execute_type_code_qmark(connection):
     create_int_table(connection)
 
     with connection.cursor() as cursor:
-        insert_sql = "insert into tsubakuro_rust_python_example values (?, ?, ?)"
+        insert_sql = "insert into tsurugi_dbapi_example values (?, ?, ?)"
         # To distinguish between Int32, Int64, and Decimal, you must specify the type at least in the first parameters.
         parameters_list = [
             (
@@ -107,7 +105,7 @@ def execute_type_code_qmark(connection):
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
-        select_sql = "select * from tsubakuro_rust_python_example where foo = ?"
+        select_sql = "select * from tsurugi_dbapi_example where foo = ?"
         cursor.execute(select_sql, (tsurugi.type_code.Int32(2),))
         row = cursor.fetchone()
         print("row:", row)
@@ -117,12 +115,12 @@ def execute_type_code_qmark(connection):
         cursor.clear()  # When explicitly clearing cached prepared statements.
 
 
-# use cursor.prepare() (tsubakuro-rust-python's proprietary specifications)
+# use cursor.prepare() (tsurugi-dbapi's proprietary specifications)
 def prepare_type_code_qmark(connection):
     create_int_table(connection)
 
     with connection.cursor() as cursor:
-        insert_sql = "insert into tsubakuro_rust_python_example values (?, ?, ?)"
+        insert_sql = "insert into tsurugi_dbapi_example values (?, ?, ?)"
         cursor.prepare(
             insert_sql,
             (
@@ -135,7 +133,7 @@ def prepare_type_code_qmark(connection):
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
-        select_sql = "select * from tsubakuro_rust_python_example where foo = ?"
+        select_sql = "select * from tsurugi_dbapi_example where foo = ?"
         cursor.prepare(select_sql, (tsurugi.type_code.Int32,))
         cursor.execute(select_sql, (2,))
         row = cursor.fetchone()
@@ -150,9 +148,7 @@ def execute_type_code_named(connection):
     create_int_table(connection)
 
     with connection.cursor() as cursor:
-        insert_sql = (
-            "insert into tsubakuro_rust_python_example values (:foo, :bar, :zzz)"
-        )
+        insert_sql = "insert into tsurugi_dbapi_example values (:foo, :bar, :zzz)"
         # To distinguish between Int32, Int64, and Decimal, you must specify the type at least in the first parameters.
         parameters_list = [
             {
@@ -167,7 +163,7 @@ def execute_type_code_named(connection):
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
-        select_sql = "select * from tsubakuro_rust_python_example where foo = :foo"
+        select_sql = "select * from tsurugi_dbapi_example where foo = :foo"
         cursor.execute(select_sql, {"foo": tsurugi.type_code.Int32(2)})
         row = cursor.fetchone()
         print("row:", row)
@@ -177,14 +173,12 @@ def execute_type_code_named(connection):
         cursor.clear()  # When explicitly clearing cached prepared statements.
 
 
-# use cursor.prepare() (tsubakuro-rust-python's proprietary specifications)
+# use cursor.prepare() (tsurugi-dbapi's proprietary specifications)
 def prepare_type_code_named(connection):
     create_int_table(connection)
 
     with connection.cursor() as cursor:
-        insert_sql = (
-            "insert into tsubakuro_rust_python_example values (:foo, :bar, :zzz)"
-        )
+        insert_sql = "insert into tsurugi_dbapi_example values (:foo, :bar, :zzz)"
         cursor.prepare(
             insert_sql,
             {
@@ -204,7 +198,7 @@ def prepare_type_code_named(connection):
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
-        select_sql = "select * from tsubakuro_rust_python_example where foo = :foo"
+        select_sql = "select * from tsurugi_dbapi_example where foo = :foo"
         cursor.prepare(select_sql, {"foo": tsurugi.type_code.Int32})
         cursor.execute(select_sql, {"foo": 2})
         row = cursor.fetchone()

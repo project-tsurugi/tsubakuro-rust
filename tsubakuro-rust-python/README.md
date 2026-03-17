@@ -1,6 +1,6 @@
-# tsubakuro-rust-python (Tsurugi Python library)
+# Tsurugi Python DB-API
 
-tsubakuro-rust-python is a Python library to access [Tsurugi](https://github.com/project-tsurugi/tsurugidb).
+Tsurugi Python DB-API (tsurugi-dbapi) is a Python DB API 2.0 driver for accessing [Tsurugi](https://github.com/project-tsurugi/tsurugidb).
 
 ## Target
 
@@ -34,7 +34,7 @@ uv run python
 ## Example
 
 ```python
-import tsubakuro_rust_python as tsurugi
+import tsurugi_dbapi as tsurugi
 
 def example():
     with tsurugi.connect(
@@ -95,9 +95,9 @@ ls target/wheels/
 
 ```bash
 cd tsubakuro-rust-python
-uv run pdoc tsubakuro_rust_python --html -o docs/ --force
+uv run pdoc tsurugi_dbapi --html -o docs/ --force
 
-ls docs/tsubakuro_rust_python/
+ls docs/tsurugi_dbapi/
 ```
 
 ## How to test

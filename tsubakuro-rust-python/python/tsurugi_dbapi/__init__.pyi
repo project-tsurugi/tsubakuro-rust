@@ -115,7 +115,7 @@ class CommitOption:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
         ```
@@ -183,26 +183,26 @@ class Config:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         config = tsurugi.Config()
-        config.application_name = "tsubakuro-rust-python example"
+        config.application_name = "tsurugi-dbapi example"
         config.endpoint = "tcp://localhost:12345"
         config.user = "tsurugi"
         config.password = "password"
-        config.session_label = "tsubakuro-rust-python session"
+        config.session_label = "tsurugi-dbapi session"
         config.default_timeout = 30  # seconds
         ```
     
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         config = tsurugi.Config(
-            application_name="tsubakuro-rust-python example",
+            application_name="tsurugi-dbapi example",
             endpoint="tcp://localhost:12345",
             user="tsurugi",
             password="password",
-            session_label="tsubakuro-rust-python session",
+            session_label="tsurugi-dbapi session",
             default_timeout=30,  # seconds
         )
         ```
@@ -403,7 +403,7 @@ class Connection:
         
         Examples:
             ```python
-            import tsubakuro_rust_python as tsurugi
+            import tsurugi_dbapi as tsurugi
         
             try:
                 metadata = connection.get_table_metadata("my_table")
@@ -574,7 +574,7 @@ class Cursor:
         
         Examples:
             ```python
-            import tsubakuro_rust_python as tsurugi
+            import tsurugi_dbapi as tsurugi
         
             sql = "insert into example values (?, ?)"
             cursor.prepare(sql, (tsurugi.type_code.Int64, tsurugi.type_code.Str))
@@ -583,7 +583,7 @@ class Cursor:
             ```
         
             ```python
-            import tsubakuro_rust_python as tsurugi
+            import tsurugi_dbapi as tsurugi
         
             sql = "insert into example values (:id, :name)"
             cursor.prepare(sql, {"id": tsurugi.type_code.Int64, "name": tsurugi.type_code.Str})
@@ -774,7 +774,7 @@ class ShutdownOption:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         shutdown_option = tsurugi.ShutdownOption(tsurugi.ShutdownType.GRACEFUL, 30)
         ```
@@ -888,25 +888,25 @@ class TransactionOption:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.OCC)
-        tx_option.label = "tsubakuro-rust-python OCC example"
+        tx_option.label = "tsurugi-dbapi OCC example"
         ```
     
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
-        tx_option.label = "tsubakuro-rust-python LTX example"
+        tx_option.label = "tsurugi-dbapi LTX example"
         tx_option.write_preserve = ["table1", "table2"]
         ```
     
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.RTX)
-        tx_option.label = "tsubakuro-rust-python RTX example"
+        tx_option.label = "tsurugi-dbapi RTX example"
         tx_option.scan_parallel = 4
         ```
     """
@@ -1013,7 +1013,7 @@ class TransactionOption:
         
         Examples:
             ```python
-            import tsubakuro_rust_python as tsurugi
+            import tsurugi_dbapi as tsurugi
         
             tx_option = tsurugi.TransactionOption.occ(label="OCC transaction")
             ```
@@ -1034,7 +1034,7 @@ class TransactionOption:
         
         Examples:
             ```python
-            import tsubakuro_rust_python as tsurugi
+            import tsurugi_dbapi as tsurugi
         
             tx_option = tsurugi.TransactionOption.ltx(
                 label="LTX transaction",
@@ -1055,7 +1055,7 @@ class TransactionOption:
         
         Examples:
             ```python
-            import tsubakuro_rust_python as tsurugi
+            import tsurugi_dbapi as tsurugi
         
             tx_option = tsurugi.TransactionOption.ddl(label="LTX transaction for DDL")
             ```
@@ -1074,7 +1074,7 @@ class TransactionOption:
         
         Examples:
             ```python
-            import tsubakuro_rust_python as tsurugi
+            import tsurugi_dbapi as tsurugi
         
             tx_option = tsurugi.TransactionOption.rtx(
                 label="RTX transaction",
@@ -1181,7 +1181,7 @@ def connect(*args: typing.Any, **kwargs: typing.Any) -> Connection:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         config = tsurugi.Config()
         config.endpoint = "tcp://localhost:12345"
@@ -1193,7 +1193,7 @@ def connect(*args: typing.Any, **kwargs: typing.Any) -> Connection:
         ```
     
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         with tsurugi.connect(
             endpoint="tcp://localhost:12345",
@@ -1215,12 +1215,13 @@ def env_logger_init(filters: builtins.str = 'tsubakuro_rust_python=info', file_p
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         tsurugi.env_logger_init("tsubakuro_rust_python=trace")
         ```
     
     Note:
-        Calls to `env_logger_init` other than the first one are ignored.
+        - `tsubakuro_rust_python` is the name of an internal module.
+        - Calls to `env_logger_init` other than the first one are ignored.
     """
 

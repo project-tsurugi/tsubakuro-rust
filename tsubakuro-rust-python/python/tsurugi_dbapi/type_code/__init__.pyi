@@ -31,7 +31,7 @@ class Bool:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         value = tsurugi.type_code.Bool(True)
         value = tsurugi.type_code.Bool(None)
@@ -59,7 +59,7 @@ class Bytes:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         value = tsurugi.type_code.Bytes(b"0x01\x02\x03")
         value = tsurugi.type_code.Bytes(None)
@@ -86,7 +86,7 @@ class Date:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
         import datetime
     
         value = tsurugi.type_code.Date(datetime.date(2026, 2, 24))
@@ -139,7 +139,7 @@ class Datetime:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
         import datetime
     
         value = tsurugi.type_code.Datetime(datetime.datetime(2026, 2, 24, 12, 34, 56, 123456)) # microsecond precision
@@ -202,7 +202,7 @@ class Decimal:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
         import decimal
     
         value = tsurugi.type_code.Decimal(decimal.Decimal("123.45"))
@@ -242,7 +242,7 @@ class Float32:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         value = tsurugi.type_code.Float32(123.5)
         value = tsurugi.type_code.Float32(None)
@@ -270,7 +270,7 @@ class Float64:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         value = tsurugi.type_code.Float64(123.5)
         value = tsurugi.type_code.Float64(None)
@@ -298,7 +298,7 @@ class Int32:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         value = tsurugi.type_code.Int32(123)
         value = tsurugi.type_code.Int32(None)
@@ -326,7 +326,7 @@ class Int64:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
     
         value = tsurugi.type_code.Int64(123)
         value = tsurugi.type_code.Int64(None)
@@ -355,7 +355,7 @@ class OffsetDatetime:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
         import datetime
     
         JST = datetime.timezone(datetime.timedelta(hours=9))
@@ -422,7 +422,7 @@ class OffsetTime:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
         import datetime
     
         JST = datetime.timezone(datetime.timedelta(hours=9))
@@ -481,6 +481,14 @@ class Str:
     
     Attributes:
         value (Optional[str]): string value. (read only)
+    
+    Examples:
+        ```python
+        import tsurugi_dbapi as tsurugi
+    
+        value = tsurugi.type_code.Str("abc")
+        value = tsurugi.type_code.Str(None)
+        ```
     """
     @property
     def value(self) -> typing.Optional[builtins.str]:
@@ -504,7 +512,7 @@ class Time:
     
     Examples:
         ```python
-        import tsubakuro_rust_python as tsurugi
+        import tsurugi_dbapi as tsurugi
         import datetime
     
         value = tsurugi.type_code.Time(datetime.time(12, 34, 56, 123456)) # microsecond precision

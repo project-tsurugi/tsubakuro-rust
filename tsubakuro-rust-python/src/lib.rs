@@ -77,14 +77,15 @@ mod _tsubakuro_rust_python {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     tsurugi.env_logger_init("tsubakuro_rust_python=trace")
     ///     ```
     ///
     /// Note:
-    ///     Calls to `env_logger_init` other than the first one are ignored.
-    #[gen_stub_pyfunction(module = "tsubakuro_rust_python")]
+    ///     - `tsubakuro_rust_python` is the name of an internal module.
+    ///     - Calls to `env_logger_init` other than the first one are ignored.
+    #[gen_stub_pyfunction(module = "tsurugi_dbapi")]
     #[pyfunction]
     #[pyo3(signature = (filters="tsubakuro_rust_python=info", file_path=None))]
     fn env_logger_init(filters: &str, file_path: Option<String>) {
@@ -102,7 +103,7 @@ mod _tsubakuro_rust_python {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     config = tsurugi.Config()
     ///     config.endpoint = "tcp://localhost:12345"
@@ -114,7 +115,7 @@ mod _tsubakuro_rust_python {
     ///     ```
     ///
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     with tsurugi.connect(
     ///         endpoint="tcp://localhost:12345",
@@ -124,7 +125,7 @@ mod _tsubakuro_rust_python {
     ///     ) as connection:
     ///         pass
     ///     ```
-    #[gen_stub_pyfunction(module = "tsubakuro_rust_python")]
+    #[gen_stub_pyfunction(module = "tsurugi_dbapi")]
     #[pyfunction]
     #[pyo3(signature = (*args, **kwargs))]
     fn connect(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Connection> {

@@ -32,31 +32,31 @@ use crate::{
 ///
 /// Examples:
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///
 ///     config = tsurugi.Config()
-///     config.application_name = "tsubakuro-rust-python example"
+///     config.application_name = "tsurugi-dbapi example"
 ///     config.endpoint = "tcp://localhost:12345"
 ///     config.user = "tsurugi"
 ///     config.password = "password"
-///     config.session_label = "tsubakuro-rust-python session"
+///     config.session_label = "tsurugi-dbapi session"
 ///     config.default_timeout = 30  # seconds
 ///     ```
 ///
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///
 ///     config = tsurugi.Config(
-///         application_name="tsubakuro-rust-python example",
+///         application_name="tsurugi-dbapi example",
 ///         endpoint="tcp://localhost:12345",
 ///         user="tsurugi",
 ///         password="password",
-///         session_label="tsubakuro-rust-python session",
+///         session_label="tsurugi-dbapi session",
 ///         default_timeout=30,  # seconds
 ///     )
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python")]
+#[pyclass(module = "tsurugi_dbapi")]
 pub struct Config {
     /// Application name.
     #[pyo3(get, set)]

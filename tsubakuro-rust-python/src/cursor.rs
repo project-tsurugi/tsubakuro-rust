@@ -43,7 +43,7 @@ impl RowNumber {
 ///     rowcount (int): Number of rows affected by the last `Cursor.execute*()` method. -1 if not applicable. (read only)
 ///     closed (bool): Whether the cursor is closed. (read only)
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python")]
+#[pyclass(module = "tsurugi_dbapi")]
 pub struct Cursor {
     py_connection: Py<Connection>,
     connection: Arc<InnerConnection>,
@@ -146,7 +146,7 @@ impl Cursor {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     sql = "insert into example values (?, ?)"
     ///     cursor.prepare(sql, (tsurugi.type_code.Int64, tsurugi.type_code.Str))
@@ -155,7 +155,7 @@ impl Cursor {
     ///     ```
     ///
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     sql = "insert into example values (:id, :name)"
     ///     cursor.prepare(sql, {"id": tsurugi.type_code.Int64, "name": tsurugi.type_code.Str})

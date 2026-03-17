@@ -1,4 +1,4 @@
-from tsubakuro_rust_python import ProgrammingError
+from tsurugi_dbapi import ProgrammingError
 
 
 def test_list_tables(connection):

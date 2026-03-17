@@ -14,7 +14,7 @@ use tsubakuro_rust_core::prelude::{
 ///     LTX: Long transaction (LTX).
 ///     RTX: Read-only transaction (RTX).
 #[gen_stub_pyclass_enum]
-#[pyclass(module = "tsubakuro_rust_python")]
+#[pyclass(module = "tsurugi_dbapi")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TransactionType {
@@ -61,29 +61,29 @@ impl TransactionType {
 ///
 /// Examples:
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///
 ///     tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.OCC)
-///     tx_option.label = "tsubakuro-rust-python OCC example"
+///     tx_option.label = "tsurugi-dbapi OCC example"
 ///     ```
 ///
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///
 ///     tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.LTX)
-///     tx_option.label = "tsubakuro-rust-python LTX example"
+///     tx_option.label = "tsurugi-dbapi LTX example"
 ///     tx_option.write_preserve = ["table1", "table2"]
 ///     ```
 ///
 ///     ```python
-///     import tsubakuro_rust_python as tsurugi
+///     import tsurugi_dbapi as tsurugi
 ///
 ///     tx_option = tsurugi.TransactionOption(tsurugi.TransactionType.RTX)
-///     tx_option.label = "tsubakuro-rust-python RTX example"
+///     tx_option.label = "tsurugi-dbapi RTX example"
 ///     tx_option.scan_parallel = 4
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsubakuro_rust_python")]
+#[pyclass(module = "tsurugi_dbapi")]
 #[derive(Debug, Clone)]
 pub struct TransactionOption {
     /// Transaction type.
@@ -153,7 +153,7 @@ impl TransactionOption {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     tx_option = tsurugi.TransactionOption.occ(label="OCC transaction")
     ///     ```
@@ -178,7 +178,7 @@ impl TransactionOption {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     tx_option = tsurugi.TransactionOption.ltx(
     ///         label="LTX transaction",
@@ -213,7 +213,7 @@ impl TransactionOption {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     tx_option = tsurugi.TransactionOption.ddl(label="LTX transaction for DDL")
     ///     ```
@@ -237,7 +237,7 @@ impl TransactionOption {
     ///
     /// Examples:
     ///     ```python
-    ///     import tsubakuro_rust_python as tsurugi
+    ///     import tsurugi_dbapi as tsurugi
     ///
     ///     tx_option = tsurugi.TransactionOption.rtx(
     ///         label="RTX transaction",
