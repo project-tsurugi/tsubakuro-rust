@@ -214,7 +214,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v6
         with:
-          name: wheels-tsubakuro-rust-python-linux-${{ matrix.platform.target }}
+          name: wheels-tsurugi-dbapi-linux-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
 
   Build_Wheel_musllinux:
@@ -264,7 +264,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v6
         with:
-          name: wheels-tsubakuro-rust-python-musllinux-${{ matrix.platform.target }}
+          name: wheels-tsurugi-dbapi-musllinux-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
 
   Build_Wheel_windows:
@@ -320,7 +320,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v6
         with:
-          name: wheels-tsubakuro-rust-python-windows-${{ matrix.platform.target }}
+          name: wheels-tsurugi-dbapi-windows-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
 
   Build_Wheel_macos:
@@ -365,7 +365,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v6
         with:
-          name: wheels-tsubakuro-rust-python-macos-${{ matrix.platform.target }}
+          name: wheels-tsurugi-dbapi-macos-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
 
   Build_Wheel_sdist:
@@ -386,7 +386,7 @@ jobs:
       - name: Upload sdist
         uses: actions/upload-artifact@v6
         with:
-          name: wheels-tsubakuro-rust-python-sdist
+          name: wheels-tsurugi-dbapi-sdist
           path: tsubakuro-rust-python/dist
 
   Publish_PyPI:
