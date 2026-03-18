@@ -1,4 +1,4 @@
-# 例外クラス
+# Tsurugi Python DB-API 例外クラス
 
 [tsubakuro-rust-python/src/error.rs](../../src/error.rs) で例外クラスを実装している。
 
