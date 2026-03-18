@@ -1,0 +1,17 @@
+name: 'Set Developmental release version'
+description: 'Appends a developmental release suffix to the version in the [package] section of Cargo.toml.'
+
+inputs:
+  manifest_path:
+    description: 'Path to the Cargo.toml file to modify'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Append developmental release suffix to Cargo.toml
+      shell: bash
+      env:
+        MANIFEST_PATH: ${{ inputs.manifest_path }}
+        DEV_VERSION_SUFFIX: -dev${{ github.run_number }}${{ github.run_attempt }}
+      run: python "$GITHUB_ACTION_PATH/set_dev_version.py" "$MANIFEST_PATH" "$DEV_VERSION_SUFFIX"

@@ -191,6 +191,11 @@ jobs:
         with:
           python-version: 3.x
 
+      - uses: ./.github/actions/python-dev-version
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        with:
+          manifest_path: tsubakuro-rust-python/Cargo.toml
+
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -239,6 +244,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: 3.x
+
+      - uses: ./.github/actions/python-dev-version
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        with:
+          manifest_path: tsubakuro-rust-python/Cargo.toml
 
       - name: Build wheels
         uses: PyO3/maturin-action@v1
@@ -292,6 +302,11 @@ jobs:
           python-version: 3.13
           architecture: ${{ matrix.platform.python_arch }}
 
+      - uses: ./.github/actions/python-dev-version
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        with:
+          manifest_path: tsubakuro-rust-python/Cargo.toml
+
       - name: Install_Protobuf
         run: |
           choco install protoc -y
@@ -342,6 +357,11 @@ jobs:
         with:
           python-version: 3.x
 
+      - uses: ./.github/actions/python-dev-version
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        with:
+          manifest_path: tsubakuro-rust-python/Cargo.toml
+
       - name: Install Protoc
         run: |
           brew install protobuf
@@ -375,6 +395,15 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+
+      - uses: ./.github/actions/python-dev-version
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        with:
+          manifest_path: tsubakuro-rust-python/Cargo.toml
 
       - name: Build sdist
         uses: PyO3/maturin-action@v1
@@ -411,7 +440,14 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 
+      - name: Publish to TestPyPI
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: uv publish --publish-url https://test.pypi.org/legacy/ 'wheels-*/*'
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+
       - name: Publish to PyPI
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: uv publish 'wheels-*/*'
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
