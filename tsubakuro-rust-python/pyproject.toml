@@ -8,13 +8,16 @@ requires-python = ">=3.10"
 authors = [
   {name = "Project Tsurugi"},
 ]
-description = "Python library for Tsurugi"
+description = "Tsurugi Python DB-API"
+readme = "README.md"
 license = "Apache-2.0"
-keywords = ["database", "tsurugidb", "sql"]
+keywords = ["database", "db-api", "dbapi", "dbapi2", "pep249", "sql", "tsurugidb", "tsurugi"]
 classifiers = [
     "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Database",
+    "Topic :: Database :: Front-Ends",
 ]
 dynamic = ["version"]
 
@@ -34,5 +37,5 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python"
-Documentation = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python/docs/tsubakuro_rust_python/"
+Documentation = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python/docs/tsurugi_dbapi/"
 Repository = "https://github.com/project-tsurugi/tsubakuro-rust.git"
