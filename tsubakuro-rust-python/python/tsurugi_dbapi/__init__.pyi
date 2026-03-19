@@ -702,7 +702,7 @@ class Cursor:
         """
     def clear(self) -> None:
         r"""
-        Clear the current query result and prepared statements.
+        Closes the current result set and clears cached prepared statements.
         """
     def close(self) -> None:
         r"""

@@ -528,7 +528,7 @@ impl Cursor {
         result
     }
 
-    /// Clear the current query result and prepared statements.
+    /// Closes the current result set and clears cached prepared statements.
     pub fn clear(&mut self) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Cursor.clear()";
         trace!("{FUNCTION_NAME} start");
