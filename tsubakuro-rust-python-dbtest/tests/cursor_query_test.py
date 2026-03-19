@@ -34,6 +34,7 @@ def test_description(connection):
             ("zzz", "Str", None, 10, None, None, None),
         )
 
+        cursor.clear()  # close QueryResult in cursor
         connection.commit()
 
 
