@@ -37,5 +37,5 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python"
-Documentation = "https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python/docs/tsurugi_dbapi/"
+Documentation = "https://tsurugi-dbapi.readthedocs.io/"
 Repository = "https://github.com/project-tsurugi/tsubakuro-rust.git"
