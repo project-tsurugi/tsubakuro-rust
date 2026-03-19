@@ -1,0 +1,25 @@
+version: 2
+
+build:
+  os: "ubuntu-22.04"
+  tools:
+    python: "3.10"
+
+  commands:
+    - |
+      set -e
+
+      wget -q https://github.com/protocolbuffers/protobuf/releases/download/v3.12.4/protoc-3.12.4-linux-x86_64.zip
+      unzip -q protoc-3.12.4-linux-x86_64.zip -d $HOME/protoc
+      export PATH="$HOME/protoc/bin:$PATH"
+      export PROTOC="$HOME/protoc/bin/protoc"
+
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      export PATH="$HOME/.cargo/bin:$PATH"
+
+      pip install uv
+
+      cd tsubakuro-rust-python
+      uv run pdoc tsurugi_dbapi --html -o $READTHEDOCS_OUTPUT/html --force
+
+      mv $READTHEDOCS_OUTPUT/html/tsurugi_dbapi/* $READTHEDOCS_OUTPUT/html/ || true
