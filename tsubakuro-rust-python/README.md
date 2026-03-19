@@ -47,7 +47,7 @@ def example():
             cursor.execute("insert into example values (1, 100, 'abc')")
             print("insert rowcount:", cursor.rowcount)
             connection.commit()
-            
+
             cursor.execute("select * from example")
             for row in cursor:
                 print("row:", row)

@@ -8,14 +8,14 @@ requires-python = ">=3.10"
 authors = [
   {name = "Project Tsurugi"},
 ]
-description = "Tsurugi Python DB-API"
-readme = "README.md"
+description = "Python DB API 2.0 (PEP 249) driver for Tsurugi"
+readme = "docs/README.md"
 license = "Apache-2.0"
 keywords = ["database", "db-api", "dbapi", "dbapi2", "pep249", "sql", "tsurugidb", "tsurugi"]
 classifiers = [
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Rust",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License",
     "Topic :: Database",
     "Topic :: Database :: Front-Ends",
 ]
