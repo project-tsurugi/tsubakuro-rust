@@ -1,6 +1,10 @@
 package com.tsurugidb.tsubakuro.rust.java.service.sql;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -31,28 +35,42 @@ class TgFfiSqlQueryResult2Test extends TgFfiTester {
     }
 
     @RepeatedTest(10)
-    void dispose() throws InterruptedException {
-        var threadList = new ArrayList<Thread>();
-        for (int i = 0; i < 50; i++) {
-            var t = new InsertThread();
-            threadList.add(t);
-        }
-        for (int i = 0; i < 4; i++) {
-            var t = new SelectThread();
-            threadList.add(t);
-        }
+    void dispose() {
+        try (var executor = Executors.newFixedThreadPool(50 + 4)) {
+            var threadList = new ArrayList<Future<Void>>();
+            for (int i = 0; i < 50; i++) {
+                var future = executor.submit(new InsertThread());
+                threadList.add(future);
+            }
+            for (int i = 0; i < 4; i++) {
+                var future = executor.submit(new SelectThread());
+                threadList.add(future);
+            }
 
-        for (var t : threadList) {
-            t.start();
-        }
-        for (var t : threadList) {
-            t.join();
+            RuntimeException re = null;
+            for (var future : threadList) {
+                try {
+                    future.get();
+                } catch (Exception e) {
+                    if (re == null) {
+                        re = new RuntimeException("TgFfiSqlQueryResult2Test.dispose() error");
+                    }
+                    re.addSuppressed(e);
+                }
+            }
+            if (re != null) {
+                throw re;
+            }
         }
     }
 
-    private class InsertThread extends Thread {
-
+    private class InsertThread implements Callable<Void> {
         @Override
+        public Void call() throws Exception {
+            run();
+            return null;
+        }
+
         public void run() {
             try (var manager = TgFfiObjectManager.create(); //
                     var context = TgFfiContext.create(manager); //
@@ -79,11 +97,16 @@ class TgFfiSqlQueryResult2Test extends TgFfiTester {
                 }
             }
         }
+
     }
 
-    private class SelectThread extends Thread {
-
+    private class SelectThread implements Callable<Void> {
         @Override
+        public Void call() throws Exception {
+            run();
+            return null;
+        }
+
         public void run() {
             try (var manager = TgFfiObjectManager.create(); //
                     var context = TgFfiContext.create(manager); //
