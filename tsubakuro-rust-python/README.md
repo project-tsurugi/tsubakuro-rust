@@ -18,6 +18,18 @@ Tsurugi Python DB-API (tsurugi-dbapi) is a Python DB API 2.0 driver for accessin
 
 ## Installation
 
+### Install from PyPI
+
+```bash
+uv add tsurugi-dbapi
+```
+
+or
+
+```bash
+uv pip install tsurugi-dbapi
+```
+
 ### Install from Local Source
 
 Since it depends on [tsubakuro-rust-core](../tsubakuro-rust-core), its build environment (e.g. `rustc`, `cargo`, `protoc`) is required.
@@ -56,6 +68,10 @@ def example():
 
 See [examples](examples) for more examples.
 
+## API documentation
+
+See https://tsurugi-dbapi.readthedocs.io/ .
+
 ## How to build
 
 Since it depends on [tsubakuro-rust-core](../tsubakuro-rust-core), its build environment (e.g. `rustc`, `cargo`, `protoc`) is required.
@@ -91,7 +107,7 @@ uv run maturin build --release
 ls target/wheels/
 ```
 
-### Generate API html
+### Generate API documentation
 
 ```bash
 cd tsubakuro-rust-python
