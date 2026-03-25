@@ -69,7 +69,7 @@ impl Connection {
                 Ok(table_names)
             }
             Err(e) => {
-                trace!("{FUNCTION_NAME} error: {:?}", e);
+                debug!("{FUNCTION_NAME} error: {:?}", e);
                 Err(to_pyerr(e))
             }
         }
@@ -106,7 +106,7 @@ impl Connection {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         };
         result
     }
@@ -142,7 +142,7 @@ impl Connection {
                     }
                 }
 
-                trace!("{FUNCTION_NAME} error: {:?}", e);
+                debug!("{FUNCTION_NAME} error: {:?}", e);
                 Err(to_pyerr(e))
             }
         }
@@ -226,7 +226,7 @@ impl Connection {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         };
         result
     }
@@ -247,7 +247,7 @@ impl Connection {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         };
         result
     }
@@ -262,7 +262,7 @@ impl Connection {
     pub fn __exit__(
         &mut self,
         _exc_type: Option<Bound<PyAny>>,
-        _exc_value: Option<Bound<PyAny>>,
+        exc_value: Option<Bound<PyAny>>,
         _traceback: Option<Bound<PyAny>>,
     ) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.__exit__()";
@@ -270,11 +270,20 @@ impl Connection {
 
         let result = self.close_internal();
 
-        match &result {
-            Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
-        };
-        result
+        match result {
+            Ok(_) => {
+                trace!("{FUNCTION_NAME} end");
+                Ok(())
+            }
+            Err(e) => {
+                debug!("{FUNCTION_NAME} error: {:?}", e);
+                if exc_value.is_none() {
+                    Err(e)
+                } else {
+                    Ok(())
+                }
+            }
+        }
     }
 
     /// Shutdown option.
@@ -298,7 +307,7 @@ impl Connection {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         };
         result
     }

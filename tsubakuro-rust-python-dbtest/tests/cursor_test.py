@@ -1,3 +1,4 @@
+import pytest
 import tsurugi_dbapi as tsurugi
 
 
@@ -35,3 +36,9 @@ def test_connection_drop(connection):
         # Verify that the cursor continues to function correctly even after cursor.connection is dropped
         cursor.execute("insert into tsubakuro_rust_python_test values (1, 100, 'abc')")
         connection.commit()
+
+
+def test_with_exception(connection):
+    with pytest.raises(Exception, match="Test exception in with block"):
+        with connection.cursor():
+            raise Exception("Test exception in with block")

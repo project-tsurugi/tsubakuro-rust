@@ -1,3 +1,4 @@
+import pytest
 import tsurugi_dbapi as tsurugi
 
 
@@ -44,3 +45,9 @@ def test_closed(connection):
         connection.rollback()
     except tsurugi.ProgrammingError as e:
         assert str(e) == "Connection is already closed"
+
+
+def test_with_exception(endpoint):
+    with pytest.raises(Exception, match="Test exception in with block"):
+        with tsurugi.connect(endpoint=endpoint, user="tsurugi", password="password"):
+            raise Exception("Test exception in with block")

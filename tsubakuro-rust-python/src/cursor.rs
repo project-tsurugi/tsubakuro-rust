@@ -133,7 +133,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
@@ -171,7 +171,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
@@ -205,7 +205,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
@@ -241,7 +241,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result.map(Some)
     }
@@ -277,7 +277,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
@@ -317,7 +317,7 @@ impl Cursor {
                 return Err(PyStopIteration::new_err(()));
             }
             Err(e) => {
-                trace!("{FUNCTION_NAME} error: {:?}", e);
+                debug!("{FUNCTION_NAME} error: {:?}", e);
                 Err(e)
             }
         }
@@ -384,7 +384,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
@@ -425,7 +425,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
@@ -497,7 +497,7 @@ impl Cursor {
                 Err(PyStopIteration::new_err(()))
             }
             Err(e) => {
-                trace!("{FUNCTION_NAME} error: {:?}", e);
+                debug!("{FUNCTION_NAME} error: {:?}", e);
                 Err(e)
             }
         }
@@ -513,7 +513,7 @@ impl Cursor {
     pub fn __exit__(
         &mut self,
         _exc_type: Option<Bound<PyAny>>,
-        _exc_value: Option<Bound<PyAny>>,
+        exc_value: Option<Bound<PyAny>>,
         _traceback: Option<Bound<PyAny>>,
     ) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Cursor.__exit__()";
@@ -521,11 +521,20 @@ impl Cursor {
 
         let result = self.close_internal();
 
-        match &result {
-            Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+        match result {
+            Ok(_) => {
+                trace!("{FUNCTION_NAME} end");
+                Ok(())
+            }
+            Err(e) => {
+                debug!("{FUNCTION_NAME} error: {:?}", e);
+                if exc_value.is_none() {
+                    Err(e)
+                } else {
+                    Ok(())
+                }
+            }
         }
-        result
     }
 
     /// Closes the current result set and clears cached prepared statements.
@@ -537,7 +546,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
@@ -551,7 +560,7 @@ impl Cursor {
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
-            Err(e) => trace!("{FUNCTION_NAME} error: {:?}", e),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
     }
