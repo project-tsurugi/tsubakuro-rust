@@ -70,6 +70,11 @@ impl InnerConnection {
         config.transaction_option = Some(option);
     }
 
+    pub(crate) fn has_transaction(&self) -> bool {
+        let transaction = self.transaction.lock().unwrap();
+        transaction.is_some()
+    }
+
     pub(crate) fn get_transaction(&self) -> Result<Arc<Transaction>, TgError> {
         const FUNCTION_NAME: &str = "get_transaction()";
 

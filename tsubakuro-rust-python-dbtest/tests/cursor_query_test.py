@@ -1,3 +1,4 @@
+import tsurugi_dbapi as tsurugi
 from tsurugi_dbapi import ProgrammingError
 
 
@@ -273,3 +274,18 @@ def test_closed(connection):
                 pass
         except ProgrammingError as e:
             assert str(e) == "Cursor is already closed"
+
+
+def test_cursor_close_after_commit(connection):
+    drop_and_create_table(connection)
+
+    # tsurugi.env_logger_init("tsubakuro_rust_python=trace")
+
+    for _ in range(100):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("select * from tsubakuro_rust_python_test order by foo")
+                # do not fetch
+                connection.commit()
+        except tsurugi.error.RestrictedOperationException:
+            pass

@@ -612,7 +612,9 @@ impl Cursor {
                 if let Some(qr) = self.query_result.as_mut() {
                     if let Err(e) = qr.close().await {
                         debug!("Cursor query_result close error: {:?}", e);
-                        err = Some(e);
+                        if connection.has_transaction() {
+                            err = Some(e);
+                        }
                     }
                 }
 
