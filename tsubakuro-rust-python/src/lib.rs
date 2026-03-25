@@ -84,12 +84,35 @@ mod _tsubakuro_rust_python {
     ///
     /// Note:
     ///     - `tsubakuro_rust_python` is the name of an internal module.
-    ///     - Calls to `env_logger_init` other than the first one are ignored.
+    ///     - Any calls to `env_logger_init` or `logging_init` other than the first one are ignored.
     #[gen_stub_pyfunction(module = "tsurugi_dbapi")]
     #[pyfunction]
     #[pyo3(signature = (filters="tsubakuro_rust_python=info", file_path=None))]
     fn env_logger_init(filters: &str, file_path: Option<String>) {
         crate::logger::env_logger_init(filters, file_path);
+    }
+
+    /// Initialize logging.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     import logging
+    ///     import tsurugi_dbapi as tsurugi
+    ///
+    ///     logging.basicConfig()
+    ///     logger = logging.getLogger("_tsubakuro_rust_python")
+    ///     logger.setLevel(5)  # TRACE
+    ///
+    ///     tsurugi.logging_init()
+    ///     ```
+    ///
+    /// Note:
+    ///     - `_tsubakuro_rust_python` is the name of an internal module.
+    ///     - Any calls to `env_logger_init` or `logging_init` other than the first one are ignored.
+    #[gen_stub_pyfunction(module = "tsurugi_dbapi")]
+    #[pyfunction]
+    fn logging_init(py: Python) {
+        crate::logger::logging_init(py);
     }
 
     /// Constructor for creating a connection to the Tsurugi.

@@ -33,7 +33,11 @@ type_codeは、テーブル定義（Connectionの `get_table_metadata` メソッ
 また、Tsurugi Python DB-APIではtype_codeと同名のラッパークラスを用意しています。  
 ラッパークラスは、パラメーター付きの `execute` や`executemany`  メソッドを呼ぶ際に、パラメーターの厳密な型を指定するために利用できます。
 
-（ラッパークラスの利用例は [usage_ja.md](usage_ja.md) を参照してください）
+> [!NOTE]
+>
+> ラッパークラスの一覧は [APIドキュメントのtype_code](https://tsurugi-dbapi.readthedocs.io/latest/type_code/index.html) を参照してください。
+>
+> ラッパークラスの利用例は [usage_ja.md](usage_ja.md) を参照してください。
 
 ## TIME, TIMESTAMPの小数秒精度
 

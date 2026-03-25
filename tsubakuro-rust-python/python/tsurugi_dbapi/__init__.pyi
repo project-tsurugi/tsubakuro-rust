@@ -31,6 +31,7 @@ __all__ = [
     "connect",
     "env_logger_init",
     "error",
+    "logging_init",
     "type_code",
 ]
 
@@ -464,7 +465,7 @@ class Connection:
         r"""
         Enter the runtime context related to this object.
         """
-    def __exit__(self, _exc_type: typing.Optional[typing.Any], _exc_value: typing.Optional[typing.Any], _traceback: typing.Optional[typing.Any]) -> None:
+    def __exit__(self, _exc_type: typing.Optional[typing.Any], exc_value: typing.Optional[typing.Any], _traceback: typing.Optional[typing.Any]) -> None:
         r"""
         Exit the runtime context related to this object.
         """
@@ -696,7 +697,7 @@ class Cursor:
         r"""
         Enter the runtime context related to this object.
         """
-    def __exit__(self, _exc_type: typing.Optional[typing.Any], _exc_value: typing.Optional[typing.Any], _traceback: typing.Optional[typing.Any]) -> None:
+    def __exit__(self, _exc_type: typing.Optional[typing.Any], exc_value: typing.Optional[typing.Any], _traceback: typing.Optional[typing.Any]) -> None:
         r"""
         Exit the runtime context related to this object.
         """
@@ -1222,6 +1223,27 @@ def env_logger_init(filters: builtins.str = 'tsubakuro_rust_python=info', file_p
     
     Note:
         - `tsubakuro_rust_python` is the name of an internal module.
-        - Calls to `env_logger_init` other than the first one are ignored.
+        - Any calls to `env_logger_init` or `logging_init` other than the first one are ignored.
+    """
+
+def logging_init() -> None:
+    r"""
+    Initialize logging.
+    
+    Examples:
+        ```python
+        import logging
+        import tsurugi_dbapi as tsurugi
+    
+        logging.basicConfig()
+        logger = logging.getLogger("_tsubakuro_rust_python")
+        logger.setLevel(5)  # TRACE
+    
+        tsurugi.logging_init()
+        ```
+    
+    Note:
+        - `_tsubakuro_rust_python` is the name of an internal module.
+        - Any calls to `env_logger_init` or `logging_init` other than the first one are ignored.
     """
 
