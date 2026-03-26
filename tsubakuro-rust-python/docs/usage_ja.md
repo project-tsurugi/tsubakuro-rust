@@ -366,3 +366,34 @@ import tsurugi_dbapi as tsurugi
 > [!NOTE]
 >
 > `env_logger_init` 関数でログ出力対象モジュールを指定する際は、`tsubakuro_rust_python` または `_tsubakuro_rust_python` のどちらで指定しても構いません。
+
+## マルチプロセッシング
+
+Pythonはマルチプロセッシングによって複数のプロセスを生成し、処理を並列に実行することができます。
+
+tsurugi-dbapiでは、以下に挙げたクラスおよび列挙型のオブジェクトはプロセス間で受け渡すことができます。
+
+- Config
+- TransactionOption, TransactionType
+- CommitOption, CommitType
+- ShutdownOption, ShutdownType
+
+> [!NOTE]
+>
+> Pythonのmultiprocessingパッケージでは、生成先プロセスにオブジェクトを渡すために、pickleによってオブジェクトをシリアライズ・デシリアライズします。
+>
+> tsurugi-dbapiでは、上記のクラスおよび列挙型のみがpickleに対応しています。
+
+マルチプロセッシングの例は [multiprocessing_example.py](../examples/multiprocessing_example.py) を参照してください。
+
+> [!TIP]
+>
+> tsurugi-dbapiではログ出力の初期化関数を呼ばないとログが出力されませんが、マルチプロセッシングにおいては、初期化関数を呼ぶ箇所について注意が必要です。
+>
+> Pythonのmultiprocessingパッケージにはforkとspawnという方式があります。（Windowsはspawnのみ、Linuxのデフォルトはfork）
+>
+> forkの場合、生成元プロセスでログ出力初期化関数を呼んでおけば、生成先プロセスでもログが出力されます。
+>
+> spawnの場合、各プロセスでログ出力初期化関数を呼ばないと、そのプロセスのログは出力されません。
+>
+> なお、プロセス内でログ出力初期化関数を複数回呼ぶと2回目以降の呼び出しは無視されますので、forkの場合に生成先プロセスでログ出力初期化関数を呼んでもエラーにはなりません。

@@ -23,5 +23,7 @@ pyo3 = { version = "0.27.2", features = ["abi3-py310", "rust_decimal", "chrono"]
 pyo3-log = "0.13.3"
 pyo3-stub-gen = { version = "0.18.0", features = ["rust_decimal"] }
 rust_decimal = { version = "1.36.0" }
+serde = { version = "1.0.228", features = ["derive"] }
+serde-pickle = "1.2.0"
 tokio = { version = "1.43.1" }
 tsubakuro-rust-core = { path = "../tsubakuro-rust-core", default-features = false, features = ["with_rust_decimal", "with_chrono"] }

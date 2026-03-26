@@ -1,7 +1,16 @@
-use std::time::Duration;
+use std::{
+    hash::{DefaultHasher, Hash, Hasher},
+    time::Duration,
+};
 
-use pyo3::{prelude::*, types::PyType};
+use log::warn;
+use pyo3::{
+    exceptions::PyRuntimeError,
+    prelude::*,
+    types::{PyTuple, PyType},
+};
 use pyo3_stub_gen::derive::*;
+use serde::{Deserialize, Serialize};
 use tsubakuro_rust_core::prelude::{
     TransactionOption as CoreTransactionOption, TransactionOptionSetter,
     TransactionType as CoreTransactionType,
@@ -15,7 +24,7 @@ use tsubakuro_rust_core::prelude::{
 ///     RTX: Read-only transaction (RTX).
 #[gen_stub_pyclass_enum]
 #[pyclass(module = "tsurugi_dbapi")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TransactionType {
     /// Optimistic concurrency control (OCC) transaction.
@@ -34,6 +43,25 @@ impl TransactionType {
 
     pub fn __hash__(&self) -> isize {
         *self as isize
+    }
+
+    pub fn __reduce__<'py>(&self, py: Python<'py>) -> PyResult<(Bound<'py, PyAny>, (i32,))> {
+        let callable = py.get_type::<TransactionType>().getattr("_from_value")?;
+        let args = (*self as i32,);
+        Ok((callable, args))
+    }
+
+    #[staticmethod]
+    pub fn _from_value(value: i32) -> Self {
+        match value {
+            1 => TransactionType::OCC,
+            2 => TransactionType::LTX,
+            3 => TransactionType::RTX,
+            _ => {
+                warn!("TransactionType._from_value(): unknown value {}", value);
+                TransactionType::OCC
+            }
+        }
     }
 }
 
@@ -84,7 +112,7 @@ impl TransactionType {
 ///     ```
 #[gen_stub_pyclass]
 #[pyclass(module = "tsurugi_dbapi")]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct TransactionOption {
     /// Transaction type.
     #[pyo3(get, set)]
@@ -251,6 +279,38 @@ impl TransactionOption {
         option.label = label;
         option.scan_parallel = scan_parallel;
         option
+    }
+
+    pub fn __eq__(&self, other: &TransactionOption) -> bool {
+        self == other
+    }
+
+    pub fn __hash__(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+
+    pub fn __reduce__<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> PyResult<(Bound<'py, PyType>, Bound<'py, PyTuple>, Vec<u8>)> {
+        let cls = py.get_type::<TransactionOption>();
+        let args = PyTuple::empty(py);
+        let state = self.__getstate__()?;
+        Ok((cls, args, state))
+    }
+
+    pub fn __getstate__(&self) -> PyResult<Vec<u8>> {
+        serde_pickle::to_vec(self, Default::default())
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+
+    pub fn __setstate__(&mut self, state: Vec<u8>) -> PyResult<()> {
+        let state: TransactionOption = serde_pickle::from_slice(&state, Default::default())
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        *self = state;
+        Ok(())
     }
 }
 

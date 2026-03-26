@@ -1,8 +1,12 @@
-use std::time::Duration;
+use std::{
+    hash::{DefaultHasher, Hash, Hasher},
+    time::Duration,
+};
 
 use log::debug;
-use pyo3::{prelude::*, types::*};
+use pyo3::{exceptions::PyRuntimeError, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
+use serde::{Deserialize, Serialize};
 use tsubakuro_rust_core::prelude::{
     CommitOption as CoreCommitOption, ConnectionOption, Credential,
     TransactionOption as CoreTransactionOption,
@@ -57,6 +61,7 @@ use crate::{
 ///     ```
 #[gen_stub_pyclass]
 #[pyclass(module = "tsurugi_dbapi")]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Config {
     /// Application name.
     #[pyo3(get, set)]
@@ -181,6 +186,38 @@ impl Config {
         if let Some(default_timeout) = &other.default_timeout {
             self.default_timeout = Some(*default_timeout);
         }
+    }
+
+    pub fn __eq__(&self, other: &Config) -> bool {
+        self == other
+    }
+
+    pub fn __hash__(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+
+    pub fn __reduce__<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> PyResult<(Bound<'py, PyType>, Bound<'py, PyTuple>, Vec<u8>)> {
+        let cls = py.get_type::<Config>();
+        let args = PyTuple::empty(py);
+        let state = self.__getstate__()?;
+        Ok((cls, args, state))
+    }
+
+    pub fn __getstate__(&self) -> PyResult<Vec<u8>> {
+        serde_pickle::to_vec(self, Default::default())
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+
+    pub fn __setstate__(&mut self, state: Vec<u8>) -> PyResult<()> {
+        let state: Config = serde_pickle::from_slice(&state, Default::default())
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        *self = state;
+        Ok(())
     }
 
     pub fn __repr__(&self) -> String {
