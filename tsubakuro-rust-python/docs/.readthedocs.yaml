@@ -19,7 +19,21 @@ build:
 
       pip install uv
 
-      cd tsubakuro-rust-python
-      uv run pdoc tsurugi_dbapi --html -o $READTHEDOCS_OUTPUT/html --force
+      # Local command examples:
+      # cd /path/to/tsubakuro-rust-python
+      # rm -rf docs/api && mkdir -p docs/api
+      # uv run pdoc tsurugi_dbapi --html -o docs/api --force
+      # mv docs/api/tsurugi_dbapi/* docs/api/ && rmdir docs/api/tsurugi_dbapi
+      # uv run mkdocs serve -f docs/mkdocs.yml
+      # browse: http://127.0.0.1:8000/
 
-      mv $READTHEDOCS_OUTPUT/html/tsurugi_dbapi/* $READTHEDOCS_OUTPUT/html/ || true
+      cd tsubakuro-rust-python
+      rm -rf docs/api && mkdir -p docs/api
+      uv run pdoc tsurugi_dbapi --html -o docs/api --force
+      mv docs/api/tsurugi_dbapi/* docs/api/ || true
+      rmdir docs/api/tsurugi_dbapi || true
+
+      uv run mkdocs build \
+        -f docs/mkdocs.yml \
+        --site-dir "$READTHEDOCS_OUTPUT/html" \
+        --clean

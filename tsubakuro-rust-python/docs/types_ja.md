@@ -35,7 +35,7 @@ type_codeは、テーブル定義（Connectionの `get_table_metadata` メソッ
 
 > [!NOTE]
 >
-> ラッパークラスの一覧は [APIドキュメントのtype_code](https://tsurugi-dbapi.readthedocs.io/latest/type_code/index.html) を参照してください。
+> ラッパークラスの一覧は [APIドキュメントのtype_code](https://tsurugi-dbapi.readthedocs.io/latest/api/type_code/index.html) を参照してください。
 >
 > ラッパークラスの利用例は [usage_ja.md](usage_ja.md) を参照してください。
 
