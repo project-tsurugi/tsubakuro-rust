@@ -1,0 +1,41 @@
+site_name: Tsurugi Python DB-API
+site_description: Documentation for the Tsurugi Python DB-API driver
+site_url: https://tsurugi-dbapi.readthedocs.io/
+repo_url: https://github.com/project-tsurugi/tsubakuro-rust/tree/master/tsubakuro-rust-python
+repo_name: project-tsurugi/tsubakuro-rust
+
+docs_dir: .
+site_dir: ../site
+use_directory_urls: true
+
+theme:
+  name: material
+  features:
+    - navigation.expand
+
+plugins:
+  search:
+    lang: 'ja'
+
+hooks:
+  - mkdocs_github_alerts.py
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: README.md
+  - API Reference: api/index.html
+  - ユーザガイド（ja）:
+      - 使用方法: usage_ja.md
+      - データ型: types_ja.md
+
+exclude_docs: |
+  internal/
