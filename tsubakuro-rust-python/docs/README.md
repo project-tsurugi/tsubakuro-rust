@@ -4,7 +4,7 @@ Tsurugi Python DB-API (tsurugi-dbapi) is a Python DB API 2.0 driver for accessin
 
 ## Target
 
-- Tsurugi 1.9.0 or later
+- Tsurugi 1.10.0 or later
 - Python 3.10 or later
 - Python DB API 2.0 (PEP 249)
 
