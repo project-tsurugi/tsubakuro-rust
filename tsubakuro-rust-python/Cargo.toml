@@ -7,7 +7,7 @@ authors = ["Project Tsurugi <https://github.com/project-tsurugi/tsurugidb>"]
 keywords = ["database", "tsurugidb", "sql"]
 categories = ["database"]
 license = "Apache-2.0"
-version = "0.9.0"
+version = "0.10.0"
 edition = "2021"
 rust-version = "1.84.1"
 
