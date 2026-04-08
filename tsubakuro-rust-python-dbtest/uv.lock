@@ -309,7 +309,10 @@ source = { directory = "../tsubakuro-rust-python" }
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mkdocs", specifier = ">=1.6.1" },
+    { name = "mkdocs-material", specifier = ">=9.6.20" },
     { name = "pdoc3", specifier = ">=0.11.6" },
+    { name = "pymdown-extensions", specifier = ">=10.15" },
     { name = "pytest", specifier = ">=9.0.2" },
 ]
 

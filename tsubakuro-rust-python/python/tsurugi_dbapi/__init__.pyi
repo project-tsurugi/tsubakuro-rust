@@ -437,7 +437,7 @@ class Connection:
             metadata = connection.find_table_metadata("my_table")
             ```
         """
-    def cursor(self, py_self: Connection) -> Cursor:
+    def cursor(self) -> Cursor:
         r"""
         Create a new cursor object using the connection.
         

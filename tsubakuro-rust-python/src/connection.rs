@@ -158,6 +158,7 @@ impl Connection {
     ///     with connection.cursor() as cursor:
     ///        pass
     ///     ```
+    #[pyo3(signature = ())]
     pub fn cursor(py_self: Py<Self>, py: Python) -> PyResult<Cursor> {
         const FUNCTION_NAME: &str = "Connection.cursor()";
         trace!("{FUNCTION_NAME} start");
