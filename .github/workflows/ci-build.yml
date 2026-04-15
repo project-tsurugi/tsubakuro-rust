@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Apt_Install
         run: |
@@ -132,7 +132,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Apt_Install
         run: |
@@ -142,7 +142,7 @@ jobs:
           fi
 
       - name: Install_uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8.0.0
 
       - name: Test_Python
         run: |
@@ -217,7 +217,7 @@ jobs:
       #     working-directory: tsubakuro-rust-python
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: wheels-tsurugi-dbapi-linux-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
@@ -272,7 +272,7 @@ jobs:
       #     working-directory: tsubakuro-rust-python
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: wheels-tsurugi-dbapi-musllinux-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
@@ -333,7 +333,7 @@ jobs:
       #     working-directory: tsubakuro-rust-python
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: wheels-tsurugi-dbapi-windows-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
@@ -383,7 +383,7 @@ jobs:
       #     working-directory: tsubakuro-rust-python
 
       - name: Upload wheels
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: wheels-tsurugi-dbapi-macos-${{ matrix.platform.target }}
           path: tsubakuro-rust-python/dist
@@ -413,7 +413,7 @@ jobs:
           working-directory: tsubakuro-rust-python
 
       - name: Upload sdist
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: wheels-tsurugi-dbapi-sdist
           path: tsubakuro-rust-python/dist
@@ -430,15 +430,15 @@ jobs:
       # Used to generate artifact attestation
       attestations: write
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
 
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest@v4
         with:
           subject-path: 'wheels-*/*'
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8.0.0
 
       - name: Publish to TestPyPI
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
@@ -465,7 +465,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install_Protobuf
         run: |
@@ -499,13 +499,13 @@ jobs:
           cargo clippy
 
       - name: Upload_DLL
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tsubakuro_rust_odbc.dll
           path: tsubakuro-rust-odbc/target/release/tsubakuro_rust_odbc.dll
 
       - name: Upload_Installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tsurugi_odbc_driver_installer.exe
           path: tsubakuro-rust-odbc/installer/Output/tsurugi_odbc_driver_installer.exe
