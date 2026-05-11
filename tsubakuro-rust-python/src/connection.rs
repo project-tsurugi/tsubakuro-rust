@@ -330,7 +330,7 @@ impl Connection {
 
         let config = Self::create_config(args, kwargs)?;
 
-        let runtime = tokio::runtime::Builder::new_current_thread()
+        let runtime = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()
             .unwrap();
