@@ -38,6 +38,7 @@ pub use crate::service::system::*;
 pub use crate::service::*;
 pub use crate::session::credential::*;
 pub use crate::session::endpoint::*;
+pub use crate::session::lob_transfer_type::*;
 pub use crate::session::option::*;
 pub use crate::session::wire::wire::WireClient;
 pub use crate::session::Session;

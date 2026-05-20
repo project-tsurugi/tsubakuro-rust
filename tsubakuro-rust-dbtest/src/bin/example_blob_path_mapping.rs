@@ -140,6 +140,7 @@ async fn example_blob_insert(client: &SqlClient, transaction: &Transaction) -> R
 }
 
 /// execute BLOB insert example
+#[allow(deprecated)]
 async fn example_blob_insert_execute(
     client: &SqlClient,
     transaction: &Transaction,

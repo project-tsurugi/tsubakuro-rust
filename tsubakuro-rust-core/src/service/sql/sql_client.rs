@@ -1,18 +1,26 @@
-use std::{collections::HashMap, io::Read, path::Path, sync::Arc, time::Duration};
+use std::{
+    collections::HashMap,
+    io::Read,
+    path::Path,
+    sync::{atomic::AtomicI64, Arc},
+    time::Duration,
+};
 
 use log::trace;
 
 use crate::{
+    client_error,
     error::TgError,
     invalid_response_error, io_error,
     job::Job,
     jogasaki::proto::sql::{
         common::Transaction as ProtoTransaction,
-        request::{request::Request as SqlCommand, Request as SqlRequest},
+        request::{
+            request::Request as SqlCommand, ClientOnlyLargeObjectInfo, Request as SqlRequest,
+        },
         response::{response::Response as SqlResponseType, Response as SqlResponse},
     },
     prelude::{
-        convert_lob_parameters,
         error_info::{transaction_error_info_processor, TransactionErrorInfo},
         execute_result_processor,
         explain::explain_processor,
@@ -26,7 +34,11 @@ use crate::{
         TgBlobReference, TgClobReference, TransactionStatusWithMessage,
     },
     prost_decode_error,
-    service::ServiceMessageVersion,
+    service::{
+        lob::lob_client::{create_lob_client, LobClient, RemoteLob},
+        sql::r#type::{blob::TgBlob, clob::TgClob},
+        ServiceMessageVersion,
+    },
     session::{
         wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
         Session,
@@ -95,6 +107,7 @@ pub(crate) const SERVICE_ID_SQL: i32 = 3;
 /// ```
 pub struct SqlClient {
     session: Arc<Session>,
+    lob_client: tokio::sync::OnceCell<Box<dyn LobClient>>,
     default_timeout: Duration,
 }
 
@@ -103,6 +116,7 @@ impl ServiceClient for SqlClient {
         let default_timeout = session.default_timeout();
         SqlClient {
             session,
+            lob_client: tokio::sync::OnceCell::new(),
             default_timeout,
         }
     }
@@ -118,6 +132,12 @@ impl ServiceMessageVersion for SqlClient {
 }
 
 impl SqlClient {
+    async fn get_lob_client(&self) -> Result<&Box<dyn LobClient + 'static>, TgError> {
+        self.lob_client
+            .get_or_try_init(|| create_lob_client(&self.session))
+            .await
+    }
+
     /// Set default timeout.
     pub fn set_default_timeout(&mut self, timeout: Duration) {
         self.default_timeout = timeout;
@@ -492,8 +512,7 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "prepared_explain()";
         trace!("{} start", FUNCTION_NAME);
 
-        let (parameters, lobs) =
-            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
+        let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
         let command = Self::explain_prepared_command(prepared_statement, parameters);
         let (slot_handle, response) = self.send_and_pull_response(command, lobs, timeout).await?;
         let explain_result = explain_processor(slot_handle, response)?;
@@ -511,8 +530,8 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "prepared_explain_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let (parameters, lobs) =
-            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
+        let timeout = self.default_timeout;
+        let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
         let command = Self::explain_prepared_command(prepared_statement, parameters);
         let job = self
             .send_and_pull_async("Explain", command, lobs, Box::new(explain_processor))
@@ -892,8 +911,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) =
-            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
+        let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
 
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
@@ -915,8 +933,8 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) =
-            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
+        let timeout = self.default_timeout;
+        let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
 
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
@@ -1092,8 +1110,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) =
-            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
+        let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
 
         let command =
             Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
@@ -1118,8 +1135,8 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let tx_handle = transaction.transaction_handle()?;
-        let (parameters, lobs) =
-            convert_lob_parameters(parameters, self.session.large_object_path_mapping_on_send())?;
+        let timeout = self.default_timeout;
+        let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
 
         let command =
             Self::execute_prepared_query_command(tx_handle, prepared_statement, parameters);
@@ -1155,6 +1172,64 @@ impl SqlClient {
             parameters,
         };
         SqlCommand::ExecutePreparedQuery(request)
+    }
+
+    pub async fn upload_blob_file_for<T: AsRef<Path>>(
+        &self,
+        path: T,
+        timeout: Duration,
+    ) -> Result<TgBlob, TgError> {
+        const FUNCTION_NAME: &str = "upload_blob_file()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let lob_client = self.get_lob_client().await?;
+        let lob = lob_client.upload_lob_file(path.as_ref(), timeout).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(TgBlob::RemoteLob(lob))
+    }
+
+    pub async fn upload_blob_for(
+        &self,
+        value: &[u8],
+        timeout: Duration,
+    ) -> Result<TgBlob, TgError> {
+        const FUNCTION_NAME: &str = "upload_blob()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let lob_client = self.get_lob_client().await?;
+        let lob = lob_client.upload_lob(value, timeout).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(TgBlob::RemoteLob(lob))
+    }
+
+    pub async fn upload_clob_file_for<T: AsRef<Path>>(
+        &self,
+        path: T,
+        timeout: Duration,
+    ) -> Result<TgClob, TgError> {
+        const FUNCTION_NAME: &str = "upload_clob_file()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let lob_client = self.get_lob_client().await?;
+        let lob = lob_client.upload_lob_file(path.as_ref(), timeout).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(TgClob::RemoteLob(lob))
+    }
+
+    pub async fn upload_clob_for(&self, value: &str, timeout: Duration) -> Result<TgClob, TgError> {
+        const FUNCTION_NAME: &str = "upload_clob()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let value = value.as_bytes();
+
+        let lob_client = self.get_lob_client().await?;
+        let lob = lob_client.upload_lob(value, timeout).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(TgClob::RemoteLob(lob))
     }
 
     /// Open BLOB file.
@@ -1996,6 +2071,121 @@ impl SqlClient {
             transaction_handle: Some(*transaction_handle),
         };
         SqlCommand::DisposeTransaction(request)
+    }
+}
+
+static BLOB_NUMBER: AtomicI64 = AtomicI64::new(0);
+static CLOB_NUMBER: AtomicI64 = AtomicI64::new(0);
+
+impl SqlClient {
+    async fn convert_lob_parameters(
+        &self,
+        parameters: Vec<SqlParameter>,
+        timeout: Duration,
+    ) -> Result<(Vec<SqlParameter>, Option<Vec<BlobInfo>>), TgError> {
+        use crate::jogasaki::proto::sql::common::blob::Data as BlobData;
+        use crate::jogasaki::proto::sql::common::clob::Data as ClobData;
+        use crate::jogasaki::proto::sql::common::Blob;
+        use crate::jogasaki::proto::sql::common::Clob;
+        use crate::jogasaki::proto::sql::request::parameter::Value;
+
+        let mut parameters_result = Vec::with_capacity(parameters.len());
+        let mut lobs = Vec::new();
+        for parameter in parameters {
+            let parameter = match parameter {
+                SqlParameter {
+                    placement,
+                    value: Some(Value::LargeObjectInfoBlob(data)),
+                } => {
+                    let channel_name = Self::create_channel_name("Blob", &BLOB_NUMBER);
+                    let lob_info = self
+                        .create_lob_info(channel_name.clone(), data, timeout)
+                        .await?;
+                    lobs.push(lob_info);
+
+                    let data = BlobData::ChannelName(channel_name);
+                    let value = Blob { data: Some(data) };
+                    let value = Value::Blob(value);
+                    SqlParameter {
+                        placement,
+                        value: Some(value),
+                    }
+                }
+                SqlParameter {
+                    placement,
+                    value: Some(Value::LargeObjectInfoClob(data)),
+                } => {
+                    let channel_name = Self::create_channel_name("Clob", &CLOB_NUMBER);
+                    let lob_info = self
+                        .create_lob_info(channel_name.clone(), data, timeout)
+                        .await?;
+                    lobs.push(lob_info);
+
+                    let data = ClobData::ChannelName(channel_name);
+                    let value = Clob { data: Some(data) };
+                    let value = Value::Clob(value);
+                    SqlParameter {
+                        placement,
+                        value: Some(value),
+                    }
+                }
+                parameter => parameter,
+            };
+            parameters_result.push(parameter);
+        }
+
+        if lobs.is_empty() {
+            Ok((parameters_result, None))
+        } else {
+            Ok((parameters_result, Some(lobs)))
+        }
+    }
+
+    fn create_channel_name(prefix: &str, number: &AtomicI64) -> String {
+        let pid = std::process::id();
+        let n = number.fetch_add(1, std::sync::atomic::Ordering::SeqCst) + 1;
+        format!("Rust{prefix}Channel-{pid}-{n}")
+    }
+
+    async fn create_lob_info(
+        &self,
+        channel_name: String,
+        info: ClientOnlyLargeObjectInfo,
+        timeout: Duration,
+    ) -> Result<BlobInfo, TgError> {
+        use crate::jogasaki::proto::sql::request::client_only_large_object_info::Data;
+        use crate::tateyama::proto::framework::common::blob_info::BlobLocation;
+        use crate::tateyama::proto::framework::common::BlobRelayReference;
+
+        let lob_location = match info.data {
+            Some(Data::ClientPath(path)) => {
+                let client_path = Path::new(&path);
+                let lob_client = self.get_lob_client().await?;
+                let lob = lob_client.upload_lob_file(client_path, timeout).await?;
+                match lob {
+                    RemoteLob::ServerPath(path) => BlobLocation::Path(path),
+                    RemoteLob::RelayLobReference(lob_ref) => {
+                        BlobLocation::Blob(BlobRelayReference {
+                            storage_id: lob_ref.storage_id,
+                            object_id: lob_ref.object_id,
+                            tag: lob_ref.tag,
+                        })
+                    }
+                }
+            }
+            Some(Data::ServerPath(path)) => BlobLocation::Path(path),
+            Some(Data::BlobRelayReference(lob_ref)) => BlobLocation::Blob(BlobRelayReference {
+                storage_id: lob_ref.storage_id,
+                object_id: lob_ref.object_id,
+                tag: lob_ref.tag,
+            }),
+            None => return Err(client_error!("Large object info data is None")),
+        };
+        Ok(BlobInfo {
+            channel_name,
+            temporary: false,
+            blob_location: Some(lob_location),
+        })
     }
 }
 

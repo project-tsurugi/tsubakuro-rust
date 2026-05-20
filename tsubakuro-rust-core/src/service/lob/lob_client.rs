@@ -1,0 +1,66 @@
+use std::{path::Path, time::Duration};
+
+use tonic::async_trait;
+
+use crate::{
+    data_relay_grpc::proto::blob_relay::blob_reference::BlobReference as RelayLobReference,
+    error::TgError,
+    io_error,
+    service::lob::{
+        lob_transfer_info::LobTransferInfo, privileged::client::PrivilegedLobClient,
+        relay::client::RelayLobClient,
+    },
+    session::Session,
+};
+
+/// Uploaded large object.
+///
+/// since 0.10.0
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RemoteLob {
+    ServerPath(String),
+    RelayLobReference(RelayLobReference),
+}
+
+/// Large object client.
+///
+/// since 0.10.0
+#[async_trait]
+pub(crate) trait LobClient {
+    async fn upload_lob_file(&self, path: &Path, timeout: Duration) -> Result<RemoteLob, TgError>;
+
+    async fn upload_lob(&self, value: &[u8], timeout: Duration) -> Result<RemoteLob, TgError>;
+}
+
+pub(crate) async fn create_lob_client(session: &Session) -> Result<Box<dyn LobClient>, TgError> {
+    let lob_transfer_info = session.lob_transfer_info();
+    let lob_client: Box<dyn LobClient> = match lob_transfer_info {
+        LobTransferInfo::NotUse => Box::new(NotUseLobClient::new()),
+        LobTransferInfo::Privileged => Box::new(PrivilegedLobClient::new(session)),
+        LobTransferInfo::Relay(info) => Box::new(RelayLobClient::new(info).await?),
+    };
+    Ok(lob_client)
+}
+
+pub(crate) struct NotUseLobClient {}
+
+impl NotUseLobClient {
+    pub(crate) fn new() -> NotUseLobClient {
+        NotUseLobClient {}
+    }
+}
+
+#[async_trait]
+impl LobClient for NotUseLobClient {
+    async fn upload_lob_file(
+        &self,
+        _path: &Path,
+        _timeout: Duration,
+    ) -> Result<RemoteLob, TgError> {
+        Err(io_error!("LOB transfer is not available"))
+    }
+
+    async fn upload_lob(&self, _value: &[u8], _timeout: Duration) -> Result<RemoteLob, TgError> {
+        Err(io_error!("LOB transfer is not available"))
+    }
+}

@@ -9,11 +9,11 @@ use crate::{
     invalid_response_error,
     job::Job,
     prost_decode_error,
-    service::ServiceMessageVersion,
+    service::{lob::lob_transfer_info::LobTransferInfo, ServiceMessageVersion},
     session::wire::{response::WireResponse, Wire},
     tateyama::proto::endpoint::request::{
-        request::Command as EndpointCommand, ClientInformation, Request as EndpointRequest,
-        WireInformation,
+        request::Command as EndpointCommand, BlobTransferMedium, ClientInformation,
+        Request as EndpointRequest, WireInformation,
     },
 };
 
@@ -24,7 +24,7 @@ pub(crate) const SERVICE_ID_ENDPOINT_BROKER: i32 = 1;
 const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
 
 /// The minor service message version for EndpointRequest.
-const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
+const ENDPOINT_BROKER_SERVICE_MESSAGE_VERSION_MINOR: u64 = 2;
 
 /// Client of endpoint broker service.
 pub struct EndpointBrokerClient;
@@ -71,13 +71,15 @@ impl EndpointBroker {
     pub(crate) async fn handshake(
         wire: &Arc<Wire>,
         client_information: ClientInformation,
+        blob_transfer_media: Vec<BlobTransferMedium>,
         wire_information: WireInformation,
         timeout: Duration,
     ) -> Result<HandshakeResult, TgError> {
         const FUNCTION_NAME: &str = "handshake()";
         trace!("{} start", FUNCTION_NAME);
 
-        let command = Self::handshake_command(client_information, wire_information);
+        let command =
+            Self::handshake_command(client_information, blob_transfer_media, wire_information);
         let request = Self::new_request(command);
 
         let (_, response) = wire
@@ -92,6 +94,7 @@ impl EndpointBroker {
     pub(crate) async fn handshake_async<F, T: 'static>(
         wire: &Arc<Wire>,
         client_information: ClientInformation,
+        blob_transfer_media: Vec<BlobTransferMedium>,
         wire_information: WireInformation,
         converter: F,
         default_timeout: Duration,
@@ -103,7 +106,8 @@ impl EndpointBroker {
         const FUNCTION_NAME: &str = "handshake_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let command = Self::handshake_command(client_information, wire_information);
+        let command =
+            Self::handshake_command(client_information, blob_transfer_media, wire_information);
         let request = Self::new_request(command);
 
         let job = wire
@@ -127,12 +131,14 @@ impl EndpointBroker {
 
     fn handshake_command(
         client_information: ClientInformation,
+        blob_transfer_media: Vec<BlobTransferMedium>,
         wire_information: WireInformation,
     ) -> EndpointCommand {
         use crate::tateyama::proto::endpoint::request::Handshake as HandshakeRequest;
 
         let handshake = HandshakeRequest {
             client_information: Some(client_information),
+            blob_transfer_media,
             wire_information: Some(wire_information),
         };
         EndpointCommand::Handshake(handshake)
@@ -203,13 +209,15 @@ fn encryption_key_processor(wire_response: WireResponse) -> Result<Option<String
 pub(crate) struct HandshakeResult {
     session_id: i64,
     user_name: Option<String>,
+    lob_transfer_info: LobTransferInfo,
 }
 
 impl HandshakeResult {
-    fn new(session_id: i64, user_name: Option<String>) -> Self {
+    fn new(session_id: i64, user_name: Option<String>, lob_transfer_info: LobTransferInfo) -> Self {
         HandshakeResult {
             session_id,
             user_name,
+            lob_transfer_info,
         }
     }
 
@@ -217,8 +225,8 @@ impl HandshakeResult {
         self.session_id
     }
 
-    pub fn user_name(self) -> Option<String> {
-        self.user_name
+    pub fn info(self) -> (Option<String>, LobTransferInfo) {
+        (self.user_name, self.lob_transfer_info)
     }
 }
 
@@ -241,7 +249,12 @@ fn handshake_processor(wire_response: WireResponse) -> Result<HandshakeResult, T
                     Some(UserNameOpt::UserName(name)) => Some(name),
                     _ => None,
                 };
-                Ok(HandshakeResult::new(session_id, user_name))
+                let lob_transfer_info = success.blob_transfer.into();
+                Ok(HandshakeResult::new(
+                    session_id,
+                    user_name,
+                    lob_transfer_info,
+                ))
             }
             Result::Error(error) => Err(endpoint_service_error!(FUNCTION_NAME, error)),
         },

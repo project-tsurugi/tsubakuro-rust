@@ -140,3 +140,17 @@ pub(crate) mod tateyama {
         }
     }
 }
+
+#[allow(clippy::module_inception)]
+pub(crate) mod data_relay_grpc {
+    pub(crate) mod proto {
+        pub(crate) mod blob_relay {
+            pub(crate) mod blob_reference {
+                tonic::include_proto!("data_relay_grpc.proto.blob_relay.blob_reference");
+            }
+            pub(crate) mod blob_relay_streaming {
+                tonic::include_proto!("data_relay_grpc.proto.blob_relay.blob_relay_streaming");
+            }
+        }
+    }
+}

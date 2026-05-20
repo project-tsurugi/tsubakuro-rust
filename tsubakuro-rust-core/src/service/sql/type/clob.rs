@@ -1,30 +1,38 @@
-use crate::jogasaki::proto::sql::common::LargeObjectProvider;
+use crate::{
+    jogasaki::proto::sql::common::LargeObjectProvider, service::lob::lob_client::RemoteLob,
+};
 
 use super::large_object::TgLargeObjectReference;
 
 /// CLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TgClob {
-    /// CLOB with path.
+    /// CLOB with client path.
     Path(String),
     /// CLOB with bytes.
     Contents(Vec<u8>),
+    /// CLOB with uploaded lob.
+    /// since 0.10.0
+    RemoteLob(RemoteLob),
 }
 
 impl TgClob {
     /// Creates a new instance.
+    #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_clob_file instead")]
     pub fn new(path: &str) -> TgClob {
         TgClob::Path(path.to_string())
     }
 }
 
 impl From<&str> for TgClob {
+    // #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_clob instead")]
     fn from(value: &str) -> Self {
         TgClob::Contents(value.as_bytes().to_vec())
     }
 }
 
 impl From<String> for TgClob {
+    // #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_clob instead")]
     fn from(value: String) -> Self {
         TgClob::Contents(value.into_bytes())
     }

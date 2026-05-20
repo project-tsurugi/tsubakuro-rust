@@ -101,6 +101,7 @@ mod test {
                 Some(value) => {
                     file = NamedTempFile::new().unwrap();
                     file.write_all(value).unwrap();
+                    #[allow(deprecated)]
                     Some(TgBlob::new(file.path().to_str().unwrap()))
                 }
                 None => None,

@@ -1,6 +1,6 @@
 extern crate prost_build;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     prost_build::compile_protos(
         &[
             "protos/jogasaki/proto/sql/common.proto",
@@ -20,6 +20,13 @@ fn main() {
             "protos/tateyama/proto/system/response.proto",
         ],
         &["protos/"],
-    )
-    .unwrap();
+    )?;
+    tonic_prost_build::configure().compile_protos(
+        &[
+            "protos/data_relay_grpc/proto/blob_relay/blob_reference.proto",
+            "protos/data_relay_grpc/proto/blob_relay/blob_relay_streaming.proto",
+        ],
+        &["protos/"],
+    )?;
+    Ok(())
 }

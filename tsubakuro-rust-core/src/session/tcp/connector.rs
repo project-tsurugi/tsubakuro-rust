@@ -7,6 +7,7 @@ use crate::job::Job;
 use crate::prelude::{ConnectionOption, Credential};
 use crate::session::wire::DelegateWire;
 use crate::session::{wire::Wire, Session};
+use crate::tateyama::proto::endpoint::request::BlobTransferMedium;
 use crate::tateyama::proto::endpoint::request::{
     wire_information::StreamInformation, wire_information::WireInformation as WireInformationType,
     ClientInformation, Credential as ProtoCredential, WireInformation,
@@ -30,9 +31,16 @@ impl TcpConnector {
 
         let client_information =
             Self::create_client_information(&wire, connection_option, timeout).await?;
+        let blob_transfer_media = Self::create_blob_transfer_media(connection_option);
         let wire_information = Self::create_wire_information();
-        let result =
-            EndpointBroker::handshake(&wire, client_information, wire_information, timeout).await?;
+        let result = EndpointBroker::handshake(
+            &wire,
+            client_information,
+            blob_transfer_media,
+            wire_information,
+            timeout,
+        )
+        .await?;
 
         wire.initialize(result)?;
 
@@ -47,11 +55,13 @@ impl TcpConnector {
 
         let client_information =
             Self::create_client_information(&wire, connection_option, default_timeout).await?;
+        let blob_transfer_media = Self::create_blob_transfer_media(connection_option);
         let wire_information = Self::create_wire_information();
         let connection_option = connection_option.clone();
         let job = EndpointBroker::handshake_async(
             &wire.clone(),
             client_information,
+            blob_transfer_media,
             wire_information,
             move |result| {
                 wire.initialize(result)?;
@@ -91,6 +101,11 @@ impl TcpConnector {
             )
             .await?,
         })
+    }
+
+    fn create_blob_transfer_media(option: &ConnectionOption) -> Vec<BlobTransferMedium> {
+        let lob_transfer_type = option.lob_transfer_type();
+        lob_transfer_type.to_proto()
     }
 
     fn create_wire_information() -> WireInformation {

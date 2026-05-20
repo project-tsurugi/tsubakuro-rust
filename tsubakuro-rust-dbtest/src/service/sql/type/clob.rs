@@ -100,6 +100,7 @@ mod test {
                 Some(value) => {
                     file = NamedTempFile::new().unwrap();
                     write!(file, "{}", value).unwrap();
+                    #[allow(deprecated)]
                     Some(TgClob::new(file.path().to_str().unwrap()))
                 }
                 None => None,

@@ -19,6 +19,7 @@ use crate::{
         ServiceMessageVersion,
     },
     prost_decode_wire_response_error, return_err_if_timeout,
+    service::lob::lob_transfer_info::LobTransferInfo,
     session::{tcp::wire::TcpWire, wire::crypto::Crypto},
     tateyama::proto::{
         diagnostics::Record as DiagnosticsRecord,
@@ -38,7 +39,7 @@ use super::{
 };
 
 /// The major service message version for FrameworkRequest.Header.
-const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 0;
+const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 1;
 
 /// The minor service message version for FrameworkRequest.Header.
 const SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;
@@ -59,6 +60,7 @@ pub(crate) struct Wire {
     wire: DelegateWire,
     crypto: tokio::sync::Mutex<Option<Crypto>>,
     user_name: Mutex<Option<String>>,
+    lob_transfer_info: Mutex<LobTransferInfo>,
 }
 
 impl std::fmt::Debug for Wire {
@@ -73,6 +75,7 @@ impl Wire {
             wire,
             crypto: tokio::sync::Mutex::new(None),
             user_name: Mutex::new(None),
+            lob_transfer_info: Mutex::new(LobTransferInfo::NotUse),
         })
     }
 
@@ -82,7 +85,9 @@ impl Wire {
 
     pub(crate) fn initialize(&self, handshake: HandshakeResult) -> Result<(), TgError> {
         self.wire.set_session_id(handshake.session_id())?;
-        *self.user_name.lock().unwrap() = handshake.user_name();
+        let (user_name, lob_transfer_info) = handshake.info();
+        *self.user_name.lock().unwrap() = user_name;
+        *self.lob_transfer_info.lock().unwrap() = lob_transfer_info;
         Ok(())
     }
 
@@ -92,6 +97,10 @@ impl Wire {
 
     pub(crate) fn user_name(&self) -> Option<String> {
         self.user_name.lock().unwrap().clone()
+    }
+
+    pub(crate) fn lob_transfer_info(&self) -> LobTransferInfo {
+        self.lob_transfer_info.lock().unwrap().clone()
     }
 }
 
@@ -128,7 +137,7 @@ impl Wire {
 }
 
 impl Wire {
-    pub(crate) async fn send_only<R: ProstMessage>(
+    pub(crate) async fn send_only<R: ProstMessage + std::fmt::Debug>(
         &self,
         service_id: i32,
         request: R,
@@ -138,7 +147,7 @@ impl Wire {
         Ok(slot_handle)
     }
 
-    pub(crate) async fn send_and_pull_response<R: ProstMessage>(
+    pub(crate) async fn send_and_pull_response<R: ProstMessage + std::fmt::Debug>(
         &self,
         service_id: i32,
         request: R,
@@ -152,7 +161,7 @@ impl Wire {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub(crate) async fn send_and_pull_async<R: ProstMessage, T: 'static>(
+    pub(crate) async fn send_and_pull_async<R: ProstMessage + std::fmt::Debug, T: 'static>(
         self: &Arc<Wire>,
         job_name: &str,
         service_id: i32,
@@ -176,7 +185,7 @@ impl Wire {
         Ok(job)
     }
 
-    async fn send_internal<T: ProstMessage>(
+    async fn send_internal<T: ProstMessage + std::fmt::Debug>(
         &self,
         service_id: i32,
         request: T,

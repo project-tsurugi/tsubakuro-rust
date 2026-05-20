@@ -9,11 +9,16 @@ use crate::{
     error::TgError,
     illegal_argument_error,
     job::Job,
-    prelude::{
-        r#type::large_object::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
-        Endpoint, ShutdownType,
+    prelude::{Endpoint, ShutdownType},
+    service::{
+        core::core_service::CoreService,
+        lob::{
+            lob_transfer_info::LobTransferInfo,
+            privileged::path_mapping::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
+        },
+        ServiceClient,
     },
-    service::{core::core_service::CoreService, ServiceClient},
+    session::lob_transfer_type::LobTransferType,
 };
 
 use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
@@ -124,6 +129,20 @@ impl Session {
     /// since 0.5.0
     pub fn user_name(&self) -> Option<String> {
         self.wire.user_name()
+    }
+
+    /// Get large object transfer type.
+    ///
+    /// since 0.10.0
+    pub fn lob_transfer_type(&self) -> LobTransferType {
+        self.wire.lob_transfer_info().into()
+    }
+
+    /// Get large object transfer info.
+    ///
+    /// since 0.10.0
+    pub(crate) fn lob_transfer_info(&self) -> LobTransferInfo {
+        self.wire.lob_transfer_info()
     }
 
     /// Checks if the session has an encryption key.

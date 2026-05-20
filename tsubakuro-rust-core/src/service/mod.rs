@@ -4,6 +4,7 @@ use crate::prelude::Session;
 
 pub mod core;
 pub(crate) mod endpoint;
+pub(crate) mod lob;
 pub mod sql;
 pub mod system;
 
