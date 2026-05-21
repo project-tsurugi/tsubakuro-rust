@@ -1,7 +1,6 @@
 use std::{
     collections::HashMap,
-    io::Read,
-    path::Path,
+    path::{Path, PathBuf},
     sync::{atomic::AtomicI64, Arc},
     time::Duration,
 };
@@ -26,9 +25,7 @@ use crate::{
         explain::explain_processor,
         list_tables_processor, prepare_dispose_processor, prepare_processor,
         query_result_processor,
-        r#type::large_object::{
-            lob_cache_processor, lob_copy_to_processor, lob_open_processor, TgLargeObjectCache,
-        },
+        r#type::large_object::TgLargeObjectCache,
         table_metadata_processor, transaction_status_processor, CommitOption, ServiceClient,
         SqlExecuteResult, SqlParameter, SqlPlaceholder, SqlQueryResult, TableList, TableMetadata,
         TgBlobReference, TgClobReference, TransactionStatusWithMessage,
@@ -201,7 +198,7 @@ impl SqlClient {
 
         let command = Self::list_tables_command();
         let job = self
-            .send_and_pull_async("ListTables", command, None, Box::new(list_tables_processor))
+            .send_and_pull_async("ListTables", command, None, Arc::new(list_tables_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -267,7 +264,7 @@ impl SqlClient {
                 "TableMetadata",
                 command,
                 None,
-                Box::new(table_metadata_processor),
+                Arc::new(table_metadata_processor),
             )
             .await?;
 
@@ -354,7 +351,7 @@ impl SqlClient {
                 "Prepare",
                 command,
                 None,
-                Box::new(move |_, response| {
+                Arc::new(move |_, response| {
                     prepare_processor(session.clone(), response, close_timeout)
                 }),
             )
@@ -463,7 +460,7 @@ impl SqlClient {
 
         let command = Self::explain_text_command(sql);
         let job = self
-            .send_and_pull_async("Explain", command, None, Box::new(explain_processor))
+            .send_and_pull_async("Explain", command, None, Arc::new(explain_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -534,7 +531,7 @@ impl SqlClient {
         let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
         let command = Self::explain_prepared_command(prepared_statement, parameters);
         let job = self
-            .send_and_pull_async("Explain", command, lobs, Box::new(explain_processor))
+            .send_and_pull_async("Explain", command, lobs, Arc::new(explain_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -627,7 +624,7 @@ impl SqlClient {
                 "StartTransaction",
                 command,
                 None,
-                Box::new(move |_, response| {
+                Arc::new(move |_, response| {
                     transaction_begin_processor(session.clone(), response, close_timeout)
                 }),
             )
@@ -709,7 +706,7 @@ impl SqlClient {
                 "TransactionErrorInfo",
                 command,
                 None,
-                Box::new(transaction_error_info_processor),
+                Arc::new(transaction_error_info_processor),
             )
             .await?;
 
@@ -783,7 +780,7 @@ impl SqlClient {
                 "TransactionStatus",
                 command,
                 None,
-                Box::new(transaction_status_processor),
+                Arc::new(transaction_status_processor),
             )
             .await?;
 
@@ -854,7 +851,7 @@ impl SqlClient {
 
         let command = Self::execute_statement_command(tx_handle, sql);
         let job = self
-            .send_and_pull_async("Execute", command, None, Box::new(execute_result_processor))
+            .send_and_pull_async("Execute", command, None, Arc::new(execute_result_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -939,7 +936,7 @@ impl SqlClient {
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
         let job = self
-            .send_and_pull_async("Execute", command, lobs, Box::new(execute_result_processor))
+            .send_and_pull_async("Execute", command, lobs, Arc::new(execute_result_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -1041,7 +1038,7 @@ impl SqlClient {
                 "Query",
                 command,
                 None,
-                Box::new(move |slot_handle, response| {
+                Arc::new(move |slot_handle, response| {
                     query_result_processor(wire.clone(), slot_handle, response, default_timeout)
                 }),
             )
@@ -1147,7 +1144,7 @@ impl SqlClient {
                 "Query",
                 command,
                 lobs,
-                Box::new(move |slot_handle, response| {
+                Arc::new(move |slot_handle, response| {
                     query_result_processor(wire.clone(), slot_handle, response, default_timeout)
                 }),
             )
@@ -1268,11 +1265,11 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "open_blob()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, blob);
-        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
-        let file = lob_open_processor(response, &self.session)?;
+        let lob_client = self.get_lob_client().await?;
+        let client_path = lob_client
+            .download_lob_file(transaction, blob, timeout)
+            .await?;
+        let file = Self::open_lob_file(client_path)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(file)
@@ -1287,18 +1284,11 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "open_blob_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, blob);
-        let session = self.session.clone();
-        let job = self
-            .send_and_pull_async(
-                "File",
-                command,
-                None,
-                Box::new(move |_, response| lob_open_processor(response, &session)),
-            )
+        let lob_client = self.get_lob_client().await?;
+        let job = lob_client
+            .download_lob_file_async(transaction, blob)
             .await?;
+        let job = job.convert("File", Arc::new(Self::open_lob_file));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1340,11 +1330,11 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "open_clob()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, clob);
-        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
-        let file = lob_open_processor(response, &self.session)?;
+        let lob_client = self.get_lob_client().await?;
+        let client_path = lob_client
+            .download_lob_file(transaction, clob, timeout)
+            .await?;
+        let file = Self::open_lob_file(client_path)?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(file)
@@ -1359,39 +1349,18 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "open_clob_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, clob);
-        let session = self.session.clone();
-        let job = self
-            .send_and_pull_async(
-                "File",
-                command,
-                None,
-                Box::new(move |_, response| lob_open_processor(response, &session)),
-            )
+        let lob_client = self.get_lob_client().await?;
+        let job = lob_client
+            .download_lob_file_async(transaction, clob)
             .await?;
+        let job = job.convert("File", Arc::new(Self::open_lob_file));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
     }
 
-    fn open_lob_command<T: TgLargeObjectReference>(
-        transaction_handle: &ProtoTransaction,
-        lob: &T,
-    ) -> SqlCommand {
-        let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
-            provider: lob.provider().into(),
-            object_id: lob.object_id(),
-            reference_tag: lob.reference_tag(),
-            contents_opt: None,
-        };
-
-        let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
-            transaction_handle: Some(*transaction_handle),
-            reference: Some(lob),
-        };
-        SqlCommand::GetLargeObjectData(request)
+    fn open_lob_file(client_path: PathBuf) -> Result<std::fs::File, TgError> {
+        std::fs::File::open(client_path).map_err(|e| io_error!("Failed to open lob file: {}", e))
     }
 
     /// Get BLOB cache.
@@ -1432,9 +1401,15 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "get_blob_cache()";
         trace!("{} start", FUNCTION_NAME);
 
-        let cache = self
-            .get_large_object_cache(transaction, blob, timeout)
-            .await?;
+        let lob_client = self.get_lob_client().await?;
+        let cache = if lob_client.support_download_lob_file() {
+            let client_path = lob_client
+                .download_lob_file(transaction, blob, timeout)
+                .await?;
+            Self::create_large_object_cache(client_path)?
+        } else {
+            TgLargeObjectCache::new(None)
+        };
 
         trace!("{} end", FUNCTION_NAME);
         Ok(cache)
@@ -1451,7 +1426,21 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "get_blob_cache_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let job = self.get_large_object_cache_async(transaction, blob).await?;
+        let lob_client = self.get_lob_client().await?;
+        let job = if lob_client.support_download_lob_file() {
+            let job = lob_client
+                .download_lob_file_async(transaction, blob)
+                .await?;
+            job.convert(
+                "LargeObjectCache",
+                Arc::new(Self::create_large_object_cache),
+            )
+        } else {
+            Job::returns(
+                "LargeObjectCache",
+                Arc::new(|| Ok(TgLargeObjectCache::new(None))),
+            )
+        };
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1495,9 +1484,15 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "get_clob_cache()";
         trace!("{} start", FUNCTION_NAME);
 
-        let cache = self
-            .get_large_object_cache(transaction, clob, timeout)
-            .await?;
+        let lob_client = self.get_lob_client().await?;
+        let cache = if lob_client.support_download_lob_file() {
+            let client_path = lob_client
+                .download_lob_file(transaction, clob, timeout)
+                .await?;
+            Self::create_large_object_cache(client_path)?
+        } else {
+            TgLargeObjectCache::new(None)
+        };
 
         trace!("{} end", FUNCTION_NAME);
         Ok(cache)
@@ -1514,42 +1509,29 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "get_clob_cache_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let job = self.get_large_object_cache_async(transaction, clob).await?;
+        let lob_client = self.get_lob_client().await?;
+        let job = if lob_client.support_download_lob_file() {
+            let job = lob_client
+                .download_lob_file_async(transaction, clob)
+                .await?;
+            job.convert(
+                "LargeObjectCache",
+                Arc::new(Self::create_large_object_cache),
+            )
+        } else {
+            Job::returns(
+                "LargeObjectCache",
+                Arc::new(|| Ok(TgLargeObjectCache::new(None))),
+            )
+        };
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
     }
 
-    async fn get_large_object_cache<T: TgLargeObjectReference>(
-        &self,
-        transaction: &Transaction,
-        lob: &T,
-        timeout: Duration,
-    ) -> Result<TgLargeObjectCache, TgError> {
-        let tx_handle = transaction.transaction_handle()?;
-        let command = Self::open_lob_command(tx_handle, lob);
-        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
-        let cache = lob_cache_processor(response, &self.session)?;
+    fn create_large_object_cache(client_path: PathBuf) -> Result<TgLargeObjectCache, TgError> {
+        let cache = TgLargeObjectCache::new(Some(client_path));
         Ok(cache)
-    }
-
-    async fn get_large_object_cache_async<T: TgLargeObjectReference>(
-        &self,
-        transaction: &Transaction,
-        lob: &T,
-    ) -> Result<Job<TgLargeObjectCache>, TgError> {
-        let tx_handle = transaction.transaction_handle()?;
-        let command = Self::open_lob_command(tx_handle, lob);
-        let session = self.session.clone();
-        let job = self
-            .send_and_pull_async(
-                "LargeObjectCache",
-                command,
-                None,
-                Box::new(move |_, response| lob_cache_processor(response, &session)),
-            )
-            .await?;
-        Ok(job)
     }
 
     /// Read BLOB.
@@ -1589,11 +1571,8 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "read_blob()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, blob);
-        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
-        let buf = Self::blob_read_processor(response, &self.session)?;
+        let lob_client = self.get_lob_client().await?;
+        let buf = lob_client.download_lob(transaction, blob, timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(buf)
@@ -1610,33 +1589,11 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "read_blob_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, blob);
-        let session = self.session.clone();
-        let job = self
-            .send_and_pull_async(
-                "BLOB",
-                command,
-                None,
-                Box::new(move |_, response| Self::blob_read_processor(response, &session)),
-            )
-            .await?;
+        let lob_client = self.get_lob_client().await?;
+        let job = lob_client.download_lob_async(transaction, blob).await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
-    }
-
-    fn blob_read_processor(
-        response: WireResponse,
-        session: &Arc<Session>,
-    ) -> Result<Vec<u8>, TgError> {
-        let mut file = lob_open_processor(response, session)?;
-        let mut buf = Vec::new();
-        file.read_to_end(&mut buf)
-            .map_err(|e| io_error!("BLOB read error", e))?;
-
-        Ok(buf)
     }
 
     /// Read CLOB.
@@ -1676,11 +1633,10 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "read_clob()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, clob);
-        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
-        let buf = Self::clob_read_processor(response, &self.session)?;
+        let lob_client = self.get_lob_client().await?;
+        let buf = lob_client.download_lob(transaction, clob, timeout).await?;
+        let buf =
+            String::from_utf8(buf).map_err(|e| io_error!("CLOB data is not valid UTF-8: {}", e))?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(buf)
@@ -1697,33 +1653,17 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "read_clob_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::open_lob_command(tx_handle, clob);
-        let session = self.session.clone();
-        let job = self
-            .send_and_pull_async(
-                "CLOB",
-                command,
-                None,
-                Box::new(move |_, response| Self::clob_read_processor(response, &session)),
-            )
-            .await?;
+        let lob_client = self.get_lob_client().await?;
+        let job = lob_client.download_lob_async(transaction, clob).await?;
+        let job = job.convert(
+            "CLOB",
+            Arc::new(|buf| {
+                String::from_utf8(buf).map_err(|e| io_error!("CLOB data is not valid UTF-8: {}", e))
+            }),
+        );
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
-    }
-
-    fn clob_read_processor(
-        response: WireResponse,
-        session: &Arc<Session>,
-    ) -> Result<String, TgError> {
-        let mut file = lob_open_processor(response, session)?;
-        let mut buf = String::new();
-        file.read_to_string(&mut buf)
-            .map_err(|e| io_error!("CLOB read error", e))?;
-
-        Ok(buf)
     }
 
     /// Copy BLOB to local file.
@@ -1761,18 +1701,15 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "copy_blob_to()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::copy_lob_to_command(tx_handle, blob);
-        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
-        lob_copy_to_processor(response, &self.session, destination)?;
+        self.copy_lob_to(transaction, blob, destination.as_ref(), timeout)
+            .await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
     }
 
     /// Copy BLOB to local file.
-    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Clone + 'static>(
+    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Sync + Clone + 'static>(
         &self,
         transaction: &Transaction,
         blob: &TgBlobReference,
@@ -1781,19 +1718,8 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "copy_blob_to_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::copy_lob_to_command(tx_handle, blob);
-        let session = self.session.clone();
         let job = self
-            .send_and_pull_async(
-                "BlobCopy",
-                command,
-                None,
-                Box::new(move |_, response| {
-                    lob_copy_to_processor(response, &session, destination.clone())
-                }),
-            )
+            .copy_lob_to_async(transaction, blob, destination.as_ref())
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -1835,18 +1761,15 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "copy_clob_to()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::copy_lob_to_command(tx_handle, clob);
-        let (_, response) = self.send_and_pull_response(command, None, timeout).await?;
-        lob_copy_to_processor(response, &self.session, destination)?;
+        self.copy_lob_to(transaction, clob, destination.as_ref(), timeout)
+            .await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(())
     }
 
     /// Copy CLOB to local file.
-    pub async fn copy_clob_to_async<T: AsRef<Path> + Send + Clone + 'static>(
+    pub async fn copy_clob_to_async<T: AsRef<Path> + Send + Sync + Clone + 'static>(
         &self,
         transaction: &Transaction,
         clob: &TgClobReference,
@@ -1855,41 +1778,67 @@ impl SqlClient {
         const FUNCTION_NAME: &str = "copy_clob_to_async()";
         trace!("{} start", FUNCTION_NAME);
 
-        let tx_handle = transaction.transaction_handle()?;
-
-        let command = Self::copy_lob_to_command(tx_handle, clob);
-        let session = self.session.clone();
         let job = self
-            .send_and_pull_async(
-                "ClobCopy",
-                command,
-                None,
-                Box::new(move |_, response| {
-                    lob_copy_to_processor(response, &session, destination.clone())
-                }),
-            )
+            .copy_lob_to_async(transaction, clob, destination.as_ref())
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
     }
 
-    fn copy_lob_to_command<T: TgLargeObjectReference>(
-        transaction_handle: &ProtoTransaction,
-        lob: &T,
-    ) -> SqlCommand {
-        let lob = crate::jogasaki::proto::sql::common::LargeObjectReference {
-            provider: lob.provider().into(),
-            object_id: lob.object_id(),
-            reference_tag: lob.reference_tag(),
-            contents_opt: None,
-        };
+    async fn copy_lob_to(
+        &self,
+        transaction: &Transaction,
+        lob: &dyn TgLargeObjectReference,
+        destination: &Path,
+        timeout: Duration,
+    ) -> Result<(), TgError> {
+        let lob_client = self.get_lob_client().await?;
+        if lob_client.support_download_lob_file() {
+            let client_path = lob_client
+                .download_lob_file(transaction, lob, timeout)
+                .await?;
+            std::fs::copy(client_path, destination)
+                .map_err(|e| io_error!("Failed to copy lob file: {}", e))?;
+        } else {
+            let buf = lob_client.download_lob(transaction, lob, timeout).await?;
+            std::fs::write(destination, buf)
+                .map_err(|e| io_error!("Failed to write lob file: {}", e))?;
+        }
+        Ok(())
+    }
 
-        let request = crate::jogasaki::proto::sql::request::GetLargeObjectData {
-            transaction_handle: Some(*transaction_handle),
-            reference: Some(lob),
+    async fn copy_lob_to_async(
+        &self,
+        transaction: &Transaction,
+        lob: &dyn TgLargeObjectReference,
+        destination: &Path,
+    ) -> Result<Job<()>, TgError> {
+        let destination = destination.to_path_buf();
+
+        let lob_client = self.get_lob_client().await?;
+        let job = if lob_client.support_download_lob_file() {
+            let job = lob_client.download_lob_file_async(transaction, lob).await?;
+            job.convert(
+                "LobFileCopy",
+                Arc::new(move |client_path| {
+                    std::fs::copy(client_path, destination.clone())
+                        .map_err(|e| io_error!("Failed to copy lob file: {}", e))?;
+                    Ok(())
+                }),
+            )
+        } else {
+            let job = lob_client.download_lob_async(transaction, lob).await?;
+            job.convert(
+                "LobCopy",
+                Arc::new(move |buf| {
+                    std::fs::write(destination.clone(), buf)
+                        .map_err(|e| io_error!("Failed to write lob file: {}", e))?;
+                    Ok(())
+                }),
+            )
         };
-        SqlCommand::GetLargeObjectData(request)
+        Ok(job)
     }
 
     /// Request commit to the SQL service.
@@ -1951,7 +1900,7 @@ impl SqlClient {
                 "Commit",
                 command,
                 None,
-                Box::new(transaction_commit_processor),
+                Arc::new(transaction_commit_processor),
             )
             .await?;
 
@@ -2021,7 +1970,7 @@ impl SqlClient {
                 "Rollback",
                 command,
                 None,
-                Box::new(transaction_rollback_processor),
+                Arc::new(transaction_rollback_processor),
             )
             .await?;
 
@@ -2211,12 +2160,14 @@ impl SqlClient {
             .await
     }
 
-    async fn send_and_pull_async<T: 'static>(
+    async fn send_and_pull_async<T: Send + 'static>(
         &self,
         job_name: &str,
         command: SqlCommand,
         lobs: Option<Vec<BlobInfo>>,
-        converter: Box<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send>,
+        converter: Arc<
+            dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
+        >,
     ) -> Result<Job<T>, TgError> {
         let request = Self::new_request(command);
         self.wire()

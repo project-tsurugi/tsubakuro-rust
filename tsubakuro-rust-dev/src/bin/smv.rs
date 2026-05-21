@@ -11,4 +11,8 @@ fn main() {
     println!("SqlClient SMV: {}", sql);
     let system = SystemClient::service_message_version();
     println!("SystemClient SMV: {}", system);
+
+    let privileged_lob =
+        tsubakuro_rust_core::service::privileged_lob_client_service_message_version();
+    println!("PrivilegedLobClient SMV: {}", privileged_lob);
 }

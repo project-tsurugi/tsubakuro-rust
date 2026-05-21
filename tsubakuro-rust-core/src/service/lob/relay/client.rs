@@ -1,6 +1,10 @@
-use std::{path::Path, time::Duration};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::Duration,
+};
 
-use log::debug;
+use log::{debug, trace};
 use tonic::async_trait;
 
 use crate::{
@@ -12,8 +16,17 @@ use crate::{
     },
     error::TgError,
     io_error,
-    service::lob::lob_client::{LobClient, RemoteLob},
+    job::Job,
+    service::{
+        lob::{
+            lob_client::{LobClient, RemoteLob},
+            storage_id,
+        },
+        sql::r#type::large_object::TgLargeObjectReference,
+    },
     tateyama::proto::endpoint::response::BlobRelayServiceInfo,
+    timeout_error,
+    transaction::Transaction,
 };
 
 const API_VERSION: u64 = 1;
@@ -51,24 +64,91 @@ impl RelayLobClient {
 impl LobClient for RelayLobClient {
     async fn upload_lob_file(&self, path: &Path, timeout: Duration) -> Result<RemoteLob, TgError> {
         const FUNCTION_NAME: &str = "RelayLobClient::upload_lob_file()";
-        debug!("{} start", FUNCTION_NAME);
+        trace!("{} start", FUNCTION_NAME);
 
         let value =
             std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
         let lob_ref = self.upload(&value, timeout).await?;
 
-        debug!("{} end", FUNCTION_NAME);
+        trace!("{} end", FUNCTION_NAME);
         Ok(RemoteLob::RelayLobReference(lob_ref))
     }
 
     async fn upload_lob(&self, value: &[u8], timeout: Duration) -> Result<RemoteLob, TgError> {
         const FUNCTION_NAME: &str = "RelayLobClient::upload_lob()";
-        debug!("{} start", FUNCTION_NAME);
+        trace!("{} start", FUNCTION_NAME);
 
         let lob_ref = self.upload(value, timeout).await?;
 
-        debug!("{} end", FUNCTION_NAME);
+        trace!("{} end", FUNCTION_NAME);
         Ok(RemoteLob::RelayLobReference(lob_ref))
+    }
+
+    fn support_download_lob_file(&self) -> bool {
+        false
+    }
+
+    async fn download_lob_file(
+        &self,
+        _transaction: &Transaction,
+        _lob: &dyn TgLargeObjectReference,
+        _timeout: Duration,
+    ) -> Result<PathBuf, TgError> {
+        Err(io_error!("Not supported in blob relay service"))
+    }
+
+    async fn download_lob_file_async(
+        &self,
+        _transaction: &Transaction,
+        _lob: &dyn TgLargeObjectReference,
+    ) -> Result<Job<PathBuf>, TgError> {
+        Err(io_error!("Not supported in blob relay service"))
+    }
+
+    async fn download_lob(
+        &self,
+        transaction: &Transaction,
+        lob: &dyn TgLargeObjectReference,
+        timeout: Duration,
+    ) -> Result<Vec<u8>, TgError> {
+        let tx_handle = transaction.transaction_handle()?;
+        Self::download(
+            self.grpc_client.clone(),
+            tx_handle.handle,
+            storage_id(lob)?,
+            lob.object_id(),
+            lob.reference_tag(),
+            timeout,
+        )
+        .await
+    }
+
+    async fn download_lob_async(
+        &self,
+        transaction: &Transaction,
+        lob: &dyn TgLargeObjectReference,
+    ) -> Result<Job<Vec<u8>>, TgError> {
+        let grpc_client = self.grpc_client.clone();
+        let tx_handle = transaction.transaction_handle()?.handle;
+        let storage_id = storage_id(lob)?;
+        let object_id = lob.object_id();
+        let tag = lob.reference_tag();
+        let job = Job::supplier(
+            "RelayLobDownload",
+            Arc::new(move |timeout| {
+                let future = Self::download(
+                    grpc_client.clone(),
+                    tx_handle,
+                    storage_id,
+                    object_id,
+                    tag,
+                    timeout,
+                );
+                Box::pin(future)
+            }),
+        );
+
+        Ok(job)
     }
 }
 
@@ -101,7 +181,7 @@ impl RelayLobClient {
         } else {
             tokio::time::timeout(timeout, grpc_client.put(tonic::Request::new(stream)))
                 .await
-                .map_err(|_| io_error!("Timeout uploading to blob relay service"))?
+                .map_err(|_| timeout_error!("RelayLobClient::upload()"))?
         };
         let response =
             result.map_err(|e| io_error!("Failed to upload to blob relay service: {}", e))?;
@@ -109,5 +189,68 @@ impl RelayLobClient {
             io_error!("Failed to upload to blob relay service: missing blob reference in response")
         })?;
         Ok(lob_ref)
+    }
+
+    async fn download(
+        mut grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
+        transaction_handle: u64,
+        storage_id: u64,
+        object_id: u64,
+        tag: u64,
+        timeout: Duration,
+    ) -> Result<Vec<u8>, TgError> {
+        use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::{
+            get_streaming_request::ContextId,
+            get_streaming_response::{metadata::BlobSizeOpt, Payload},
+            GetStreamingRequest,
+        };
+
+        let context_id = ContextId::TransactionId(transaction_handle);
+        let lob_ref = RelayLobReference {
+            storage_id,
+            object_id,
+            tag,
+        };
+        let request = GetStreamingRequest {
+            api_version: API_VERSION,
+            blob: Some(lob_ref),
+            context_id: Some(context_id),
+        };
+
+        let result = if timeout.is_zero() {
+            grpc_client.get(request).await
+        } else {
+            tokio::time::timeout(timeout, grpc_client.get(request))
+                .await
+                .map_err(|_| timeout_error!("RelayLobClient::download()"))?
+        };
+        let mut stream = result
+            .map_err(|e| io_error!("Failed to download from blob relay service: {}", e))?
+            .into_inner();
+
+        let mut buffer = Vec::new();
+        while let Some(response) = stream
+            .message()
+            .await
+            .map_err(|e| io_error!("Failed to receive chunk from blob relay service: {}", e))?
+        {
+            match response.payload {
+                Some(Payload::Metadata(metadata)) => {
+                    if let Some(BlobSizeOpt::BlobSize(lob_size)) = metadata.blob_size_opt {
+                        buffer.reserve(lob_size as usize);
+                    }
+                }
+                Some(Payload::Chunk(chunk)) => {
+                    buffer.extend_from_slice(&chunk);
+                }
+                _ => {
+                    return Err(io_error!(
+                        "Failed to download from blob relay service: missing chunk in response"
+                    ));
+                }
+            }
+        }
+
+        Ok(buffer)
     }
 }

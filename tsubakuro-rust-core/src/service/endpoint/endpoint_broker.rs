@@ -91,7 +91,7 @@ impl EndpointBroker {
         Ok(session_id)
     }
 
-    pub(crate) async fn handshake_async<F, T: 'static>(
+    pub(crate) async fn handshake_async<F, T: Send + 'static>(
         wire: &Arc<Wire>,
         client_information: ClientInformation,
         blob_transfer_media: Vec<BlobTransferMedium>,
@@ -101,7 +101,7 @@ impl EndpointBroker {
         fail_on_drop_error: bool,
     ) -> Result<Job<T>, TgError>
     where
-        F: Fn(HandshakeResult) -> Result<T, TgError> + Send + 'static,
+        F: Fn(HandshakeResult) -> Result<T, TgError> + Send + Sync + 'static,
     {
         const FUNCTION_NAME: &str = "handshake_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -116,7 +116,7 @@ impl EndpointBroker {
                 SERVICE_ID_ENDPOINT_BROKER,
                 request,
                 None,
-                Box::new(move |_, response| {
+                Arc::new(move |_, response| {
                     let session_id = handshake_processor(response)?;
                     converter(session_id)
                 }),

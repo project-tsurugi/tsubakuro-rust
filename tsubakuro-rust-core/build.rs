@@ -18,6 +18,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "protos/tateyama/proto/system/diagnostic.proto",
             "protos/tateyama/proto/system/request.proto",
             "protos/tateyama/proto/system/response.proto",
+            "protos/tateyama/proto/system/request.proto",
+            "protos/tateyama/proto/system/response.proto",
+            "protos/tateyama/proto/blob_relay_privilege/request.proto",
+            "protos/tateyama/proto/blob_relay_privilege/response.proto",
         ],
         &["protos/"],
     )?;

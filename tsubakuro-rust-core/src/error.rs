@@ -5,7 +5,7 @@ pub enum TgError {
         /// message
         String,
         /// cause
-        Option<Box<dyn std::error::Error>>,
+        Option<Box<dyn std::error::Error + Send + Sync>>,
     ),
     /// Timeout error.
     TimeoutError(
@@ -17,7 +17,7 @@ pub enum TgError {
         /// message
         String,
         /// cause
-        Option<Box<dyn std::error::Error>>,
+        Option<Box<dyn std::error::Error + Send + Sync>>,
     ),
 
     /// Server error.
@@ -80,9 +80,13 @@ impl std::fmt::Display for TgError {
 impl std::error::Error for TgError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            TgError::ClientError(_, cause) => cause.as_deref(),
+            TgError::ClientError(_, cause) => cause
+                .as_deref()
+                .map(|e| e as &(dyn std::error::Error + 'static)),
             TgError::TimeoutError(_) => None,
-            TgError::IoError(_, cause) => cause.as_deref(),
+            TgError::IoError(_, cause) => cause
+                .as_deref()
+                .map(|e| e as &(dyn std::error::Error + 'static)),
             TgError::ServerError(..) => None,
         }
     }

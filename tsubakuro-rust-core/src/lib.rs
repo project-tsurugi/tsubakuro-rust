@@ -50,7 +50,7 @@ pub mod session;
 pub mod transaction;
 pub(crate) mod util;
 
-#[allow(clippy::enum_variant_names, clippy::module_inception)]
+#[allow(clippy::enum_variant_names, clippy::module_inception, unused)]
 pub(crate) mod jogasaki {
     pub(crate) mod proto {
         pub(crate) mod sql {
@@ -70,7 +70,7 @@ pub(crate) mod jogasaki {
     }
 }
 
-#[allow(clippy::module_inception)]
+#[allow(clippy::module_inception, unused)]
 pub(crate) mod tateyama {
     pub(crate) mod proto {
         pub(crate) mod core {
@@ -138,10 +138,24 @@ pub(crate) mod tateyama {
                 ));
             }
         }
+        pub(crate) mod blob_relay_privilege {
+            pub(crate) mod request {
+                include!(concat!(
+                    env!("OUT_DIR"),
+                    "/tateyama.proto.blob_relay_privilege.request.rs"
+                ));
+            }
+            pub(crate) mod response {
+                include!(concat!(
+                    env!("OUT_DIR"),
+                    "/tateyama.proto.blob_relay_privilege.response.rs"
+                ));
+            }
+        }
     }
 }
 
-#[allow(clippy::module_inception)]
+#[allow(clippy::module_inception, unused)]
 pub(crate) mod data_relay_grpc {
     pub(crate) mod proto {
         pub(crate) mod blob_relay {
