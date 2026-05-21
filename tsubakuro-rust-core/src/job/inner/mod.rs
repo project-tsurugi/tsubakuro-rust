@@ -6,7 +6,7 @@ use tonic::async_trait;
 use crate::error::TgError;
 
 pub(crate) mod convert_job;
-pub(crate) mod supplier_job;
+pub(crate) mod spawn_job;
 pub(crate) mod value_job;
 pub(crate) mod wire_slot_job;
 

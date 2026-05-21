@@ -7,7 +7,7 @@ use crate::{
     error::TgError,
     job::inner::{
         convert_job::ConvertJob,
-        supplier_job::{BoxFuture, SupplierJob},
+        spawn_job::{BoxFuture, SpawnJob},
         value_job::ValueJob,
         wire_slot_job::WireSlotJob,
         InnerJob,
@@ -106,7 +106,7 @@ impl<T: Send + 'static> Job<T> {
         name: &str,
         supplier: Arc<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>,
     ) -> Job<T> {
-        let inner = Arc::new(SupplierJob::new(supplier));
+        let inner = SpawnJob::new(supplier);
 
         Job {
             name: name.to_string(),
