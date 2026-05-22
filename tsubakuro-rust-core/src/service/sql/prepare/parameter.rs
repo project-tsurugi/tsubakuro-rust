@@ -198,11 +198,11 @@ impl SqlParameterOf<TgBlob> for SqlParameter {
                     let info = ClientOnlyLargeObjectInfo { data: Some(data) };
                     Value::LargeObjectInfoBlob(info)
                 }
-                RemoteLob::RelayLobReference(lob_ref) => {
+                RemoteLob::LobReference(storage_id, object_id, tag) => {
                     let lob_ref = crate::jogasaki::proto::sql::request::BlobRelayReference {
-                        storage_id: lob_ref.storage_id,
-                        object_id: lob_ref.object_id,
-                        tag: lob_ref.tag,
+                        storage_id,
+                        object_id,
+                        tag,
                     };
                     let data = ClientOnlyLargeObjectInfoData::BlobRelayReference(lob_ref);
                     let info = ClientOnlyLargeObjectInfo { data: Some(data) };
@@ -233,11 +233,11 @@ impl SqlParameterOf<TgClob> for SqlParameter {
                     let info = ClientOnlyLargeObjectInfo { data: Some(data) };
                     Value::LargeObjectInfoClob(info)
                 }
-                RemoteLob::RelayLobReference(lob_ref) => {
+                RemoteLob::LobReference(storage_id, object_id, tag) => {
                     let lob_ref = crate::jogasaki::proto::sql::request::BlobRelayReference {
-                        storage_id: lob_ref.storage_id,
-                        object_id: lob_ref.object_id,
-                        tag: lob_ref.tag,
+                        storage_id,
+                        object_id,
+                        tag,
                     };
                     let data = ClientOnlyLargeObjectInfoData::BlobRelayReference(lob_ref);
                     let info = ClientOnlyLargeObjectInfo { data: Some(data) };

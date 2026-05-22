@@ -20,7 +20,9 @@ use crate::{
     service::{
         lob::{
             lob_client::{LobClient, LobClientMethod, RemoteLob},
+            relay::uploader::RelayLobUploader,
             storage_id,
+            uploader::LobUploader,
         },
         sql::r#type::large_object::TgLargeObjectReference,
     },
@@ -65,7 +67,7 @@ impl LobClient for RelayLobClient {
     fn supports_method(&self, method: LobClientMethod) -> bool {
         use LobClientMethod::*;
         match method {
-            UploadLobFile | UploadLob => true,
+            UploadLobFile | UploadLob | CreateLobUploader => true,
             DownloadLobFile => false,
             DownloadLob => true,
         }
@@ -80,10 +82,14 @@ impl LobClient for RelayLobClient {
 
         let value =
             std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
-        let lob_ref = Self::upload(grpc_client, blob_session_id, &value, timeout).await?;
+        let lob = Self::upload(grpc_client, blob_session_id, &value, timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(RemoteLob::RelayLobReference(lob_ref))
+        Ok(RemoteLob::LobReference(
+            lob.storage_id,
+            lob.object_id,
+            lob.tag,
+        ))
     }
 
     async fn upload_lob_file_async(&self, path: &Path) -> Result<Job<RemoteLob>, TgError> {
@@ -116,10 +122,14 @@ impl LobClient for RelayLobClient {
 
         let grpc_client = self.grpc_client.clone();
         let blob_session_id = self.info.blob_session_id;
-        let lob_ref = Self::upload(grpc_client, blob_session_id, value, timeout).await?;
+        let lob = Self::upload(grpc_client, blob_session_id, value, timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(RemoteLob::RelayLobReference(lob_ref))
+        Ok(RemoteLob::LobReference(
+            lob.storage_id,
+            lob.object_id,
+            lob.tag,
+        ))
     }
 
     async fn upload_lob_async(&self, value: &[u8]) -> Result<Job<RemoteLob>, TgError> {
@@ -132,14 +142,30 @@ impl LobClient for RelayLobClient {
         let job = Job::supplier(
             "RelayLobUpload",
             Arc::new(move |timeout| {
-                let future =
-                    Self::upload_async(grpc_client.clone(), blob_session_id, value.clone(), timeout);
+                let future = Self::upload_async(
+                    grpc_client.clone(),
+                    blob_session_id,
+                    value.clone(),
+                    timeout,
+                );
                 Box::pin(future)
             }),
         );
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
+    }
+
+    async fn create_lob_uploader(&self) -> Result<Arc<dyn LobUploader + Send + Sync>, TgError> {
+        const FUNCTION_NAME: &str = "RelayLobClient::create_lob_uploader()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let grpc_client = self.grpc_client.clone();
+        let blob_session_id = self.info.blob_session_id;
+        let uploader = RelayLobUploader::new(grpc_client, blob_session_id).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(Arc::new(uploader))
     }
 
     async fn download_lob_file(
@@ -213,24 +239,14 @@ impl RelayLobClient {
         value: &[u8],
         timeout: Duration,
     ) -> Result<RelayLobReference, TgError> {
-        use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::put_streaming_request::{Payload, Metadata, metadata::BlobSizeOpt};
+        let first_request =
+            Self::create_upload_metadata_request(blob_session_id, Some(value.len() as u64));
 
-        let metadata = Metadata {
-            api_version: API_VERSION,
-            session_id: blob_session_id,
-            blob_size_opt: Some(BlobSizeOpt::BlobSize(value.len() as u64)),
-        };
-        let first_request = PutStreamingRequest {
-            payload: Some(Payload::Metadata(metadata)),
-        };
-
-        const CHUNK_SIZE: usize = 64 * 1024;
+        const CHUNK_SIZE: usize = 1024 * 1024;
 
         let chunks: Vec<PutStreamingRequest> = value
             .chunks(CHUNK_SIZE)
-            .map(|c| PutStreamingRequest {
-                payload: Some(Payload::Chunk(c.to_vec())),
-            })
+            .map(|c| Self::create_upload_chunk_request(c.to_vec()))
             .collect();
         let stream = tokio_stream::iter(std::iter::once(first_request).chain(chunks));
 
@@ -257,8 +273,8 @@ impl RelayLobClient {
     ) -> Result<RemoteLob, TgError> {
         let value =
             std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
-        let lob_ref = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
-        let remote_lob = RemoteLob::RelayLobReference(lob_ref);
+        let lob = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
+        let remote_lob = RemoteLob::LobReference(lob.storage_id, lob.object_id, lob.tag);
         Ok(remote_lob)
     }
 
@@ -268,9 +284,37 @@ impl RelayLobClient {
         value: Vec<u8>,
         timeout: Duration,
     ) -> Result<RemoteLob, TgError> {
-        let lob_ref = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
-        let remote_lob = RemoteLob::RelayLobReference(lob_ref);
+        let lob = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
+        let remote_lob = RemoteLob::LobReference(lob.storage_id, lob.object_id, lob.tag);
         Ok(remote_lob)
+    }
+
+    pub(crate) fn create_upload_metadata_request(
+        blob_session_id: u64,
+        lob_size: Option<u64>,
+    ) -> PutStreamingRequest {
+        use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::put_streaming_request::{
+            metadata::BlobSizeOpt, Metadata, Payload,
+        };
+
+        let lob_size_opt = lob_size.map(BlobSizeOpt::BlobSize);
+
+        let metadata = Metadata {
+            api_version: API_VERSION,
+            session_id: blob_session_id,
+            blob_size_opt: lob_size_opt,
+        };
+        PutStreamingRequest {
+            payload: Some(Payload::Metadata(metadata)),
+        }
+    }
+
+    pub(crate) fn create_upload_chunk_request(chunk: Vec<u8>) -> PutStreamingRequest {
+        use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::put_streaming_request::Payload;
+
+        PutStreamingRequest {
+            payload: Some(Payload::Chunk(chunk)),
+        }
     }
 
     async fn download(

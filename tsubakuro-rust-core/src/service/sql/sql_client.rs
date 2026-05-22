@@ -32,7 +32,10 @@ use crate::{
     },
     prost_decode_error,
     service::{
-        lob::lob_client::{create_lob_client, LobClient, LobClientMethod, RemoteLob},
+        lob::{
+            lob_client::{create_lob_client, LobClient, LobClientMethod, RemoteLob},
+            uploader::{BlobUploader, ClobUploader},
+        },
         sql::r#type::{blob::TgBlob, clob::TgClob},
         ServiceMessageVersion,
     },
@@ -1178,6 +1181,7 @@ impl SqlClient {
         let method_list = match operation {
             LobOperation::UploadLobFile => vec![UploadLobFile],
             LobOperation::UploadLob => vec![UploadLob],
+            LobOperation::CreateLobUploader => vec![CreateLobUploader],
             LobOperation::OpenLob => vec![DownloadLobFile],
             LobOperation::GetLobCache => vec![DownloadLobFile, DownloadLob],
             LobOperation::ReadLob => vec![DownloadLob],
@@ -1324,6 +1328,18 @@ impl SqlClient {
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
+    }
+
+    pub async fn create_blob_uploader(&self) -> Result<BlobUploader, TgError> {
+        let lob_client = self.get_lob_client().await?;
+        let uploader = lob_client.create_lob_uploader().await?;
+        Ok(BlobUploader::new(uploader))
+    }
+
+    pub async fn create_clob_uploader(&self) -> Result<ClobUploader, TgError> {
+        let lob_client = self.get_lob_client().await?;
+        let uploader = lob_client.create_lob_uploader().await?;
+        Ok(ClobUploader::new(uploader))
     }
 
     /// Open BLOB file.
@@ -2204,11 +2220,11 @@ impl SqlClient {
                 let lob = lob_client.upload_lob_file(client_path, timeout).await?;
                 match lob {
                     RemoteLob::ServerPath(path) => BlobLocation::Path(path),
-                    RemoteLob::RelayLobReference(lob_ref) => {
+                    RemoteLob::LobReference(storage_id, object_id, tag) => {
                         BlobLocation::Blob(BlobRelayReference {
-                            storage_id: lob_ref.storage_id,
-                            object_id: lob_ref.object_id,
-                            tag: lob_ref.tag,
+                            storage_id,
+                            object_id,
+                            tag,
                         })
                     }
                 }
@@ -2293,6 +2309,8 @@ pub enum LobOperation {
     UploadLobFile,
     /// upload_lob
     UploadLob,
+    /// create_lob_uploader
+    CreateLobUploader,
     /// open_lob
     OpenLob,
     /// get_lob_cache

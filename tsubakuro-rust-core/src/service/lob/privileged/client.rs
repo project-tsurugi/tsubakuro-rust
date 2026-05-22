@@ -18,6 +18,7 @@ use crate::{
             lob_client::{LobClient, LobClientMethod, RemoteLob},
             privileged::path_mapping::LargeObjectRecvPathMapping,
             storage_id,
+            uploader::LobUploader,
         },
         sql::r#type::large_object::TgLargeObjectReference,
         ServiceMessageVersion,
@@ -69,7 +70,7 @@ impl LobClient for PrivilegedLobClient {
         use LobClientMethod::*;
         match method {
             UploadLobFile => true,
-            UploadLob => false,
+            UploadLob | CreateLobUploader => false,
             DownloadLobFile | DownloadLob => true,
         }
     }
@@ -96,6 +97,10 @@ impl LobClient for PrivilegedLobClient {
     }
 
     async fn upload_lob_async(&self, _value: &[u8]) -> Result<Job<RemoteLob>, TgError> {
+        Err(io_error!("Not supported in privileged mode"))
+    }
+
+    async fn create_lob_uploader(&self) -> Result<Arc<dyn LobUploader + Send + Sync>, TgError> {
         Err(io_error!("Not supported in privileged mode"))
     }
 

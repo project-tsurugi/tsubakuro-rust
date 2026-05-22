@@ -7,14 +7,13 @@ use std::{
 use tonic::async_trait;
 
 use crate::{
-    data_relay_grpc::proto::blob_relay::blob_reference::BlobReference as RelayLobReference,
     error::TgError,
     io_error,
     job::Job,
     service::{
         lob::{
             lob_transfer_info::LobTransferInfo, privileged::client::PrivilegedLobClient,
-            relay::client::RelayLobClient,
+            relay::client::RelayLobClient, uploader::LobUploader,
         },
         sql::r#type::large_object::TgLargeObjectReference,
     },
@@ -27,13 +26,16 @@ use crate::{
 /// since 0.10.0
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum RemoteLob {
+    /// server path
     ServerPath(String),
-    RelayLobReference(RelayLobReference),
+    /// LobReference(storage_id, object_id, tag)
+    LobReference(u64, u64, u64),
 }
 
 pub(crate) enum LobClientMethod {
     UploadLobFile,
     UploadLob,
+    CreateLobUploader,
     DownloadLobFile,
     DownloadLob,
 }
@@ -52,6 +54,8 @@ pub(crate) trait LobClient {
     async fn upload_lob(&self, value: &[u8], timeout: Duration) -> Result<RemoteLob, TgError>;
 
     async fn upload_lob_async(&self, value: &[u8]) -> Result<Job<RemoteLob>, TgError>;
+
+    async fn create_lob_uploader(&self) -> Result<Arc<dyn LobUploader + Send + Sync>, TgError>;
 
     async fn download_lob_file(
         &self,
@@ -123,6 +127,10 @@ impl LobClient for NotUseLobClient {
     }
 
     async fn upload_lob_async(&self, _value: &[u8]) -> Result<Job<RemoteLob>, TgError> {
+        Err(io_error!("LOB transfer is not available"))
+    }
+
+    async fn create_lob_uploader(&self) -> Result<Arc<dyn LobUploader + Send + Sync>, TgError> {
         Err(io_error!("LOB transfer is not available"))
     }
 
