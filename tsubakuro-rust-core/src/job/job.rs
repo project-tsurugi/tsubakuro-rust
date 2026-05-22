@@ -6,10 +6,10 @@ use crate::{
     client_error,
     error::TgError,
     job::inner::{
-        convert_job::ConvertJob,
-        spawn_job::{BoxFuture, SpawnJob},
-        value_job::ValueJob,
-        wire_slot_job::WireSlotJob,
+        convert_job::ConvertInnerJob,
+        spawn_job::{BoxFuture, SpawnInnerJob},
+        value_job::ValueInnerJob,
+        wire_slot_job::WireSlotInnerJob,
         InnerJob,
     },
     session::wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
@@ -35,7 +35,7 @@ use crate::{
 ///     Ok(())
 /// }
 /// ```
-pub struct Job<T: Send + 'static> {
+pub struct Job<T: Send + Sync + 'static> {
     name: String,
     inner: Arc<dyn InnerJob<T> + Send + Sync>,
     default_timeout: Duration,
@@ -46,7 +46,7 @@ pub struct Job<T: Send + 'static> {
     fail_on_drop_error: bool,
 }
 
-impl<T: Send + 'static> std::fmt::Debug for Job<T> {
+impl<T: Send + Sync + 'static> std::fmt::Debug for Job<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Job")
             .field("name", &self.name)
@@ -59,7 +59,7 @@ impl<T: Send + 'static> std::fmt::Debug for Job<T> {
     }
 }
 
-impl<T: Send + 'static> Job<T> {
+impl<T: Send + Sync + 'static> Job<T> {
     pub(crate) fn new(
         name: &str,
         wire: Arc<Wire>,
@@ -70,7 +70,7 @@ impl<T: Send + 'static> Job<T> {
         default_timeout: Duration,
         fail_on_drop_error: bool,
     ) -> Job<T> {
-        let inner = Arc::new(WireSlotJob::new(wire, slot_handle, converter));
+        let inner = Arc::new(WireSlotInnerJob::new(wire, slot_handle, converter));
 
         Job {
             name: name.to_string(),
@@ -84,11 +84,8 @@ impl<T: Send + 'static> Job<T> {
         }
     }
 
-    pub(crate) fn returns(
-        name: &str,
-        supplier: Arc<dyn Fn() -> Result<T, TgError> + Send + Sync>,
-    ) -> Job<T> {
-        let inner = Arc::new(ValueJob::new(supplier));
+    pub(crate) fn returns(name: &str, value: T) -> Job<T> {
+        let inner = Arc::new(ValueInnerJob::new(value));
 
         Job {
             name: name.to_string(),
@@ -106,7 +103,7 @@ impl<T: Send + 'static> Job<T> {
         name: &str,
         supplier: Arc<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>,
     ) -> Job<T> {
-        let inner = SpawnJob::new(supplier);
+        let inner = SpawnInnerJob::new(supplier);
 
         Job {
             name: name.to_string(),
@@ -120,12 +117,12 @@ impl<T: Send + 'static> Job<T> {
         }
     }
 
-    pub(crate) fn convert<R: Send + 'static>(
+    pub(crate) fn convert<R: Send + Sync + 'static>(
         self,
         name: &str,
         converter: Arc<dyn Fn(T) -> Result<R, TgError> + Send + Sync>,
     ) -> Job<R> {
-        let inner = Arc::new(ConvertJob::new(self.inner.clone(), converter));
+        let inner = Arc::new(ConvertInnerJob::new(self.inner.clone(), converter));
 
         let default_timeout = self.default_timeout;
         let done = self.done;
@@ -269,9 +266,9 @@ impl<T: Send + 'static> Job<T> {
         // self.check_cancel()?;
         // self.check_close()?;
 
+        self.taked = true;
         let value = self.inner.take_for(timeout).await?;
         self.done = true;
-        self.taked = true;
         Ok(value)
     }
 
@@ -421,7 +418,7 @@ impl<T: Send + 'static> Job<T> {
     }
 }
 
-impl<T: Send + 'static> Drop for Job<T> {
+impl<T: Send + Sync + 'static> Drop for Job<T> {
     fn drop(&mut self) {
         if self.done || self.canceled || self.closed {
             return;

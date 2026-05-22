@@ -17,16 +17,16 @@ use crate::{
 
 pub(crate) type BoxFuture<T> = Pin<Box<dyn Future<Output = Result<T, TgError>> + Send>>;
 
-pub(crate) struct SpawnJob<T: Send> {
+pub(crate) struct SpawnInnerJob<T: Send> {
     handle: Mutex<Option<JoinHandle<()>>>,
     done: AtomicBool,
     notify: Notify,
     result: tokio::sync::Mutex<Option<Result<T, TgError>>>,
 }
 
-impl<T: Send + 'static> SpawnJob<T> {
+impl<T: Send + 'static> SpawnInnerJob<T> {
     pub(crate) fn new(supplier: Arc<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>) -> Arc<Self> {
-        let job = Arc::new(SpawnJob {
+        let job = Arc::new(SpawnInnerJob {
             handle: Mutex::new(None),
             done: AtomicBool::new(false),
             notify: Notify::new(),
@@ -50,7 +50,7 @@ impl<T: Send + 'static> SpawnJob<T> {
 }
 
 #[async_trait]
-impl<T: Send> InnerJob<T> for SpawnJob<T> {
+impl<T: Send> InnerJob<T> for SpawnInnerJob<T> {
     async fn wait(&self, timeout: Duration) -> Result<bool, TgError> {
         if self.done.load(std::sync::atomic::Ordering::Acquire) {
             return Ok(true);
@@ -98,7 +98,7 @@ impl<T: Send> InnerJob<T> for SpawnJob<T> {
     }
 }
 
-impl<T: Send> SpawnJob<T> {
+impl<T: Send> SpawnInnerJob<T> {
     fn abort(&self) {
         let handle = {
             let mut self_handle = self.handle.lock().unwrap();

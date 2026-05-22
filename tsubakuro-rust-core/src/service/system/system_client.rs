@@ -79,11 +79,13 @@ impl SystemClient {
             .await
     }
 
-    async fn send_and_pull_async<T: Send + 'static>(
+    async fn send_and_pull_async<T: Send + Sync + 'static>(
         &self,
         job_name: &str,
         command: SystemCommand,
-        converter: Arc<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync>,
+        converter: Arc<
+            dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
+        >,
     ) -> Result<Job<T>, TgError> {
         let request = Self::new_request(command);
         self.wire()

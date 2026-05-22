@@ -11,21 +11,21 @@ use crate::{
     util::Timeout,
 };
 
-pub(crate) struct WireSlotJob<T: Send> {
+pub(crate) struct WireSlotInnerJob<T: Send> {
     wire: Arc<Wire>,
     slot_handle: Arc<SlotEntryHandle>,
     converter: Arc<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync>,
 }
 
-impl<T: Send> WireSlotJob<T> {
+impl<T: Send> WireSlotInnerJob<T> {
     pub(crate) fn new(
         wire: Arc<Wire>,
         slot_handle: Arc<SlotEntryHandle>,
         converter: Arc<
             dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
         >,
-    ) -> WireSlotJob<T> {
-        WireSlotJob {
+    ) -> WireSlotInnerJob<T> {
+        WireSlotInnerJob {
             wire,
             slot_handle,
             converter,
@@ -34,7 +34,7 @@ impl<T: Send> WireSlotJob<T> {
 }
 
 #[async_trait]
-impl<T: Send> InnerJob<T> for WireSlotJob<T> {
+impl<T: Send> InnerJob<T> for WireSlotInnerJob<T> {
     async fn wait(&self, timeout: Duration) -> Result<bool, TgError> {
         let slot_handle = self.slot_handle.clone();
         let timeout = Timeout::new(timeout);

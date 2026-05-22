@@ -13,6 +13,7 @@ pub enum TgBlob {
     Contents(Vec<u8>),
     /// BLOB with uploaded lob.
     /// since 0.10.0
+    #[allow(private_interfaces)]
     RemoteLob(RemoteLob),
 }
 

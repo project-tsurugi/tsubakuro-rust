@@ -1,24 +1,27 @@
-use std::{sync::Arc, time::Duration};
+use std::time::Duration;
 
 use tonic::async_trait;
 
 use crate::{
+    client_error,
     error::TgError,
     job::{cancel_job::CancelJob, inner::InnerJob},
 };
 
-pub(crate) struct ValueJob<T: Send> {
-    supplier: Arc<dyn Fn() -> Result<T, TgError> + Send + Sync>,
+pub(crate) struct ValueInnerJob<T: Send> {
+    value: tokio::sync::Mutex<Option<T>>,
 }
 
-impl<T: Send> ValueJob<T> {
-    pub(crate) fn new(supplier: Arc<dyn Fn() -> Result<T, TgError> + Send + Sync>) -> Self {
-        ValueJob { supplier }
+impl<T: Send> ValueInnerJob<T> {
+    pub(crate) fn new(value: T) -> Self {
+        ValueInnerJob {
+            value: tokio::sync::Mutex::new(Some(value)),
+        }
     }
 }
 
 #[async_trait]
-impl<T: Send> InnerJob<T> for ValueJob<T> {
+impl<T: Send + Sync> InnerJob<T> for ValueInnerJob<T> {
     async fn wait(&self, _timeout: Duration) -> Result<bool, TgError> {
         Ok(true)
     }
@@ -28,7 +31,11 @@ impl<T: Send> InnerJob<T> for ValueJob<T> {
     }
 
     async fn take_for(&self, _timeout: Duration) -> Result<T, TgError> {
-        (self.supplier)()
+        let mut self_value = self.value.lock().await;
+        match self_value.take() {
+            Some(value) => Ok(value),
+            None => Err(client_error!("ValueJob::take_for(): value already taken")),
+        }
     }
 
     async fn cancel_async(&self) -> Result<Option<CancelJob>, TgError> {

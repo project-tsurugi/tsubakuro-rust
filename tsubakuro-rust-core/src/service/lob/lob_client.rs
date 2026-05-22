@@ -26,9 +26,16 @@ use crate::{
 ///
 /// since 0.10.0
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RemoteLob {
+pub(crate) enum RemoteLob {
     ServerPath(String),
     RelayLobReference(RelayLobReference),
+}
+
+pub(crate) enum LobClientMethod {
+    UploadLobFile,
+    UploadLob,
+    DownloadLobFile,
+    DownloadLob,
 }
 
 /// Large object client.
@@ -36,11 +43,11 @@ pub enum RemoteLob {
 /// since 0.10.0
 #[async_trait]
 pub(crate) trait LobClient {
+    fn supports_method(&self, method: LobClientMethod) -> bool;
+
     async fn upload_lob_file(&self, path: &Path, timeout: Duration) -> Result<RemoteLob, TgError>;
 
     async fn upload_lob(&self, value: &[u8], timeout: Duration) -> Result<RemoteLob, TgError>;
-
-    fn support_download_lob_file(&self) -> bool;
 
     async fn download_lob_file(
         &self,
@@ -91,6 +98,10 @@ impl NotUseLobClient {
 
 #[async_trait]
 impl LobClient for NotUseLobClient {
+    fn supports_method(&self, _method: LobClientMethod) -> bool {
+        false
+    }
+
     async fn upload_lob_file(
         &self,
         _path: &Path,
@@ -101,10 +112,6 @@ impl LobClient for NotUseLobClient {
 
     async fn upload_lob(&self, _value: &[u8], _timeout: Duration) -> Result<RemoteLob, TgError> {
         Err(io_error!("LOB transfer is not available"))
-    }
-
-    fn support_download_lob_file(&self) -> bool {
-        false
     }
 
     async fn download_lob_file(

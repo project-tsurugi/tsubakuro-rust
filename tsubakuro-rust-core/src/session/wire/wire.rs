@@ -163,14 +163,16 @@ impl Wire {
     #[allow(clippy::too_many_arguments)]
     pub(crate) async fn send_and_pull_async<
         R: ProstMessage + std::fmt::Debug,
-        T: Send + 'static,
+        T: Send + Sync + 'static,
     >(
         self: &Arc<Wire>,
         job_name: &str,
         service_id: i32,
         request: R,
         lobs: Option<Vec<BlobInfo>>,
-        converter: Arc<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync>,
+        converter: Arc<
+            dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
+        >,
         default_timeout: Duration,
         fail_on_drop_error: bool,
     ) -> Result<Job<T>, TgError> {

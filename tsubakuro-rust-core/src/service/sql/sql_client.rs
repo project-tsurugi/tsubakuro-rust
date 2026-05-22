@@ -32,7 +32,7 @@ use crate::{
     },
     prost_decode_error,
     service::{
-        lob::lob_client::{create_lob_client, LobClient, RemoteLob},
+        lob::lob_client::{create_lob_client, LobClient, LobClientMethod, RemoteLob},
         sql::r#type::{blob::TgBlob, clob::TgClob},
         ServiceMessageVersion,
     },
@@ -1171,6 +1171,33 @@ impl SqlClient {
         SqlCommand::ExecutePreparedQuery(request)
     }
 
+    pub async fn allows_lob_operation(&self, operation: LobOperation) -> Result<bool, TgError> {
+        let lob_client = self.get_lob_client().await?;
+
+        use LobClientMethod::*;
+        let method_list = match operation {
+            LobOperation::UploadLobFile => vec![UploadLobFile],
+            LobOperation::UploadLob => vec![UploadLob],
+            LobOperation::OpenLob => vec![DownloadLobFile],
+            LobOperation::GetLobCache => vec![DownloadLobFile, DownloadLob],
+            LobOperation::ReadLob => vec![DownloadLob],
+            LobOperation::CopyLobTo => vec![DownloadLobFile, DownloadLob],
+        };
+
+        for m in method_list {
+            let supported = lob_client.supports_method(m);
+            if supported {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    pub async fn upload_blob_file<T: AsRef<Path>>(&self, path: T) -> Result<TgBlob, TgError> {
+        let timeout = self.default_timeout;
+        self.upload_blob_file_for(path, timeout).await
+    }
+
     pub async fn upload_blob_file_for<T: AsRef<Path>>(
         &self,
         path: T,
@@ -1184,6 +1211,11 @@ impl SqlClient {
 
         trace!("{} end", FUNCTION_NAME);
         Ok(TgBlob::RemoteLob(lob))
+    }
+
+    pub async fn upload_clob_file<T: AsRef<Path>>(&self, path: T) -> Result<TgClob, TgError> {
+        let timeout = self.default_timeout;
+        self.upload_clob_file_for(path, timeout).await
     }
 
     pub async fn upload_blob_for(
@@ -1402,7 +1434,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let lob_client = self.get_lob_client().await?;
-        let cache = if lob_client.support_download_lob_file() {
+        let cache = if lob_client.supports_method(LobClientMethod::DownloadLobFile) {
             let client_path = lob_client
                 .download_lob_file(transaction, blob, timeout)
                 .await?;
@@ -1427,7 +1459,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let lob_client = self.get_lob_client().await?;
-        let job = if lob_client.support_download_lob_file() {
+        let job = if lob_client.supports_method(LobClientMethod::DownloadLobFile) {
             let job = lob_client
                 .download_lob_file_async(transaction, blob)
                 .await?;
@@ -1436,10 +1468,7 @@ impl SqlClient {
                 Arc::new(Self::create_large_object_cache),
             )
         } else {
-            Job::returns(
-                "LargeObjectCache",
-                Arc::new(|| Ok(TgLargeObjectCache::new(None))),
-            )
+            Job::returns("LargeObjectCache", TgLargeObjectCache::new(None))
         };
 
         trace!("{} end", FUNCTION_NAME);
@@ -1485,7 +1514,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let lob_client = self.get_lob_client().await?;
-        let cache = if lob_client.support_download_lob_file() {
+        let cache = if lob_client.supports_method(LobClientMethod::DownloadLobFile) {
             let client_path = lob_client
                 .download_lob_file(transaction, clob, timeout)
                 .await?;
@@ -1510,7 +1539,7 @@ impl SqlClient {
         trace!("{} start", FUNCTION_NAME);
 
         let lob_client = self.get_lob_client().await?;
-        let job = if lob_client.support_download_lob_file() {
+        let job = if lob_client.supports_method(LobClientMethod::DownloadLobFile) {
             let job = lob_client
                 .download_lob_file_async(transaction, clob)
                 .await?;
@@ -1519,10 +1548,7 @@ impl SqlClient {
                 Arc::new(Self::create_large_object_cache),
             )
         } else {
-            Job::returns(
-                "LargeObjectCache",
-                Arc::new(|| Ok(TgLargeObjectCache::new(None))),
-            )
+            Job::returns("LargeObjectCache", TgLargeObjectCache::new(None))
         };
 
         trace!("{} end", FUNCTION_NAME);
@@ -1794,7 +1820,7 @@ impl SqlClient {
         timeout: Duration,
     ) -> Result<(), TgError> {
         let lob_client = self.get_lob_client().await?;
-        if lob_client.support_download_lob_file() {
+        if lob_client.supports_method(LobClientMethod::DownloadLobFile) {
             let client_path = lob_client
                 .download_lob_file(transaction, lob, timeout)
                 .await?;
@@ -1817,7 +1843,7 @@ impl SqlClient {
         let destination = destination.to_path_buf();
 
         let lob_client = self.get_lob_client().await?;
-        let job = if lob_client.support_download_lob_file() {
+        let job = if lob_client.supports_method(LobClientMethod::DownloadLobFile) {
             let job = lob_client.download_lob_file_async(transaction, lob).await?;
             job.convert(
                 "LobFileCopy",
@@ -2160,7 +2186,7 @@ impl SqlClient {
             .await
     }
 
-    async fn send_and_pull_async<T: Send + 'static>(
+    async fn send_and_pull_async<T: Send + Sync + 'static>(
         &self,
         job_name: &str,
         command: SqlCommand,
@@ -2191,6 +2217,25 @@ impl SqlClient {
             request: Some(command),
         }
     }
+}
+
+/// Large object (BLOB/CLOB) operation type.
+///
+/// since 0.10.0
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LobOperation {
+    /// upload_lob_file
+    UploadLobFile,
+    /// upload_lob
+    UploadLob,
+    /// open_lob
+    OpenLob,
+    /// get_lob_cache
+    GetLobCache,
+    /// read_lob
+    ReadLob,
+    /// copy_lob_to
+    CopyLobTo,
 }
 
 #[allow(clippy::type_complexity)]

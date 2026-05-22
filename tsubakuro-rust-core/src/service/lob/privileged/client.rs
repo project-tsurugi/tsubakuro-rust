@@ -15,7 +15,7 @@ use crate::{
     lob_relay_privileged_service_error, prost_decode_error,
     service::{
         lob::{
-            lob_client::{LobClient, RemoteLob},
+            lob_client::{LobClient, LobClientMethod, RemoteLob},
             privileged::path_mapping::LargeObjectRecvPathMapping,
             storage_id,
         },
@@ -65,6 +65,15 @@ impl ServiceMessageVersion for PrivilegedLobClient {
 
 #[async_trait]
 impl LobClient for PrivilegedLobClient {
+    fn supports_method(&self, method: LobClientMethod) -> bool {
+        use LobClientMethod::*;
+        match method {
+            UploadLobFile => true,
+            UploadLob => false,
+            DownloadLobFile | DownloadLob => true,
+        }
+    }
+
     async fn upload_lob_file(&self, path: &Path, _timeout: Duration) -> Result<RemoteLob, TgError> {
         let server_path = self
             .session
@@ -75,10 +84,6 @@ impl LobClient for PrivilegedLobClient {
 
     async fn upload_lob(&self, _value: &[u8], _timeout: Duration) -> Result<RemoteLob, TgError> {
         Err(io_error!("Not supported in privileged mode"))
-    }
-
-    fn support_download_lob_file(&self) -> bool {
-        true
     }
 
     async fn download_lob_file(
@@ -241,7 +246,7 @@ impl PrivilegedLobClient {
             .await
     }
 
-    async fn send_and_pull_async<T: Send + 'static>(
+    async fn send_and_pull_async<T: Send + Sync + 'static>(
         &self,
         job_name: &str,
         command: Command,

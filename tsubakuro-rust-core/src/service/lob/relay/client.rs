@@ -19,7 +19,7 @@ use crate::{
     job::Job,
     service::{
         lob::{
-            lob_client::{LobClient, RemoteLob},
+            lob_client::{LobClient, LobClientMethod, RemoteLob},
             storage_id,
         },
         sql::r#type::large_object::TgLargeObjectReference,
@@ -62,6 +62,15 @@ impl RelayLobClient {
 
 #[async_trait]
 impl LobClient for RelayLobClient {
+    fn supports_method(&self, method: LobClientMethod) -> bool {
+        use LobClientMethod::*;
+        match method {
+            UploadLobFile | UploadLob => true,
+            DownloadLobFile => false,
+            DownloadLob => true,
+        }
+    }
+
     async fn upload_lob_file(&self, path: &Path, timeout: Duration) -> Result<RemoteLob, TgError> {
         const FUNCTION_NAME: &str = "RelayLobClient::upload_lob_file()";
         trace!("{} start", FUNCTION_NAME);
@@ -82,10 +91,6 @@ impl LobClient for RelayLobClient {
 
         trace!("{} end", FUNCTION_NAME);
         Ok(RemoteLob::RelayLobReference(lob_ref))
-    }
-
-    fn support_download_lob_file(&self) -> bool {
-        false
     }
 
     async fn download_lob_file(

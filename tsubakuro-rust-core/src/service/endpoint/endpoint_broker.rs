@@ -91,7 +91,7 @@ impl EndpointBroker {
         Ok(session_id)
     }
 
-    pub(crate) async fn handshake_async<F, T: Send + 'static>(
+    pub(crate) async fn handshake_async<F, T: Send + Sync + 'static>(
         wire: &Arc<Wire>,
         client_information: ClientInformation,
         blob_transfer_media: Vec<BlobTransferMedium>,
