@@ -75,22 +75,71 @@ impl LobClient for RelayLobClient {
         const FUNCTION_NAME: &str = "RelayLobClient::upload_lob_file()";
         trace!("{} start", FUNCTION_NAME);
 
+        let grpc_client = self.grpc_client.clone();
+        let blob_session_id = self.info.blob_session_id;
+
         let value =
             std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
-        let lob_ref = self.upload(&value, timeout).await?;
+        let lob_ref = Self::upload(grpc_client, blob_session_id, &value, timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(RemoteLob::RelayLobReference(lob_ref))
+    }
+
+    async fn upload_lob_file_async(&self, path: &Path) -> Result<Job<RemoteLob>, TgError> {
+        const FUNCTION_NAME: &str = "RelayLobClient::upload_lob_file_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let grpc_client = self.grpc_client.clone();
+        let blob_session_id = self.info.blob_session_id;
+        let path = path.to_path_buf();
+        let job = Job::supplier(
+            "RelayLobUpload",
+            Arc::new(move |timeout| {
+                let future = Self::upload_file_async(
+                    grpc_client.clone(),
+                    blob_session_id,
+                    path.clone(),
+                    timeout,
+                );
+                Box::pin(future)
+            }),
+        );
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
     }
 
     async fn upload_lob(&self, value: &[u8], timeout: Duration) -> Result<RemoteLob, TgError> {
         const FUNCTION_NAME: &str = "RelayLobClient::upload_lob()";
         trace!("{} start", FUNCTION_NAME);
 
-        let lob_ref = self.upload(value, timeout).await?;
+        let grpc_client = self.grpc_client.clone();
+        let blob_session_id = self.info.blob_session_id;
+        let lob_ref = Self::upload(grpc_client, blob_session_id, value, timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(RemoteLob::RelayLobReference(lob_ref))
+    }
+
+    async fn upload_lob_async(&self, value: &[u8]) -> Result<Job<RemoteLob>, TgError> {
+        const FUNCTION_NAME: &str = "RelayLobClient::upload_lob_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let grpc_client = self.grpc_client.clone();
+        let blob_session_id = self.info.blob_session_id;
+        let value = value.to_vec();
+        let job = Job::supplier(
+            "RelayLobUpload",
+            Arc::new(move |timeout| {
+                let future =
+                    Self::upload_async(grpc_client.clone(), blob_session_id, value.clone(), timeout);
+                Box::pin(future)
+            }),
+        );
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
     }
 
     async fn download_lob_file(
@@ -158,12 +207,17 @@ impl LobClient for RelayLobClient {
 }
 
 impl RelayLobClient {
-    async fn upload(&self, value: &[u8], timeout: Duration) -> Result<RelayLobReference, TgError> {
+    async fn upload(
+        mut grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
+        blob_session_id: u64,
+        value: &[u8],
+        timeout: Duration,
+    ) -> Result<RelayLobReference, TgError> {
         use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::put_streaming_request::{Payload, Metadata, metadata::BlobSizeOpt};
 
         let metadata = Metadata {
             api_version: API_VERSION,
-            session_id: self.info.blob_session_id,
+            session_id: blob_session_id,
             blob_size_opt: Some(BlobSizeOpt::BlobSize(value.len() as u64)),
         };
         let first_request = PutStreamingRequest {
@@ -180,7 +234,6 @@ impl RelayLobClient {
             .collect();
         let stream = tokio_stream::iter(std::iter::once(first_request).chain(chunks));
 
-        let mut grpc_client = self.grpc_client.clone();
         let result = if timeout.is_zero() {
             grpc_client.put(tonic::Request::new(stream)).await
         } else {
@@ -194,6 +247,30 @@ impl RelayLobClient {
             io_error!("Failed to upload to blob relay service: missing blob reference in response")
         })?;
         Ok(lob_ref)
+    }
+
+    async fn upload_file_async(
+        grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
+        blob_session_id: u64,
+        path: PathBuf,
+        timeout: Duration,
+    ) -> Result<RemoteLob, TgError> {
+        let value =
+            std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
+        let lob_ref = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
+        let remote_lob = RemoteLob::RelayLobReference(lob_ref);
+        Ok(remote_lob)
+    }
+
+    async fn upload_async(
+        grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
+        blob_session_id: u64,
+        value: Vec<u8>,
+        timeout: Duration,
+    ) -> Result<RemoteLob, TgError> {
+        let lob_ref = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
+        let remote_lob = RemoteLob::RelayLobReference(lob_ref);
+        Ok(remote_lob)
     }
 
     async fn download(

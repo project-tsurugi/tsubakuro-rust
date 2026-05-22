@@ -1213,24 +1213,24 @@ impl SqlClient {
         Ok(TgBlob::RemoteLob(lob))
     }
 
-    pub async fn upload_clob_file<T: AsRef<Path>>(&self, path: T) -> Result<TgClob, TgError> {
-        let timeout = self.default_timeout;
-        self.upload_clob_file_for(path, timeout).await
-    }
-
-    pub async fn upload_blob_for(
+    pub async fn upload_blob_file_async<T: AsRef<Path>>(
         &self,
-        value: &[u8],
-        timeout: Duration,
-    ) -> Result<TgBlob, TgError> {
-        const FUNCTION_NAME: &str = "upload_blob()";
+        path: T,
+    ) -> Result<Job<TgBlob>, TgError> {
+        const FUNCTION_NAME: &str = "upload_blob_file_async()";
         trace!("{} start", FUNCTION_NAME);
 
         let lob_client = self.get_lob_client().await?;
-        let lob = lob_client.upload_lob(value, timeout).await?;
+        let job = lob_client.upload_lob_file_async(path.as_ref()).await?;
+        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::RemoteLob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(TgBlob::RemoteLob(lob))
+        Ok(job)
+    }
+
+    pub async fn upload_clob_file<T: AsRef<Path>>(&self, path: T) -> Result<TgClob, TgError> {
+        let timeout = self.default_timeout;
+        self.upload_clob_file_for(path, timeout).await
     }
 
     pub async fn upload_clob_file_for<T: AsRef<Path>>(
@@ -1248,6 +1248,58 @@ impl SqlClient {
         Ok(TgClob::RemoteLob(lob))
     }
 
+    pub async fn upload_clob_file_async<T: AsRef<Path>>(
+        &self,
+        path: T,
+    ) -> Result<Job<TgClob>, TgError> {
+        const FUNCTION_NAME: &str = "upload_clob_file_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let lob_client = self.get_lob_client().await?;
+        let job = lob_client.upload_lob_file_async(path.as_ref()).await?;
+        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::RemoteLob(lob))));
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    pub async fn upload_blob(&self, value: &[u8]) -> Result<TgBlob, TgError> {
+        let timeout = self.default_timeout;
+        self.upload_blob_for(value, timeout).await
+    }
+
+    pub async fn upload_blob_for(
+        &self,
+        value: &[u8],
+        timeout: Duration,
+    ) -> Result<TgBlob, TgError> {
+        const FUNCTION_NAME: &str = "upload_blob()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let lob_client = self.get_lob_client().await?;
+        let lob = lob_client.upload_lob(value, timeout).await?;
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(TgBlob::RemoteLob(lob))
+    }
+
+    pub async fn upload_blob_async(&self, value: &[u8]) -> Result<Job<TgBlob>, TgError> {
+        const FUNCTION_NAME: &str = "upload_blob_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let lob_client = self.get_lob_client().await?;
+        let job = lob_client.upload_lob_async(value).await?;
+        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::RemoteLob(lob))));
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
+    }
+
+    pub async fn upload_clob(&self, value: &str) -> Result<TgClob, TgError> {
+        let timeout = self.default_timeout;
+        self.upload_clob_for(value, timeout).await
+    }
+
     pub async fn upload_clob_for(&self, value: &str, timeout: Duration) -> Result<TgClob, TgError> {
         const FUNCTION_NAME: &str = "upload_clob()";
         trace!("{} start", FUNCTION_NAME);
@@ -1259,6 +1311,19 @@ impl SqlClient {
 
         trace!("{} end", FUNCTION_NAME);
         Ok(TgClob::RemoteLob(lob))
+    }
+
+    pub async fn upload_clob_async(&self, value: &str) -> Result<Job<TgClob>, TgError> {
+        const FUNCTION_NAME: &str = "upload_clob_async()";
+        trace!("{} start", FUNCTION_NAME);
+
+        let lob_client = self.get_lob_client().await?;
+        let value = value.as_bytes();
+        let job = lob_client.upload_lob_async(value).await?;
+        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::RemoteLob(lob))));
+
+        trace!("{} end", FUNCTION_NAME);
+        Ok(job)
     }
 
     /// Open BLOB file.

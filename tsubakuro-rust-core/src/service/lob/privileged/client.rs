@@ -82,7 +82,20 @@ impl LobClient for PrivilegedLobClient {
         Ok(RemoteLob::ServerPath(server_path))
     }
 
+    async fn upload_lob_file_async(&self, path: &Path) -> Result<Job<RemoteLob>, TgError> {
+        let server_path = self
+            .session
+            .large_object_path_mapping_on_send()
+            .convert_to_server_path(path)?;
+        let remote_lob = RemoteLob::ServerPath(server_path);
+        Ok(Job::returns("UploadLobFile", remote_lob))
+    }
+
     async fn upload_lob(&self, _value: &[u8], _timeout: Duration) -> Result<RemoteLob, TgError> {
+        Err(io_error!("Not supported in privileged mode"))
+    }
+
+    async fn upload_lob_async(&self, _value: &[u8]) -> Result<Job<RemoteLob>, TgError> {
         Err(io_error!("Not supported in privileged mode"))
     }
 

@@ -47,7 +47,11 @@ pub(crate) trait LobClient {
 
     async fn upload_lob_file(&self, path: &Path, timeout: Duration) -> Result<RemoteLob, TgError>;
 
+    async fn upload_lob_file_async(&self, path: &Path) -> Result<Job<RemoteLob>, TgError>;
+
     async fn upload_lob(&self, value: &[u8], timeout: Duration) -> Result<RemoteLob, TgError>;
+
+    async fn upload_lob_async(&self, value: &[u8]) -> Result<Job<RemoteLob>, TgError>;
 
     async fn download_lob_file(
         &self,
@@ -110,7 +114,15 @@ impl LobClient for NotUseLobClient {
         Err(io_error!("LOB transfer is not available"))
     }
 
+    async fn upload_lob_file_async(&self, _path: &Path) -> Result<Job<RemoteLob>, TgError> {
+        Err(io_error!("LOB transfer is not available"))
+    }
+
     async fn upload_lob(&self, _value: &[u8], _timeout: Duration) -> Result<RemoteLob, TgError> {
+        Err(io_error!("LOB transfer is not available"))
+    }
+
+    async fn upload_lob_async(&self, _value: &[u8]) -> Result<Job<RemoteLob>, TgError> {
         Err(io_error!("LOB transfer is not available"))
     }
 
