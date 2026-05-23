@@ -12,8 +12,9 @@ use crate::{
     job::Job,
     service::{
         lob::{
-            lob_transfer_info::LobTransferInfo, privileged::client::PrivilegedLobClient,
-            relay::client::RelayLobClient, uploader::LobUploader,
+            downloader::LobDownloader, lob_transfer_info::LobTransferInfo,
+            privileged::client::PrivilegedLobClient, relay::client::RelayLobClient,
+            uploader::LobUploader,
         },
         sql::r#type::large_object::TgLargeObjectReference,
     },
@@ -38,6 +39,7 @@ pub(crate) enum LobClientMethod {
     CreateLobUploader,
     DownloadLobFile,
     DownloadLob,
+    CreateLobDownloader,
 }
 
 /// Large object client.
@@ -82,6 +84,13 @@ pub(crate) trait LobClient {
         transaction: &Transaction,
         lob: &dyn TgLargeObjectReference,
     ) -> Result<Job<Vec<u8>>, TgError>;
+
+    async fn create_lob_downloader(
+        &self,
+        transaction: &Transaction,
+        lob: &dyn TgLargeObjectReference,
+        timeout: Duration,
+    ) -> Result<Box<dyn LobDownloader>, TgError>;
 }
 
 pub(crate) async fn create_lob_client(
@@ -165,6 +174,15 @@ impl LobClient for NotUseLobClient {
         _transaction: &Transaction,
         _lob: &dyn TgLargeObjectReference,
     ) -> Result<Job<Vec<u8>>, TgError> {
+        Err(io_error!("LOB transfer is not available"))
+    }
+
+    async fn create_lob_downloader(
+        &self,
+        _transaction: &Transaction,
+        _lob: &dyn TgLargeObjectReference,
+        _timeout: Duration,
+    ) -> Result<Box<dyn LobDownloader>, TgError> {
         Err(io_error!("LOB transfer is not available"))
     }
 }

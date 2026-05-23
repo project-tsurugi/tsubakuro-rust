@@ -15,8 +15,11 @@ use crate::{
     lob_relay_privileged_service_error, prost_decode_error,
     service::{
         lob::{
+            downloader::LobDownloader,
             lob_client::{LobClient, LobClientMethod, RemoteLob},
-            privileged::path_mapping::LargeObjectRecvPathMapping,
+            privileged::{
+                downloader::PrivilegedLobDownloader, path_mapping::LargeObjectRecvPathMapping,
+            },
             storage_id,
             uploader::LobUploader,
         },
@@ -71,7 +74,7 @@ impl LobClient for PrivilegedLobClient {
         match method {
             UploadLobFile => true,
             UploadLob | CreateLobUploader => false,
-            DownloadLobFile | DownloadLob => true,
+            DownloadLobFile | DownloadLob | CreateLobDownloader => true,
         }
     }
 
@@ -144,6 +147,17 @@ impl LobClient for PrivilegedLobClient {
             }),
         );
         Ok(job)
+    }
+
+    async fn create_lob_downloader(
+        &self,
+        transaction: &Transaction,
+        lob: &dyn TgLargeObjectReference,
+        timeout: Duration,
+    ) -> Result<Box<dyn LobDownloader>, TgError> {
+        let client_path = self.get_file_path(transaction, lob, timeout).await?;
+        let downloader = PrivilegedLobDownloader::new(&client_path).await?;
+        Ok(Box::new(downloader))
     }
 }
 

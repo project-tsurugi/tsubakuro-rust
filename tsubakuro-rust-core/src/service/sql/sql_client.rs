@@ -33,6 +33,7 @@ use crate::{
     prost_decode_error,
     service::{
         lob::{
+            downloader::{BlobDownloader, ClobDownloader},
             lob_client::{create_lob_client, LobClient, LobClientMethod, RemoteLob},
             uploader::{BlobUploader, ClobUploader},
         },
@@ -1186,6 +1187,7 @@ impl SqlClient {
             LobOperation::GetLobCache => vec![DownloadLobFile, DownloadLob],
             LobOperation::ReadLob => vec![DownloadLob],
             LobOperation::CopyLobTo => vec![DownloadLobFile, DownloadLob],
+            LobOperation::CreateLobDownloader => vec![CreateLobDownloader],
         };
 
         for m in method_list {
@@ -1948,6 +1950,32 @@ impl SqlClient {
         Ok(job)
     }
 
+    pub async fn create_blob_downloader(
+        &self,
+        transaction: &Transaction,
+        blob: &TgBlobReference,
+        timeout: Duration,
+    ) -> Result<BlobDownloader, TgError> {
+        let lob_client = self.get_lob_client().await?;
+        let downloader = lob_client
+            .create_lob_downloader(transaction, blob, timeout)
+            .await?;
+        Ok(BlobDownloader::new(downloader))
+    }
+
+    pub async fn create_clob_downloader(
+        &self,
+        transaction: &Transaction,
+        clob: &TgClobReference,
+        timeout: Duration,
+    ) -> Result<ClobDownloader, TgError> {
+        let lob_client = self.get_lob_client().await?;
+        let downloader = lob_client
+            .create_lob_downloader(transaction, clob, timeout)
+            .await?;
+        Ok(ClobDownloader::new(downloader))
+    }
+
     /// Request commit to the SQL service.
     ///
     /// # Examples
@@ -2319,6 +2347,8 @@ pub enum LobOperation {
     ReadLob,
     /// copy_lob_to
     CopyLobTo,
+    /// create_lob_downloader
+    CreateLobDownloader,
 }
 
 #[allow(clippy::type_complexity)]

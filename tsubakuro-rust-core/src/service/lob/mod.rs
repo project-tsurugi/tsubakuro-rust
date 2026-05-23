@@ -1,5 +1,6 @@
 use crate::{error::TgError, io_error, service::sql::r#type::large_object::TgLargeObjectReference};
 
+pub(crate) mod downloader;
 pub(crate) mod lob_client;
 pub(crate) mod lob_transfer_info;
 pub(crate) mod privileged;

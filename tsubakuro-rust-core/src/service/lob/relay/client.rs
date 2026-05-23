@@ -5,13 +5,14 @@ use std::{
 };
 
 use log::{debug, trace};
-use tonic::async_trait;
+use tonic::{async_trait, Streaming};
 
 use crate::{
     data_relay_grpc::proto::blob_relay::{
         blob_reference::BlobReference as RelayLobReference,
         blob_relay_streaming::{
-            blob_relay_streaming_client::BlobRelayStreamingClient, PutStreamingRequest,
+            blob_relay_streaming_client::BlobRelayStreamingClient, GetStreamingResponse,
+            PutStreamingRequest,
         },
     },
     error::TgError,
@@ -19,8 +20,9 @@ use crate::{
     job::Job,
     service::{
         lob::{
+            downloader::LobDownloader,
             lob_client::{LobClient, LobClientMethod, RemoteLob},
-            relay::uploader::RelayLobUploader,
+            relay::{downloader::RelayLobDownloader, uploader::RelayLobUploader},
             storage_id,
             uploader::LobUploader,
         },
@@ -69,7 +71,7 @@ impl LobClient for RelayLobClient {
         match method {
             UploadLobFile | UploadLob | CreateLobUploader => true,
             DownloadLobFile => false,
-            DownloadLob => true,
+            DownloadLob | CreateLobDownloader => true,
         }
     }
 
@@ -102,7 +104,7 @@ impl LobClient for RelayLobClient {
         let job = Job::supplier(
             "RelayLobUpload",
             Arc::new(move |timeout| {
-                let future = Self::upload_file_async(
+                let future = Self::upload_file_for_async(
                     grpc_client.clone(),
                     blob_session_id,
                     path.clone(),
@@ -142,7 +144,7 @@ impl LobClient for RelayLobClient {
         let job = Job::supplier(
             "RelayLobUpload",
             Arc::new(move |timeout| {
-                let future = Self::upload_async(
+                let future = Self::upload_for_async(
                     grpc_client.clone(),
                     blob_session_id,
                     value.clone(),
@@ -230,6 +232,17 @@ impl LobClient for RelayLobClient {
 
         Ok(job)
     }
+
+    async fn create_lob_downloader(
+        &self,
+        transaction: &Transaction,
+        lob: &dyn TgLargeObjectReference,
+        timeout: Duration,
+    ) -> Result<Box<dyn LobDownloader>, TgError> {
+        let grpc_client = self.grpc_client.clone();
+        let downloader = RelayLobDownloader::new(grpc_client, transaction, lob, timeout).await?;
+        Ok(Box::new(downloader))
+    }
 }
 
 impl RelayLobClient {
@@ -265,7 +278,7 @@ impl RelayLobClient {
         Ok(lob_ref)
     }
 
-    async fn upload_file_async(
+    async fn upload_file_for_async(
         grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
         blob_session_id: u64,
         path: PathBuf,
@@ -278,7 +291,7 @@ impl RelayLobClient {
         Ok(remote_lob)
     }
 
-    async fn upload_async(
+    async fn upload_for_async(
         grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
         blob_session_id: u64,
         value: Vec<u8>,
@@ -318,7 +331,7 @@ impl RelayLobClient {
     }
 
     async fn download(
-        mut grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
+        grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
         transaction_handle: u64,
         storage_id: u64,
         object_id: u64,
@@ -326,33 +339,17 @@ impl RelayLobClient {
         timeout: Duration,
     ) -> Result<Vec<u8>, TgError> {
         use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::{
-            get_streaming_request::ContextId,
             get_streaming_response::{metadata::BlobSizeOpt, Payload},
-            GetStreamingRequest,
         };
-
-        let context_id = ContextId::TransactionId(transaction_handle);
-        let lob_ref = RelayLobReference {
+        let mut stream = Self::start_download(
+            grpc_client.clone(),
+            transaction_handle,
             storage_id,
             object_id,
             tag,
-        };
-        let request = GetStreamingRequest {
-            api_version: API_VERSION,
-            blob: Some(lob_ref),
-            context_id: Some(context_id),
-        };
-
-        let result = if timeout.is_zero() {
-            grpc_client.get(request).await
-        } else {
-            tokio::time::timeout(timeout, grpc_client.get(request))
-                .await
-                .map_err(|_| timeout_error!("RelayLobClient::download()"))?
-        };
-        let mut stream = result
-            .map_err(|e| io_error!("Failed to download from blob relay service: {}", e))?
-            .into_inner();
+            timeout,
+        )
+        .await?;
 
         let mut buffer = Vec::new();
         while let Some(response) = stream
@@ -378,5 +375,43 @@ impl RelayLobClient {
         }
 
         Ok(buffer)
+    }
+
+    pub(crate) async fn start_download(
+        mut grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
+        transaction_handle: u64,
+        storage_id: u64,
+        object_id: u64,
+        tag: u64,
+        timeout: Duration,
+    ) -> Result<Streaming<GetStreamingResponse>, TgError> {
+        use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::{
+            get_streaming_request::ContextId, GetStreamingRequest,
+        };
+
+        let context_id = ContextId::TransactionId(transaction_handle);
+        let lob_ref = RelayLobReference {
+            storage_id,
+            object_id,
+            tag,
+        };
+        let request = GetStreamingRequest {
+            api_version: API_VERSION,
+            blob: Some(lob_ref),
+            context_id: Some(context_id),
+        };
+
+        let result = if timeout.is_zero() {
+            grpc_client.get(request).await
+        } else {
+            tokio::time::timeout(timeout, grpc_client.get(request))
+                .await
+                .map_err(|_| timeout_error!("RelayLobClient::download()"))?
+        };
+        let stream = result
+            .map_err(|e| io_error!("Failed to download from blob relay service: {}", e))?
+            .into_inner();
+
+        Ok(stream)
     }
 }
