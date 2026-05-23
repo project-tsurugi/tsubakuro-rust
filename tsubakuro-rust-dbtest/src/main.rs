@@ -70,6 +70,10 @@ mod test {
                 args.auth_token = Some(arg.clone().split_off(11));
             } else if arg.starts_with("credentials=") {
                 args.file_path = Some(arg.clone().split_off(12));
+            } else if arg.starts_with("lob-send-path-mapping=") {
+                args.lob_send_path_mapping.push(arg.clone().split_off(22));
+            } else if arg.starts_with("lob-recv-path-mapping=") {
+                args.lob_recv_path_mapping.push(arg.clone().split_off(22));
             }
         }
 
@@ -86,6 +90,8 @@ mod test {
         password: Option<String>,
         auth_token: Option<String>,
         file_path: Option<String>,
+        lob_send_path_mapping: Vec<String>,
+        lob_recv_path_mapping: Vec<String>,
     }
 
     impl TestArgs {
@@ -96,6 +102,8 @@ mod test {
                 password: None,
                 auth_token: None,
                 file_path: None,
+                lob_send_path_mapping: Vec::new(),
+                lob_recv_path_mapping: Vec::new(),
             }
         }
 
@@ -141,6 +149,39 @@ mod test {
             } else {
                 None
             }
+        }
+
+        pub fn has_lob_path_mapping(&self) -> bool {
+            !self.lob_send_path_mapping.is_empty() || !self.lob_recv_path_mapping.is_empty()
+        }
+
+        pub fn apply_lob_path_mapping(&self, option: &mut ConnectionOption) {
+            for mapping in &self.lob_send_path_mapping {
+                let n = mapping.rfind(':');
+                if let Some(n) = n {
+                    let client_path = &mapping[..n];
+                    let server_path = &mapping[n + 1..];
+                    option.add_large_object_path_mapping_on_send(client_path, server_path);
+                }
+            }
+            for mapping in &self.lob_recv_path_mapping {
+                if let Some(n) = mapping.rfind(':') {
+                    let client_path = &mapping[..n];
+                    let server_path = &mapping[n + 1..];
+                    option.add_large_object_path_mapping_on_recv(server_path, client_path);
+                }
+            }
+        }
+
+        pub fn lob_send_client_dir(&self) -> Option<String> {
+            for mapping in &self.lob_send_path_mapping {
+                let n = mapping.rfind(':');
+                if let Some(n) = n {
+                    let client_path = &mapping[..n];
+                    return Some(client_path.to_string());
+                }
+            }
+            None
         }
     }
 

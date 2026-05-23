@@ -36,3 +36,14 @@ cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345
   - password for user
 - auth-token=`<token>`
 - credentials=`</path/to/credential-file>`
+- lob-send-path-mapping=`<client_path>:<server_path>`
+- lob-recv-path-mapping=`<client_path>:<server_path>`
+
+#### Example of LOB path mapping in MS-Windows
+
+```
+docker container run -d -p 12345:12345 -p 52345:52345 -v C:/tmp/client:/mnt/client -v C:/tmp/tsurugi:/opt/tsurugi/var/data/log --name tsurugi -e GLOG_v=30 ghcr.io/project-tsurugi/tsurugidb:latest
+
+cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345 lob-send-path-mapping=C:/tmp/client:/mnt/client lob-recv-path-mapping=C:/tmp/tsurugi:/opt/tsurugi/var/data/log
+```
+
