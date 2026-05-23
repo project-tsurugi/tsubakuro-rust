@@ -31,6 +31,7 @@ pub use crate::service::sql::r#type::time_of_day::*;
 pub use crate::service::sql::r#type::time_of_day_with_time_zone::*;
 pub use crate::service::sql::r#type::time_point::*;
 pub use crate::service::sql::r#type::time_point_with_time_zone::*;
+pub use crate::service::sql::sql_client::LobOperation;
 pub use crate::service::sql::table_list::*;
 pub use crate::service::sql::table_metadata::*;
 pub use crate::service::sql::*;

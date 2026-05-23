@@ -11,8 +11,9 @@ fn storage_id(lob: &dyn TgLargeObjectReference) -> Result<u64, TgError> {
     use crate::jogasaki::proto::sql::common::LargeObjectProvider::*;
     match lob.provider() {
         Datastore => Ok(1), // LIMESTONE_BLOB_STORE
-        _ => Err(io_error!(
-            "Unsupported LargeObjectProvider for privileged mode"
-        )),
+        v => Err(io_error!(format!(
+            "Unsupported LargeObjectProvider: {:?}",
+            v
+        ))),
     }
 }

@@ -112,6 +112,7 @@ impl LobClient for RelayLobClient {
                 );
                 Box::pin(future)
             }),
+            Duration::ZERO,
         );
 
         trace!("{} end", FUNCTION_NAME);
@@ -152,6 +153,7 @@ impl LobClient for RelayLobClient {
                 );
                 Box::pin(future)
             }),
+            Duration::ZERO,
         );
 
         trace!("{} end", FUNCTION_NAME);
@@ -215,6 +217,7 @@ impl LobClient for RelayLobClient {
         let storage_id = storage_id(lob)?;
         let object_id = lob.object_id();
         let tag = lob.reference_tag();
+        let default_timeout = transaction.default_timeout();
         let job = Job::supplier(
             "RelayLobDownload",
             Arc::new(move |timeout| {
@@ -228,6 +231,7 @@ impl LobClient for RelayLobClient {
                 );
                 Box::pin(future)
             }),
+            default_timeout,
         );
 
         Ok(job)

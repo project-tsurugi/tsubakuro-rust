@@ -56,6 +56,11 @@ impl<T: Send> InnerJob<T> for SpawnInnerJob<T> {
             return Ok(true);
         }
 
+        if timeout.is_zero() {
+            self.notify.notified().await;
+            return Ok(true);
+        }
+
         match tokio::time::timeout(timeout, self.notify.notified()).await {
             Ok(_) => Ok(true),
             Err(_) => Ok(false),

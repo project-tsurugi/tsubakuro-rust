@@ -135,6 +135,10 @@ impl Transaction {
         self.closed.load(std::sync::atomic::Ordering::SeqCst)
     }
 
+    pub(crate) fn default_timeout(&self) -> Duration {
+        self.session.default_timeout()
+    }
+
     /// for debug
     #[doc(hidden)]
     pub fn set_fail_on_drop_error(&self, value: bool) {

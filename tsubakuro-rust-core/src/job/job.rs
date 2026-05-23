@@ -102,13 +102,14 @@ impl<T: Send + Sync + 'static> Job<T> {
     pub(crate) fn supplier(
         name: &str,
         supplier: Arc<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>,
+        default_timeout: Duration,
     ) -> Job<T> {
         let inner = SpawnInnerJob::new(supplier);
 
         Job {
             name: name.to_string(),
             inner,
-            default_timeout: Duration::ZERO,
+            default_timeout,
             done: true,
             taked: false,
             canceled: false,

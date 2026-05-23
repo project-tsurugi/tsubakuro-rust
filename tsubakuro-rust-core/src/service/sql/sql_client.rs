@@ -1818,7 +1818,7 @@ impl SqlClient {
     }
 
     /// Copy BLOB to local file.
-    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Sync + Clone + 'static>(
+    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Sync + Clone>(
         &self,
         transaction: &Transaction,
         blob: &TgBlobReference,
@@ -1878,7 +1878,7 @@ impl SqlClient {
     }
 
     /// Copy CLOB to local file.
-    pub async fn copy_clob_to_async<T: AsRef<Path> + Send + Sync + Clone + 'static>(
+    pub async fn copy_clob_to_async<T: AsRef<Path> + Send + Sync + Clone>(
         &self,
         transaction: &Transaction,
         clob: &TgClobReference,
