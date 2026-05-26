@@ -51,7 +51,11 @@ mod test {
 
     pub(crate) fn create_test_connection_option() -> ConnectionOption {
         let args = create_test_args();
-        let option = create_connection_option(args.endpoint(), args.credential()).unwrap();
+        let mut option = create_connection_option(args.endpoint(), args.credential()).unwrap();
+        if let Some(endpoint) = args.blob_relay_service_endpoint() {
+            option.set_blob_relay_service_endpoint(endpoint);
+        }
+
         option
     }
 
@@ -74,6 +78,8 @@ mod test {
                 args.lob_send_path_mapping.push(arg.clone().split_off(22));
             } else if arg.starts_with("lob-recv-path-mapping=") {
                 args.lob_recv_path_mapping.push(arg.clone().split_off(22));
+            } else if arg.starts_with("blob-relay-service-endpoint=") {
+                args.blob_relay_service_endpoint = Some(arg.clone().split_off(28));
             }
         }
 
@@ -92,6 +98,7 @@ mod test {
         file_path: Option<String>,
         lob_send_path_mapping: Vec<String>,
         lob_recv_path_mapping: Vec<String>,
+        blob_relay_service_endpoint: Option<String>,
     }
 
     impl TestArgs {
@@ -104,6 +111,7 @@ mod test {
                 file_path: None,
                 lob_send_path_mapping: Vec::new(),
                 lob_recv_path_mapping: Vec::new(),
+                blob_relay_service_endpoint: None,
             }
         }
 
@@ -182,6 +190,9 @@ mod test {
                 }
             }
             None
+        }
+        pub fn blob_relay_service_endpoint(&self) -> Option<&String> {
+            self.blob_relay_service_endpoint.as_ref()
         }
     }
 

@@ -41,8 +41,15 @@ pub(crate) struct RelayLobClient {
 }
 
 impl RelayLobClient {
-    pub(crate) async fn new(info: BlobRelayServiceInfo) -> Result<RelayLobClient, TgError> {
-        let url = Self::grpc_url(&info);
+    pub(crate) async fn new(
+        info: BlobRelayServiceInfo,
+        endpoint: Option<&String>,
+    ) -> Result<RelayLobClient, TgError> {
+        let url = if let Some(endpoint) = endpoint {
+            endpoint.clone()
+        } else {
+            Self::grpc_url(&info)
+        };
         debug!("Connecting to blob relay service at URL: {}", url);
 
         let grpc_client = BlobRelayStreamingClient::connect(url)

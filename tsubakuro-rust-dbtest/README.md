@@ -39,11 +39,23 @@ cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345
 - lob-send-path-mapping=`<client_path>:<server_path>`
 - lob-recv-path-mapping=`<client_path>:<server_path>`
 
-#### Example of LOB path mapping in MS-Windows
+#### Example of LOB path mapping in MS-Windows command prompt
 
 ```
 docker container run -d -p 12345:12345 -p 52345:52345 -v C:/tmp/client:/mnt/client -v C:/tmp/tsurugi:/opt/tsurugi/var/data/log --name tsurugi -e GLOG_v=30 ghcr.io/project-tsurugi/tsurugidb:latest
 
-cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345 lob-send-path-mapping=C:/tmp/client:/mnt/client lob-recv-path-mapping=C:/tmp/tsurugi:/opt/tsurugi/var/data/log
+cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345 ^
+lob-send-path-mapping=C:/tmp/client:/mnt/client ^
+lob-recv-path-mapping=C:/tmp/tsurugi:/opt/tsurugi/var/data/log
 ```
 
+#### Example of blob relay service endpoint
+
+```bash
+cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345 blob-relay-service-endpoint=http://localhost:52345
+```
+
+> [!IMPORTANT]
+>
+> Tsubakuro/Rust (the [tonic](https://docs.rs/tonic/latest/tonic/) crate used by Tsubakuro/Rust) does not support `dns:///`.
+> Use `http://` instead.

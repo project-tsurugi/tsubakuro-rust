@@ -39,7 +39,7 @@ use super::{
 };
 
 /// The major service message version for FrameworkRequest.Header.
-const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 1;
+const SERVICE_MESSAGE_VERSION_MAJOR: u64 = 2;
 
 /// The minor service message version for FrameworkRequest.Header.
 const SERVICE_MESSAGE_VERSION_MINOR: u64 = 1;

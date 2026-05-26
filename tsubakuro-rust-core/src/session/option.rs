@@ -49,6 +49,7 @@ pub struct ConnectionOption {
     lob_transfer_type: LobTransferType,
     lob_send_path_mapping: LargeObjectSendPathMapping,
     lob_recv_path_mapping: LargeObjectRecvPathMapping,
+    blob_relay_service_endpoint: Option<String>,
     default_timeout: Duration,
     send_timeout: Duration,
     recv_timeout: Duration,
@@ -73,6 +74,7 @@ impl ConnectionOption {
             lob_transfer_type: LobTransferType::Default,
             lob_send_path_mapping: LargeObjectSendPathMapping::new(),
             lob_recv_path_mapping: LargeObjectRecvPathMapping::new(),
+            blob_relay_service_endpoint: None,
             default_timeout: Duration::ZERO,
             send_timeout: Duration::ZERO,
             recv_timeout: Duration::ZERO,
@@ -217,6 +219,20 @@ impl ConnectionOption {
 
     pub(crate) fn large_object_path_mapping_on_recv(&self) -> &LargeObjectRecvPathMapping {
         &self.lob_recv_path_mapping
+    }
+
+    /// Set blob relay service endpoint.
+    ///
+    /// since 0.10.0
+    pub fn set_blob_relay_service_endpoint(&mut self, endpoint: &str) {
+        self.blob_relay_service_endpoint = Some(endpoint.to_string());
+    }
+
+    /// Get blob relay service endpoint.
+    ///
+    /// since 0.10.0
+    pub fn blob_relay_service_endpoint(&self) -> Option<&String> {
+        self.blob_relay_service_endpoint.as_ref()
     }
 
     /// Set default timeout.
