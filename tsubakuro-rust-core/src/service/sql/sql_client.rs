@@ -2419,6 +2419,6 @@ mod test {
     #[test]
     fn service_message_version() {
         let smv = SqlClient::service_message_version();
-        assert_eq!("sql-2.0", smv);
+        assert_eq!("sql-2.1", smv);
     }
 }

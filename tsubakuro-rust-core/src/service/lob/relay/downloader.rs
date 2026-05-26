@@ -64,8 +64,9 @@ impl LobDownloader for RelayLobDownloader {
                     continue;
                 }
                 Some(Payload::Chunk(chunk)) => {
+                    let len = chunk.len();
                     buffer.extend_from_slice(&chunk);
-                    return Ok(buffer.len());
+                    return Ok(len);
                 }
                 _ => {
                     return Err(io_error!(
