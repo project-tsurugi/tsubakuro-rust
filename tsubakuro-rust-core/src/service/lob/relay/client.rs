@@ -336,7 +336,7 @@ impl RelayLobClient {
     ) -> Result<RemoteLob, TgError> {
         let value = tokio::fs::read(path)
             .await
-            .map_err(|e| io_error!("Failed to read lob file: {}", e))?;
+            .map_err(|e| io_error!("Failed to read lob file", e))?;
         let lob = Self::upload(
             grpc_client.clone(),
             blob_session_id,

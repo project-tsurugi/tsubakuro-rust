@@ -82,12 +82,15 @@ impl LobUploader for RelayLobUploader {
             let result = if timeout.is_zero() {
                 put_handle.request_handle.await
             } else {
-                tokio::time::timeout(timeout, put_handle.request_handle)
-                    .await
-                    .map_err(|_| timeout_error!("RelayLobUploader::finish()"))?
+                match tokio::time::timeout(timeout, put_handle.request_handle).await {
+                    Ok(result) => result,
+                    Err(_) => {
+                        let _ = self.cancel();
+                        return Err(timeout_error!("RelayLobUploader::finish()"));
+                    }
+                }
             };
-            let result =
-                result.map_err(|e| io_error!("Failed to receive upload response", e))?;
+            let result = result.map_err(|e| io_error!("Failed to receive upload response", e))?;
             match result {
                 Ok(response) => {
                     let response = response.into_inner();
