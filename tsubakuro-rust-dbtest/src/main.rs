@@ -165,19 +165,16 @@ mod test {
 
         pub fn apply_lob_path_mapping(&self, option: &mut ConnectionOption) {
             for mapping in &self.lob_send_path_mapping {
-                let n = mapping.rfind(':');
-                if let Some(n) = n {
-                    let client_path = &mapping[..n];
-                    let server_path = &mapping[n + 1..];
-                    option.add_large_object_path_mapping_on_send(client_path, server_path);
-                }
+                let n = mapping.rfind(':').unwrap_or_else(|| panic!("invalid lob-send-path-mapping (expected <client_path>:<server_path>): {mapping}"));
+                let client_path = &mapping[..n];
+                let server_path = &mapping[n + 1..];
+                option.add_large_object_path_mapping_on_send(client_path, server_path);
             }
             for mapping in &self.lob_recv_path_mapping {
-                if let Some(n) = mapping.rfind(':') {
-                    let client_path = &mapping[..n];
-                    let server_path = &mapping[n + 1..];
-                    option.add_large_object_path_mapping_on_recv(server_path, client_path);
-                }
+                let n = mapping.rfind(':').unwrap_or_else(|| panic!("invalid lob-recv-path-mapping (expected <client_path>:<server_path>): {mapping}"));
+                let client_path = &mapping[..n];
+                let server_path = &mapping[n + 1..];
+                option.add_large_object_path_mapping_on_recv(server_path, client_path);
             }
         }
 
