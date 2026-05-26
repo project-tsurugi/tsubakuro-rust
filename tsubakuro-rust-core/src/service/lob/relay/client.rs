@@ -415,30 +415,44 @@ impl RelayLobClient {
         )
         .await?;
 
-        let mut buffer = Vec::new();
-        while let Some(response) = stream
-            .message()
-            .await
-            .map_err(|e| io_error!("Failed to receive chunk from blob relay service: {}", e))?
-        {
-            match response.payload {
-                Some(Payload::Metadata(metadata)) => {
-                    if let Some(BlobSizeOpt::BlobSize(lob_size)) = metadata.blob_size_opt {
-                        buffer.reserve(lob_size as usize);
-                    }
-                }
-                Some(Payload::Chunk(chunk)) => {
-                    buffer.extend_from_slice(&chunk);
-                }
-                _ => {
-                    return Err(io_error!(
+        let future = async {
+            let mut buffer = Vec::new();
+
+            loop {
+                let response = stream.message().await.map_err(|e| {
+                    io_error!("Failed to receive chunk from blob relay service: {}", e)
+                })?;
+
+                match response {
+                    Some(response) => match response.payload {
+                        Some(Payload::Metadata(metadata)) => {
+                            if let Some(BlobSizeOpt::BlobSize(lob_size)) = metadata.blob_size_opt {
+                                buffer.reserve(lob_size as usize);
+                            }
+                        }
+                        Some(Payload::Chunk(chunk)) => {
+                            buffer.extend_from_slice(&chunk);
+                        }
+                        _ => {
+                            return Err(io_error!(
                         "Failed to download from blob relay service: missing chunk in response"
                     ));
+                        }
+                    },
+                    None => break, // end of stream
                 }
             }
-        }
 
-        Ok(buffer)
+            Ok(buffer)
+        };
+
+        if timeout.is_zero() {
+            future.await
+        } else {
+            tokio::time::timeout(timeout, future)
+                .await
+                .map_err(|_| timeout_error!("RelayLobClient::download()"))?
+        }
     }
 
     pub(crate) async fn start_download(

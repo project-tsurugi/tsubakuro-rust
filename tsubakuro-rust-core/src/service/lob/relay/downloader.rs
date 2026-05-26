@@ -13,6 +13,7 @@ use crate::{
         lob::{downloader::LobDownloader, relay::client::RelayLobClient, storage_id},
         sql::r#type::large_object::TgLargeObjectReference,
     },
+    timeout_error,
     transaction::Transaction,
 };
 
@@ -47,35 +48,40 @@ impl LobDownloader for RelayLobDownloader {
     async fn download_chunk(
         &mut self,
         buffer: &mut BytesMut,
-        _timeout: Duration,
+        timeout: Duration,
     ) -> Result<usize, TgError> {
         use crate::data_relay_grpc::proto::blob_relay::blob_relay_streaming::get_streaming_response::{
             Payload,
         };
 
-        while let Some(response) = self
-            .stream
-            .message()
-            .await
-            .map_err(|e| io_error!("Failed to receive chunk from blob relay service: {}", e))?
-        {
-            match response.payload {
-                Some(Payload::Metadata(_metadata)) => {
-                    continue;
-                }
-                Some(Payload::Chunk(chunk)) => {
-                    let len = chunk.len();
-                    buffer.extend_from_slice(&chunk);
-                    return Ok(len);
-                }
-                _ => {
-                    return Err(io_error!(
-                        "Failed to download from blob relay service: missing chunk in response"
-                    ));
-                }
+        loop {
+            let result = if timeout.is_zero() {
+                self.stream.message().await
+            } else {
+                tokio::time::timeout(timeout, self.stream.message())
+                    .await
+                    .map_err(|_| timeout_error!("RelayLobDownloader::download_chunk()"))?
+            };
+            let response = result
+                .map_err(|e| io_error!("Failed to receive chunk from blob relay service: {}", e))?;
+            match response {
+                Some(response) => match response.payload {
+                    Some(Payload::Metadata(_metadata)) => {
+                        continue;
+                    }
+                    Some(Payload::Chunk(chunk)) => {
+                        let len = chunk.len();
+                        buffer.extend_from_slice(&chunk);
+                        return Ok(len);
+                    }
+                    _ => {
+                        return Err(io_error!(
+                            "Failed to download from blob relay service: missing chunk in response"
+                        ));
+                    }
+                },
+                None => return Ok(0), // end of stream
             }
         }
-
-        Ok(0)
     }
 }
