@@ -109,8 +109,9 @@ impl LobClient for RelayLobClient {
         let grpc_client = self.grpc_client.clone();
         let blob_session_id = self.info.blob_session_id;
 
-        let value =
-            std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
+        let value = tokio::fs::read(path)
+            .await
+            .map_err(|e| io_error!("Failed to read lob file: {}", e))?;
         let lob = Self::upload(
             grpc_client,
             blob_session_id,
@@ -333,8 +334,9 @@ impl RelayLobClient {
         chunk_size: usize,
         timeout: Duration,
     ) -> Result<RemoteLob, TgError> {
-        let value =
-            std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
+        let value = tokio::fs::read(path)
+            .await
+            .map_err(|e| io_error!("Failed to read lob file: {}", e))?;
         let lob = Self::upload(
             grpc_client.clone(),
             blob_session_id,

@@ -131,7 +131,9 @@ impl LobClient for PrivilegedLobClient {
         timeout: Duration,
     ) -> Result<Vec<u8>, TgError> {
         let client_path = self.get_file_path(transaction, lob, timeout).await?;
-        std::fs::read(client_path).map_err(|e| io_error!("Failed to read lob file: {}", e))
+        tokio::fs::read(client_path)
+            .await
+            .map_err(|e| io_error!("Failed to read lob file: {}", e))
     }
 
     async fn download_lob_async(
