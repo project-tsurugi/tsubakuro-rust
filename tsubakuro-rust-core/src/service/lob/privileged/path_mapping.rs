@@ -91,7 +91,7 @@ impl LargeObjectSendPathMapping {
             }
         }
 
-        let server_path = client_path_to_server_path(&client_path);
+        let server_path = client_path_to_server_path(client_path);
         debug!(
             "LargeObjectSendPathMapping: client_path={:?} == server_path={}",
             client_path, server_path

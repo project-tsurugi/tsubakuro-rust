@@ -21,6 +21,7 @@ pub enum LobTransferType {
 }
 
 impl LobTransferType {
+    #[allow(clippy::wrong_self_convention)]
     pub(crate) fn to_proto(&self) -> Vec<BlobTransferMedium> {
         use ProtoLobTransferType::*;
         match self {

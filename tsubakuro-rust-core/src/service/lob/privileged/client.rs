@@ -170,7 +170,7 @@ impl PrivilegedLobClient {
     ) -> Result<PathBuf, TgError> {
         let tx_handle = transaction.transaction_handle()?;
 
-        let command = Self::get_lob_command(&tx_handle, lob)?;
+        let command = Self::get_lob_command(tx_handle, lob)?;
         let (_, response) = self.send_and_pull_response(command, timeout).await?;
         let client_path = get_lob_processor(
             response,
@@ -187,7 +187,7 @@ impl PrivilegedLobClient {
     ) -> Result<Job<PathBuf>, TgError> {
         let tx_handle = transaction.transaction_handle()?;
 
-        let command = Self::get_lob_command(&tx_handle, lob)?;
+        let command = Self::get_lob_command(tx_handle, lob)?;
         let lob_recv_path_mapping = self.session.large_object_path_mapping_on_recv().clone();
         let job = self
             .send_and_pull_async(

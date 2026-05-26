@@ -19,13 +19,13 @@ use crate::{
     timeout_error,
 };
 
+struct PutHandle {
+    tx: mpsc::Sender<PutStreamingRequest>,
+    request_handle: JoinHandle<Result<Response<PutStreamingResponse>, tonic::Status>>,
+}
+
 pub(crate) struct RelayLobUploader {
-    handle: tokio::sync::Mutex<
-        Option<(
-            mpsc::Sender<PutStreamingRequest>,
-            JoinHandle<Result<Response<PutStreamingResponse>, tonic::Status>>,
-        )>,
-    >,
+    handle: tokio::sync::Mutex<Option<PutHandle>>,
     cancel_tx: tokio::sync::Mutex<Option<tokio::sync::oneshot::Sender<()>>>,
 }
 
@@ -50,7 +50,7 @@ impl RelayLobUploader {
             .map_err(|e| io_error!("Failed to send first request: {}", e))?;
 
         Ok(RelayLobUploader {
-            handle: tokio::sync::Mutex::new(Some((tx, request_handle))),
+            handle: tokio::sync::Mutex::new(Some(PutHandle { tx, request_handle })),
             cancel_tx: tokio::sync::Mutex::new(Some(cancel_tx)),
         })
     }
@@ -60,8 +60,8 @@ impl RelayLobUploader {
 impl LobUploader for RelayLobUploader {
     async fn upload_chunk(&self, value: &[u8], timeout: Duration) -> Result<(), TgError> {
         let request = RelayLobClient::create_upload_chunk_request(value.to_vec());
-        if let Some((tx, _)) = self.handle.lock().await.as_ref() {
-            match tx.send_timeout(request, timeout).await {
+        if let Some(put_handle) = self.handle.lock().await.as_ref() {
+            match put_handle.tx.send_timeout(request, timeout).await {
                 Ok(()) => Ok(()),
                 Err(SendTimeoutError::Timeout(_)) => {
                     Err(timeout_error!("RelayLobUploader::upload_chunk()"))
@@ -76,10 +76,10 @@ impl LobUploader for RelayLobUploader {
     }
 
     async fn finish(&self, timeout: Duration) -> Result<RemoteLob, TgError> {
-        if let Some((tx, request_handle)) = self.handle.lock().await.take() {
-            drop(tx); // close the sender to indicate the end of the stream
+        if let Some(put_handle) = self.handle.lock().await.take() {
+            drop(put_handle.tx); // close the sender to indicate the end of the stream
 
-            let result = tokio::time::timeout(timeout, request_handle)
+            let result = tokio::time::timeout(timeout, put_handle.request_handle)
                 .await
                 .map_err(|_| timeout_error!("RelayLobUploader::finish()"))?
                 .map_err(|e| io_error!("Failed to receive upload response: {}", e))?;
