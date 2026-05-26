@@ -4,7 +4,8 @@ use log::warn;
 use tsubakuro_rust_core::prelude::*;
 
 /*
-docker run -d -p 12345:12345 --name tsurugi -v D:/tmp/client:/mnt/client -v D:/tmp/tsurugi:/opt/tsurugi/var/data/log ghcr.io/project-tsurugi/tsurugidb:latest
+docker run -d -p 12345:12345 --name tsurugi -v C:/tmp/client:/mnt/client -v C:/tmp/tsurugi:/opt/tsurugi/var/data/log ghcr.io/project-tsurugi/tsurugidb:latest
+cargo run --bin example_blob_path_mapping
 */
 
 #[tokio::main]
@@ -20,9 +21,10 @@ async fn example() -> Result<(), TgError> {
     connection_option.set_endpoint(endpoint);
     connection_option.set_application_name("Tsubakuro/Rust example");
     connection_option.set_session_label("example session");
-    connection_option.add_large_object_path_mapping_on_send("D:/tmp/client", "/mnt/client");
+    connection_option.set_lob_transfer_type(LobTransferType::Privileged);
+    connection_option.add_large_object_path_mapping_on_send("C:/tmp/client", "/mnt/client");
     connection_option
-        .add_large_object_path_mapping_on_recv("/opt/tsurugi/var/data/log", "D:/tmp/tsurugi");
+        .add_large_object_path_mapping_on_recv("/opt/tsurugi/var/data/log", "C:/tmp/tsurugi");
     connection_option.set_default_timeout(Duration::from_secs(10));
 
     // connect
@@ -140,12 +142,13 @@ async fn example_blob_insert(client: &SqlClient, transaction: &Transaction) -> R
 }
 
 /// execute BLOB insert example
+#[allow(deprecated)]
 async fn example_blob_insert_execute(
     client: &SqlClient,
     transaction: &Transaction,
     ps: &SqlPreparedStatement,
 ) -> Result<(), TgError> {
-    let blob_file = "D:/tmp/client/send-rust-blob.dat";
+    let blob_file = "C:/tmp/client/send-rust-blob.dat";
     let data = vec![0x31_u8, 0x32_u8, 0x33_u8];
     std::fs::write(blob_file, data).unwrap();
 

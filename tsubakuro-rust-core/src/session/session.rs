@@ -9,11 +9,16 @@ use crate::{
     error::TgError,
     illegal_argument_error,
     job::Job,
-    prelude::{
-        r#type::large_object::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
-        Endpoint, ShutdownType,
+    prelude::{Endpoint, ShutdownType},
+    service::{
+        core::core_service::CoreService,
+        lob::{
+            lob_transfer_info::LobTransferInfo,
+            privileged::path_mapping::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
+        },
+        ServiceClient,
     },
-    service::{core::core_service::CoreService, ServiceClient},
+    session::lob_transfer_type::LobTransferType,
 };
 
 use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
@@ -45,8 +50,9 @@ use super::{option::ConnectionOption, tcp::connector::TcpConnector, wire::Wire};
 #[derive(Debug)]
 pub struct Session {
     wire: Arc<Wire>,
-    lob_send_path_mapping: LargeObjectSendPathMapping,
-    lob_recv_path_mapping: LargeObjectRecvPathMapping,
+    lob_send_path_mapping: Arc<LargeObjectSendPathMapping>,
+    lob_recv_path_mapping: Arc<LargeObjectRecvPathMapping>,
+    blob_relay_service_endpoint: Option<String>,
     default_timeout: RwLock<Duration>,
     shutdowned: AtomicBool,
     fail_on_drop_error: AtomicBool,
@@ -124,6 +130,27 @@ impl Session {
     /// since 0.5.0
     pub fn user_name(&self) -> Option<String> {
         self.wire.user_name()
+    }
+
+    /// Get large object transfer type.
+    ///
+    /// since 0.10.0
+    pub fn lob_transfer_type(&self) -> LobTransferType {
+        self.wire.lob_transfer_info().into()
+    }
+
+    /// Get large object transfer info.
+    ///
+    /// since 0.10.0
+    pub(crate) fn lob_transfer_info(&self) -> LobTransferInfo {
+        self.wire.lob_transfer_info()
+    }
+
+    /// Get blob relay service endpoint.
+    ///
+    /// since 0.10.0
+    pub(crate) fn blob_relay_service_endpoint(&self) -> Option<&String> {
+        self.blob_relay_service_endpoint.as_ref()
     }
 
     /// Checks if the session has an encryption key.
@@ -213,11 +240,11 @@ impl Session {
         .await
     }
 
-    pub(crate) fn large_object_path_mapping_on_send(&self) -> &LargeObjectSendPathMapping {
+    pub(crate) fn large_object_path_mapping_on_send(&self) -> &Arc<LargeObjectSendPathMapping> {
         &self.lob_send_path_mapping
     }
 
-    pub(crate) fn large_object_path_mapping_on_recv(&self) -> &LargeObjectRecvPathMapping {
+    pub(crate) fn large_object_path_mapping_on_recv(&self) -> &Arc<LargeObjectRecvPathMapping> {
         &self.lob_recv_path_mapping
     }
 
@@ -295,12 +322,17 @@ impl Session {
     ) -> Arc<Self> {
         let session = Arc::new(Session {
             wire,
-            lob_send_path_mapping: connection_option
-                .large_object_path_mapping_on_send()
-                .clone(),
-            lob_recv_path_mapping: connection_option
-                .large_object_path_mapping_on_recv()
-                .clone(),
+            lob_send_path_mapping: Arc::new(
+                connection_option
+                    .large_object_path_mapping_on_send()
+                    .clone(),
+            ),
+            lob_recv_path_mapping: Arc::new(
+                connection_option
+                    .large_object_path_mapping_on_recv()
+                    .clone(),
+            ),
+            blob_relay_service_endpoint: connection_option.blob_relay_service_endpoint().cloned(),
             default_timeout: RwLock::new(default_timeout),
             shutdowned: AtomicBool::new(false),
             fail_on_drop_error: AtomicBool::new(false),

@@ -169,8 +169,7 @@ impl From<TgTimeOfDayWithTimeZone> for (time::Time, time::UtcOffset) {
 impl From<&TgTimeOfDayWithTimeZone> for (time::Time, time::UtcOffset) {
     fn from(value: &TgTimeOfDayWithTimeZone) -> Self {
         let time = offset_nanos_to_time(value.offset_nanoseconds);
-        let offset =
-            time::UtcOffset::from_whole_seconds((value.time_zone_offset * 60) as i32).unwrap();
+        let offset = time::UtcOffset::from_whole_seconds(value.time_zone_offset * 60).unwrap();
 
         (time, offset)
     }
@@ -212,8 +211,7 @@ impl From<&TgTimePointWithTimeZone> for time::OffsetDateTime {
         let nanos = value.nano_adjustment;
         let (date, time) = epoch_seconds_to_date_time(seconds, nanos);
 
-        let offset =
-            time::UtcOffset::from_whole_seconds((value.time_zone_offset * 60) as i32).unwrap();
+        let offset = time::UtcOffset::from_whole_seconds(value.time_zone_offset * 60).unwrap();
 
         time::OffsetDateTime::new_in_offset(date, time, offset)
     }

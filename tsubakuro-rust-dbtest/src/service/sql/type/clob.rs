@@ -7,8 +7,7 @@ mod test {
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
-    #[allow(dead_code)]
-    //TODO #[test]
+    #[test]
     async fn literal() {
         let client = create_test_sql_client().await;
 
@@ -100,6 +99,7 @@ mod test {
                 Some(value) => {
                     file = NamedTempFile::new().unwrap();
                     write!(file, "{}", value).unwrap();
+                    #[allow(deprecated)]
                     Some(TgClob::new(file.path().to_str().unwrap()))
                 }
                 None => None,
@@ -161,18 +161,32 @@ mod test {
             if !skip {
                 let v: Option<TgClobReference> = query_result.fetch().await.unwrap();
                 if let Some(clob) = v {
-                    let file = client.open_clob(&transaction, &clob).await.unwrap();
-                    let mut reader = BufReader::new(file);
-                    let mut v = String::new();
-                    reader.read_to_string(&mut v).unwrap();
-                    assert_eq!(expected.1, Some(v));
+                    if client
+                        .allows_lob_operation(LobOperation::OpenLob)
+                        .await
+                        .unwrap()
+                    {
+                        let file = client.open_clob(&transaction, &clob).await.unwrap();
+                        let mut reader = BufReader::new(file);
+                        let mut v = String::new();
+                        reader.read_to_string(&mut v).unwrap();
+                        assert_eq!(expected.1, Some(v));
+                    }
 
                     let cache = client.get_clob_cache(&transaction, &clob).await.unwrap();
-                    let file = std::fs::File::open(cache.path().unwrap()).unwrap();
-                    let mut reader = BufReader::new(file);
-                    let mut v = String::new();
-                    reader.read_to_string(&mut v).unwrap();
-                    assert_eq!(expected.1, Some(v));
+                    if client
+                        .allows_lob_operation(LobOperation::OpenLob)
+                        .await
+                        .unwrap()
+                    {
+                        let file = std::fs::File::open(cache.path().unwrap()).unwrap();
+                        let mut reader = BufReader::new(file);
+                        let mut v = String::new();
+                        reader.read_to_string(&mut v).unwrap();
+                        assert_eq!(expected.1, Some(v));
+                    } else {
+                        assert_eq!(true, cache.path().is_none());
+                    }
 
                     let v = client.read_clob(&transaction, &clob).await.unwrap();
                     assert_eq!(expected.1, Some(v));

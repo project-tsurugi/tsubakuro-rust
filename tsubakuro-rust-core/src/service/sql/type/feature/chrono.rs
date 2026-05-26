@@ -157,7 +157,7 @@ impl From<&TgTimeOfDayWithTimeZone> for (chrono::NaiveTime, chrono::FixedOffset)
 
         let time =
             chrono::NaiveTime::from_num_seconds_from_midnight_opt(seconds as u32, nanos).unwrap();
-        let offset = chrono::FixedOffset::east_opt((value.time_zone_offset * 60) as i32).unwrap();
+        let offset = chrono::FixedOffset::east_opt(value.time_zone_offset * 60).unwrap();
 
         (time, offset)
     }
@@ -204,7 +204,7 @@ impl From<&TgTimePointWithTimeZone> for chrono::DateTime<chrono::FixedOffset> {
         let time =
             chrono::NaiveTime::from_num_seconds_from_midnight_opt(secs_of_day, nanos).unwrap();
         let datetime = chrono::NaiveDateTime::new(date, time);
-        let offset = chrono::FixedOffset::east_opt((value.time_zone_offset * 60) as i32).unwrap();
+        let offset = chrono::FixedOffset::east_opt(value.time_zone_offset * 60).unwrap();
 
         offset.from_local_datetime(&datetime).unwrap()
     }

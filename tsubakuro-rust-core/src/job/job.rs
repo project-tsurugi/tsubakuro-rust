@@ -1,14 +1,18 @@
 use std::{sync::Arc, time::Duration};
 
 use super::cancel_job::CancelJob;
-use log::{error, warn};
 
 use crate::{
     client_error,
     error::TgError,
-    service::endpoint::endpoint_broker::EndpointBroker,
+    job::inner::{
+        convert_job::ConvertInnerJob,
+        spawn_job::{BoxFuture, SpawnInnerJob},
+        value_job::ValueInnerJob,
+        wire_slot_job::WireSlotInnerJob,
+        InnerJob,
+    },
     session::wire::{response::WireResponse, response_box::SlotEntryHandle, Wire},
-    util::Timeout,
 };
 
 /// Job.
@@ -31,11 +35,9 @@ use crate::{
 ///     Ok(())
 /// }
 /// ```
-pub struct Job<T> {
+pub struct Job<T: Send + Sync + 'static> {
     name: String,
-    wire: Arc<Wire>,
-    slot_handle: Arc<SlotEntryHandle>,
-    converter: Box<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send>,
+    inner: Arc<dyn InnerJob<T> + Send + Sync>,
     default_timeout: Duration,
     done: bool,
     taked: bool,
@@ -44,12 +46,10 @@ pub struct Job<T> {
     fail_on_drop_error: bool,
 }
 
-impl<T> std::fmt::Debug for Job<T> {
+impl<T: Send + Sync + 'static> std::fmt::Debug for Job<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Job")
             .field("name", &self.name)
-            .field("wire", &self.wire)
-            .field("slot_handle", &self.slot_handle)
             .field("default_timeout", &self.default_timeout)
             .field("done", &self.done)
             .field("taked", &self.taked)
@@ -59,28 +59,87 @@ impl<T> std::fmt::Debug for Job<T> {
     }
 }
 
-impl<T> Job<T> {
-    pub(crate) fn new<F>(
+impl<T: Send + Sync + 'static> Job<T> {
+    pub(crate) fn new(
         name: &str,
         wire: Arc<Wire>,
         slot_handle: Arc<SlotEntryHandle>,
-        converter: F,
+        converter: Arc<
+            dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
+        >,
         default_timeout: Duration,
         fail_on_drop_error: bool,
-    ) -> Job<T>
-    where
-        F: Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + 'static,
-    {
+    ) -> Job<T> {
+        let inner = Arc::new(WireSlotInnerJob::new(wire, slot_handle, converter));
+
         Job {
             name: name.to_string(),
-            wire,
-            slot_handle,
-            converter: Box::new(converter),
+            inner,
             default_timeout,
             done: false,
             taked: false,
             canceled: false,
             closed: false,
+            fail_on_drop_error,
+        }
+    }
+
+    pub(crate) fn returns(name: &str, value: T) -> Job<T> {
+        let inner = Arc::new(ValueInnerJob::new(value));
+
+        Job {
+            name: name.to_string(),
+            inner,
+            default_timeout: Duration::ZERO,
+            done: true,
+            taked: false,
+            canceled: false,
+            closed: false,
+            fail_on_drop_error: false,
+        }
+    }
+
+    pub(crate) fn supplier(
+        name: &str,
+        supplier: Arc<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>,
+        default_timeout: Duration,
+    ) -> Job<T> {
+        let inner = SpawnInnerJob::new(supplier);
+
+        Job {
+            name: name.to_string(),
+            inner,
+            default_timeout,
+            done: true, // TODO false
+            taked: false,
+            canceled: false,
+            closed: false,
+            fail_on_drop_error: false,
+        }
+    }
+
+    pub(crate) fn convert<R: Send + Sync + 'static>(
+        self,
+        name: &str,
+        converter: Arc<dyn Fn(T) -> Result<R, TgError> + Send + Sync>,
+    ) -> Job<R> {
+        let inner = Arc::new(ConvertInnerJob::new(self.inner.clone(), converter));
+
+        let default_timeout = self.default_timeout;
+        let done = self.done;
+        let taked = self.taked;
+        let canceled = self.canceled;
+        let closed = self.closed;
+        let fail_on_drop_error = self.fail_on_drop_error;
+
+        Job {
+            name: name.to_string(),
+            inner,
+            default_timeout,
+            done,
+            taked,
+            canceled,
+            closed,
             fail_on_drop_error,
         }
     }
@@ -121,9 +180,7 @@ impl<T> Job<T> {
             return Ok(true);
         }
 
-        let slot_handle = self.slot_handle.clone();
-        let timeout = Timeout::new(timeout);
-        let result = self.wire.wait_response(slot_handle, &timeout).await;
+        let result = self.inner.wait(timeout).await;
         if let Ok(true) = result {
             self.done = true;
         }
@@ -163,8 +220,7 @@ impl<T> Job<T> {
             return Ok(false);
         }
 
-        let slot_handle = self.slot_handle.clone();
-        let result = self.wire.check_response(slot_handle).await;
+        let result = self.inner.is_done().await;
         if let Ok(true) = result {
             self.done = true;
         }
@@ -211,12 +267,10 @@ impl<T> Job<T> {
         // self.check_cancel()?;
         // self.check_close()?;
 
-        let slot_handle = &self.slot_handle;
-        let timeout = Timeout::new(timeout);
-        let response = self.wire.pull_response(slot_handle, &timeout).await?;
-        self.done = true;
         self.taked = true;
-        (self.converter)(slot_handle.clone(), response)
+        let value = self.inner.take_for(timeout).await?;
+        self.done = true;
+        Ok(value)
     }
 
     /// Retrieves the result value if a response has been received.
@@ -321,9 +375,7 @@ impl<T> Job<T> {
         }
         self.canceled = true;
 
-        self.send_cancel().await?;
-        let job = CancelJob::new(self.wire.clone(), self.slot_handle.clone());
-        Ok(Some(job))
+        self.inner.cancel_async().await
     }
 
     // fn check_cancel(&self) -> Result<(), TgError> {
@@ -346,7 +398,7 @@ impl<T> Job<T> {
             return Ok(());
         }
 
-        self.send_cancel().await // send only (do not check response)
+        self.inner.send_cancel().await // send only (do not check response)
     }
 
     // fn check_close(&self) -> Result<(), TgError> {
@@ -355,13 +407,6 @@ impl<T> Job<T> {
     //     }
     //     Ok(())
     // }
-
-    async fn send_cancel(&self) -> Result<(), TgError> {
-        let slot = self.slot_handle.slot();
-        EndpointBroker::cancel(&self.wire, slot).await?;
-
-        Ok(())
-    }
 
     /// for debug
     #[doc(hidden)]
@@ -374,39 +419,12 @@ impl<T> Job<T> {
     }
 }
 
-impl<T> Drop for Job<T> {
+impl<T: Send + Sync + 'static> Drop for Job<T> {
     fn drop(&mut self) {
         if self.done || self.canceled || self.closed {
             return;
         }
-        if self.slot_handle.exists_wire_response() {
-            return;
-        }
 
-        std::thread::scope(|scope| {
-            scope.spawn(move || {
-                let runtime = {
-                    match tokio::runtime::Runtime::new() {
-                        Ok(runtime) => runtime,
-                        Err(e) => {
-                            error!("Job<{}>.drop() runtime::new error. {}", self.name, e);
-                            if self.fail_on_drop_error() {
-                                panic!("Job<{}>.drop() runtime::new error. {}", self.name, e);
-                            }
-                            return;
-                        }
-                    }
-                };
-                runtime.block_on(async {
-                    let result = self.send_cancel().await; // send only (do not check response)
-                    if let Err(e) = result {
-                        warn!("Job<{}>.drop() close error. {}", self.name, e);
-                        if self.fail_on_drop_error() {
-                            panic!("Job<{}>.drop() close error. {}", self.name, e);
-                        }
-                    }
-                })
-            });
-        });
+        self.inner.dispose(&self.name, self.fail_on_drop_error());
     }
 }

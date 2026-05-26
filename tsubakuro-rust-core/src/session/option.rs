@@ -2,10 +2,11 @@ use std::{path::Path, time::Duration};
 
 use crate::{
     error::TgError,
-    prelude::{
-        r#type::large_object::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
-        Credential,
+    prelude::Credential,
+    service::lob::privileged::path_mapping::{
+        LargeObjectRecvPathMapping, LargeObjectSendPathMapping,
     },
+    session::lob_transfer_type::LobTransferType,
 };
 
 use super::endpoint::Endpoint;
@@ -45,8 +46,10 @@ pub struct ConnectionOption {
     application_name: Option<String>,
     session_label: Option<String>,
     keep_alive: Duration,
+    lob_transfer_type: LobTransferType,
     lob_send_path_mapping: LargeObjectSendPathMapping,
     lob_recv_path_mapping: LargeObjectRecvPathMapping,
+    blob_relay_service_endpoint: Option<String>,
     default_timeout: Duration,
     send_timeout: Duration,
     recv_timeout: Duration,
@@ -68,8 +71,10 @@ impl ConnectionOption {
             application_name: None,
             session_label: None,
             keep_alive: Duration::from_secs(60),
+            lob_transfer_type: LobTransferType::Default,
             lob_send_path_mapping: LargeObjectSendPathMapping::new(),
             lob_recv_path_mapping: LargeObjectRecvPathMapping::new(),
+            blob_relay_service_endpoint: None,
             default_timeout: Duration::ZERO,
             send_timeout: Duration::ZERO,
             recv_timeout: Duration::ZERO,
@@ -160,6 +165,20 @@ impl ConnectionOption {
         self.keep_alive
     }
 
+    /// Set large object transfer type.
+    ///
+    /// since 0.10.0
+    pub fn set_lob_transfer_type(&mut self, lob_transfer_type: LobTransferType) {
+        self.lob_transfer_type = lob_transfer_type;
+    }
+
+    /// Get large object transfer type.
+    ///
+    /// since 0.10.0
+    pub fn lob_transfer_type(&self) -> LobTransferType {
+        self.lob_transfer_type
+    }
+
     /// Adds a path mapping entry for both sending and receiving BLOB/CLOB.
     ///
     /// since 0.2.0
@@ -200,6 +219,20 @@ impl ConnectionOption {
 
     pub(crate) fn large_object_path_mapping_on_recv(&self) -> &LargeObjectRecvPathMapping {
         &self.lob_recv_path_mapping
+    }
+
+    /// Set blob relay service endpoint.
+    ///
+    /// since 0.10.0
+    pub fn set_blob_relay_service_endpoint(&mut self, endpoint: &str) {
+        self.blob_relay_service_endpoint = Some(endpoint.to_string());
+    }
+
+    /// Get blob relay service endpoint.
+    ///
+    /// since 0.10.0
+    pub fn blob_relay_service_endpoint(&self) -> Option<&String> {
+        self.blob_relay_service_endpoint.as_ref()
     }
 
     /// Set default timeout.
@@ -314,6 +347,15 @@ mod test {
         option.set_session_label(&label);
 
         assert_eq!(Some(&label), option.session_label());
+    }
+
+    #[test]
+    fn lob_transfer_type() {
+        let mut option = ConnectionOption::new();
+        assert_eq!(LobTransferType::Default, option.lob_transfer_type());
+
+        option.set_lob_transfer_type(LobTransferType::Relay);
+        assert_eq!(LobTransferType::Relay, option.lob_transfer_type());
     }
 
     #[test]

@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
-use crate::prelude::Session;
+use crate::{prelude::Session, service::lob::privileged::client::PrivilegedLobClient};
 
 pub mod core;
 pub(crate) mod endpoint;
+pub(crate) mod lob;
 pub mod sql;
 pub mod system;
 
@@ -21,4 +22,12 @@ pub trait ServiceClient {
 pub trait ServiceMessageVersion {
     /// Returns the service message version.
     fn service_message_version() -> String;
+}
+
+/// Returns the service message version for PrivilegedLobClient.
+/// for internal use only.
+///
+/// since 0.10.0
+pub fn privileged_lob_client_service_message_version() -> String {
+    PrivilegedLobClient::service_message_version()
 }

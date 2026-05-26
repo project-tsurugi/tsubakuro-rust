@@ -88,6 +88,7 @@ If proto files in [Tsubakuro/Java](https://github.com/project-tsurugi/tsubakuro)
 cd tsubakuro-rust-core
 cp -rp /path/to/tsubakuro/modules/proto/src/main/protos .
 cp -rp /path/to/tsubakuro/modules/system/src/main/proto/* protos/
+cp -rp /path/to/tsubakuro/modules/grpc/src/main/proto/* protos/
 ```
 
 Then build with `cargo`.

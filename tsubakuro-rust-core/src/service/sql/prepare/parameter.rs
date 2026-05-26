@@ -1,12 +1,15 @@
-use std::sync::atomic::AtomicI64;
-
 use crate::jogasaki::proto::sql::request::parameter::{Placement, Value};
-use crate::prelude::{
-    r#type::large_object::LargeObjectSendPathMapping, TgBlob, TgClob, TgDate, TgDecimal,
-    TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone, TgTimePoint, TgTimePointWithTimeZone,
+use crate::jogasaki::proto::sql::request::Parameter as SqlParameter;
+use crate::jogasaki::proto::sql::request::{
+    client_only_large_object_info::Data as ClientOnlyLargeObjectInfoData, ClientOnlyLargeObjectInfo,
 };
-use crate::tateyama::proto::framework::common::BlobInfo;
-use crate::{error::TgError, jogasaki::proto::sql::request::Parameter as SqlParameter};
+use crate::prelude::{
+    TgBlob, TgClob, TgDate, TgDecimal, TgDecimalI128, TgTimeOfDay, TgTimeOfDayWithTimeZone,
+    TgTimePoint, TgTimePointWithTimeZone,
+};
+use crate::service::lob::lob_client::RemoteLob;
+use crate::service::sql::r#type::blob::InnerBlob;
+use crate::service::sql::r#type::clob::InnerClob;
 
 #[cfg(feature = "with_bigdecimal")]
 mod bigdecimal;
@@ -180,26 +183,70 @@ impl SqlParameterOf<TgTimePointWithTimeZone> for SqlParameter {
 
 impl SqlParameterOf<TgBlob> for SqlParameter {
     fn of(name: &str, value: TgBlob) -> SqlParameter {
-        use crate::jogasaki::proto::sql::common::blob::Data;
-        let data = match value {
-            TgBlob::Path(path) => Data::LocalPath(path),
-            TgBlob::Contents(value) => Data::Contents(value),
+        let value = match value.inner {
+            InnerBlob::Path(path) => {
+                let data = ClientOnlyLargeObjectInfoData::ClientPath(path);
+                let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+                Value::LargeObjectInfoBlob(info)
+            }
+            InnerBlob::Contents(value) => {
+                let data = crate::jogasaki::proto::sql::common::blob::Data::Contents(value);
+                let value = crate::jogasaki::proto::sql::common::Blob { data: Some(data) };
+                Value::Blob(value)
+            }
+            InnerBlob::RemoteLob(remote_lob) => match remote_lob {
+                RemoteLob::ServerPath(path) => {
+                    let data = ClientOnlyLargeObjectInfoData::ServerPath(path);
+                    let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+                    Value::LargeObjectInfoBlob(info)
+                }
+                RemoteLob::LobReference(storage_id, object_id, tag) => {
+                    let lob_ref = crate::jogasaki::proto::sql::request::BlobRelayReference {
+                        storage_id,
+                        object_id,
+                        tag,
+                    };
+                    let data = ClientOnlyLargeObjectInfoData::BlobRelayReference(lob_ref);
+                    let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+                    Value::LargeObjectInfoBlob(info)
+                }
+            },
         };
-        let value = crate::jogasaki::proto::sql::common::Blob { data: Some(data) };
-        let value = Value::Blob(value);
         SqlParameter::new(name, Some(value))
     }
 }
 
 impl SqlParameterOf<TgClob> for SqlParameter {
     fn of(name: &str, value: TgClob) -> SqlParameter {
-        use crate::jogasaki::proto::sql::common::clob::Data;
-        let data = match value {
-            TgClob::Path(path) => Data::LocalPath(path),
-            TgClob::Contents(value) => Data::Contents(value),
+        let value = match value.inner {
+            InnerClob::Path(path) => {
+                let data = ClientOnlyLargeObjectInfoData::ClientPath(path);
+                let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+                Value::LargeObjectInfoClob(info)
+            }
+            InnerClob::Contents(value) => {
+                let data = crate::jogasaki::proto::sql::common::clob::Data::Contents(value);
+                let value = crate::jogasaki::proto::sql::common::Clob { data: Some(data) };
+                Value::Clob(value)
+            }
+            InnerClob::RemoteLob(remote_lob) => match remote_lob {
+                RemoteLob::ServerPath(path) => {
+                    let data = ClientOnlyLargeObjectInfoData::ServerPath(path);
+                    let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+                    Value::LargeObjectInfoClob(info)
+                }
+                RemoteLob::LobReference(storage_id, object_id, tag) => {
+                    let lob_ref = crate::jogasaki::proto::sql::request::BlobRelayReference {
+                        storage_id,
+                        object_id,
+                        tag,
+                    };
+                    let data = ClientOnlyLargeObjectInfoData::BlobRelayReference(lob_ref);
+                    let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+                    Value::LargeObjectInfoClob(info)
+                }
+            },
         };
-        let value = crate::jogasaki::proto::sql::common::Clob { data: Some(data) };
-        let value = Value::Clob(value);
         SqlParameter::new(name, Some(value))
     }
 }
@@ -256,89 +303,6 @@ impl SqlParameterBindNull for String {
     fn parameter_null(&self) -> SqlParameter {
         SqlParameter::null(self)
     }
-}
-
-static BLOB_NUMBER: AtomicI64 = AtomicI64::new(0);
-static CLOB_NUMBER: AtomicI64 = AtomicI64::new(0);
-
-pub(crate) fn convert_lob_parameters(
-    parameters: Vec<SqlParameter>,
-    lob_send_path_mapping: &LargeObjectSendPathMapping,
-) -> Result<(Vec<SqlParameter>, Option<Vec<BlobInfo>>), TgError> {
-    use crate::jogasaki::proto::sql::common::blob::Data as BlobData;
-    use crate::jogasaki::proto::sql::common::clob::Data as ClobData;
-    use crate::jogasaki::proto::sql::common::Blob;
-    use crate::jogasaki::proto::sql::common::Clob;
-
-    let mut parameters_result = Vec::with_capacity(parameters.len());
-    let mut lobs = Vec::new();
-    for parameter in parameters {
-        let parameter = match parameter {
-            SqlParameter {
-                placement,
-                value:
-                    Some(Value::Blob(Blob {
-                        data: Some(BlobData::LocalPath(path)),
-                    })),
-            } => {
-                let path = lob_send_path_mapping.contert_to_server_path(&path)?;
-                let channel_name = create_channel_name("Blob", &BLOB_NUMBER);
-                let lob_info = BlobInfo {
-                    channel_name: channel_name.clone(),
-                    path,
-                    temporary: false,
-                };
-                lobs.push(lob_info);
-
-                let data = BlobData::ChannelName(channel_name);
-                let value = Blob { data: Some(data) };
-                let value = Value::Blob(value);
-                SqlParameter {
-                    placement,
-                    value: Some(value),
-                }
-            }
-            SqlParameter {
-                placement,
-                value:
-                    Some(Value::Clob(Clob {
-                        data: Some(ClobData::LocalPath(path)),
-                    })),
-            } => {
-                let path = lob_send_path_mapping.contert_to_server_path(&path)?;
-                let channel_name = create_channel_name("Clob", &CLOB_NUMBER);
-                // not ClobInfo
-                let lob_info = BlobInfo {
-                    channel_name: channel_name.clone(),
-                    path,
-                    temporary: false,
-                };
-                lobs.push(lob_info);
-
-                let data = ClobData::ChannelName(channel_name);
-                let value = Clob { data: Some(data) };
-                let value = Value::Clob(value);
-                SqlParameter {
-                    placement,
-                    value: Some(value),
-                }
-            }
-            parameter => parameter,
-        };
-        parameters_result.push(parameter);
-    }
-
-    if lobs.is_empty() {
-        Ok((parameters_result, None))
-    } else {
-        Ok((parameters_result, Some(lobs)))
-    }
-}
-
-fn create_channel_name(prefix: &str, number: &AtomicI64) -> String {
-    let pid = std::process::id();
-    let n = number.fetch_add(1, std::sync::atomic::Ordering::SeqCst) + 1;
-    format!("Rust{prefix}Channel-{pid}-{n}")
 }
 
 #[cfg(test)]
@@ -658,15 +622,14 @@ mod test {
 
     #[test]
     fn blob_path() {
+        #[allow(deprecated)]
         let value = TgBlob::new("/path/to/file");
         let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
-        let data =
-            crate::jogasaki::proto::sql::common::blob::Data::LocalPath("/path/to/file".to_string());
-        assert_eq!(
-            &Value::Blob(crate::jogasaki::proto::sql::common::Blob { data: Some(data) }),
-            target0.value().unwrap()
-        );
+
+        let data = ClientOnlyLargeObjectInfoData::ClientPath("/path/to/file".to_string());
+        let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+        assert_eq!(&Value::LargeObjectInfoBlob(info), target0.value().unwrap());
 
         let target = SqlParameter::of("test", Some(value.clone()));
         assert_eq!(target0, target);
@@ -690,15 +653,13 @@ mod test {
 
     #[test]
     fn clob_path() {
+        #[allow(deprecated)]
         let value = TgClob::new("/path/to/file");
         let target0 = SqlParameter::of("test", value.clone());
         assert_eq!("test", target0.name().unwrap());
-        let data =
-            crate::jogasaki::proto::sql::common::clob::Data::LocalPath("/path/to/file".to_string());
-        assert_eq!(
-            &Value::Clob(crate::jogasaki::proto::sql::common::Clob { data: Some(data) }),
-            target0.value().unwrap()
-        );
+        let data = ClientOnlyLargeObjectInfoData::ClientPath("/path/to/file".to_string());
+        let info = ClientOnlyLargeObjectInfo { data: Some(data) };
+        assert_eq!(&Value::LargeObjectInfoClob(info), target0.value().unwrap());
 
         let target = SqlParameter::of("test", Some(value.clone()));
         assert_eq!(target0, target);

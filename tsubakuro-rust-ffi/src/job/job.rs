@@ -18,14 +18,14 @@ use crate::{
 
 use super::cancel_job::TsurugiFfiCancelJobHandle;
 
-pub(crate) struct TsurugiFfiJob<T> {
+pub(crate) struct TsurugiFfiJob<T: Send + Sync + 'static> {
     job: Option<Job<T>>,
     delegater: Box<dyn TsurugiFfiJobDelegator>,
     runtime: Arc<tokio::runtime::Runtime>,
     name: Option<CString>,
 }
 
-impl<T> TsurugiFfiJob<T> {
+impl<T: Send + Sync + 'static> TsurugiFfiJob<T> {
     pub(crate) fn new(
         job: Job<T>,
         delegater: Box<dyn TsurugiFfiJobDelegator>,
@@ -339,7 +339,7 @@ pub extern "C" fn tsurugi_ffi_job_take(
         .take(context, job, value_out)
 }
 
-impl<T> TsurugiFfiJob<T> {
+impl<T: Send + Sync + 'static> TsurugiFfiJob<T> {
     pub(crate) fn take<FFI>(
         &mut self,
         context: TsurugiFfiContextHandle,
@@ -411,7 +411,7 @@ pub extern "C" fn tsurugi_ffi_job_take_for(
         .take_for(context, job, timeout, value_out)
 }
 
-impl<T> TsurugiFfiJob<T> {
+impl<T: Send + Sync + 'static> TsurugiFfiJob<T> {
     pub(crate) fn take_for<FFI>(
         &mut self,
         context: TsurugiFfiContextHandle,
@@ -487,7 +487,7 @@ pub extern "C" fn tsurugi_ffi_job_take_if_ready(
         .take_if_ready(context, job, is_ready_out, value_out)
 }
 
-impl<T> TsurugiFfiJob<T> {
+impl<T: Send + Sync + 'static> TsurugiFfiJob<T> {
     pub(crate) fn take_if_ready<FFI>(
         &mut self,
         context: TsurugiFfiContextHandle,

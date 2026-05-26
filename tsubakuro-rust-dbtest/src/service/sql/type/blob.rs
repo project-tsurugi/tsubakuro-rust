@@ -7,8 +7,7 @@ mod test {
     use tokio::test;
     use tsubakuro_rust_core::prelude::*;
 
-    #[allow(dead_code)]
-    //TODO #[test]
+    #[test]
     async fn literal() {
         let client = create_test_sql_client().await;
 
@@ -101,6 +100,7 @@ mod test {
                 Some(value) => {
                     file = NamedTempFile::new().unwrap();
                     file.write_all(value).unwrap();
+                    #[allow(deprecated)]
                     Some(TgBlob::new(file.path().to_str().unwrap()))
                 }
                 None => None,
@@ -162,16 +162,30 @@ mod test {
             if !skip {
                 let v: Option<TgBlobReference> = query_result.fetch().await.unwrap();
                 if let Some(blob) = v {
-                    let mut file = client.open_blob(&transaction, &blob).await.unwrap();
-                    let mut v = Vec::new();
-                    file.read_to_end(&mut v).unwrap();
-                    assert_eq!(expected.1, Some(v));
+                    if client
+                        .allows_lob_operation(LobOperation::OpenLob)
+                        .await
+                        .unwrap()
+                    {
+                        let mut file = client.open_blob(&transaction, &blob).await.unwrap();
+                        let mut v = Vec::new();
+                        file.read_to_end(&mut v).unwrap();
+                        assert_eq!(expected.1, Some(v));
+                    }
 
                     let cache = client.get_blob_cache(&transaction, &blob).await.unwrap();
-                    let mut file = std::fs::File::open(cache.path().unwrap()).unwrap();
-                    let mut v = Vec::new();
-                    file.read_to_end(&mut v).unwrap();
-                    assert_eq!(expected.1, Some(v));
+                    if client
+                        .allows_lob_operation(LobOperation::OpenLob)
+                        .await
+                        .unwrap()
+                    {
+                        let mut file = std::fs::File::open(cache.path().unwrap()).unwrap();
+                        let mut v = Vec::new();
+                        file.read_to_end(&mut v).unwrap();
+                        assert_eq!(expected.1, Some(v));
+                    } else {
+                        assert_eq!(true, cache.path().is_none());
+                    }
 
                     let v = client.read_blob(&transaction, &blob).await.unwrap();
                     assert_eq!(expected.1, Some(v));
