@@ -421,9 +421,10 @@ impl RelayLobClient {
             let mut buffer = Vec::new();
 
             loop {
-                let response = stream.message().await.map_err(|e| {
-                    io_error!("Failed to receive chunk from blob relay service", e)
-                })?;
+                let response = stream
+                    .message()
+                    .await
+                    .map_err(|e| io_error!("Failed to receive chunk from blob relay service", e))?;
 
                 match response {
                     Some(response) => match response.payload {
@@ -486,10 +487,10 @@ impl RelayLobClient {
         } else {
             tokio::time::timeout(timeout, grpc_client.get(request))
                 .await
-                .map_err(|_| timeout_error!("RelayLobClient::download()"))?
+                .map_err(|_| timeout_error!("RelayLobClient::start_download()"))?
         };
         let stream = result
-            .map_err(|e| io_error!("Failed to download from blob relay service", e))?
+            .map_err(|e| io_error!("Failed to start download from blob relay service", e))?
             .into_inner();
 
         Ok(stream)
