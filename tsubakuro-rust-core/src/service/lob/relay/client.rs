@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use log::{debug, trace};
+use log::{debug, trace, warn};
 use tonic::{async_trait, Streaming};
 
 use crate::{
@@ -38,6 +38,7 @@ const API_VERSION: u64 = 1;
 pub(crate) struct RelayLobClient {
     info: BlobRelayServiceInfo,
     grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
+    stream_chunk_size: usize,
 }
 
 impl RelayLobClient {
@@ -56,7 +57,13 @@ impl RelayLobClient {
             .await
             .map_err(|e| io_error!("Failed to connect to blob relay service: {}", e))?;
 
-        Ok(RelayLobClient { info, grpc_client })
+        let stream_chunk_size = Self::stream_chunk_size(&info);
+
+        Ok(RelayLobClient {
+            info,
+            grpc_client,
+            stream_chunk_size,
+        })
     }
 
     fn grpc_url(info: &BlobRelayServiceInfo) -> String {
@@ -68,6 +75,19 @@ impl RelayLobClient {
         } else {
             endpoint.clone()
         }
+    }
+
+    fn stream_chunk_size(info: &BlobRelayServiceInfo) -> usize {
+        if let Some(size) = info.parameters.get("stream_chunk_size") {
+            if let Ok(size) = size.parse::<usize>() {
+                return size;
+            }
+            warn!(
+                "Invalid stream_chunk_size parameter in BlobRelayServiceInfo: {}",
+                size
+            );
+        }
+        1024 * 1024 // default 1MB
     }
 }
 
@@ -91,7 +111,14 @@ impl LobClient for RelayLobClient {
 
         let value =
             std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
-        let lob = Self::upload(grpc_client, blob_session_id, &value, timeout).await?;
+        let lob = Self::upload(
+            grpc_client,
+            blob_session_id,
+            &value,
+            self.stream_chunk_size,
+            timeout,
+        )
+        .await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(RemoteLob::LobReference(
@@ -108,6 +135,7 @@ impl LobClient for RelayLobClient {
         let grpc_client = self.grpc_client.clone();
         let blob_session_id = self.info.blob_session_id;
         let path = path.to_path_buf();
+        let chunk_size = self.stream_chunk_size;
         let job = Job::supplier(
             "RelayLobUpload",
             Arc::new(move |timeout| {
@@ -115,6 +143,7 @@ impl LobClient for RelayLobClient {
                     grpc_client.clone(),
                     blob_session_id,
                     path.clone(),
+                    chunk_size,
                     timeout,
                 );
                 Box::pin(future)
@@ -132,7 +161,14 @@ impl LobClient for RelayLobClient {
 
         let grpc_client = self.grpc_client.clone();
         let blob_session_id = self.info.blob_session_id;
-        let lob = Self::upload(grpc_client, blob_session_id, value, timeout).await?;
+        let lob = Self::upload(
+            grpc_client,
+            blob_session_id,
+            value,
+            self.stream_chunk_size,
+            timeout,
+        )
+        .await?;
 
         trace!("{} end", FUNCTION_NAME);
         Ok(RemoteLob::LobReference(
@@ -149,6 +185,7 @@ impl LobClient for RelayLobClient {
         let grpc_client = self.grpc_client.clone();
         let blob_session_id = self.info.blob_session_id;
         let value = value.to_vec();
+        let chunk_size = self.stream_chunk_size;
         let job = Job::supplier(
             "RelayLobUpload",
             Arc::new(move |timeout| {
@@ -156,6 +193,7 @@ impl LobClient for RelayLobClient {
                     grpc_client.clone(),
                     blob_session_id,
                     value.clone(),
+                    chunk_size,
                     timeout,
                 );
                 Box::pin(future)
@@ -261,15 +299,14 @@ impl RelayLobClient {
         mut grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
         blob_session_id: u64,
         value: &[u8],
+        chunk_size: usize,
         timeout: Duration,
     ) -> Result<RelayLobReference, TgError> {
         let first_request =
             Self::create_upload_metadata_request(blob_session_id, Some(value.len() as u64));
 
-        const CHUNK_SIZE: usize = 1024 * 1024;
-
         let chunks: Vec<PutStreamingRequest> = value
-            .chunks(CHUNK_SIZE)
+            .chunks(chunk_size)
             .map(|c| Self::create_upload_chunk_request(c.to_vec()))
             .collect();
         let stream = tokio_stream::iter(std::iter::once(first_request).chain(chunks));
@@ -293,11 +330,19 @@ impl RelayLobClient {
         grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
         blob_session_id: u64,
         path: PathBuf,
+        chunk_size: usize,
         timeout: Duration,
     ) -> Result<RemoteLob, TgError> {
         let value =
             std::fs::read(path).map_err(|e| io_error!("Failed to read blob file: {}", e))?;
-        let lob = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
+        let lob = Self::upload(
+            grpc_client.clone(),
+            blob_session_id,
+            &value,
+            chunk_size,
+            timeout,
+        )
+        .await?;
         let remote_lob = RemoteLob::LobReference(lob.storage_id, lob.object_id, lob.tag);
         Ok(remote_lob)
     }
@@ -306,9 +351,17 @@ impl RelayLobClient {
         grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
         blob_session_id: u64,
         value: Vec<u8>,
+        chunk_size: usize,
         timeout: Duration,
     ) -> Result<RemoteLob, TgError> {
-        let lob = Self::upload(grpc_client.clone(), blob_session_id, &value, timeout).await?;
+        let lob = Self::upload(
+            grpc_client.clone(),
+            blob_session_id,
+            &value,
+            chunk_size,
+            timeout,
+        )
+        .await?;
         let remote_lob = RemoteLob::LobReference(lob.storage_id, lob.object_id, lob.tag);
         Ok(remote_lob)
     }
