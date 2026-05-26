@@ -46,7 +46,7 @@ pub(crate) enum LobClientMethod {
 ///
 /// since 0.10.0
 #[async_trait]
-pub(crate) trait LobClient {
+pub(crate) trait LobClient: Send + Sync {
     fn supports_method(&self, method: LobClientMethod) -> bool;
 
     async fn upload_lob_file(&self, path: &Path, timeout: Duration) -> Result<RemoteLob, TgError>;
