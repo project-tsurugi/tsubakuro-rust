@@ -127,15 +127,18 @@ tsubakuro-rust-coreは [Tsubakuro/Java](https://github.com/project-tsurugi/tsuba
 
 #### BLOB関連
 
-| API                        | tsubakuro-rust-core                           | Tsubakuro/Java                         |
-| -------------------------- | --------------------------------------------- | -------------------------------------- |
-| プレースホルダー生成       | SqlPlaceholder::of("name", AtomType::Blob)    | Placeholders.of("name", AtomType.BLOB) |
-| パラメーター生成           | SqlParameter::of("name", TgBlob::new("path")) | Parameters.blobOf("name", "path")      |
-| SELECT結果の値取得         | SqlQueryResult::fetch()                       | ResultSet#fetchBlob()                  |
-| 取得用BLOB型               | TgBlobReference                               | BlobReference                          |
-| BLOB読み込み               | SqlClient::open_blob()                        | Transaction#openInputStream()          |
-| BLOBキャッシュ取得         | SqlClient::get_blob_cache()                   | Transaction#getLargeObjectCache()      |
-| ローカルファイルへのコピー | SqlClient::copy_blob_to()                     | Transaction#copyTo()                   |
+| API                        | tsubakuro-rust-core                        | Tsubakuro/Java                         |
+| -------------------------- | ------------------------------------------ | -------------------------------------- |
+| プレースホルダー生成       | SqlPlaceholder::of("name", AtomType::Blob) | Placeholders.of("name", AtomType.BLOB) |
+| BLOBアップロード           | SqlClient::upload_blob(データ)             | LargeObjectClient.upload(データ)       |
+| パラメーター生成           | SqlParameter::of("name", blob)             | Parameters.blobOf("name", blob)        |
+| SELECT結果の値取得         | SqlQueryResult::fetch()                    | ResultSet#fetchBlob()                  |
+| 取得用BLOB型               | TgBlobReference                            | BlobReference                          |
+| BLOB読み込み               | SqlClient::open_blob()                     | Transaction#openInputStream()          |
+| BLOBキャッシュ取得         | SqlClient::get_blob_cache()                | Transaction#getLargeObjectCache()      |
+| ローカルファイルへのコピー | SqlClient::copy_blob_to()                  | Transaction#copyTo()                   |
+
+- BLOBの使用方法については [BLOB, CLOB使用方法](blob_ja.md) を参照。
 
 ### 非同期API
 

@@ -21,11 +21,12 @@ async fn example() -> Result<(), TgError> {
     connection_option.set_endpoint(endpoint);
     connection_option.set_application_name("Tsubakuro/Rust example");
     connection_option.set_session_label("example session");
+    connection_option.set_default_timeout(Duration::from_secs(10));
+
     connection_option.set_lob_transfer_type(LobTransferType::Privileged);
     connection_option.add_large_object_path_mapping_on_send("C:/tmp/client", "/mnt/client");
     connection_option
         .add_large_object_path_mapping_on_recv("/opt/tsurugi/var/data/log", "C:/tmp/tsurugi");
-    connection_option.set_default_timeout(Duration::from_secs(10));
 
     // connect
     let session = Session::connect(&connection_option).await?;
