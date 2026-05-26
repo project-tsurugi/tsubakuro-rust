@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{sync::Mutex, time::Duration};
 
 use tokio::{
     sync::mpsc::{self, error::SendTimeoutError},
@@ -26,7 +26,7 @@ struct PutHandle {
 
 pub(crate) struct RelayLobUploader {
     handle: tokio::sync::Mutex<Option<PutHandle>>,
-    cancel_tx: tokio::sync::Mutex<Option<tokio::sync::oneshot::Sender<()>>>,
+    cancel_tx: Mutex<Option<tokio::sync::oneshot::Sender<()>>>,
 }
 
 impl RelayLobUploader {
@@ -51,7 +51,7 @@ impl RelayLobUploader {
 
         Ok(RelayLobUploader {
             handle: tokio::sync::Mutex::new(Some(PutHandle { tx, request_handle })),
-            cancel_tx: tokio::sync::Mutex::new(Some(cancel_tx)),
+            cancel_tx: Mutex::new(Some(cancel_tx)),
         })
     }
 }
@@ -111,8 +111,8 @@ impl LobUploader for RelayLobUploader {
         }
     }
 
-    async fn cancel(&self) -> Result<(), TgError> {
-        if let Some(cancel_tx) = self.cancel_tx.lock().await.take() {
+    fn cancel(&self) -> Result<(), TgError> {
+        if let Some(cancel_tx) = self.cancel_tx.lock().unwrap().take() {
             let _ = cancel_tx.send(());
         }
         Ok(())

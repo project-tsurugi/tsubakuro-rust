@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use log::{error, warn};
+use log::warn;
 use tonic::async_trait;
 
 use crate::{
@@ -15,7 +15,7 @@ use crate::{
 pub(crate) trait LobUploader {
     async fn upload_chunk(&self, value: &[u8], timeout: Duration) -> Result<(), TgError>;
     async fn finish(&self, timeout: Duration) -> Result<RemoteLob, TgError>;
-    async fn cancel(&self) -> Result<(), TgError>;
+    fn cancel(&self) -> Result<(), TgError>;
 }
 
 pub struct BlobUploader {
@@ -41,10 +41,10 @@ impl BlobUploader {
         Ok(TgBlob::RemoteLob(lob))
     }
 
-    pub async fn cancel(mut self) -> Result<(), TgError> {
+    pub fn cancel(mut self) -> Result<(), TgError> {
         self.done = true;
 
-        self.inner.cancel().await
+        self.inner.cancel()
     }
 }
 
@@ -54,26 +54,10 @@ impl Drop for BlobUploader {
             return;
         }
 
-        let inner = self.inner.clone();
-        std::thread::scope(|scope| {
-            scope.spawn(move || {
-                let runtime = {
-                    match tokio::runtime::Runtime::new() {
-                        Ok(runtime) => runtime,
-                        Err(e) => {
-                            error!("BlobUploader.drop() runtime::new error. {}", e);
-                            return;
-                        }
-                    }
-                };
-                runtime.block_on(async {
-                    let result = inner.cancel().await;
-                    if let Err(e) = result {
-                        warn!("BlobUploader.drop() close error. {}", e);
-                    }
-                })
-            });
-        });
+        let result = self.inner.cancel();
+        if let Err(e) = result {
+            warn!("BlobUploader.drop() close error. {}", e);
+        }
     }
 }
 
@@ -100,10 +84,10 @@ impl ClobUploader {
         Ok(TgClob::RemoteLob(lob))
     }
 
-    pub async fn cancel(mut self) -> Result<(), TgError> {
+    pub fn cancel(mut self) -> Result<(), TgError> {
         self.done = true;
 
-        self.inner.cancel().await
+        self.inner.cancel()
     }
 }
 
@@ -113,25 +97,9 @@ impl Drop for ClobUploader {
             return;
         }
 
-        let inner = self.inner.clone();
-        std::thread::scope(|scope| {
-            scope.spawn(move || {
-                let runtime = {
-                    match tokio::runtime::Runtime::new() {
-                        Ok(runtime) => runtime,
-                        Err(e) => {
-                            error!("ClobUploader.drop() runtime::new error. {}", e);
-                            return;
-                        }
-                    }
-                };
-                runtime.block_on(async {
-                    let result = inner.cancel().await;
-                    if let Err(e) = result {
-                        warn!("ClobUploader.drop() close error. {}", e);
-                    }
-                })
-            });
-        });
+        let result = self.inner.cancel();
+        if let Err(e) = result {
+            warn!("ClobUploader.drop() close error. {}", e);
+        }
     }
 }

@@ -25,7 +25,7 @@ impl LargeObjectPathMappingEntry {
         }
     }
 
-    // local_flie: absolute path
+    // local_file: absolute path
     pub(crate) fn convert_to_server_path<T: AsRef<Path>>(&self, local_file: T) -> Option<String> {
         let local_file = local_file.as_ref();
         match local_file.strip_prefix(&self.client_path) {
