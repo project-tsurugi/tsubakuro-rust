@@ -38,7 +38,7 @@ impl BlobUploader {
         self.done = true;
 
         let lob = self.inner.finish(timeout).await?;
-        Ok(TgBlob::RemoteLob(lob))
+        Ok(TgBlob::from_remote_lob(lob))
     }
 
     pub fn cancel(mut self) -> Result<(), TgError> {
@@ -81,7 +81,7 @@ impl ClobUploader {
         self.done = true;
 
         let lob = self.inner.finish(timeout).await?;
-        Ok(TgClob::RemoteLob(lob))
+        Ok(TgClob::from_remote_lob(lob))
     }
 
     pub fn cancel(mut self) -> Result<(), TgError> {

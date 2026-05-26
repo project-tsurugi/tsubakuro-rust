@@ -8,6 +8,8 @@ use crate::prelude::{
     TgTimePoint, TgTimePointWithTimeZone,
 };
 use crate::service::lob::lob_client::RemoteLob;
+use crate::service::sql::r#type::blob::InnerBlob;
+use crate::service::sql::r#type::clob::InnerClob;
 
 #[cfg(feature = "with_bigdecimal")]
 mod bigdecimal;
@@ -181,18 +183,18 @@ impl SqlParameterOf<TgTimePointWithTimeZone> for SqlParameter {
 
 impl SqlParameterOf<TgBlob> for SqlParameter {
     fn of(name: &str, value: TgBlob) -> SqlParameter {
-        let value = match value {
-            TgBlob::Path(path) => {
+        let value = match value.inner {
+            InnerBlob::Path(path) => {
                 let data = ClientOnlyLargeObjectInfoData::ClientPath(path);
                 let info = ClientOnlyLargeObjectInfo { data: Some(data) };
                 Value::LargeObjectInfoBlob(info)
             }
-            TgBlob::Contents(value) => {
+            InnerBlob::Contents(value) => {
                 let data = crate::jogasaki::proto::sql::common::blob::Data::Contents(value);
                 let value = crate::jogasaki::proto::sql::common::Blob { data: Some(data) };
                 Value::Blob(value)
             }
-            TgBlob::RemoteLob(remote_lob) => match remote_lob {
+            InnerBlob::RemoteLob(remote_lob) => match remote_lob {
                 RemoteLob::ServerPath(path) => {
                     let data = ClientOnlyLargeObjectInfoData::ServerPath(path);
                     let info = ClientOnlyLargeObjectInfo { data: Some(data) };
@@ -216,18 +218,18 @@ impl SqlParameterOf<TgBlob> for SqlParameter {
 
 impl SqlParameterOf<TgClob> for SqlParameter {
     fn of(name: &str, value: TgClob) -> SqlParameter {
-        let value = match value {
-            TgClob::Path(path) => {
+        let value = match value.inner {
+            InnerClob::Path(path) => {
                 let data = ClientOnlyLargeObjectInfoData::ClientPath(path);
                 let info = ClientOnlyLargeObjectInfo { data: Some(data) };
                 Value::LargeObjectInfoClob(info)
             }
-            TgClob::Contents(value) => {
+            InnerClob::Contents(value) => {
                 let data = crate::jogasaki::proto::sql::common::clob::Data::Contents(value);
                 let value = crate::jogasaki::proto::sql::common::Clob { data: Some(data) };
                 Value::Clob(value)
             }
-            TgClob::RemoteLob(remote_lob) => match remote_lob {
+            InnerClob::RemoteLob(remote_lob) => match remote_lob {
                 RemoteLob::ServerPath(path) => {
                     let data = ClientOnlyLargeObjectInfoData::ServerPath(path);
                     let info = ClientOnlyLargeObjectInfo { data: Some(data) };

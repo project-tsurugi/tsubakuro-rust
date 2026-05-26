@@ -6,14 +6,17 @@ use super::large_object::TgLargeObjectReference;
 
 /// BLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TgBlob {
+pub struct TgBlob {
+    pub(crate) inner: InnerBlob,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum InnerBlob {
     /// BLOB with client path.
     Path(String),
     /// BLOB with bytes.
     Contents(Vec<u8>),
     /// BLOB with uploaded lob.
-    /// since 0.10.0
-    #[allow(private_interfaces)]
     RemoteLob(RemoteLob),
 }
 
@@ -21,14 +24,24 @@ impl TgBlob {
     /// Creates a new instance.
     #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_blob_file instead")]
     pub fn new(path: &str) -> TgBlob {
-        TgBlob::Path(path.to_string())
+        TgBlob {
+            inner: InnerBlob::Path(path.to_string()),
+        }
+    }
+
+    pub(crate) fn from_remote_lob(remote_lob: RemoteLob) -> TgBlob {
+        TgBlob {
+            inner: InnerBlob::RemoteLob(remote_lob),
+        }
     }
 }
 
 impl From<Vec<u8>> for TgBlob {
     // #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_blob instead")]
     fn from(value: Vec<u8>) -> Self {
-        TgBlob::Contents(value)
+        TgBlob {
+            inner: InnerBlob::Contents(value),
+        }
     }
 }
 

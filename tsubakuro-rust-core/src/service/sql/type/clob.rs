@@ -6,14 +6,17 @@ use super::large_object::TgLargeObjectReference;
 
 /// CLOB.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TgClob {
+pub struct TgClob {
+    pub(crate) inner: InnerClob,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum InnerClob {
     /// CLOB with client path.
     Path(String),
     /// CLOB with bytes.
     Contents(Vec<u8>),
     /// CLOB with uploaded lob.
-    /// since 0.10.0
-    #[allow(private_interfaces)]
     RemoteLob(RemoteLob),
 }
 
@@ -21,21 +24,33 @@ impl TgClob {
     /// Creates a new instance.
     #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_clob_file instead")]
     pub fn new(path: &str) -> TgClob {
-        TgClob::Path(path.to_string())
+        TgClob {
+            inner: InnerClob::Path(path.to_string()),
+        }
+    }
+
+    pub(crate) fn from_remote_lob(remote_lob: RemoteLob) -> TgClob {
+        TgClob {
+            inner: InnerClob::RemoteLob(remote_lob),
+        }
     }
 }
 
 impl From<&str> for TgClob {
     // #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_clob instead")]
     fn from(value: &str) -> Self {
-        TgClob::Contents(value.as_bytes().to_vec())
+        TgClob {
+            inner: InnerClob::Contents(value.as_bytes().to_vec()),
+        }
     }
 }
 
 impl From<String> for TgClob {
     // #[deprecated(since = "0.10.0", note = "Use SqlClient::upload_clob instead")]
     fn from(value: String) -> Self {
-        TgClob::Contents(value.into_bytes())
+        TgClob {
+            inner: InnerClob::Contents(value.into_bytes()),
+        }
     }
 }
 

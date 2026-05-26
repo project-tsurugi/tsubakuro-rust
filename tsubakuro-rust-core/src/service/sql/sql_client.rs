@@ -1216,7 +1216,7 @@ impl SqlClient {
         let lob = lob_client.upload_lob_file(path.as_ref(), timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(TgBlob::RemoteLob(lob))
+        Ok(TgBlob::from_remote_lob(lob))
     }
 
     pub async fn upload_blob_file_async<T: AsRef<Path>>(
@@ -1228,7 +1228,7 @@ impl SqlClient {
 
         let lob_client = self.get_lob_client().await?;
         let job = lob_client.upload_lob_file_async(path.as_ref()).await?;
-        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::RemoteLob(lob))));
+        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1251,7 +1251,7 @@ impl SqlClient {
         let lob = lob_client.upload_lob_file(path.as_ref(), timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(TgClob::RemoteLob(lob))
+        Ok(TgClob::from_remote_lob(lob))
     }
 
     pub async fn upload_clob_file_async<T: AsRef<Path>>(
@@ -1263,7 +1263,7 @@ impl SqlClient {
 
         let lob_client = self.get_lob_client().await?;
         let job = lob_client.upload_lob_file_async(path.as_ref()).await?;
-        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::RemoteLob(lob))));
+        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1286,7 +1286,7 @@ impl SqlClient {
         let lob = lob_client.upload_lob(value, timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(TgBlob::RemoteLob(lob))
+        Ok(TgBlob::from_remote_lob(lob))
     }
 
     pub async fn upload_blob_async(&self, value: &[u8]) -> Result<Job<TgBlob>, TgError> {
@@ -1295,7 +1295,7 @@ impl SqlClient {
 
         let lob_client = self.get_lob_client().await?;
         let job = lob_client.upload_lob_async(value).await?;
-        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::RemoteLob(lob))));
+        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1316,7 +1316,7 @@ impl SqlClient {
         let lob = lob_client.upload_lob(value, timeout).await?;
 
         trace!("{} end", FUNCTION_NAME);
-        Ok(TgClob::RemoteLob(lob))
+        Ok(TgClob::from_remote_lob(lob))
     }
 
     pub async fn upload_clob_async(&self, value: &str) -> Result<Job<TgClob>, TgError> {
@@ -1326,7 +1326,7 @@ impl SqlClient {
         let lob_client = self.get_lob_client().await?;
         let value = value.as_bytes();
         let job = lob_client.upload_lob_async(value).await?;
-        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::RemoteLob(lob))));
+        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
