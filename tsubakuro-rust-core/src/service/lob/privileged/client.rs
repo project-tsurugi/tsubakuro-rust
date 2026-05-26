@@ -133,7 +133,7 @@ impl LobClient for PrivilegedLobClient {
         let client_path = self.get_file_path(transaction, lob, timeout).await?;
         tokio::fs::read(client_path)
             .await
-            .map_err(|e| io_error!("Failed to read lob file: {}", e))
+            .map_err(|e| io_error!("Failed to read lob file", e))
     }
 
     async fn download_lob_async(
@@ -145,7 +145,7 @@ impl LobClient for PrivilegedLobClient {
         let job = job.convert(
             "Bytes",
             Arc::new(|client_path| {
-                std::fs::read(client_path).map_err(|e| io_error!("Failed to read lob file: {}", e))
+                std::fs::read(client_path).map_err(|e| io_error!("Failed to read lob file", e))
             }),
         );
         Ok(job)

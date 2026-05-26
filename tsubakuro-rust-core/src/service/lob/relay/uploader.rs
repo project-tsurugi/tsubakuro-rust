@@ -47,7 +47,7 @@ impl RelayLobUploader {
         let first_request = RelayLobClient::create_upload_metadata_request(blob_session_id, None);
         tx.send(first_request)
             .await
-            .map_err(|e| io_error!("Failed to send first request: {}", e))?;
+            .map_err(|e| io_error!("Failed to send first request", e))?;
 
         Ok(RelayLobUploader {
             handle: tokio::sync::Mutex::new(Some(PutHandle { tx, request_handle })),
@@ -87,7 +87,7 @@ impl LobUploader for RelayLobUploader {
                     .map_err(|_| timeout_error!("RelayLobUploader::finish()"))?
             };
             let result =
-                result.map_err(|e| io_error!("Failed to receive upload response: {}", e))?;
+                result.map_err(|e| io_error!("Failed to receive upload response", e))?;
             match result {
                 Ok(response) => {
                     let response = response.into_inner();
@@ -101,7 +101,7 @@ impl LobUploader for RelayLobUploader {
                     ))
                 }
                 Err(status) => {
-                    return Err(io_error!("Upload failed: {}", status));
+                    return Err(io_error!("Upload failed", status));
                 }
             }
         } else {

@@ -63,7 +63,7 @@ impl LobDownloader for RelayLobDownloader {
                     .map_err(|_| timeout_error!("RelayLobDownloader::download_chunk()"))?
             };
             let response = result
-                .map_err(|e| io_error!("Failed to receive chunk from blob relay service: {}", e))?;
+                .map_err(|e| io_error!("Failed to receive chunk from blob relay service", e))?;
             match response {
                 Some(response) => match response.payload {
                     Some(Payload::Metadata(_metadata)) => {

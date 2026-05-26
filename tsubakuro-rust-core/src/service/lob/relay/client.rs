@@ -55,7 +55,7 @@ impl RelayLobClient {
 
         let grpc_client = BlobRelayStreamingClient::connect(url)
             .await
-            .map_err(|e| io_error!("Failed to connect to blob relay service: {}", e))?;
+            .map_err(|e| io_error!("Failed to connect to blob relay service", e))?;
 
         let stream_chunk_size = Self::stream_chunk_size(&info);
 
@@ -111,7 +111,7 @@ impl LobClient for RelayLobClient {
 
         let value = tokio::fs::read(path)
             .await
-            .map_err(|e| io_error!("Failed to read lob file: {}", e))?;
+            .map_err(|e| io_error!("Failed to read lob file", e))?;
         let lob = Self::upload(
             grpc_client,
             blob_session_id,
@@ -320,7 +320,7 @@ impl RelayLobClient {
                 .map_err(|_| timeout_error!("RelayLobClient::upload()"))?
         };
         let response =
-            result.map_err(|e| io_error!("Failed to upload to blob relay service: {}", e))?;
+            result.map_err(|e| io_error!("Failed to upload to blob relay service", e))?;
         let lob_ref = response.into_inner().blob.ok_or_else(|| {
             io_error!("Failed to upload to blob relay service: missing blob reference in response")
         })?;
@@ -422,7 +422,7 @@ impl RelayLobClient {
 
             loop {
                 let response = stream.message().await.map_err(|e| {
-                    io_error!("Failed to receive chunk from blob relay service: {}", e)
+                    io_error!("Failed to receive chunk from blob relay service", e)
                 })?;
 
                 match response {
@@ -489,7 +489,7 @@ impl RelayLobClient {
                 .map_err(|_| timeout_error!("RelayLobClient::download()"))?
         };
         let stream = result
-            .map_err(|e| io_error!("Failed to download from blob relay service: {}", e))?
+            .map_err(|e| io_error!("Failed to download from blob relay service", e))?
             .into_inner();
 
         Ok(stream)

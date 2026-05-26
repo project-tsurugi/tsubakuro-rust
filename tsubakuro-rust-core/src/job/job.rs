@@ -110,7 +110,7 @@ impl<T: Send + Sync + 'static> Job<T> {
             name: name.to_string(),
             inner,
             default_timeout,
-            done: true,
+            done: true, // TODO false
             taked: false,
             canceled: false,
             closed: false,
