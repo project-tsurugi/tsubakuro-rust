@@ -79,13 +79,15 @@ impl LobUploader for RelayLobUploader {
         if let Some(put_handle) = self.handle.lock().await.take() {
             drop(put_handle.tx); // close the sender to indicate the end of the stream
 
+            let mut request_handle = put_handle.request_handle;
             let result = if timeout.is_zero() {
-                put_handle.request_handle.await
+                request_handle.await
             } else {
-                match tokio::time::timeout(timeout, put_handle.request_handle).await {
-                    Ok(result) => result,
-                    Err(_) => {
+                tokio::select! {
+                    result = &mut request_handle => result,
+                    _ = tokio::time::sleep(timeout) => {
                         let _ = self.cancel();
+                        request_handle.abort();
                         return Err(timeout_error!("RelayLobUploader::finish()"));
                     }
                 }
