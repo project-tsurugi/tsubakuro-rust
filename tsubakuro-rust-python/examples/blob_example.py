@@ -56,7 +56,7 @@ def execute_blob(connection):
             (2, tsurugi.type_code.Blob(b"abc")),
             (3, tsurugi.type_code.Blob(b"def")),
         ]
-        cursor.executemany(insert_sql, parameters_list)
+        cursor.executemany(insert_sql, parameters_list)  # Uploaded here
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 
@@ -69,15 +69,15 @@ def execute_prepare(connection):
 
     with connection.cursor() as cursor:
         insert_sql = "insert into blob_example values (?, ?)"
-        placeholder_list = [tsurugi.type_code.Int32, tsurugi.type_code.Blob]
-        cursor.prepare(insert_sql, placeholder_list)
+        placeholders = [tsurugi.type_code.Int32, tsurugi.type_code.Blob]
+        cursor.prepare(insert_sql, placeholders)
 
         parameters_list = [
             (1, None),
             (2, b"abc"),
             (3, b"def"),
         ]
-        cursor.executemany(insert_sql, parameters_list)
+        cursor.executemany(insert_sql, parameters_list)  # Uploaded here
         print("insert rowcount:", cursor.rowcount)
         connection.commit()
 

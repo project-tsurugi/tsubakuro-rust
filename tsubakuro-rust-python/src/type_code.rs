@@ -55,6 +55,8 @@ pub(crate) fn atom_type_to_type_code(atom_type: Option<AtomType>) -> &'static st
             AtomType::TimePoint => "Datetime",
             AtomType::TimeOfDayWithTimeZone => "OffsetTime",
             AtomType::TimePointWithTimeZone => "OffsetDatetime",
+            AtomType::Blob => "Blob",
+            AtomType::Clob => "Clob",
             _ => "Unknown",
         },
         None => "Unknown",
