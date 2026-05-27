@@ -194,7 +194,7 @@ docker run -d -p 12345:12345 --name tsurugi -v C:/tmp/client:/mnt/client -v C:/t
 
     connection_option.set_lob_transfer_type(LobTransferType::Privileged);
     connection_option.add_large_object_path_mapping_on_send("C:/tmp/client", "/mnt/client");
-    connection_option        .add_large_object_path_mapping_on_recv("/opt/tsurugi/var/data/log", "C:/tmp/tsurugi");
+    connection_option.add_large_object_path_mapping_on_recv("/opt/tsurugi/var/data/log", "C:/tmp/tsurugi");
 
     // connect
     let session = Session::connect(&connection_option).await?;
