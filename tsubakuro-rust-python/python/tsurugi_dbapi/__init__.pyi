@@ -19,6 +19,7 @@ __all__ = [
     "IntegrityError",
     "InterfaceError",
     "InternalError",
+    "LobTransferType",
     "NotSupportedError",
     "OperationalError",
     "ProgrammingError",
@@ -182,6 +183,8 @@ class Config:
         auth_token (str): Authentication token.
         credentials (str): Path to credentials file.
         session_label (str): Session label for the connection.
+        blob_relay_service_endpoint (str): Blob relay service endpoint. since 0.10.0
+        lob_upload_timeout (int): Large object upload timeout in seconds. since 0.10.0
         transaction_option (TransactionOption): Transaction option.
         commit_option (CommitOption): Commit option.
         shutdown_option (ShutdownOption): Shutdown option.
@@ -282,6 +285,20 @@ class Config:
     def session_label(self, value: typing.Optional[builtins.str]) -> None:
         r"""
         Session label for the connection.
+        """
+    @property
+    def blob_relay_service_endpoint(self) -> typing.Optional[builtins.str]:
+        r"""
+        Blob relay service endpoint.
+        
+        since 0.10.0
+        """
+    @blob_relay_service_endpoint.setter
+    def blob_relay_service_endpoint(self, value: typing.Optional[builtins.str]) -> None:
+        r"""
+        Blob relay service endpoint.
+        
+        since 0.10.0
         """
     @property
     def transaction_option(self) -> typing.Optional[TransactionOption]:
@@ -386,6 +403,19 @@ class Connection:
     def shutdown_option(self, value: ShutdownOption) -> None:
         r"""
         Shutdown option.
+        """
+    def lob_transfer_type(self) -> typing.Optional[LobTransferType]:
+        r"""
+        Get the large object transfer type.
+        
+        Returns:
+            LobTransferType: Large object transfer type.
+        
+        Examples:
+            ```python
+            lob_transfer_type = connection.lob_transfer_type()
+            ```
+        since 0.10.0
         """
     def list_tables(self) -> builtins.list[builtins.str]:
         r"""
@@ -601,6 +631,44 @@ class Cursor:
             cursor.execute(sql, {"id": 1, "name": "Hello"})
             connection.commit()
             ```
+        """
+    def upload_blob(self, value: typing.Optional[typing.Sequence[builtins.int]]) -> type_code.Blob:
+        r"""
+        Upload a blob value.
+        
+        Args:
+            value (bytes | None): Blob value to be uploaded.
+        
+        Returns:
+            Optional[Blob]: Uploaded blob.
+        
+        Examples:
+            ```python
+            blob = cursor.upload_blob(b"0x01\x02\x03")
+            cursor.execute("insert into blob_example values (?, ?)", (1, blob))
+            connection.commit()
+            ```
+        
+        since 0.10.0
+        """
+    def upload_clob(self, value: typing.Optional[builtins.str]) -> type_code.Clob:
+        r"""
+        Upload a clob value.
+        
+        Args:
+            value (str | None): Clob value to be uploaded.
+        
+        Returns:
+            Optional[Clob]: Uploaded clob.
+        
+        Examples:
+            ```python
+            clob = cursor.upload_clob("Hello, World!")
+            cursor.execute("insert into clob_example values (?, ?)", (1, clob))
+            connection.commit()
+            ```
+        
+        since 0.10.0
         """
     def executemany(self, operation: builtins.str, seq_of_parameters: typing.Any) -> None:
         r"""
@@ -1141,6 +1209,26 @@ class CommitType(enum.Enum):
     PROPAGATED = ...
     r"""
     commit data has been propagated to the all suitable nodes.
+    """
+
+@typing.final
+class LobTransferType(enum.Enum):
+    r"""
+    Large object transfer type.
+    
+    Attributes:
+        NOT_USE: does not use transfer type.
+        RELAY: Blob Relay transfer type.
+    
+    since 0.10.0
+    """
+    NOT_USE = ...
+    r"""
+    Does not use transfer type.
+    """
+    RELAY = ...
+    r"""
+    Blob Relay transfer type.
     """
 
 @typing.final

@@ -8,11 +8,11 @@ use crate::{error::to_pyerr, type_code::ParameterContext};
 ///
 /// Examples:
 ///     ```python
-///     import tsurugi_dbapi as tsurugi
-///
-///     value = tsurugi.type_code.Blob(b"0x01\x02\x03")
-///     value = tsurugi.type_code.Blob(None)
+///     value = cursor.upload_blob(b"0x01\x02\x03")
+///     value = cursor.upload_blob(None)
 ///     ```
+///
+/// since 0.10.0
 #[gen_stub_pyclass]
 #[pyclass(module = "tsurugi_dbapi.type_code")]
 #[derive(Debug)]

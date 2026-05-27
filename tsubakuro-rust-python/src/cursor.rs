@@ -177,6 +177,22 @@ impl Cursor {
         result
     }
 
+    /// Upload a blob value.
+    ///
+    /// Args:
+    ///     value (bytes | None): Blob value to be uploaded.
+    ///
+    /// Returns:
+    ///     Optional[Blob]: Uploaded blob.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     blob = cursor.upload_blob(b"0x01\x02\x03")
+    ///     cursor.execute("insert into blob_example values (?, ?)", (1, blob))
+    ///     connection.commit()
+    ///     ```
+    ///
+    /// since 0.10.0
     pub fn upload_blob(&self, value: Option<Vec<u8>>) -> PyResult<Blob> {
         const FUNCTION_NAME: &str = "Cursor.upload_blob()";
         let value = match value {
@@ -205,6 +221,22 @@ impl Cursor {
         result
     }
 
+    /// Upload a clob value.
+    ///
+    /// Args:
+    ///     value (str | None): Clob value to be uploaded.
+    ///
+    /// Returns:
+    ///     Optional[Clob]: Uploaded clob.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     clob = cursor.upload_clob("Hello, World!")
+    ///     cursor.execute("insert into clob_example values (?, ?)", (1, clob))
+    ///     connection.commit()
+    ///     ```
+    ///
+    /// since 0.10.0
     pub fn upload_clob(&self, value: Option<String>) -> PyResult<Clob> {
         const FUNCTION_NAME: &str = "Cursor.upload_clob()";
         let value = match value {

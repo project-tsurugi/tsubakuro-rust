@@ -11,6 +11,8 @@ use tsubakuro_rust_core::prelude::LobTransferType as CoreLobTransferType;
 /// Attributes:
 ///     NOT_USE: does not use transfer type.
 ///     RELAY: Blob Relay transfer type.
+///
+/// since 0.10.0
 #[gen_stub_pyclass_enum]
 #[pyclass(module = "tsurugi_dbapi")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]

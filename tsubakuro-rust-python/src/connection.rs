@@ -40,6 +40,16 @@ impl Connection {
 #[gen_stub_pymethods]
 #[pymethods]
 impl Connection {
+    /// Get the large object transfer type.
+    ///
+    /// Returns:
+    ///     LobTransferType: Large object transfer type.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     lob_transfer_type = connection.lob_transfer_type()
+    ///     ```
+    /// since 0.10.0
     pub fn lob_transfer_type(&self) -> PyResult<Option<LobTransferType>> {
         const FUNCTION_NAME: &str = "Connection.lob_transfer_type()";
         trace!("{FUNCTION_NAME} start");

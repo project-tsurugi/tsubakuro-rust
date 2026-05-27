@@ -29,6 +29,8 @@ use crate::{
 ///     auth_token (str): Authentication token.
 ///     credentials (str): Path to credentials file.
 ///     session_label (str): Session label for the connection.
+///     blob_relay_service_endpoint (str): Blob relay service endpoint. since 0.10.0
+///     lob_upload_timeout (int): Large object upload timeout in seconds. since 0.10.0
 ///     transaction_option (TransactionOption): Transaction option.
 ///     commit_option (CommitOption): Commit option.
 ///     shutdown_option (ShutdownOption): Shutdown option.
@@ -84,6 +86,9 @@ pub struct Config {
     /// Session label for the connection.
     #[pyo3(get, set)]
     session_label: Option<String>,
+    /// Blob relay service endpoint.
+    ///
+    /// since 0.10.0
     #[pyo3(get, set)]
     blob_relay_service_endpoint: Option<String>,
     /// Transaction option.
