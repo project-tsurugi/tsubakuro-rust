@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 use pyo3::{prelude::*, types::*};
 use tokio::runtime::Runtime;
@@ -64,13 +64,19 @@ pub(crate) fn atom_type_to_type_code(atom_type: Option<AtomType>) -> &'static st
 pub(crate) struct ParameterContext<'a> {
     runtime: &'a Runtime,
     sql_client: &'a SqlClient,
+    lob_upload_timeout: Duration,
 }
 
 impl<'a> ParameterContext<'a> {
-    pub(crate) fn new(runtime: &'a Runtime, sql_client: &'a SqlClient) -> Self {
+    pub(crate) fn new(
+        runtime: &'a Runtime,
+        sql_client: &'a SqlClient,
+        lob_upload_timeout: Duration,
+    ) -> Self {
         Self {
             runtime,
             sql_client,
+            lob_upload_timeout,
         }
     }
 
@@ -80,6 +86,10 @@ impl<'a> ParameterContext<'a> {
 
     pub(crate) fn sql_client(&self) -> &SqlClient {
         self.sql_client
+    }
+
+    pub(crate) fn lob_upload_timeout(&self) -> Duration {
+        self.lob_upload_timeout
     }
 }
 

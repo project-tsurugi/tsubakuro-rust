@@ -61,6 +61,16 @@ impl InnerConnection {
         &self.sql_client
     }
 
+    pub(crate) fn lob_upload_timeout(&self) -> Duration {
+        let config = self.config.lock().unwrap();
+        config.lob_upload_timeout()
+    }
+
+    pub(crate) fn lob_download_timeout(&self) -> Duration {
+        let config = self.config.lock().unwrap();
+        config.lob_download_timeout()
+    }
+
     pub(crate) fn default_timeout(&self) -> Duration {
         let config = self.config.lock().unwrap();
         config.default_timeout()

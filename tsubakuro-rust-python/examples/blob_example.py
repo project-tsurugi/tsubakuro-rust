@@ -8,11 +8,15 @@ def main():
     config.user = "tsurugi"
     config.password = "password"
     config.default_timeout = 30  # seconds
+
+    # config.blob_relay_service_endpoint = "http://localhost:52345"
+    config.lob_upload_timeout = 60  # seconds
+
     with tsurugi.connect(config) as connection:
         print("lob_transfer_type:", connection.lob_transfer_type())
 
-        execute_blob(connection)
         execute_upload(connection)
+        execute_blob(connection)
         execute_prepare(connection)
 
 
@@ -21,24 +25,6 @@ def create_table(connection):
         cursor.execute("drop table if exists blob_example")
         cursor.execute("create table blob_example (pk int primary key, value blob)")
         connection.commit()  # You must commit even with DDL.
-
-
-def execute_blob(connection):
-    print("=== execute_blob() ===")
-    create_table(connection)
-
-    with connection.cursor() as cursor:
-        insert_sql = "insert into blob_example values (?, ?)"
-        parameters_list = [
-            (1, tsurugi.type_code.Blob(None)),
-            (2, tsurugi.type_code.Blob(b"abc")),
-            (3, tsurugi.type_code.Blob(b"def")),
-        ]
-        cursor.executemany(insert_sql, parameters_list)
-        print("insert rowcount:", cursor.rowcount)
-        connection.commit()
-
-        select(connection)
 
 
 def execute_upload(connection):
@@ -51,6 +37,24 @@ def execute_upload(connection):
             (1, cursor.upload_blob(None)),
             (2, cursor.upload_blob(b"abc")),
             (3, cursor.upload_blob(b"def")),
+        ]
+        cursor.executemany(insert_sql, parameters_list)
+        print("insert rowcount:", cursor.rowcount)
+        connection.commit()
+
+        select(connection)
+
+
+def execute_blob(connection):
+    print("=== execute_blob() ===")
+    create_table(connection)
+
+    with connection.cursor() as cursor:
+        insert_sql = "insert into blob_example values (?, ?)"
+        parameters_list = [
+            (1, tsurugi.type_code.Blob(None)),
+            (2, tsurugi.type_code.Blob(b"abc")),
+            (3, tsurugi.type_code.Blob(b"def")),
         ]
         cursor.executemany(insert_sql, parameters_list)
         print("insert rowcount:", cursor.rowcount)

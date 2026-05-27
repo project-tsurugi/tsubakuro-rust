@@ -86,9 +86,10 @@ impl Blob {
     fn upload_blob(context: &ParameterContext, value: &[u8]) -> PyResult<TgBlob> {
         let runtime = context.runtime();
         let sql_client = context.sql_client();
+        let timeout = context.lob_upload_timeout();
 
         let blob = runtime
-            .block_on(sql_client.upload_blob(value))
+            .block_on(sql_client.upload_blob_for(value, timeout))
             .map_err(to_pyerr)?;
         Ok(blob)
     }

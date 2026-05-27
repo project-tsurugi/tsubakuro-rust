@@ -185,6 +185,7 @@ class Config:
         session_label (str): Session label for the connection.
         blob_relay_service_endpoint (str): Blob relay service endpoint. since 0.10.0
         lob_upload_timeout (int): Large object upload timeout in seconds. since 0.10.0
+        lob_download_timeout (int): Large object download timeout in seconds. since 0.10.0
         transaction_option (TransactionOption): Transaction option.
         commit_option (CommitOption): Commit option.
         shutdown_option (ShutdownOption): Shutdown option.
@@ -297,6 +298,34 @@ class Config:
     def blob_relay_service_endpoint(self, value: typing.Optional[builtins.str]) -> None:
         r"""
         Blob relay service endpoint.
+        
+        since 0.10.0
+        """
+    @property
+    def lob_upload_timeout(self) -> typing.Optional[builtins.int]:
+        r"""
+        Large object upload timeout in seconds.
+        
+        since 0.10.0
+        """
+    @lob_upload_timeout.setter
+    def lob_upload_timeout(self, value: typing.Optional[builtins.int]) -> None:
+        r"""
+        Large object upload timeout in seconds.
+        
+        since 0.10.0
+        """
+    @property
+    def lob_download_timeout(self) -> typing.Optional[builtins.int]:
+        r"""
+        Large object download timeout in seconds.
+        
+        since 0.10.0
+        """
+    @lob_download_timeout.setter
+    def lob_download_timeout(self, value: typing.Optional[builtins.int]) -> None:
+        r"""
+        Large object download timeout in seconds.
         
         since 0.10.0
         """
@@ -632,38 +661,40 @@ class Cursor:
             connection.commit()
             ```
         """
-    def upload_blob(self, value: typing.Optional[typing.Sequence[builtins.int]]) -> type_code.Blob:
+    def upload_blob(self, value: typing.Optional[typing.Sequence[builtins.int]], timeout: typing.Optional[builtins.int] = None) -> type_code.Blob:
         r"""
         Upload a blob value.
         
         Args:
             value (bytes | None): Blob value to be uploaded.
+            timeout (int, optional): Timeout for the blob upload operation in seconds. If not specified, use the connection's default LOB upload timeout.
         
         Returns:
             Optional[Blob]: Uploaded blob.
         
         Examples:
             ```python
-            blob = cursor.upload_blob(b"0x01\x02\x03")
+            blob = cursor.upload_blob(b"0x01\x02\x03", 10)
             cursor.execute("insert into blob_example values (?, ?)", (1, blob))
             connection.commit()
             ```
         
         since 0.10.0
         """
-    def upload_clob(self, value: typing.Optional[builtins.str]) -> type_code.Clob:
+    def upload_clob(self, value: typing.Optional[builtins.str], timeout: typing.Optional[builtins.int] = None) -> type_code.Clob:
         r"""
         Upload a clob value.
         
         Args:
             value (str | None): Clob value to be uploaded.
+            timeout (int, optional): Timeout for the clob upload operation in seconds. If not specified, use the connection's default LOB upload timeout.
         
         Returns:
             Optional[Clob]: Uploaded clob.
         
         Examples:
             ```python
-            clob = cursor.upload_clob("Hello, World!")
+            clob = cursor.upload_clob("Hello, World!", 10)
             cursor.execute("insert into clob_example values (?, ?)", (1, clob))
             connection.commit()
             ```

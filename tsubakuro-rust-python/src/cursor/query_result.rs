@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use chrono::Timelike;
 use log::{debug, warn};
@@ -20,6 +20,7 @@ pub(crate) struct QueryResultContext<'py, 'a> {
     py: Python<'py>,
     sql_client: &'a SqlClient,
     transaction: Option<Arc<Transaction>>,
+    lob_download_timeout: Duration,
 }
 
 impl<'py, 'a> QueryResultContext<'py, 'a> {
@@ -27,11 +28,13 @@ impl<'py, 'a> QueryResultContext<'py, 'a> {
         py: Python<'py>,
         sql_client: &'a SqlClient,
         transaction: Option<Arc<Transaction>>,
+        lob_download_timeout: Duration,
     ) -> QueryResultContext<'py, 'a> {
         QueryResultContext {
             py,
             sql_client,
             transaction,
+            lob_download_timeout,
         }
     }
 
@@ -47,6 +50,10 @@ impl<'py, 'a> QueryResultContext<'py, 'a> {
         self.transaction
             .as_ref()
             .ok_or_else(|| PyErr::new::<InternalError, _>("Transaction is not available"))
+    }
+
+    fn lob_download_timeout(&self) -> Duration {
+        self.lob_download_timeout
     }
 }
 
@@ -202,8 +209,12 @@ async fn download_blob<'py>(
 
     let sql_client = context.sql_client();
     let tx = context.transaction()?;
+    let timeout = context.lob_download_timeout();
 
-    let value = sql_client.read_blob(&tx, &blob).await.map_err(to_pyerr)?;
+    let value = sql_client
+        .read_blob_for(&tx, &blob, timeout)
+        .await
+        .map_err(to_pyerr)?;
     Ok(value.into_pyobject(py)?)
 }
 
@@ -219,7 +230,11 @@ async fn download_clob<'py>(
 
     let sql_client = context.sql_client();
     let tx = context.transaction()?;
+    let timeout = context.lob_download_timeout();
 
-    let value = sql_client.read_clob(&tx, &clob).await.map_err(to_pyerr)?;
+    let value = sql_client
+        .read_clob_for(&tx, &clob, timeout)
+        .await
+        .map_err(to_pyerr)?;
     Ok(value.into_pyobject(py)?.into_any())
 }

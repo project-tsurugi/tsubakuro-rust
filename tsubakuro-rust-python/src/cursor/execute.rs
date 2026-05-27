@@ -91,7 +91,11 @@ impl Cursor {
         }
 
         let connection = &self.connection;
-        let context = ParameterContext::new(connection.runtime(), connection.sql_client());
+        let context = ParameterContext::new(
+            connection.runtime(),
+            connection.sql_client(),
+            connection.lob_upload_timeout(),
+        );
         let (info, parameters_list) = if let Some((ps, types)) = self.ps_map.get_mut(sql) {
             let parameters_list = to_parameters_only(&context, seq_of_parameters, &types)?;
             (PsInfo::Ps(ps), parameters_list)
@@ -229,7 +233,7 @@ impl Cursor {
             self.ps_map.remove(sql);
         }
 
-        let context = ParameterContext::new(runtime, sql_client);
+        let context = ParameterContext::new(runtime, sql_client, connection.lob_upload_timeout());
         let (types, placeholders) = to_placeholders(&context, parameters)?;
 
         trace!("{FUNCTION_NAME}: prepare statement start");
