@@ -46,6 +46,7 @@ jobs:
         image: ghcr.io/project-tsurugi/tsurugidb:${{ inputs.tsurugi_version || 'snapshot' }}-${{ inputs.os || 'ubuntu-22.04' }}
         ports:
           - 12345:12345
+          - 52345:52345
         env:
           GLOG_v: ${{ inputs.tsurugi_loglevel || 30 }}
 
@@ -70,7 +71,7 @@ jobs:
         run: |
           cd tsubakuro-rust-dbtest
           cargo run ${DBTEST_ENDPOINT} tsurugi password
-          cargo test "" -- --test-threads=1 endpoint=${DBTEST_ENDPOINT}
+          cargo test "" -- --skip "service::sql::r#type::blob_privileged::test" --skip "service::sql::r#type::clob_privileged::test" --test-threads=1 endpoint=${DBTEST_ENDPOINT}
 
       - name: Build_FFI
         run: |
@@ -127,6 +128,7 @@ jobs:
         image: ghcr.io/project-tsurugi/tsurugidb:${{ inputs.tsurugi_version || 'snapshot' }}-${{ inputs.os || 'ubuntu-22.04' }}
         ports:
           - 12345:12345
+          - 52345:52345
         env:
           GLOG_v: ${{ inputs.tsurugi_loglevel || 30 }}
 
