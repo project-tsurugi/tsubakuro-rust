@@ -46,6 +46,7 @@ jobs:
         image: ghcr.io/project-tsurugi/tsurugidb:${{ inputs.tsurugi_version || 'snapshot' }}-${{ inputs.os || 'ubuntu-22.04' }}
         ports:
           - 12345:12345
+          - 52345:52345
         env:
           GLOG_v: ${{ inputs.tsurugi_loglevel || 30 }}
 
