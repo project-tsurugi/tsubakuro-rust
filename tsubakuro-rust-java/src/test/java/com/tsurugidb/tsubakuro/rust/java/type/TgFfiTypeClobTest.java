@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.IOException;
 import java.lang.foreign.MemorySegment;
@@ -19,11 +20,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.tsurugidb.iceaxe.session.TgLobTransferType;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameter;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindParameters;
 import com.tsurugidb.iceaxe.sql.parameter.TgBindVariable;
 import com.tsurugidb.iceaxe.sql.parameter.TgParameterMapping;
-import com.tsurugidb.iceaxe.sql.type.IceaxeObjectFactory;
 import com.tsurugidb.iceaxe.sql.type.TgClob;
 import com.tsurugidb.iceaxe.transaction.option.TgTxOption;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
@@ -72,11 +73,12 @@ class TgFfiTypeClobTest extends TgFfiTester {
                     var parameter = TgBindParameters.of(TgBindParameter.of("pk", 0), TgBindParameter.of("value", (TgClob) null));
                     transaction.executeAndGetCountDetail(ps, parameter);
                 }
-                try (var value = IceaxeObjectFactory.getDefaultInstance().createClob("abc", true)) {
+                var lobFactory = session.getLobFactory();
+                try (var value = lobFactory.uploadClob("abc")) {
                     var parameter = TgBindParameters.of(TgBindParameter.of("pk", 1), TgBindParameter.of("value", value));
                     transaction.executeAndGetCountDetail(ps, parameter);
                 }
-                try (var value = IceaxeObjectFactory.getDefaultInstance().createClob("def", true)) {
+                try (var value = lobFactory.uploadClob("def")) {
                     var parameter = TgBindParameters.of(TgBindParameter.of("pk", 2), TgBindParameter.of("value", value));
                     transaction.executeAndGetCountDetail(ps, parameter);
                 }
@@ -111,6 +113,9 @@ class TgFfiTypeClobTest extends TgFfiTester {
 
     @Test
     void insertFfi() throws Exception {
+        var iceaxeLobTransferType = getIceaxeLobTransferType(); // TODO Iceaxeでなく、FFIで転送方法を判定するべき
+        assumeFalse(iceaxeLobTransferType == TgLobTransferType.NOT_USE, "Skip when LobTransferType is NOT_USE");
+
         var manager = getFfiObjectManager();
         var context = TgFfiContext.create(manager);
 
@@ -128,12 +133,6 @@ class TgFfiTypeClobTest extends TgFfiTester {
                         TgFfiSqlParameter.ofClob(context, "value", path));
                 try (var er = client.preparedExecute(context, transaction, ps, parameters)) {
                     assertEquals(1, er.getRows(context));
-                } catch (TgFfiRuntimeException e) {
-                    if (e.getErrorType() == TgFfiRcType.CORE_SERVER_ERROR && e.getServerErrorStructuredCode().equals("SCD-00404")) {
-                        // OPERATION_DENIED
-                    } else {
-                        throw e;
-                    }
                 }
             }
 
@@ -184,13 +183,15 @@ class TgFfiTypeClobTest extends TgFfiTester {
     }
 
     private void selectFfi(boolean skip, String pattern) throws Exception {
+        var iceaxeLobTransferType = getIceaxeLobTransferType(); // TODO Iceaxeでなく、FFIで転送方法を判定するべき
+        assumeFalse(iceaxeLobTransferType == TgLobTransferType.NOT_USE, "Skip when LobTransferType is NOT_USE");
+
         var manager = getFfiObjectManager();
         var context = TgFfiContext.create(manager);
 
         try (var client = createSqlClient(); //
                 var transaction = startOcc(client)) {
 
-            boolean operationDenied = false;
             try (var qr = client.query(context, transaction, "select * from test order by pk")) {
                 queryResultMetadata(qr.getMetadata(context));
 
@@ -208,12 +209,12 @@ class TgFfiTypeClobTest extends TgFfiTester {
                             switch (pattern) {
                             case DIRECT:
                                 try (var value = qr.fetchClob(context)) {
-                                    operationDenied |= new ClobTester(client, transaction, i, value).test();
+                                    new ClobTester(iceaxeLobTransferType, client, transaction, i, value).test();
                                 }
                                 break;
                             case DIRECT_FOR:
                                 try (var value = qr.fetchForClob(context, Duration.ofSeconds(5))) {
-                                    operationDenied |= new ClobTester(client, transaction, i, value).test();
+                                    new ClobTester(iceaxeLobTransferType, client, transaction, i, value).test();
                                 }
                                 break;
                             default:
@@ -232,16 +233,7 @@ class TgFfiTypeClobTest extends TgFfiTester {
                 }
             }
 
-            if (operationDenied) {
-                var e = assertThrows(TgFfiRuntimeException.class, () -> {
-                    commitAndClose(client, transaction, DIRECT_FOR);
-                });
-                if (!e.getServerErrorStructuredCode().equals("SQL-02025")) { // INACTIVE_TRANSACTION_EXCEPTION
-                    throw e;
-                }
-            } else {
-                commitAndClose(client, transaction, DIRECT_FOR);
-            }
+            commitAndClose(client, transaction, DIRECT_FOR);
         }
     }
 
@@ -265,32 +257,25 @@ class TgFfiTypeClobTest extends TgFfiTester {
     }
 
     class ClobTester {
+        private final TgLobTransferType iceaxeLobTransferType;
         private final TgFfiSqlClient client;
         private final TgFfiTransaction transaction;
         private final int index;
         private final TgFfiClobReference clob;
 
-        ClobTester(TgFfiSqlClient client, TgFfiTransaction transaction, int index, TgFfiClobReference clob) {
+        ClobTester(TgLobTransferType iceaxeLobTransferType, TgFfiSqlClient client, TgFfiTransaction transaction, int index, TgFfiClobReference clob) {
+            this.iceaxeLobTransferType = iceaxeLobTransferType;
             this.client = client;
             this.transaction = transaction;
             this.index = index;
             this.clob = clob;
         }
 
-        boolean test() throws IOException {
-            boolean operationDenied = false;
+        void test() throws IOException {
             for (var pattern : List.of(DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY)) {
-                try {
-                    read_clob(pattern);
-                    get_clob_cache(pattern);
-                    copy_clob_to(pattern);
-                } catch (TgFfiRuntimeException e) {
-                    if (e.getServerErrorStructuredCode().equals("SCD-00404")) { // OPERATION_DENIED
-                        operationDenied = true;
-                        continue;
-                    }
-                    throw e;
-                }
+                read_clob(pattern);
+                get_clob_cache(pattern);
+                copy_clob_to(pattern);
             }
 
             read_clob_argError();
@@ -301,8 +286,6 @@ class TgFfiTypeClobTest extends TgFfiTester {
             copy_clob_to_argError();
             copy_clob_to_for_argError();
             copy_clob_to_async_argError();
-
-            return operationDenied;
         }
 
         private void read_clob(String pattern) throws IOException {
@@ -342,11 +325,19 @@ class TgFfiTypeClobTest extends TgFfiTester {
                     }
                     break;
                 }
-                String path = cache.getPath(context);
-                assertNotNull(path);
 
-                var value = Files.readString(Path.of(path));
-                assertValue(value);
+                String path = cache.getPath(context);
+                switch (iceaxeLobTransferType) { // TODO Iceaxeでなく、FFIで転送方法を判定するべき
+                case PRIVILEGED:
+                    assertNotNull(path);
+
+                    var value = Files.readString(Path.of(path));
+                    assertValue(value);
+                    break;
+                default:
+                    assertNull(path);
+                    break;
+                }
             }
         }
 

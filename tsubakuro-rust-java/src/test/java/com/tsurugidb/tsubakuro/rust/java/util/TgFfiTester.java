@@ -16,6 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.tsurugidb.iceaxe.TsurugiConnector;
+import com.tsurugidb.iceaxe.session.TgLobTransferType;
 import com.tsurugidb.tsubakuro.channel.common.connection.Credential;
 import com.tsurugidb.tsubakuro.channel.common.connection.FileCredential;
 import com.tsurugidb.tsubakuro.channel.common.connection.RememberMeCredential;
@@ -154,6 +155,17 @@ public class TgFfiTester {
 
     protected static TsurugiConnector getTsurugiConnector() {
         return TsurugiConnector.of(getEndpointJava(), getCredentialJava());
+    }
+
+    protected TgLobTransferType getIceaxeLobTransferType() {
+        var connector = getTsurugiConnector();
+        try (var session = connector.createSession()) {
+            return session.getLobTransferType();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e.getMessage(), e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private TgFfiObjectManager manager;
