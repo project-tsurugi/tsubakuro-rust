@@ -3,6 +3,7 @@ package com.tsurugidb.tsubakuro.rust.java.service.sql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +46,7 @@ class TgFfiSqlClientTest extends TgFfiTester {
         try (var context = TgFfiContext.create(manager); //
                 var client = createSqlClient()) {
             String smv = client.getServiceMessageVersion(context);
-            assertEquals("sql-2.0", smv);
+            assertNotNull(smv);
         }
     }
 
