@@ -7,7 +7,7 @@ use tsubakuro_rust_core::prelude::{AtomType, SqlPlaceholder, SqlPreparedStatemen
 use crate::{
     cursor::{Cursor, RowNumber},
     error::{to_pyerr, OperationalError, ProgrammingError},
-    type_code::{to_parameters, to_parameters_only, to_placeholders},
+    type_code::{to_parameters, to_parameters_only, to_placeholders, ParameterContext},
 };
 
 impl Cursor {
@@ -90,11 +90,14 @@ impl Cursor {
             Ps(&'a mut SqlPreparedStatement),
         }
 
+        let connection = &self.connection;
+        let context = ParameterContext::new(connection.runtime(), connection.sql_client());
         let (info, parameters_list) = if let Some((ps, types)) = self.ps_map.get_mut(sql) {
-            let parameters_list = to_parameters_only(seq_of_parameters, &types)?;
+            let parameters_list = to_parameters_only(&context, seq_of_parameters, &types)?;
             (PsInfo::Ps(ps), parameters_list)
         } else {
-            let (types, placeholders, parameters_list) = to_parameters(seq_of_parameters)?;
+            let (types, placeholders, parameters_list) =
+                to_parameters(&context, seq_of_parameters)?;
             (PsInfo::First(types, placeholders), parameters_list)
         };
         if parameters_list.is_empty() {
@@ -226,7 +229,8 @@ impl Cursor {
             self.ps_map.remove(sql);
         }
 
-        let (types, placeholders) = to_placeholders(parameters)?;
+        let context = ParameterContext::new(runtime, sql_client);
+        let (types, placeholders) = to_placeholders(&context, parameters)?;
 
         trace!("{FUNCTION_NAME}: prepare statement start");
         let ps = runtime

@@ -53,6 +53,10 @@ impl InnerConnection {
         &self.runtime
     }
 
+    pub(crate) fn session(&self) -> &Arc<Session> {
+        &self.session
+    }
+
     pub(crate) fn sql_client(&self) -> &SqlClient {
         &self.sql_client
     }
@@ -93,6 +97,11 @@ impl InnerConnection {
         }
 
         Ok(transaction.as_ref().unwrap().clone())
+    }
+
+    pub(crate) fn find_transaction(&self) -> Option<Arc<Transaction>> {
+        let transaction = self.transaction.lock().unwrap();
+        transaction.as_ref().cloned()
     }
 
     fn begin_timeout(&self) -> Duration {

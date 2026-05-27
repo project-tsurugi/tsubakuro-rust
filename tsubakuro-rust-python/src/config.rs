@@ -84,6 +84,8 @@ pub struct Config {
     /// Session label for the connection.
     #[pyo3(get, set)]
     session_label: Option<String>,
+    #[pyo3(get, set)]
+    blob_relay_service_endpoint: Option<String>,
     /// Transaction option.
     #[pyo3(get, set)]
     pub transaction_option: Option<TransactionOption>,
@@ -108,6 +110,7 @@ impl Default for Config {
             auth_token: None,
             credentials: None,
             session_label: None,
+            blob_relay_service_endpoint: None,
             transaction_option: None,
             commit_option: None,
             shutdown_option: None,
@@ -174,6 +177,9 @@ impl Config {
         if let Some(session_label) = &other.session_label {
             self.session_label = Some(session_label.clone());
         }
+        if let Some(blob_relay_service_endpoint) = &other.blob_relay_service_endpoint {
+            self.blob_relay_service_endpoint = Some(blob_relay_service_endpoint.clone());
+        }
         if let Some(transaction_option) = &other.transaction_option {
             self.transaction_option = Some(transaction_option.clone());
         }
@@ -224,7 +230,7 @@ impl Config {
         let none = &"None".to_string();
         let mask = &"****".to_string();
         format!(
-            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, session_label={}, default_timeout={})",
+            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, session_label={}, blob_relay_service_endpoint={}, default_timeout={})",
             self.application_name.as_ref().unwrap_or(none),
             self.endpoint.as_ref().unwrap_or(none),
             self.user.as_ref().unwrap_or(none),
@@ -232,6 +238,7 @@ impl Config {
             self.auth_token.as_ref().map_or(none, |_| mask),
             self.credentials.as_ref().unwrap_or(none),
             self.session_label.as_ref().unwrap_or(none),
+            self.blob_relay_service_endpoint.as_ref().unwrap_or(none),
             self.default_timeout.as_ref().map_or(none.to_string(), |v| v.to_string())
         )
     }
@@ -305,6 +312,9 @@ impl Config {
             "auth_token" => self.auth_token = Some(value.to_string()),
             "credentials" => self.credentials = Some(value.to_string()),
             "session_label" => self.session_label = Some(value.to_string()),
+            "blob_relay_service_endpoint" => {
+                self.blob_relay_service_endpoint = Some(value.to_string())
+            }
             "default_timeout" | "timeout" => {
                 let timeout: u64 = value.parse().map_err(|_| {
                     InterfaceError::new_err("Invalid value for default_timeout/timeout")
@@ -325,6 +335,9 @@ impl Config {
             "auth_token" => self.auth_token = Some(value.extract()?),
             "credentials" => self.credentials = Some(value.extract()?),
             "session_label" => self.session_label = Some(value.extract()?),
+            "blob_relay_service_endpoint" => {
+                self.blob_relay_service_endpoint = Some(value.extract()?)
+            }
             "default_timeout" | "timeout" => self.default_timeout = Some(value.extract()?),
             _ => debug!("Unknown key: {}", key),
         }
@@ -361,6 +374,9 @@ impl Config {
 
         if let Some(session_label) = &self.session_label {
             connection_option.set_session_label(session_label);
+        }
+        if let Some(endpoint) = &self.blob_relay_service_endpoint {
+            connection_option.set_blob_relay_service_endpoint(endpoint);
         }
 
         connection_option.set_default_timeout(self.default_timeout());
