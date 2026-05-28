@@ -18,6 +18,26 @@ pub(crate) trait LobUploader {
     fn cancel(&self) -> Result<(), TgError>;
 }
 
+/// BLOB uploader.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example(client: &SqlClient, value: &[u8]) -> Result<TgBlob, TgError> {
+///     let timeout = std::time::Duration::from_secs(10);
+///     let mut uploader = client.create_blob_uploader().await?;
+///
+///     for chunk in value.chunks(1024 * 1024) {
+///         uploader.upload_chunk(chunk, timeout).await?;
+///     }
+///     let blob = uploader.finish(timeout).await?;
+///
+///     Ok(blob)
+/// }
+/// ```
+///
+/// since 0.10.0
 pub struct BlobUploader {
     inner: Arc<dyn LobUploader + Send + Sync>,
     done: bool,
@@ -30,10 +50,12 @@ impl BlobUploader {
 }
 
 impl BlobUploader {
+    /// Uploads a chunk of data.
     pub async fn upload_chunk(&mut self, value: &[u8], timeout: Duration) -> Result<(), TgError> {
         self.inner.upload_chunk(value, timeout).await
     }
 
+    /// Finishes the upload and returns the resulting `TgBlob`.
     pub async fn finish(mut self, timeout: Duration) -> Result<TgBlob, TgError> {
         self.done = true;
 
@@ -41,6 +63,7 @@ impl BlobUploader {
         Ok(TgBlob::from_remote_lob(lob))
     }
 
+    /// Cancels the upload.
     pub fn cancel(mut self) -> Result<(), TgError> {
         self.done = true;
 
@@ -61,6 +84,27 @@ impl Drop for BlobUploader {
     }
 }
 
+/// CLOB uploader.
+///
+/// # Examples
+/// ```
+/// use tsubakuro_rust_core::prelude::*;
+///
+/// async fn example(client: &SqlClient, value: &str) -> Result<TgClob, TgError> {
+///     let timeout = std::time::Duration::from_secs(10);
+///     let mut uploader = client.create_clob_uploader().await?;
+///
+///     let bytes = value.as_bytes();
+///     for chunk in bytes.chunks(1024 * 1024) {
+///         uploader.upload_chunk_utf8(chunk, timeout).await?;
+///     }
+///     let clob = uploader.finish(timeout).await?;
+///
+///     Ok(clob)
+/// }
+/// ```
+///
+/// since 0.10.0
 pub struct ClobUploader {
     inner: Arc<dyn LobUploader + Send + Sync>,
     done: bool,
@@ -73,10 +117,16 @@ impl ClobUploader {
 }
 
 impl ClobUploader {
-    pub async fn upload_chunk(&mut self, value: &[u8], timeout: Duration) -> Result<(), TgError> {
+    /// Uploads a chunk of data as UTF-8.
+    pub async fn upload_chunk_utf8(
+        &mut self,
+        value: &[u8],
+        timeout: Duration,
+    ) -> Result<(), TgError> {
         self.inner.upload_chunk(value, timeout).await
     }
 
+    /// Finishes the upload and returns the resulting `TgClob`.
     pub async fn finish(mut self, timeout: Duration) -> Result<TgClob, TgError> {
         self.done = true;
 
@@ -84,6 +134,7 @@ impl ClobUploader {
         Ok(TgClob::from_remote_lob(lob))
     }
 
+    /// Cancels the upload.
     pub fn cancel(mut self) -> Result<(), TgError> {
         self.done = true;
 

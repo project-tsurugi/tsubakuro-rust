@@ -16,6 +16,9 @@ pub(crate) trait LobDownloader {
     ) -> Result<usize, TgError>;
 }
 
+/// BLOB downloader.
+///
+/// since 0.10.0
 pub struct BlobDownloader {
     inner: Box<dyn LobDownloader>,
     buffer: BytesMut,
@@ -31,6 +34,24 @@ impl BlobDownloader {
         }
     }
 
+    /// Downloads a chunk of data.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, blob: &TgBlobReference) -> Result<Vec<u8>, TgError> {
+    ///     let timeout = std::time::Duration::from_secs(10);
+    ///     let mut downloader = client.create_blob_downloader(transaction, blob, timeout).await?;
+    ///
+    ///     let mut value = Vec::new();
+    ///     while let Some(chunk) = downloader.download_chunk(1024 * 1024, timeout).await? {
+    ///         value.extend_from_slice(&chunk);
+    ///     }
+    ///
+    ///     Ok(value)
+    /// }
+    /// ```
     pub async fn download_chunk(
         &mut self,
         length: usize,
@@ -52,6 +73,29 @@ impl BlobDownloader {
         Ok(Some(chunk))
     }
 
+    /// Downloads a chunk of data into the provided buffer.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, blob: &TgBlobReference) -> Result<Vec<u8>, TgError> {
+    ///     let timeout = std::time::Duration::from_secs(10);
+    ///     let mut downloader = client.create_blob_downloader(transaction, blob, timeout).await?;
+    ///
+    ///     let mut value = Vec::new();
+    ///     let mut chunk = vec![0; 1024 * 1024];
+    ///     loop {
+    ///         let n = downloader.download_chunk_into(&mut chunk, timeout).await?;
+    ///         if n == 0 {
+    ///             break;
+    ///         }
+    ///         value.extend_from_slice(&chunk[..n]);
+    ///     }
+    ///
+    ///     Ok(value)
+    /// }
+    /// ```
     pub async fn download_chunk_into(
         &mut self,
         chunk: &mut [u8],
@@ -94,6 +138,7 @@ impl BlobDownloader {
         Ok(())
     }
 
+    /// Checks if the end of the stream is reached.
     pub async fn is_eof(&mut self, timeout: Duration) -> Result<bool, TgError> {
         if !self.buffer.is_empty() {
             return Ok(false);
@@ -111,6 +156,9 @@ impl BlobDownloader {
     }
 }
 
+/// CLOB downloader.
+///
+/// since 0.10.0
 pub struct ClobDownloader {
     inner: BlobDownloader,
 }
@@ -122,6 +170,24 @@ impl ClobDownloader {
         }
     }
 
+    /// Downloads a chunk of data as UTF-8.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, clob: &TgClobReference) -> Result<String, TgError> {
+    ///     let timeout = std::time::Duration::from_secs(10);
+    ///     let mut downloader = client.create_clob_downloader(transaction, clob, timeout).await?;
+    ///
+    ///     let mut value = Vec::new();
+    ///     while let Some(chunk) = downloader.download_chunk_utf8(1024 * 1024, timeout).await? {
+    ///         value.extend_from_slice(&chunk);
+    ///     }
+    ///
+    ///     Ok(String::from_utf8(value).unwrap())
+    /// }
+    /// ```
     pub async fn download_chunk_utf8(
         &mut self,
         length: usize,
@@ -130,6 +196,29 @@ impl ClobDownloader {
         self.inner.download_chunk(length, timeout).await
     }
 
+    /// Downloads a chunk of data as UTF-8 into the provided buffer.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(client: &SqlClient, transaction: &Transaction, clob: &TgClobReference) -> Result<String, TgError> {
+    ///     let timeout = std::time::Duration::from_secs(10);
+    ///     let mut downloader = client.create_clob_downloader(transaction, clob, timeout).await?;
+    ///
+    ///     let mut value = Vec::new();
+    ///     let mut chunk = vec![0; 1024 * 1024];
+    ///     loop {
+    ///         let n = downloader.download_chunk_into_utf8(&mut chunk, timeout).await?;
+    ///         if n == 0 {
+    ///             break;
+    ///         }
+    ///         value.extend_from_slice(&chunk[..n]);
+    ///     }
+    ///
+    ///     Ok(String::from_utf8(value).unwrap())
+    /// }
+    /// ```
     pub async fn download_chunk_into_utf8(
         &mut self,
         chunk: &mut [u8],
@@ -138,6 +227,7 @@ impl ClobDownloader {
         self.inner.download_chunk_into(chunk, timeout).await
     }
 
+    /// Checks if the end of the stream is reached.
     pub async fn is_eof(&mut self, timeout: Duration) -> Result<bool, TgError> {
         self.inner.is_eof(timeout).await
     }

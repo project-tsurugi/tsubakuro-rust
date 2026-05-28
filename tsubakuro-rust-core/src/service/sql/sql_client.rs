@@ -1175,6 +1175,25 @@ impl SqlClient {
         SqlCommand::ExecutePreparedQuery(request)
     }
 
+    /// Check whether LOB operation is supported in the current lob transfer type.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(
+    ///     client: &SqlClient,
+    ///     value: &[u8],
+    /// ) -> Result<Option<TgBlob>, TgError> {
+    ///     if client.allows_lob_operation(LobOperation::UploadLob).await? {
+    ///         let blob = client.upload_blob(value).await?;
+    ///         return Ok(Some(blob));
+    ///     }
+    ///     Ok(None)
+    /// }
+    /// ```
+    ///
+    /// since 0.10.0
     pub async fn allows_lob_operation(&self, operation: LobOperation) -> Result<bool, TgError> {
         let lob_client = self.get_lob_client().await?;
 
@@ -1199,11 +1218,39 @@ impl SqlClient {
         Ok(false)
     }
 
+    /// Uploads a file as a BLOB.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(
+    ///     client: &SqlClient,
+    ///     transaction: &Transaction,
+    ///     ps: &SqlPreparedStatement, // insert into blob_example values(:pk, :value)
+    ///     pk: i32,
+    ///     path: &std::path::Path,
+    /// ) -> Result<i64, TgError> {
+    ///     let blob = client.upload_blob_file(path).await?;
+    ///
+    ///     let parameters = vec![
+    ///         SqlParameter::of("pk", pk),
+    ///         SqlParameter::of("value", blob),
+    ///     ];
+    ///     let execute_result = client.prepared_execute(transaction, ps, parameters).await?;
+    ///     Ok(execute_result.inserted_rows())
+    /// }
+    /// ```
+    ///
+    /// since 0.10.0
     pub async fn upload_blob_file<T: AsRef<Path>>(&self, path: T) -> Result<TgBlob, TgError> {
         let timeout = self.default_timeout;
         self.upload_blob_file_for(path, timeout).await
     }
 
+    /// Uploads a file as a BLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_blob_file_for<T: AsRef<Path>>(
         &self,
         path: T,
@@ -1219,6 +1266,9 @@ impl SqlClient {
         Ok(TgBlob::from_remote_lob(lob))
     }
 
+    /// Uploads a file as a BLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_blob_file_async<T: AsRef<Path>>(
         &self,
         path: T,
@@ -1234,11 +1284,39 @@ impl SqlClient {
         Ok(job)
     }
 
+    /// Uploads a file as a CLOB.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(
+    ///     client: &SqlClient,
+    ///     transaction: &Transaction,
+    ///     ps: &SqlPreparedStatement, // insert into clob_example values(:pk, :value)
+    ///     pk: i32,
+    ///     path: &std::path::Path,
+    /// ) -> Result<i64, TgError> {
+    ///     let clob = client.upload_clob_file(path).await?;
+    ///
+    ///     let parameters = vec![
+    ///         SqlParameter::of("pk", pk),
+    ///         SqlParameter::of("value", clob),
+    ///     ];
+    ///     let execute_result = client.prepared_execute(transaction, ps, parameters).await?;
+    ///     Ok(execute_result.inserted_rows())
+    /// }
+    /// ```
+    ///
+    /// since 0.10.0
     pub async fn upload_clob_file<T: AsRef<Path>>(&self, path: T) -> Result<TgClob, TgError> {
         let timeout = self.default_timeout;
         self.upload_clob_file_for(path, timeout).await
     }
 
+    /// Uploads a file as a CLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_clob_file_for<T: AsRef<Path>>(
         &self,
         path: T,
@@ -1254,6 +1332,9 @@ impl SqlClient {
         Ok(TgClob::from_remote_lob(lob))
     }
 
+    /// Uploads a file as a CLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_clob_file_async<T: AsRef<Path>>(
         &self,
         path: T,
@@ -1269,11 +1350,39 @@ impl SqlClient {
         Ok(job)
     }
 
+    /// Uploads a BLOB.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(
+    ///     client: &SqlClient,
+    ///     transaction: &Transaction,
+    ///     ps: &SqlPreparedStatement, // insert into blob_example values(:pk, :value)
+    ///     pk: i32,
+    ///     value: &[u8],
+    /// ) -> Result<i64, TgError> {
+    ///     let blob = client.upload_blob(value).await?;
+    ///
+    ///     let parameters = vec![
+    ///         SqlParameter::of("pk", pk),
+    ///         SqlParameter::of("value", blob),
+    ///     ];
+    ///     let execute_result = client.prepared_execute(transaction, ps, parameters).await?;
+    ///     Ok(execute_result.inserted_rows())
+    /// }
+    /// ```
+    ///
+    /// since 0.10.0
     pub async fn upload_blob(&self, value: &[u8]) -> Result<TgBlob, TgError> {
         let timeout = self.default_timeout;
         self.upload_blob_for(value, timeout).await
     }
 
+    /// Uploads a BLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_blob_for(
         &self,
         value: &[u8],
@@ -1289,6 +1398,9 @@ impl SqlClient {
         Ok(TgBlob::from_remote_lob(lob))
     }
 
+    /// Uploads a BLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_blob_async(&self, value: &[u8]) -> Result<Job<TgBlob>, TgError> {
         const FUNCTION_NAME: &str = "upload_blob_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -1301,11 +1413,39 @@ impl SqlClient {
         Ok(job)
     }
 
+    /// Uploads a CLOB.
+    ///
+    /// # Examples
+    /// ```
+    /// use tsubakuro_rust_core::prelude::*;
+    ///
+    /// async fn example(
+    ///     client: &SqlClient,
+    ///     transaction: &Transaction,
+    ///     ps: &SqlPreparedStatement, // insert into clob_example values(:pk, :value)
+    ///     pk: i32,
+    ///     value: &str,
+    /// ) -> Result<i64, TgError> {
+    ///     let clob = client.upload_clob(value).await?;
+    ///
+    ///     let parameters = vec![
+    ///         SqlParameter::of("pk", pk),
+    ///         SqlParameter::of("value", clob),
+    ///     ];
+    ///     let execute_result = client.prepared_execute(transaction, ps, parameters).await?;
+    ///     Ok(execute_result.inserted_rows())
+    /// }
+    /// ```
+    ///
+    /// since 0.10.0
     pub async fn upload_clob(&self, value: &str) -> Result<TgClob, TgError> {
         let timeout = self.default_timeout;
         self.upload_clob_for(value, timeout).await
     }
 
+    /// Uploads a CLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_clob_for(&self, value: &str, timeout: Duration) -> Result<TgClob, TgError> {
         const FUNCTION_NAME: &str = "upload_clob()";
         trace!("{} start", FUNCTION_NAME);
@@ -1319,6 +1459,9 @@ impl SqlClient {
         Ok(TgClob::from_remote_lob(lob))
     }
 
+    /// Uploads a CLOB.
+    ///
+    /// since 0.10.0
     pub async fn upload_clob_async(&self, value: &str) -> Result<Job<TgClob>, TgError> {
         const FUNCTION_NAME: &str = "upload_clob_async()";
         trace!("{} start", FUNCTION_NAME);
@@ -1332,12 +1475,18 @@ impl SqlClient {
         Ok(job)
     }
 
+    /// Creates a BLOB uploader.
+    ///
+    /// since 0.10.0
     pub async fn create_blob_uploader(&self) -> Result<BlobUploader, TgError> {
         let lob_client = self.get_lob_client().await?;
         let uploader = lob_client.create_lob_uploader().await?;
         Ok(BlobUploader::new(uploader))
     }
 
+    /// Creates a CLOB uploader.
+    ///
+    /// since 0.10.0
     pub async fn create_clob_uploader(&self) -> Result<ClobUploader, TgError> {
         let lob_client = self.get_lob_client().await?;
         let uploader = lob_client.create_lob_uploader().await?;
@@ -1950,6 +2099,9 @@ impl SqlClient {
         Ok(job)
     }
 
+    /// Creates a BLOB downloader.
+    ///
+    /// since 0.10.0
     pub async fn create_blob_downloader(
         &self,
         transaction: &Transaction,
@@ -1963,6 +2115,9 @@ impl SqlClient {
         Ok(BlobDownloader::new(downloader))
     }
 
+    /// Creates a CLOB downloader.
+    ///
+    /// since 0.10.0
     pub async fn create_clob_downloader(
         &self,
         transaction: &Transaction,

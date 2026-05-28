@@ -306,7 +306,7 @@ mod test {
                     let mut uploader = client.create_clob_uploader().await?;
                     let timeout = Duration::from_secs(10);
                     for chunk in value.as_bytes().chunks(1024) {
-                        uploader.upload_chunk(chunk, timeout).await?;
+                        uploader.upload_chunk_utf8(chunk, timeout).await?;
                     }
                     let clob = uploader.finish(timeout).await?;
                     Some(clob)

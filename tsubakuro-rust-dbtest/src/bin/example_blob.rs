@@ -116,6 +116,7 @@ async fn example_transaction2(client: &SqlClient) -> Result<(), TgError> {
 async fn example_sql(client: &SqlClient, transaction: &Transaction) -> Result<(), TgError> {
     example_blob_insert(client, transaction).await?;
     example_blob_query(client, transaction).await?;
+    example_blob_downloader(client, transaction).await?;
     Ok(())
 }
 
@@ -130,7 +131,10 @@ async fn example_blob_insert(client: &SqlClient, transaction: &Transaction) -> R
     ];
     let ps = client.prepare(sql, placeholders).await?;
 
-    let result = example_blob_insert_execute(client, transaction, &ps).await;
+    let mut result = example_blob_insert_execute(client, transaction, &ps).await;
+    if result.is_ok() {
+        result = example_blob_uploader(client, transaction, &ps).await;
+    }
 
     if let Err(e) = ps.close().await {
         warn!("preparedStatement close error. {}", e);
@@ -140,7 +144,6 @@ async fn example_blob_insert(client: &SqlClient, transaction: &Transaction) -> R
 }
 
 /// execute BLOB insert example
-#[allow(deprecated)]
 async fn example_blob_insert_execute(
     client: &SqlClient,
     transaction: &Transaction,
@@ -151,6 +154,31 @@ async fn example_blob_insert_execute(
 
     let parameters = vec![
         SqlParameter::of("pk", 1_i32),
+        SqlParameter::of("value", blob),
+    ];
+    let execute_result = client.prepared_execute(transaction, ps, parameters).await?;
+    println!("inserted_rows={}", execute_result.inserted_rows());
+
+    Ok(())
+}
+
+/// BLOB uploader example
+async fn example_blob_uploader(
+    client: &SqlClient,
+    transaction: &Transaction,
+    ps: &SqlPreparedStatement,
+) -> Result<(), TgError> {
+    let data = vec![0xff_u8; 1024 * 1024 * 4]; // 4MB
+
+    let timeout = Duration::from_secs(10);
+    let mut uploader = client.create_blob_uploader().await?;
+    for chunk in data.chunks(1024 * 1024) {
+        uploader.upload_chunk(chunk, timeout).await?;
+    }
+    let blob = uploader.finish(timeout).await?;
+
+    let parameters = vec![
+        SqlParameter::of("pk", 2_i32),
         SqlParameter::of("value", blob),
     ];
     let execute_result = client.prepared_execute(transaction, ps, parameters).await?;
@@ -174,10 +202,67 @@ async fn example_blob_query(client: &SqlClient, transaction: &Transaction) -> Re
         let blob: TgBlobReference = query_result.fetch().await?;
         let value = client.read_blob(transaction, &blob).await?;
 
-        println!("pk={pk}, value={value:?}");
+        print_record(pk, value);
     }
 
     query_result.close().await?;
 
     Ok(())
+}
+
+/// BLOB downloader example
+async fn example_blob_downloader(
+    client: &SqlClient,
+    transaction: &Transaction,
+) -> Result<(), TgError> {
+    println!("---example_blob_downloader---");
+
+    let sql = "select * from blob_example";
+    let mut query_result = client.query(&transaction, sql).await?;
+
+    while query_result.next_row().await? {
+        assert!(query_result.next_column().await?);
+        let pk: i32 = query_result.fetch().await?;
+
+        assert!(query_result.next_column().await?);
+        let blob: TgBlobReference = query_result.fetch().await?;
+        let timeout = Duration::from_secs(10);
+
+        // download_chunk
+        let mut downloader = client
+            .create_blob_downloader(transaction, &blob, timeout)
+            .await?;
+        let mut value = Vec::new();
+        while let Some(chunk) = downloader.download_chunk(1024 * 1024, timeout).await? {
+            value.extend_from_slice(&chunk);
+        }
+        print_record(pk, value);
+
+        // download_chunk_into
+        let mut downloader = client
+            .create_blob_downloader(transaction, &blob, timeout)
+            .await?;
+        let mut value = Vec::new();
+        let mut buffer = vec![0_u8; 1024 * 1024];
+        loop {
+            let len = downloader.download_chunk_into(&mut buffer, timeout).await?;
+            if len == 0 {
+                break;
+            }
+            value.extend_from_slice(&buffer[..len]);
+        }
+        print_record(pk, value);
+    }
+
+    query_result.close().await?;
+
+    Ok(())
+}
+
+fn print_record(pk: i32, value: Vec<u8>) {
+    if value.len() <= 16 {
+        println!("pk={pk}, value={value:?}");
+    } else {
+        println!("pk={pk}, value=[{} bytes]", value.len());
+    }
 }
