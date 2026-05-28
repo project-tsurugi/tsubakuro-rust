@@ -144,7 +144,7 @@ impl LobClient for PrivilegedLobClient {
         let job = self.get_file_path_async(transaction, lob).await?;
         let job = job.convert(
             "Bytes",
-            Arc::new(|client_path| {
+            Box::new(|client_path| {
                 std::fs::read(client_path).map_err(|e| io_error!("Failed to read lob file", e))
             }),
         );

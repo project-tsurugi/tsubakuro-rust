@@ -179,14 +179,10 @@ impl Wire {
         let slot_handle = self.send_internal(service_id, request, lobs).await?;
 
         let wire = self.clone();
-        let job = Job::new(
-            job_name,
-            wire,
-            slot_handle,
-            converter,
-            default_timeout,
-            fail_on_drop_error,
-        );
+        let mut job = Job::new(job_name, wire, slot_handle, converter, default_timeout);
+        if fail_on_drop_error {
+            job.set_fail_on_drop_error(true);
+        }
         Ok(job)
     }
 

@@ -10,12 +10,12 @@ pub(crate) mod spawn_job;
 pub(crate) mod value_job;
 pub(crate) mod wire_slot_job;
 
-#[async_trait]
+#[async_trait(?Send)]
 pub(crate) trait InnerJob<T: Send> {
     async fn wait(&self, timeout: Duration) -> Result<bool, TgError>;
     async fn is_done(&self) -> Result<bool, TgError>;
     async fn take_for(&self, timeout: Duration) -> Result<T, TgError>;
     async fn cancel_async(&self) -> Result<Option<CancelJob>, TgError>;
     async fn send_cancel(&self) -> Result<(), TgError>;
-    fn dispose(&self, name: &str, fail_on_error: bool);
+    fn set_fail_on_drop_error(&self, value: bool);
 }

@@ -35,31 +35,26 @@ use crate::{
 ///     Ok(())
 /// }
 /// ```
-pub struct Job<T: Send + Sync + 'static> {
+pub struct Job<T: Send> {
     name: String,
-    inner: Arc<dyn InnerJob<T> + Send + Sync>,
+    inner: Box<dyn InnerJob<T> + Send>,
     default_timeout: Duration,
-    done: bool,
     taked: bool,
-    canceled: bool,
     closed: bool,
-    fail_on_drop_error: bool,
 }
 
-impl<T: Send + Sync + 'static> std::fmt::Debug for Job<T> {
+impl<T: Send> std::fmt::Debug for Job<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Job")
             .field("name", &self.name)
             .field("default_timeout", &self.default_timeout)
-            .field("done", &self.done)
             .field("taked", &self.taked)
-            .field("canceled", &self.canceled)
             .field("closed", &self.closed)
             .finish()
     }
 }
 
-impl<T: Send + Sync + 'static> Job<T> {
+impl<T: Send + 'static> Job<T> {
     pub(crate) fn new(
         name: &str,
         wire: Arc<Wire>,
@@ -68,40 +63,38 @@ impl<T: Send + Sync + 'static> Job<T> {
             dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
         >,
         default_timeout: Duration,
-        fail_on_drop_error: bool,
     ) -> Job<T> {
-        let inner = Arc::new(WireSlotInnerJob::new(wire, slot_handle, converter));
+        let inner = Box::new(WireSlotInnerJob::new(
+            name.to_string(),
+            wire,
+            slot_handle,
+            converter,
+        ));
 
         Job {
             name: name.to_string(),
             inner,
             default_timeout,
-            done: false,
             taked: false,
-            canceled: false,
             closed: false,
-            fail_on_drop_error,
         }
     }
 
     pub(crate) fn returns(name: &str, value: T) -> Job<T> {
-        let inner = Arc::new(ValueInnerJob::new(value));
+        let inner = Box::new(ValueInnerJob::new(value));
 
         Job {
             name: name.to_string(),
             inner,
             default_timeout: Duration::ZERO,
-            done: true,
             taked: false,
-            canceled: false,
             closed: false,
-            fail_on_drop_error: false,
         }
     }
 
     pub(crate) fn supplier(
         name: &str,
-        supplier: Arc<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>,
+        supplier: Box<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>,
         default_timeout: Duration,
     ) -> Job<T> {
         let inner = SpawnInnerJob::new(supplier);
@@ -110,37 +103,28 @@ impl<T: Send + Sync + 'static> Job<T> {
             name: name.to_string(),
             inner,
             default_timeout,
-            done: true, // TODO false
             taked: false,
-            canceled: false,
             closed: false,
-            fail_on_drop_error: false,
         }
     }
 
-    pub(crate) fn convert<R: Send + Sync + 'static>(
+    pub(crate) fn convert<R: Send + 'static>(
         self,
         name: &str,
-        converter: Arc<dyn Fn(T) -> Result<R, TgError> + Send + Sync>,
+        converter: Box<dyn Fn(T) -> Result<R, TgError> + Send>,
     ) -> Job<R> {
-        let inner = Arc::new(ConvertInnerJob::new(self.inner.clone(), converter));
+        let inner = Box::new(ConvertInnerJob::new(self.inner, converter));
 
         let default_timeout = self.default_timeout;
-        let done = self.done;
         let taked = self.taked;
-        let canceled = self.canceled;
         let closed = self.closed;
-        let fail_on_drop_error = self.fail_on_drop_error;
 
         Job {
             name: name.to_string(),
             inner,
             default_timeout,
-            done,
             taked,
-            canceled,
             closed,
-            fail_on_drop_error,
         }
     }
 
@@ -176,15 +160,7 @@ impl<T: Send + Sync + 'static> Job<T> {
     pub async fn wait(&mut self, timeout: Duration) -> Result<bool, TgError> {
         // self.check_cancel()?;
         // self.check_close()?;
-        if self.done {
-            return Ok(true);
-        }
-
-        let result = self.inner.wait(timeout).await;
-        if let Ok(true) = result {
-            self.done = true;
-        }
-        result
+        self.inner.wait(timeout).await
     }
 
     /// Whether a response has been received.
@@ -210,21 +186,7 @@ impl<T: Send + Sync + 'static> Job<T> {
     /// }
     /// ```
     pub async fn is_done(&mut self) -> Result<bool, TgError> {
-        if self.done {
-            return Ok(true);
-        }
-        if self.canceled {
-            return Ok(false);
-        }
-        if self.closed {
-            return Ok(false);
-        }
-
-        let result = self.inner.is_done().await;
-        if let Ok(true) = result {
-            self.done = true;
-        }
-        result
+        self.inner.is_done().await
     }
 
     /// Retrieves the result value, or wait until response has been received.
@@ -269,7 +231,6 @@ impl<T: Send + Sync + 'static> Job<T> {
 
         self.taked = true;
         let value = self.inner.take_for(timeout).await?;
-        self.done = true;
         Ok(value)
     }
 
@@ -367,13 +328,9 @@ impl<T: Send + Sync + 'static> Job<T> {
     /// ```
     pub async fn cancel_async(mut self) -> Result<Option<CancelJob>, TgError> {
         // self.check_close()?;
-        if self.done {
+        if self.is_done().await? {
             return Ok(None);
         }
-        if self.canceled {
-            return Ok(None);
-        }
-        self.canceled = true;
 
         self.inner.cancel_async().await
     }
@@ -394,7 +351,7 @@ impl<T: Send + Sync + 'static> Job<T> {
         }
         self.closed = true;
 
-        if self.done || self.canceled {
+        if self.is_done().await? {
             return Ok(());
         }
 
@@ -411,20 +368,6 @@ impl<T: Send + Sync + 'static> Job<T> {
     /// for debug
     #[doc(hidden)]
     pub fn set_fail_on_drop_error(&mut self, value: bool) {
-        self.fail_on_drop_error = value;
-    }
-
-    pub(crate) fn fail_on_drop_error(&self) -> bool {
-        self.fail_on_drop_error
-    }
-}
-
-impl<T: Send + Sync + 'static> Drop for Job<T> {
-    fn drop(&mut self) {
-        if self.done || self.canceled || self.closed {
-            return;
-        }
-
-        self.inner.dispose(&self.name, self.fail_on_drop_error());
+        self.inner.set_fail_on_drop_error(value);
     }
 }

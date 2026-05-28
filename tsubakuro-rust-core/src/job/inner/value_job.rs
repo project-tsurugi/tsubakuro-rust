@@ -20,8 +20,8 @@ impl<T: Send> ValueInnerJob<T> {
     }
 }
 
-#[async_trait]
-impl<T: Send + Sync> InnerJob<T> for ValueInnerJob<T> {
+#[async_trait(?Send)]
+impl<T: Send> InnerJob<T> for ValueInnerJob<T> {
     async fn wait(&self, _timeout: Duration) -> Result<bool, TgError> {
         Ok(true)
     }
@@ -46,7 +46,7 @@ impl<T: Send + Sync> InnerJob<T> for ValueInnerJob<T> {
         Ok(())
     }
 
-    fn dispose(&self, _name: &str, _fail_on_error: bool) {
+    fn set_fail_on_drop_error(&self, _value: bool) {
         // do nothing
     }
 }

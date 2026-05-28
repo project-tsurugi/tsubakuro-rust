@@ -1,11 +1,6 @@
-use std::{
-    future::Future,
-    pin::Pin,
-    sync::{atomic::AtomicBool, Arc, Mutex},
-    time::Duration,
-};
+use std::{future::Future, pin::Pin, sync::Mutex, time::Duration};
 
-use tokio::{sync::Notify, task::JoinHandle};
+use tokio::task::JoinHandle;
 use tonic::async_trait;
 
 use crate::{
@@ -18,69 +13,85 @@ use crate::{
 pub(crate) type BoxFuture<T> = Pin<Box<dyn Future<Output = Result<T, TgError>> + Send>>;
 
 pub(crate) struct SpawnInnerJob<T: Send> {
-    handle: Mutex<Option<JoinHandle<()>>>,
-    done: AtomicBool,
-    notify: Notify,
-    result: tokio::sync::Mutex<Option<Result<T, TgError>>>,
+    handle: Mutex<Option<JoinHandle<Result<T, TgError>>>>,
 }
 
 impl<T: Send + 'static> SpawnInnerJob<T> {
-    pub(crate) fn new(supplier: Arc<dyn Fn(Duration) -> BoxFuture<T> + Send + Sync>) -> Arc<Self> {
-        let job = Arc::new(SpawnInnerJob {
-            handle: Mutex::new(None),
-            done: AtomicBool::new(false),
-            notify: Notify::new(),
-            result: tokio::sync::Mutex::new(None),
-        });
+    pub(crate) fn new(supplier: Box<dyn Fn(Duration) -> BoxFuture<T> + Send>) -> Box<Self> {
+        let handle = tokio::spawn(supplier(Duration::ZERO));
 
-        let cloned = job.clone();
-        let handle = tokio::spawn(async move {
-            let result = supplier(Duration::ZERO).await;
-            *cloned.result.lock().await = Some(result);
-            cloned
-                .done
-                .store(true, std::sync::atomic::Ordering::Release);
-            cloned.notify.notify_waiters();
-        });
-
-        *job.handle.lock().unwrap() = Some(handle);
-
-        job
+        Box::new(SpawnInnerJob {
+            handle: Mutex::new(Some(handle)),
+        })
     }
 }
 
-#[async_trait]
+#[async_trait(?Send)]
 impl<T: Send> InnerJob<T> for SpawnInnerJob<T> {
     async fn wait(&self, timeout: Duration) -> Result<bool, TgError> {
-        if self.done.load(std::sync::atomic::Ordering::Acquire) {
+        if self.is_finished() {
             return Ok(true);
         }
 
         if timeout.is_zero() {
-            self.notify.notified().await;
-            return Ok(true);
+            loop {
+                tokio::task::yield_now().await;
+
+                if self.is_finished() {
+                    return Ok(true);
+                }
+            }
         }
 
-        match tokio::time::timeout(timeout, self.notify.notified()).await {
+        match tokio::time::timeout(timeout, async {
+            loop {
+                tokio::task::yield_now().await;
+
+                if self.is_finished() {
+                    break;
+                }
+            }
+        })
+        .await
+        {
             Ok(_) => Ok(true),
             Err(_) => Ok(false),
         }
     }
 
     async fn is_done(&self) -> Result<bool, TgError> {
-        Ok(self.done.load(std::sync::atomic::Ordering::Acquire))
+        Ok(self.is_finished())
     }
 
     async fn take_for(&self, timeout: Duration) -> Result<T, TgError> {
-        if !self.wait(timeout).await? {
-            return Err(timeout_error!("SpawnJob::take_for()"));
-        }
+        let handle = {
+            let mut guard = self.handle.lock().unwrap();
 
-        let mut result = self.result.lock().await;
+            guard.take()
+        };
 
-        match result.take() {
-            Some(result) => result,
-            None => Err(client_error!("SpawnJob::take_for(): result already taken")),
+        let handle = match handle {
+            Some(handle) => handle,
+            None => {
+                return Err(client_error!("SpawnInnerJob::take_for(): already taken"));
+            }
+        };
+
+        let join_result = if timeout.is_zero() {
+            handle.await
+        } else {
+            match tokio::time::timeout(timeout, handle).await {
+                Ok(result) => result,
+                Err(_) => {
+                    return Err(timeout_error!("SpawnInnerJob::take_for()"));
+                }
+            }
+        };
+
+        match join_result {
+            Ok(result) => result,
+            Err(err) if err.is_cancelled() => Err(client_error!("SpawnInnerJob cancelled")),
+            Err(err) => Err(client_error!("Join error: {}", err)),
         }
     }
 
@@ -94,23 +105,31 @@ impl<T: Send> InnerJob<T> for SpawnInnerJob<T> {
         Ok(())
     }
 
-    fn dispose(&self, _name: &str, _fail_on_error: bool) {
-        if self.done.load(std::sync::atomic::Ordering::Acquire) {
-            return;
-        }
+    fn set_fail_on_drop_error(&self, _value: bool) {
+        // do nothing
+    }
+}
 
+impl<T: Send> Drop for SpawnInnerJob<T> {
+    fn drop(&mut self) {
         self.abort();
     }
 }
 
 impl<T: Send> SpawnInnerJob<T> {
-    fn abort(&self) {
-        let handle = {
-            let mut self_handle = self.handle.lock().unwrap();
-            self_handle.take()
-        };
+    fn is_finished(&self) -> bool {
+        let guard = self.handle.lock().unwrap();
 
-        if let Some(handle) = handle {
+        match guard.as_ref() {
+            Some(handle) => handle.is_finished(),
+            None => true,
+        }
+    }
+
+    fn abort(&self) {
+        let guard = self.handle.lock().unwrap();
+
+        if let Some(handle) = guard.as_ref() {
             handle.abort();
         }
     }

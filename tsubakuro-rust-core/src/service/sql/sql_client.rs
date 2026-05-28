@@ -1278,7 +1278,7 @@ impl SqlClient {
 
         let lob_client = self.get_lob_client().await?;
         let job = lob_client.upload_lob_file_async(path.as_ref()).await?;
-        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::from_remote_lob(lob))));
+        let job = job.convert("TgBlob", Box::new(|lob| Ok(TgBlob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1344,7 +1344,7 @@ impl SqlClient {
 
         let lob_client = self.get_lob_client().await?;
         let job = lob_client.upload_lob_file_async(path.as_ref()).await?;
-        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::from_remote_lob(lob))));
+        let job = job.convert("TgClob", Box::new(|lob| Ok(TgClob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1407,7 +1407,7 @@ impl SqlClient {
 
         let lob_client = self.get_lob_client().await?;
         let job = lob_client.upload_lob_async(value).await?;
-        let job = job.convert("TgBlob", Arc::new(|lob| Ok(TgBlob::from_remote_lob(lob))));
+        let job = job.convert("TgBlob", Box::new(|lob| Ok(TgBlob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1469,7 +1469,7 @@ impl SqlClient {
         let lob_client = self.get_lob_client().await?;
         let value = value.as_bytes();
         let job = lob_client.upload_lob_async(value).await?;
-        let job = job.convert("TgClob", Arc::new(|lob| Ok(TgClob::from_remote_lob(lob))));
+        let job = job.convert("TgClob", Box::new(|lob| Ok(TgClob::from_remote_lob(lob))));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1552,7 +1552,7 @@ impl SqlClient {
         let job = lob_client
             .download_lob_file_async(transaction, blob)
             .await?;
-        let job = job.convert("File", Arc::new(Self::open_lob_file));
+        let job = job.convert("File", Box::new(Self::open_lob_file));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1617,7 +1617,7 @@ impl SqlClient {
         let job = lob_client
             .download_lob_file_async(transaction, clob)
             .await?;
-        let job = job.convert("File", Arc::new(Self::open_lob_file));
+        let job = job.convert("File", Box::new(Self::open_lob_file));
 
         trace!("{} end", FUNCTION_NAME);
         Ok(job)
@@ -1697,7 +1697,7 @@ impl SqlClient {
                 .await?;
             job.convert(
                 "LargeObjectCache",
-                Arc::new(Self::create_large_object_cache),
+                Box::new(Self::create_large_object_cache),
             )
         } else {
             Job::returns("LargeObjectCache", TgLargeObjectCache::new(None))
@@ -1777,7 +1777,7 @@ impl SqlClient {
                 .await?;
             job.convert(
                 "LargeObjectCache",
-                Arc::new(Self::create_large_object_cache),
+                Box::new(Self::create_large_object_cache),
             )
         } else {
             Job::returns("LargeObjectCache", TgLargeObjectCache::new(None))
@@ -1915,7 +1915,7 @@ impl SqlClient {
         let job = lob_client.download_lob_async(transaction, clob).await?;
         let job = job.convert(
             "CLOB",
-            Arc::new(|buf| {
+            Box::new(|buf| {
                 String::from_utf8(buf).map_err(|e| io_error!("CLOB data is not valid UTF-8: {}", e))
             }),
         );
@@ -2079,7 +2079,7 @@ impl SqlClient {
             let job = lob_client.download_lob_file_async(transaction, lob).await?;
             job.convert(
                 "LobFileCopy",
-                Arc::new(move |client_path| {
+                Box::new(move |client_path| {
                     std::fs::copy(client_path, destination.clone())
                         .map_err(|e| io_error!("Failed to copy lob file: {}", e))?;
                     Ok(())
@@ -2089,7 +2089,7 @@ impl SqlClient {
             let job = lob_client.download_lob_async(transaction, lob).await?;
             job.convert(
                 "LobCopy",
-                Arc::new(move |buf| {
+                Box::new(move |buf| {
                     std::fs::write(destination.clone(), buf)
                         .map_err(|e| io_error!("Failed to write lob file: {}", e))?;
                     Ok(())

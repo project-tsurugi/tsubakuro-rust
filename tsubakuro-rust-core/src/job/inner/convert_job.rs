@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::Duration};
+use std::{time::Duration};
 
 use tonic::async_trait;
 
@@ -8,14 +8,14 @@ use crate::{
 };
 
 pub(crate) struct ConvertInnerJob<ORG: Send, T: Send> {
-    original_job: Arc<dyn InnerJob<ORG> + Send + Sync>,
-    converter: Arc<dyn Fn(ORG) -> Result<T, TgError> + Send + Sync>,
+    original_job: Box<dyn InnerJob<ORG> + Send>,
+    converter: Box<dyn Fn(ORG) -> Result<T, TgError> + Send>,
 }
 
 impl<ORG: Send, T: Send> ConvertInnerJob<ORG, T> {
     pub(crate) fn new(
-        original_job: Arc<dyn InnerJob<ORG> + Send + Sync>,
-        converter: Arc<dyn Fn(ORG) -> Result<T, TgError> + Send + Sync>,
+        original_job: Box<dyn InnerJob<ORG> + Send>,
+        converter: Box<dyn Fn(ORG) -> Result<T, TgError> + Send>,
     ) -> Self {
         ConvertInnerJob {
             original_job,
@@ -24,7 +24,7 @@ impl<ORG: Send, T: Send> ConvertInnerJob<ORG, T> {
     }
 }
 
-#[async_trait]
+#[async_trait(?Send)]
 impl<ORG: Send, T: Send> InnerJob<T> for ConvertInnerJob<ORG, T> {
     async fn wait(&self, timeout: Duration) -> Result<bool, TgError> {
         self.original_job.wait(timeout).await
@@ -47,7 +47,7 @@ impl<ORG: Send, T: Send> InnerJob<T> for ConvertInnerJob<ORG, T> {
         self.original_job.send_cancel().await
     }
 
-    fn dispose(&self, name: &str, fail_on_error: bool) {
-        self.original_job.dispose(name, fail_on_error);
+    fn set_fail_on_drop_error(&self, value: bool) {
+        self.original_job.set_fail_on_drop_error(value);
     }
 }

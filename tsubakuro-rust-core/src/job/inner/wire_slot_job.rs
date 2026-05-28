@@ -1,4 +1,7 @@
-use std::{sync::Arc, time::Duration};
+use std::{
+    sync::{atomic::AtomicBool, Arc},
+    time::Duration,
+};
 
 use log::{error, warn};
 use tonic::async_trait;
@@ -12,13 +15,18 @@ use crate::{
 };
 
 pub(crate) struct WireSlotInnerJob<T: Send> {
+    name: String,
     wire: Arc<Wire>,
     slot_handle: Arc<SlotEntryHandle>,
     converter: Arc<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync>,
+    done: AtomicBool,
+    cancelled: AtomicBool,
+    fail_on_drop_error: AtomicBool,
 }
 
 impl<T: Send> WireSlotInnerJob<T> {
     pub(crate) fn new(
+        name: String,
         wire: Arc<Wire>,
         slot_handle: Arc<SlotEntryHandle>,
         converter: Arc<
@@ -26,34 +34,61 @@ impl<T: Send> WireSlotInnerJob<T> {
         >,
     ) -> WireSlotInnerJob<T> {
         WireSlotInnerJob {
+            name,
             wire,
             slot_handle,
             converter,
+            done: AtomicBool::new(false),
+            cancelled: AtomicBool::new(false),
+            fail_on_drop_error: AtomicBool::new(false),
         }
     }
 }
 
-#[async_trait]
+#[async_trait(?Send)]
 impl<T: Send> InnerJob<T> for WireSlotInnerJob<T> {
     async fn wait(&self, timeout: Duration) -> Result<bool, TgError> {
         let slot_handle = self.slot_handle.clone();
         let timeout = Timeout::new(timeout);
-        self.wire.wait_response(slot_handle, &timeout).await
+        let done = self.wire.wait_response(slot_handle, &timeout).await?;
+        if done {
+            self.done.store(true, std::sync::atomic::Ordering::Relaxed);
+        }
+        Ok(done)
     }
 
     async fn is_done(&self) -> Result<bool, TgError> {
+        if self.done.load(std::sync::atomic::Ordering::Relaxed) {
+            return Ok(true);
+        }
+
         let slot_handle = self.slot_handle.clone();
-        self.wire.check_response(slot_handle).await
+        let done = self.wire.check_response(slot_handle).await?;
+        if done {
+            self.done.store(true, std::sync::atomic::Ordering::Relaxed);
+        }
+        Ok(done)
     }
 
     async fn take_for(&self, timeout: Duration) -> Result<T, TgError> {
         let slot_handle = self.slot_handle.clone();
         let timeout = Timeout::new(timeout);
         let response = self.wire.pull_response(&slot_handle, &timeout).await?;
+        self.done.store(true, std::sync::atomic::Ordering::Relaxed);
         (self.converter)(slot_handle, response)
     }
 
     async fn cancel_async(&self) -> Result<Option<CancelJob>, TgError> {
+        if self.done.load(std::sync::atomic::Ordering::Relaxed) {
+            return Ok(None);
+        }
+        if self
+            .cancelled
+            .swap(true, std::sync::atomic::Ordering::Relaxed)
+        {
+            return Ok(None);
+        }
+
         self.send_cancel().await?;
         let job = CancelJob::new(self.wire.clone(), self.slot_handle.clone());
         Ok(Some(job))
@@ -66,11 +101,38 @@ impl<T: Send> InnerJob<T> for WireSlotInnerJob<T> {
         Ok(())
     }
 
-    fn dispose(&self, name: &str, fail_on_error: bool) {
+    fn set_fail_on_drop_error(&self, value: bool) {
+        self.fail_on_drop_error
+            .store(value, std::sync::atomic::Ordering::Relaxed);
+    }
+}
+
+impl<T: Send> Drop for WireSlotInnerJob<T> {
+    fn drop(&mut self) {
+        if self.done.swap(true, std::sync::atomic::Ordering::AcqRel) {
+            return;
+        }
+        if self
+            .cancelled
+            .swap(true, std::sync::atomic::Ordering::AcqRel)
+        {
+            return;
+        }
+
+        self.dispose();
+    }
+}
+
+impl<T: Send> WireSlotInnerJob<T> {
+    fn dispose(&self) {
         if self.slot_handle.exists_wire_response() {
             return;
         }
 
+        let name = &self.name;
+        let fail_on_error = self
+            .fail_on_drop_error
+            .load(std::sync::atomic::Ordering::Relaxed);
         std::thread::scope(|scope| {
             scope.spawn(move || {
                 let runtime = {

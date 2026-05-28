@@ -139,7 +139,7 @@ impl LobClient for RelayLobClient {
         let chunk_size = self.stream_chunk_size;
         let job = Job::supplier(
             "RelayLobUpload",
-            Arc::new(move |timeout| {
+            Box::new(move |timeout| {
                 let future = Self::upload_file_for_async(
                     grpc_client.clone(),
                     blob_session_id,
@@ -189,7 +189,7 @@ impl LobClient for RelayLobClient {
         let chunk_size = self.stream_chunk_size;
         let job = Job::supplier(
             "RelayLobUpload",
-            Arc::new(move |timeout| {
+            Box::new(move |timeout| {
                 let future = Self::upload_for_async(
                     grpc_client.clone(),
                     blob_session_id,
@@ -266,7 +266,7 @@ impl LobClient for RelayLobClient {
         let default_timeout = transaction.default_timeout();
         let job = Job::supplier(
             "RelayLobDownload",
-            Arc::new(move |timeout| {
+            Box::new(move |timeout| {
                 let future = Self::download(
                     grpc_client.clone(),
                     tx_handle,
