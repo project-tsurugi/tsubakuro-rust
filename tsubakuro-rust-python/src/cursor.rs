@@ -44,7 +44,7 @@ impl RowNumber {
 ///     rowcount (int): Number of rows affected by the last `Cursor.execute*()` method. -1 if not applicable. (read only)
 ///     closed (bool): Whether the cursor is closed. (read only)
 #[gen_stub_pyclass]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", unsendable)]
 pub struct Cursor {
     py_connection: Py<Connection>,
     connection: Arc<InnerConnection>,

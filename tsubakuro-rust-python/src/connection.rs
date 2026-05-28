@@ -26,7 +26,7 @@ pub(crate) mod inner_connection;
 ///     shutdown_option (ShutdownOption): Shutdown option. (write only)
 ///     closed (bool): Whether the connection is closed. (read only)
 #[gen_stub_pyclass]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", unsendable)]
 pub struct Connection {
     inner: Arc<InnerConnection>,
 }
