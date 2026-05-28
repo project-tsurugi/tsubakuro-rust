@@ -202,7 +202,7 @@ impl SqlClient {
 
         let command = Self::list_tables_command();
         let job = self
-            .send_and_pull_async("ListTables", command, None, Arc::new(list_tables_processor))
+            .send_and_pull_async("ListTables", command, None, Box::new(list_tables_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -268,7 +268,7 @@ impl SqlClient {
                 "TableMetadata",
                 command,
                 None,
-                Arc::new(table_metadata_processor),
+                Box::new(table_metadata_processor),
             )
             .await?;
 
@@ -355,7 +355,7 @@ impl SqlClient {
                 "Prepare",
                 command,
                 None,
-                Arc::new(move |_, response| {
+                Box::new(move |_, response| {
                     prepare_processor(session.clone(), response, close_timeout)
                 }),
             )
@@ -464,7 +464,7 @@ impl SqlClient {
 
         let command = Self::explain_text_command(sql);
         let job = self
-            .send_and_pull_async("Explain", command, None, Arc::new(explain_processor))
+            .send_and_pull_async("Explain", command, None, Box::new(explain_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -535,7 +535,7 @@ impl SqlClient {
         let (parameters, lobs) = self.convert_lob_parameters(parameters, timeout).await?;
         let command = Self::explain_prepared_command(prepared_statement, parameters);
         let job = self
-            .send_and_pull_async("Explain", command, lobs, Arc::new(explain_processor))
+            .send_and_pull_async("Explain", command, lobs, Box::new(explain_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -628,7 +628,7 @@ impl SqlClient {
                 "StartTransaction",
                 command,
                 None,
-                Arc::new(move |_, response| {
+                Box::new(move |_, response| {
                     transaction_begin_processor(session.clone(), response, close_timeout)
                 }),
             )
@@ -710,7 +710,7 @@ impl SqlClient {
                 "TransactionErrorInfo",
                 command,
                 None,
-                Arc::new(transaction_error_info_processor),
+                Box::new(transaction_error_info_processor),
             )
             .await?;
 
@@ -784,7 +784,7 @@ impl SqlClient {
                 "TransactionStatus",
                 command,
                 None,
-                Arc::new(transaction_status_processor),
+                Box::new(transaction_status_processor),
             )
             .await?;
 
@@ -855,7 +855,7 @@ impl SqlClient {
 
         let command = Self::execute_statement_command(tx_handle, sql);
         let job = self
-            .send_and_pull_async("Execute", command, None, Arc::new(execute_result_processor))
+            .send_and_pull_async("Execute", command, None, Box::new(execute_result_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -940,7 +940,7 @@ impl SqlClient {
         let command =
             Self::execute_prepared_statement_command(tx_handle, prepared_statement, parameters);
         let job = self
-            .send_and_pull_async("Execute", command, lobs, Arc::new(execute_result_processor))
+            .send_and_pull_async("Execute", command, lobs, Box::new(execute_result_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);
@@ -1042,7 +1042,7 @@ impl SqlClient {
                 "Query",
                 command,
                 None,
-                Arc::new(move |slot_handle, response| {
+                Box::new(move |slot_handle, response| {
                     query_result_processor(wire.clone(), slot_handle, response, default_timeout)
                 }),
             )
@@ -1148,7 +1148,7 @@ impl SqlClient {
                 "Query",
                 command,
                 lobs,
-                Arc::new(move |slot_handle, response| {
+                Box::new(move |slot_handle, response| {
                     query_result_processor(wire.clone(), slot_handle, response, default_timeout)
                 }),
             )
@@ -1967,7 +1967,7 @@ impl SqlClient {
     }
 
     /// Copy BLOB to local file.
-    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Sync + Clone>(
+    pub async fn copy_blob_to_async<T: AsRef<Path> + Send + Clone>(
         &self,
         transaction: &Transaction,
         blob: &TgBlobReference,
@@ -2027,7 +2027,7 @@ impl SqlClient {
     }
 
     /// Copy CLOB to local file.
-    pub async fn copy_clob_to_async<T: AsRef<Path> + Send + Sync + Clone>(
+    pub async fn copy_clob_to_async<T: AsRef<Path> + Send + Clone>(
         &self,
         transaction: &Transaction,
         clob: &TgClobReference,
@@ -2190,7 +2190,7 @@ impl SqlClient {
                 "Commit",
                 command,
                 None,
-                Arc::new(transaction_commit_processor),
+                Box::new(transaction_commit_processor),
             )
             .await?;
 
@@ -2260,7 +2260,7 @@ impl SqlClient {
                 "Rollback",
                 command,
                 None,
-                Arc::new(transaction_rollback_processor),
+                Box::new(transaction_rollback_processor),
             )
             .await?;
 
@@ -2450,12 +2450,12 @@ impl SqlClient {
             .await
     }
 
-    async fn send_and_pull_async<T: Send + Sync + 'static>(
+    async fn send_and_pull_async<T: Send + 'static>(
         &self,
         job_name: &str,
         command: SqlCommand,
         lobs: Option<Vec<BlobInfo>>,
-        converter: Arc<
+        converter: Box<
             dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
         >,
     ) -> Result<Job<T>, TgError> {

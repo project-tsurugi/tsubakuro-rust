@@ -91,7 +91,7 @@ impl EndpointBroker {
         Ok(session_id)
     }
 
-    pub(crate) async fn handshake_async<F, T: Send + Sync + 'static>(
+    pub(crate) async fn handshake_async<F, T: Send + 'static>(
         wire: &Arc<Wire>,
         client_information: ClientInformation,
         blob_transfer_media: Vec<BlobTransferMedium>,
@@ -116,7 +116,7 @@ impl EndpointBroker {
                 SERVICE_ID_ENDPOINT_BROKER,
                 request,
                 None,
-                Arc::new(move |_, response| {
+                Box::new(move |_, response| {
                     let session_id = handshake_processor(response)?;
                     converter(session_id)
                 }),

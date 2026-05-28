@@ -79,11 +79,11 @@ impl SystemClient {
             .await
     }
 
-    async fn send_and_pull_async<T: Send + Sync + 'static>(
+    async fn send_and_pull_async<T: Send + 'static>(
         &self,
         job_name: &str,
         command: SystemCommand,
-        converter: Arc<
+        converter: Box<
             dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
         >,
     ) -> Result<Job<T>, TgError> {
@@ -161,7 +161,7 @@ impl SystemClient {
 
         let command = Self::get_system_info_command();
         let job = self
-            .send_and_pull_async("GetSystemInfo", command, Arc::new(system_info_processor))
+            .send_and_pull_async("GetSystemInfo", command, Box::new(system_info_processor))
             .await?;
 
         trace!("{} end", FUNCTION_NAME);

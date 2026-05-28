@@ -80,7 +80,7 @@ impl CoreService {
                 SERVICE_ID_ROUTING,
                 request,
                 None,
-                Arc::new(update_expiration_time_processor),
+                Box::new(update_expiration_time_processor),
                 default_timeout,
                 fail_on_drop_error,
             )
@@ -139,7 +139,7 @@ impl CoreService {
                 SERVICE_ID_ROUTING,
                 request,
                 None,
-                Arc::new(move |_, response| shutdown_processor_for_job(&wire_clone, response)),
+                Box::new(move |_, response| shutdown_processor_for_job(&wire_clone, response)),
                 default_timeout,
                 fail_on_drop_error,
             )

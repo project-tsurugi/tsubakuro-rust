@@ -18,7 +18,7 @@ pub(crate) struct WireSlotInnerJob<T: Send> {
     name: String,
     wire: Arc<Wire>,
     slot_handle: Arc<SlotEntryHandle>,
-    converter: Arc<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync>,
+    converter: Box<dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync>,
     done: AtomicBool,
     cancelled: AtomicBool,
     fail_on_drop_error: AtomicBool,
@@ -29,7 +29,7 @@ impl<T: Send> WireSlotInnerJob<T> {
         name: String,
         wire: Arc<Wire>,
         slot_handle: Arc<SlotEntryHandle>,
-        converter: Arc<
+        converter: Box<
             dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
         >,
     ) -> WireSlotInnerJob<T> {

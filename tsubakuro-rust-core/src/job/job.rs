@@ -59,7 +59,7 @@ impl<T: Send + 'static> Job<T> {
         name: &str,
         wire: Arc<Wire>,
         slot_handle: Arc<SlotEntryHandle>,
-        converter: Arc<
+        converter: Box<
             dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
         >,
         default_timeout: Duration,

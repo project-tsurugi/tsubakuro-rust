@@ -195,7 +195,7 @@ impl PrivilegedLobClient {
             .send_and_pull_async(
                 "LobFilePath",
                 command,
-                Arc::new(move |_, response| {
+                Box::new(move |_, response| {
                     get_lob_processor(response, lob_recv_path_mapping.clone())
                 }),
             )
@@ -280,11 +280,11 @@ impl PrivilegedLobClient {
             .await
     }
 
-    async fn send_and_pull_async<T: Send + Sync + 'static>(
+    async fn send_and_pull_async<T: Send + 'static>(
         &self,
         job_name: &str,
         command: Command,
-        converter: Arc<
+        converter: Box<
             dyn Fn(Arc<SlotEntryHandle>, WireResponse) -> Result<T, TgError> + Send + Sync,
         >,
     ) -> Result<Job<T>, TgError> {
