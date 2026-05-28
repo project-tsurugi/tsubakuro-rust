@@ -14,7 +14,7 @@ Tsurugi Python DB-API (tsurugi-dbapi) is a Python DB API 2.0 driver for accessin
 - The default transaction_type is `OCC`.
 - The default commit_type is `DEFAULT`.
 - The default shutdown_type is `GRACEFUL`.
-- BLOB/CLOB is not supported.
+- The only supported LOB transfer mode is blob relay service.
 
 ## Installation
 

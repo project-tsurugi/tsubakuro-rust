@@ -11,9 +11,13 @@ def main():
 
     # config.blob_relay_service_endpoint = "http://localhost:52345"
     config.lob_upload_timeout = 60  # seconds
+    config.lob_download_timeout = 60  # seconds
 
     with tsurugi.connect(config) as connection:
         print("lob_transfer_type:", connection.lob_transfer_type())
+        if connection.lob_transfer_type() == tsurugi.LobTransferType.NOT_USE:
+            print("The server does not support LOB transfer.")
+            return
 
         execute_upload(connection)
         execute_blob(connection)
