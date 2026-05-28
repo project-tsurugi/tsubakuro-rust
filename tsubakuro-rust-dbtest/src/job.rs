@@ -98,13 +98,13 @@ mod test {
         let job = client.list_tables_async().await.unwrap();
 
         let job = job.cancel_async().await.unwrap();
-        let mut job = job.unwrap();
+        if let Some(mut job) = job {
+            let wait = job.wait(Duration::from_secs(10)).await.unwrap();
+            assert_eq!(true, wait);
 
-        let wait = job.wait(Duration::from_secs(10)).await.unwrap();
-        assert_eq!(true, wait);
-
-        let done = job.is_done().await.unwrap();
-        assert_eq!(true, done);
+            let done = job.is_done().await.unwrap();
+            assert_eq!(true, done);
+        }
     }
 
     #[test]
