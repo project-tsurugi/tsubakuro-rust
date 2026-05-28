@@ -1,19 +1,22 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 use pyo3::{prelude::*, types::*};
-use tsubakuro_rust_core::prelude::{AtomType, SqlParameter, SqlPlaceholder};
+use tokio::runtime::Runtime;
+use tsubakuro_rust_core::prelude::{AtomType, SqlClient, SqlParameter, SqlPlaceholder};
 
 use crate::{
     error::ProgrammingError,
     type_code::{
-        bool::Bool, bytes::Bytes, date::Date, datetime::Datetime, decimal::Decimal,
-        float32::Float32, float64::Float64, int32::Int32, int64::Int64,
+        blob::Blob, bool::Bool, bytes::Bytes, clob::Clob, date::Date, datetime::Datetime,
+        decimal::Decimal, float32::Float32, float64::Float64, int32::Int32, int64::Int64,
         offset_datetime::OffsetDatetime, offset_time::OffsetTime, str::Str, time::Time,
     },
 };
 
+pub mod blob;
 pub mod bool;
 pub mod bytes;
+pub mod clob;
 pub mod date;
 pub mod datetime;
 pub mod decimal;
@@ -30,8 +33,8 @@ pub mod time;
 pub(crate) mod type_code {
     #[pymodule_export]
     use super::{
-        bool::Bool, bytes::Bytes, date::Date, datetime::Datetime, decimal::Decimal,
-        float32::Float32, float64::Float64, int32::Int32, int64::Int64,
+        blob::Blob, bool::Bool, bytes::Bytes, clob::Clob, date::Date, datetime::Datetime,
+        decimal::Decimal, float32::Float32, float64::Float64, int32::Int32, int64::Int64,
         offset_datetime::OffsetDatetime, offset_time::OffsetTime, str::Str, time::Time,
     };
 }
@@ -52,13 +55,48 @@ pub(crate) fn atom_type_to_type_code(atom_type: Option<AtomType>) -> &'static st
             AtomType::TimePoint => "Datetime",
             AtomType::TimeOfDayWithTimeZone => "OffsetTime",
             AtomType::TimePointWithTimeZone => "OffsetDatetime",
+            AtomType::Blob => "Blob",
+            AtomType::Clob => "Clob",
             _ => "Unknown",
         },
         None => "Unknown",
     }
 }
 
+pub(crate) struct ParameterContext<'a> {
+    runtime: &'a Runtime,
+    sql_client: &'a SqlClient,
+    lob_upload_timeout: Duration,
+}
+
+impl<'a> ParameterContext<'a> {
+    pub(crate) fn new(
+        runtime: &'a Runtime,
+        sql_client: &'a SqlClient,
+        lob_upload_timeout: Duration,
+    ) -> Self {
+        Self {
+            runtime,
+            sql_client,
+            lob_upload_timeout,
+        }
+    }
+
+    pub(crate) fn runtime(&self) -> &Runtime {
+        self.runtime
+    }
+
+    pub(crate) fn sql_client(&self) -> &SqlClient {
+        self.sql_client
+    }
+
+    pub(crate) fn lob_upload_timeout(&self) -> Duration {
+        self.lob_upload_timeout
+    }
+}
+
 pub(crate) fn to_parameters(
+    context: &ParameterContext,
     seq_of_parameters: Bound<PyAny>,
 ) -> PyResult<(
     HashMap<String, AtomType>,
@@ -74,9 +112,9 @@ pub(crate) fn to_parameters(
         let row = row?;
 
         let parameters = if let Ok(row) = row.extract() {
-            to_parameter_named(row, first, &mut types, &mut placeholders, true)?
+            to_parameter_named(context, row, first, &mut types, &mut placeholders, true)?
         } else {
-            to_parameter_qmark(row, first, &mut types, &mut placeholders, true)?
+            to_parameter_qmark(context, row, first, &mut types, &mut placeholders, true)?
         };
 
         parameters_list.push(parameters);
@@ -88,19 +126,21 @@ pub(crate) fn to_parameters(
 }
 
 pub(crate) fn to_placeholders(
+    context: &ParameterContext,
     row: Bound<PyAny>,
 ) -> PyResult<(HashMap<String, AtomType>, Vec<SqlPlaceholder>)> {
     let mut types = HashMap::new();
     let mut placeholders = Vec::new();
     if let Ok(row) = row.extract() {
-        to_parameter_named(row, true, &mut types, &mut placeholders, false)?
+        to_parameter_named(context, row, true, &mut types, &mut placeholders, false)?
     } else {
-        to_parameter_qmark(row, true, &mut types, &mut placeholders, false)?
+        to_parameter_qmark(context, row, true, &mut types, &mut placeholders, false)?
     };
     Ok((types, placeholders))
 }
 
 fn to_parameter_qmark(
+    context: &ParameterContext,
     row: Bound<PyAny>,
     first: bool,
     types: &mut HashMap<String, AtomType>,
@@ -131,7 +171,7 @@ fn to_parameter_qmark(
         }
 
         if with_parameter {
-            let parameter = create_parameter(&placeholder_name, &value, atom_type)?;
+            let parameter = create_parameter(context, &placeholder_name, &value, atom_type)?;
             parameters.push(parameter);
         }
 
@@ -146,6 +186,7 @@ fn to_parameter_qmark(
 }
 
 fn to_parameter_named(
+    context: &ParameterContext,
     row: Bound<PyDict>,
     first: bool,
     types: &mut HashMap<String, AtomType>,
@@ -173,7 +214,7 @@ fn to_parameter_named(
         }
 
         if with_parameter {
-            let parameter = create_parameter(&placeholder_name, &value, atom_type)?;
+            let parameter = create_parameter(context, &placeholder_name, &value, atom_type)?;
             parameters.push(parameter);
         }
 
@@ -186,6 +227,7 @@ fn to_parameter_named(
 }
 
 pub(crate) fn to_parameters_only(
+    context: &ParameterContext,
     seq_of_parameters: Bound<PyAny>,
     types: &HashMap<String, AtomType>,
 ) -> PyResult<Vec<Vec<SqlParameter>>> {
@@ -195,9 +237,9 @@ pub(crate) fn to_parameters_only(
         let row = row?;
 
         let parameters = if let Ok(row) = row.extract() {
-            to_parameter_only_named(row, types)?
+            to_parameter_only_named(context, row, types)?
         } else {
-            to_parameter_only_qmark(row, types)?
+            to_parameter_only_qmark(context, row, types)?
         };
 
         parameters_list.push(parameters);
@@ -207,6 +249,7 @@ pub(crate) fn to_parameters_only(
 }
 
 fn to_parameter_only_qmark(
+    context: &ParameterContext,
     row: Bound<PyAny>,
     types: &HashMap<String, AtomType>,
 ) -> PyResult<Vec<SqlParameter>> {
@@ -220,7 +263,7 @@ fn to_parameter_only_qmark(
         let atom_type = types
             .get(&placeholder_name)
             .ok_or_else(|| ProgrammingError::new_err("parameter type not found"))?;
-        let parameter = create_parameter(&placeholder_name, &value, *atom_type)?;
+        let parameter = create_parameter(context, &placeholder_name, &value, *atom_type)?;
 
         parameters.push(parameter);
 
@@ -231,6 +274,7 @@ fn to_parameter_only_qmark(
 }
 
 fn to_parameter_only_named(
+    context: &ParameterContext,
     row: Bound<PyDict>,
     types: &HashMap<String, AtomType>,
 ) -> PyResult<Vec<SqlParameter>> {
@@ -242,7 +286,7 @@ fn to_parameter_only_named(
             .get(&placeholder_name)
             .ok_or_else(|| ProgrammingError::new_err("parameter type not found"))?;
 
-        let parameter = create_parameter(&placeholder_name, &value, *atom_type)?;
+        let parameter = create_parameter(context, &placeholder_name, &value, *atom_type)?;
         parameters.push(parameter);
     }
 
@@ -284,46 +328,50 @@ fn to_atom_type_from_name(type_name: &str) -> PyResult<AtomType> {
     match type_name {
         "NoneType" => Ok(AtomType::Unknown),
         "bool"  // Python bool
-        | "Bool" // Tsurugi Warper
+        | "Bool" // Tsurugi Wrapper
             => Ok(AtomType::Boolean),
-        "Int32" // Tsurugi Warper
+        "Int32" // Tsurugi Wrapper
         | "int32" // numpy.int32
             => Ok(AtomType::Int4),
         "int" // Python int
-        | "Int64"  // Tsurugi Warper
+        | "Int64"  // Tsurugi Wrapper
         | "int64" // numpy.int64
             => Ok(AtomType::Int8),
-        "Float32" // Tsurugi Warper
+        "Float32" // Tsurugi Wrapper
         | "float32" // numpy.float32
             => Ok(AtomType::Float4),
         "float"  // Python float
-        | "Float64" // Tsurugi Warper
+        | "Float64" // Tsurugi Wrapper
         | "float64" // numpy.float64
             => Ok(AtomType::Float8),
-        "Decimal" // Python decimal.Decimal, Tsurugi Warper
+        "Decimal" // Python decimal.Decimal, Tsurugi Wrapper
             => Ok(AtomType::Decimal),
         "str" // Python str
-        | "Str" // Tsurugi Warper
+        | "Str" // Tsurugi Wrapper
         | "str_" // numpy.str_
             => Ok(AtomType::Character),
         "bytes" // Python bytes
-        | "Bytes" // Tsurugi Warper
+        | "Bytes" // Tsurugi Wrapper
         | "bytes_" // numpy.bytes_
             => Ok(AtomType::Octet),
         "date" // Python datetime.date
-        | "Date" // Tsurugi Warper
+        | "Date" // Tsurugi Wrapper
             => Ok(AtomType::Date),
         "time" // Python datetime.time
-        | "Time" // Tsurugi Warper
+        | "Time" // Tsurugi Wrapper
             => Ok(AtomType::TimeOfDay),
-        "Datetime" // Tsurugi Warper
+        "Datetime" // Tsurugi Wrapper
         | "datetime64" // numpy.datetime64
             => Ok(AtomType::TimePoint),
-        "OffsetTime" // Tsurugi Warper
+        "OffsetTime" // Tsurugi Wrapper
             => Ok(AtomType::TimeOfDayWithTimeZone),
         "datetime" // Python datetime.datetime
-        | "OffsetDatetime" // Tsurugi Warper
+        | "OffsetDatetime" // Tsurugi Wrapper
             => Ok(AtomType::TimePointWithTimeZone),
+        "Blob" // Tsurugi Wrapper
+            => Ok(AtomType::Blob),
+        "Clob" // Tsurugi Wrapper
+            => Ok(AtomType::Clob),
         _ => Err(ProgrammingError::new_err(format!(
             "to_atom_type_from_name(): Unsupported type_name: {}",
             type_name
@@ -332,6 +380,7 @@ fn to_atom_type_from_name(type_name: &str) -> PyResult<AtomType> {
 }
 
 fn create_parameter(
+    context: &ParameterContext,
     name: &str,
     value: &Bound<PyAny>,
     atom_type: AtomType,
@@ -350,6 +399,8 @@ fn create_parameter(
         AtomType::TimePoint => Datetime::create_parameter(name, value),
         AtomType::TimeOfDayWithTimeZone => OffsetTime::create_parameter(name, value),
         AtomType::TimePointWithTimeZone => OffsetDatetime::create_parameter(name, value),
+        AtomType::Blob => Blob::create_parameter(context, name, value),
+        AtomType::Clob => Clob::create_parameter(context, name, value),
         _ => Err(ProgrammingError::new_err(format!(
             "create_parameter: unsupported AtomType: {:?}",
             atom_type

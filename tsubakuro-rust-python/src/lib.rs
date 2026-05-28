@@ -7,6 +7,7 @@ mod config;
 mod connection;
 mod cursor;
 mod error;
+mod lob_transfer_type;
 mod logger;
 mod shutdown_option;
 mod table_metadata;
@@ -45,6 +46,9 @@ mod _tsubakuro_rust_python {
 
     #[pymodule_export]
     use crate::config::Config;
+
+    #[pymodule_export]
+    use crate::lob_transfer_type::LobTransferType;
 
     #[pymodule_export]
     use crate::transaction_option::{TransactionOption, TransactionType};

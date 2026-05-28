@@ -1,14 +1,15 @@
 use log::{debug, trace};
 use pyo3::{exceptions::PyStopIteration, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
-use std::{collections::HashMap, sync::Arc, vec};
+use std::{collections::HashMap, sync::Arc, time::Duration, vec};
 use tsubakuro_rust_core::prelude::{AtomType, SqlPreparedStatement, SqlQueryResult};
 
 use crate::{
     column::columns_description,
     connection::{inner_connection::InnerConnection, Connection},
-    cursor::query_result::next_row1,
+    cursor::query_result::{next_row1, QueryResultContext},
     error::{to_pyerr, NotSupportedError, OperationalError, ProgrammingError},
+    type_code::{blob::Blob, clob::Clob},
 };
 
 mod execute;
@@ -176,6 +177,102 @@ impl Cursor {
         result
     }
 
+    /// Upload a blob value.
+    ///
+    /// Args:
+    ///     value (bytes | None): Blob value to be uploaded.
+    ///     timeout (int, optional): Timeout for the blob upload operation in seconds. If not specified, use the connection's default LOB upload timeout.
+    ///
+    /// Returns:
+    ///     Blob: Uploaded blob.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     blob = cursor.upload_blob(b"\x01\x02\x03", 10)
+    ///     cursor.execute("insert into blob_example values (?, ?)", (1, blob))
+    ///     connection.commit()
+    ///     ```
+    ///
+    /// since 0.10.0
+    #[pyo3(signature = (value, timeout=None))]
+    pub fn upload_blob(&self, value: Option<Vec<u8>>, timeout: Option<u64>) -> PyResult<Blob> {
+        const FUNCTION_NAME: &str = "Cursor.upload_blob()";
+        let value = match value {
+            Some(v) => v,
+            None => {
+                trace!("{FUNCTION_NAME} start. value=None");
+                trace!("{FUNCTION_NAME} end");
+                return Ok(Blob::none());
+            }
+        };
+        trace!("{FUNCTION_NAME} start. value.len={}", value.len());
+
+        let connection = &self.connection;
+        let runtime = connection.runtime();
+        let sql_client = connection.sql_client();
+        let timeout = timeout
+            .map(Duration::from_secs)
+            .unwrap_or_else(|| connection.lob_upload_timeout());
+        let result = runtime
+            .block_on(sql_client.upload_blob_for(&value, timeout))
+            .map(Blob::from_blob)
+            .map_err(to_pyerr);
+
+        match &result {
+            Ok(_) => trace!("{FUNCTION_NAME} end"),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
+        }
+        result
+    }
+
+    /// Upload a clob value.
+    ///
+    /// Args:
+    ///     value (str | None): Clob value to be uploaded.
+    ///     timeout (int, optional): Timeout for the clob upload operation in seconds. If not specified, use the connection's default LOB upload timeout.
+    ///
+    /// Returns:
+    ///     Clob: Uploaded clob.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     clob = cursor.upload_clob("Hello, World!", 10)
+    ///     cursor.execute("insert into clob_example values (?, ?)", (1, clob))
+    ///     connection.commit()
+    ///     ```
+    ///
+    /// since 0.10.0
+    #[pyo3(signature = (value, timeout=None))]
+    pub fn upload_clob(&self, value: Option<String>, timeout: Option<u64>) -> PyResult<Clob> {
+        const FUNCTION_NAME: &str = "Cursor.upload_clob()";
+        let value = match value {
+            Some(v) => v,
+            None => {
+                trace!("{FUNCTION_NAME} start. value=None");
+                trace!("{FUNCTION_NAME} end");
+                return Ok(Clob::none());
+            }
+        };
+        trace!("{FUNCTION_NAME} start. value.len={}", value.len());
+
+        let connection = &self.connection;
+        let runtime = connection.runtime();
+        let sql_client = connection.sql_client();
+        let timeout = timeout
+            .map(Duration::from_secs)
+            .unwrap_or_else(|| connection.lob_upload_timeout());
+        let result = runtime
+            .block_on(sql_client.upload_clob_for(&value, timeout))
+            .map(Clob::from_clob)
+            .map_err(to_pyerr);
+
+        match &result {
+            Ok(_) => trace!("{FUNCTION_NAME} end"),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
+        }
+        result
+    }
+
     /// Execute a prepared SQL statement multiple times.
     ///
     /// Args:
@@ -273,7 +370,20 @@ impl Cursor {
 
         let connection = &self.connection;
         let runtime = connection.runtime();
-        let result = runtime.block_on(next_row1(py, qr, &self.query_types, &mut self.row_number));
+        let sql_client = connection.sql_client();
+        let transaction = connection.find_transaction();
+        let context = QueryResultContext::new(
+            py,
+            sql_client,
+            transaction,
+            connection.lob_download_timeout(),
+        );
+        let result = runtime.block_on(next_row1(
+            &context,
+            qr,
+            &self.query_types,
+            &mut self.row_number,
+        ));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -305,7 +415,20 @@ impl Cursor {
 
         let connection = &self.connection;
         let runtime = connection.runtime();
-        let result = runtime.block_on(next_row1(py, qr, &self.query_types, &mut self.row_number));
+        let sql_client = connection.sql_client();
+        let transaction = connection.find_transaction();
+        let context = QueryResultContext::new(
+            py,
+            sql_client,
+            transaction,
+            connection.lob_download_timeout(),
+        );
+        let result = runtime.block_on(next_row1(
+            &context,
+            qr,
+            &self.query_types,
+            &mut self.row_number,
+        ));
 
         match result {
             Ok(Some(row)) => {
@@ -374,8 +497,16 @@ impl Cursor {
 
         let connection = &self.connection;
         let runtime = connection.runtime();
-        let result = runtime.block_on(Self::next_rows(
+        let sql_client = connection.sql_client();
+        let transaction = connection.find_transaction();
+        let context = QueryResultContext::new(
             py,
+            sql_client,
+            transaction,
+            connection.lob_download_timeout(),
+        );
+        let result = runtime.block_on(Self::next_rows(
+            &context,
             qr,
             &self.query_types,
             &mut self.row_number,
@@ -416,8 +547,16 @@ impl Cursor {
 
         let connection = &self.connection;
         let runtime = connection.runtime();
-        let result = runtime.block_on(Self::all_rows(
+        let sql_client = connection.sql_client();
+        let transaction = connection.find_transaction();
+        let context = QueryResultContext::new(
             py,
+            sql_client,
+            transaction,
+            connection.lob_download_timeout(),
+        );
+        let result = runtime.block_on(Self::all_rows(
+            &context,
             qr,
             &self.query_types,
             &mut self.row_number,
@@ -487,7 +626,20 @@ impl Cursor {
 
         let connection = &self.connection;
         let runtime = connection.runtime();
-        match runtime.block_on(next_row1(py, qr, &self.query_types, &mut self.row_number)) {
+        let sql_client = connection.sql_client();
+        let transaction = connection.find_transaction();
+        let context = QueryResultContext::new(
+            py,
+            sql_client,
+            transaction,
+            connection.lob_download_timeout(),
+        );
+        match runtime.block_on(next_row1(
+            &context,
+            qr,
+            &self.query_types,
+            &mut self.row_number,
+        )) {
             Ok(Some(row)) => {
                 trace!("{FUNCTION_NAME} end");
                 Ok(row)
@@ -568,7 +720,7 @@ impl Cursor {
 
 impl Cursor {
     async fn next_rows<'py>(
-        py: Python<'py>,
+        context: &QueryResultContext<'py, '_>,
         qr: &mut SqlQueryResult,
         types: &Vec<AtomType>,
         row_number: &mut Option<RowNumber>,
@@ -576,7 +728,7 @@ impl Cursor {
     ) -> PyResult<Vec<Bound<'py, PyTuple>>> {
         let mut rows = Vec::with_capacity(size);
         for _ in 0..size {
-            if let Some(row) = next_row1(py, qr, types, row_number).await? {
+            if let Some(row) = next_row1(context, qr, types, row_number).await? {
                 rows.push(row);
             } else {
                 break;
@@ -586,14 +738,14 @@ impl Cursor {
     }
 
     async fn all_rows<'py>(
-        py: Python<'py>,
+        context: &QueryResultContext<'py, '_>,
         qr: &mut SqlQueryResult,
         types: &Vec<AtomType>,
         row_number: &mut Option<RowNumber>,
     ) -> PyResult<Vec<Bound<'py, PyTuple>>> {
         let mut rows = Vec::new();
         loop {
-            if let Some(row) = next_row1(py, qr, types, row_number).await? {
+            if let Some(row) = next_row1(context, qr, types, row_number).await? {
                 rows.push(row);
             } else {
                 break;

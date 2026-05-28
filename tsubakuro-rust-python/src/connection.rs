@@ -10,6 +10,7 @@ use crate::{
     connection::inner_connection::InnerConnection,
     cursor::Cursor,
     error::{to_pyerr, ProgrammingError},
+    lob_transfer_type::LobTransferType,
     shutdown_option::ShutdownOption,
     table_metadata::TableMetadata,
     transaction_option::TransactionOption,
@@ -39,6 +40,29 @@ impl Connection {
 #[gen_stub_pymethods]
 #[pymethods]
 impl Connection {
+    /// Get the large object transfer type.
+    ///
+    /// Returns:
+    ///     LobTransferType: Large object transfer type.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     lob_transfer_type = connection.lob_transfer_type()
+    ///     ```
+    /// since 0.10.0
+    pub fn lob_transfer_type(&self) -> PyResult<Option<LobTransferType>> {
+        const FUNCTION_NAME: &str = "Connection.lob_transfer_type()";
+        trace!("{FUNCTION_NAME} start");
+
+        let connection = &self.inner;
+        let session = connection.session();
+        let core_type = session.lob_transfer_type();
+        let lob_transfer_type = LobTransferType::from_core_lob_transfer_type(core_type);
+
+        trace!("{FUNCTION_NAME} end");
+        Ok(lob_transfer_type)
+    }
+
     /// List table names.
     ///
     /// Returns:

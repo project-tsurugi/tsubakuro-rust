@@ -29,6 +29,9 @@ use crate::{
 ///     auth_token (str): Authentication token.
 ///     credentials (str): Path to credentials file.
 ///     session_label (str): Session label for the connection.
+///     blob_relay_service_endpoint (str): Blob relay service endpoint. since 0.10.0
+///     lob_upload_timeout (int): Large object upload timeout in seconds. since 0.10.0
+///     lob_download_timeout (int): Large object download timeout in seconds. since 0.10.0
 ///     transaction_option (TransactionOption): Transaction option.
 ///     commit_option (CommitOption): Commit option.
 ///     shutdown_option (ShutdownOption): Shutdown option.
@@ -84,6 +87,21 @@ pub struct Config {
     /// Session label for the connection.
     #[pyo3(get, set)]
     session_label: Option<String>,
+    /// Blob relay service endpoint.
+    ///
+    /// since 0.10.0
+    #[pyo3(get, set)]
+    blob_relay_service_endpoint: Option<String>,
+    /// Large object upload timeout in seconds.
+    ///
+    /// since 0.10.0
+    #[pyo3(get, set)]
+    lob_upload_timeout: Option<u64>,
+    /// Large object download timeout in seconds.
+    ///
+    /// since 0.10.0
+    #[pyo3(get, set)]
+    lob_download_timeout: Option<u64>,
     /// Transaction option.
     #[pyo3(get, set)]
     pub transaction_option: Option<TransactionOption>,
@@ -108,6 +126,9 @@ impl Default for Config {
             auth_token: None,
             credentials: None,
             session_label: None,
+            blob_relay_service_endpoint: None,
+            lob_upload_timeout: None,
+            lob_download_timeout: None,
             transaction_option: None,
             commit_option: None,
             shutdown_option: None,
@@ -174,6 +195,15 @@ impl Config {
         if let Some(session_label) = &other.session_label {
             self.session_label = Some(session_label.clone());
         }
+        if let Some(blob_relay_service_endpoint) = &other.blob_relay_service_endpoint {
+            self.blob_relay_service_endpoint = Some(blob_relay_service_endpoint.clone());
+        }
+        if let Some(lob_upload_timeout) = &other.lob_upload_timeout {
+            self.lob_upload_timeout = Some(*lob_upload_timeout);
+        }
+        if let Some(lob_download_timeout) = &other.lob_download_timeout {
+            self.lob_download_timeout = Some(*lob_download_timeout);
+        }
         if let Some(transaction_option) = &other.transaction_option {
             self.transaction_option = Some(transaction_option.clone());
         }
@@ -224,7 +254,7 @@ impl Config {
         let none = &"None".to_string();
         let mask = &"****".to_string();
         format!(
-            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, session_label={}, default_timeout={})",
+            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, session_label={}, blob_relay_service_endpoint={}, lob_upload_timeout={}, lob_download_timeout={}, default_timeout={})",
             self.application_name.as_ref().unwrap_or(none),
             self.endpoint.as_ref().unwrap_or(none),
             self.user.as_ref().unwrap_or(none),
@@ -232,6 +262,9 @@ impl Config {
             self.auth_token.as_ref().map_or(none, |_| mask),
             self.credentials.as_ref().unwrap_or(none),
             self.session_label.as_ref().unwrap_or(none),
+            self.blob_relay_service_endpoint.as_ref().unwrap_or(none),
+            self.lob_upload_timeout.as_ref().map_or(none.to_string(), |v| v.to_string()),
+            self.lob_download_timeout.as_ref().map_or(none.to_string(), |v| v.to_string()),
             self.default_timeout.as_ref().map_or(none.to_string(), |v| v.to_string())
         )
     }
@@ -305,6 +338,21 @@ impl Config {
             "auth_token" => self.auth_token = Some(value.to_string()),
             "credentials" => self.credentials = Some(value.to_string()),
             "session_label" => self.session_label = Some(value.to_string()),
+            "blob_relay_service_endpoint" => {
+                self.blob_relay_service_endpoint = Some(value.to_string())
+            }
+            "lob_upload_timeout" => {
+                let timeout: u64 = value
+                    .parse()
+                    .map_err(|_| InterfaceError::new_err("Invalid value for lob_upload_timeout"))?;
+                self.lob_upload_timeout = Some(timeout);
+            }
+            "lob_download_timeout" => {
+                let timeout: u64 = value.parse().map_err(|_| {
+                    InterfaceError::new_err("Invalid value for lob_download_timeout")
+                })?;
+                self.lob_download_timeout = Some(timeout);
+            }
             "default_timeout" | "timeout" => {
                 let timeout: u64 = value.parse().map_err(|_| {
                     InterfaceError::new_err("Invalid value for default_timeout/timeout")
@@ -325,6 +373,11 @@ impl Config {
             "auth_token" => self.auth_token = Some(value.extract()?),
             "credentials" => self.credentials = Some(value.extract()?),
             "session_label" => self.session_label = Some(value.extract()?),
+            "blob_relay_service_endpoint" => {
+                self.blob_relay_service_endpoint = Some(value.extract()?)
+            }
+            "lob_upload_timeout" => self.lob_upload_timeout = Some(value.extract()?),
+            "lob_download_timeout" => self.lob_download_timeout = Some(value.extract()?),
             "default_timeout" | "timeout" => self.default_timeout = Some(value.extract()?),
             _ => debug!("Unknown key: {}", key),
         }
@@ -362,6 +415,9 @@ impl Config {
         if let Some(session_label) = &self.session_label {
             connection_option.set_session_label(session_label);
         }
+        if let Some(endpoint) = &self.blob_relay_service_endpoint {
+            connection_option.set_blob_relay_service_endpoint(endpoint);
+        }
 
         connection_option.set_default_timeout(self.default_timeout());
 
@@ -370,6 +426,22 @@ impl Config {
 
     pub(crate) fn connect_timeout(&self) -> Duration {
         self.default_timeout()
+    }
+
+    pub(crate) fn lob_upload_timeout(&self) -> Duration {
+        if let Some(timeout) = self.lob_upload_timeout {
+            Duration::from_secs(timeout)
+        } else {
+            self.default_timeout()
+        }
+    }
+
+    pub(crate) fn lob_download_timeout(&self) -> Duration {
+        if let Some(timeout) = self.lob_download_timeout {
+            Duration::from_secs(timeout)
+        } else {
+            self.default_timeout()
+        }
     }
 
     pub(crate) fn core_transaction_option(&self) -> CoreTransactionOption {

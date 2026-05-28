@@ -6,8 +6,10 @@ import datetime
 import decimal
 import typing
 __all__ = [
+    "Blob",
     "Bool",
     "Bytes",
+    "Clob",
     "Date",
     "Datetime",
     "Decimal",
@@ -20,6 +22,25 @@ __all__ = [
     "Str",
     "Time",
 ]
+
+@typing.final
+class Blob:
+    r"""
+    BLOB type.
+    
+    Examples:
+        ```python
+        value = cursor.upload_blob(b"\x01\x02\x03")
+        value = cursor.upload_blob(None)
+        ```
+    
+    since 0.10.0
+    """
+    def __new__(cls, value: typing.Optional[typing.Sequence[builtins.int]] = None) -> Blob:
+        r"""
+        Create a new `Blob`.
+        """
+    def __repr__(self) -> builtins.str: ...
 
 @typing.final
 class Bool:
@@ -73,6 +94,25 @@ class Bytes:
     def __new__(cls, value: typing.Optional[typing.Sequence[builtins.int]] = None) -> Bytes:
         r"""
         Create a new `Bytes`.
+        """
+    def __repr__(self) -> builtins.str: ...
+
+@typing.final
+class Clob:
+    r"""
+    CLOB type.
+    
+    Examples:
+        ```python
+        value = cursor.upload_clob("example text")
+        value = cursor.upload_clob(None)
+        ```
+    
+    since 0.10.0
+    """
+    def __new__(cls, value: typing.Optional[builtins.str] = None) -> Clob:
+        r"""
+        Create a new `Clob`.
         """
     def __repr__(self) -> builtins.str: ...
 
