@@ -215,7 +215,7 @@ async fn download_blob<'py>(
         .read_blob_for(&tx, &blob, timeout)
         .await
         .map_err(to_pyerr)?;
-    Ok(value.into_pyobject(py)?)
+    Ok(value.into_pyobject(py)?.into_any())
 }
 
 async fn download_clob<'py>(

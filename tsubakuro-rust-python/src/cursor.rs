@@ -184,11 +184,11 @@ impl Cursor {
     ///     timeout (int, optional): Timeout for the blob upload operation in seconds. If not specified, use the connection's default LOB upload timeout.
     ///
     /// Returns:
-    ///     Optional[Blob]: Uploaded blob.
+    ///     Blob: Uploaded blob.
     ///
     /// Examples:
     ///     ```python
-    ///     blob = cursor.upload_blob(b"0x01\x02\x03", 10)
+    ///     blob = cursor.upload_blob(b"\x01\x02\x03", 10)
     ///     cursor.execute("insert into blob_example values (?, ?)", (1, blob))
     ///     connection.commit()
     ///     ```
@@ -232,7 +232,7 @@ impl Cursor {
     ///     timeout (int, optional): Timeout for the clob upload operation in seconds. If not specified, use the connection's default LOB upload timeout.
     ///
     /// Returns:
-    ///     Optional[Clob]: Uploaded clob.
+    ///     Clob: Uploaded clob.
     ///
     /// Examples:
     ///     ```python

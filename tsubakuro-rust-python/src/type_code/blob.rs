@@ -8,7 +8,7 @@ use crate::{error::to_pyerr, type_code::ParameterContext};
 ///
 /// Examples:
 ///     ```python
-///     value = cursor.upload_blob(b"0x01\x02\x03")
+///     value = cursor.upload_blob(b"\x01\x02\x03")
 ///     value = cursor.upload_blob(None)
 ///     ```
 ///

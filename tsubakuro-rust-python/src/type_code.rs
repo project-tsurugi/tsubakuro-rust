@@ -328,49 +328,49 @@ fn to_atom_type_from_name(type_name: &str) -> PyResult<AtomType> {
     match type_name {
         "NoneType" => Ok(AtomType::Unknown),
         "bool"  // Python bool
-        | "Bool" // Tsurugi Warper
+        | "Bool" // Tsurugi Wrapper
             => Ok(AtomType::Boolean),
-        "Int32" // Tsurugi Warper
+        "Int32" // Tsurugi Wrapper
         | "int32" // numpy.int32
             => Ok(AtomType::Int4),
         "int" // Python int
-        | "Int64"  // Tsurugi Warper
+        | "Int64"  // Tsurugi Wrapper
         | "int64" // numpy.int64
             => Ok(AtomType::Int8),
-        "Float32" // Tsurugi Warper
+        "Float32" // Tsurugi Wrapper
         | "float32" // numpy.float32
             => Ok(AtomType::Float4),
         "float"  // Python float
-        | "Float64" // Tsurugi Warper
+        | "Float64" // Tsurugi Wrapper
         | "float64" // numpy.float64
             => Ok(AtomType::Float8),
-        "Decimal" // Python decimal.Decimal, Tsurugi Warper
+        "Decimal" // Python decimal.Decimal, Tsurugi Wrapper
             => Ok(AtomType::Decimal),
         "str" // Python str
-        | "Str" // Tsurugi Warper
+        | "Str" // Tsurugi Wrapper
         | "str_" // numpy.str_
             => Ok(AtomType::Character),
         "bytes" // Python bytes
-        | "Bytes" // Tsurugi Warper
+        | "Bytes" // Tsurugi Wrapper
         | "bytes_" // numpy.bytes_
             => Ok(AtomType::Octet),
         "date" // Python datetime.date
-        | "Date" // Tsurugi Warper
+        | "Date" // Tsurugi Wrapper
             => Ok(AtomType::Date),
         "time" // Python datetime.time
-        | "Time" // Tsurugi Warper
+        | "Time" // Tsurugi Wrapper
             => Ok(AtomType::TimeOfDay),
-        "Datetime" // Tsurugi Warper
+        "Datetime" // Tsurugi Wrapper
         | "datetime64" // numpy.datetime64
             => Ok(AtomType::TimePoint),
-        "OffsetTime" // Tsurugi Warper
+        "OffsetTime" // Tsurugi Wrapper
             => Ok(AtomType::TimeOfDayWithTimeZone),
         "datetime" // Python datetime.datetime
-        | "OffsetDatetime" // Tsurugi Warper
+        | "OffsetDatetime" // Tsurugi Wrapper
             => Ok(AtomType::TimePointWithTimeZone),
-        "Blob" // Tsurugi Warper
+        "Blob" // Tsurugi Wrapper
             => Ok(AtomType::Blob),
-        "Clob" // Tsurugi Warper
+        "Clob" // Tsurugi Wrapper
             => Ok(AtomType::Clob),
         _ => Err(ProgrammingError::new_err(format!(
             "to_atom_type_from_name(): Unsupported type_name: {}",

@@ -86,9 +86,10 @@ impl Clob {
     fn upload_clob(context: &ParameterContext, value: &str) -> PyResult<TgClob> {
         let runtime = context.runtime();
         let sql_client = context.sql_client();
+        let timeout = context.lob_upload_timeout();
 
         let clob = runtime
-            .block_on(sql_client.upload_clob(value))
+            .block_on(sql_client.upload_clob_for(value, timeout))
             .map_err(to_pyerr)?;
         Ok(clob)
     }

@@ -6,6 +6,8 @@ use pyo3_stub_gen::derive::*;
 use serde::{Deserialize, Serialize};
 use tsubakuro_rust_core::prelude::LobTransferType as CoreLobTransferType;
 
+use crate::error::InternalError;
+
 /// Large object transfer type.
 ///
 /// Attributes:
@@ -41,13 +43,16 @@ impl LobTransferType {
     }
 
     #[staticmethod]
-    pub fn _from_value(value: i32) -> Self {
+    pub fn _from_value(value: i32) -> PyResult<Self> {
         match value {
-            1 => LobTransferType::NOT_USE,
-            2 => LobTransferType::RELAY,
+            1 => Ok(LobTransferType::NOT_USE),
+            2 => Ok(LobTransferType::RELAY),
             _ => {
                 warn!("LobTransferType._from_value(): unknown value {}", value);
-                LobTransferType::NOT_USE
+                Err(InternalError::new_err(format!(
+                    "Unknown LobTransferType value: {}",
+                    value
+                )))
             }
         }
     }

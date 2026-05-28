@@ -2,6 +2,11 @@ import tsurugi_dbapi as tsurugi
 import pickle
 
 
+def test_lob_transfer_type():
+    pickle_test_main(tsurugi.LobTransferType.NOT_USE)
+    pickle_test_main(tsurugi.LobTransferType.RELAY)
+
+
 def test_transaction_type():
     pickle_test_main(tsurugi.TransactionType.OCC)
     pickle_test_main(tsurugi.TransactionType.LTX)
