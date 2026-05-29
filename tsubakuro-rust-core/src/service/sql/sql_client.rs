@@ -2576,4 +2576,13 @@ mod test {
         let smv = SqlClient::service_message_version();
         assert_eq!("sql-2.1", smv);
     }
+
+    fn assert_send<T: Send>() {}
+    fn assert_sync<T: Sync>() {}
+
+    #[test]
+    fn sql_client_is_send_sync() {
+        assert_send::<SqlClient>();
+        assert_sync::<SqlClient>();
+    }
 }
