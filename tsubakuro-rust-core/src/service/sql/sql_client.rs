@@ -2486,7 +2486,7 @@ impl SqlClient {
 /// Large object (BLOB/CLOB) operation type.
 ///
 /// since 0.10.0
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LobOperation {
     /// upload_lob_file
     UploadLobFile,

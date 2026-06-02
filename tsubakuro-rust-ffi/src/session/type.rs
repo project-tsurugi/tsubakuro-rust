@@ -1,6 +1,47 @@
-//! shutdown type.
+//! Session type.
 
 use tsubakuro_rust_core::prelude::*;
+
+/// Large object transfer type.
+///
+/// since 0.10.0
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(i32)]
+pub enum TsurugiFfiLobTransferType {
+    /// Indicates the default transfer policy.
+    Default = 0,
+
+    /// Does not use transfer type.
+    NotUse = 1,
+
+    /// Privileged transfer type.
+    Privileged = 2,
+
+    /// Blob Relay transfer type.
+    Relay = 3,
+}
+
+impl From<TsurugiFfiLobTransferType> for LobTransferType {
+    fn from(value: TsurugiFfiLobTransferType) -> Self {
+        match value {
+            TsurugiFfiLobTransferType::Default => Self::Default,
+            TsurugiFfiLobTransferType::NotUse => Self::NotUse,
+            TsurugiFfiLobTransferType::Privileged => Self::Privileged,
+            TsurugiFfiLobTransferType::Relay => Self::Relay,
+        }
+    }
+}
+
+impl From<LobTransferType> for TsurugiFfiLobTransferType {
+    fn from(value: LobTransferType) -> Self {
+        match value {
+            LobTransferType::Default => Self::Default,
+            LobTransferType::NotUse => Self::NotUse,
+            LobTransferType::Privileged => Self::Privileged,
+            LobTransferType::Relay => Self::Relay,
+        }
+    }
+}
 
 /// Shutdown type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
