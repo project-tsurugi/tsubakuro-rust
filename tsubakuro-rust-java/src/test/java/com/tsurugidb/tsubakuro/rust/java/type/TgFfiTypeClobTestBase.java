@@ -93,6 +93,8 @@ abstract class TgFfiTypeClobTestBase extends TgFfiTester {
 
     @Test
     void insertJava() throws Exception {
+        assumeLobTest(getLobTransferType().name());
+
         var sql = "insert into test values(:pk, :value)";
         var mapping = TgParameterMapping.of(TgBindVariable.ofInt("pk"), TgBindVariable.ofClob("value"));
 
@@ -122,6 +124,8 @@ abstract class TgFfiTypeClobTestBase extends TgFfiTester {
 
     @Test
     void insertFfi_path() throws Exception {
+        assumeLobTest(getLobTransferType().name());
+
         var manager = getFfiObjectManager();
         var context = TgFfiContext.create(manager);
 
@@ -190,6 +194,8 @@ abstract class TgFfiTypeClobTestBase extends TgFfiTester {
     @ParameterizedTest
     @ValueSource(strings = { DIRECT, DIRECT_FOR, TAKE, TAKE_FOR, TAKE_IF_READY })
     void insertFfi_uploadClobFile(String pattern) throws Exception {
+        assumeLobTest(getLobTransferType().name());
+
         var manager = getFfiObjectManager();
         var context = TgFfiContext.create(manager);
 

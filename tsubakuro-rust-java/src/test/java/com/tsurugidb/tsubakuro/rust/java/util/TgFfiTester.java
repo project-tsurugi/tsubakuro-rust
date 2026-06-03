@@ -2,6 +2,7 @@ package com.tsurugidb.tsubakuro.rust.java.util;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -498,5 +499,19 @@ public class TgFfiTester {
                 }
             }
         }
+    }
+
+    protected static void assumeLobTest(String lobTransferType) {
+        disabledIfEnvironmentVariable("TgFfiLobTest_" + lobTransferType);
+    }
+
+    protected static void disabledIfEnvironmentVariable(String value) {
+        String env = System.getenv("FFI_DBTEST_DISABLE");
+        if (env == null) {
+            return;
+        }
+
+        boolean matched = env.contains(value);
+        assumeFalse(matched, () -> "FFI_DBTEST_DISABLE contains " + value);
     }
 }
