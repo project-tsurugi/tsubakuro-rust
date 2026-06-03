@@ -14,6 +14,8 @@ import java.util.Objects;
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.rc.TgFfiRcUtil;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiBlob;
+import com.tsurugidb.tsubakuro.rust.java.service.sql.type.TgFfiClob;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObject;
 import com.tsurugidb.tsubakuro.rust.java.util.TgFfiObjectManager;
 
@@ -595,6 +597,39 @@ public class TgFfiSqlParameter extends TgFfiObject {
         return new TgFfiSqlParameter(manager, outHandle);
     }
 
+    public static TgFfiSqlParameter ofBlob2(TgFfiContext context, String name, TgFfiBlob blob) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofBlob2(context.manager(), context, name, blob);
+    }
+
+    public static TgFfiSqlParameter ofBlob2(TgFfiObjectManager manager, String name, TgFfiBlob blob) {
+        return ofBlob2(manager, null, name, blob);
+    }
+
+    public static TgFfiSqlParameter ofBlob2(TgFfiObjectManager manager, TgFfiContext context, String name, TgFfiBlob blob) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofBlob2Main(manager, context, name, blob);
+            }
+        } else {
+            return ofBlob2Main(manager, null, name, blob);
+        }
+    }
+
+    private static TgFfiSqlParameter ofBlob2Main(TgFfiObjectManager manager, TgFfiContext context, String name, TgFfiBlob blob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = blob.handle();
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_blob2(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
     public static TgFfiSqlParameter ofClob(TgFfiContext context, String name, Path path) {
         Objects.requireNonNull(context, "context must not be null");
         return ofClob(context.manager(), context, name, path);
@@ -655,6 +690,39 @@ public class TgFfiSqlParameter extends TgFfiObject {
         var arg2 = manager.allocateString(value);
         var out = manager.allocateHandleOut();
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_clob_contents(ctx, arg1, arg2, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        var outHandle = outToHandle(out);
+        return new TgFfiSqlParameter(manager, outHandle);
+    }
+
+    public static TgFfiSqlParameter ofClob2(TgFfiContext context, String name, TgFfiClob clob) {
+        Objects.requireNonNull(context, "context must not be null");
+        return ofClob2(context.manager(), context, name, clob);
+    }
+
+    public static TgFfiSqlParameter ofClob2(TgFfiObjectManager manager, String name, TgFfiClob clob) {
+        return ofClob2(manager, null, name, clob);
+    }
+
+    public static TgFfiSqlParameter ofClob2(TgFfiObjectManager manager, TgFfiContext context, String name, TgFfiClob clob) {
+        Objects.requireNonNull(manager, "manager must not be null");
+
+        if (context != null) {
+            synchronized (context) {
+                return ofClob2Main(manager, context, name, clob);
+            }
+        } else {
+            return ofClob2Main(manager, null, name, clob);
+        }
+    }
+
+    private static TgFfiSqlParameter ofClob2Main(TgFfiObjectManager manager, TgFfiContext context, String name, TgFfiClob clob) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var arg1 = manager.allocateString(name);
+        var arg2 = clob.handle();
+        var out = manager.allocateHandleOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_parameter_of_clob2(ctx, arg1, arg2, out);
         TgFfiRcUtil.throwIfError(rc, context);
 
         var outHandle = outToHandle(out);

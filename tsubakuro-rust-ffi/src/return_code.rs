@@ -74,6 +74,10 @@ pub const TSURUGI_FFI_RC_FFI_ERROR: u32 = TSURUGI_FFI_RC_FFI_BASE | (2 << 24);
 pub const TSURUGI_FFI_RC_FFI_NUL_ERROR: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ERROR | 1;
 /// TsurugiFfiRc: FFI diagnostic code not found
 pub const TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ERROR | 2;
+/// TsurugiFfiRc: FFI already finished error
+pub const TSURUGI_FFI_RC_FFI_ALREADY_FINISHED: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ERROR | 3;
+/// TsurugiFfiRc: FFI cancel error
+pub const TSURUGI_FFI_RC_FFI_CANCEL_ERROR: TsurugiFfiRc = TSURUGI_FFI_RC_FFI_ERROR | 4;
 
 #[doc(hidden)]
 pub const TSURUGI_FFI_RC_CORE_CLIENT_ERROR: u32 = TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR << 30;
@@ -154,6 +158,7 @@ pub(crate) fn rc_to_name(rc: TsurugiFfiRc) -> &'static str {
             TSURUGI_FFI_RC_FFI_JOB_ALREADY_CLOSED => "FFI_JOB_ALREADY_CLOSED",
             TSURUGI_FFI_RC_FFI_NUL_ERROR => "FFI_NUL_ERROR",
             TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND => "FFI_DIAGNOSTIC_CODE_NOT_FOUND",
+            TSURUGI_FFI_RC_FFI_CANCEL_ERROR => "FFI_CANCEL_ERROR",
             _ => "FFI_ERROR",
         },
         TsurugiFfiRcType::CoreClientError => "CORE_CLIENT_ERROR",

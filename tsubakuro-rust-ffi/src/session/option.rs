@@ -11,7 +11,7 @@ use crate::{
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
     rc_ffi_arg_error,
     return_code::{rc_ok, TsurugiFfiRc},
-    session::credential::TsurugiFfiCredentialHandle,
+    session::{credential::TsurugiFfiCredentialHandle, r#type::TsurugiFfiLobTransferType},
     TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
@@ -23,6 +23,7 @@ pub(crate) struct TsurugiFfiConnectionOption {
     endpoint_url: Option<CString>,
     application_name: Option<CString>,
     session_label: Option<CString>,
+    blob_relay_service_endpoint: Option<CString>,
 }
 
 impl std::ops::Deref for TsurugiFfiConnectionOption {
@@ -68,6 +69,7 @@ pub extern "C" fn tsurugi_ffi_connection_option_create(
         endpoint_url: None,
         application_name: None,
         session_label: None,
+        blob_relay_service_endpoint: None,
     });
 
     let handle = Box::into_raw(connection_option);
@@ -496,6 +498,90 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_keep_alive(
     rc
 }
 
+/// ConnectionOption: Set large object transfer type.
+///
+/// See [`ConnectionOption::set_lob_transfer_type`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Parameters
+/// - `lob_transfer_type` - Large object transfer type.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_set_lob_transfer_type(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    lob_transfer_type: TsurugiFfiLobTransferType,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_lob_transfer_type()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, lob_transfer_type={:?}",
+        context,
+        connection_option,
+        lob_transfer_type as i32,
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+
+    let connection_option = unsafe { &mut *connection_option };
+    let lob_transfer_type = LobTransferType::from(lob_transfer_type);
+
+    connection_option.set_lob_transfer_type(lob_transfer_type);
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// ConnectionOption: Get large object transfer type.
+///
+/// See [`ConnectionOption::lob_transfer_type`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Returns
+/// - `lob_transfer_type_out` - Large object transfer type.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_get_lob_transfer_type(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    lob_transfer_type_out: *mut TsurugiFfiLobTransferType,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_lob_transfer_type()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, lob_transfer_type_out={:?}",
+        context,
+        connection_option,
+        lob_transfer_type_out
+    );
+
+    ffi_arg_out_initialize!(lob_transfer_type_out, TsurugiFfiLobTransferType::Default);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, lob_transfer_type_out);
+
+    let connection_option = unsafe { &*connection_option };
+
+    let lob_transfer_type = connection_option.lob_transfer_type();
+
+    let value = TsurugiFfiLobTransferType::from(lob_transfer_type);
+    unsafe {
+        *lob_transfer_type_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (lob_transfer_type={:?})",
+        rc,
+        value as i32
+    );
+    rc
+}
+
 /// ConnectionOption: Adds a path mapping entry for both sending and receiving BLOB/CLOB.
 ///
 /// See [`ConnectionOption::add_large_object_path_mapping`].
@@ -618,6 +704,98 @@ pub extern "C" fn tsurugi_ffi_connection_option_add_large_object_path_mapping_on
 
     let rc = rc_ok(context);
     trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// ConnectionOption: Set blob relay service endpoint.
+///
+/// See [`ConnectionOption::set_blob_relay_service_endpoint`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Parameters
+/// - `endpoint` - blob relay service endpoint url. (e.g. `http://localhost:52345`)
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    endpoint: TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_blob_relay_service_endpoint()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, endpoint={:?}",
+        context,
+        connection_option,
+        endpoint
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint);
+
+    let endpoint = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, endpoint);
+
+    let connection_option = unsafe { &mut *connection_option };
+
+    connection_option.set_blob_relay_service_endpoint(endpoint);
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
+/// ConnectionOption: Get blob relay service endpoint.
+///
+/// See [`ConnectionOption::blob_relay_service_endpoint`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Returns
+/// - `endpoint_out` - blob relay service endpoint url. (e.g. `http://localhost:52345`)
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    endpoint_out: *mut TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_get_blob_relay_service_endpoint()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, endpoint_out={:?}",
+        context,
+        connection_option,
+        endpoint_out
+    );
+
+    ffi_arg_out_initialize!(endpoint_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, endpoint_out);
+
+    let connection_option = unsafe { &mut *connection_option };
+
+    match connection_option.blob_relay_service_endpoint() {
+        Some(endpoint) => {
+            let endpoint = endpoint.to_string();
+            cchar_field_set!(
+                context,
+                connection_option.blob_relay_service_endpoint,
+                endpoint
+            );
+        }
+        None => cchar_field_clear!(connection_option.blob_relay_service_endpoint),
+    }
+
+    let ptr = cstring_to_cchar!(connection_option.blob_relay_service_endpoint);
+    unsafe {
+        *endpoint_out = ptr;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. (endpoint={:?})", rc, ptr);
     rc
 }
 

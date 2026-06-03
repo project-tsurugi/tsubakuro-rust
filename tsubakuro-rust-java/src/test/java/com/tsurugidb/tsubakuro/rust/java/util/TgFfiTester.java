@@ -2,21 +2,25 @@ package com.tsurugidb.tsubakuro.rust.java.util;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.tsurugidb.iceaxe.TsurugiConnector;
-import com.tsurugidb.iceaxe.session.TgLobTransferType;
+import com.tsurugidb.iceaxe.session.TgSessionOption;
+import com.tsurugidb.iceaxe.sql.type.IceaxeObjectFactory;
 import com.tsurugidb.tsubakuro.channel.common.connection.Credential;
 import com.tsurugidb.tsubakuro.channel.common.connection.FileCredential;
 import com.tsurugidb.tsubakuro.channel.common.connection.RememberMeCredential;
@@ -28,6 +32,7 @@ import com.tsurugidb.tsubakuro.rust.java.service.sql.TgFfiSqlQueryResult;
 import com.tsurugidb.tsubakuro.rust.java.service.system.TgFfiSystemClient;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiConnectionOption;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiCredential;
+import com.tsurugidb.tsubakuro.rust.java.session.TgFfiLobTransferType;
 import com.tsurugidb.tsubakuro.rust.java.session.TgFfiSession;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransaction;
@@ -47,6 +52,9 @@ public class TgFfiTester {
     private static final String SYSPROP_DBTEST_PASSWORD = "tsurugi.dbtest.password";
     private static final String SYSPROP_DBTEST_AUTH_TOKEN = "tsurugi.dbtest.auth-token";
     private static final String SYSPROP_DBTEST_CREDENTIALS = "tsurugi.dbtest.credentials";
+    private static final String SYSPROP_DBTEST_LOB_SEND_PATH_MAPPING = "tsurugi.dbtest.lob-send-path-mapping";
+    private static final String SYSPROP_DBTEST_LOB_RECV_PATH_MAPPING = "tsurugi.dbtest.lob-recv-path-mapping";
+    private static final String SYSPROP_DBTEST_BLOB_RELAY_SERVICE_ENDPOINT = "tsurugi.dbtest.blob-relay-service-endpoint";
 
     private static String staticEndpoint;
     private static String staticEndpointJava;
@@ -145,6 +153,45 @@ public class TgFfiTester {
         return getSystemProperty(SYSPROP_DBTEST_CREDENTIALS);
     }
 
+    public static TgFfiPathMappingEntry getLobSendPathMapping() {
+        String s = getSystemProperty(SYSPROP_DBTEST_LOB_SEND_PATH_MAPPING);
+        if (s == null) {
+            return null;
+        }
+        return TgFfiPathMappingEntry.parse(s);
+    }
+
+    protected Path createLobFilePath(String fileName) {
+        try {
+            Path dir;
+            var mapping = getLobSendPathMapping();
+            if (mapping != null) {
+                dir = mapping.clientPath();
+                Files.createDirectories(dir);
+            } else {
+                dir = Path.of(System.getProperty("java.io.tmpdir"));
+            }
+
+            Path path = Files.createTempFile(dir, "tsubakuro-rust-ffi.test", fileName);
+            path.toFile().deleteOnExit();
+            return path;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e.getMessage(), e);
+        }
+    }
+
+    public static TgFfiPathMappingEntry getLobRecvPathMapping() {
+        String s = getSystemProperty(SYSPROP_DBTEST_LOB_RECV_PATH_MAPPING);
+        if (s == null) {
+            return null;
+        }
+        return TgFfiPathMappingEntry.parse(s);
+    }
+
+    public static String getBlobRelayServiceEndpoint() {
+        return getSystemProperty(SYSPROP_DBTEST_BLOB_RELAY_SERVICE_ENDPOINT);
+    }
+
     private static String getSystemProperty(String key) {
         String value = System.getProperty(key);
         if (value != null && value.isEmpty()) {
@@ -154,18 +201,35 @@ public class TgFfiTester {
     }
 
     protected static TsurugiConnector getTsurugiConnector() {
-        return TsurugiConnector.of(getEndpointJava(), getCredentialJava());
+        return getTsurugiConnector(null);
     }
 
-    protected TgLobTransferType getIceaxeLobTransferType() {
-        var connector = getTsurugiConnector();
-        try (var session = connector.createSession()) {
-            return session.getLobTransferType();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e.getMessage(), e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+    protected static TsurugiConnector getTsurugiConnector(Consumer<TgSessionOption> customizer) {
+        var sessionOption = TgSessionOption.of();
+        var sendMapping = getLobSendPathMapping();
+        if (sendMapping != null) {
+            sessionOption = sessionOption.addLargeObjectPathMappingOnSend(sendMapping.clientPath(), sendMapping.serverPath());
+            IceaxeObjectFactory.getDefaultInstance().setTempDirectory(sendMapping.clientPath());
         }
+        var recvMapping = getLobRecvPathMapping();
+        if (recvMapping != null) {
+            sessionOption = sessionOption.addLargeObjectPathMappingOnReceive(recvMapping.serverPath(), recvMapping.clientPath());
+        }
+        var blobRelayEndpoint = getBlobRelayServiceEndpoint();
+        if (blobRelayEndpoint != null) {
+            String s = blobRelayEndpoint;
+            if (s.startsWith("http://") || s.startsWith("https://")) {
+                s = s.substring(s.indexOf("://") + 3);
+            }
+            var endpoint = URI.create(s);
+            sessionOption = sessionOption.setBlobRelayServiceEndpoint(endpoint);
+        }
+
+        if (customizer != null) {
+            customizer.accept(sessionOption);
+        }
+
+        return TsurugiConnector.of(getEndpointJava(), getCredentialJava(), sessionOption);
     }
 
     private TgFfiObjectManager manager;
@@ -224,12 +288,32 @@ public class TgFfiTester {
     }
 
     protected TgFfiSession createSession() {
+        return createSession(null);
+    }
+
+    protected TgFfiSession createSession(Consumer<TgFfiConnectionOption> customizer) {
         var manager = getFfiObjectManager();
 
         try (var context = TgFfiContext.create(manager); //
                 var connectionOption = TgFfiConnectionOption.create(context)) {
             connectionOption.setEndpointUrl(context, getEndpoint());
             connectionOption.setCredential(context, getCredential(context));
+            var sendMapping = getLobSendPathMapping();
+            if (sendMapping != null) {
+                connectionOption.addLargeObjectPathMappingOnSend(context, sendMapping.clientPath(), sendMapping.serverPath());
+            }
+            var recvMapping = getLobRecvPathMapping();
+            if (recvMapping != null) {
+                connectionOption.addLargeObjectPathMappingOnRecv(context, recvMapping.serverPath(), recvMapping.clientPath());
+            }
+            var blobRelayServiceEndpoint = getBlobRelayServiceEndpoint();
+            if (blobRelayServiceEndpoint != null) {
+                connectionOption.setBlobRelayServiceEndpoint(context, blobRelayServiceEndpoint);
+            }
+
+            if (customizer != null) {
+                customizer.accept(connectionOption);
+            }
 
             var session = TgFfiSession.connect(context, connectionOption);
             return session;
@@ -241,6 +325,18 @@ public class TgFfiTester {
         var session = createSession();
 
         try (var context = TgFfiContext.create(manager)) {
+            var client = session.makeSqlClient(context);
+            return client;
+        }
+    }
+
+    protected TgFfiSqlClient createSqlClient(TgFfiLobTransferType lobTransferType) {
+        var manager = getFfiObjectManager();
+        try (var context = TgFfiContext.create(manager)) {
+            var session = createSession(option -> {
+                option.setLobTransferType(context, lobTransferType);
+            });
+
             var client = session.makeSqlClient(context);
             return client;
         }
@@ -407,5 +503,19 @@ public class TgFfiTester {
                 }
             }
         }
+    }
+
+    protected static void assumeLobTest(String lobTransferType) {
+        disabledIfEnvironmentVariable("TgFfiLobTest_" + lobTransferType);
+    }
+
+    protected static void disabledIfEnvironmentVariable(String value) {
+        String env = System.getenv("FFI_DBTEST_DISABLE");
+        if (env == null) {
+            return;
+        }
+
+        boolean matched = env.contains(value);
+        assumeFalse(matched, () -> "FFI_DBTEST_DISABLE contains " + value);
     }
 }

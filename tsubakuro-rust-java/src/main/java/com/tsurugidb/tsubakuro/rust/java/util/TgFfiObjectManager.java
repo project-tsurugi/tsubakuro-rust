@@ -67,13 +67,7 @@ public class TgFfiObjectManager implements AutoCloseable {
             return MemorySegment.NULL;
         }
 
-        // TODO バイト配列をallocateする効率の良い方法
-        var array = arena.allocate(value.length);
-        for (int i = 0; i < value.length; i++) {
-            array.setAtIndex(ValueLayout.JAVA_BYTE, i, value[i]);
-        }
-
-        return array;
+        return arena.allocateFrom(ValueLayout.JAVA_BYTE, value);
     }
 
     public MemorySegment allocateHandleOut() {

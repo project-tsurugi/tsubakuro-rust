@@ -1,6 +1,6 @@
 //! Sql parameter.
 
-use std::ffi::CString;
+use std::{ffi::CString, ops::Deref};
 
 use log::trace;
 use tsubakuro_rust_core::prelude::*;
@@ -10,6 +10,7 @@ use crate::{
     context::TsurugiFfiContextHandle,
     cstring_to_cchar, ffi_arg_cchar_to_str, ffi_arg_out_initialize, ffi_arg_require_non_null,
     return_code::{rc_ok, TsurugiFfiRc},
+    service::sql::r#type::{blob::TsurugiFfiBlobHandle, clob::TsurugiFfiClobHandle},
     TsurugiFfiByteArrayHandle, TsurugiFfiStringHandle,
 };
 
@@ -771,7 +772,10 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_time_point_with_time_zone(
 ///
 /// # Returns
 /// - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
+///
+/// Deprecated since 0.10.0. Use [`tsurugi_ffi_sql_parameter_of_blob2`] instead.
 #[no_mangle]
+#[deprecated(since = "0.10.0")]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob(
     context: TsurugiFfiContextHandle,
     name: TsurugiFfiStringHandle,
@@ -794,6 +798,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob(
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+    #[allow(deprecated)]
     let parameter = SqlParameter::of(name, TgBlob::new(path));
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
@@ -819,7 +824,10 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob(
 ///
 /// # Returns
 /// - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
+///
+/// Deprecated since 0.10.0. Use [`tsurugi_ffi_sql_parameter_of_blob2`] instead.
 #[no_mangle]
+#[deprecated(since = "0.10.0")]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob_contents(
     context: TsurugiFfiContextHandle,
     name: TsurugiFfiStringHandle,
@@ -827,7 +835,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob_contents(
     value_size: u64,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_blob()";
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_blob_contents()";
     trace!(
         "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, value_size={:?}, parameter_out={:?}",
         context,
@@ -858,6 +866,54 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob_contents(
     rc
 }
 
+/// SqlParameter: Creates a parameter of blob.
+///
+/// See [`SqlClient::upload_blob`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `blob` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob2(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    blob: TsurugiFfiBlobHandle,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_blob2()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, blob={:?}, parameter_out={:?}",
+        context,
+        name,
+        blob,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let blob = unsafe { &*blob }.deref().clone();
+
+    let parameter = SqlParameter::of(name, blob);
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
 /// SqlParameter: Creates a parameter of clob.
 ///
 /// See [`TgClob::new`].
@@ -868,7 +924,10 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_blob_contents(
 ///
 /// # Returns
 /// - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
+///
+/// Deprecated since 0.10.0. Use [`tsurugi_ffi_sql_parameter_of_clob2`] instead.
 #[no_mangle]
+#[deprecated(since = "0.10.0")]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob(
     context: TsurugiFfiContextHandle,
     name: TsurugiFfiStringHandle,
@@ -891,6 +950,7 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob(
 
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+    #[allow(deprecated)]
     let parameter = SqlParameter::of(name, TgClob::new(path));
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
@@ -915,14 +975,17 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob(
 ///
 /// # Returns
 /// - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
+///
+/// Deprecated since 0.10.0. Use [`tsurugi_ffi_sql_parameter_of_clob2`] instead.
 #[no_mangle]
+#[deprecated(since = "0.10.0")]
 pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob_contents(
     context: TsurugiFfiContextHandle,
     name: TsurugiFfiStringHandle,
     value: TsurugiFfiStringHandle,
     parameter_out: *mut TsurugiFfiSqlParameterHandle,
 ) -> TsurugiFfiRc {
-    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_clob()";
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_clob_contents()";
     trace!(
         "{FUNCTION_NAME} start. context={:?}, name={:?}, value={:?}, parameter_out={:?}",
         context,
@@ -939,6 +1002,54 @@ pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob_contents(
     let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
     let value = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, value);
     let parameter = SqlParameter::of(name, TgClob::from(value));
+
+    let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
+
+    let handle = Box::into_raw(parameter);
+    unsafe {
+        *parameter_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. parameter={:?}", rc, handle);
+    rc
+}
+
+/// SqlParameter: Creates a parameter of clob.
+///
+/// See [`SqlClient::upload_clob`].
+///
+/// # Parameters
+/// - `name` - parameter name.
+/// - `clob` - parameter value.
+///
+/// # Returns
+/// - `parameter_out` - parameter. To dispose, call [`tsurugi_ffi_sql_parameter_dispose`].
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_parameter_of_clob2(
+    context: TsurugiFfiContextHandle,
+    name: TsurugiFfiStringHandle,
+    clob: TsurugiFfiClobHandle,
+    parameter_out: *mut TsurugiFfiSqlParameterHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_parameter_of_clob2()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, name={:?}, clob={:?}, parameter_out={:?}",
+        context,
+        name,
+        clob,
+        parameter_out
+    );
+
+    ffi_arg_out_initialize!(parameter_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, name);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, parameter_out);
+
+    let name = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 1, name);
+    let clob = unsafe { &*clob }.deref().clone();
+
+    let parameter = SqlParameter::of(name, clob);
 
     let parameter = Box::new(TsurugiFfiSqlParameter::new(parameter));
 

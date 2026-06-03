@@ -22,6 +22,7 @@ import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlParameter;
 import com.tsurugidb.tsubakuro.rust.java.service.sql.prepare.TgFfiSqlPlaceholder;
+import com.tsurugidb.tsubakuro.rust.java.session.TgFfiLobTransferType;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiCommitOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionOption;
 import com.tsurugidb.tsubakuro.rust.java.transaction.TgFfiTransactionType;
@@ -2743,8 +2744,44 @@ class TgFfiSqlClientTest extends TgFfiTester {
         }
     }
 
-    // copy_blob_to() → TgFfiTypeBlobTest
-    // copy_clob_to() → TgFfiTypeClobTest
+    @Test
+    void allows_lob_operation_NOT_USE() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient(TgFfiLobTransferType.NOT_USE);
+        var context = TgFfiContext.create(manager);
+
+        for (var operation : TgFfiLobOperation.values()) {
+            assertFalse(client.allowsLobOperation(context, operation));
+        }
+    }
+
+    @Test
+    void allows_lob_operation_argError() {
+        var manager = getFfiObjectManager();
+        var client = createSqlClient();
+
+        try (var context = TgFfiContext.create(manager)) {
+            {
+                var ctx = context.handle();
+                var handle = MemorySegment.NULL;
+                var arg1 = TgFfiLobOperation.UPLOAD_LOB.value();
+                var out = manager.allocateBooleanOut();
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_allows_lob_operation(ctx, handle, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+            }
+            {
+                var ctx = context.handle();
+                var handle = client.handle();
+                var arg1 = TgFfiLobOperation.UPLOAD_LOB.value();
+                var out = MemorySegment.NULL;
+                var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_sql_client_allows_lob_operation(ctx, handle, arg1, out);
+                assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+            }
+        }
+    }
+
+    // copy_blob_to(),etc → TgFfiTypeBlobTest
+    // copy_clob_to(),etc → TgFfiTypeClobTest
 
     @Test
     void commit() {

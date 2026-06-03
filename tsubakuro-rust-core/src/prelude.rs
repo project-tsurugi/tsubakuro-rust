@@ -14,6 +14,8 @@ pub use crate::jogasaki::proto::sql::response::ResultSetMetadata as SqlQueryResu
 pub use crate::jogasaki::proto::sql::response::TransactionStatus;
 pub use crate::service::core::core_service::CoreClient;
 pub use crate::service::endpoint::endpoint_broker::EndpointBrokerClient;
+pub use crate::service::lob::downloader::*;
+pub use crate::service::lob::uploader::*;
 pub use crate::service::ServiceMessageVersion;
 // pub use crate::service::sql::column::*;
 pub use crate::service::sql::execute_result::*;

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.lang.foreign.MemorySegment;
 import java.time.Duration;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -302,6 +303,54 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
     }
 
     @Test
+    void set_lob_transfer_type() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            assertEquals(TgFfiLobTransferType.DEFAULT, target.getLobTransferType(context));
+
+            target.setLobTransferType(context, TgFfiLobTransferType.PRIVILEGED);
+
+            assertEquals(TgFfiLobTransferType.PRIVILEGED, target.getLobTransferType(context));
+        }
+    }
+
+    @Test
+    void set_lob_transfer_type_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg1 = TgFfiLobTransferType.DEFAULT.value();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_lob_transfer_type(ctx, handle, arg1);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void get_lob_transfer_type_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var out = manager.allocateIntOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_lob_transfer_type(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_lob_transfer_type(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+    }
+
+    @Test
     void add_large_object_path_mapping_argError() {
         var manager = getFfiObjectManager();
 
@@ -394,6 +443,62 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
             var arg2 = MemorySegment.NULL;
             var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(ctx, handle, arg1, arg2);
             assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG3_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void set_blob_relay_service_endpoint() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            assertEquals(Optional.empty(), target.getBlobRelayServiceEndpoint(context));
+
+            target.setBlobRelayServiceEndpoint(context, "http://localhost:52345");
+
+            assertEquals(Optional.of("http://localhost:52345"), target.getBlobRelayServiceEndpoint(context));
+        }
+    }
+
+    @Test
+    void set_set_blob_relay_service_endpoint_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg1 = manager.allocateString("http://localhost:52345");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(ctx, handle, arg1);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(ctx, handle, arg1);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+    }
+
+    @Test
+    void get_blob_relay_service_endpoint_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var out = manager.allocatePtrOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
         }
     }
 

@@ -6,6 +6,53 @@ use log::trace;
 use tsubakuro_rust_core::prelude::*;
 
 #[derive(Debug)]
+pub(crate) struct TsurugiFfiClob {
+    clob: TgClob,
+}
+
+impl TsurugiFfiClob {
+    pub(crate) fn new(clob: TgClob) -> TsurugiFfiClob {
+        TsurugiFfiClob { clob }
+    }
+}
+
+impl std::ops::Deref for TsurugiFfiClob {
+    type Target = TgClob;
+
+    fn deref(&self) -> &Self::Target {
+        &self.clob
+    }
+}
+
+/// Clob.
+///
+/// since 0.10.0
+pub type TsurugiFfiClobHandle = *mut TsurugiFfiClob;
+
+/// Clob: Dispose.
+///
+/// # Receiver
+/// - `clob` - clob.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_clob_dispose(clob: TsurugiFfiClobHandle) {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_clob_dispose()";
+    trace!("{FUNCTION_NAME} start. clob={:?}", clob);
+
+    if clob.is_null() {
+        trace!("{FUNCTION_NAME} end. arg[clob] is null");
+        return;
+    }
+
+    unsafe {
+        let _ = Box::from_raw(clob);
+    }
+
+    trace!("{FUNCTION_NAME} end");
+}
+
+#[derive(Debug)]
 pub(crate) struct TsurugiFfiClobReference {
     clob_reference: TgClobReference,
     pub(crate) value: Option<CString>,

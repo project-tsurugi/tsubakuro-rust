@@ -10,14 +10,26 @@ use crate::{
     ffi_exec_core_async, impl_job_delegator,
     job::{TsurugiFfiJob, TsurugiFfiJobHandle, VoidJobDelegator},
     return_code::{rc_ok, TsurugiFfiRc},
-    service::sql::{
-        execute_result::TsurugiFfiSqlExecuteResult,
-        explain::TsurugiFfiSqlExplainResult,
-        prepare::prepared_statement::TsurugiFfiSqlPreparedStatement,
-        query_result::TsurugiFfiSqlQueryResult,
-        r#type::large_object::{TsurugiFfiLargeObjectCache, TsurugiFfiLargeObjectCacheHandle},
-        table_list::TsurugiFfiTableList,
-        table_metadata::TsurugiFfiTableMetadata,
+    service::{
+        lob::{
+            blob_downloader::{TsurugiFfiBlobDownloader, TsurugiFfiBlobDownloaderHandle},
+            blob_uploader::{TsurugiFfiBlobUploader, TsurugiFfiBlobUploaderHandle},
+            clob_downloader::{TsurugiFfiClobDownloader, TsurugiFfiClobDownloaderHandle},
+            clob_uploader::{TsurugiFfiClobUploader, TsurugiFfiClobUploaderHandle},
+        },
+        sql::{
+            execute_result::TsurugiFfiSqlExecuteResult,
+            explain::TsurugiFfiSqlExplainResult,
+            prepare::prepared_statement::TsurugiFfiSqlPreparedStatement,
+            query_result::TsurugiFfiSqlQueryResult,
+            r#type::{
+                blob::{TsurugiFfiBlob, TsurugiFfiBlobHandle},
+                clob::{TsurugiFfiClob, TsurugiFfiClobHandle},
+                large_object::{TsurugiFfiLargeObjectCache, TsurugiFfiLargeObjectCacheHandle},
+            },
+            table_list::TsurugiFfiTableList,
+            table_metadata::TsurugiFfiTableMetadata,
+        },
     },
     transaction::{
         commit_option::TsurugiFfiCommitOptionHandle,
@@ -44,6 +56,45 @@ use super::{
     table_list::TsurugiFfiTableListHandle,
     table_metadata::TsurugiFfiTableMetadataHandle,
 };
+
+/// Large object (BLOB/CLOB) operation type.
+///
+/// since 0.10.0
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(i32)]
+pub enum TsurugiFfiLobOperation {
+    /// upload_lob_file
+    UploadLobFile = 11,
+    /// upload_lob
+    UploadLob = 12,
+    /// create_lob_uploader
+    CreateLobUploader = 13,
+    /// open_lob
+    OpenLob = 21,
+    /// get_lob_cache
+    GetLobCache = 22,
+    /// read_lob
+    ReadLob = 23,
+    /// copy_lob_to
+    CopyLobTo = 24,
+    /// create_lob_downloader
+    CreateLobDownloader = 25,
+}
+
+impl From<TsurugiFfiLobOperation> for LobOperation {
+    fn from(value: TsurugiFfiLobOperation) -> Self {
+        match value {
+            TsurugiFfiLobOperation::UploadLobFile => Self::UploadLobFile,
+            TsurugiFfiLobOperation::UploadLob => Self::UploadLob,
+            TsurugiFfiLobOperation::CreateLobUploader => Self::CreateLobUploader,
+            TsurugiFfiLobOperation::OpenLob => Self::OpenLob,
+            TsurugiFfiLobOperation::GetLobCache => Self::GetLobCache,
+            TsurugiFfiLobOperation::ReadLob => Self::ReadLob,
+            TsurugiFfiLobOperation::CopyLobTo => Self::CopyLobTo,
+            TsurugiFfiLobOperation::CreateLobDownloader => Self::CreateLobDownloader,
+        }
+    }
+}
 
 pub(crate) struct TsurugiFfiSqlClient {
     sql_client: SqlClient,
@@ -2687,6 +2738,895 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
     rc
 }
 
+/// SqlClient: Check whether LOB operation is supported in the current lob transfer type.
+///
+/// See [`SqlClient::allows_lob_operation`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `operation` - LOB operation.
+///
+/// # Returns
+/// - `allows_out` - true if the LOB operation is allowed, false otherwise.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_allows_lob_operation(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    operation: TsurugiFfiLobOperation,
+    allows_out: *mut bool,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_allows_lob_operation()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, operation={:?}, allows_out={:?}",
+        context,
+        sql_client,
+        operation as i32,
+        allows_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, allows_out);
+
+    let client = unsafe { &*sql_client };
+
+    let runtime = client.runtime();
+    let allows = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.allows_lob_operation(operation.into())
+    );
+
+    unsafe {
+        *allows_out = allows;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. allows={}", rc, allows);
+    rc
+}
+
+/// SqlClient: Uploads a file as a BLOB.
+///
+/// See [`SqlClient::upload_blob_file`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `path` - file path.
+///
+/// # Returns
+/// - `blob_out` - BLOB. To dispose, call [`tsurugi_ffi_blob_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_blob_file(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    path: TsurugiFfiStringHandle,
+    blob_out: *mut TsurugiFfiBlobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_blob_file()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, path={:?}, blob_out={:?}",
+        context,
+        sql_client,
+        path,
+        blob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob_out);
+
+    let client = unsafe { &*sql_client };
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_blob_file(path)
+    );
+
+    let blob = Box::new(TsurugiFfiBlob::new(value));
+    let handle = Box::into_raw(blob);
+    unsafe {
+        *blob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads a file as a BLOB.
+///
+/// See [`SqlClient::upload_blob_file_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `path` - file path.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `blob_out` - BLOB. To dispose, call [`tsurugi_ffi_blob_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_blob_file_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    path: TsurugiFfiStringHandle,
+    timeout: TsurugiFfiDuration,
+    blob_out: *mut TsurugiFfiBlobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_blob_file_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, path={:?}, timeout={:?}, blob_out={:?}",
+        context,
+        sql_client,
+        path,
+        timeout,
+        blob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, blob_out);
+
+    let client = unsafe { &*sql_client };
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_blob_file_for(path, timeout)
+    );
+
+    let blob = Box::new(TsurugiFfiBlob::new(value));
+    let handle = Box::into_raw(blob);
+    unsafe {
+        *blob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads a file as a BLOB.
+///
+/// See [`SqlClient::upload_blob_file_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `path` - file path.
+///
+/// # Returns
+/// - `blob_job_out` - Job for `TsurugiFfiBlobHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiBlobHandle` and call [`tsurugi_ffi_blob_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_dispose) to dispose.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_blob_file_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    path: TsurugiFfiStringHandle,
+    blob_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_blob_file_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, path={:?}, blob_job_out={:?}",
+        context,
+        sql_client,
+        path,
+        blob_job_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob_job_out);
+
+    let client = unsafe { &*sql_client };
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_blob_file_async(path)
+    );
+
+    let job = TsurugiFfiJob::new(job, Box::new(BlobJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *blob_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob_job={:?}", rc, handle);
+    rc
+}
+
+impl_job_delegator! {
+    BlobJobDelegator,
+    TgBlob,
+    TsurugiFfiBlob,
+    "blob",
+}
+
+impl BlobJobDelegator {
+    fn convert(value: TgBlob, _runtime: Arc<tokio::runtime::Runtime>) -> Option<TsurugiFfiBlob> {
+        Some(TsurugiFfiBlob::new(value))
+    }
+}
+
+/// SqlClient: Uploads a file as a CLOB.
+///
+/// See [`SqlClient::upload_clob_file`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `path` - file path.
+///
+/// # Returns
+/// - `clob_out` - CLOB. To dispose, call [`tsurugi_ffi_clob_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_clob_file(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    path: TsurugiFfiStringHandle,
+    clob_out: *mut TsurugiFfiClobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_clob_file()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, path={:?}, clob_out={:?}",
+        context,
+        sql_client,
+        path,
+        clob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob_out);
+
+    let client = unsafe { &*sql_client };
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_clob_file(path)
+    );
+
+    let clob = Box::new(TsurugiFfiClob::new(value));
+    let handle = Box::into_raw(clob);
+    unsafe {
+        *clob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads a file as a CLOB.
+///
+/// See [`SqlClient::upload_clob_file_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `path` - file path.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `clob_out` - CLOB. To dispose, call [`tsurugi_ffi_clob_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_clob_file_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    path: TsurugiFfiStringHandle,
+    timeout: TsurugiFfiDuration,
+    clob_out: *mut TsurugiFfiClobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_clob_file_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, path={:?}, timeout={:?}, clob_out={:?}",
+        context,
+        sql_client,
+        path,
+        timeout,
+        clob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, clob_out);
+
+    let client = unsafe { &*sql_client };
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_clob_file_for(path, timeout)
+    );
+
+    let clob = Box::new(TsurugiFfiClob::new(value));
+    let handle = Box::into_raw(clob);
+    unsafe {
+        *clob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads a file as a CLOB.
+///
+/// See [`SqlClient::upload_clob_file_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `path` - file path.
+///
+/// # Returns
+/// - `clob_job_out` - Job for `TsurugiFfiClobHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiClobHandle` and call [`tsurugi_ffi_clob_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_dispose) to dispose.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_clob_file_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    path: TsurugiFfiStringHandle,
+    clob_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_clob_file_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, path={:?}, clob_job_out={:?}",
+        context,
+        sql_client,
+        path,
+        clob_job_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, path);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob_job_out);
+
+    let client = unsafe { &*sql_client };
+    let path = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, path);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_clob_file_async(path)
+    );
+
+    let job = TsurugiFfiJob::new(job, Box::new(ClobJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *clob_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob_job={:?}", rc, handle);
+    rc
+}
+
+impl_job_delegator! {
+    ClobJobDelegator,
+    TgClob,
+    TsurugiFfiClob,
+    "clob",
+}
+
+impl ClobJobDelegator {
+    fn convert(value: TgClob, _runtime: Arc<tokio::runtime::Runtime>) -> Option<TsurugiFfiClob> {
+        Some(TsurugiFfiClob::new(value))
+    }
+}
+
+/// SqlClient: Uploads data as a BLOB.
+///
+/// See [`SqlClient::upload_blob`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `value` - data pointer.
+/// - `size` - data size \[bytes\].
+///
+/// # Returns
+/// - `blob_out` - BLOB. To dispose, call [`tsurugi_ffi_blob_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_blob(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    value: TsurugiFfiByteArrayHandle,
+    size: u64,
+    blob_out: *mut TsurugiFfiBlobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_blob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, value={:?}, size={:?}, blob_out={:?}",
+        context,
+        sql_client,
+        value,
+        size,
+        blob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    if size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, blob_out);
+
+    let client = unsafe { &*sql_client };
+    let value = unsafe { std::slice::from_raw_parts(value, size as usize) };
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.upload_blob(value));
+
+    let blob = Box::new(TsurugiFfiBlob::new(value));
+    let handle = Box::into_raw(blob);
+    unsafe {
+        *blob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads data as a BLOB.
+///
+/// See [`SqlClient::upload_blob_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `value` - data pointer.
+/// - `size` - data size \[bytes\].
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `blob_out` - BLOB. To dispose, call [`tsurugi_ffi_blob_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_blob_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    value: TsurugiFfiByteArrayHandle,
+    size: u64,
+    timeout: TsurugiFfiDuration,
+    blob_out: *mut TsurugiFfiBlobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_blob_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, value={:?}, size={:?}, timeout={:?}, blob_out={:?}",
+        context,
+        sql_client,
+        value,
+        size,
+        timeout,
+        blob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    if size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, blob_out);
+
+    let client = unsafe { &*sql_client };
+    let value = unsafe { std::slice::from_raw_parts(value, size as usize) };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_blob_for(value, timeout)
+    );
+
+    let blob = Box::new(TsurugiFfiBlob::new(value));
+    let handle = Box::into_raw(blob);
+    unsafe {
+        *blob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads data as a BLOB.
+///
+/// See [`SqlClient::upload_blob_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `value` - data pointer.
+/// - `size` - data size \[bytes\].
+///
+/// # Returns
+/// - `blob_job_out` - Job for `TsurugiFfiBlobHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiBlobHandle` and call [`tsurugi_ffi_blob_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_dispose) to dispose.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_blob_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    value: TsurugiFfiByteArrayHandle,
+    size: u64,
+    blob_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_blob_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, value={:?}, size={:?}, blob_job_out={:?}",
+        context,
+        sql_client,
+        value,
+        size,
+        blob_job_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    if size > 0 {
+        ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    }
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, blob_job_out);
+
+    let client = unsafe { &*sql_client };
+    let value = unsafe { std::slice::from_raw_parts(value, size as usize) };
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_blob_async(value)
+    );
+
+    let job = TsurugiFfiJob::new(job, Box::new(BlobJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *blob_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. blob_job={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads data as a CLOB.
+///
+/// See [`SqlClient::upload_clob`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `value` - string.
+///
+/// # Returns
+/// - `clob_out` - CLOB. To dispose, call [`tsurugi_ffi_clob_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_clob(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    value: TsurugiFfiStringHandle,
+    clob_out: *mut TsurugiFfiClobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_clob()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, value={:?}, clob_out={:?}",
+        context,
+        sql_client,
+        value,
+        clob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob_out);
+
+    let client = unsafe { &*sql_client };
+    let value = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, value);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(context, FUNCTION_NAME, runtime, client.upload_clob(value));
+
+    let clob = Box::new(TsurugiFfiClob::new(value));
+    let handle = Box::into_raw(clob);
+    unsafe {
+        *clob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads data as a CLOB.
+///
+/// See [`SqlClient::upload_clob_for`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `value` - data pointer.
+/// - `size` - data size \[bytes\].
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `clob_out` - CLOB. To dispose, call [`tsurugi_ffi_clob_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_clob_for(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    value: TsurugiFfiStringHandle,
+    timeout: TsurugiFfiDuration,
+    clob_out: *mut TsurugiFfiClobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_clob_for()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, value={:?}, timeout={:?}, clob_out={:?}",
+        context,
+        sql_client,
+        value,
+        timeout,
+        clob_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 4, clob_out);
+
+    let client = unsafe { &*sql_client };
+    let value = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, value);
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let value = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_clob_for(value, timeout)
+    );
+
+    let clob = Box::new(TsurugiFfiClob::new(value));
+    let handle = Box::into_raw(clob);
+    unsafe {
+        *clob_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob={:?}", rc, handle);
+    rc
+}
+
+/// SqlClient: Uploads data as a CLOB.
+///
+/// See [`SqlClient::upload_clob_async`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `value` - data pointer.
+/// - `size` - data size \[bytes\].
+///
+/// # Returns
+/// - `clob_job_out` - Job for `TsurugiFfiClobHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
+///   Handle taken from Job casts to `TsurugiFfiClobHandle` and call [`tsurugi_ffi_clob_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_dispose) to dispose.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_upload_clob_async(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    value: TsurugiFfiStringHandle,
+    clob_job_out: *mut TsurugiFfiJobHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_upload_clob_async()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, value={:?}, clob_job_out={:?}",
+        context,
+        sql_client,
+        value,
+        clob_job_out
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, value);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob_job_out);
+
+    let client = unsafe { &*sql_client };
+    let value = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, value);
+
+    let runtime = client.runtime();
+    let job = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.upload_clob_async(value)
+    );
+
+    let job = TsurugiFfiJob::new(job, Box::new(ClobJobDelegator {}), runtime.clone());
+    let job = Box::new(job);
+
+    let handle = Box::into_raw(job);
+    unsafe {
+        *clob_job_out = handle as TsurugiFfiJobHandle;
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}. clob_job={:?}", rc, handle);
+    rc
+}
+
+/// Creates a BLOB uploader.
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Returns
+/// - `blob_uploader_out` - Blob uploader. To dispose, call [`tsurugi_ffi_blob_uploader_dispose`](crate::service::lob::blob_uploader::tsurugi_ffi_blob_uploader_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_create_blob_uploader(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    blob_uploader_out: *mut TsurugiFfiBlobUploaderHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_create_blob_uploader()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, blob_uploader_out={:?}",
+        context,
+        sql_client,
+        blob_uploader_out
+    );
+
+    ffi_arg_out_initialize!(blob_uploader_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, blob_uploader_out);
+
+    let client = unsafe { &*sql_client };
+
+    let runtime = client.runtime();
+    let uploader = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.create_blob_uploader()
+    );
+
+    let uploader = Box::new(TsurugiFfiBlobUploader::new(uploader, runtime.clone()));
+    let handle = Box::into_raw(uploader);
+    unsafe {
+        *blob_uploader_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. blob_uploader={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// Creates a CLOB uploader.
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Returns
+/// - `clob_uploader_out` - Clob uploader. To dispose, call [`tsurugi_ffi_clob_uploader_dispose`](crate::service::lob::clob_uploader::tsurugi_ffi_clob_uploader_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_create_clob_uploader(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    clob_uploader_out: *mut TsurugiFfiClobUploaderHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_create_clob_uploader()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, clob_uploader_out={:?}",
+        context,
+        sql_client,
+        clob_uploader_out
+    );
+
+    ffi_arg_out_initialize!(clob_uploader_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, clob_uploader_out);
+
+    let client = unsafe { &*sql_client };
+
+    let runtime = client.runtime();
+    let uploader = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.create_clob_uploader()
+    );
+
+    let uploader = Box::new(TsurugiFfiClobUploader::new(uploader, runtime.clone()));
+    let handle = Box::into_raw(uploader);
+    unsafe {
+        *clob_uploader_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. clob_uploader={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
 /// SqlClient: Get BLOB cache.
 ///
 /// See [`SqlClient::get_blob_cache`].
@@ -2699,7 +3639,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_prepared_query_async(
 /// - `blob` - BLOB.
 ///
 /// # Returns
-/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::large_object::tsurugi_ffi_large_object_cache_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache(
     context: TsurugiFfiContextHandle,
@@ -2763,7 +3703,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache(
 /// - `timeout` - timeout time \[nanoseconds\].
 ///
 /// # Returns
-/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::large_object::tsurugi_ffi_large_object_cache_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache_for(
     context: TsurugiFfiContextHandle,
@@ -2830,7 +3770,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache_for(
 ///
 /// # Returns
 /// - `large_object_cache_job_out` - Job for `TsurugiFfiLargeObjectCacheHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
-///   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose) to dispose.
+///   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::large_object::tsurugi_ffi_large_object_cache_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache_async(
     context: TsurugiFfiContextHandle,
@@ -2899,7 +3839,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_blob_cache_async(
 /// - `clob` - CLOB.
 ///
 /// # Returns
-/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::large_object::tsurugi_ffi_large_object_cache_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache(
     context: TsurugiFfiContextHandle,
@@ -2962,7 +3902,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache(
 /// - `clob` - CLOB.
 ///
 /// # Returns
-/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose).
+/// - `large_object_cache_out` - large object cache. To dispose, call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::large_object::tsurugi_ffi_large_object_cache_dispose).
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache_for(
     context: TsurugiFfiContextHandle,
@@ -3029,7 +3969,7 @@ pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache_for(
 ///
 /// # Returns
 /// - `large_object_cache_job_out` - Job for `TsurugiFfiLargeObjectCacheHandle`. To dispose, call [`tsurugi_ffi_job_dispose`](crate::job::tsurugi_ffi_job_dispose).
-///   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::lob::tsurugi_ffi_large_object_cache_dispose) to dispose.
+///   Handle taken from Job casts to `TsurugiFfiLargeObjectCacheHandle` and call [`tsurugi_ffi_large_object_cache_dispose`](crate::service::sql::type::large_object::tsurugi_ffi_large_object_cache_dispose) to dispose.
 #[no_mangle]
 pub extern "C" fn tsurugi_ffi_sql_client_get_clob_cache_async(
     context: TsurugiFfiContextHandle,
@@ -3728,6 +4668,144 @@ pub extern "C" fn tsurugi_ffi_sql_client_copy_clob_to_async(
     let rc = rc_ok(context);
     trace!(
         "{FUNCTION_NAME} end rc={:x}. copy_clob_to_job={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Create BLOB downloader.
+///
+/// See [`SqlClient::create_blob_downloader`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `blob` - BLOB.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `blob_downloader_out` - BLOB downloader. To dispose, call [`tsurugi_ffi_blob_downloader_dispose`](crate::service::lob::blob_downloader::tsurugi_ffi_blob_downloader_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_create_blob_downloader(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    blob: TsurugiFfiBlobReferenceHandle,
+    timeout: TsurugiFfiDuration,
+    blob_downloader_out: *mut TsurugiFfiBlobDownloaderHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_create_blob_downloader()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, blob={:?}, timeout={:?}, blob_downloader_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        blob,
+        timeout,
+        blob_downloader_out
+    );
+
+    ffi_arg_out_initialize!(blob_downloader_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, blob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, blob_downloader_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let blob = unsafe { &mut *blob };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let downloader = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.create_blob_downloader(transaction, blob, timeout)
+    );
+    let downloader = Box::new(TsurugiFfiBlobDownloader::new(downloader, runtime.clone()));
+    let handle = Box::into_raw(downloader);
+    unsafe {
+        *blob_downloader_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. blob_downloader={:?}",
+        rc,
+        handle
+    );
+    rc
+}
+
+/// SqlClient: Create CLOB downloader.
+///
+/// See [`SqlClient::create_clob_downloader`].
+///
+/// # Receiver
+/// - `sql_client` - Sql client.
+///
+/// # Parameters
+/// - `transaction` - transaction.
+/// - `clob` - CLOB.
+/// - `timeout` - timeout time \[nanoseconds\].
+///
+/// # Returns
+/// - `clob_downloader_out` - CLOB downloader. To dispose, call [`tsurugi_ffi_clob_downloader_dispose`](crate::service::lob::clob_downloader::tsurugi_ffi_clob_downloader_dispose).
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_sql_client_create_clob_downloader(
+    context: TsurugiFfiContextHandle,
+    sql_client: TsurugiFfiSqlClientHandle,
+    transaction: TsurugiFfiTransactionHandle,
+    clob: TsurugiFfiClobReferenceHandle,
+    timeout: TsurugiFfiDuration,
+    clob_downloader_out: *mut TsurugiFfiClobDownloaderHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_sql_client_create_clob_downloader()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, sql_client={:?}, transaction={:?}, clob={:?}, timeout={:?}, clob_downloader_out={:?}",
+        context,
+        sql_client,
+        transaction,
+        clob,
+        timeout,
+        clob_downloader_out
+    );
+
+    ffi_arg_out_initialize!(clob_downloader_out, std::ptr::null_mut());
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, sql_client);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, transaction);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 3, clob);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 5, clob_downloader_out);
+
+    let client = unsafe { &*sql_client };
+    let transaction = unsafe { &*transaction };
+    let clob = unsafe { &mut *clob };
+    let timeout = Duration::from_nanos(timeout);
+
+    let runtime = client.runtime();
+    let downloader = ffi_exec_core_async!(
+        context,
+        FUNCTION_NAME,
+        runtime,
+        client.create_clob_downloader(transaction, clob, timeout)
+    );
+    let downloader = Box::new(TsurugiFfiClobDownloader::new(downloader, runtime.clone()));
+    let handle = Box::into_raw(downloader);
+    unsafe {
+        *clob_downloader_out = handle;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. clob_downloader={:?}",
         rc,
         handle
     );

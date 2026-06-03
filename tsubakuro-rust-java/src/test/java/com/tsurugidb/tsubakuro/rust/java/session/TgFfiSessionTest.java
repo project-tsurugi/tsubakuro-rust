@@ -127,6 +127,51 @@ class TgFfiSessionTest extends TgFfiTester {
     }
 
     @Test
+    void get_lob_transfer_type() {
+        var manager = getFfiObjectManager();
+        var context = TgFfiContext.create(manager);
+
+        var connectionOption = TgFfiConnectionOption.create(context);
+        connectionOption.setEndpointUrl(context, getEndpoint());
+        connectionOption.setCredential(context, getCredential(context));
+
+        connectionOption.setLobTransferType(context, TgFfiLobTransferType.NOT_USE);
+        try (var session = TgFfiSession.connect(context, connectionOption)) {
+            var lobTransferType = session.getLobTransferType(context);
+
+            assertEquals(TgFfiLobTransferType.NOT_USE, lobTransferType);
+        }
+
+        connectionOption.setLobTransferType(context, TgFfiLobTransferType.DEFAULT);
+        try (var session = TgFfiSession.connect(context, connectionOption)) {
+            var lobTransferType = session.getLobTransferType(context);
+
+            assertTrue(lobTransferType == TgFfiLobTransferType.RELAY || lobTransferType == TgFfiLobTransferType.NOT_USE);
+        }
+    }
+
+    @Test
+    void get_lob_transfer_type_argError() {
+        var manager = getFfiObjectManager();
+        var context = TgFfiContext.create(manager);
+
+        {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var out = manager.allocateIntOut();
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_lob_transfer_type(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var session = createSession()) {
+            var ctx = context.handle();
+            var handle = session.handle();
+            var out = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_lob_transfer_type(ctx, handle, out);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+    }
+
+    @Test
     void set_default_timeout() {
         var manager = getFfiObjectManager();
         var context = TgFfiContext.create(manager);

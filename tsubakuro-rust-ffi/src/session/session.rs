@@ -14,6 +14,7 @@ use crate::{
         sql::{TsurugiFfiSqlClient, TsurugiFfiSqlClientHandle},
         system::{TsurugiFfiSystemClient, TsurugiFfiSystemClientHandle},
     },
+    session::r#type::TsurugiFfiLobTransferType,
     TsurugiFfiDuration, TsurugiFfiStringHandle,
 };
 
@@ -277,6 +278,52 @@ pub extern "C" fn tsurugi_ffi_session_get_user_name(
 
     let rc = rc_ok(context);
     trace!("{FUNCTION_NAME} end rc={:x}. (user_name={:?})", rc, ptr);
+    rc
+}
+
+/// Session: Get large object transfer type.
+///
+/// See [`Session::lob_transfer_type`].
+///
+/// # Receiver
+/// - `session` - Session.
+///
+/// # Returns
+/// - `lob_transfer_type_out` - large object transfer type.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_session_get_lob_transfer_type(
+    context: TsurugiFfiContextHandle,
+    session: TsurugiFfiSessionHandle,
+    lob_transfer_type_out: *mut TsurugiFfiLobTransferType,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_session_get_lob_transfer_type()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, session={:?}, lob_transfer_type_out={:?}",
+        context,
+        session,
+        lob_transfer_type_out
+    );
+
+    ffi_arg_out_initialize!(lob_transfer_type_out, TsurugiFfiLobTransferType::Default);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, session);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, lob_transfer_type_out);
+
+    let session = unsafe { &mut *session };
+
+    let lob_transfer_type = session.lob_transfer_type();
+    let value: TsurugiFfiLobTransferType = lob_transfer_type.into();
+    unsafe {
+        *lob_transfer_type_out = value;
+    }
+
+    let rc = rc_ok(context);
+    trace!(
+        "{FUNCTION_NAME} end rc={:x}. (lob_transfer_type={:?})",
+        rc,
+        value as i32
+    );
     rc
 }
 
