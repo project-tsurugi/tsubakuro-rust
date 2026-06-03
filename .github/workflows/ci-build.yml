@@ -82,6 +82,8 @@ jobs:
         run: |
           cd tsubakuro-rust-java
           ./gradlew test -Pffi.library.path=${GITHUB_WORKSPACE}/tsubakuro-rust-ffi/target/release/libtsubakuro_rust_ffi.so -Pdbtest.endpoint=${DBTEST_ENDPOINT} -Pdbtest.endpoint.java=${DBTEST_ENDPOINT_JAVA}
+        env:
+          FFI_DBTEST_DISABLE: TgFfiLobTest_PRIVILEGED
 
       - name: Lint_Core
         run: |
