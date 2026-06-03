@@ -12,63 +12,17 @@ import java.util.stream.*;
 import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
 
-public class tsubakuro_rust_ffi_h {
+public class tsubakuro_rust_ffi_h extends tsubakuro_rust_ffi_h$shared {
 
     tsubakuro_rust_ffi_h() {
         // Should not be called directly
     }
 
     static final Arena LIBRARY_ARENA = Arena.ofAuto();
-    static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
-
-    static void traceDowncall(String name, Object... args) {
-         String traceArgs = Arrays.stream(args)
-                       .map(Object::toString)
-                       .collect(Collectors.joining(", "));
-         System.out.printf("%s(%s)\n", name, traceArgs);
-    }
-
-    static MemorySegment findOrThrow(String symbol) {
-        return SYMBOL_LOOKUP.find(symbol)
-            .orElseThrow(() -> new UnsatisfiedLinkError("unresolved symbol: " + symbol));
-    }
-
-    static MethodHandle upcallHandle(Class<?> fi, String name, FunctionDescriptor fdesc) {
-        try {
-            return MethodHandles.lookup().findVirtual(fi, name, fdesc.toMethodType());
-        } catch (ReflectiveOperationException ex) {
-            throw new AssertionError(ex);
-        }
-    }
-
-    static MemoryLayout align(MemoryLayout layout, long align) {
-        return switch (layout) {
-            case PaddingLayout p -> p;
-            case ValueLayout v -> v.withByteAlignment(align);
-            case GroupLayout g -> {
-                MemoryLayout[] alignedMembers = g.memberLayouts().stream()
-                        .map(m -> align(m, align)).toArray(MemoryLayout[]::new);
-                yield g instanceof StructLayout ?
-                        MemoryLayout.structLayout(alignedMembers) : MemoryLayout.unionLayout(alignedMembers);
-            }
-            case SequenceLayout s -> MemoryLayout.sequenceLayout(s.elementCount(), align(s.elementLayout(), align));
-        };
-    }
 
     static final SymbolLookup SYMBOL_LOOKUP = SymbolLookup.loaderLookup()
             .or(Linker.nativeLinker().defaultLookup());
 
-    public static final ValueLayout.OfBoolean C_BOOL = ValueLayout.JAVA_BOOLEAN;
-    public static final ValueLayout.OfByte C_CHAR = ValueLayout.JAVA_BYTE;
-    public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
-    public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
-    public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
-    public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
-    public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
-    public static final AddressLayout C_POINTER = ValueLayout.ADDRESS
-            .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
-    public static final ValueLayout.OfInt C_LONG = ValueLayout.JAVA_INT;
-    public static final ValueLayout.OfDouble C_LONG_DOUBLE = ValueLayout.JAVA_DOUBLE;
     private static final int __GNUC_VA_LIST = (int)1L;
     /**
      * {@snippet lang=c :
@@ -384,6 +338,15 @@ public class tsubakuro_rust_ffi_h {
     public static int _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES_MEMORY() {
         return _CRT_SECURE_CPP_OVERLOAD_SECURE_NAMES_MEMORY;
     }
+    private static final int _STATIC_INLINE_UCRT_FUNCTIONS = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * #define _STATIC_INLINE_UCRT_FUNCTIONS 1
+     * }
+     */
+    public static int _STATIC_INLINE_UCRT_FUNCTIONS() {
+        return _STATIC_INLINE_UCRT_FUNCTIONS;
+    }
     private static final int CHAR_BIT = (int)8L;
     /**
      * {@snippet lang=c :
@@ -620,7 +583,7 @@ public class tsubakuro_rust_ffi_h {
         private static final FunctionDescriptor BASE_DESC = FunctionDescriptor.ofVoid(
                 tsubakuro_rust_ffi_h.C_POINTER
             );
-        private static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__va_start");
+        private static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__va_start");
 
         private final MethodHandle handle;
         private final FunctionDescriptor descriptor;
@@ -672,7 +635,7 @@ public class tsubakuro_rust_ffi_h {
                 if (TRACE_DOWNCALLS) {
                     traceDowncall("__va_start", x0, x1);
                 }
-                spreader.invokeExact(x0, x1);
+                 spreader.invokeExact(x0, x1);
             } catch(IllegalArgumentException | ClassCastException ex$)  {
                 throw ex$; // rethrow IAE from passing wrong number/type of args
             } catch (Throwable ex$) {
@@ -714,7 +677,7 @@ public class tsubakuro_rust_ffi_h {
     private static class __security_init_cookie {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__security_init_cookie");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__security_init_cookie");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -761,6 +724,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__security_init_cookie");
             }
             mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -771,7 +736,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__security_check_cookie");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__security_check_cookie");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -818,6 +783,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__security_check_cookie", _StackCookie);
             }
             mh$.invokeExact(_StackCookie);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -828,7 +795,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__report_gsfailure");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__report_gsfailure");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -875,6 +842,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__report_gsfailure", _StackCookie);
             }
             mh$.invokeExact(_StackCookie);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -882,7 +851,7 @@ public class tsubakuro_rust_ffi_h {
 
     private static class __security_cookie$constants {
         public static final OfLong LAYOUT = tsubakuro_rust_ffi_h.C_LONG_LONG;
-        public static final MemorySegment SEGMENT = tsubakuro_rust_ffi_h.findOrThrow("__security_cookie").reinterpret(LAYOUT.byteSize());
+        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("__security_cookie").reinterpret(LAYOUT.byteSize());
     }
 
     /**
@@ -1090,7 +1059,7 @@ public class tsubakuro_rust_ffi_h {
     private static class _invalid_parameter_noinfo {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_invalid_parameter_noinfo");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_invalid_parameter_noinfo");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1137,6 +1106,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_invalid_parameter_noinfo");
             }
             mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1145,7 +1116,7 @@ public class tsubakuro_rust_ffi_h {
     private static class _invalid_parameter_noinfo_noreturn {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_invalid_parameter_noinfo_noreturn");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_invalid_parameter_noinfo_noreturn");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1192,6 +1163,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_invalid_parameter_noinfo_noreturn");
             }
             mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1206,7 +1179,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_invoke_watson");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_invoke_watson");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1253,6 +1226,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_invoke_watson", _Expression, _FunctionName, _FileName, _LineNo, _Reserved);
             }
             mh$.invokeExact(_Expression, _FunctionName, _FileName, _LineNo, _Reserved);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1313,7 +1288,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_calloc_base");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_calloc_base");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1360,6 +1335,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_calloc_base", _Count, _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Count, _Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1372,7 +1349,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("calloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("calloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1419,6 +1396,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("calloc", _Count, _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Count, _Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1430,7 +1409,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_callnewh");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_callnewh");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1477,6 +1456,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_callnewh", _Size);
             }
             return (int)mh$.invokeExact(_Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1489,7 +1470,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_expand");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_expand");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1536,6 +1517,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_expand", _Block, _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1546,7 +1529,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_free_base");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_free_base");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1593,6 +1576,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_free_base", _Block);
             }
             mh$.invokeExact(_Block);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1603,7 +1588,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("free");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("free");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1650,6 +1635,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("free", _Block);
             }
             mh$.invokeExact(_Block);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1661,7 +1648,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_malloc_base");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_malloc_base");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1708,6 +1695,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_malloc_base", _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1719,7 +1708,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("malloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("malloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1766,6 +1755,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("malloc", _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1777,7 +1768,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_msize_base");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_msize_base");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1824,6 +1815,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_msize_base", _Block);
             }
             return (long)mh$.invokeExact(_Block);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1835,7 +1828,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_msize");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_msize");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1882,6 +1875,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_msize", _Block);
             }
             return (long)mh$.invokeExact(_Block);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1894,7 +1889,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_realloc_base");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_realloc_base");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -1941,6 +1936,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_realloc_base", _Block, _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -1953,7 +1950,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("realloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("realloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2000,6 +1997,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("realloc", _Block, _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2013,7 +2012,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_recalloc_base");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_recalloc_base");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2060,6 +2059,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_recalloc_base", _Block, _Count, _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Count, _Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2073,7 +2074,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_recalloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_recalloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2120,6 +2121,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_recalloc", _Block, _Count, _Size);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Count, _Size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2130,7 +2133,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_free");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_free");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2177,6 +2180,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_free", _Block);
             }
             mh$.invokeExact(_Block);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2189,7 +2194,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_malloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_malloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2236,6 +2241,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_malloc", _Size, _Alignment);
             }
             return (MemorySegment)mh$.invokeExact(_Size, _Alignment);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2249,7 +2256,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_offset_malloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_offset_malloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2296,6 +2303,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_offset_malloc", _Size, _Alignment, _Offset);
             }
             return (MemorySegment)mh$.invokeExact(_Size, _Alignment, _Offset);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2309,7 +2318,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_msize");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_msize");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2356,6 +2365,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_msize", _Block, _Alignment, _Offset);
             }
             return (long)mh$.invokeExact(_Block, _Alignment, _Offset);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2370,7 +2381,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_offset_realloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_offset_realloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2417,6 +2428,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_offset_realloc", _Block, _Size, _Alignment, _Offset);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Size, _Alignment, _Offset);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2432,7 +2445,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_offset_recalloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_offset_recalloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2479,6 +2492,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_offset_recalloc", _Block, _Count, _Size, _Alignment, _Offset);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Count, _Size, _Alignment, _Offset);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2492,7 +2507,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_realloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_realloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2539,6 +2554,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_realloc", _Block, _Size, _Alignment);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Size, _Alignment);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2553,7 +2570,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_aligned_recalloc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_aligned_recalloc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2600,6 +2617,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_aligned_recalloc", _Block, _Count, _Size, _Alignment);
             }
             return (MemorySegment)mh$.invokeExact(_Block, _Count, _Size, _Alignment);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2622,7 +2641,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("bsearch_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("bsearch_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2669,6 +2688,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("bsearch_s", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2683,7 +2704,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("qsort_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("qsort_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2730,6 +2751,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("qsort_s", _Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
             }
             mh$.invokeExact(_Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2745,7 +2768,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("bsearch");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("bsearch");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2792,6 +2815,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("bsearch", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2805,7 +2830,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("qsort");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("qsort");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2852,6 +2877,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("qsort", _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
             }
             mh$.invokeExact(_Base, _NumOfElements, _SizeOfElements, _CompareFunction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2868,7 +2895,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_lfind_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_lfind_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2915,6 +2942,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_lfind_s", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2930,7 +2959,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_lfind");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_lfind");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -2977,6 +3006,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_lfind", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -2993,7 +3024,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_lsearch_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_lsearch_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3040,6 +3071,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_lsearch_s", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction, _Context);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3055,7 +3088,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_lsearch");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_lsearch");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3102,6 +3135,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_lsearch", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3117,7 +3152,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("lfind");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("lfind");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3164,6 +3199,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("lfind", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3179,7 +3216,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("lsearch");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("lsearch");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3226,6 +3263,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("lsearch", _Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
             }
             return (MemorySegment)mh$.invokeExact(_Key, _Base, _NumOfElements, _SizeOfElements, _CompareFunction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3240,7 +3279,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_itow_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_itow_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3287,6 +3326,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_itow_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3300,7 +3341,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_itow");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_itow");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3347,6 +3388,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_itow", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3361,7 +3404,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ltow_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ltow_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3408,6 +3451,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ltow_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3421,7 +3466,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ltow");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ltow");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3468,6 +3513,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ltow", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3482,7 +3529,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ultow_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ultow_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3529,6 +3576,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ultow_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3542,7 +3591,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ultow");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ultow");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3589,6 +3638,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ultow", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3601,7 +3652,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstod");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstod");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3648,6 +3699,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstod", _String, _EndPtr);
             }
             return (double)mh$.invokeExact(_String, _EndPtr);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3661,7 +3714,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstod_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstod_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3708,6 +3761,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstod_l", _String, _EndPtr, _Locale);
             }
             return (double)mh$.invokeExact(_String, _EndPtr, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3721,7 +3776,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstol");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstol");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3768,6 +3823,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstol", _String, _EndPtr, _Radix);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3782,7 +3839,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstol_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstol_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3829,6 +3886,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstol_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3842,7 +3901,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstoll");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstoll");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3889,6 +3948,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstoll", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3903,7 +3964,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstoll_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstoll_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -3950,6 +4011,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstoll_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -3963,7 +4026,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstoul");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstoul");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4010,6 +4073,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstoul", _String, _EndPtr, _Radix);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4024,7 +4089,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstoul_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstoul_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4071,6 +4136,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstoul_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4084,7 +4151,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstoull");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstoull");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4131,6 +4198,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstoull", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4145,7 +4214,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstoull_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstoull_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4192,6 +4261,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstoull_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4204,7 +4275,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstold");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstold");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4251,6 +4322,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstold", _String, _EndPtr);
             }
             return (double)mh$.invokeExact(_String, _EndPtr);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4264,7 +4337,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstold_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstold_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4311,6 +4384,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstold_l", _String, _EndPtr, _Locale);
             }
             return (double)mh$.invokeExact(_String, _EndPtr, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4323,7 +4398,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstof");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstof");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4370,6 +4445,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstof", _String, _EndPtr);
             }
             return (float)mh$.invokeExact(_String, _EndPtr);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4383,7 +4460,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstof_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstof_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4430,6 +4507,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstof_l", _String, _EndPtr, _Locale);
             }
             return (float)mh$.invokeExact(_String, _EndPtr, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4441,7 +4520,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtof");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtof");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4488,6 +4567,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtof", _String);
             }
             return (double)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4500,7 +4581,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtof_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtof_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4547,6 +4628,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtof_l", _String, _Locale);
             }
             return (double)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4558,7 +4641,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtoi");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtoi");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4605,6 +4688,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtoi", _String);
             }
             return (int)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4617,7 +4702,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtoi_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtoi_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4664,6 +4749,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtoi_l", _String, _Locale);
             }
             return (int)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4675,7 +4762,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtol");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtol");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4722,6 +4809,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtol", _String);
             }
             return (int)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4734,7 +4823,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtol_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtol_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4781,6 +4870,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtol_l", _String, _Locale);
             }
             return (int)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4792,7 +4883,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtoll");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtoll");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4839,6 +4930,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtoll", _String);
             }
             return (long)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4851,7 +4944,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtoll_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtoll_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4898,6 +4991,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtoll_l", _String, _Locale);
             }
             return (long)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4912,7 +5007,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_i64tow_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_i64tow_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -4959,6 +5054,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_i64tow_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -4972,7 +5069,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_i64tow");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_i64tow");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5019,6 +5116,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_i64tow", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5033,7 +5132,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ui64tow_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ui64tow_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5080,6 +5179,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ui64tow_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5093,7 +5194,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ui64tow");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ui64tow");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5140,6 +5241,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ui64tow", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5151,7 +5254,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtoi64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtoi64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5198,6 +5301,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtoi64", _String);
             }
             return (long)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5210,7 +5315,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wtoi64_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wtoi64_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5257,6 +5362,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wtoi64_l", _String, _Locale);
             }
             return (long)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5270,7 +5377,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstoi64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstoi64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5317,6 +5424,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstoi64", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5331,7 +5440,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstoi64_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstoi64_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5378,6 +5487,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstoi64_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5391,7 +5502,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstoui64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstoui64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5438,6 +5549,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstoui64", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5452,7 +5565,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstoui64_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstoui64_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5499,6 +5612,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstoui64_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5512,7 +5627,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wfullpath");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wfullpath");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5559,6 +5674,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wfullpath", _Buffer, _Path, _BufferCount);
             }
             return (MemorySegment)mh$.invokeExact(_Buffer, _Path, _BufferCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5575,7 +5692,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wmakepath_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wmakepath_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5622,6 +5739,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wmakepath_s", _Buffer, _BufferCount, _Drive, _Dir, _Filename, _Ext);
             }
             return (int)mh$.invokeExact(_Buffer, _BufferCount, _Drive, _Dir, _Filename, _Ext);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5636,7 +5755,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wmakepath");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wmakepath");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5683,6 +5802,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wmakepath", _Buffer, _Drive, _Dir, _Filename, _Ext);
             }
             mh$.invokeExact(_Buffer, _Drive, _Dir, _Filename, _Ext);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5693,7 +5814,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wperror");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wperror");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5740,6 +5861,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wperror", _ErrorMessage);
             }
             mh$.invokeExact(_ErrorMessage);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5754,7 +5877,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wsplitpath");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wsplitpath");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5801,6 +5924,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wsplitpath", _FullPath, _Drive, _Dir, _Filename, _Ext);
             }
             mh$.invokeExact(_FullPath, _Drive, _Dir, _Filename, _Ext);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5820,7 +5945,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wsplitpath_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wsplitpath_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5867,6 +5992,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wsplitpath_s", _FullPath, _Drive, _DriveCount, _Dir, _DirCount, _Filename, _FilenameCount, _Ext, _ExtCount);
             }
             return (int)mh$.invokeExact(_FullPath, _Drive, _DriveCount, _Dir, _DirCount, _Filename, _FilenameCount, _Ext, _ExtCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5880,7 +6007,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wdupenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wdupenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5927,6 +6054,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wdupenv_s", _Buffer, _BufferCount, _VarName);
             }
             return (int)mh$.invokeExact(_Buffer, _BufferCount, _VarName);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5938,7 +6067,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wgetenv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wgetenv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -5985,6 +6114,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wgetenv", _VarName);
             }
             return (MemorySegment)mh$.invokeExact(_VarName);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -5999,7 +6130,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wgetenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wgetenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6046,6 +6177,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wgetenv_s", _RequiredCount, _Buffer, _BufferCount, _VarName);
             }
             return (int)mh$.invokeExact(_RequiredCount, _Buffer, _BufferCount, _VarName);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6057,7 +6190,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wputenv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wputenv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6104,6 +6237,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wputenv", _EnvString);
             }
             return (int)mh$.invokeExact(_EnvString);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6116,7 +6251,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wputenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wputenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6163,6 +6298,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wputenv_s", _Name, _Value);
             }
             return (int)mh$.invokeExact(_Name, _Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6177,7 +6314,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wsearchenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wsearchenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6224,6 +6361,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wsearchenv_s", _Filename, _VarName, _Buffer, _BufferCount);
             }
             return (int)mh$.invokeExact(_Filename, _VarName, _Buffer, _BufferCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6236,7 +6375,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wsearchenv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wsearchenv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6283,6 +6422,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wsearchenv", _Filename, _VarName, _ResultPath);
             }
             mh$.invokeExact(_Filename, _VarName, _ResultPath);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6294,7 +6435,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wsystem");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wsystem");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6341,6 +6482,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wsystem", _Command);
             }
             return (int)mh$.invokeExact(_Command);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6353,7 +6496,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_swab");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_swab");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6400,6 +6543,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_swab", _Buf1, _Buf2, _SizeInBytes);
             }
             mh$.invokeExact(_Buf1, _Buf2, _SizeInBytes);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6410,7 +6555,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("exit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("exit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6457,6 +6602,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("exit", _Code);
             }
             mh$.invokeExact(_Code);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6467,7 +6614,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_exit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_exit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6514,6 +6661,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_exit", _Code);
             }
             mh$.invokeExact(_Code);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6524,7 +6673,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_Exit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_Exit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6571,6 +6720,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_Exit", _Code);
             }
             mh$.invokeExact(_Code);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6581,7 +6732,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("quick_exit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("quick_exit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6628,6 +6779,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("quick_exit", _Code);
             }
             mh$.invokeExact(_Code);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6636,7 +6789,7 @@ public class tsubakuro_rust_ffi_h {
     private static class abort {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("abort");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("abort");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6683,6 +6836,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("abort");
             }
             mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6695,7 +6850,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_abort_behavior");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_abort_behavior");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6742,6 +6897,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_abort_behavior", _Flags, _Mask);
             }
             return (int)mh$.invokeExact(_Flags, _Mask);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6753,7 +6910,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("atexit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("atexit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6800,6 +6957,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("atexit", x0);
             }
             return (int)mh$.invokeExact(x0);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6811,7 +6970,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_onexit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_onexit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6858,6 +7017,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_onexit", _Func);
             }
             return (MemorySegment)mh$.invokeExact(_Func);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6869,7 +7030,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("at_quick_exit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("at_quick_exit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6916,6 +7077,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("at_quick_exit", x0);
             }
             return (int)mh$.invokeExact(x0);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6927,7 +7090,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_purecall_handler");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_purecall_handler");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -6974,6 +7137,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_purecall_handler", _Handler);
             }
             return (MemorySegment)mh$.invokeExact(_Handler);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -6983,7 +7148,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_purecall_handler");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_purecall_handler");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7030,6 +7195,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_purecall_handler");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7041,7 +7208,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_invalid_parameter_handler");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_invalid_parameter_handler");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7088,6 +7255,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_invalid_parameter_handler", _Handler);
             }
             return (MemorySegment)mh$.invokeExact(_Handler);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7097,7 +7266,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_invalid_parameter_handler");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_invalid_parameter_handler");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7144,6 +7313,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_invalid_parameter_handler");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7155,7 +7326,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_thread_local_invalid_parameter_handler");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_thread_local_invalid_parameter_handler");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7202,6 +7373,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_thread_local_invalid_parameter_handler", _Handler);
             }
             return (MemorySegment)mh$.invokeExact(_Handler);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7211,7 +7384,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_thread_local_invalid_parameter_handler");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_thread_local_invalid_parameter_handler");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7258,6 +7431,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_thread_local_invalid_parameter_handler");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7269,7 +7444,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_error_mode");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_error_mode");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7316,6 +7491,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_error_mode", _Mode);
             }
             return (int)mh$.invokeExact(_Mode);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7325,7 +7502,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_errno");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_errno");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7372,6 +7549,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_errno");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7383,7 +7562,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_errno");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_errno");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7430,6 +7609,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_errno", _Value);
             }
             return (int)mh$.invokeExact(_Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7441,7 +7622,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_errno");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_errno");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7488,6 +7669,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_errno", _Value);
             }
             return (int)mh$.invokeExact(_Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7497,7 +7680,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__doserrno");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__doserrno");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7544,6 +7727,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__doserrno");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7555,7 +7740,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_doserrno");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_doserrno");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7602,6 +7787,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_doserrno", _Value);
             }
             return (int)mh$.invokeExact(_Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7613,7 +7800,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_doserrno");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_doserrno");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7660,6 +7847,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_doserrno", _Value);
             }
             return (int)mh$.invokeExact(_Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7669,7 +7858,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__sys_errlist");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__sys_errlist");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7716,6 +7905,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__sys_errlist");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7725,7 +7916,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__sys_nerr");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__sys_nerr");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7772,6 +7963,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__sys_nerr");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7782,7 +7975,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("perror");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("perror");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7829,6 +8022,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("perror", _ErrMsg);
             }
             mh$.invokeExact(_ErrMsg);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7838,7 +8033,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p__pgmptr");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p__pgmptr");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7885,6 +8080,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p__pgmptr");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7894,7 +8091,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p__wpgmptr");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p__wpgmptr");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7941,6 +8138,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p__wpgmptr");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -7950,7 +8149,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p__fmode");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p__fmode");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -7997,6 +8196,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p__fmode");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8008,7 +8209,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_pgmptr");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_pgmptr");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8055,6 +8256,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_pgmptr", _Value);
             }
             return (int)mh$.invokeExact(_Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8066,7 +8269,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_wpgmptr");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_wpgmptr");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8113,6 +8316,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_wpgmptr", _Value);
             }
             return (int)mh$.invokeExact(_Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8124,7 +8329,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_set_fmode");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_set_fmode");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8171,6 +8376,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_set_fmode", _Mode);
             }
             return (int)mh$.invokeExact(_Mode);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8182,7 +8389,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_get_fmode");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_get_fmode");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8229,6 +8436,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_get_fmode", _PMode);
             }
             return (int)mh$.invokeExact(_PMode);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8240,7 +8449,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("abs");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("abs");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8287,6 +8496,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("abs", _Number);
             }
             return (int)mh$.invokeExact(_Number);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8298,7 +8509,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("labs");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("labs");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8345,6 +8556,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("labs", _Number);
             }
             return (int)mh$.invokeExact(_Number);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8356,7 +8569,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("llabs");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("llabs");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8403,6 +8616,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("llabs", _Number);
             }
             return (long)mh$.invokeExact(_Number);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8414,7 +8629,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_abs64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_abs64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8461,6 +8676,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_abs64", _Number);
             }
             return (long)mh$.invokeExact(_Number);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8472,7 +8689,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_SHORT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_byteswap_ushort");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_byteswap_ushort");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8519,6 +8736,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_byteswap_ushort", _Number);
             }
             return (short)mh$.invokeExact(_Number);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8530,7 +8749,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_byteswap_ulong");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_byteswap_ulong");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8577,6 +8796,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_byteswap_ulong", _Number);
             }
             return (int)mh$.invokeExact(_Number);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8588,7 +8809,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_byteswap_uint64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_byteswap_uint64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8635,6 +8856,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_byteswap_uint64", _Number);
             }
             return (long)mh$.invokeExact(_Number);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8647,7 +8870,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("div");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("div");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8694,6 +8917,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("div", allocator, _Numerator, _Denominator);
             }
             return (MemorySegment)mh$.invokeExact(allocator, _Numerator, _Denominator);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8706,7 +8931,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("ldiv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ldiv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8753,6 +8978,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("ldiv", allocator, _Numerator, _Denominator);
             }
             return (MemorySegment)mh$.invokeExact(allocator, _Numerator, _Denominator);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8765,7 +8992,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("lldiv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("lldiv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8812,6 +9039,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("lldiv", allocator, _Numerator, _Denominator);
             }
             return (MemorySegment)mh$.invokeExact(allocator, _Numerator, _Denominator);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8824,7 +9053,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_rotl");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_rotl");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8871,6 +9100,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_rotl", _Value, _Shift);
             }
             return (int)mh$.invokeExact(_Value, _Shift);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8883,7 +9114,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_lrotl");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_lrotl");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8930,6 +9161,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_lrotl", _Value, _Shift);
             }
             return (int)mh$.invokeExact(_Value, _Shift);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -8942,7 +9175,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_rotl64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_rotl64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -8989,6 +9222,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_rotl64", _Value, _Shift);
             }
             return (long)mh$.invokeExact(_Value, _Shift);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9001,7 +9236,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_rotr");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_rotr");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9048,6 +9283,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_rotr", _Value, _Shift);
             }
             return (int)mh$.invokeExact(_Value, _Shift);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9060,7 +9297,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_lrotr");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_lrotr");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9107,6 +9344,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_lrotr", _Value, _Shift);
             }
             return (int)mh$.invokeExact(_Value, _Shift);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9119,7 +9358,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_rotr64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_rotr64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9166,6 +9405,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_rotr64", _Value, _Shift);
             }
             return (long)mh$.invokeExact(_Value, _Shift);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9176,7 +9417,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("srand");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("srand");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9223,6 +9464,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("srand", _Seed);
             }
             mh$.invokeExact(_Seed);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9232,7 +9475,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("rand");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("rand");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9279,6 +9522,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("rand");
             }
             return (int)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9290,7 +9535,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("atof");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("atof");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9337,6 +9582,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("atof", _String);
             }
             return (double)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9348,7 +9595,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("atoi");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("atoi");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9395,6 +9642,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("atoi", _String);
             }
             return (int)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9406,7 +9655,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("atol");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("atol");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9453,6 +9702,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("atol", _String);
             }
             return (int)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9464,7 +9715,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("atoll");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("atoll");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9511,6 +9762,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("atoll", _String);
             }
             return (long)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9522,7 +9775,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoi64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoi64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9569,6 +9822,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoi64", _String);
             }
             return (long)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9581,7 +9836,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atof_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atof_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9628,6 +9883,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atof_l", _String, _Locale);
             }
             return (double)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9640,7 +9897,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoi_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoi_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9687,6 +9944,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoi_l", _String, _Locale);
             }
             return (int)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9699,7 +9958,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atol_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atol_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9746,6 +10005,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atol_l", _String, _Locale);
             }
             return (int)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9758,7 +10019,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoll_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoll_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9805,6 +10066,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoll_l", _String, _Locale);
             }
             return (long)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9817,7 +10080,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoi64_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoi64_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9864,6 +10127,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoi64_l", _String, _Locale);
             }
             return (long)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9876,7 +10141,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoflt");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoflt");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9923,6 +10188,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoflt", _Result, _String);
             }
             return (int)mh$.invokeExact(_Result, _String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9935,7 +10202,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atodbl");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atodbl");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -9982,6 +10249,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atodbl", _Result, _String);
             }
             return (int)mh$.invokeExact(_Result, _String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -9994,7 +10263,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoldbl");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoldbl");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10041,6 +10310,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoldbl", _Result, _String);
             }
             return (int)mh$.invokeExact(_Result, _String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10054,7 +10325,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoflt_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoflt_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10101,6 +10372,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoflt_l", _Result, _String, _Locale);
             }
             return (int)mh$.invokeExact(_Result, _String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10114,7 +10387,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atodbl_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atodbl_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10161,6 +10434,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atodbl_l", _Result, _String, _Locale);
             }
             return (int)mh$.invokeExact(_Result, _String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10174,7 +10449,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_atoldbl_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_atoldbl_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10221,6 +10496,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_atoldbl_l", _Result, _String, _Locale);
             }
             return (int)mh$.invokeExact(_Result, _String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10233,7 +10510,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("strtof");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("strtof");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10280,6 +10557,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("strtof", _String, _EndPtr);
             }
             return (float)mh$.invokeExact(_String, _EndPtr);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10293,7 +10572,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtof_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtof_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10340,6 +10619,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtof_l", _String, _EndPtr, _Locale);
             }
             return (float)mh$.invokeExact(_String, _EndPtr, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10352,7 +10633,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("strtod");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("strtod");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10399,6 +10680,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("strtod", _String, _EndPtr);
             }
             return (double)mh$.invokeExact(_String, _EndPtr);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10412,7 +10695,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtod_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtod_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10459,6 +10742,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtod_l", _String, _EndPtr, _Locale);
             }
             return (double)mh$.invokeExact(_String, _EndPtr, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10471,7 +10756,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("strtold");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("strtold");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10518,6 +10803,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("strtold", _String, _EndPtr);
             }
             return (double)mh$.invokeExact(_String, _EndPtr);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10531,7 +10818,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtold_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtold_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10578,6 +10865,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtold_l", _String, _EndPtr, _Locale);
             }
             return (double)mh$.invokeExact(_String, _EndPtr, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10591,7 +10880,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("strtol");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("strtol");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10638,6 +10927,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("strtol", _String, _EndPtr, _Radix);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10652,7 +10943,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtol_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtol_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10699,6 +10990,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtol_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10712,7 +11005,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("strtoll");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("strtoll");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10759,6 +11052,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("strtoll", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10773,7 +11068,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtoll_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtoll_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10820,6 +11115,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtoll_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10833,7 +11130,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("strtoul");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("strtoul");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10880,6 +11177,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("strtoul", _String, _EndPtr, _Radix);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10894,7 +11193,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtoul_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtoul_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -10941,6 +11240,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtoul_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (int)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -10954,7 +11255,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("strtoull");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("strtoull");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11001,6 +11302,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("strtoull", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11015,7 +11318,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtoull_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtoull_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11062,6 +11365,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtoull_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11075,7 +11380,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtoi64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtoi64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11122,6 +11427,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtoi64", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11136,7 +11443,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtoi64_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtoi64_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11183,6 +11490,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtoi64_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11196,7 +11505,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtoui64");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtoui64");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11243,6 +11552,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtoui64", _String, _EndPtr, _Radix);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11257,7 +11568,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_strtoui64_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_strtoui64_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11304,6 +11615,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_strtoui64_l", _String, _EndPtr, _Radix, _Locale);
             }
             return (long)mh$.invokeExact(_String, _EndPtr, _Radix, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11318,7 +11631,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_itoa_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_itoa_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11365,6 +11678,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_itoa_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11378,7 +11693,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_itoa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_itoa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11425,6 +11740,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_itoa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11439,7 +11756,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ltoa_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ltoa_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11486,6 +11803,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ltoa_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11499,7 +11818,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ltoa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ltoa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11546,6 +11865,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ltoa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11560,7 +11881,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ultoa_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ultoa_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11607,6 +11928,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ultoa_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11620,7 +11943,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ultoa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ultoa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11667,6 +11990,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ultoa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11681,7 +12006,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_i64toa_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_i64toa_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11728,6 +12053,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_i64toa_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11741,7 +12068,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_i64toa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_i64toa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11788,6 +12115,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_i64toa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11802,7 +12131,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ui64toa_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ui64toa_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11849,6 +12178,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ui64toa_s", _Value, _Buffer, _BufferCount, _Radix);
             }
             return (int)mh$.invokeExact(_Value, _Buffer, _BufferCount, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11862,7 +12193,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ui64toa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ui64toa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11909,6 +12240,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ui64toa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11925,7 +12258,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ecvt_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ecvt_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -11972,6 +12305,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ecvt_s", _Buffer, _BufferCount, _Value, _DigitCount, _PtDec, _PtSign);
             }
             return (int)mh$.invokeExact(_Buffer, _BufferCount, _Value, _DigitCount, _PtDec, _PtSign);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -11986,7 +12321,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_ecvt");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_ecvt");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12033,6 +12368,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_ecvt", _Value, _DigitCount, _PtDec, _PtSign);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _DigitCount, _PtDec, _PtSign);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12049,7 +12386,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_fcvt_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_fcvt_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12096,6 +12433,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_fcvt_s", _Buffer, _BufferCount, _Value, _FractionalDigitCount, _PtDec, _PtSign);
             }
             return (int)mh$.invokeExact(_Buffer, _BufferCount, _Value, _FractionalDigitCount, _PtDec, _PtSign);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12110,7 +12449,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_fcvt");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_fcvt");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12157,6 +12496,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_fcvt", _Value, _FractionalDigitCount, _PtDec, _PtSign);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _FractionalDigitCount, _PtDec, _PtSign);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12171,7 +12512,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_gcvt_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_gcvt_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12218,6 +12559,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_gcvt_s", _Buffer, _BufferCount, _Value, _DigitCount);
             }
             return (int)mh$.invokeExact(_Buffer, _BufferCount, _Value, _DigitCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12231,7 +12574,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_gcvt");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_gcvt");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12278,6 +12621,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_gcvt", _Value, _DigitCount, _Buffer);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _DigitCount, _Buffer);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12287,7 +12632,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("___mb_cur_max_func");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("___mb_cur_max_func");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12334,6 +12679,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("___mb_cur_max_func");
             }
             return (int)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12345,7 +12692,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("___mb_cur_max_l_func");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("___mb_cur_max_l_func");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12392,6 +12739,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("___mb_cur_max_l_func", _Locale);
             }
             return (int)mh$.invokeExact(_Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12404,7 +12753,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("mblen");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("mblen");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12451,6 +12800,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("mblen", _Ch, _MaxCount);
             }
             return (int)mh$.invokeExact(_Ch, _MaxCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12464,7 +12815,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mblen_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mblen_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12511,6 +12862,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mblen_l", _Ch, _MaxCount, _Locale);
             }
             return (int)mh$.invokeExact(_Ch, _MaxCount, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12522,7 +12875,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mbstrlen");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mbstrlen");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12569,6 +12922,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mbstrlen", _String);
             }
             return (long)mh$.invokeExact(_String);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12581,7 +12936,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mbstrlen_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mbstrlen_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12628,6 +12983,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mbstrlen_l", _String, _Locale);
             }
             return (long)mh$.invokeExact(_String, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12640,7 +12997,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mbstrnlen");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mbstrnlen");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12687,6 +13044,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mbstrnlen", _String, _MaxCount);
             }
             return (long)mh$.invokeExact(_String, _MaxCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12700,7 +13059,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mbstrnlen_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mbstrnlen_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12747,6 +13106,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mbstrnlen_l", _String, _MaxCount, _Locale);
             }
             return (long)mh$.invokeExact(_String, _MaxCount, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12760,7 +13121,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("mbtowc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("mbtowc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12807,6 +13168,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("mbtowc", _DstCh, _SrcCh, _SrcSizeInBytes);
             }
             return (int)mh$.invokeExact(_DstCh, _SrcCh, _SrcSizeInBytes);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12821,7 +13184,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mbtowc_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mbtowc_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12868,6 +13231,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mbtowc_l", _DstCh, _SrcCh, _SrcSizeInBytes, _Locale);
             }
             return (int)mh$.invokeExact(_DstCh, _SrcCh, _SrcSizeInBytes, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12883,7 +13248,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("mbstowcs_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("mbstowcs_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12930,6 +13295,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("mbstowcs_s", _PtNumOfCharConverted, _DstBuf, _SizeInWords, _SrcBuf, _MaxCount);
             }
             return (int)mh$.invokeExact(_PtNumOfCharConverted, _DstBuf, _SizeInWords, _SrcBuf, _MaxCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -12943,7 +13310,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("mbstowcs");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("mbstowcs");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -12990,6 +13357,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("mbstowcs", _Dest, _Source, _MaxCount);
             }
             return (long)mh$.invokeExact(_Dest, _Source, _MaxCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13006,7 +13375,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mbstowcs_s_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mbstowcs_s_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13053,6 +13422,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mbstowcs_s_l", _PtNumOfCharConverted, _DstBuf, _SizeInWords, _SrcBuf, _MaxCount, _Locale);
             }
             return (int)mh$.invokeExact(_PtNumOfCharConverted, _DstBuf, _SizeInWords, _SrcBuf, _MaxCount, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13067,7 +13438,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_mbstowcs_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_mbstowcs_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13114,6 +13485,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_mbstowcs_l", _Dest, _Source, _MaxCount, _Locale);
             }
             return (long)mh$.invokeExact(_Dest, _Source, _MaxCount, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13126,7 +13499,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_SHORT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wctomb");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wctomb");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13173,6 +13546,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wctomb", _MbCh, _WCh);
             }
             return (int)mh$.invokeExact(_MbCh, _WCh);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13186,7 +13561,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wctomb_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wctomb_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13233,6 +13608,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wctomb_l", _MbCh, _WCh, _Locale);
             }
             return (int)mh$.invokeExact(_MbCh, _WCh, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13247,7 +13624,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_SHORT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wctomb_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wctomb_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13294,6 +13671,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wctomb_s", _SizeConverted, _MbCh, _SizeInBytes, _WCh);
             }
             return (int)mh$.invokeExact(_SizeConverted, _MbCh, _SizeInBytes, _WCh);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13309,7 +13688,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wctomb_s_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wctomb_s_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13356,6 +13735,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wctomb_s_l", _SizeConverted, _MbCh, _SizeInBytes, _WCh, _Locale);
             }
             return (int)mh$.invokeExact(_SizeConverted, _MbCh, _SizeInBytes, _WCh, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13371,7 +13752,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstombs_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstombs_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13418,6 +13799,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstombs_s", _PtNumOfCharConverted, _Dst, _DstSizeInBytes, _Src, _MaxCountInBytes);
             }
             return (int)mh$.invokeExact(_PtNumOfCharConverted, _Dst, _DstSizeInBytes, _Src, _MaxCountInBytes);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13431,7 +13814,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("wcstombs");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("wcstombs");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13478,6 +13861,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("wcstombs", _Dest, _Source, _MaxCount);
             }
             return (long)mh$.invokeExact(_Dest, _Source, _MaxCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13494,7 +13879,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstombs_s_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstombs_s_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13541,6 +13926,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstombs_s_l", _PtNumOfCharConverted, _Dst, _DstSizeInBytes, _Src, _MaxCountInBytes, _Locale);
             }
             return (int)mh$.invokeExact(_PtNumOfCharConverted, _Dst, _DstSizeInBytes, _Src, _MaxCountInBytes, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13555,7 +13942,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_wcstombs_l");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_wcstombs_l");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13602,6 +13989,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_wcstombs_l", _Dest, _Source, _MaxCount, _Locale);
             }
             return (long)mh$.invokeExact(_Dest, _Source, _MaxCount, _Locale);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13615,7 +14004,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_fullpath");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_fullpath");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13662,6 +14051,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_fullpath", _Buffer, _Path, _BufferCount);
             }
             return (MemorySegment)mh$.invokeExact(_Buffer, _Path, _BufferCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13678,7 +14069,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_makepath_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_makepath_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13725,6 +14116,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_makepath_s", _Buffer, _BufferCount, _Drive, _Dir, _Filename, _Ext);
             }
             return (int)mh$.invokeExact(_Buffer, _BufferCount, _Drive, _Dir, _Filename, _Ext);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13739,7 +14132,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_makepath");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_makepath");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13786,6 +14179,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_makepath", _Buffer, _Drive, _Dir, _Filename, _Ext);
             }
             mh$.invokeExact(_Buffer, _Drive, _Dir, _Filename, _Ext);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13800,7 +14195,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_splitpath");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_splitpath");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13847,6 +14242,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_splitpath", _FullPath, _Drive, _Dir, _Filename, _Ext);
             }
             mh$.invokeExact(_FullPath, _Drive, _Dir, _Filename, _Ext);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13866,7 +14263,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_splitpath_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_splitpath_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13913,6 +14310,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_splitpath_s", _FullPath, _Drive, _DriveCount, _Dir, _DirCount, _Filename, _FilenameCount, _Ext, _ExtCount);
             }
             return (int)mh$.invokeExact(_FullPath, _Drive, _DriveCount, _Dir, _DirCount, _Filename, _FilenameCount, _Ext, _ExtCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13927,7 +14326,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("getenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("getenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -13974,6 +14373,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("getenv_s", _RequiredCount, _Buffer, _BufferCount, _VarName);
             }
             return (int)mh$.invokeExact(_RequiredCount, _Buffer, _BufferCount, _VarName);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -13983,7 +14384,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p___argc");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p___argc");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14030,6 +14431,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p___argc");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14039,7 +14442,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p___argv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p___argv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14086,6 +14489,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p___argv");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14095,7 +14500,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p___wargv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p___wargv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14142,6 +14547,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p___wargv");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14151,7 +14558,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p__environ");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p__environ");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14198,6 +14605,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p__environ");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14207,7 +14616,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_POINTER    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("__p__wenviron");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__p__wenviron");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14254,6 +14663,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("__p__wenviron");
             }
             return (MemorySegment)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14265,7 +14676,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("getenv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("getenv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14312,6 +14723,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("getenv", _VarName);
             }
             return (MemorySegment)mh$.invokeExact(_VarName);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14325,7 +14738,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_dupenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_dupenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14372,6 +14785,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_dupenv_s", _Buffer, _BufferCount, _VarName);
             }
             return (int)mh$.invokeExact(_Buffer, _BufferCount, _VarName);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14383,7 +14798,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("system");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("system");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14430,6 +14845,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("system", _Command);
             }
             return (int)mh$.invokeExact(_Command);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14441,7 +14858,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_putenv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_putenv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14488,6 +14905,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_putenv", _EnvString);
             }
             return (int)mh$.invokeExact(_EnvString);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14500,7 +14919,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_putenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_putenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14547,6 +14966,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_putenv_s", _Name, _Value);
             }
             return (int)mh$.invokeExact(_Name, _Value);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14561,7 +14982,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_searchenv_s");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_searchenv_s");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14608,6 +15029,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_searchenv_s", _Filename, _VarName, _Buffer, _BufferCount);
             }
             return (int)mh$.invokeExact(_Filename, _VarName, _Buffer, _BufferCount);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14620,7 +15043,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_searchenv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_searchenv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14667,6 +15090,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_searchenv", _Filename, _VarName, _Buffer);
             }
             mh$.invokeExact(_Filename, _VarName, _Buffer);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14677,7 +15102,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_seterrormode");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_seterrormode");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14724,6 +15149,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_seterrormode", _Mode);
             }
             mh$.invokeExact(_Mode);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14735,7 +15162,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_beep");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_beep");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14782,6 +15209,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_beep", _Frequency, _Duration);
             }
             mh$.invokeExact(_Frequency, _Duration);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14792,7 +15221,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("_sleep");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("_sleep");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14839,6 +15268,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("_sleep", _Duration);
             }
             mh$.invokeExact(_Duration);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14853,7 +15284,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("ecvt");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ecvt");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14900,6 +15331,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("ecvt", _Value, _DigitCount, _PtDec, _PtSign);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _DigitCount, _PtDec, _PtSign);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14914,7 +15347,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("fcvt");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("fcvt");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -14961,6 +15394,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("fcvt", _Value, _FractionalDigitCount, _PtDec, _PtSign);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _FractionalDigitCount, _PtDec, _PtSign);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -14974,7 +15409,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("gcvt");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("gcvt");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -15021,6 +15456,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("gcvt", _Value, _DigitCount, _DstBuf);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _DigitCount, _DstBuf);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -15034,7 +15471,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("itoa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("itoa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -15081,6 +15518,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("itoa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -15094,7 +15533,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("ltoa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ltoa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -15141,6 +15580,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("ltoa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -15153,7 +15594,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("swab");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("swab");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -15200,6 +15641,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("swab", _Buf1, _Buf2, _SizeInBytes);
             }
             mh$.invokeExact(_Buf1, _Buf2, _SizeInBytes);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -15213,7 +15656,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("ultoa");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("ultoa");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -15260,6 +15703,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("ultoa", _Value, _Buffer, _Radix);
             }
             return (MemorySegment)mh$.invokeExact(_Value, _Buffer, _Radix);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -15271,7 +15716,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("putenv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("putenv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -15318,6 +15763,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("putenv", _EnvString);
             }
             return (int)mh$.invokeExact(_EnvString);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -15329,7 +15776,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("onexit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("onexit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -15376,10 +15823,54 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("onexit", _Func);
             }
             return (MemorySegment)mh$.invokeExact(_Func);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
     }
+    private static final int TSURUGI_FFI_RC_TYPE_OK = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_OK = 0
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_OK() {
+        return TSURUGI_FFI_RC_TYPE_OK;
+    }
+    private static final int TSURUGI_FFI_RC_TYPE_FFI_ERROR = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_FFI_ERROR = 1
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_FFI_ERROR() {
+        return TSURUGI_FFI_RC_TYPE_FFI_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR = 2
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR() {
+        return TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR;
+    }
+    private static final int TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR = (int)3L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR = 3
+     * }
+     */
+    public static int TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR() {
+        return TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef uint32_t TsurugiFfiRcType
+     * }
+     */
+    public static final OfInt TsurugiFfiRcType = tsubakuro_rust_ffi_h.C_INT;
     private static final int TSURUGI_FFI_ATOM_TYPE_TYPE_UNSPECIFIED = (int)0L;
     /**
      * {@snippet lang=c :
@@ -15566,132 +16057,6 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final OfInt TsurugiFfiAtomType = tsubakuro_rust_ffi_h.C_INT;
-    private static final int TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED = (int)0L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED = 0
-     * }
-     */
-    public static int TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED() {
-        return TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED;
-    }
-    private static final int TSURUGI_FFI_COMMIT_TYPE_ACCEPTED = (int)10L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_ACCEPTED = 10
-     * }
-     */
-    public static int TSURUGI_FFI_COMMIT_TYPE_ACCEPTED() {
-        return TSURUGI_FFI_COMMIT_TYPE_ACCEPTED;
-    }
-    private static final int TSURUGI_FFI_COMMIT_TYPE_AVAILABLE = (int)20L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_AVAILABLE = 20
-     * }
-     */
-    public static int TSURUGI_FFI_COMMIT_TYPE_AVAILABLE() {
-        return TSURUGI_FFI_COMMIT_TYPE_AVAILABLE;
-    }
-    private static final int TSURUGI_FFI_COMMIT_TYPE_STORED = (int)30L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_STORED = 30
-     * }
-     */
-    public static int TSURUGI_FFI_COMMIT_TYPE_STORED() {
-        return TSURUGI_FFI_COMMIT_TYPE_STORED;
-    }
-    private static final int TSURUGI_FFI_COMMIT_TYPE_PROPAGATED = (int)40L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_PROPAGATED = 40
-     * }
-     */
-    public static int TSURUGI_FFI_COMMIT_TYPE_PROPAGATED() {
-        return TSURUGI_FFI_COMMIT_TYPE_PROPAGATED;
-    }
-    /**
-     * {@snippet lang=c :
-     * typedef int32_t TsurugiFfiCommitType
-     * }
-     */
-    public static final OfInt TsurugiFfiCommitType = tsubakuro_rust_ffi_h.C_INT;
-    private static final int TSURUGI_FFI_RC_TYPE_OK = (int)0L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_OK = 0
-     * }
-     */
-    public static int TSURUGI_FFI_RC_TYPE_OK() {
-        return TSURUGI_FFI_RC_TYPE_OK;
-    }
-    private static final int TSURUGI_FFI_RC_TYPE_FFI_ERROR = (int)1L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_FFI_ERROR = 1
-     * }
-     */
-    public static int TSURUGI_FFI_RC_TYPE_FFI_ERROR() {
-        return TSURUGI_FFI_RC_TYPE_FFI_ERROR;
-    }
-    private static final int TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR = (int)2L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR = 2
-     * }
-     */
-    public static int TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR() {
-        return TSURUGI_FFI_RC_TYPE_CORE_CLIENT_ERROR;
-    }
-    private static final int TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR = (int)3L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiRcType.TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR = 3
-     * }
-     */
-    public static int TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR() {
-        return TSURUGI_FFI_RC_TYPE_CORE_SERVER_ERROR;
-    }
-    /**
-     * {@snippet lang=c :
-     * typedef uint32_t TsurugiFfiRcType
-     * }
-     */
-    public static final OfInt TsurugiFfiRcType = tsubakuro_rust_ffi_h.C_INT;
-    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET = (int)0L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET = 0
-     * }
-     */
-    public static int TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET() {
-        return TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET;
-    }
-    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL = (int)1L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL = 1
-     * }
-     */
-    public static int TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL() {
-        return TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL;
-    }
-    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL = (int)2L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL = 2
-     * }
-     */
-    public static int TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL() {
-        return TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL;
-    }
-    /**
-     * {@snippet lang=c :
-     * typedef int32_t TsurugiFfiShutdownType
-     * }
-     */
-    public static final OfInt TsurugiFfiShutdownType = tsubakuro_rust_ffi_h.C_INT;
     private static final int TSURUGI_FFI_SQL_COUNTER_TYPE_UNSPECIFIED = (int)0L;
     /**
      * {@snippet lang=c :
@@ -15743,6 +16108,252 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final OfInt TsurugiFfiSqlCounterType = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB_FILE = (int)11L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB_FILE = 11
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB_FILE() {
+        return TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB_FILE;
+    }
+    private static final int TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB = (int)12L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB = 12
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB() {
+        return TSURUGI_FFI_LOB_OPERATION_UPLOAD_LOB;
+    }
+    private static final int TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_UPLOADER = (int)13L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_UPLOADER = 13
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_UPLOADER() {
+        return TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_UPLOADER;
+    }
+    private static final int TSURUGI_FFI_LOB_OPERATION_OPEN_LOB = (int)21L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_OPEN_LOB = 21
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_OPEN_LOB() {
+        return TSURUGI_FFI_LOB_OPERATION_OPEN_LOB;
+    }
+    private static final int TSURUGI_FFI_LOB_OPERATION_GET_LOB_CACHE = (int)22L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_GET_LOB_CACHE = 22
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_GET_LOB_CACHE() {
+        return TSURUGI_FFI_LOB_OPERATION_GET_LOB_CACHE;
+    }
+    private static final int TSURUGI_FFI_LOB_OPERATION_READ_LOB = (int)23L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_READ_LOB = 23
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_READ_LOB() {
+        return TSURUGI_FFI_LOB_OPERATION_READ_LOB;
+    }
+    private static final int TSURUGI_FFI_LOB_OPERATION_COPY_LOB_TO = (int)24L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_COPY_LOB_TO = 24
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_COPY_LOB_TO() {
+        return TSURUGI_FFI_LOB_OPERATION_COPY_LOB_TO;
+    }
+    private static final int TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_DOWNLOADER = (int)25L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobOperation.TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_DOWNLOADER = 25
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_DOWNLOADER() {
+        return TSURUGI_FFI_LOB_OPERATION_CREATE_LOB_DOWNLOADER;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiLobOperation
+     * }
+     */
+    public static final OfInt TsurugiFfiLobOperation = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_LOB_TRANSFER_TYPE_DEFAULT = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobTransferType.TSURUGI_FFI_LOB_TRANSFER_TYPE_DEFAULT = 0
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_TRANSFER_TYPE_DEFAULT() {
+        return TSURUGI_FFI_LOB_TRANSFER_TYPE_DEFAULT;
+    }
+    private static final int TSURUGI_FFI_LOB_TRANSFER_TYPE_NOT_USE = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobTransferType.TSURUGI_FFI_LOB_TRANSFER_TYPE_NOT_USE = 1
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_TRANSFER_TYPE_NOT_USE() {
+        return TSURUGI_FFI_LOB_TRANSFER_TYPE_NOT_USE;
+    }
+    private static final int TSURUGI_FFI_LOB_TRANSFER_TYPE_PRIVILEGED = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobTransferType.TSURUGI_FFI_LOB_TRANSFER_TYPE_PRIVILEGED = 2
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_TRANSFER_TYPE_PRIVILEGED() {
+        return TSURUGI_FFI_LOB_TRANSFER_TYPE_PRIVILEGED;
+    }
+    private static final int TSURUGI_FFI_LOB_TRANSFER_TYPE_RELAY = (int)3L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiLobTransferType.TSURUGI_FFI_LOB_TRANSFER_TYPE_RELAY = 3
+     * }
+     */
+    public static int TSURUGI_FFI_LOB_TRANSFER_TYPE_RELAY() {
+        return TSURUGI_FFI_LOB_TRANSFER_TYPE_RELAY;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiLobTransferType
+     * }
+     */
+    public static final OfInt TsurugiFfiLobTransferType = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET = 0
+     * }
+     */
+    public static int TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET() {
+        return TSURUGI_FFI_SHUTDOWN_TYPE_NOT_SET;
+    }
+    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL = 1
+     * }
+     */
+    public static int TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL() {
+        return TSURUGI_FFI_SHUTDOWN_TYPE_GRACEFUL;
+    }
+    private static final int TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiShutdownType.TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL = 2
+     * }
+     */
+    public static int TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL() {
+        return TSURUGI_FFI_SHUTDOWN_TYPE_FORCEFUL;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiShutdownType
+     * }
+     */
+    public static final OfInt TsurugiFfiShutdownType = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED = 0
+     * }
+     */
+    public static int TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED() {
+        return TSURUGI_FFI_COMMIT_TYPE_UNSPECIFIED;
+    }
+    private static final int TSURUGI_FFI_COMMIT_TYPE_ACCEPTED = (int)10L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_ACCEPTED = 10
+     * }
+     */
+    public static int TSURUGI_FFI_COMMIT_TYPE_ACCEPTED() {
+        return TSURUGI_FFI_COMMIT_TYPE_ACCEPTED;
+    }
+    private static final int TSURUGI_FFI_COMMIT_TYPE_AVAILABLE = (int)20L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_AVAILABLE = 20
+     * }
+     */
+    public static int TSURUGI_FFI_COMMIT_TYPE_AVAILABLE() {
+        return TSURUGI_FFI_COMMIT_TYPE_AVAILABLE;
+    }
+    private static final int TSURUGI_FFI_COMMIT_TYPE_STORED = (int)30L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_STORED = 30
+     * }
+     */
+    public static int TSURUGI_FFI_COMMIT_TYPE_STORED() {
+        return TSURUGI_FFI_COMMIT_TYPE_STORED;
+    }
+    private static final int TSURUGI_FFI_COMMIT_TYPE_PROPAGATED = (int)40L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiCommitType.TSURUGI_FFI_COMMIT_TYPE_PROPAGATED = 40
+     * }
+     */
+    public static int TSURUGI_FFI_COMMIT_TYPE_PROPAGATED() {
+        return TSURUGI_FFI_COMMIT_TYPE_PROPAGATED;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiCommitType
+     * }
+     */
+    public static final OfInt TsurugiFfiCommitType = tsubakuro_rust_ffi_h.C_INT;
+    private static final int TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED = (int)0L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED = 0
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED() {
+        return TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED;
+    }
+    private static final int TSURUGI_FFI_TRANSACTION_TYPE_SHORT = (int)1L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_SHORT = 1
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_TYPE_SHORT() {
+        return TSURUGI_FFI_TRANSACTION_TYPE_SHORT;
+    }
+    private static final int TSURUGI_FFI_TRANSACTION_TYPE_LONG = (int)2L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_LONG = 2
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_TYPE_LONG() {
+        return TSURUGI_FFI_TRANSACTION_TYPE_LONG;
+    }
+    private static final int TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY = (int)3L;
+    /**
+     * {@snippet lang=c :
+     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY = 3
+     * }
+     */
+    public static int TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY() {
+        return TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY;
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef int32_t TsurugiFfiTransactionType
+     * }
+     */
+    public static final OfInt TsurugiFfiTransactionType = tsubakuro_rust_ffi_h.C_INT;
     private static final int TSURUGI_FFI_TRANSACTION_PRIORITY_UNSPECIFIED = (int)0L;
     /**
      * {@snippet lang=c :
@@ -15881,48 +16492,6 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final OfInt TsurugiFfiTransactionStatus = tsubakuro_rust_ffi_h.C_INT;
-    private static final int TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED = (int)0L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED = 0
-     * }
-     */
-    public static int TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED() {
-        return TSURUGI_FFI_TRANSACTION_TYPE_UNSPECIFIED;
-    }
-    private static final int TSURUGI_FFI_TRANSACTION_TYPE_SHORT = (int)1L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_SHORT = 1
-     * }
-     */
-    public static int TSURUGI_FFI_TRANSACTION_TYPE_SHORT() {
-        return TSURUGI_FFI_TRANSACTION_TYPE_SHORT;
-    }
-    private static final int TSURUGI_FFI_TRANSACTION_TYPE_LONG = (int)2L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_LONG = 2
-     * }
-     */
-    public static int TSURUGI_FFI_TRANSACTION_TYPE_LONG() {
-        return TSURUGI_FFI_TRANSACTION_TYPE_LONG;
-    }
-    private static final int TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY = (int)3L;
-    /**
-     * {@snippet lang=c :
-     * enum TsurugiFfiTransactionType.TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY = 3
-     * }
-     */
-    public static int TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY() {
-        return TSURUGI_FFI_TRANSACTION_TYPE_READ_ONLY;
-    }
-    /**
-     * {@snippet lang=c :
-     * typedef int32_t TsurugiFfiTransactionType
-     * }
-     */
-    public static final OfInt TsurugiFfiTransactionType = tsubakuro_rust_ffi_h.C_INT;
     /**
      * {@snippet lang=c :
      * typedef uint32_t TsurugiFfiRc
@@ -15961,6 +16530,48 @@ public class tsubakuro_rust_ffi_h {
     public static final AddressLayout TsurugiFfiJobHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
+     * typedef struct TsurugiFfiBlobDownloader *TsurugiFfiBlobDownloaderHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiBlobDownloaderHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef const uint8_t *TsurugiFfiByteArrayHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiByteArrayHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiBlobUploader *TsurugiFfiBlobUploaderHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiBlobUploaderHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiBlob *TsurugiFfiBlobHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiBlobHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiClobDownloader *TsurugiFfiClobDownloaderHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiClobDownloaderHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiClobUploader *TsurugiFfiClobUploaderHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiClobUploaderHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
+     * typedef struct TsurugiFfiClob *TsurugiFfiClobHandle
+     * }
+     */
+    public static final AddressLayout TsurugiFfiClobHandle = tsubakuro_rust_ffi_h.C_POINTER;
+    /**
+     * {@snippet lang=c :
      * typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle
      * }
      */
@@ -15983,12 +16594,6 @@ public class tsubakuro_rust_ffi_h {
      * }
      */
     public static final AddressLayout TsurugiFfiSqlParameterHandle = tsubakuro_rust_ffi_h.C_POINTER;
-    /**
-     * {@snippet lang=c :
-     * typedef const uint8_t *TsurugiFfiByteArrayHandle
-     * }
-     */
-    public static final AddressLayout TsurugiFfiByteArrayHandle = tsubakuro_rust_ffi_h.C_POINTER;
     /**
      * {@snippet lang=c :
      * typedef struct TsurugiFfiSqlPlaceholder *TsurugiFfiSqlPlaceholderHandle
@@ -16128,7 +16733,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_create");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_create");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16175,6 +16780,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_create", context_out);
             }
             return (int)mh$.invokeExact(context_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16187,7 +16794,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_return_code");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_return_code");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16234,6 +16841,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_return_code", context, rc_out);
             }
             return (int)mh$.invokeExact(context, rc_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16246,7 +16855,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_error_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_error_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16293,6 +16902,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_error_name", context, error_name_out);
             }
             return (int)mh$.invokeExact(context, error_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16305,7 +16916,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_error_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_error_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16352,6 +16963,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_error_type", context, error_type_out);
             }
             return (int)mh$.invokeExact(context, error_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16364,7 +16977,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_error_message");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_error_message");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16411,6 +17024,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_error_message", context, error_message_out);
             }
             return (int)mh$.invokeExact(context, error_message_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16423,7 +17038,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_server_error_category_number");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_server_error_category_number");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16470,6 +17085,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_server_error_category_number", context, category_number_out);
             }
             return (int)mh$.invokeExact(context, category_number_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16482,7 +17099,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_server_error_category_str");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_server_error_category_str");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16529,6 +17146,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_server_error_category_str", context, category_str_out);
             }
             return (int)mh$.invokeExact(context, category_str_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16541,7 +17160,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_server_error_code_number");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_server_error_code_number");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16588,6 +17207,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_server_error_code_number", context, code_number_out);
             }
             return (int)mh$.invokeExact(context, code_number_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16600,7 +17221,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_get_server_error_structured_code");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_get_server_error_structured_code");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16647,6 +17268,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_get_server_error_structured_code", context, structured_code_out);
             }
             return (int)mh$.invokeExact(context, structured_code_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16657,7 +17280,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_context_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_context_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16704,6 +17327,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_context_dispose", context);
             }
             mh$.invokeExact(context);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16718,7 +17343,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_cancel_job_wait");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_cancel_job_wait");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16765,6 +17390,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_cancel_job_wait", context, cancel_job, timeout, done_out);
             }
             return (int)mh$.invokeExact(context, cancel_job, timeout, done_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16778,7 +17405,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_cancel_job_is_done");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_cancel_job_is_done");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16825,6 +17452,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_cancel_job_is_done", context, cancel_job, done_out);
             }
             return (int)mh$.invokeExact(context, cancel_job, done_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16835,7 +17464,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_cancel_job_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_cancel_job_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16882,6 +17511,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_cancel_job_dispose", cancel_job);
             }
             mh$.invokeExact(cancel_job);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16895,7 +17526,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_get_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_get_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -16942,6 +17573,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_get_name", context, job, name_out);
             }
             return (int)mh$.invokeExact(context, job, name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -16956,7 +17589,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_wait");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_wait");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17003,6 +17636,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_wait", context, job, timeout, done_out);
             }
             return (int)mh$.invokeExact(context, job, timeout, done_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17016,7 +17651,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_is_done");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_is_done");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17063,6 +17698,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_is_done", context, job, done_out);
             }
             return (int)mh$.invokeExact(context, job, done_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17076,7 +17713,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_take");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_take");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17123,6 +17760,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_take", context, job, value_out);
             }
             return (int)mh$.invokeExact(context, job, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17137,7 +17776,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_take_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_take_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17184,6 +17823,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_take_for", context, job, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, job, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17198,7 +17839,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_take_if_ready");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_take_if_ready");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17245,6 +17886,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_take_if_ready", context, job, is_ready_out, value_out);
             }
             return (int)mh$.invokeExact(context, job, is_ready_out, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17258,7 +17901,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_cancel");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_cancel");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17305,6 +17948,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_cancel", context, job, cancell_done_out);
             }
             return (int)mh$.invokeExact(context, job, cancell_done_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17319,7 +17964,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_cancel_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_cancel_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17366,6 +18011,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_cancel_for", context, job, timeout, cancell_done_out);
             }
             return (int)mh$.invokeExact(context, job, timeout, cancell_done_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17379,7 +18026,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_cancel_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_cancel_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17426,6 +18073,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_cancel_async", context, job, cancel_job_out);
             }
             return (int)mh$.invokeExact(context, job, cancel_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17438,7 +18087,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_close");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_close");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17485,6 +18134,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_close", context, job);
             }
             return (int)mh$.invokeExact(context, job);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17495,7 +18146,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_job_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_job_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17542,6 +18193,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_job_dispose", job);
             }
             mh$.invokeExact(job);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17551,7 +18204,7 @@ public class tsubakuro_rust_ffi_h {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT    );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_env_logger_init");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_env_logger_init");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17598,6 +18251,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_env_logger_init");
             }
             return (int)mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17610,7 +18265,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_env_logger_init_with_filters");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_env_logger_init_with_filters");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17657,6 +18312,880 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_env_logger_init_with_filters", filters, file_path);
             }
             return (int)mh$.invokeExact(filters, file_path);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_downloader_download_chunk {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_downloader_download_chunk");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_downloader_download_chunk$descriptor() {
+        return tsurugi_ffi_blob_downloader_download_chunk.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_downloader_download_chunk$handle() {
+        return tsurugi_ffi_blob_downloader_download_chunk.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_downloader_download_chunk$address() {
+        return tsurugi_ffi_blob_downloader_download_chunk.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_blob_downloader_download_chunk(MemorySegment context, MemorySegment downloader, long length, long timeout, MemorySegment value_out, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_blob_downloader_download_chunk.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_downloader_download_chunk", context, downloader, length, timeout, value_out, size_out);
+            }
+            return (int)mh$.invokeExact(context, downloader, length, timeout, value_out, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_downloader_download_chunk_into {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_downloader_download_chunk_into");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk_into(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_downloader_download_chunk_into$descriptor() {
+        return tsurugi_ffi_blob_downloader_download_chunk_into.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk_into(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_downloader_download_chunk_into$handle() {
+        return tsurugi_ffi_blob_downloader_download_chunk_into.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk_into(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_downloader_download_chunk_into$address() {
+        return tsurugi_ffi_blob_downloader_download_chunk_into.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk_into(TsurugiFfiContextHandle context, TsurugiFfiBlobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_blob_downloader_download_chunk_into(MemorySegment context, MemorySegment downloader, MemorySegment buffer, long buffer_size, long timeout, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_blob_downloader_download_chunk_into.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_downloader_download_chunk_into", context, downloader, buffer, buffer_size, timeout, size_out);
+            }
+            return (int)mh$.invokeExact(context, downloader, buffer, buffer_size, timeout, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_downloader_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_downloader_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_downloader_dispose(TsurugiFfiBlobDownloaderHandle downloader)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_downloader_dispose$descriptor() {
+        return tsurugi_ffi_blob_downloader_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_downloader_dispose(TsurugiFfiBlobDownloaderHandle downloader)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_downloader_dispose$handle() {
+        return tsurugi_ffi_blob_downloader_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_downloader_dispose(TsurugiFfiBlobDownloaderHandle downloader)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_downloader_dispose$address() {
+        return tsurugi_ffi_blob_downloader_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_downloader_dispose(TsurugiFfiBlobDownloaderHandle downloader)
+     * }
+     */
+    public static void tsurugi_ffi_blob_downloader_dispose(MemorySegment downloader) {
+        var mh$ = tsurugi_ffi_blob_downloader_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_downloader_dispose", downloader);
+            }
+            mh$.invokeExact(downloader);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_uploader_upload_chunk {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_uploader_upload_chunk");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_upload_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_uploader_upload_chunk$descriptor() {
+        return tsurugi_ffi_blob_uploader_upload_chunk.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_upload_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_uploader_upload_chunk$handle() {
+        return tsurugi_ffi_blob_uploader_upload_chunk.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_upload_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_uploader_upload_chunk$address() {
+        return tsurugi_ffi_blob_uploader_upload_chunk.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_upload_chunk(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static int tsurugi_ffi_blob_uploader_upload_chunk(MemorySegment context, MemorySegment uploader, MemorySegment value, long size, long timeout) {
+        var mh$ = tsurugi_ffi_blob_uploader_upload_chunk.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_uploader_upload_chunk", context, uploader, value, size, timeout);
+            }
+            return (int)mh$.invokeExact(context, uploader, value, size, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_uploader_finish {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_uploader_finish");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_uploader_finish$descriptor() {
+        return tsurugi_ffi_blob_uploader_finish.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_uploader_finish$handle() {
+        return tsurugi_ffi_blob_uploader_finish.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_uploader_finish$address() {
+        return tsurugi_ffi_blob_uploader_finish.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static int tsurugi_ffi_blob_uploader_finish(MemorySegment context, MemorySegment uploader, long timeout, MemorySegment blob_out) {
+        var mh$ = tsurugi_ffi_blob_uploader_finish.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_uploader_finish", context, uploader, timeout, blob_out);
+            }
+            return (int)mh$.invokeExact(context, uploader, timeout, blob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_uploader_cancel {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_uploader_cancel");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_uploader_cancel$descriptor() {
+        return tsurugi_ffi_blob_uploader_cancel.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_uploader_cancel$handle() {
+        return tsurugi_ffi_blob_uploader_cancel.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_uploader_cancel$address() {
+        return tsurugi_ffi_blob_uploader_cancel.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_blob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static int tsurugi_ffi_blob_uploader_cancel(MemorySegment context, MemorySegment uploader) {
+        var mh$ = tsurugi_ffi_blob_uploader_cancel.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_uploader_cancel", context, uploader);
+            }
+            return (int)mh$.invokeExact(context, uploader);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_uploader_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_uploader_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_uploader_dispose(TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_uploader_dispose$descriptor() {
+        return tsurugi_ffi_blob_uploader_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_uploader_dispose(TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_uploader_dispose$handle() {
+        return tsurugi_ffi_blob_uploader_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_uploader_dispose(TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_uploader_dispose$address() {
+        return tsurugi_ffi_blob_uploader_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_uploader_dispose(TsurugiFfiBlobUploaderHandle uploader)
+     * }
+     */
+    public static void tsurugi_ffi_blob_uploader_dispose(MemorySegment uploader) {
+        var mh$ = tsurugi_ffi_blob_uploader_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_uploader_dispose", uploader);
+            }
+            mh$.invokeExact(uploader);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_downloader_download_chunk_utf8 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_downloader_download_chunk_utf8");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_downloader_download_chunk_utf8$descriptor() {
+        return tsurugi_ffi_clob_downloader_download_chunk_utf8.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_downloader_download_chunk_utf8$handle() {
+        return tsurugi_ffi_clob_downloader_download_chunk_utf8.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_downloader_download_chunk_utf8$address() {
+        return tsurugi_ffi_clob_downloader_download_chunk_utf8.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint64_t length, TsurugiFfiDuration timeout, TsurugiFfiByteArrayHandle *value_out, uint64_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_clob_downloader_download_chunk_utf8(MemorySegment context, MemorySegment downloader, long length, long timeout, MemorySegment value_out, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_clob_downloader_download_chunk_utf8.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_downloader_download_chunk_utf8", context, downloader, length, timeout, value_out, size_out);
+            }
+            return (int)mh$.invokeExact(context, downloader, length, timeout, value_out, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_downloader_download_chunk_into_utf8 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_downloader_download_chunk_into_utf8");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_into_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_downloader_download_chunk_into_utf8$descriptor() {
+        return tsurugi_ffi_clob_downloader_download_chunk_into_utf8.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_into_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_downloader_download_chunk_into_utf8$handle() {
+        return tsurugi_ffi_clob_downloader_download_chunk_into_utf8.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_into_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_downloader_download_chunk_into_utf8$address() {
+        return tsurugi_ffi_clob_downloader_download_chunk_into_utf8.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_into_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobDownloaderHandle downloader, uint8_t *buffer, uint64_t buffer_size, TsurugiFfiDuration timeout, uint64_t *size_out)
+     * }
+     */
+    public static int tsurugi_ffi_clob_downloader_download_chunk_into_utf8(MemorySegment context, MemorySegment downloader, MemorySegment buffer, long buffer_size, long timeout, MemorySegment size_out) {
+        var mh$ = tsurugi_ffi_clob_downloader_download_chunk_into_utf8.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_downloader_download_chunk_into_utf8", context, downloader, buffer, buffer_size, timeout, size_out);
+            }
+            return (int)mh$.invokeExact(context, downloader, buffer, buffer_size, timeout, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_downloader_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_downloader_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_downloader_dispose(TsurugiFfiClobDownloaderHandle downloader)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_downloader_dispose$descriptor() {
+        return tsurugi_ffi_clob_downloader_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_downloader_dispose(TsurugiFfiClobDownloaderHandle downloader)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_downloader_dispose$handle() {
+        return tsurugi_ffi_clob_downloader_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_downloader_dispose(TsurugiFfiClobDownloaderHandle downloader)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_downloader_dispose$address() {
+        return tsurugi_ffi_clob_downloader_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_downloader_dispose(TsurugiFfiClobDownloaderHandle downloader)
+     * }
+     */
+    public static void tsurugi_ffi_clob_downloader_dispose(MemorySegment downloader) {
+        var mh$ = tsurugi_ffi_clob_downloader_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_downloader_dispose", downloader);
+            }
+            mh$.invokeExact(downloader);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_uploader_upload_chunk_utf8 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_uploader_upload_chunk_utf8");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_upload_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_uploader_upload_chunk_utf8$descriptor() {
+        return tsurugi_ffi_clob_uploader_upload_chunk_utf8.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_upload_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_uploader_upload_chunk_utf8$handle() {
+        return tsurugi_ffi_clob_uploader_upload_chunk_utf8.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_upload_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_uploader_upload_chunk_utf8$address() {
+        return tsurugi_ffi_clob_uploader_upload_chunk_utf8.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_upload_chunk_utf8(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout)
+     * }
+     */
+    public static int tsurugi_ffi_clob_uploader_upload_chunk_utf8(MemorySegment context, MemorySegment uploader, MemorySegment value, long size, long timeout) {
+        var mh$ = tsurugi_ffi_clob_uploader_upload_chunk_utf8.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_uploader_upload_chunk_utf8", context, uploader, value, size, timeout);
+            }
+            return (int)mh$.invokeExact(context, uploader, value, size, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_uploader_finish {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_uploader_finish");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_uploader_finish$descriptor() {
+        return tsurugi_ffi_clob_uploader_finish.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_uploader_finish$handle() {
+        return tsurugi_ffi_clob_uploader_finish.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_uploader_finish$address() {
+        return tsurugi_ffi_clob_uploader_finish.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_finish(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static int tsurugi_ffi_clob_uploader_finish(MemorySegment context, MemorySegment uploader, long timeout, MemorySegment clob_out) {
+        var mh$ = tsurugi_ffi_clob_uploader_finish.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_uploader_finish", context, uploader, timeout, clob_out);
+            }
+            return (int)mh$.invokeExact(context, uploader, timeout, clob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_uploader_cancel {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_uploader_cancel");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_uploader_cancel$descriptor() {
+        return tsurugi_ffi_clob_uploader_cancel.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_uploader_cancel$handle() {
+        return tsurugi_ffi_clob_uploader_cancel.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_uploader_cancel$address() {
+        return tsurugi_ffi_clob_uploader_cancel.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_clob_uploader_cancel(TsurugiFfiContextHandle context, TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static int tsurugi_ffi_clob_uploader_cancel(MemorySegment context, MemorySegment uploader) {
+        var mh$ = tsurugi_ffi_clob_uploader_cancel.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_uploader_cancel", context, uploader);
+            }
+            return (int)mh$.invokeExact(context, uploader);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_uploader_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_uploader_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_uploader_dispose(TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_uploader_dispose$descriptor() {
+        return tsurugi_ffi_clob_uploader_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_uploader_dispose(TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_uploader_dispose$handle() {
+        return tsurugi_ffi_clob_uploader_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_uploader_dispose(TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_uploader_dispose$address() {
+        return tsurugi_ffi_clob_uploader_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_uploader_dispose(TsurugiFfiClobUploaderHandle uploader)
+     * }
+     */
+    public static void tsurugi_ffi_clob_uploader_dispose(MemorySegment uploader) {
+        var mh$ = tsurugi_ffi_clob_uploader_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_uploader_dispose", uploader);
+            }
+            mh$.invokeExact(uploader);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17670,7 +19199,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17717,6 +19246,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_name", context, sql_column, name_out);
             }
             return (int)mh$.invokeExact(context, sql_column, name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17730,7 +19261,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_atom_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_atom_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17777,6 +19308,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_atom_type", context, sql_column, atom_type_out);
             }
             return (int)mh$.invokeExact(context, sql_column, atom_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17792,7 +19325,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_length");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_length");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17839,6 +19372,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_length", context, sql_column, provided_out, length_out, arbitrary_length_out);
             }
             return (int)mh$.invokeExact(context, sql_column, provided_out, length_out, arbitrary_length_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17854,7 +19389,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_precision");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_precision");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17901,6 +19436,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_precision", context, sql_column, provided_out, precision_out, arbitrary_precision_out);
             }
             return (int)mh$.invokeExact(context, sql_column, provided_out, precision_out, arbitrary_precision_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17916,7 +19453,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_scale");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_scale");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -17963,6 +19500,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_scale", context, sql_column, provided_out, scale_out, arbitrary_scale_out);
             }
             return (int)mh$.invokeExact(context, sql_column, provided_out, scale_out, arbitrary_scale_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -17977,7 +19516,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_nullable");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_nullable");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18024,6 +19563,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_nullable", context, sql_column, provided_out, nullable_out);
             }
             return (int)mh$.invokeExact(context, sql_column, provided_out, nullable_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18038,7 +19579,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_varying");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_varying");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18085,6 +19626,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_varying", context, sql_column, provided_out, varying_out);
             }
             return (int)mh$.invokeExact(context, sql_column, provided_out, varying_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18098,7 +19641,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_description");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_description");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18145,6 +19688,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_description", context, sql_column, description_out);
             }
             return (int)mh$.invokeExact(context, sql_column, description_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18158,7 +19703,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_sql_type_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_sql_type_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18205,6 +19750,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_sql_type_name", context, sql_column, sql_type_name_out);
             }
             return (int)mh$.invokeExact(context, sql_column, sql_type_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18218,7 +19765,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_get_sql_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_get_sql_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18265,6 +19812,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_get_sql_type", context, sql_column, sql_type_out);
             }
             return (int)mh$.invokeExact(context, sql_column, sql_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18275,7 +19824,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_column_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_column_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18322,6 +19871,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_column_dispose", sql_column);
             }
             mh$.invokeExact(sql_column);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18337,7 +19888,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_get_counters");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_execute_result_get_counters");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18384,6 +19935,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_execute_result_get_counters", context, execute_result, counters_keys_out, counters_rows_out, counters_size_out);
             }
             return (int)mh$.invokeExact(context, execute_result, counters_keys_out, counters_rows_out, counters_size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18397,7 +19950,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_get_inserted_rows");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_execute_result_get_inserted_rows");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18444,6 +19997,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_execute_result_get_inserted_rows", context, execute_result, rows_out);
             }
             return (int)mh$.invokeExact(context, execute_result, rows_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18457,7 +20012,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_get_updated_rows");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_execute_result_get_updated_rows");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18504,6 +20059,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_execute_result_get_updated_rows", context, execute_result, rows_out);
             }
             return (int)mh$.invokeExact(context, execute_result, rows_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18517,7 +20074,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_get_merged_rows");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_execute_result_get_merged_rows");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18564,6 +20121,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_execute_result_get_merged_rows", context, execute_result, rows_out);
             }
             return (int)mh$.invokeExact(context, execute_result, rows_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18577,7 +20136,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_get_deleted_rows");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_execute_result_get_deleted_rows");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18624,6 +20183,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_execute_result_get_deleted_rows", context, execute_result, rows_out);
             }
             return (int)mh$.invokeExact(context, execute_result, rows_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18637,7 +20198,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_get_rows");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_execute_result_get_rows");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18684,6 +20245,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_execute_result_get_rows", context, execute_result, rows_out);
             }
             return (int)mh$.invokeExact(context, execute_result, rows_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18694,7 +20257,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_execute_result_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_execute_result_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18741,6 +20304,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_execute_result_dispose", execute_result);
             }
             mh$.invokeExact(execute_result);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18754,7 +20319,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_explain_result_get_format_id");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_explain_result_get_format_id");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18801,6 +20366,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_explain_result_get_format_id", context, explain_result, format_id_out);
             }
             return (int)mh$.invokeExact(context, explain_result, format_id_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18814,7 +20381,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_explain_result_get_format_version");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_explain_result_get_format_version");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18861,6 +20428,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_explain_result_get_format_version", context, explain_result, format_version_out);
             }
             return (int)mh$.invokeExact(context, explain_result, format_version_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18874,7 +20443,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_explain_result_get_contents");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_explain_result_get_contents");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18921,6 +20490,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_explain_result_get_contents", context, explain_result, contents_out);
             }
             return (int)mh$.invokeExact(context, explain_result, contents_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18934,7 +20505,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_explain_result_get_columns_size");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_explain_result_get_columns_size");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -18981,6 +20552,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_explain_result_get_columns_size", context, explain_result, size_out);
             }
             return (int)mh$.invokeExact(context, explain_result, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -18995,7 +20568,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_explain_result_get_columns_value");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_explain_result_get_columns_value");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19042,6 +20615,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_explain_result_get_columns_value", context, explain_result, index, sql_column_out);
             }
             return (int)mh$.invokeExact(context, explain_result, index, sql_column_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19052,7 +20627,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_explain_result_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_explain_result_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19099,6 +20674,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_explain_result_dispose", explain_result);
             }
             mh$.invokeExact(explain_result);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19112,7 +20689,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_null");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_null");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19159,6 +20736,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_null", context, name, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19173,7 +20752,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_boolean");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_boolean");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19220,6 +20799,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_boolean", context, name, value, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19234,7 +20815,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_int4");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_int4");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19281,6 +20862,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_int4", context, name, value, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19295,7 +20878,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_int8");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_int8");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19342,6 +20925,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_int8", context, name, value, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19356,7 +20941,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_float4");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_float4");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19403,6 +20988,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_float4", context, name, value, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19417,7 +21004,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_float8");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_float8");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19464,6 +21051,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_float8", context, name, value, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19480,7 +21069,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_decimal");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_decimal");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19527,6 +21116,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_decimal", context, name, unscaled_value, unscaled_value_size, exponent, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, unscaled_value, unscaled_value_size, exponent, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19543,7 +21134,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_decimal_i128");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_decimal_i128");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19590,6 +21181,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_decimal_i128", context, name, unscaled_value_high, unscaled_value_low, exponent, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, unscaled_value_high, unscaled_value_low, exponent, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19604,7 +21197,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_character");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_character");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19651,6 +21244,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_character", context, name, value, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19666,7 +21261,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_octet");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_octet");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19713,6 +21308,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_octet", context, name, value, value_size, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, value_size, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19727,7 +21324,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_date");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_date");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19774,6 +21371,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_date", context, name, epoch_days, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, epoch_days, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19788,7 +21387,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_of_day");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_time_of_day");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19835,6 +21434,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_time_of_day", context, name, nanoseconds_of_day, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, nanoseconds_of_day, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19850,7 +21451,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_point");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_time_point");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19897,6 +21498,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_time_point", context, name, epoch_seconds, nanos, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, epoch_seconds, nanos, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19912,7 +21515,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -19959,6 +21562,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_time_of_day_with_time_zone", context, name, nanoseconds_of_day, time_zone_offset, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, nanoseconds_of_day, time_zone_offset, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -19975,7 +21580,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_time_point_with_time_zone");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_time_point_with_time_zone");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20022,6 +21627,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_time_point_with_time_zone", context, name, epoch_seconds, nanos, time_zone_offset, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, epoch_seconds, nanos, time_zone_offset, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20036,7 +21643,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_blob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_blob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20083,6 +21690,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_blob", context, name, path, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, path, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20098,7 +21707,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_blob_contents");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_blob_contents");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20145,6 +21754,71 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_blob_contents", context, name, value, value_size, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, value_size, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_parameter_of_blob2 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_blob2");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiBlobHandle blob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_blob2$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_blob2.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiBlobHandle blob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_blob2$handle() {
+        return tsurugi_ffi_sql_parameter_of_blob2.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiBlobHandle blob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_blob2$address() {
+        return tsurugi_ffi_sql_parameter_of_blob2.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_blob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiBlobHandle blob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_blob2(MemorySegment context, MemorySegment name, MemorySegment blob, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_blob2.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_blob2", context, name, blob, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, blob, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20159,7 +21833,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_clob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_clob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20206,6 +21880,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_clob", context, name, path, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, path, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20220,7 +21896,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_of_clob_contents");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_clob_contents");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20267,6 +21943,71 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_of_clob_contents", context, name, value, parameter_out);
             }
             return (int)mh$.invokeExact(context, name, value, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_parameter_of_clob2 {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_of_clob2");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiClobHandle clob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_parameter_of_clob2$descriptor() {
+        return tsurugi_ffi_sql_parameter_of_clob2.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiClobHandle clob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_parameter_of_clob2$handle() {
+        return tsurugi_ffi_sql_parameter_of_clob2.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiClobHandle clob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_parameter_of_clob2$address() {
+        return tsurugi_ffi_sql_parameter_of_clob2.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_parameter_of_clob2(TsurugiFfiContextHandle context, TsurugiFfiStringHandle name, TsurugiFfiClobHandle clob, TsurugiFfiSqlParameterHandle *parameter_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_parameter_of_clob2(MemorySegment context, MemorySegment name, MemorySegment clob, MemorySegment parameter_out) {
+        var mh$ = tsurugi_ffi_sql_parameter_of_clob2.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_parameter_of_clob2", context, name, clob, parameter_out);
+            }
+            return (int)mh$.invokeExact(context, name, clob, parameter_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20280,7 +22021,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_get_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_get_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20327,6 +22068,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_get_name", context, parameter, name_out);
             }
             return (int)mh$.invokeExact(context, parameter, name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20337,7 +22080,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_parameter_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_parameter_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20384,6 +22127,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_parameter_dispose", parameter);
             }
             mh$.invokeExact(parameter);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20398,7 +22143,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_placeholder_of_atom_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_placeholder_of_atom_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20445,6 +22190,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_placeholder_of_atom_type", context, name, atom_type, placeholder_out);
             }
             return (int)mh$.invokeExact(context, name, atom_type, placeholder_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20458,7 +22205,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_placeholder_get_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_placeholder_get_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20505,6 +22252,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_placeholder_get_name", context, placeholder, name_out);
             }
             return (int)mh$.invokeExact(context, placeholder, name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20518,7 +22267,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_placeholder_get_atom_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_placeholder_get_atom_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20565,6 +22314,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_placeholder_get_atom_type", context, placeholder, atom_type_out);
             }
             return (int)mh$.invokeExact(context, placeholder, atom_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20575,7 +22326,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_placeholder_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_placeholder_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20622,6 +22373,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_placeholder_dispose", placeholder);
             }
             mh$.invokeExact(placeholder);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20635,7 +22388,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_has_result_records");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_prepared_statement_has_result_records");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20682,6 +22435,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_prepared_statement_has_result_records", context, prepared_statement, has_result_records_out);
             }
             return (int)mh$.invokeExact(context, prepared_statement, has_result_records_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20695,7 +22450,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_set_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_prepared_statement_set_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20742,6 +22497,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_prepared_statement_set_close_timeout", context, prepared_statement, close_timeout);
             }
             return (int)mh$.invokeExact(context, prepared_statement, close_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20755,7 +22512,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_get_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_prepared_statement_get_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20802,6 +22559,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_prepared_statement_get_close_timeout", context, prepared_statement, close_timeout_out);
             }
             return (int)mh$.invokeExact(context, prepared_statement, close_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20814,7 +22573,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_close");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_prepared_statement_close");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20861,6 +22620,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_prepared_statement_close", context, prepared_statement);
             }
             return (int)mh$.invokeExact(context, prepared_statement);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20874,7 +22635,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_close_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_prepared_statement_close_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20921,6 +22682,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_prepared_statement_close_for", context, prepared_statement, timeout);
             }
             return (int)mh$.invokeExact(context, prepared_statement, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20934,7 +22697,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_is_closed");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_prepared_statement_is_closed");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -20981,6 +22744,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_prepared_statement_is_closed", context, prepared_statement, is_closed_out);
             }
             return (int)mh$.invokeExact(context, prepared_statement, is_closed_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -20991,7 +22756,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_prepared_statement_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_prepared_statement_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21038,6 +22803,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_prepared_statement_dispose", prepared_statement);
             }
             mh$.invokeExact(prepared_statement);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21051,7 +22818,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_set_default_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_set_default_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21098,6 +22865,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_set_default_timeout", context, query_result, timeout);
             }
             return (int)mh$.invokeExact(context, query_result, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21111,7 +22880,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_get_default_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_get_default_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21158,6 +22927,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_get_default_timeout", context, query_result, default_timeout_out);
             }
             return (int)mh$.invokeExact(context, query_result, default_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21171,7 +22942,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_get_metadata");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_get_metadata");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21218,6 +22989,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_get_metadata", context, query_result, query_result_metadata_out);
             }
             return (int)mh$.invokeExact(context, query_result, query_result_metadata_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21231,7 +23004,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_next_row");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_next_row");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21278,6 +23051,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_next_row", context, query_result, has_row_out);
             }
             return (int)mh$.invokeExact(context, query_result, has_row_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21292,7 +23067,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_next_row_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_next_row_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21339,6 +23114,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_next_row_for", context, query_result, timeout, has_row_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, has_row_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21352,7 +23129,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_next_column");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_next_column");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21399,6 +23176,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_next_column", context, query_result, has_column_out);
             }
             return (int)mh$.invokeExact(context, query_result, has_column_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21413,7 +23192,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_next_column_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_next_column_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21460,6 +23239,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_next_column_for", context, query_result, timeout, has_column_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, has_column_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21473,7 +23254,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_is_null");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_is_null");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21520,6 +23301,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_is_null", context, query_result, is_null_out);
             }
             return (int)mh$.invokeExact(context, query_result, is_null_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21533,7 +23316,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_boolean");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_boolean");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21580,6 +23363,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_boolean", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21594,7 +23379,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_boolean");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_boolean");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21641,6 +23426,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_boolean", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21654,7 +23441,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_int4");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_int4");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21701,6 +23488,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_int4", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21715,7 +23504,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_int4");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_int4");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21762,6 +23551,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_int4", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21775,7 +23566,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_int8");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_int8");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21822,6 +23613,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_int8", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21836,7 +23629,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_int8");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_int8");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21883,6 +23676,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_int8", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21896,7 +23691,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_float4");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_float4");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -21943,6 +23738,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_float4", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -21957,7 +23754,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_float4");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_float4");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22004,6 +23801,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_float4", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22017,7 +23816,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_float8");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_float8");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22064,6 +23863,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_float8", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22078,7 +23879,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_float8");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_float8");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22125,6 +23926,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_float8", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22141,7 +23944,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_decimal");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_decimal");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22188,6 +23991,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_decimal", context, query_result, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
             }
             return (int)mh$.invokeExact(context, query_result, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22205,7 +24010,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_decimal");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_decimal");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22252,6 +24057,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_decimal", context, query_result, timeout, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, unscaled_value_bytes_out, unscaled_value_bytes_size_out, unscaled_value_out, exponent_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22267,7 +24074,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_decimal_i128");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_decimal_i128");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22314,6 +24121,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_decimal_i128", context, query_result, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
             }
             return (int)mh$.invokeExact(context, query_result, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22330,7 +24139,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_decimal_i128");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_decimal_i128");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22377,6 +24186,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_decimal_i128", context, query_result, timeout, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, unscaled_value_high_out, unscaled_value_low_out, exponent_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22390,7 +24201,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_character");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_character");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22437,6 +24248,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_character", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22451,7 +24264,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_character");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_character");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22498,6 +24311,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_character", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22512,7 +24327,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_octet");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_octet");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22559,6 +24374,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_octet", context, query_result, value_out, size_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22574,7 +24391,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_octet");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_octet");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22621,6 +24438,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_octet", context, query_result, timeout, value_out, size_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22634,7 +24453,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_date");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_date");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22681,6 +24500,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_date", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22695,7 +24516,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_date");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_date");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22742,6 +24563,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_date", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22755,7 +24578,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_of_day");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_of_day");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22802,6 +24625,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_of_day", context, query_result, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22816,7 +24641,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_of_day");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_of_day");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22863,6 +24688,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_of_day", context, query_result, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22877,7 +24704,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_point");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_point");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22924,6 +24751,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_point", context, query_result, value_out, nanos_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out, nanos_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -22939,7 +24768,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_point");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_point");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -22986,6 +24815,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_point", context, query_result, timeout, value_out, nanos_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out, nanos_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23000,7 +24831,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23047,6 +24878,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_of_day_with_time_zone", context, query_result, value_out, time_zone_offset_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out, time_zone_offset_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23062,7 +24895,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23109,6 +24942,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_of_day_with_time_zone", context, query_result, timeout, value_out, time_zone_offset_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out, time_zone_offset_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23124,7 +24959,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23171,6 +25006,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_time_point_with_time_zone", context, query_result, value_out, nanos_out, time_zone_offset_out);
             }
             return (int)mh$.invokeExact(context, query_result, value_out, nanos_out, time_zone_offset_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23187,7 +25024,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23234,6 +25071,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_time_point_with_time_zone", context, query_result, timeout, value_out, nanos_out, time_zone_offset_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, value_out, nanos_out, time_zone_offset_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23247,7 +25086,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_blob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_blob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23294,6 +25133,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_blob", context, query_result, blob_reference_out);
             }
             return (int)mh$.invokeExact(context, query_result, blob_reference_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23308,7 +25149,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_blob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_blob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23355,6 +25196,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_blob", context, query_result, timeout, blob_reference_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, blob_reference_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23368,7 +25211,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_clob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_clob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23415,6 +25258,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_clob", context, query_result, clob_reference_out);
             }
             return (int)mh$.invokeExact(context, query_result, clob_reference_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23429,7 +25274,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_clob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_fetch_for_clob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23476,6 +25321,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_fetch_for_clob", context, query_result, timeout, clob_reference_out);
             }
             return (int)mh$.invokeExact(context, query_result, timeout, clob_reference_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23489,7 +25336,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_set_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_set_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23536,6 +25383,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_set_close_timeout", context, query_result, close_timeout);
             }
             return (int)mh$.invokeExact(context, query_result, close_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23549,7 +25398,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_get_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_get_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23596,6 +25445,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_get_close_timeout", context, query_result, close_timeout_out);
             }
             return (int)mh$.invokeExact(context, query_result, close_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23608,7 +25459,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_close");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_close");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23655,6 +25506,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_close", context, query_result);
             }
             return (int)mh$.invokeExact(context, query_result);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23668,7 +25521,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_close_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_close_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23715,6 +25568,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_close_for", context, query_result, timeout);
             }
             return (int)mh$.invokeExact(context, query_result, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23728,7 +25583,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_is_closed");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_is_closed");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23775,6 +25630,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_is_closed", context, query_result, is_closed_out);
             }
             return (int)mh$.invokeExact(context, query_result, is_closed_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23785,7 +25642,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23832,6 +25689,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_dispose", query_result);
             }
             mh$.invokeExact(query_result);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23845,7 +25704,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_metadata_get_columns_size");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_metadata_get_columns_size");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23892,6 +25751,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_metadata_get_columns_size", context, query_result_metadata, size_out);
             }
             return (int)mh$.invokeExact(context, query_result_metadata, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23906,7 +25767,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_metadata_get_columns_value");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_metadata_get_columns_value");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -23953,6 +25814,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_metadata_get_columns_value", context, query_result_metadata, index, sql_column_out);
             }
             return (int)mh$.invokeExact(context, query_result_metadata, index, sql_column_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -23963,7 +25826,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_query_result_metadata_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_query_result_metadata_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24010,6 +25873,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_query_result_metadata_dispose", query_result_metadata);
             }
             mh$.invokeExact(query_result_metadata);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24023,7 +25888,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_service_message_version");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_service_message_version");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24070,6 +25935,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_service_message_version", context, sql_client, version_out);
             }
             return (int)mh$.invokeExact(context, sql_client, version_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24083,7 +25950,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_list_tables");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_list_tables");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24130,6 +25997,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_list_tables", context, sql_client, table_list_out);
             }
             return (int)mh$.invokeExact(context, sql_client, table_list_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24144,7 +26013,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_list_tables_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_list_tables_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24191,6 +26060,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_list_tables_for", context, sql_client, timeout, table_list_out);
             }
             return (int)mh$.invokeExact(context, sql_client, timeout, table_list_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24204,7 +26075,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_list_tables_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_list_tables_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24251,6 +26122,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_list_tables_async", context, sql_client, table_list_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, table_list_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24265,7 +26138,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_table_metadata");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_table_metadata");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24312,6 +26185,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_table_metadata", context, sql_client, table_name, table_metadata_out);
             }
             return (int)mh$.invokeExact(context, sql_client, table_name, table_metadata_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24327,7 +26202,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_table_metadata_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_table_metadata_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24374,6 +26249,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_table_metadata_for", context, sql_client, table_name, timeout, table_metadata_out);
             }
             return (int)mh$.invokeExact(context, sql_client, table_name, timeout, table_metadata_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24388,7 +26265,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_table_metadata_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_table_metadata_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24435,6 +26312,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_table_metadata_async", context, sql_client, table_name, table_metadata_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, table_name, table_metadata_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24451,7 +26330,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepare");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepare");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24498,6 +26377,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepare", context, sql_client, sql, placeholders, placeholders_size, prepared_statement_out);
             }
             return (int)mh$.invokeExact(context, sql_client, sql, placeholders, placeholders_size, prepared_statement_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24515,7 +26396,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepare_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepare_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24562,6 +26443,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepare_for", context, sql_client, sql, placeholders, placeholders_size, timeout, prepared_statement_out);
             }
             return (int)mh$.invokeExact(context, sql_client, sql, placeholders, placeholders_size, timeout, prepared_statement_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24578,7 +26461,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepare_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepare_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24625,6 +26508,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepare_async", context, sql_client, sql, placeholders, placeholders_size, prepared_statement_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, sql, placeholders, placeholders_size, prepared_statement_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24639,7 +26524,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_explain");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_explain");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24686,6 +26571,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_explain", context, sql_client, sql, explain_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, sql, explain_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24701,7 +26588,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_explain_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_explain_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24748,6 +26635,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_explain_for", context, sql_client, sql, timeout, explain_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, sql, timeout, explain_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24762,7 +26651,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_explain_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_explain_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24809,6 +26698,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_explain_async", context, sql_client, sql, explain_result_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, sql, explain_result_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24825,7 +26716,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_explain");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_explain");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24872,6 +26763,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_explain", context, sql_client, prepared_statement, parameters, parameters_size, explain_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameters_size, explain_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24889,7 +26782,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_explain_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_explain_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24936,6 +26829,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_explain_for", context, sql_client, prepared_statement, parameters, parameters_size, timeout, explain_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameters_size, timeout, explain_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -24952,7 +26847,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_explain_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_explain_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -24999,6 +26894,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_explain_async", context, sql_client, prepared_statement, parameters, parameters_size, explain_result_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, prepared_statement, parameters, parameters_size, explain_result_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25013,7 +26910,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_start_transaction");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_start_transaction");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25060,6 +26957,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_start_transaction", context, sql_client, transaction_option, transaction_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction_option, transaction_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25075,7 +26974,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_start_transaction_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_start_transaction_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25122,6 +27021,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_start_transaction_for", context, sql_client, transaction_option, timeout, transaction_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction_option, timeout, transaction_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25136,7 +27037,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_start_transaction_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_start_transaction_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25183,6 +27084,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_start_transaction_async", context, sql_client, transaction_option, transaction_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction_option, transaction_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25197,7 +27100,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_error_info");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_transaction_error_info");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25244,6 +27147,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_transaction_error_info", context, sql_client, transaction, transaction_error_info_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, transaction_error_info_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25259,7 +27164,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_error_info_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_transaction_error_info_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25306,6 +27211,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_transaction_error_info_for", context, sql_client, transaction, timeout, transaction_error_info_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, timeout, transaction_error_info_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25320,7 +27227,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_error_info_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_transaction_error_info_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25367,6 +27274,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_transaction_error_info_async", context, sql_client, transaction, transaction_error_info_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, transaction_error_info_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25381,7 +27290,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25428,6 +27337,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_transaction_status", context, sql_client, transaction, transaction_status_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, transaction_status_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25443,7 +27354,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25490,6 +27401,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_transaction_status_for", context, sql_client, transaction, timeout, transaction_status_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, timeout, transaction_status_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25504,7 +27417,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_transaction_status_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25551,6 +27464,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_transaction_status_async", context, sql_client, transaction, transaction_status_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, transaction_status_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25566,7 +27481,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_execute");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_execute");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25613,6 +27528,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_execute", context, sql_client, transaction, sql, execute_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, sql, execute_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25629,7 +27546,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_execute_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_execute_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25676,6 +27593,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_execute_for", context, sql_client, transaction, sql, timeout, execute_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, sql, timeout, execute_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25691,7 +27610,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_execute_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_execute_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25738,6 +27657,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_execute_async", context, sql_client, transaction, sql, execute_result_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, sql, execute_result_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25755,7 +27676,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_execute");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_execute");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25802,6 +27723,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_execute", context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25820,7 +27743,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_execute_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_execute_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25867,6 +27790,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_execute_for", context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, execute_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, execute_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25884,7 +27809,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_execute_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_execute_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25931,6 +27856,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_execute_async", context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, execute_result_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -25946,7 +27873,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_query");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_query");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -25993,6 +27920,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_query", context, sql_client, transaction, sql, query_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, sql, query_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26009,7 +27938,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_query_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_query_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26056,6 +27985,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_query_for", context, sql_client, transaction, sql, timeout, query_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, sql, timeout, query_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26071,7 +28002,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_query_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_query_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26118,6 +28049,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_query_async", context, sql_client, transaction, sql, query_result_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, sql, query_result_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26135,7 +28068,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_query");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_query");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26182,6 +28115,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_query", context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26200,7 +28135,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_query_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_query_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26247,6 +28182,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_query_for", context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, query_result_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, timeout, query_result_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26264,7 +28201,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_prepared_query_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_prepared_query_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26311,6 +28248,958 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_prepared_query_async", context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, prepared_statement, parameters, parameters_size, query_result_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_allows_lob_operation {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_allows_lob_operation");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_allows_lob_operation(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiLobOperation operation, _Bool *allows_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_allows_lob_operation$descriptor() {
+        return tsurugi_ffi_sql_client_allows_lob_operation.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_allows_lob_operation(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiLobOperation operation, _Bool *allows_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_allows_lob_operation$handle() {
+        return tsurugi_ffi_sql_client_allows_lob_operation.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_allows_lob_operation(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiLobOperation operation, _Bool *allows_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_allows_lob_operation$address() {
+        return tsurugi_ffi_sql_client_allows_lob_operation.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_allows_lob_operation(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiLobOperation operation, _Bool *allows_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_allows_lob_operation(MemorySegment context, MemorySegment sql_client, int operation, MemorySegment allows_out) {
+        var mh$ = tsurugi_ffi_sql_client_allows_lob_operation.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_allows_lob_operation", context, sql_client, operation, allows_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, operation, allows_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_blob_file {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_blob_file");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_blob_file$descriptor() {
+        return tsurugi_ffi_sql_client_upload_blob_file.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_blob_file$handle() {
+        return tsurugi_ffi_sql_client_upload_blob_file.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_blob_file$address() {
+        return tsurugi_ffi_sql_client_upload_blob_file.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_blob_file(MemorySegment context, MemorySegment sql_client, MemorySegment path, MemorySegment blob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_blob_file.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_blob_file", context, sql_client, path, blob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, path, blob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_blob_file_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_blob_file_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_blob_file_for$descriptor() {
+        return tsurugi_ffi_sql_client_upload_blob_file_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_blob_file_for$handle() {
+        return tsurugi_ffi_sql_client_upload_blob_file_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_blob_file_for$address() {
+        return tsurugi_ffi_sql_client_upload_blob_file_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_blob_file_for(MemorySegment context, MemorySegment sql_client, MemorySegment path, long timeout, MemorySegment blob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_blob_file_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_blob_file_for", context, sql_client, path, timeout, blob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, path, timeout, blob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_blob_file_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_blob_file_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_blob_file_async$descriptor() {
+        return tsurugi_ffi_sql_client_upload_blob_file_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_blob_file_async$handle() {
+        return tsurugi_ffi_sql_client_upload_blob_file_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_blob_file_async$address() {
+        return tsurugi_ffi_sql_client_upload_blob_file_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_blob_file_async(MemorySegment context, MemorySegment sql_client, MemorySegment path, MemorySegment blob_job_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_blob_file_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_blob_file_async", context, sql_client, path, blob_job_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, path, blob_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_clob_file {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_clob_file");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_clob_file$descriptor() {
+        return tsurugi_ffi_sql_client_upload_clob_file.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_clob_file$handle() {
+        return tsurugi_ffi_sql_client_upload_clob_file.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_clob_file$address() {
+        return tsurugi_ffi_sql_client_upload_clob_file.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_clob_file(MemorySegment context, MemorySegment sql_client, MemorySegment path, MemorySegment clob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_clob_file.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_clob_file", context, sql_client, path, clob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, path, clob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_clob_file_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_clob_file_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_clob_file_for$descriptor() {
+        return tsurugi_ffi_sql_client_upload_clob_file_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_clob_file_for$handle() {
+        return tsurugi_ffi_sql_client_upload_clob_file_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_clob_file_for$address() {
+        return tsurugi_ffi_sql_client_upload_clob_file_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_clob_file_for(MemorySegment context, MemorySegment sql_client, MemorySegment path, long timeout, MemorySegment clob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_clob_file_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_clob_file_for", context, sql_client, path, timeout, clob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, path, timeout, clob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_clob_file_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_clob_file_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_clob_file_async$descriptor() {
+        return tsurugi_ffi_sql_client_upload_clob_file_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_clob_file_async$handle() {
+        return tsurugi_ffi_sql_client_upload_clob_file_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_clob_file_async$address() {
+        return tsurugi_ffi_sql_client_upload_clob_file_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle path, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_clob_file_async(MemorySegment context, MemorySegment sql_client, MemorySegment path, MemorySegment clob_job_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_clob_file_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_clob_file_async", context, sql_client, path, clob_job_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, path, clob_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_blob {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_blob");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_blob$descriptor() {
+        return tsurugi_ffi_sql_client_upload_blob.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_blob$handle() {
+        return tsurugi_ffi_sql_client_upload_blob.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_blob$address() {
+        return tsurugi_ffi_sql_client_upload_blob.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_blob(MemorySegment context, MemorySegment sql_client, MemorySegment value, long size, MemorySegment blob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_blob.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_blob", context, sql_client, value, size, blob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, value, size, blob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_blob_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_blob_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_blob_for$descriptor() {
+        return tsurugi_ffi_sql_client_upload_blob_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_blob_for$handle() {
+        return tsurugi_ffi_sql_client_upload_blob_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_blob_for$address() {
+        return tsurugi_ffi_sql_client_upload_blob_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiDuration timeout, TsurugiFfiBlobHandle *blob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_blob_for(MemorySegment context, MemorySegment sql_client, MemorySegment value, long size, long timeout, MemorySegment blob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_blob_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_blob_for", context, sql_client, value, size, timeout, blob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, value, size, timeout, blob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_blob_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_blob_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_blob_async$descriptor() {
+        return tsurugi_ffi_sql_client_upload_blob_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_blob_async$handle() {
+        return tsurugi_ffi_sql_client_upload_blob_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_blob_async$address() {
+        return tsurugi_ffi_sql_client_upload_blob_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiByteArrayHandle value, uint64_t size, TsurugiFfiJobHandle *blob_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_blob_async(MemorySegment context, MemorySegment sql_client, MemorySegment value, long size, MemorySegment blob_job_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_blob_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_blob_async", context, sql_client, value, size, blob_job_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, value, size, blob_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_clob {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_clob");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_clob$descriptor() {
+        return tsurugi_ffi_sql_client_upload_clob.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_clob$handle() {
+        return tsurugi_ffi_sql_client_upload_clob.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_clob$address() {
+        return tsurugi_ffi_sql_client_upload_clob.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_clob(MemorySegment context, MemorySegment sql_client, MemorySegment value, MemorySegment clob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_clob.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_clob", context, sql_client, value, clob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, value, clob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_clob_for {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_clob_for");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_clob_for$descriptor() {
+        return tsurugi_ffi_sql_client_upload_clob_for.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_clob_for$handle() {
+        return tsurugi_ffi_sql_client_upload_clob_for.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_clob_for$address() {
+        return tsurugi_ffi_sql_client_upload_clob_for.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_for(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiDuration timeout, TsurugiFfiClobHandle *clob_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_clob_for(MemorySegment context, MemorySegment sql_client, MemorySegment value, long timeout, MemorySegment clob_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_clob_for.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_clob_for", context, sql_client, value, timeout, clob_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, value, timeout, clob_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_upload_clob_async {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_upload_clob_async");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_upload_clob_async$descriptor() {
+        return tsurugi_ffi_sql_client_upload_clob_async.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_upload_clob_async$handle() {
+        return tsurugi_ffi_sql_client_upload_clob_async.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_upload_clob_async$address() {
+        return tsurugi_ffi_sql_client_upload_clob_async.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_async(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiStringHandle value, TsurugiFfiJobHandle *clob_job_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_upload_clob_async(MemorySegment context, MemorySegment sql_client, MemorySegment value, MemorySegment clob_job_out) {
+        var mh$ = tsurugi_ffi_sql_client_upload_clob_async.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_upload_clob_async", context, sql_client, value, clob_job_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, value, clob_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_create_blob_uploader {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_create_blob_uploader");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiBlobUploaderHandle *blob_uploader_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_create_blob_uploader$descriptor() {
+        return tsurugi_ffi_sql_client_create_blob_uploader.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiBlobUploaderHandle *blob_uploader_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_create_blob_uploader$handle() {
+        return tsurugi_ffi_sql_client_create_blob_uploader.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiBlobUploaderHandle *blob_uploader_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_create_blob_uploader$address() {
+        return tsurugi_ffi_sql_client_create_blob_uploader.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiBlobUploaderHandle *blob_uploader_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_create_blob_uploader(MemorySegment context, MemorySegment sql_client, MemorySegment blob_uploader_out) {
+        var mh$ = tsurugi_ffi_sql_client_create_blob_uploader.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_create_blob_uploader", context, sql_client, blob_uploader_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, blob_uploader_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_create_clob_uploader {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_create_clob_uploader");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiClobUploaderHandle *clob_uploader_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_create_clob_uploader$descriptor() {
+        return tsurugi_ffi_sql_client_create_clob_uploader.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiClobUploaderHandle *clob_uploader_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_create_clob_uploader$handle() {
+        return tsurugi_ffi_sql_client_create_clob_uploader.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiClobUploaderHandle *clob_uploader_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_create_clob_uploader$address() {
+        return tsurugi_ffi_sql_client_create_clob_uploader.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_uploader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiClobUploaderHandle *clob_uploader_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_create_clob_uploader(MemorySegment context, MemorySegment sql_client, MemorySegment clob_uploader_out) {
+        var mh$ = tsurugi_ffi_sql_client_create_clob_uploader.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_create_clob_uploader", context, sql_client, clob_uploader_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, clob_uploader_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26326,7 +29215,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_blob_cache");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_blob_cache");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26373,6 +29262,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_blob_cache", context, sql_client, transaction, blob, large_object_cache_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, large_object_cache_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26389,7 +29280,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_blob_cache_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_blob_cache_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26436,6 +29327,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_blob_cache_for", context, sql_client, transaction, blob, timeout, large_object_cache_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, timeout, large_object_cache_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26451,7 +29344,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_blob_cache_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_blob_cache_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26498,6 +29391,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_blob_cache_async", context, sql_client, transaction, blob, large_object_cache_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, large_object_cache_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26513,7 +29408,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_clob_cache");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_clob_cache");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26560,6 +29455,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_clob_cache", context, sql_client, transaction, clob, large_object_cache_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, large_object_cache_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26576,7 +29473,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_clob_cache_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_clob_cache_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26623,6 +29520,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_clob_cache_for", context, sql_client, transaction, clob, timeout, large_object_cache_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, timeout, large_object_cache_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26638,7 +29537,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_get_clob_cache_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_get_clob_cache_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26685,6 +29584,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_get_clob_cache_async", context, sql_client, transaction, clob, large_object_cache_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, large_object_cache_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26701,7 +29602,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_read_blob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_read_blob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26748,6 +29649,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_read_blob", context, sql_client, transaction, blob, value_out, size_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, value_out, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26765,7 +29668,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_read_blob_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_read_blob_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26812,6 +29715,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_read_blob_for", context, sql_client, transaction, blob, timeout, value_out, size_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, timeout, value_out, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26827,7 +29732,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_read_clob");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_read_clob");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26874,6 +29779,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_read_clob", context, sql_client, transaction, clob, value_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26890,7 +29797,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_read_clob_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_read_clob_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26937,6 +29844,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_read_clob_for", context, sql_client, transaction, clob, timeout, value_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, timeout, value_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -26952,7 +29861,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_copy_blob_to");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_copy_blob_to");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -26999,6 +29908,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_copy_blob_to", context, sql_client, transaction, blob, destination);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, destination);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27015,7 +29926,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_copy_blob_to_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_copy_blob_to_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27062,6 +29973,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_copy_blob_to_for", context, sql_client, transaction, blob, destination, timeout);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, destination, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27078,7 +29991,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_copy_blob_to_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_copy_blob_to_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27125,6 +30038,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_copy_blob_to_async", context, sql_client, transaction, blob, destination, copy_blob_to_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, blob, destination, copy_blob_to_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27140,7 +30055,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_copy_clob_to");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_copy_clob_to");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27187,6 +30102,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_copy_clob_to", context, sql_client, transaction, clob, destination);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, destination);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27203,7 +30120,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_copy_clob_to_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_copy_clob_to_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27250,6 +30167,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_copy_clob_to_for", context, sql_client, transaction, clob, destination, timeout);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, destination, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27266,7 +30185,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_copy_clob_to_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_copy_clob_to_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27313,6 +30232,138 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_copy_clob_to_async", context, sql_client, transaction, clob, destination, copy_clob_to_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, clob, destination, copy_clob_to_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_create_blob_downloader {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_create_blob_downloader");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiBlobReferenceHandle blob, TsurugiFfiDuration timeout, TsurugiFfiBlobDownloaderHandle *blob_downloader_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_create_blob_downloader$descriptor() {
+        return tsurugi_ffi_sql_client_create_blob_downloader.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiBlobReferenceHandle blob, TsurugiFfiDuration timeout, TsurugiFfiBlobDownloaderHandle *blob_downloader_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_create_blob_downloader$handle() {
+        return tsurugi_ffi_sql_client_create_blob_downloader.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiBlobReferenceHandle blob, TsurugiFfiDuration timeout, TsurugiFfiBlobDownloaderHandle *blob_downloader_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_create_blob_downloader$address() {
+        return tsurugi_ffi_sql_client_create_blob_downloader.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiBlobReferenceHandle blob, TsurugiFfiDuration timeout, TsurugiFfiBlobDownloaderHandle *blob_downloader_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_create_blob_downloader(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment blob, long timeout, MemorySegment blob_downloader_out) {
+        var mh$ = tsurugi_ffi_sql_client_create_blob_downloader.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_create_blob_downloader", context, sql_client, transaction, blob, timeout, blob_downloader_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, transaction, blob, timeout, blob_downloader_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_sql_client_create_clob_downloader {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_LONG_LONG,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_create_clob_downloader");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiClobReferenceHandle clob, TsurugiFfiDuration timeout, TsurugiFfiClobDownloaderHandle *clob_downloader_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_sql_client_create_clob_downloader$descriptor() {
+        return tsurugi_ffi_sql_client_create_clob_downloader.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiClobReferenceHandle clob, TsurugiFfiDuration timeout, TsurugiFfiClobDownloaderHandle *clob_downloader_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_sql_client_create_clob_downloader$handle() {
+        return tsurugi_ffi_sql_client_create_clob_downloader.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiClobReferenceHandle clob, TsurugiFfiDuration timeout, TsurugiFfiClobDownloaderHandle *clob_downloader_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_sql_client_create_clob_downloader$address() {
+        return tsurugi_ffi_sql_client_create_clob_downloader.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_downloader(TsurugiFfiContextHandle context, TsurugiFfiSqlClientHandle sql_client, TsurugiFfiTransactionHandle transaction, TsurugiFfiClobReferenceHandle clob, TsurugiFfiDuration timeout, TsurugiFfiClobDownloaderHandle *clob_downloader_out)
+     * }
+     */
+    public static int tsurugi_ffi_sql_client_create_clob_downloader(MemorySegment context, MemorySegment sql_client, MemorySegment transaction, MemorySegment clob, long timeout, MemorySegment clob_downloader_out) {
+        var mh$ = tsurugi_ffi_sql_client_create_clob_downloader.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_sql_client_create_clob_downloader", context, sql_client, transaction, clob, timeout, clob_downloader_out);
+            }
+            return (int)mh$.invokeExact(context, sql_client, transaction, clob, timeout, clob_downloader_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27327,7 +30378,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_commit");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_commit");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27374,6 +30425,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_commit", context, sql_client, transaction, commit_option);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, commit_option);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27389,7 +30442,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_commit_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_commit_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27436,6 +30489,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_commit_for", context, sql_client, transaction, commit_option, timeout);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, commit_option, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27451,7 +30506,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_commit_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_commit_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27498,6 +30553,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_commit_async", context, sql_client, transaction, commit_option, commit_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, commit_option, commit_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27511,7 +30568,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_rollback");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_rollback");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27558,6 +30615,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_rollback", context, sql_client, transaction);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27572,7 +30631,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_rollback_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_rollback_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27619,6 +30678,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_rollback_for", context, sql_client, transaction, timeout);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27633,7 +30694,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_rollback_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_rollback_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27680,6 +30741,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_rollback_async", context, sql_client, transaction, rollback_job_out);
             }
             return (int)mh$.invokeExact(context, sql_client, transaction, rollback_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27690,7 +30753,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_sql_client_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_sql_client_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27737,6 +30800,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_sql_client_dispose", sql_client);
             }
             mh$.invokeExact(sql_client);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27751,7 +30816,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_list_get_table_names");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_list_get_table_names");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27798,6 +30863,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_list_get_table_names", context, table_list, table_names_out, table_names_size_out);
             }
             return (int)mh$.invokeExact(context, table_list, table_names_out, table_names_size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27808,7 +30875,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_list_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_list_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27855,6 +30922,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_list_dispose", table_list);
             }
             mh$.invokeExact(table_list);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27868,7 +30937,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_database_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_get_database_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27915,6 +30984,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_get_database_name", context, table_metadata, database_name_out);
             }
             return (int)mh$.invokeExact(context, table_metadata, database_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27928,7 +30999,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_schema_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_get_schema_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -27975,6 +31046,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_get_schema_name", context, table_metadata, schema_name_out);
             }
             return (int)mh$.invokeExact(context, table_metadata, schema_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -27988,7 +31061,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_table_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_get_table_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28035,6 +31108,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_get_table_name", context, table_metadata, table_name_out);
             }
             return (int)mh$.invokeExact(context, table_metadata, table_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28048,7 +31123,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_description");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_get_description");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28095,6 +31170,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_get_description", context, table_metadata, description_out);
             }
             return (int)mh$.invokeExact(context, table_metadata, description_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28108,7 +31185,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_columns_size");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_get_columns_size");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28155,6 +31232,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_get_columns_size", context, table_metadata, size_out);
             }
             return (int)mh$.invokeExact(context, table_metadata, size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28169,7 +31248,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_columns_value");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_get_columns_value");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28216,6 +31295,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_get_columns_value", context, table_metadata, index, sql_column_out);
             }
             return (int)mh$.invokeExact(context, table_metadata, index, sql_column_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28230,7 +31311,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_get_primary_keys");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_get_primary_keys");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28277,6 +31358,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_get_primary_keys", context, table_metadata, primary_keys_out, primary_keys_size_out);
             }
             return (int)mh$.invokeExact(context, table_metadata, primary_keys_out, primary_keys_size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28287,7 +31370,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_table_metadata_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_table_metadata_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28334,6 +31417,67 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_table_metadata_dispose", table_metadata);
             }
             mh$.invokeExact(table_metadata);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_blob_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_dispose(TsurugiFfiBlobHandle blob)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_blob_dispose$descriptor() {
+        return tsurugi_ffi_blob_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_dispose(TsurugiFfiBlobHandle blob)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_blob_dispose$handle() {
+        return tsurugi_ffi_blob_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_dispose(TsurugiFfiBlobHandle blob)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_blob_dispose$address() {
+        return tsurugi_ffi_blob_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_blob_dispose(TsurugiFfiBlobHandle blob)
+     * }
+     */
+    public static void tsurugi_ffi_blob_dispose(MemorySegment blob) {
+        var mh$ = tsurugi_ffi_blob_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_blob_dispose", blob);
+            }
+            mh$.invokeExact(blob);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28344,7 +31488,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_blob_reference_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_blob_reference_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28391,6 +31535,67 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_blob_reference_dispose", blob_reference);
             }
             mh$.invokeExact(blob_reference);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_clob_dispose {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_dispose");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_dispose(TsurugiFfiClobHandle clob)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_clob_dispose$descriptor() {
+        return tsurugi_ffi_clob_dispose.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_dispose(TsurugiFfiClobHandle clob)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_clob_dispose$handle() {
+        return tsurugi_ffi_clob_dispose.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_dispose(TsurugiFfiClobHandle clob)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_clob_dispose$address() {
+        return tsurugi_ffi_clob_dispose.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void tsurugi_ffi_clob_dispose(TsurugiFfiClobHandle clob)
+     * }
+     */
+    public static void tsurugi_ffi_clob_dispose(MemorySegment clob) {
+        var mh$ = tsurugi_ffi_clob_dispose.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_clob_dispose", clob);
+            }
+            mh$.invokeExact(clob);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28401,7 +31606,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_clob_reference_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_clob_reference_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28448,6 +31653,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_clob_reference_dispose", clob_reference);
             }
             mh$.invokeExact(clob_reference);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28461,7 +31668,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_large_object_cache_get_path");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_large_object_cache_get_path");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28508,6 +31715,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_large_object_cache_get_path", context, large_object_cache, path_out);
             }
             return (int)mh$.invokeExact(context, large_object_cache, path_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28518,7 +31727,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_large_object_cache_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_large_object_cache_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28565,6 +31774,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_large_object_cache_dispose", large_object_cache);
             }
             mh$.invokeExact(large_object_cache);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28578,7 +31789,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_service_message_version");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_client_get_service_message_version");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28625,6 +31836,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_client_get_service_message_version", context, system_client, version_out);
             }
             return (int)mh$.invokeExact(context, system_client, version_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28638,7 +31851,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_system_info");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_client_get_system_info");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28685,6 +31898,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_client_get_system_info", context, system_client, system_info_out);
             }
             return (int)mh$.invokeExact(context, system_client, system_info_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28699,7 +31914,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_system_info_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_client_get_system_info_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28746,6 +31961,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_client_get_system_info_for", context, system_client, timeout, system_info_out);
             }
             return (int)mh$.invokeExact(context, system_client, timeout, system_info_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28759,7 +31976,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_get_system_info_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_client_get_system_info_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28806,6 +32023,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_client_get_system_info_async", context, system_client, system_info_job_out);
             }
             return (int)mh$.invokeExact(context, system_client, system_info_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28816,7 +32035,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_client_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_client_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28863,6 +32082,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_client_dispose", system_client);
             }
             mh$.invokeExact(system_client);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28876,7 +32097,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_info_get_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_info_get_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28923,6 +32144,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_info_get_name", context, system_info, name_out);
             }
             return (int)mh$.invokeExact(context, system_info, name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28936,7 +32159,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_info_get_version");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_info_get_version");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -28983,6 +32206,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_info_get_version", context, system_info, version_out);
             }
             return (int)mh$.invokeExact(context, system_info, version_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -28993,7 +32218,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_system_info_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_system_info_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29040,6 +32265,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_system_info_dispose", system_info);
             }
             mh$.invokeExact(system_info);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29052,7 +32279,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_null");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_credential_null");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29099,6 +32326,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_credential_null", context, credential_out);
             }
             return (int)mh$.invokeExact(context, credential_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29113,7 +32342,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_from_user_password");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_credential_from_user_password");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29160,6 +32389,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_credential_from_user_password", context, user, password, credential_out);
             }
             return (int)mh$.invokeExact(context, user, password, credential_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29173,7 +32404,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_from_auth_token");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_credential_from_auth_token");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29220,6 +32451,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_credential_from_auth_token", context, token, credential_out);
             }
             return (int)mh$.invokeExact(context, token, credential_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29233,7 +32466,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_load");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_credential_load");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29280,6 +32513,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_credential_load", context, path, credential_out);
             }
             return (int)mh$.invokeExact(context, path, credential_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29290,7 +32525,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_credential_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_credential_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29337,6 +32572,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_credential_dispose", credential);
             }
             mh$.invokeExact(credential);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29350,7 +32587,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_endpoint_parse");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_endpoint_parse");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29397,6 +32634,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_endpoint_parse", context, endpoint, endpoint_out);
             }
             return (int)mh$.invokeExact(context, endpoint, endpoint_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29407,7 +32646,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_endpoint_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_endpoint_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29454,6 +32693,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_endpoint_dispose", endpoint);
             }
             mh$.invokeExact(endpoint);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29466,7 +32707,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_create");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_create");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29513,6 +32754,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_create", context, connection_option_out);
             }
             return (int)mh$.invokeExact(context, connection_option_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29526,7 +32769,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_endpoint");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_endpoint");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29573,6 +32816,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_endpoint", context, connection_option, endpoint);
             }
             return (int)mh$.invokeExact(context, connection_option, endpoint);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29586,7 +32831,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_endpoint_url");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_endpoint_url");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29633,6 +32878,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_endpoint_url", context, connection_option, endpoint_url);
             }
             return (int)mh$.invokeExact(context, connection_option, endpoint_url);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29646,7 +32893,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_endpoint_url");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_endpoint_url");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29693,6 +32940,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_endpoint_url", context, connection_option, endpoint_url_out);
             }
             return (int)mh$.invokeExact(context, connection_option, endpoint_url_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29706,7 +32955,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_credential");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_credential");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29753,6 +33002,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_credential", context, connection_option, credential);
             }
             return (int)mh$.invokeExact(context, connection_option, credential);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29766,7 +33017,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_application_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_application_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29813,6 +33064,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_application_name", context, connection_option, application_name);
             }
             return (int)mh$.invokeExact(context, connection_option, application_name);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29826,7 +33079,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_application_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_application_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29873,6 +33126,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_application_name", context, connection_option, application_name_out);
             }
             return (int)mh$.invokeExact(context, connection_option, application_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29886,7 +33141,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_session_label");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_session_label");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29933,6 +33188,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_session_label", context, connection_option, session_label);
             }
             return (int)mh$.invokeExact(context, connection_option, session_label);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -29946,7 +33203,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_session_label");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_session_label");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -29993,6 +33250,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_session_label", context, connection_option, session_label_out);
             }
             return (int)mh$.invokeExact(context, connection_option, session_label_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30006,7 +33265,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_keep_alive");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_keep_alive");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30053,6 +33312,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_keep_alive", context, connection_option, keep_alive);
             }
             return (int)mh$.invokeExact(context, connection_option, keep_alive);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30066,7 +33327,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_keep_alive");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_keep_alive");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30113,6 +33374,132 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_keep_alive", context, connection_option, keep_alive_out);
             }
             return (int)mh$.invokeExact(context, connection_option, keep_alive_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_set_lob_transfer_type {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_INT
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_lob_transfer_type");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType lob_transfer_type)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_set_lob_transfer_type$descriptor() {
+        return tsurugi_ffi_connection_option_set_lob_transfer_type.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType lob_transfer_type)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_set_lob_transfer_type$handle() {
+        return tsurugi_ffi_connection_option_set_lob_transfer_type.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType lob_transfer_type)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_set_lob_transfer_type$address() {
+        return tsurugi_ffi_connection_option_set_lob_transfer_type.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType lob_transfer_type)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_set_lob_transfer_type(MemorySegment context, MemorySegment connection_option, int lob_transfer_type) {
+        var mh$ = tsurugi_ffi_connection_option_set_lob_transfer_type.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_set_lob_transfer_type", context, connection_option, lob_transfer_type);
+            }
+            return (int)mh$.invokeExact(context, connection_option, lob_transfer_type);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_get_lob_transfer_type {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_lob_transfer_type");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_get_lob_transfer_type$descriptor() {
+        return tsurugi_ffi_connection_option_get_lob_transfer_type.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_get_lob_transfer_type$handle() {
+        return tsurugi_ffi_connection_option_get_lob_transfer_type.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_get_lob_transfer_type$address() {
+        return tsurugi_ffi_connection_option_get_lob_transfer_type.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_get_lob_transfer_type(MemorySegment context, MemorySegment connection_option, MemorySegment lob_transfer_type_out) {
+        var mh$ = tsurugi_ffi_connection_option_get_lob_transfer_type.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_get_lob_transfer_type", context, connection_option, lob_transfer_type_out);
+            }
+            return (int)mh$.invokeExact(context, connection_option, lob_transfer_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30127,7 +33514,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30174,6 +33561,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_add_large_object_path_mapping", context, connection_option, client_path, server_path);
             }
             return (int)mh$.invokeExact(context, connection_option, client_path, server_path);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30188,7 +33577,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30235,6 +33624,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_send", context, connection_option, client_path, server_path);
             }
             return (int)mh$.invokeExact(context, connection_option, client_path, server_path);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30249,7 +33640,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30296,6 +33687,132 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv", context, connection_option, server_path, client_path);
             }
             return (int)mh$.invokeExact(context, connection_option, server_path, client_path);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_set_blob_relay_service_endpoint {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_blob_relay_service_endpoint");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_set_blob_relay_service_endpoint$descriptor() {
+        return tsurugi_ffi_connection_option_set_blob_relay_service_endpoint.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_set_blob_relay_service_endpoint$handle() {
+        return tsurugi_ffi_connection_option_set_blob_relay_service_endpoint.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_set_blob_relay_service_endpoint$address() {
+        return tsurugi_ffi_connection_option_set_blob_relay_service_endpoint.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle endpoint)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint) {
+        var mh$ = tsurugi_ffi_connection_option_set_blob_relay_service_endpoint.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_set_blob_relay_service_endpoint", context, connection_option, endpoint);
+            }
+            return (int)mh$.invokeExact(context, connection_option, endpoint);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_connection_option_get_blob_relay_service_endpoint {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_blob_relay_service_endpoint");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_get_blob_relay_service_endpoint$descriptor() {
+        return tsurugi_ffi_connection_option_get_blob_relay_service_endpoint.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_get_blob_relay_service_endpoint$handle() {
+        return tsurugi_ffi_connection_option_get_blob_relay_service_endpoint.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_get_blob_relay_service_endpoint$address() {
+        return tsurugi_ffi_connection_option_get_blob_relay_service_endpoint.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle *endpoint_out)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(MemorySegment context, MemorySegment connection_option, MemorySegment endpoint_out) {
+        var mh$ = tsurugi_ffi_connection_option_get_blob_relay_service_endpoint.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_get_blob_relay_service_endpoint", context, connection_option, endpoint_out);
+            }
+            return (int)mh$.invokeExact(context, connection_option, endpoint_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30309,7 +33826,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_default_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_default_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30356,6 +33873,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_default_timeout", context, connection_option, default_timeout);
             }
             return (int)mh$.invokeExact(context, connection_option, default_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30369,7 +33888,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_default_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_default_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30416,6 +33935,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_default_timeout", context, connection_option, default_timeout_out);
             }
             return (int)mh$.invokeExact(context, connection_option, default_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30429,7 +33950,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_send_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_send_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30476,6 +33997,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_send_timeout", context, connection_option, send_timeout);
             }
             return (int)mh$.invokeExact(context, connection_option, send_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30489,7 +34012,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_send_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_send_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30536,6 +34059,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_send_timeout", context, connection_option, send_timeout_out);
             }
             return (int)mh$.invokeExact(context, connection_option, send_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30549,7 +34074,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_recv_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_set_recv_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30596,6 +34121,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_set_recv_timeout", context, connection_option, recv_timeout);
             }
             return (int)mh$.invokeExact(context, connection_option, recv_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30609,7 +34136,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_get_recv_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_get_recv_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30656,6 +34183,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_get_recv_timeout", context, connection_option, recv_timeout_out);
             }
             return (int)mh$.invokeExact(context, connection_option, recv_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30666,7 +34195,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_connection_option_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30713,6 +34242,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_connection_option_dispose", connection_option);
             }
             mh$.invokeExact(connection_option);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30726,7 +34257,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_connect");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_connect");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30773,6 +34304,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_connect", context, connection_option, session_out);
             }
             return (int)mh$.invokeExact(context, connection_option, session_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30787,7 +34320,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_connect_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_connect_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30834,6 +34367,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_connect_for", context, connection_option, timeout, session_out);
             }
             return (int)mh$.invokeExact(context, connection_option, timeout, session_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30847,7 +34382,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_connect_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_connect_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30894,6 +34429,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_connect_async", context, connection_option, session_job_out);
             }
             return (int)mh$.invokeExact(context, connection_option, session_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30907,7 +34444,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_get_user_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_get_user_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -30954,6 +34491,70 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_get_user_name", context, session, user_name_out);
             }
             return (int)mh$.invokeExact(context, session, user_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class tsurugi_ffi_session_get_lob_transfer_type {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_get_lob_transfer_type");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_session_get_lob_transfer_type$descriptor() {
+        return tsurugi_ffi_session_get_lob_transfer_type.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_session_get_lob_transfer_type$handle() {
+        return tsurugi_ffi_session_get_lob_transfer_type.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_session_get_lob_transfer_type$address() {
+        return tsurugi_ffi_session_get_lob_transfer_type.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_session_get_lob_transfer_type(TsurugiFfiContextHandle context, TsurugiFfiSessionHandle session, TsurugiFfiLobTransferType *lob_transfer_type_out)
+     * }
+     */
+    public static int tsurugi_ffi_session_get_lob_transfer_type(MemorySegment context, MemorySegment session, MemorySegment lob_transfer_type_out) {
+        var mh$ = tsurugi_ffi_session_get_lob_transfer_type.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_session_get_lob_transfer_type", context, session, lob_transfer_type_out);
+            }
+            return (int)mh$.invokeExact(context, session, lob_transfer_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -30967,7 +34568,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_set_default_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_set_default_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31014,6 +34615,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_set_default_timeout", context, session, default_timeout);
             }
             return (int)mh$.invokeExact(context, session, default_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31027,7 +34630,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_get_default_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_get_default_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31074,6 +34677,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_get_default_timeout", context, session, default_timeout_out);
             }
             return (int)mh$.invokeExact(context, session, default_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31087,7 +34692,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_make_sql_client");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_make_sql_client");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31134,6 +34739,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_make_sql_client", context, session, sql_client_out);
             }
             return (int)mh$.invokeExact(context, session, sql_client_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31147,7 +34754,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_make_system_client");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_make_system_client");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31194,6 +34801,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_make_system_client", context, session, system_client_out);
             }
             return (int)mh$.invokeExact(context, session, system_client_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31208,7 +34817,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_update_expiration_time");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_update_expiration_time");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31255,6 +34864,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_update_expiration_time", context, session, expiration_time_exists, expiration_time);
             }
             return (int)mh$.invokeExact(context, session, expiration_time_exists, expiration_time);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31270,7 +34881,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_update_expiration_time_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_update_expiration_time_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31317,6 +34928,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_update_expiration_time_for", context, session, expiration_time_exists, expiration_time, timeout);
             }
             return (int)mh$.invokeExact(context, session, expiration_time_exists, expiration_time, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31332,7 +34945,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_update_expiration_time_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_update_expiration_time_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31379,6 +34992,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_update_expiration_time_async", context, session, expiration_time_exists, expiration_time, update_expiration_time_job_out);
             }
             return (int)mh$.invokeExact(context, session, expiration_time_exists, expiration_time, update_expiration_time_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31392,7 +35007,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_shutdown");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_shutdown");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31439,6 +35054,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_shutdown", context, session, shutdown_type);
             }
             return (int)mh$.invokeExact(context, session, shutdown_type);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31453,7 +35070,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_shutdown_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_shutdown_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31500,6 +35117,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_shutdown_for", context, session, shutdown_type, timeout);
             }
             return (int)mh$.invokeExact(context, session, shutdown_type, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31514,7 +35133,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_shutdown_async");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_shutdown_async");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31561,6 +35180,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_shutdown_async", context, session, shutdown_type, shutdown_job_out);
             }
             return (int)mh$.invokeExact(context, session, shutdown_type, shutdown_job_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31574,7 +35195,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_is_shutdowned");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_is_shutdowned");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31621,6 +35242,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_is_shutdowned", context, session, is_shutdowned_out);
             }
             return (int)mh$.invokeExact(context, session, is_shutdowned_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31633,7 +35256,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_close");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_close");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31680,6 +35303,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_close", context, session);
             }
             return (int)mh$.invokeExact(context, session);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31693,7 +35318,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_is_closed");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_is_closed");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31740,6 +35365,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_is_closed", context, session, is_closed_out);
             }
             return (int)mh$.invokeExact(context, session, is_closed_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31750,7 +35377,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_session_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_session_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31797,6 +35424,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_session_dispose", session);
             }
             mh$.invokeExact(session);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31809,7 +35438,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_create");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_commit_option_create");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31856,6 +35485,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_commit_option_create", context, commit_option_out);
             }
             return (int)mh$.invokeExact(context, commit_option_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31869,7 +35500,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_set_commit_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_commit_option_set_commit_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31916,6 +35547,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_commit_option_set_commit_type", context, commit_option, commit_type);
             }
             return (int)mh$.invokeExact(context, commit_option, commit_type);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31929,7 +35562,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_get_commit_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_commit_option_get_commit_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -31976,6 +35609,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_commit_option_get_commit_type", context, commit_option, commit_type_out);
             }
             return (int)mh$.invokeExact(context, commit_option, commit_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -31989,7 +35624,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_BOOL
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_set_auto_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_commit_option_set_auto_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32036,6 +35671,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_commit_option_set_auto_dispose", context, commit_option, auto_dispose);
             }
             return (int)mh$.invokeExact(context, commit_option, auto_dispose);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32049,7 +35686,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_get_auto_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_commit_option_get_auto_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32096,6 +35733,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_commit_option_get_auto_dispose", context, commit_option, auto_dispose_out);
             }
             return (int)mh$.invokeExact(context, commit_option, auto_dispose_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32106,7 +35745,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_commit_option_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_commit_option_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32153,6 +35792,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_commit_option_dispose", commit_option);
             }
             mh$.invokeExact(commit_option);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32166,7 +35807,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_is_normal");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_is_normal");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32213,6 +35854,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_is_normal", context, transaction_error_info, is_normal_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, is_normal_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32226,7 +35869,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_is_error");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_is_error");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32273,6 +35916,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_is_error", context, transaction_error_info, is_error_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, is_error_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32286,7 +35931,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_name");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_name");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32333,6 +35978,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_get_server_error_name", context, transaction_error_info, error_name_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, error_name_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32346,7 +35993,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_message");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_message");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32393,6 +36040,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_get_server_error_message", context, transaction_error_info, error_message_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, error_message_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32406,7 +36055,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_category_number");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_category_number");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32453,6 +36102,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_get_server_error_category_number", context, transaction_error_info, category_number_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, category_number_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32466,7 +36117,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_category_str");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_category_str");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32513,6 +36164,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_get_server_error_category_str", context, transaction_error_info, category_str_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, category_str_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32526,7 +36179,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_code_number");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_code_number");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32573,6 +36226,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_get_server_error_code_number", context, transaction_error_info, code_number_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, code_number_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32586,7 +36241,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_structured_code");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_get_server_error_structured_code");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32633,6 +36288,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_get_server_error_structured_code", context, transaction_error_info, structured_code_out);
             }
             return (int)mh$.invokeExact(context, transaction_error_info, structured_code_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32643,7 +36300,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_error_info_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_error_info_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32690,6 +36347,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_error_info_dispose", transaction_error_info);
             }
             mh$.invokeExact(transaction_error_info);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32702,7 +36361,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_create");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_create");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32749,6 +36408,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_create", context, transaction_option_out);
             }
             return (int)mh$.invokeExact(context, transaction_option_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32762,7 +36423,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_transaction_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_transaction_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32809,6 +36470,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_transaction_type", context, transaction_option, transaction_type);
             }
             return (int)mh$.invokeExact(context, transaction_option, transaction_type);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32822,7 +36485,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_transaction_type");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_transaction_type");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32869,6 +36532,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_transaction_type", context, transaction_option, transaction_type_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, transaction_type_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32882,7 +36547,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_transaction_label");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_transaction_label");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32929,6 +36594,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_transaction_label", context, transaction_option, transaction_label);
             }
             return (int)mh$.invokeExact(context, transaction_option, transaction_label);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -32942,7 +36609,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_transaction_label");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_transaction_label");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -32989,6 +36656,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_transaction_label", context, transaction_option, transaction_label_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, transaction_label_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33002,7 +36671,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_BOOL
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_modifies_definitions");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_modifies_definitions");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33049,6 +36718,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_modifies_definitions", context, transaction_option, modifies_definitions);
             }
             return (int)mh$.invokeExact(context, transaction_option, modifies_definitions);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33062,7 +36733,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_modifies_definitions");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_modifies_definitions");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33109,6 +36780,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_modifies_definitions", context, transaction_option, modifies_definitions_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, modifies_definitions_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33123,7 +36796,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_write_preserve");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_write_preserve");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33170,6 +36843,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_write_preserve", context, transaction_option, table_names, table_names_size);
             }
             return (int)mh$.invokeExact(context, transaction_option, table_names, table_names_size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33184,7 +36859,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_write_preserve");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_write_preserve");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33231,6 +36906,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_write_preserve", context, transaction_option, table_names_out, table_names_size_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, table_names_out, table_names_size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33245,7 +36922,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_inclusive_read_area");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_inclusive_read_area");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33292,6 +36969,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_inclusive_read_area", context, transaction_option, table_names, table_names_size);
             }
             return (int)mh$.invokeExact(context, transaction_option, table_names, table_names_size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33306,7 +36985,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_inclusive_read_area");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_inclusive_read_area");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33353,6 +37032,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_inclusive_read_area", context, transaction_option, table_names_out, table_names_size_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, table_names_out, table_names_size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33367,7 +37048,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_exclusive_read_area");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_exclusive_read_area");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33414,6 +37095,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_exclusive_read_area", context, transaction_option, table_names, table_names_size);
             }
             return (int)mh$.invokeExact(context, transaction_option, table_names, table_names_size);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33428,7 +37111,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_exclusive_read_area");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_exclusive_read_area");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33475,6 +37158,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_exclusive_read_area", context, transaction_option, table_names_out, table_names_size_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, table_names_out, table_names_size_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33488,7 +37173,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_scan_parallel");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_scan_parallel");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33535,6 +37220,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_scan_parallel", context, transaction_option, scan_parallel);
             }
             return (int)mh$.invokeExact(context, transaction_option, scan_parallel);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33549,7 +37236,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_scan_parallel");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_scan_parallel");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33596,6 +37283,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_scan_parallel", context, transaction_option, scan_parallel_exists_out, scan_parallel_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, scan_parallel_exists_out, scan_parallel_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33609,7 +37298,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_INT
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_priority");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_priority");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33656,6 +37345,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_priority", context, transaction_option, priority);
             }
             return (int)mh$.invokeExact(context, transaction_option, priority);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33669,7 +37360,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_priority");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_priority");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33716,6 +37407,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_priority", context, transaction_option, priority_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, priority_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33729,7 +37422,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_set_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_set_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33776,6 +37469,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_set_close_timeout", context, transaction_option, close_timeout);
             }
             return (int)mh$.invokeExact(context, transaction_option, close_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33790,7 +37485,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_get_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_get_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33837,6 +37532,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_get_close_timeout", context, transaction_option, close_timeout_exists_out, close_timeout_out);
             }
             return (int)mh$.invokeExact(context, transaction_option, close_timeout_exists_out, close_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33847,7 +37544,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_option_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_option_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33894,6 +37591,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_option_dispose", transaction_option);
             }
             mh$.invokeExact(transaction_option);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33907,7 +37606,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_with_message_get_status");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_status_with_message_get_status");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -33954,6 +37653,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_status_with_message_get_status", context, transaction_status, status_out);
             }
             return (int)mh$.invokeExact(context, transaction_status, status_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -33967,7 +37668,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_with_message_get_message");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_status_with_message_get_message");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34014,6 +37715,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_status_with_message_get_message", context, transaction_status, message_out);
             }
             return (int)mh$.invokeExact(context, transaction_status, message_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34024,7 +37727,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_status_with_message_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_status_with_message_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34071,6 +37774,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_status_with_message_dispose", transaction_status);
             }
             mh$.invokeExact(transaction_status);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34084,7 +37789,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_get_transaction_id");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_get_transaction_id");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34131,6 +37836,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_get_transaction_id", context, transaction, transaction_id_out);
             }
             return (int)mh$.invokeExact(context, transaction, transaction_id_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34144,7 +37851,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_set_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_set_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34191,6 +37898,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_set_close_timeout", context, transaction, close_timeout);
             }
             return (int)mh$.invokeExact(context, transaction, close_timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34204,7 +37913,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_get_close_timeout");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_get_close_timeout");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34251,6 +37960,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_get_close_timeout", context, transaction, close_timeout_out);
             }
             return (int)mh$.invokeExact(context, transaction, close_timeout_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34263,7 +37974,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_close");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_close");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34310,6 +38021,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_close", context, transaction);
             }
             return (int)mh$.invokeExact(context, transaction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34323,7 +38036,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_LONG_LONG
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_close_for");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_close_for");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34370,6 +38083,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_close_for", context, transaction, timeout);
             }
             return (int)mh$.invokeExact(context, transaction, timeout);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34383,7 +38098,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_is_closed");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_is_closed");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34430,6 +38145,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_is_closed", context, transaction, is_closed_out);
             }
             return (int)mh$.invokeExact(context, transaction, is_closed_out);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34440,7 +38157,7 @@ public class tsubakuro_rust_ffi_h {
             tsubakuro_rust_ffi_h.C_POINTER
         );
 
-        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_transaction_dispose");
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("tsurugi_ffi_transaction_dispose");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
@@ -34487,6 +38204,8 @@ public class tsubakuro_rust_ffi_h {
                 traceDowncall("tsurugi_ffi_transaction_dispose", transaction);
             }
             mh$.invokeExact(transaction);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
@@ -34961,13 +38680,13 @@ public class tsubakuro_rust_ffi_h {
     }
     /**
      * {@snippet lang=c :
-     * #define __FILEW__ "D"
+     * #define __FILEW__ "j"
      * }
      */
     public static MemorySegment __FILEW__() {
         class Holder {
             static final MemorySegment __FILEW__
-                = tsubakuro_rust_ffi_h.LIBRARY_ARENA.allocateFrom("D");
+                = tsubakuro_rust_ffi_h.LIBRARY_ARENA.allocateFrom("j");
         }
         return Holder.__FILEW__;
     }
@@ -35582,6 +39301,24 @@ public class tsubakuro_rust_ffi_h {
      */
     public static int TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND() {
         return TSURUGI_FFI_RC_FFI_DIAGNOSTIC_CODE_NOT_FOUND;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_ALREADY_FINISHED = (int)1107296259L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_ALREADY_FINISHED 1107296259
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_ALREADY_FINISHED() {
+        return TSURUGI_FFI_RC_FFI_ALREADY_FINISHED;
+    }
+    private static final int TSURUGI_FFI_RC_FFI_CANCEL_ERROR = (int)1107296260L;
+    /**
+     * {@snippet lang=c :
+     * #define TSURUGI_FFI_RC_FFI_CANCEL_ERROR 1107296260
+     * }
+     */
+    public static int TSURUGI_FFI_RC_FFI_CANCEL_ERROR() {
+        return TSURUGI_FFI_RC_FFI_CANCEL_ERROR;
     }
     private static final int TSURUGI_FFI_RC_CORE_CLIENT_CLIENT_ERROR = (int)-2147418112L;
     /**

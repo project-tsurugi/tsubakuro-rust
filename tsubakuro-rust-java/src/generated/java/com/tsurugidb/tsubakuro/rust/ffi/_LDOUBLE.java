@@ -48,7 +48,7 @@ public class _LDOUBLE {
         return ld$LAYOUT;
     }
 
-    private static final long ld$OFFSET = 0;
+    private static final long ld$OFFSET = $LAYOUT.byteOffset(groupElement("ld"));
 
     /**
      * Offset for field:
@@ -100,7 +100,7 @@ public class _LDOUBLE {
      * }
      */
     public static byte ld(MemorySegment struct, long index0) {
-        return (byte)ld$ELEM_HANDLE.get(struct, 0L, index0);
+        return (byte)ld$ELEM_HANDLE.get(struct, ld$OFFSET, index0);
     }
 
     /**
@@ -110,7 +110,7 @@ public class _LDOUBLE {
      * }
      */
     public static void ld(MemorySegment struct, long index0, byte fieldValue) {
-        ld$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
+        ld$ELEM_HANDLE.set(struct, ld$OFFSET, index0, fieldValue);
     }
 
     /**

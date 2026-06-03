@@ -52,7 +52,7 @@ public class _Mbstatet {
         return _Wchar$LAYOUT;
     }
 
-    private static final long _Wchar$OFFSET = 0;
+    private static final long _Wchar$OFFSET = $LAYOUT.byteOffset(groupElement("_Wchar"));
 
     /**
      * Offset for field:
@@ -96,7 +96,7 @@ public class _Mbstatet {
         return _Byte$LAYOUT;
     }
 
-    private static final long _Byte$OFFSET = 4;
+    private static final long _Byte$OFFSET = $LAYOUT.byteOffset(groupElement("_Byte"));
 
     /**
      * Offset for field:
@@ -140,7 +140,7 @@ public class _Mbstatet {
         return _State$LAYOUT;
     }
 
-    private static final long _State$OFFSET = 6;
+    private static final long _State$OFFSET = $LAYOUT.byteOffset(groupElement("_State"));
 
     /**
      * Offset for field:

@@ -136,6 +136,17 @@ public class TgFfiSession extends TgFfiObject {
         return Optional.ofNullable(outToString(out));
     }
 
+    public synchronized TgFfiLobTransferType getLobTransferType(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_session_get_lob_transfer_type(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        int value = outToInt(out);
+        return TgFfiLobTransferType.forNumber(value);
+    }
+
     public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {
         var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
         var handle = handle();

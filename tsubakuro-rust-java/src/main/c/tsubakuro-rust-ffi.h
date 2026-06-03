@@ -437,6 +437,8 @@ typedef struct TsurugiFfiBlobDownloader TsurugiFfiBlobDownloader;
 
 typedef struct TsurugiFfiBlobReference TsurugiFfiBlobReference;
 
+typedef struct TsurugiFfiBlobUploader TsurugiFfiBlobUploader;
+
 typedef struct TsurugiFfiCancelJob TsurugiFfiCancelJob;
 
 typedef struct TsurugiFfiClob TsurugiFfiClob;
@@ -444,6 +446,8 @@ typedef struct TsurugiFfiClob TsurugiFfiClob;
 typedef struct TsurugiFfiClobDownloader TsurugiFfiClobDownloader;
 
 typedef struct TsurugiFfiClobReference TsurugiFfiClobReference;
+
+typedef struct TsurugiFfiClobUploader TsurugiFfiClobUploader;
 
 typedef struct TsurugiFfiCommitOption TsurugiFfiCommitOption;
 
@@ -526,6 +530,53 @@ typedef uint64_t TsurugiFfiDuration;
 typedef void *TsurugiFfiJobHandle;
 
 /**
+ * BlobDownloader.
+ *
+ * since 0.10.0
+ */
+typedef struct TsurugiFfiBlobDownloader *TsurugiFfiBlobDownloaderHandle;
+
+/**
+ * Byte array.
+ */
+typedef const uint8_t *TsurugiFfiByteArrayHandle;
+
+/**
+ * BlobUploader.
+ *
+ * since 0.10.0
+ */
+typedef struct TsurugiFfiBlobUploader *TsurugiFfiBlobUploaderHandle;
+
+/**
+ * Blob.
+ *
+ * since 0.10.0
+ */
+typedef struct TsurugiFfiBlob *TsurugiFfiBlobHandle;
+
+/**
+ * ClobDownloader.
+ *
+ * since 0.10.0
+ */
+typedef struct TsurugiFfiClobDownloader *TsurugiFfiClobDownloaderHandle;
+
+/**
+ * ClobUploader.
+ *
+ * since 0.10.0
+ */
+typedef struct TsurugiFfiClobUploader *TsurugiFfiClobUploaderHandle;
+
+/**
+ * Clob.
+ *
+ * since 0.10.0
+ */
+typedef struct TsurugiFfiClob *TsurugiFfiClobHandle;
+
+/**
  * Sql column.
  */
 typedef struct TsurugiFfiSqlColumn *TsurugiFfiSqlColumnHandle;
@@ -544,25 +595,6 @@ typedef struct TsurugiFfiSqlExplainResult *TsurugiFfiSqlExplainResultHandle;
  * Sql parameter.
  */
 typedef struct TsurugiFfiSqlParameter *TsurugiFfiSqlParameterHandle;
-
-/**
- * Byte array.
- */
-typedef const uint8_t *TsurugiFfiByteArrayHandle;
-
-/**
- * Blob.
- *
- * since 0.10.0
- */
-typedef struct TsurugiFfiBlob *TsurugiFfiBlobHandle;
-
-/**
- * Clob.
- *
- * since 0.10.0
- */
-typedef struct TsurugiFfiClob *TsurugiFfiClobHandle;
 
 /**
  * Sql placeholder.
@@ -630,20 +662,6 @@ typedef struct TsurugiFfiTransactionErrorInfo *TsurugiFfiTransactionErrorInfoHan
 typedef struct TsurugiFfiTransactionStatusWithMessage *TsurugiFfiTransactionStatusWithMessageHandle;
 
 typedef struct TsurugiFfiLargeObjectCache *TsurugiFfiLargeObjectCacheHandle;
-
-/**
- * BlobDownloader.
- *
- * since 0.10.0
- */
-typedef struct TsurugiFfiBlobDownloader *TsurugiFfiBlobDownloaderHandle;
-
-/**
- * ClobDownloader.
- *
- * since 0.10.0
- */
-typedef struct TsurugiFfiClobDownloader *TsurugiFfiClobDownloaderHandle;
 
 /**
  * Commit option.
@@ -1119,6 +1137,256 @@ TsurugiFfiRc tsurugi_ffi_env_logger_init(void);
  */
 TsurugiFfiRc tsurugi_ffi_env_logger_init_with_filters(TsurugiFfiStringHandle filters,
                                                       TsurugiFfiStringHandle file_path);
+
+/**
+ * Downloads a chunk of data.
+ *
+ * See [`BlobDownloader::download_chunk`].
+ *
+ * # Receiver
+ * - `downloader` - BlobDownloader.
+ *
+ * # Arguments
+ * - `length` - chunk length (number of bytes).
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `value_out` - chunk data.
+ * - `size_out` - chunk data size (number of bytes).
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk(TsurugiFfiContextHandle context,
+                                                        TsurugiFfiBlobDownloaderHandle downloader,
+                                                        uint64_t length,
+                                                        TsurugiFfiDuration timeout,
+                                                        TsurugiFfiByteArrayHandle *value_out,
+                                                        uint64_t *size_out);
+
+/**
+ * Downloads a chunk of data into the provided buffer.
+ *
+ * See [`BlobDownloader::download_chunk_into`].
+ *
+ * # Receiver
+ * - `downloader` - BlobDownloader.
+ *
+ * # Arguments
+ * - `buffer` - buffer to store the chunk data.
+ * - `buffer_size` - buffer size (number of bytes).
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `size_out` - chunk data size (number of bytes) actually downloaded.
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_blob_downloader_download_chunk_into(TsurugiFfiContextHandle context,
+                                                             TsurugiFfiBlobDownloaderHandle downloader,
+                                                             uint8_t *buffer,
+                                                             uint64_t buffer_size,
+                                                             TsurugiFfiDuration timeout,
+                                                             uint64_t *size_out);
+
+/**
+ * Disposes the BlobDownloader.
+ *
+ * # Receiver
+ * - `downloader` - BlobDownloader.
+ *
+ * since 0.10.0
+ */
+void tsurugi_ffi_blob_downloader_dispose(TsurugiFfiBlobDownloaderHandle downloader);
+
+/**
+ * Uploads a chunk of data.
+ *
+ * See [`BlobUploader::upload_chunk`].
+ *
+ * # Receiver
+ * - `uploader` - BlobUploader.
+ *
+ * # Arguments
+ * - `value` - chunk data.
+ * - `size` - chunk data size (number of bytes).
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_blob_uploader_upload_chunk(TsurugiFfiContextHandle context,
+                                                    TsurugiFfiBlobUploaderHandle uploader,
+                                                    TsurugiFfiByteArrayHandle value,
+                                                    uint64_t size,
+                                                    TsurugiFfiDuration timeout);
+
+/**
+ * Finishes the upload and returns the resulting `TgBlob`.
+ *
+ * See [`BlobUploader::finish`].
+ *
+ * # Receiver
+ * - `uploader` - BlobUploader.
+ *
+ * # Arguments
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `blob_out` - BLOB. To dispose, call [`tsurugi_ffi_blob_dispose`](crate::service::sql::type::blob::tsurugi_ffi_blob_dispose).
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_blob_uploader_finish(TsurugiFfiContextHandle context,
+                                              TsurugiFfiBlobUploaderHandle uploader,
+                                              TsurugiFfiDuration timeout,
+                                              TsurugiFfiBlobHandle *blob_out);
+
+/**
+ * Cancels the upload.
+ *
+ * See [`BlobUploader::cancel`].
+ *
+ * # Receiver
+ * - `uploader` - BlobUploader.
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_blob_uploader_cancel(TsurugiFfiContextHandle context,
+                                              TsurugiFfiBlobUploaderHandle uploader);
+
+/**
+ * Disposes the BlobUploader.
+ *
+ * # Receiver
+ * - `uploader` - BlobUploader.
+ *
+ * since 0.10.0
+ */
+void tsurugi_ffi_blob_uploader_dispose(TsurugiFfiBlobUploaderHandle uploader);
+
+/**
+ * Downloads a chunk of data.
+ *
+ * See [`ClobDownloader::download_chunk`].
+ *
+ * # Receiver
+ * - `downloader` - ClobDownloader.
+ *
+ * # Arguments
+ * - `length` - chunk length (number of bytes).
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `value_out` - chunk data.
+ * - `size_out` - chunk data size (number of bytes).
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_utf8(TsurugiFfiContextHandle context,
+                                                             TsurugiFfiClobDownloaderHandle downloader,
+                                                             uint64_t length,
+                                                             TsurugiFfiDuration timeout,
+                                                             TsurugiFfiByteArrayHandle *value_out,
+                                                             uint64_t *size_out);
+
+/**
+ * Downloads a chunk of data as UTF-8 into the provided buffer.
+ *
+ * See [`ClobDownloader::download_chunk_into_utf8`].
+ *
+ * # Receiver
+ * - `downloader` - ClobDownloader.
+ *
+ * # Arguments
+ * - `buffer` - buffer to store chunk data.
+ * - `buffer_size` - buffer size (number of bytes).
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `size_out` - chunk data size (number of bytes) actually downloaded.
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_clob_downloader_download_chunk_into_utf8(TsurugiFfiContextHandle context,
+                                                                  TsurugiFfiClobDownloaderHandle downloader,
+                                                                  uint8_t *buffer,
+                                                                  uint64_t buffer_size,
+                                                                  TsurugiFfiDuration timeout,
+                                                                  uint64_t *size_out);
+
+/**
+ * Disposes the ClobDownloader.
+ *
+ * # Receiver
+ * - `downloader` - ClobDownloader.
+ *
+ * since 0.10.0
+ */
+void tsurugi_ffi_clob_downloader_dispose(TsurugiFfiClobDownloaderHandle downloader);
+
+/**
+ * Uploads a chunk of data.
+ *
+ * See [`ClobUploader::upload_chunk_utf8`].
+ *
+ * # Receiver
+ * - `uploader` - ClobUploader.
+ *
+ * # Arguments
+ * - `value` - chunk data as UTF-8 bytes.
+ * - `size` - chunk data size (number of bytes).
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_clob_uploader_upload_chunk_utf8(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiClobUploaderHandle uploader,
+                                                         TsurugiFfiByteArrayHandle value,
+                                                         uint64_t size,
+                                                         TsurugiFfiDuration timeout);
+
+/**
+ * Finishes the upload and returns the resulting `TgClob`.
+ *
+ * See [`ClobUploader::finish`].
+ *
+ * # Receiver
+ * - `uploader` - ClobUploader.
+ *
+ * # Arguments
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `clob_out` - CLOB. To dispose, call [`tsurugi_ffi_clob_dispose`](crate::service::sql::type::clob::tsurugi_ffi_clob_dispose).
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_clob_uploader_finish(TsurugiFfiContextHandle context,
+                                              TsurugiFfiClobUploaderHandle uploader,
+                                              TsurugiFfiDuration timeout,
+                                              TsurugiFfiClobHandle *clob_out);
+
+/**
+ * Cancels the upload.
+ *
+ * See [`ClobUploader::cancel`].
+ *
+ * # Receiver
+ * - `uploader` - ClobUploader.
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_clob_uploader_cancel(TsurugiFfiContextHandle context,
+                                              TsurugiFfiClobUploaderHandle uploader);
+
+/**
+ * Disposes the ClobUploader.
+ *
+ * # Receiver
+ * - `uploader` - ClobUploader.
+ *
+ * since 0.10.0
+ */
+void tsurugi_ffi_clob_uploader_dispose(TsurugiFfiClobUploaderHandle uploader);
 
 /**
  * SqlColumn: Get name.
@@ -4160,8 +4428,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_file_async(TsurugiFfiContextHand
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob(TsurugiFfiContextHandle context,
                                                 TsurugiFfiSqlClientHandle sql_client,
-                                                const uint8_t *value,
-                                                uintptr_t size,
+                                                TsurugiFfiByteArrayHandle value,
+                                                uint64_t size,
                                                 TsurugiFfiBlobHandle *blob_out);
 
 /**
@@ -4184,8 +4452,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob(TsurugiFfiContextHandle context,
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_for(TsurugiFfiContextHandle context,
                                                     TsurugiFfiSqlClientHandle sql_client,
-                                                    const uint8_t *value,
-                                                    uintptr_t size,
+                                                    TsurugiFfiByteArrayHandle value,
+                                                    uint64_t size,
                                                     TsurugiFfiDuration timeout,
                                                     TsurugiFfiBlobHandle *blob_out);
 
@@ -4209,8 +4477,8 @@ TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_for(TsurugiFfiContextHandle cont
  */
 TsurugiFfiRc tsurugi_ffi_sql_client_upload_blob_async(TsurugiFfiContextHandle context,
                                                       TsurugiFfiSqlClientHandle sql_client,
-                                                      const uint8_t *value,
-                                                      uintptr_t size,
+                                                      TsurugiFfiByteArrayHandle value,
+                                                      uint64_t size,
                                                       TsurugiFfiJobHandle *blob_job_out);
 
 /**
@@ -4280,6 +4548,36 @@ TsurugiFfiRc tsurugi_ffi_sql_client_upload_clob_async(TsurugiFfiContextHandle co
                                                       TsurugiFfiSqlClientHandle sql_client,
                                                       TsurugiFfiStringHandle value,
                                                       TsurugiFfiJobHandle *clob_job_out);
+
+/**
+ * Creates a BLOB uploader.
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Returns
+ * - `blob_uploader_out` - Blob uploader. To dispose, call [`tsurugi_ffi_blob_uploader_dispose`](crate::service::lob::blob_uploader::tsurugi_ffi_blob_uploader_dispose).
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_uploader(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlClientHandle sql_client,
+                                                         TsurugiFfiBlobUploaderHandle *blob_uploader_out);
+
+/**
+ * Creates a CLOB uploader.
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Returns
+ * - `clob_uploader_out` - Clob uploader. To dispose, call [`tsurugi_ffi_clob_uploader_dispose`](crate::service::lob::clob_uploader::tsurugi_ffi_clob_uploader_dispose).
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_uploader(TsurugiFfiContextHandle context,
+                                                         TsurugiFfiSqlClientHandle sql_client,
+                                                         TsurugiFfiClobUploaderHandle *clob_uploader_out);
 
 /**
  * SqlClient: Get BLOB cache.
@@ -4630,6 +4928,24 @@ TsurugiFfiRc tsurugi_ffi_sql_client_copy_clob_to_async(TsurugiFfiContextHandle c
                                                        TsurugiFfiStringHandle destination,
                                                        TsurugiFfiJobHandle *copy_clob_to_job_out);
 
+/**
+ * SqlClient: Create BLOB downloader.
+ *
+ * See [`SqlClient::create_blob_downloader`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `blob` - BLOB.
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `blob_downloader_out` - BLOB downloader. To dispose, call [`tsurugi_ffi_blob_downloader_dispose`](crate::service::lob::blob_downloader::tsurugi_ffi_blob_downloader_dispose).
+ *
+ * since 0.10.0
+ */
 TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_downloader(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
                                                            TsurugiFfiTransactionHandle transaction,
@@ -4637,6 +4953,24 @@ TsurugiFfiRc tsurugi_ffi_sql_client_create_blob_downloader(TsurugiFfiContextHand
                                                            TsurugiFfiDuration timeout,
                                                            TsurugiFfiBlobDownloaderHandle *blob_downloader_out);
 
+/**
+ * SqlClient: Create CLOB downloader.
+ *
+ * See [`SqlClient::create_clob_downloader`].
+ *
+ * # Receiver
+ * - `sql_client` - Sql client.
+ *
+ * # Parameters
+ * - `transaction` - transaction.
+ * - `clob` - CLOB.
+ * - `timeout` - timeout time \[nanoseconds\].
+ *
+ * # Returns
+ * - `clob_downloader_out` - CLOB downloader. To dispose, call [`tsurugi_ffi_clob_downloader_dispose`](crate::service::lob::clob_downloader::tsurugi_ffi_clob_downloader_dispose).
+ *
+ * since 0.10.0
+ */
 TsurugiFfiRc tsurugi_ffi_sql_client_create_clob_downloader(TsurugiFfiContextHandle context,
                                                            TsurugiFfiSqlClientHandle sql_client,
                                                            TsurugiFfiTransactionHandle transaction,
@@ -5423,9 +5757,9 @@ TsurugiFfiRc tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv
  *
  * since 0.10.0
  */
-TsurugiFfiRc tsurugi_ffi_connection_set_blob_relay_service_endpoint(TsurugiFfiContextHandle context,
-                                                                    TsurugiFfiConnectionOptionHandle connection_option,
-                                                                    TsurugiFfiStringHandle endpoint);
+TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(TsurugiFfiContextHandle context,
+                                                                           TsurugiFfiConnectionOptionHandle connection_option,
+                                                                           TsurugiFfiStringHandle endpoint);
 
 /**
  * ConnectionOption: Get blob relay service endpoint.
@@ -5440,9 +5774,9 @@ TsurugiFfiRc tsurugi_ffi_connection_set_blob_relay_service_endpoint(TsurugiFfiCo
  *
  * since 0.10.0
  */
-TsurugiFfiRc tsurugi_ffi_connection_get_blob_relay_service_endpoint(TsurugiFfiContextHandle context,
-                                                                    TsurugiFfiConnectionOptionHandle connection_option,
-                                                                    TsurugiFfiStringHandle *endpoint_out);
+TsurugiFfiRc tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(TsurugiFfiContextHandle context,
+                                                                           TsurugiFfiConnectionOptionHandle connection_option,
+                                                                           TsurugiFfiStringHandle *endpoint_out);
 
 /**
  * ConnectionOption: Set default timeout.

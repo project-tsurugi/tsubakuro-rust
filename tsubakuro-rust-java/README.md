@@ -55,3 +55,27 @@ cd tsubakuro-rust-java
 For tests other than credential, specifying only one of `user`, `auth-token`, or `credentials` is sufficient. If none of these are specified, authentication will be performed using the user `tsurugi`.
 
 In the credential test, anything not specified is skipped.
+
+### test with lob path mapping
+
+Lob path mapping for privileged mode is specified using the format `<client-path>:<server-path>`.
+
+#### example for MS-Windows command prompt
+
+```
+docker container run -d -p 12345:12345 -p 52345:52345 -v C:/tmp/client:/mnt/client -v C:/tmp/tsurugi:/opt/tsurugi/var/data/log --name tsurugi -e GLOG_v=30 ghcr.io/project-tsurugi/tsurugidb:latest
+
+gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.dll ^
+-Pdbtest.lob-send-path-mapping=C:/tmp/client:/mnt/client ^
+-Pdbtest.lob-recv-path-mapping=C:/tmp/tsurugi:/opt/tsurugi/var/data/log
+```
+
+### test with blob relay service endpoint
+
+#### example
+
+```bash
+./gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.so \
+-Pdbtest.blob-relay-service-endpoint=http:///localhost:52345
+```
+

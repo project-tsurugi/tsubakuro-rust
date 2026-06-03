@@ -38,6 +38,10 @@ public abstract class TgFfiObject implements Closeable {
         return manager.allocateString(s);
     }
 
+    protected final MemorySegment allocateBytes(byte[] value) {
+        return manager.allocateBytes(value);
+    }
+
     protected final <T extends TgFfiObject> MemorySegment allocateArray(List<T> list) {
         return manager.allocateArray(list);
     }
@@ -106,7 +110,7 @@ public abstract class TgFfiObject implements Closeable {
         // stringPtr.byteSize() == 0 なので、
         // stringPtr.getString(0)だと、1バイトも取得できずにIndexOutOfBoundsExceptionが発生する。
         // そこで、バイト数を適当に増やしてからgetString()を呼ぶ。
-        var ptr = stringPtr.reinterpret(Short.MAX_VALUE);
+        var ptr = stringPtr.reinterpret(1024 * 1024 * 2);
         return ptr.getString(0);
     }
 

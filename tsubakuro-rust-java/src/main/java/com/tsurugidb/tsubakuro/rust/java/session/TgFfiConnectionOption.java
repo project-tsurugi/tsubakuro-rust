@@ -4,6 +4,7 @@ import java.lang.foreign.MemorySegment;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tsurugidb.tsubakuro.rust.ffi.tsubakuro_rust_ffi_h;
 import com.tsurugidb.tsubakuro.rust.java.context.TgFfiContext;
@@ -148,6 +149,27 @@ public class TgFfiConnectionOption extends TgFfiObject {
         return outToDuration(out);
     }
 
+    public synchronized void setLobTransferType(TgFfiContext context, TgFfiLobTransferType lobTransferType) {
+        Objects.requireNonNull(lobTransferType, "lobTransferType must not be null");
+
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg1 = lobTransferType.value();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_lob_transfer_type(ctx, handle, arg1);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized TgFfiLobTransferType getLobTransferType(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocateIntOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_lob_transfer_type(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        int value = outToInt(out);
+        return TgFfiLobTransferType.forNumber(value);
+    }
+
     public synchronized void addLargeObjectPathMapping(TgFfiContext context, Path clientPath, String serverPath) {
         Objects.requireNonNull(clientPath, "clientPath must not be null");
         Objects.requireNonNull(serverPath, "serverPath must not be null");
@@ -182,6 +204,26 @@ public class TgFfiConnectionOption extends TgFfiObject {
         var arg2 = allocateString(clientPath.toString());
         var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_add_large_object_path_mapping_on_recv(ctx, handle, arg1, arg2);
         TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized void setBlobRelayServiceEndpoint(TgFfiContext context, String endpoint) {
+        Objects.requireNonNull(endpoint, "endpoint must not be null");
+
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = allocateString(endpoint);
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_blob_relay_service_endpoint(ctx, handle, arg);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
+    public synchronized Optional<String> getBlobRelayServiceEndpoint(TgFfiContext context) {
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var out = allocatePtrOut();
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(ctx, handle, out);
+        TgFfiRcUtil.throwIfError(rc, context);
+
+        return Optional.ofNullable(outToString(out));
     }
 
     public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {
