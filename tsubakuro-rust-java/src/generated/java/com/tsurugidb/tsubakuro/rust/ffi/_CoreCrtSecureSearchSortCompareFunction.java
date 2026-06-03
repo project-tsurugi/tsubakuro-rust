@@ -17,9 +17,9 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * typedef int (*_CoreCrtSecureSearchSortCompareFunction)(void *, const void *, const void *) __attribute__((cdecl))
  * }
  */
-public final class _CoreCrtSecureSearchSortCompareFunction {
+public class _CoreCrtSecureSearchSortCompareFunction {
 
-    private _CoreCrtSecureSearchSortCompareFunction() {
+    _CoreCrtSecureSearchSortCompareFunction() {
         // Should not be called directly
     }
 
@@ -59,11 +59,9 @@ public final class _CoreCrtSecureSearchSortCompareFunction {
     /**
      * Invoke the upcall stub {@code funcPtr}, with given parameters
      */
-    public static int invoke(MemorySegment funcPtr, MemorySegment _x0, MemorySegment _x1, MemorySegment _x2) {
+    public static int invoke(MemorySegment funcPtr,MemorySegment _x0, MemorySegment _x1, MemorySegment _x2) {
         try {
             return (int) DOWN$MH.invokeExact(funcPtr, _x0, _x1, _x2);
-        } catch (Error | RuntimeException ex) {
-            throw ex;
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

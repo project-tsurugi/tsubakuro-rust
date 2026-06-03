@@ -17,9 +17,9 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * void (*)(void) __attribute__((cdecl))
  * }
  */
-public final class at_quick_exit$x0 {
+public class at_quick_exit$x0 {
 
-    private at_quick_exit$x0() {
+    at_quick_exit$x0() {
         // Should not be called directly
     }
 
@@ -57,8 +57,6 @@ public final class at_quick_exit$x0 {
     public static void invoke(MemorySegment funcPtr) {
         try {
              DOWN$MH.invokeExact(funcPtr);
-        } catch (Error | RuntimeException ex) {
-            throw ex;
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

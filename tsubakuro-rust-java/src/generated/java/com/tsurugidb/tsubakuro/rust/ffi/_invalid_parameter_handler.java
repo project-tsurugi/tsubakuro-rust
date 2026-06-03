@@ -17,9 +17,9 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * typedef void (*_invalid_parameter_handler)(const wchar_t *, const wchar_t *, const wchar_t *, unsigned int, uintptr_t) __attribute__((cdecl))
  * }
  */
-public final class _invalid_parameter_handler {
+public class _invalid_parameter_handler {
 
-    private _invalid_parameter_handler() {
+    _invalid_parameter_handler() {
         // Should not be called directly
     }
 
@@ -60,11 +60,9 @@ public final class _invalid_parameter_handler {
     /**
      * Invoke the upcall stub {@code funcPtr}, with given parameters
      */
-    public static void invoke(MemorySegment funcPtr, MemorySegment _x0, MemorySegment _x1, MemorySegment _x2, int _x3, long _x4) {
+    public static void invoke(MemorySegment funcPtr,MemorySegment _x0, MemorySegment _x1, MemorySegment _x2, int _x3, long _x4) {
         try {
              DOWN$MH.invokeExact(funcPtr, _x0, _x1, _x2, _x3, _x4);
-        } catch (Error | RuntimeException ex) {
-            throw ex;
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

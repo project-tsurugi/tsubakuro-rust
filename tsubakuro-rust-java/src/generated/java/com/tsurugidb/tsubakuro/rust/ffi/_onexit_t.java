@@ -17,9 +17,9 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * typedef int (*_onexit_t)(void) __attribute__((cdecl))
  * }
  */
-public final class _onexit_t {
+public class _onexit_t {
 
-    private _onexit_t() {
+    _onexit_t() {
         // Should not be called directly
     }
 
@@ -58,8 +58,6 @@ public final class _onexit_t {
     public static int invoke(MemorySegment funcPtr) {
         try {
             return (int) DOWN$MH.invokeExact(funcPtr);
-        } catch (Error | RuntimeException ex) {
-            throw ex;
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

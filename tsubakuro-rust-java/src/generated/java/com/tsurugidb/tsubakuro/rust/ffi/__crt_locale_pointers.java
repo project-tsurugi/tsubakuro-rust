@@ -50,7 +50,7 @@ public class __crt_locale_pointers {
         return locinfo$LAYOUT;
     }
 
-    private static final long locinfo$OFFSET = $LAYOUT.byteOffset(groupElement("locinfo"));
+    private static final long locinfo$OFFSET = 0;
 
     /**
      * Offset for field:
@@ -94,7 +94,7 @@ public class __crt_locale_pointers {
         return mbcinfo$LAYOUT;
     }
 
-    private static final long mbcinfo$OFFSET = $LAYOUT.byteOffset(groupElement("mbcinfo"));
+    private static final long mbcinfo$OFFSET = 8;
 
     /**
      * Offset for field:

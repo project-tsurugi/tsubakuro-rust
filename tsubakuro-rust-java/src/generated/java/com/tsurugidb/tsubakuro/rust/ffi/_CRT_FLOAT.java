@@ -48,7 +48,7 @@ public class _CRT_FLOAT {
         return f$LAYOUT;
     }
 
-    private static final long f$OFFSET = $LAYOUT.byteOffset(groupElement("f"));
+    private static final long f$OFFSET = 0;
 
     /**
      * Offset for field:

@@ -17,9 +17,9 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
  * typedef void (*_purecall_handler)(void) __attribute__((cdecl))
  * }
  */
-public final class _purecall_handler {
+public class _purecall_handler {
 
-    private _purecall_handler() {
+    _purecall_handler() {
         // Should not be called directly
     }
 
@@ -57,8 +57,6 @@ public final class _purecall_handler {
     public static void invoke(MemorySegment funcPtr) {
         try {
              DOWN$MH.invokeExact(funcPtr);
-        } catch (Error | RuntimeException ex) {
-            throw ex;
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

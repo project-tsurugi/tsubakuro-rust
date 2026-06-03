@@ -48,7 +48,7 @@ public class _LDBL12 {
         return ld12$LAYOUT;
     }
 
-    private static final long ld12$OFFSET = $LAYOUT.byteOffset(groupElement("ld12"));
+    private static final long ld12$OFFSET = 0;
 
     /**
      * Offset for field:
@@ -100,7 +100,7 @@ public class _LDBL12 {
      * }
      */
     public static byte ld12(MemorySegment struct, long index0) {
-        return (byte)ld12$ELEM_HANDLE.get(struct, ld12$OFFSET, index0);
+        return (byte)ld12$ELEM_HANDLE.get(struct, 0L, index0);
     }
 
     /**
@@ -110,7 +110,7 @@ public class _LDBL12 {
      * }
      */
     public static void ld12(MemorySegment struct, long index0, byte fieldValue) {
-        ld12$ELEM_HANDLE.set(struct, ld12$OFFSET, index0, fieldValue);
+        ld12$ELEM_HANDLE.set(struct, 0L, index0, fieldValue);
     }
 
     /**

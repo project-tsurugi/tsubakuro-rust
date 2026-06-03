@@ -52,7 +52,7 @@ public class __crt_locale_data_public {
         return _locale_pctype$LAYOUT;
     }
 
-    private static final long _locale_pctype$OFFSET = $LAYOUT.byteOffset(groupElement("_locale_pctype"));
+    private static final long _locale_pctype$OFFSET = 0;
 
     /**
      * Offset for field:
@@ -96,7 +96,7 @@ public class __crt_locale_data_public {
         return _locale_mb_cur_max$LAYOUT;
     }
 
-    private static final long _locale_mb_cur_max$OFFSET = $LAYOUT.byteOffset(groupElement("_locale_mb_cur_max"));
+    private static final long _locale_mb_cur_max$OFFSET = 8;
 
     /**
      * Offset for field:
@@ -140,7 +140,7 @@ public class __crt_locale_data_public {
         return _locale_lc_codepage$LAYOUT;
     }
 
-    private static final long _locale_lc_codepage$OFFSET = $LAYOUT.byteOffset(groupElement("_locale_lc_codepage"));
+    private static final long _locale_lc_codepage$OFFSET = 12;
 
     /**
      * Offset for field:
