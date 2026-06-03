@@ -217,7 +217,11 @@ public class TgFfiTester {
         }
         var blobRelayEndpoint = getBlobRelayServiceEndpoint();
         if (blobRelayEndpoint != null) {
-            var endpoint = URI.create(blobRelayEndpoint);
+            String s = blobRelayEndpoint;
+            if (s.startsWith("http://") || s.startsWith("https://")) {
+                s = s.substring(s.indexOf("://") + 3);
+            }
+            var endpoint = URI.create(s);
             sessionOption = sessionOption.setBlobRelayServiceEndpoint(endpoint);
         }
 
