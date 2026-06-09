@@ -223,3 +223,13 @@ BLOB中継サービスの接続先URI（エンドポイント）は、Tsurugi DB
 
 なお、tsubakuro-rust-coreでは `dns:///` は使用できません。`http://` に置き換えてください。
 
+### CA証明書
+
+HTTPS接続時にサーバー証明書の検証に使用するCA証明書を指定することもできます。
+
+```rust
+    connection_option.set_lob_transfer_type(LobTransferType::Relay);
+    connection_option.set_blob_relay_service_endpoint("https://localhost:52345");
+    connection_option.set_blob_relay_service_ca_cert_pem_file("/path/to/ca_cert.pem")?;
+```
+

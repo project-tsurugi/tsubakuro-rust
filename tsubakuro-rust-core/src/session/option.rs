@@ -1,7 +1,10 @@
 use std::{path::Path, time::Duration};
 
+use tonic::transport::{Certificate, ClientTlsConfig};
+
 use crate::{
     error::TgError,
+    io_error,
     prelude::Credential,
     service::lob::privileged::path_mapping::{
         LargeObjectRecvPathMapping, LargeObjectSendPathMapping,
@@ -50,6 +53,7 @@ pub struct ConnectionOption {
     lob_send_path_mapping: LargeObjectSendPathMapping,
     lob_recv_path_mapping: LargeObjectRecvPathMapping,
     blob_relay_service_endpoint: Option<String>,
+    blob_relay_service_tls_config: Option<ClientTlsConfig>,
     default_timeout: Duration,
     send_timeout: Duration,
     recv_timeout: Duration,
@@ -75,6 +79,7 @@ impl ConnectionOption {
             lob_send_path_mapping: LargeObjectSendPathMapping::new(),
             lob_recv_path_mapping: LargeObjectRecvPathMapping::new(),
             blob_relay_service_endpoint: None,
+            blob_relay_service_tls_config: None,
             default_timeout: Duration::ZERO,
             send_timeout: Duration::ZERO,
             recv_timeout: Duration::ZERO,
@@ -233,6 +238,35 @@ impl ConnectionOption {
     /// since 0.10.0
     pub fn blob_relay_service_endpoint(&self) -> Option<&String> {
         self.blob_relay_service_endpoint.as_ref()
+    }
+
+    /// Set blob relay service TLS config.
+    ///
+    /// since 0.10.0
+    pub fn set_blob_relay_service_tls_config(&mut self, tls_config: ClientTlsConfig) {
+        self.blob_relay_service_tls_config = Some(tls_config);
+    }
+
+    /// Set blob relay service CA certificate from PEM file.
+    ///
+    /// since 0.10.0
+    pub fn set_blob_relay_service_ca_cert_pem_file(
+        &mut self,
+        ca_cert_pem: impl AsRef<Path>,
+    ) -> Result<(), TgError> {
+        let pem = std::fs::read(ca_cert_pem)
+            .map_err(|e| io_error!("Failed to read CA certificate PEM file", e))?;
+        let ca_cert = Certificate::from_pem(pem);
+        let tls_config = ClientTlsConfig::new().ca_certificate(ca_cert);
+        self.set_blob_relay_service_tls_config(tls_config);
+        Ok(())
+    }
+
+    /// Get blob relay service TLS config.
+    ///
+    /// since 0.10.0
+    pub fn blob_relay_service_tls_config(&self) -> Option<&ClientTlsConfig> {
+        self.blob_relay_service_tls_config.as_ref()
     }
 
     /// Set default timeout.

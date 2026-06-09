@@ -24,6 +24,8 @@ async fn example() -> Result<(), TgError> {
 
     connection_option.set_lob_transfer_type(LobTransferType::Relay);
     // connection_option.set_blob_relay_service_endpoint("http://localhost:52345");
+    // connection_option.set_blob_relay_service_tls_config(tls_config);
+    // connection_option.set_blob_relay_service_ca_cert_pem_file("/path/to/ca_cert.pem")?;
 
     // connect
     let session = Session::connect(&connection_option).await?;

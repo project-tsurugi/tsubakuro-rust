@@ -47,13 +47,18 @@ fn create_connection_option(
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::{env, panic, sync::Arc};
+    use std::{env, panic, path::PathBuf, sync::Arc};
 
     pub(crate) fn create_test_connection_option() -> ConnectionOption {
         let args = create_test_args();
         let mut option = create_connection_option(args.endpoint(), args.credential()).unwrap();
         if let Some(endpoint) = args.blob_relay_service_endpoint() {
             option.set_blob_relay_service_endpoint(endpoint);
+        }
+        if let Some(ca_cert_pem) = args.blob_relay_service_ca_cert_pem {
+            option
+                .set_blob_relay_service_ca_cert_pem_file(ca_cert_pem)
+                .unwrap();
         }
 
         option
@@ -80,6 +85,9 @@ mod test {
                 args.lob_recv_path_mapping.push(arg.clone().split_off(22));
             } else if arg.starts_with("blob-relay-service-endpoint=") {
                 args.blob_relay_service_endpoint = Some(arg.clone().split_off(28));
+            } else if arg.starts_with("blob-relay-service-ca-cert-pem=") {
+                args.blob_relay_service_ca_cert_pem =
+                    Some(PathBuf::from(arg.clone().split_off(31)));
             }
         }
 
@@ -99,6 +107,7 @@ mod test {
         lob_send_path_mapping: Vec<String>,
         lob_recv_path_mapping: Vec<String>,
         blob_relay_service_endpoint: Option<String>,
+        blob_relay_service_ca_cert_pem: Option<PathBuf>,
     }
 
     impl TestArgs {
@@ -112,6 +121,7 @@ mod test {
                 lob_send_path_mapping: Vec::new(),
                 lob_recv_path_mapping: Vec::new(),
                 blob_relay_service_endpoint: None,
+                blob_relay_service_ca_cert_pem: None,
             }
         }
 
