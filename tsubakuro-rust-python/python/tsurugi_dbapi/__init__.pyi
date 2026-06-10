@@ -184,6 +184,7 @@ class Config:
         credentials (str): Path to credentials file.
         session_label (str): Session label for the connection.
         blob_relay_service_endpoint (str): Blob relay service endpoint. since 0.10.0
+        blob_relay_service_ca_cert_pem_file (str): Blob relay service CA certificate PEM file. since 0.10.0
         lob_upload_timeout (int): Large object upload timeout in seconds. since 0.10.0
         lob_download_timeout (int): Large object download timeout in seconds. since 0.10.0
         transaction_option (TransactionOption): Transaction option.
@@ -298,6 +299,20 @@ class Config:
     def blob_relay_service_endpoint(self, value: typing.Optional[builtins.str]) -> None:
         r"""
         Blob relay service endpoint.
+        
+        since 0.10.0
+        """
+    @property
+    def blob_relay_service_ca_cert_pem_file(self) -> typing.Optional[builtins.str]:
+        r"""
+        Blob relay service CA certificate PEM file.
+        
+        since 0.10.0
+        """
+    @blob_relay_service_ca_cert_pem_file.setter
+    def blob_relay_service_ca_cert_pem_file(self, value: typing.Optional[builtins.str]) -> None:
+        r"""
+        Blob relay service CA certificate PEM file.
         
         since 0.10.0
         """
