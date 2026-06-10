@@ -120,6 +120,7 @@ tasks.named('test') {
     systemProperty 'tsurugi.dbtest.lob-send-path-mapping', findProperty('dbtest.lob-send-path-mapping') ?: ''
     systemProperty 'tsurugi.dbtest.lob-recv-path-mapping', findProperty('dbtest.lob-recv-path-mapping') ?: ''
     systemProperty 'tsurugi.dbtest.blob-relay-service-endpoint', findProperty('dbtest.blob-relay-service-endpoint') ?: ''
+    systemProperty 'tsurugi.dbtest.blob-relay-service-ca-cert-pem-file', findProperty('dbtest.blob-relay-service-ca-cert-pem-file') ?: ''
     systemProperty 'tsurugi.ffi.library.path', findProperty('ffi.library.path')
 }
 

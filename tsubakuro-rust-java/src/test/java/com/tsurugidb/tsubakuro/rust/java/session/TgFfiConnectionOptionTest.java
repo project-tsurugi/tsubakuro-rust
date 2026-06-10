@@ -503,6 +503,27 @@ class TgFfiConnectionOptionTest extends TgFfiTester {
     }
 
     @Test
+    void set_set_blob_relay_service_ca_cert_pem_file_argError() {
+        var manager = getFfiObjectManager();
+
+        try (var context = TgFfiContext.create(manager)) {
+            var ctx = context.handle();
+            var handle = MemorySegment.NULL;
+            var arg1 = manager.allocateString("/path/to/ca_cert.pem");
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(ctx, handle, arg1);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG1_ERROR(), rc);
+        }
+        try (var context = TgFfiContext.create(manager); //
+                var target = TgFfiConnectionOption.create(context)) {
+            var ctx = context.handle();
+            var handle = target.handle();
+            var arg1 = MemorySegment.NULL;
+            var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(ctx, handle, arg1);
+            assertEquals(tsubakuro_rust_ffi_h.TSURUGI_FFI_RC_FFI_ARG2_ERROR(), rc);
+        }
+    }
+
+    @Test
     void set_default_timeout() {
         var manager = getFfiObjectManager();
 

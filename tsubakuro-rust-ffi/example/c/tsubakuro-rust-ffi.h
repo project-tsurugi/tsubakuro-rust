@@ -5779,6 +5779,23 @@ TsurugiFfiRc tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(Tsuru
                                                                            TsurugiFfiStringHandle *endpoint_out);
 
 /**
+ * ConnectionOption: Set blob relay service CA certificate PEM file.
+ *
+ * See [`ConnectionOption::set_blob_relay_service_ca_cert_pem_file`].
+ *
+ * # Receiver
+ * - `connection_option` - Connection option.
+ *
+ * # Parameters
+ * - `ca_cert_pem_file` - blob relay service CA certificate PEM file path.
+ *
+ * since 0.10.0
+ */
+TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(TsurugiFfiContextHandle context,
+                                                                                   TsurugiFfiConnectionOptionHandle connection_option,
+                                                                                   TsurugiFfiStringHandle ca_cert_pem_file);
+
+/**
  * ConnectionOption: Set default timeout.
  *
  * See [`ConnectionOption::set_default_timeout`].

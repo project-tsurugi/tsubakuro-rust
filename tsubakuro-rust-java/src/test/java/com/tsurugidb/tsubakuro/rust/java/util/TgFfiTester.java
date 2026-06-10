@@ -55,6 +55,7 @@ public class TgFfiTester {
     private static final String SYSPROP_DBTEST_LOB_SEND_PATH_MAPPING = "tsurugi.dbtest.lob-send-path-mapping";
     private static final String SYSPROP_DBTEST_LOB_RECV_PATH_MAPPING = "tsurugi.dbtest.lob-recv-path-mapping";
     private static final String SYSPROP_DBTEST_BLOB_RELAY_SERVICE_ENDPOINT = "tsurugi.dbtest.blob-relay-service-endpoint";
+    private static final String SYSPROP_DBTEST_BLOB_RELAY_SERVICE_CA_CERT_PEM_FILE = "tsurugi.dbtest.blob-relay-service-ca-cert-pem-file";
 
     private static String staticEndpoint;
     private static String staticEndpointJava;
@@ -192,6 +193,10 @@ public class TgFfiTester {
         return getSystemProperty(SYSPROP_DBTEST_BLOB_RELAY_SERVICE_ENDPOINT);
     }
 
+    public static String getBlobRelayServiceCaCertPemFile() {
+        return getSystemProperty(SYSPROP_DBTEST_BLOB_RELAY_SERVICE_CA_CERT_PEM_FILE);
+    }
+
     private static String getSystemProperty(String key) {
         String value = System.getProperty(key);
         if (value != null && value.isEmpty()) {
@@ -309,6 +314,10 @@ public class TgFfiTester {
             var blobRelayServiceEndpoint = getBlobRelayServiceEndpoint();
             if (blobRelayServiceEndpoint != null) {
                 connectionOption.setBlobRelayServiceEndpoint(context, blobRelayServiceEndpoint);
+            }
+            var blobRelayServiceCaCertPemFile = getBlobRelayServiceCaCertPemFile();
+            if (blobRelayServiceCaCertPemFile != null) {
+                connectionOption.setBlobRelayServiceCaCertPemFile(context, blobRelayServiceCaCertPemFile);
             }
 
             if (customizer != null) {

@@ -70,12 +70,19 @@ gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.dll ^
 -Pdbtest.lob-recv-path-mapping=C:/tmp/tsurugi:/opt/tsurugi/var/data/log
 ```
 
-### test with blob relay service endpoint
+### test with blob relay service
 
-#### example
+#### example of endpoint
 
 ```bash
 ./gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.so \
--Pdbtest.blob-relay-service-endpoint=http:///localhost:52345
+-Pdbtest.blob-relay-service-endpoint=http://localhost:52345
 ```
 
+#### example of CA certificate PEM file
+
+```bash
+./gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.so \
+-Pdbtest.blob-relay-service-endpoint=https://localhost:52345 \
+-Pdbtest.blob-relay-service-ca-cert-pem-file=/path/to/pem
+```
