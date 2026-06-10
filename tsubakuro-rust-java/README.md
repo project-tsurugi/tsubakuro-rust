@@ -2,6 +2,8 @@
 
 tsubakuro-rust-java is a project for testing [tsubakuro-rust-ffi](../tsubakuro-rust-ffi).
 
+We also verify that the results match those produced by [Iceaxe](https://github.com/project-tsurugi/iceaxe).
+
 ## How to build
 
 First, generate a C header file from [tsubakuro-rust-ffi](../tsubakuro-rust-ffi).
@@ -20,7 +22,7 @@ cd tsubakuro-rust-java
 jextract -t com.tsurugidb.tsubakuro.rust.ffi --output src/generated/java src/main/c/tsubakuro-rust-ffi.h
 ```
 
-- [jextract](https://github.com/openjdk/jextract)
+- [jextract](https://github.com/openjdk/jextract) 22
 
 ## How to test
 
@@ -81,7 +83,14 @@ gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.dll ^
 
 #### example of CA certificate PEM file
 
+You also need to configure Java VM for Iceaxe.
+
 ```bash
+BLOBS_SERVER_CA_FILE=/path/to/ca.crt
+TRUSTSTORE_FILE=/path/to/truststore.p12
+keytool -importcert -alias eisen-blobs-test-ca -file ${BLOBS_SERVER_CA_FILE} -keystore ${TRUSTSTORE_FILE} -storetype PKCS12 -storepass changeit -noprompt
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Djavax.net.ssl.trustStore=${TRUSTSTORE_FILE} -Djavax.net.ssl.trustStoreType=PKCS12 -Djavax.net.ssl.trustStorePassword=changeit"
+
 ./gradlew test -Pffi.library.path=/path/to/libtsubakuro_rust_ffi.so \
 -Pdbtest.blob-relay-service-endpoint=https://localhost:52345 \
 -Pdbtest.blob-relay-service-ca-cert-pem-file=/path/to/pem
