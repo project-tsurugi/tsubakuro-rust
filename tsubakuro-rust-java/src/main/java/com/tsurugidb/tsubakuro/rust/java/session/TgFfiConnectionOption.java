@@ -226,6 +226,16 @@ public class TgFfiConnectionOption extends TgFfiObject {
         return Optional.ofNullable(outToString(out));
     }
 
+    public synchronized void setBlobRelayServiceCaCertPemFile(TgFfiContext context, String path) {
+        Objects.requireNonNull(path, "path must not be null");
+
+        var ctx = (context != null) ? context.handle() : MemorySegment.NULL;
+        var handle = handle();
+        var arg = allocateString(path);
+        var rc = tsubakuro_rust_ffi_h.tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(ctx, handle, arg);
+        TgFfiRcUtil.throwIfError(rc, context);
+    }
+
     public synchronized void setDefaultTimeout(TgFfiContext context, Duration timeout) {
         Objects.requireNonNull(timeout, "timeout must not be null");
 

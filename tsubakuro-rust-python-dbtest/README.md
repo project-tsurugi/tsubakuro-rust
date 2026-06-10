@@ -20,3 +20,9 @@ uv run pytest --endpoint=tcp://localhost:12345 --blob-relay-service-endpoint=htt
 > tsubakuro-rust-python ([tsubakuro-rust-core](../tsubakuro-rust-core)) does not support `dns:///`.
 > Use `http://` instead.
 
+#### Example of blob relay service CA certificate PEM file
+
+```bash
+uv run pytest --endpoint=tcp://localhost:12345 --blob-relay-service-endpoint=https://localhost:52345 --blob-relay-service-ca-cert-pem-file=/path/to/pem
+```
+

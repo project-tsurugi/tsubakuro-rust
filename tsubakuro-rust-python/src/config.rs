@@ -30,6 +30,7 @@ use crate::{
 ///     credentials (str): Path to credentials file.
 ///     session_label (str): Session label for the connection.
 ///     blob_relay_service_endpoint (str): Blob relay service endpoint. since 0.10.0
+///     blob_relay_service_ca_cert_pem_file (str): Blob relay service CA certificate PEM file. since 0.10.0
 ///     lob_upload_timeout (int): Large object upload timeout in seconds. since 0.10.0
 ///     lob_download_timeout (int): Large object download timeout in seconds. since 0.10.0
 ///     transaction_option (TransactionOption): Transaction option.
@@ -92,6 +93,11 @@ pub struct Config {
     /// since 0.10.0
     #[pyo3(get, set)]
     blob_relay_service_endpoint: Option<String>,
+    /// Blob relay service CA certificate PEM file.
+    ///
+    /// since 0.10.0
+    #[pyo3(get, set)]
+    blob_relay_service_ca_cert_pem_file: Option<String>,
     /// Large object upload timeout in seconds.
     ///
     /// since 0.10.0
@@ -127,6 +133,7 @@ impl Default for Config {
             credentials: None,
             session_label: None,
             blob_relay_service_endpoint: None,
+            blob_relay_service_ca_cert_pem_file: None,
             lob_upload_timeout: None,
             lob_download_timeout: None,
             transaction_option: None,
@@ -198,6 +205,12 @@ impl Config {
         if let Some(blob_relay_service_endpoint) = &other.blob_relay_service_endpoint {
             self.blob_relay_service_endpoint = Some(blob_relay_service_endpoint.clone());
         }
+        if let Some(blob_relay_service_ca_cert_pem_file) =
+            &other.blob_relay_service_ca_cert_pem_file
+        {
+            self.blob_relay_service_ca_cert_pem_file =
+                Some(blob_relay_service_ca_cert_pem_file.clone());
+        }
         if let Some(lob_upload_timeout) = &other.lob_upload_timeout {
             self.lob_upload_timeout = Some(*lob_upload_timeout);
         }
@@ -254,7 +267,7 @@ impl Config {
         let none = &"None".to_string();
         let mask = &"****".to_string();
         format!(
-            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, session_label={}, blob_relay_service_endpoint={}, lob_upload_timeout={}, lob_download_timeout={}, default_timeout={})",
+            "Config(application_name={}, endpoint={}, user={}, password={}, auth_token={}, credentials={}, session_label={}, blob_relay_service_endpoint={}, blob_relay_service_ca_cert_pem_file={}, lob_upload_timeout={}, lob_download_timeout={}, default_timeout={})",
             self.application_name.as_ref().unwrap_or(none),
             self.endpoint.as_ref().unwrap_or(none),
             self.user.as_ref().unwrap_or(none),
@@ -263,6 +276,7 @@ impl Config {
             self.credentials.as_ref().unwrap_or(none),
             self.session_label.as_ref().unwrap_or(none),
             self.blob_relay_service_endpoint.as_ref().unwrap_or(none),
+            self.blob_relay_service_ca_cert_pem_file.as_ref().unwrap_or(none),
             self.lob_upload_timeout.as_ref().map_or(none.to_string(), |v| v.to_string()),
             self.lob_download_timeout.as_ref().map_or(none.to_string(), |v| v.to_string()),
             self.default_timeout.as_ref().map_or(none.to_string(), |v| v.to_string())
@@ -341,6 +355,9 @@ impl Config {
             "blob_relay_service_endpoint" => {
                 self.blob_relay_service_endpoint = Some(value.to_string())
             }
+            "blob_relay_service_ca_cert_pem_file" => {
+                self.blob_relay_service_ca_cert_pem_file = Some(value.to_string())
+            }
             "lob_upload_timeout" => {
                 let timeout: u64 = value
                     .parse()
@@ -375,6 +392,9 @@ impl Config {
             "session_label" => self.session_label = Some(value.extract()?),
             "blob_relay_service_endpoint" => {
                 self.blob_relay_service_endpoint = Some(value.extract()?)
+            }
+            "blob_relay_service_ca_cert_pem_file" => {
+                self.blob_relay_service_ca_cert_pem_file = Some(value.extract()?)
             }
             "lob_upload_timeout" => self.lob_upload_timeout = Some(value.extract()?),
             "lob_download_timeout" => self.lob_download_timeout = Some(value.extract()?),
@@ -417,6 +437,11 @@ impl Config {
         }
         if let Some(endpoint) = &self.blob_relay_service_endpoint {
             connection_option.set_blob_relay_service_endpoint(endpoint);
+        }
+        if let Some(ca_cert_pem) = &self.blob_relay_service_ca_cert_pem_file {
+            connection_option
+                .set_blob_relay_service_ca_cert_pem_file(ca_cert_pem)
+                .map_err(to_pyerr)?;
         }
 
         connection_option.set_default_timeout(self.default_timeout());

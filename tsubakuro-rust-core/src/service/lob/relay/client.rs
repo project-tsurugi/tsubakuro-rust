@@ -5,7 +5,7 @@ use std::{
 };
 
 use log::{debug, trace, warn};
-use tonic::{async_trait, Streaming};
+use tonic::{async_trait, transport::ClientTlsConfig, Streaming};
 
 use crate::{
     data_relay_grpc::proto::blob_relay::{
@@ -35,6 +35,21 @@ use crate::{
 
 const API_VERSION: u64 = 1;
 
+#[derive(Debug)]
+pub(crate) struct RelayLobClientOption {
+    endpoint: Option<String>,
+    tls_config: Option<ClientTlsConfig>,
+}
+
+impl RelayLobClientOption {
+    pub(crate) fn new(endpoint: Option<String>, tls_config: Option<ClientTlsConfig>) -> Self {
+        RelayLobClientOption {
+            endpoint,
+            tls_config,
+        }
+    }
+}
+
 pub(crate) struct RelayLobClient {
     info: BlobRelayServiceInfo,
     grpc_client: BlobRelayStreamingClient<tonic::transport::Channel>,
@@ -44,18 +59,17 @@ pub(crate) struct RelayLobClient {
 impl RelayLobClient {
     pub(crate) async fn new(
         info: BlobRelayServiceInfo,
-        endpoint: Option<&String>,
+        option: &RelayLobClientOption,
     ) -> Result<RelayLobClient, TgError> {
-        let url = if let Some(endpoint) = endpoint {
+        let url = if let Some(endpoint) = &option.endpoint {
             endpoint.clone()
         } else {
             Self::grpc_url(&info)
         };
         debug!("Connecting to blob relay service at URL: {}", url);
 
-        let grpc_client = BlobRelayStreamingClient::connect(url)
-            .await
-            .map_err(|e| io_error!("Failed to connect to blob relay service", e))?;
+        let channel = Self::channel(url, option).await?;
+        let grpc_client = BlobRelayStreamingClient::new(channel);
 
         let stream_chunk_size = Self::stream_chunk_size(&info);
 
@@ -74,6 +88,39 @@ impl RelayLobClient {
             format!("{scheme}{rest}")
         } else {
             endpoint.clone()
+        }
+    }
+
+    async fn channel(
+        url: String,
+        option: &RelayLobClientOption,
+    ) -> Result<tonic::transport::Channel, TgError> {
+        let tls_config = Self::tls_config(&url, option);
+
+        let mut endpoint = tonic::transport::Endpoint::from_shared(url)
+            .map_err(|e| io_error!("Invalid blob relay service URL", e))?;
+        if let Some(tls_config) = tls_config {
+            endpoint = endpoint
+                .tls_config(tls_config)
+                .map_err(|e| io_error!("Failed to configure TLS", e))?
+        };
+
+        let channel = endpoint
+            .connect()
+            .await
+            .map_err(|e| io_error!("Failed to connect to blob relay service", e))?;
+        Ok(channel)
+    }
+
+    fn tls_config(url: &str, option: &RelayLobClientOption) -> Option<ClientTlsConfig> {
+        if let Some(tls_config) = &option.tls_config {
+            return Some(tls_config.clone());
+        }
+
+        if url.starts_with("https:") {
+            Some(ClientTlsConfig::new())
+        } else {
+            None
         }
     }
 

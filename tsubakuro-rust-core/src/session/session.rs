@@ -15,6 +15,7 @@ use crate::{
         lob::{
             lob_transfer_info::LobTransferInfo,
             privileged::path_mapping::{LargeObjectRecvPathMapping, LargeObjectSendPathMapping},
+            relay::client::RelayLobClientOption,
         },
         ServiceClient,
     },
@@ -52,7 +53,7 @@ pub struct Session {
     wire: Arc<Wire>,
     lob_send_path_mapping: Arc<LargeObjectSendPathMapping>,
     lob_recv_path_mapping: Arc<LargeObjectRecvPathMapping>,
-    blob_relay_service_endpoint: Option<String>,
+    relay_lob_client_option: RelayLobClientOption,
     default_timeout: RwLock<Duration>,
     shutdowned: AtomicBool,
     fail_on_drop_error: AtomicBool,
@@ -146,11 +147,11 @@ impl Session {
         self.wire.lob_transfer_info()
     }
 
-    /// Get blob relay service endpoint.
+    /// Get blob relay service option.
     ///
     /// since 0.10.0
-    pub(crate) fn blob_relay_service_endpoint(&self) -> Option<&String> {
-        self.blob_relay_service_endpoint.as_ref()
+    pub(crate) fn relay_lob_client_option(&self) -> &RelayLobClientOption {
+        &self.relay_lob_client_option
     }
 
     /// Checks if the session has an encryption key.
@@ -320,6 +321,11 @@ impl Session {
         connection_option: &ConnectionOption,
         default_timeout: Duration,
     ) -> Arc<Self> {
+        let relay_lob_client_option = RelayLobClientOption::new(
+            connection_option.blob_relay_service_endpoint().cloned(),
+            connection_option.blob_relay_service_tls_config().cloned(),
+        );
+
         let session = Arc::new(Session {
             wire,
             lob_send_path_mapping: Arc::new(
@@ -332,7 +338,7 @@ impl Session {
                     .large_object_path_mapping_on_recv()
                     .clone(),
             ),
-            blob_relay_service_endpoint: connection_option.blob_relay_service_endpoint().cloned(),
+            relay_lob_client_option,
             default_timeout: RwLock::new(default_timeout),
             shutdowned: AtomicBool::new(false),
             fail_on_drop_error: AtomicBool::new(false),

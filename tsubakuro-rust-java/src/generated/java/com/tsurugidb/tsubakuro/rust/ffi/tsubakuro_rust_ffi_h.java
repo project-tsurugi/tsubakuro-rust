@@ -32832,6 +32832,66 @@ public class tsubakuro_rust_ffi_h {
         }
     }
 
+    private static class tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            tsubakuro_rust_ffi_h.C_INT,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER,
+            tsubakuro_rust_ffi_h.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = tsubakuro_rust_ffi_h.findOrThrow("tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle ca_cert_pem_file)
+     * }
+     */
+    public static FunctionDescriptor tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file$descriptor() {
+        return tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle ca_cert_pem_file)
+     * }
+     */
+    public static MethodHandle tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file$handle() {
+        return tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle ca_cert_pem_file)
+     * }
+     */
+    public static MemorySegment tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file$address() {
+        return tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * TsurugiFfiRc tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(TsurugiFfiContextHandle context, TsurugiFfiConnectionOptionHandle connection_option, TsurugiFfiStringHandle ca_cert_pem_file)
+     * }
+     */
+    public static int tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(MemorySegment context, MemorySegment connection_option, MemorySegment ca_cert_pem_file) {
+        var mh$ = tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file", context, connection_option, ca_cert_pem_file);
+            }
+            return (int)mh$.invokeExact(context, connection_option, ca_cert_pem_file);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     private static class tsurugi_ffi_connection_option_set_default_timeout {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             tsubakuro_rust_ffi_h.C_INT,

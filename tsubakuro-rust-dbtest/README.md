@@ -59,3 +59,9 @@ cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345 blob-relay-serv
 >
 > Tsubakuro/Rust (the [tonic](https://docs.rs/tonic/latest/tonic/) crate used by Tsubakuro/Rust) does not support `dns:///`.
 > Use `http://` instead.
+
+#### Example of blob relay service CA certificate PEM file
+
+```bash
+cargo test "" -- --test-threads=1 endpoint=tcp://localhost:12345 blob-relay-service-endpoint=https://localhost:52345 blob-relay-service-ca-cert-pem=/path/to/pem
+```

@@ -101,7 +101,8 @@ pub(crate) async fn create_lob_client(
         LobTransferInfo::NotUse => Box::new(NotUseLobClient::new()),
         LobTransferInfo::Privileged => Box::new(PrivilegedLobClient::new(session.clone())),
         LobTransferInfo::Relay(info) => {
-            Box::new(RelayLobClient::new(info, session.blob_relay_service_endpoint()).await?)
+            let option = session.relay_lob_client_option();
+            Box::new(RelayLobClient::new(info, option).await?)
         }
     };
     Ok(lob_client)

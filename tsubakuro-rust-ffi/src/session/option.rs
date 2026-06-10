@@ -799,6 +799,50 @@ pub extern "C" fn tsurugi_ffi_connection_option_get_blob_relay_service_endpoint(
     rc
 }
 
+/// ConnectionOption: Set blob relay service CA certificate PEM file.
+///
+/// See [`ConnectionOption::set_blob_relay_service_ca_cert_pem_file`].
+///
+/// # Receiver
+/// - `connection_option` - Connection option.
+///
+/// # Parameters
+/// - `ca_cert_pem_file` - blob relay service CA certificate PEM file path.
+///
+/// since 0.10.0
+#[no_mangle]
+pub extern "C" fn tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file(
+    context: TsurugiFfiContextHandle,
+    connection_option: TsurugiFfiConnectionOptionHandle,
+    ca_cert_pem_file: TsurugiFfiStringHandle,
+) -> TsurugiFfiRc {
+    const FUNCTION_NAME: &str = "tsurugi_ffi_connection_option_set_blob_relay_service_ca_cert_pem_file()";
+    trace!(
+        "{FUNCTION_NAME} start. context={:?}, connection_option={:?}, ca_cert_pem_file={:?}",
+        context,
+        connection_option,
+        ca_cert_pem_file
+    );
+
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 1, connection_option);
+    ffi_arg_require_non_null!(context, FUNCTION_NAME, 2, ca_cert_pem_file);
+
+    let ca_cert_pem_file = ffi_arg_cchar_to_str!(context, FUNCTION_NAME, 2, ca_cert_pem_file);
+
+    let connection_option = unsafe { &mut *connection_option };
+
+    match connection_option.set_blob_relay_service_ca_cert_pem_file(ca_cert_pem_file) {
+        Ok(_) => {}
+        Err(e) => {
+            return rc_ffi_arg_error!(context, FUNCTION_NAME, 2, "ca_cert_pem_file", e.message())
+        }
+    }
+
+    let rc = rc_ok(context);
+    trace!("{FUNCTION_NAME} end rc={:x}", rc);
+    rc
+}
+
 /// ConnectionOption: Set default timeout.
 ///
 /// See [`ConnectionOption::set_default_timeout`].
