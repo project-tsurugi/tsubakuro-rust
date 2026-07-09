@@ -66,6 +66,14 @@ mod test {
         values.push((3, Some(date_time(1969, 12, 31, 23, 59, 59, 999999999, 0))));
         values.push((4, Some(date_time(1, 1, 1, 0, 0, 0, 0, 0))));
         values.push((5, Some(date_time(9999, 12, 31, 23, 59, 59, 999999999, 0))));
+        values.push((
+            6,
+            Some(date_time(999999999, 12, 31, 23, 59, 59, 999999999, 0)),
+        ));
+        values.push((
+            7,
+            Some(date_time(999999999, 12, 31, 23, 59, 59, 999999999, -18)),
+        ));
         if minus {
             values.push((10, Some(date_time(0, 1, 1, 0, 0, 0, 0, 9))));
             values.push((11, Some(date_time(-1, 1, 1, 0, 0, 0, 0, 9))));
@@ -119,12 +127,22 @@ mod test {
             days -= 1;
         }
         let offset_hour = value.time_zone_offset / 60;
-        format!(
-            "{} {}+{:02}:00",
-            epoch_days_to_string(days),
-            seconds_of_day_to_string(seconds as u32, value.nano_adjustment),
-            offset_hour
-        )
+        if offset_hour >= 0 {
+            format!(
+                "{} {}+{:02}:00",
+                epoch_days_to_string(days),
+                seconds_of_day_to_string(seconds as u32, value.nano_adjustment),
+                offset_hour
+            )
+        } else {
+            let offset_hour = -offset_hour;
+            format!(
+                "{} {}-{:02}:00",
+                epoch_days_to_string(days),
+                seconds_of_day_to_string(seconds as u32, value.nano_adjustment),
+                offset_hour
+            )
+        }
     }
 
     async fn insert_prepared(
