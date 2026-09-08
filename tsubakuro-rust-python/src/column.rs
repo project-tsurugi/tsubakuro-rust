@@ -19,6 +19,7 @@ use crate::type_code::atom_type_to_type_code;
 ///     nullable (Optional[bool]): Nullable flag. (read only)
 #[gen_stub_pyclass]
 #[pyclass(module = "tsurugi_dbapi")]
+#[derive(Clone)]
 pub struct Column {
     inner: SqlColumn,
 }
@@ -26,6 +27,17 @@ pub struct Column {
 impl Column {
     pub(crate) fn new(column: SqlColumn) -> Self {
         Column { inner: column }
+    }
+}
+
+impl std::fmt::Debug for Column {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Column(name='{}', type='{}')",
+            self.name(),
+            self.sql_type()
+        )
     }
 }
 

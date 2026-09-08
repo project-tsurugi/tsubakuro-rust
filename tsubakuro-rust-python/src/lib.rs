@@ -69,6 +69,8 @@ mod _tsubakuro_rust_python {
 
     #[pymodule_export]
     use crate::cursor::Cursor;
+    #[pymodule_export]
+    use crate::cursor::explain::ExplainResult;
 
     #[pymodule_export]
     use crate::type_code::type_code;

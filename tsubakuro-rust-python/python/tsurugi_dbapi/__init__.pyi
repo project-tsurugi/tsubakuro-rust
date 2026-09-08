@@ -16,6 +16,7 @@ __all__ = [
     "DataError",
     "DatabaseError",
     "Error",
+    "ExplainResult",
     "IntegrityError",
     "InterfaceError",
     "InternalError",
@@ -649,6 +650,32 @@ class Cursor:
             connection.commit()
             ```
         """
+    def explain(self, operation: builtins.str, parameters: typing.Optional[typing.Any] = None) -> ExplainResult:
+        r"""
+        Explain a SQL statement.
+        
+        Args:
+            operation (str): SQL statement to be executed.
+            parameters (Tuple[Any, ...] | dict[str, Any], optional): Parameters for the SQL statement.
+        
+        Returns:
+           ExplainResult: Explain result.
+        
+        Examples:
+            ```python
+            explain_result = cursor.explain("select * from example")
+            ```
+        
+            ```python
+            explain_result = cursor.explain("insert into example values (?, ?)", (1, "Hello"))
+            ```
+        
+            ```python
+            explain_result = cursor.explain("insert into example values (:id, :name)", {"id": 1, "name": "Hello"})
+            ```
+        
+        since 0.11.0
+        """
     def prepare(self, operation: builtins.str, parameters: typing.Any) -> None:
         r"""
         Prepare a SQL statement for execution.
@@ -851,6 +878,40 @@ class Error(builtins.Exception):
     base class of all other exceptions (PEP 249)
     """
     ...
+
+@typing.final
+class ExplainResult:
+    r"""
+    Explain result.
+    
+    Attributes:
+        format_id (str): The content format ID. (read only)
+        format_version (int): The content format version. (read only)
+        contents (str): The explain result contents. (read only)
+        columns (List[Column]): The result set column information, or empty if it does not provided. (read only)
+    
+    since 0.11.0
+    """
+    @property
+    def format_id(self) -> builtins.str:
+        r"""
+        the content format ID.
+        """
+    @property
+    def format_version(self) -> builtins.int:
+        r"""
+        the content format version.
+        """
+    @property
+    def contents(self) -> builtins.str:
+        r"""
+        the explain result contents.
+        """
+    @property
+    def columns(self) -> builtins.list[Column]:
+        r"""
+        the result set column information, or empty if it does not provided.
+        """
 
 class IntegrityError(DatabaseError):
     r"""

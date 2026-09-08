@@ -7,12 +7,16 @@ use tsubakuro_rust_core::prelude::{AtomType, SqlPreparedStatement, SqlQueryResul
 use crate::{
     column::columns_description,
     connection::{inner_connection::InnerConnection, Connection},
-    cursor::query_result::{next_row1, QueryResultContext},
+    cursor::{
+        explain::ExplainResult,
+        query_result::{next_row1, QueryResultContext},
+    },
     error::{to_pyerr, NotSupportedError, OperationalError, ProgrammingError},
     type_code::{blob::Blob, clob::Clob},
 };
 
 mod execute;
+pub(crate) mod explain;
 mod query_result;
 
 pub(crate) struct RowNumber {
@@ -130,6 +134,55 @@ impl Cursor {
             self.execute_with_parameters(operation, seq_of_parameters)
         } else {
             self.execute_direct(operation)
+        };
+
+        match &result {
+            Ok(_) => trace!("{FUNCTION_NAME} end"),
+            Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
+        }
+        result
+    }
+
+    /// Explain a SQL statement.
+    ///
+    /// Args:
+    ///     operation (str): SQL statement to be executed.
+    ///     parameters (Tuple[Any, ...] | dict[str, Any], optional): Parameters for the SQL statement.
+    ///
+    /// Returns:
+    ///    ExplainResult: Explain result.
+    ///
+    /// Examples:
+    ///     ```python
+    ///     explain_result = cursor.explain("select * from example")
+    ///     ```
+    ///
+    ///     ```python
+    ///     explain_result = cursor.explain("insert into example values (?, ?)", (1, "Hello"))
+    ///     ```
+    ///
+    ///     ```python
+    ///     explain_result = cursor.explain("insert into example values (:id, :name)", {"id": 1, "name": "Hello"})
+    ///     ```
+    ///
+    /// since 0.11.0
+    #[pyo3(signature = (operation, parameters=None))]
+    pub fn explain(
+        &mut self,
+        py: Python,
+        operation: &str,
+        parameters: Option<Bound<PyAny>>,
+    ) -> PyResult<ExplainResult> {
+        const FUNCTION_NAME: &str = "Cursor.explain()";
+        self.check_closed(FUNCTION_NAME)?;
+        trace!("{FUNCTION_NAME} start. operation={}", operation);
+
+        let result = if let Some(parameters) = parameters {
+            let vec = vec![parameters];
+            let seq_of_parameters = vec.into_pyobject(py)?;
+            self.explain_with_parameters(operation, seq_of_parameters)
+        } else {
+            self.explain_direct(operation)
         };
 
         match &result {

@@ -317,6 +317,28 @@ tsurugi-dbapi独自の拡張機能として、SQL実行前にプレースホル�
 > 
 >Cursorの `close` または `clear` メソッドを呼ぶと、キャッシュされていたPreparedStatementは解放されます。
 
+## SQLの実行計画の取得方法
+
+Cursorの `explain` メソッドで、SQLの実行計画を取得できます。
+tsurugi-dbapiの拡張機能です。
+
+`explain` メソッドの引数は、`execute` メソッドと同様です。
+
+```python
+    with connection.cursor() as cursor:
+        explain_result = corsor.explain("select * from example");
+        print("explain:", explain_result.contents)
+
+        sql = "select * from example where foo = ?"
+        parameters = (tsurug.type_code.Int32(1),)
+        explain_result = corsor.explain(sql, parameters);
+        print("explain:", explain_result.contents)
+```
+
+> [!NOTE]
+>
+> `explain` メソッドの実行結果（[ExplainResult](https://tsurugi-dbapi.readthedocs.io/latest/api/#tsurugi_dbapi.ExplainResult)）の `contents` は、Tsurugiから返されたJSON文字列です。必要に応じてJSONにパースしてください。
+
 ## BLOB, CLOB
 
 BLOB, CLOBを扱う方法は [BLOB, CLOB使用方法](blob_ja.md) を参照してください。
