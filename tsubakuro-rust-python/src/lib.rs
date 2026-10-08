@@ -17,6 +17,7 @@ mod type_code;
 /// Python library for Tsurugi.
 #[pymodule]
 mod _tsubakuro_rust_python {
+    use log::trace;
     use pyo3::{prelude::*, types::*};
     use pyo3_stub_gen::derive::*;
 
@@ -69,6 +70,7 @@ mod _tsubakuro_rust_python {
 
     #[pymodule_export]
     use crate::cursor::Cursor;
+
     #[pymodule_export]
     use crate::cursor::explain::ExplainResult;
 
@@ -157,9 +159,21 @@ mod _tsubakuro_rust_python {
     #[gen_stub_pyfunction(module = "tsurugi_dbapi")]
     #[pyfunction]
     #[pyo3(signature = (*args, **kwargs))]
-    fn connect(args: &Bound<PyTuple>, kwargs: Option<Bound<PyDict>>) -> PyResult<Connection> {
-        let connection = Connection::connect(args, kwargs)?;
-        Ok(connection)
+    fn connect(
+        py: Python,
+        args: &Bound<PyTuple>,
+        kwargs: Option<Bound<PyDict>>,
+    ) -> PyResult<Connection> {
+        const FUNCTION_NAME: &str = "connect()";
+        trace!("{FUNCTION_NAME} start");
+
+        let config = Connection::create_config(args, kwargs)?;
+        py.detach(|| {
+            let connection = Connection::connect(config)?;
+
+            trace!("{FUNCTION_NAME} end");
+            Ok(connection)
+        })
     }
 }
 

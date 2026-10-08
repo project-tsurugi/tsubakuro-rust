@@ -1,22 +1,20 @@
 use log::{debug, trace};
 use pyo3::{exceptions::PyStopIteration, prelude::*, types::*};
 use pyo3_stub_gen::derive::*;
-use std::{collections::HashMap, sync::Arc, time::Duration, vec};
+use std::{collections::HashMap, sync::Arc, vec};
 use tsubakuro_rust_core::prelude::{AtomType, SqlPreparedStatement, SqlQueryResult};
 
 use crate::{
     column::columns_description,
     connection::{inner_connection::InnerConnection, Connection},
-    cursor::{
-        explain::ExplainResult,
-        query_result::{next_row1, QueryResultContext},
-    },
-    error::{to_pyerr, NotSupportedError, OperationalError, ProgrammingError},
-    type_code::{blob::Blob, clob::Clob},
+    cursor::{explain::ExplainResult, query_result::convert_row_to_tuple},
+    error::{NotSupportedError, OperationalError},
+    type_code::{blob::Blob, clob::Clob, to_placeholders, ParameterContext},
 };
 
 mod execute;
 pub(crate) mod explain;
+mod internal;
 mod query_result;
 
 pub(crate) struct RowNumber {
@@ -55,7 +53,7 @@ pub struct Cursor {
     /// Whether to execute `Cursor.executemany()` asynchronously. Default is `True`.
     #[pyo3(set, get)]
     executemany_async: bool, // internally used
-    ps_map: HashMap<String, (SqlPreparedStatement, HashMap<String, AtomType>)>,
+    ps_map: HashMap<String, (Arc<SqlPreparedStatement>, HashMap<String, AtomType>)>,
     query_result: Option<SqlQueryResult>,
     query_types: Vec<AtomType>,
     row_number: Option<RowNumber>,
@@ -129,11 +127,14 @@ impl Cursor {
         trace!("{FUNCTION_NAME} start. operation={}", operation);
 
         let result = if let Some(parameters) = parameters {
-            let vec = vec![parameters];
-            let seq_of_parameters = vec.into_pyobject(py)?;
-            self.execute_with_parameters(operation, seq_of_parameters)
+            let (info, parameters_list) = {
+                let vec = vec![parameters];
+                let seq_of_parameters = vec.into_pyobject(py)?;
+                self.convert_parameters(operation, seq_of_parameters)?
+            };
+            py.detach(|| self.execute_with_parameters(info, parameters_list))
         } else {
-            self.execute_direct(operation)
+            py.detach(|| self.execute_direct(operation))
         };
 
         match &result {
@@ -178,11 +179,18 @@ impl Cursor {
         trace!("{FUNCTION_NAME} start. operation={}", operation);
 
         let result = if let Some(parameters) = parameters {
-            let vec = vec![parameters];
-            let seq_of_parameters = vec.into_pyobject(py)?;
-            self.explain_with_parameters(operation, seq_of_parameters)
+            let (info, parameters_list) = {
+                let vec = vec![parameters];
+                let seq_of_parameters = vec.into_pyobject(py)?;
+                self.convert_parameters(operation, seq_of_parameters)?
+            };
+            if parameters_list.is_empty() {
+                py.detach(|| self.explain_direct(operation))
+            } else {
+                py.detach(|| self.explain_with_parameters(info, parameters_list))
+            }
         } else {
-            self.explain_direct(operation)
+            py.detach(|| self.explain_direct(operation))
         };
 
         match &result {
@@ -216,12 +224,23 @@ impl Cursor {
     ///     cursor.execute(sql, {"id": 1, "name": "Hello"})
     ///     connection.commit()
     ///     ```
-    pub fn prepare(&mut self, operation: &str, parameters: Bound<PyAny>) -> PyResult<()> {
+    pub fn prepare(
+        &mut self,
+        py: Python,
+        operation: &str,
+        parameters: Bound<PyAny>,
+    ) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Cursor.prepare()";
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start. operation={}", operation);
 
-        let result = self.prepare_placeholders(operation, parameters);
+        let connection = &self.connection;
+        let runtime = connection.runtime();
+        let sql_client = connection.sql_client();
+        let context = ParameterContext::new(runtime, sql_client, connection.lob_upload_timeout());
+        let (types, placeholders) = to_placeholders(&context, parameters)?;
+
+        let result = py.detach(|| self.prepare_placeholders(operation, types, placeholders));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -248,7 +267,12 @@ impl Cursor {
     ///
     /// since 0.10.0
     #[pyo3(signature = (value, timeout=None))]
-    pub fn upload_blob(&self, value: Option<Vec<u8>>, timeout: Option<u64>) -> PyResult<Blob> {
+    pub fn upload_blob(
+        &self,
+        py: Python,
+        value: Option<Vec<u8>>,
+        timeout: Option<u64>,
+    ) -> PyResult<Blob> {
         const FUNCTION_NAME: &str = "Cursor.upload_blob()";
         let value = match value {
             Some(v) => v,
@@ -260,16 +284,7 @@ impl Cursor {
         };
         trace!("{FUNCTION_NAME} start. value.len={}", value.len());
 
-        let connection = &self.connection;
-        let runtime = connection.runtime();
-        let sql_client = connection.sql_client();
-        let timeout = timeout
-            .map(Duration::from_secs)
-            .unwrap_or_else(|| connection.lob_upload_timeout());
-        let result = runtime
-            .block_on(sql_client.upload_blob_for(&value, timeout))
-            .map(Blob::from_blob)
-            .map_err(to_pyerr);
+        let result = py.detach(|| self.upload_blob_internal(value, timeout));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -296,7 +311,12 @@ impl Cursor {
     ///
     /// since 0.10.0
     #[pyo3(signature = (value, timeout=None))]
-    pub fn upload_clob(&self, value: Option<String>, timeout: Option<u64>) -> PyResult<Clob> {
+    pub fn upload_clob(
+        &self,
+        py: Python,
+        value: Option<String>,
+        timeout: Option<u64>,
+    ) -> PyResult<Clob> {
         const FUNCTION_NAME: &str = "Cursor.upload_clob()";
         let value = match value {
             Some(v) => v,
@@ -308,16 +328,7 @@ impl Cursor {
         };
         trace!("{FUNCTION_NAME} start. value.len={}", value.len());
 
-        let connection = &self.connection;
-        let runtime = connection.runtime();
-        let sql_client = connection.sql_client();
-        let timeout = timeout
-            .map(Duration::from_secs)
-            .unwrap_or_else(|| connection.lob_upload_timeout());
-        let result = runtime
-            .block_on(sql_client.upload_clob_for(&value, timeout))
-            .map(Clob::from_clob)
-            .map_err(to_pyerr);
+        let result = py.detach(|| self.upload_clob_internal(&value, timeout));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -344,6 +355,7 @@ impl Cursor {
     ///     ```
     pub fn executemany(
         &mut self,
+        py: Python,
         operation: &str,
         seq_of_parameters: Bound<PyAny>,
     ) -> PyResult<()> {
@@ -351,7 +363,8 @@ impl Cursor {
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start. operation={}", operation);
 
-        let result = self.execute_with_parameters(operation, seq_of_parameters);
+        let (info, parameters_list) = self.convert_parameters(operation, seq_of_parameters)?;
+        let result = py.detach(|| self.execute_with_parameters(info, parameters_list));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -412,31 +425,15 @@ impl Cursor {
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start");
 
-        let qr = if let Some(qr) = &mut self.query_result {
-            qr
-        } else {
-            trace!("{FUNCTION_NAME} error: No query result available");
-            return Err(ProgrammingError::new_err(
-                "No query result available for fetchone",
-            ));
+        let result = py.detach(|| self.fetchone_internal());
+        let result = match result {
+            Ok(Some(row)) => match convert_row_to_tuple(py, row) {
+                Ok(tuple) => Ok(Some(tuple)),
+                Err(e) => Err(e),
+            },
+            Ok(None) => Ok(None),
+            Err(e) => Err(e),
         };
-
-        let connection = &self.connection;
-        let runtime = connection.runtime();
-        let sql_client = connection.sql_client();
-        let transaction = connection.find_transaction();
-        let context = QueryResultContext::new(
-            py,
-            sql_client,
-            transaction,
-            connection.lob_download_timeout(),
-        );
-        let result = runtime.block_on(next_row1(
-            &context,
-            qr,
-            &self.query_types,
-            &mut self.row_number,
-        ));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -457,31 +454,15 @@ impl Cursor {
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start");
 
-        let qr = if let Some(qr) = &mut self.query_result {
-            qr
-        } else {
-            trace!("{FUNCTION_NAME} error: No query result available");
-            return Err(ProgrammingError::new_err(
-                "No query result available for next",
-            ));
+        let result = py.detach(|| self.fetchone_internal());
+        let result = match result {
+            Ok(Some(row)) => match convert_row_to_tuple(py, row) {
+                Ok(tuple) => Ok(Some(tuple)),
+                Err(e) => Err(e),
+            },
+            Ok(None) => Ok(None),
+            Err(e) => Err(e),
         };
-
-        let connection = &self.connection;
-        let runtime = connection.runtime();
-        let sql_client = connection.sql_client();
-        let transaction = connection.find_transaction();
-        let context = QueryResultContext::new(
-            py,
-            sql_client,
-            transaction,
-            connection.lob_download_timeout(),
-        );
-        let result = runtime.block_on(next_row1(
-            &context,
-            qr,
-            &self.query_types,
-            &mut self.row_number,
-        ));
 
         match result {
             Ok(Some(row)) => {
@@ -537,39 +518,17 @@ impl Cursor {
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start. size={:?}", size);
 
-        let qr = if let Some(qr) = &mut self.query_result {
-            qr
-        } else {
-            trace!("{FUNCTION_NAME} error: No query result available");
-            return Err(ProgrammingError::new_err(
-                "No query result available for fetchmany",
-            ));
+        let result = py.detach(|| self.fetchmany_internal(size));
+        let result = match result {
+            Ok(rows) => self.convert_rows_to_tuples(py, rows),
+            Err(e) => Err(e),
         };
-
-        let size = size.unwrap_or(self.arraysize);
-
-        let connection = &self.connection;
-        let runtime = connection.runtime();
-        let sql_client = connection.sql_client();
-        let transaction = connection.find_transaction();
-        let context = QueryResultContext::new(
-            py,
-            sql_client,
-            transaction,
-            connection.lob_download_timeout(),
-        );
-        let result = runtime.block_on(Self::next_rows(
-            &context,
-            qr,
-            &self.query_types,
-            &mut self.row_number,
-            size,
-        ));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
             Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
+
         result
     }
 
@@ -589,31 +548,11 @@ impl Cursor {
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start");
 
-        let qr = if let Some(qr) = &mut self.query_result {
-            qr
-        } else {
-            trace!("{FUNCTION_NAME} error: No query result available");
-            return Err(ProgrammingError::new_err(
-                "No query result available for fetchall",
-            ));
+        let result = py.detach(|| self.fetchall_internal());
+        let result = match result {
+            Ok(rows) => self.convert_rows_to_tuples(py, rows),
+            Err(e) => Err(e),
         };
-
-        let connection = &self.connection;
-        let runtime = connection.runtime();
-        let sql_client = connection.sql_client();
-        let transaction = connection.find_transaction();
-        let context = QueryResultContext::new(
-            py,
-            sql_client,
-            transaction,
-            connection.lob_download_timeout(),
-        );
-        let result = runtime.block_on(Self::all_rows(
-            &context,
-            qr,
-            &self.query_types,
-            &mut self.row_number,
-        ));
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -668,31 +607,17 @@ impl Cursor {
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start");
 
-        let qr = if let Some(qr) = &mut self.query_result {
-            qr
-        } else {
-            trace!("{FUNCTION_NAME} error: No query result available");
-            return Err(ProgrammingError::new_err(
-                "No query result available for iteration",
-            ));
+        let result = py.detach(|| self.fetchone_internal());
+        let result = match result {
+            Ok(Some(row)) => match convert_row_to_tuple(py, row) {
+                Ok(tuple) => Ok(Some(tuple)),
+                Err(e) => Err(e),
+            },
+            Ok(None) => Ok(None),
+            Err(e) => Err(e),
         };
 
-        let connection = &self.connection;
-        let runtime = connection.runtime();
-        let sql_client = connection.sql_client();
-        let transaction = connection.find_transaction();
-        let context = QueryResultContext::new(
-            py,
-            sql_client,
-            transaction,
-            connection.lob_download_timeout(),
-        );
-        match runtime.block_on(next_row1(
-            &context,
-            qr,
-            &self.query_types,
-            &mut self.row_number,
-        )) {
+        match result {
             Ok(Some(row)) => {
                 trace!("{FUNCTION_NAME} end");
                 Ok(row)
@@ -717,6 +642,7 @@ impl Cursor {
     /// Exit the runtime context related to this object.
     pub fn __exit__(
         &mut self,
+        py: Python,
         _exc_type: Option<Bound<PyAny>>,
         exc_value: Option<Bound<PyAny>>,
         _traceback: Option<Bound<PyAny>>,
@@ -724,7 +650,7 @@ impl Cursor {
         const FUNCTION_NAME: &str = "Cursor.__exit__()";
         trace!("{FUNCTION_NAME} start");
 
-        let result = self.close_internal();
+        let result = py.detach(|| self.close_internal());
 
         match result {
             Ok(_) => {
@@ -743,11 +669,11 @@ impl Cursor {
     }
 
     /// Closes the current result set and clears cached prepared statements.
-    pub fn clear(&mut self) -> PyResult<()> {
+    pub fn clear(&mut self, py: Python) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Cursor.clear()";
         trace!("{FUNCTION_NAME} start");
 
-        let result = self.clear_internal();
+        let result = py.detach(|| self.clear_internal());
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
@@ -757,109 +683,17 @@ impl Cursor {
     }
 
     /// Close the cursor.
-    pub fn close(&mut self) -> PyResult<()> {
+    pub fn close(&mut self, py: Python) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Cursor.close()";
         trace!("{FUNCTION_NAME} start");
 
-        let result = self.close_internal();
+        let result = py.detach(|| self.close_internal());
 
         match &result {
             Ok(_) => trace!("{FUNCTION_NAME} end"),
             Err(e) => debug!("{FUNCTION_NAME} error: {:?}", e),
         }
         result
-    }
-}
-
-impl Cursor {
-    async fn next_rows<'py>(
-        context: &QueryResultContext<'py, '_>,
-        qr: &mut SqlQueryResult,
-        types: &Vec<AtomType>,
-        row_number: &mut Option<RowNumber>,
-        size: usize,
-    ) -> PyResult<Vec<Bound<'py, PyTuple>>> {
-        let mut rows = Vec::with_capacity(size);
-        for _ in 0..size {
-            if let Some(row) = next_row1(context, qr, types, row_number).await? {
-                rows.push(row);
-            } else {
-                break;
-            }
-        }
-        Ok(rows)
-    }
-
-    async fn all_rows<'py>(
-        context: &QueryResultContext<'py, '_>,
-        qr: &mut SqlQueryResult,
-        types: &Vec<AtomType>,
-        row_number: &mut Option<RowNumber>,
-    ) -> PyResult<Vec<Bound<'py, PyTuple>>> {
-        let mut rows = Vec::new();
-        loop {
-            if let Some(row) = next_row1(context, qr, types, row_number).await? {
-                rows.push(row);
-            } else {
-                break;
-            }
-        }
-        Ok(rows)
-    }
-
-    fn clear_internal(&mut self) -> PyResult<()> {
-        let err = if !self.ps_map.is_empty() || self.query_result.is_some() {
-            let connection = &self.connection;
-            let runtime = connection.runtime();
-            runtime.block_on(async {
-                let mut err = None;
-
-                if let Some(qr) = self.query_result.as_mut() {
-                    if let Err(e) = qr.close().await {
-                        debug!("Cursor query_result close error: {:?}", e);
-                        if connection.has_transaction() {
-                            err = Some(e);
-                        }
-                    }
-                }
-
-                for (ps, _) in self.ps_map.values_mut() {
-                    if let Err(e) = ps.close().await {
-                        debug!("Cursor prepared_statement close error: {:?}", e);
-                        if err.is_none() {
-                            err = Some(e);
-                        }
-                    }
-                }
-                err
-            })
-        } else {
-            None
-        };
-
-        self.ps_map.clear();
-        self.query_result = None;
-        self.query_types.clear();
-        self.row_number = None;
-        self.rowcount = -1;
-
-        if let Some(e) = err {
-            return Err(to_pyerr(e));
-        }
-        Ok(())
-    }
-
-    fn close_internal(&mut self) -> PyResult<()> {
-        self.closed = true;
-        self.clear_internal()
-    }
-
-    fn check_closed(&self, function_name: &str) -> PyResult<()> {
-        if self.closed {
-            trace!("{}: Cursor is already closed", function_name);
-            return Err(ProgrammingError::new_err("Cursor is already closed"));
-        }
-        Ok(())
     }
 }
 

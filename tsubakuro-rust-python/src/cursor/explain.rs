@@ -1,17 +1,14 @@
-use std::collections::HashMap;
+use std::sync::Arc;
 
 use log::trace;
 use pyo3::prelude::*;
 use pyo3_stub_gen::derive::gen_stub_pyclass;
-use tsubakuro_rust_core::prelude::{
-    AtomType, SqlExplainResult, SqlPlaceholder, SqlPreparedStatement,
-};
+use tsubakuro_rust_core::prelude::{SqlExplainResult, SqlParameter};
 
 use crate::{
     column::Column,
-    cursor::Cursor,
+    cursor::{execute::PsInfo, Cursor},
     error::to_pyerr,
-    type_code::{to_parameters, to_parameters_only, ParameterContext},
 };
 
 /// Explain result.
@@ -68,7 +65,7 @@ impl ExplainResult {
 }
 
 impl Cursor {
-    pub(crate) fn explain_direct(&mut self, sql: &str) -> PyResult<ExplainResult> {
+    pub(crate) fn explain_direct(&self, sql: &str) -> PyResult<ExplainResult> {
         const FUNCTION_NAME: &str = "explain_direct()";
 
         let connection = &self.connection;
@@ -87,33 +84,10 @@ impl Cursor {
 
     pub(crate) fn explain_with_parameters(
         &mut self,
-        sql: &str,
-        seq_of_parameters: Bound<PyAny>,
+        info: PsInfo,
+        parameters_list: Vec<Vec<SqlParameter>>,
     ) -> PyResult<ExplainResult> {
         const FUNCTION_NAME: &str = "explain_with_parameters()";
-
-        enum PsInfo<'a> {
-            First(HashMap<String, AtomType>, Vec<SqlPlaceholder>),
-            Ps(&'a mut SqlPreparedStatement),
-        }
-
-        let connection = &self.connection;
-        let context = ParameterContext::new(
-            connection.runtime(),
-            connection.sql_client(),
-            connection.lob_upload_timeout(),
-        );
-        let (info, parameters_list) = if let Some((ps, types)) = self.ps_map.get_mut(sql) {
-            let parameters_list = to_parameters_only(&context, seq_of_parameters, &types)?;
-            (PsInfo::Ps(ps), parameters_list)
-        } else {
-            let (types, placeholders, parameters_list) =
-                to_parameters(&context, seq_of_parameters)?;
-            (PsInfo::First(types, placeholders), parameters_list)
-        };
-        if parameters_list.is_empty() {
-            return self.explain_direct(sql);
-        }
 
         let connection = &self.connection;
         let runtime = connection.runtime();
@@ -121,15 +95,15 @@ impl Cursor {
         let timeout = connection.default_timeout();
 
         let ps = match info {
-            PsInfo::First(types, placeholders) => {
+            PsInfo::First(sql, types, placeholders) => {
                 trace!("{FUNCTION_NAME}: prepare statement start");
                 let ps = runtime
                     .block_on(sql_client.prepare_for(&sql, placeholders, timeout))
                     .map_err(to_pyerr)?;
                 trace!("{FUNCTION_NAME}: prepare statement end");
 
-                self.ps_map.insert(sql.to_string(), (ps, types));
-                let (ps, _) = self.ps_map.get_mut(sql).unwrap();
+                let ps = Arc::new(ps);
+                self.ps_map.insert(sql.to_string(), (ps.clone(), types));
                 ps
             }
             PsInfo::Ps(ps) => ps,

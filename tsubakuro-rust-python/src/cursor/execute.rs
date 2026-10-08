@@ -1,14 +1,21 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use log::{debug, trace};
 use pyo3::prelude::*;
-use tsubakuro_rust_core::prelude::{AtomType, SqlPlaceholder, SqlPreparedStatement, TgError};
+use tsubakuro_rust_core::prelude::{
+    AtomType, SqlParameter, SqlPlaceholder, SqlPreparedStatement, TgError,
+};
 
 use crate::{
     cursor::{Cursor, RowNumber},
     error::{to_pyerr, OperationalError, ProgrammingError},
-    type_code::{to_parameters, to_parameters_only, to_placeholders, ParameterContext},
+    type_code::{to_parameters, to_parameters_only, ParameterContext},
 };
+
+pub(crate) enum PsInfo<'a> {
+    First(&'a str, HashMap<String, AtomType>, Vec<SqlPlaceholder>),
+    Ps(Arc<SqlPreparedStatement>),
+}
 
 impl Cursor {
     pub(crate) fn execute_direct(&mut self, sql: &str) -> PyResult<()> {
@@ -33,8 +40,8 @@ impl Cursor {
         self.row_number = None;
         self.rowcount = -1;
 
-        let (ps, _types) = if let Some(ps) = self.ps_map.get_mut(sql) {
-            ps
+        let ps = if let Some((ps, _types)) = self.ps_map.get(sql) {
+            ps.clone()
         } else {
             trace!("{FUNCTION_NAME}: prepare statement start");
             let placeholders = Vec::new();
@@ -43,8 +50,10 @@ impl Cursor {
                 .map_err(to_pyerr)?;
             trace!("{FUNCTION_NAME}: prepare statement end");
 
-            self.ps_map.insert(sql.to_string(), (ps, HashMap::new()));
-            self.ps_map.get_mut(sql).unwrap()
+            let ps = Arc::new(ps);
+            self.ps_map
+                .insert(sql.to_string(), (ps.clone(), HashMap::new()));
+            ps
         };
 
         let parameters = Vec::new();
@@ -78,32 +87,36 @@ impl Cursor {
         Ok(())
     }
 
-    pub(crate) fn execute_with_parameters(
-        &mut self,
-        sql: &str,
+    pub(crate) fn convert_parameters<'a>(
+        &self,
+        sql: &'a str,
         seq_of_parameters: Bound<PyAny>,
-    ) -> PyResult<()> {
-        const FUNCTION_NAME: &str = "execute_with_parameters()";
-
-        enum PsInfo<'a> {
-            First(HashMap<String, AtomType>, Vec<SqlPlaceholder>),
-            Ps(&'a mut SqlPreparedStatement),
-        }
-
+    ) -> PyResult<(PsInfo<'a>, Vec<Vec<SqlParameter>>)> {
         let connection = &self.connection;
         let context = ParameterContext::new(
             connection.runtime(),
             connection.sql_client(),
             connection.lob_upload_timeout(),
         );
-        let (info, parameters_list) = if let Some((ps, types)) = self.ps_map.get_mut(sql) {
+
+        let result = if let Some((ps, types)) = self.ps_map.get(sql) {
             let parameters_list = to_parameters_only(&context, seq_of_parameters, &types)?;
-            (PsInfo::Ps(ps), parameters_list)
+            (PsInfo::Ps(ps.clone()), parameters_list)
         } else {
             let (types, placeholders, parameters_list) =
                 to_parameters(&context, seq_of_parameters)?;
-            (PsInfo::First(types, placeholders), parameters_list)
+            (PsInfo::First(sql, types, placeholders), parameters_list)
         };
+        Ok(result)
+    }
+
+    pub(crate) fn execute_with_parameters(
+        &mut self,
+        info: PsInfo,
+        parameters_list: Vec<Vec<SqlParameter>>,
+    ) -> PyResult<()> {
+        const FUNCTION_NAME: &str = "execute_with_parameters()";
+
         if parameters_list.is_empty() {
             return Ok(());
         }
@@ -128,15 +141,15 @@ impl Cursor {
         self.rowcount = -1;
 
         let ps = match info {
-            PsInfo::First(types, placeholders) => {
+            PsInfo::First(sql, types, placeholders) => {
                 trace!("{FUNCTION_NAME}: prepare statement start");
                 let ps = runtime
                     .block_on(sql_client.prepare_for(&sql, placeholders, timeout))
                     .map_err(to_pyerr)?;
                 trace!("{FUNCTION_NAME}: prepare statement end");
 
-                self.ps_map.insert(sql.to_string(), (ps, types));
-                let (ps, _) = self.ps_map.get_mut(sql).unwrap();
+                let ps = Arc::new(ps);
+                self.ps_map.insert(sql.to_string(), (ps.clone(), types));
                 ps
             }
             PsInfo::Ps(ps) => ps,
@@ -212,7 +225,8 @@ impl Cursor {
     pub(crate) fn prepare_placeholders(
         &mut self,
         sql: &str,
-        parameters: Bound<PyAny>,
+        types: HashMap<String, AtomType>,
+        placeholders: Vec<SqlPlaceholder>,
     ) -> PyResult<()> {
         const FUNCTION_NAME: &str = "prepare_placeholders()";
 
@@ -233,16 +247,13 @@ impl Cursor {
             self.ps_map.remove(sql);
         }
 
-        let context = ParameterContext::new(runtime, sql_client, connection.lob_upload_timeout());
-        let (types, placeholders) = to_placeholders(&context, parameters)?;
-
         trace!("{FUNCTION_NAME}: prepare statement start");
         let ps = runtime
             .block_on(sql_client.prepare_for(&sql, placeholders, timeout))
             .map_err(to_pyerr)?;
         trace!("{FUNCTION_NAME}: prepare statement end");
 
-        self.ps_map.insert(sql.to_string(), (ps, types));
+        self.ps_map.insert(sql.to_string(), (Arc::new(ps), types));
 
         Ok(())
     }
