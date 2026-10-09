@@ -146,13 +146,21 @@ impl InnerConnection {
             let commit_option = option.unwrap_or(*self.commit_option.lock().unwrap());
             let timeout = self.commit_timeout(timeout);
 
-            trace!("{FUNCTION_NAME}: commit start. {:?}", commit_option);
-            runtime
-                .block_on(sql_client.commit_for(tx, &commit_option, timeout))
-                .map_err(to_pyerr)?;
-            trace!("{FUNCTION_NAME}: commit end");
+            let result = runtime
+                .block_on(async {
+                    trace!("{FUNCTION_NAME}: commit start. {:?}", commit_option);
+                    let result = sql_client.commit_for(tx, &commit_option, timeout).await;
+                    trace!("{FUNCTION_NAME}: commit end. {:?}", result);
+
+                    Self::close_transaction(FUNCTION_NAME, tx).await;
+                    result
+                })
+                .map_err(to_pyerr);
 
             *transaction = None;
+            result?;
+        } else {
+            trace!("{FUNCTION_NAME}: no active transaction");
         }
 
         Ok(())
@@ -171,13 +179,21 @@ impl InnerConnection {
             let sql_client = self.sql_client();
             let timeout = self.default_timeout();
 
-            trace!("{FUNCTION_NAME}: rollback start");
-            runtime
-                .block_on(sql_client.rollback_for(tx, timeout))
-                .map_err(to_pyerr)?;
-            trace!("{FUNCTION_NAME}: rollback end");
+            let result = runtime
+                .block_on(async {
+                    trace!("{FUNCTION_NAME}: rollback start");
+                    let result = sql_client.rollback_for(tx, timeout).await;
+                    trace!("{FUNCTION_NAME}: rollback end. {:?}", result);
+
+                    Self::close_transaction(FUNCTION_NAME, tx).await;
+                    result
+                })
+                .map_err(to_pyerr);
 
             *transaction = None;
+            result?;
+        } else {
+            trace!("{FUNCTION_NAME}: no active transaction");
         }
 
         Ok(())
@@ -208,11 +224,7 @@ impl InnerConnection {
                 {
                     let transaction = self.transaction.lock().unwrap();
                     if let Some(tx) = &*transaction {
-                        trace!("{FUNCTION_NAME}: transaction close start");
-                        if let Err(e) = tx.close().await {
-                            debug!("{FUNCTION_NAME}: transaction close error: {:?}", e);
-                        }
-                        trace!("{FUNCTION_NAME}: transaction close end");
+                        Self::close_transaction(FUNCTION_NAME, tx).await;
                     }
                 }
 
@@ -249,6 +261,15 @@ impl InnerConnection {
         let mut transaction = self.transaction.lock().unwrap();
         *transaction = None;
         result
+    }
+
+    async fn close_transaction(function_name: &str, transaction: &Transaction) {
+        trace!("{function_name}: transaction close start");
+        if let Err(e) = transaction.close().await {
+            debug!("{function_name}: transaction close error: {:?}", e);
+        } else {
+            trace!("{function_name}: transaction close end");
+        }
     }
 
     pub(crate) fn is_closed(&self) -> bool {

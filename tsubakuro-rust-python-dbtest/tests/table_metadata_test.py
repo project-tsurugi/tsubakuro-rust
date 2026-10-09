@@ -1,3 +1,4 @@
+import pytest
 import tsurugi_dbapi as tsurugi
 from tsurugi_dbapi import ProgrammingError
 
@@ -7,11 +8,8 @@ def test_table_metadata(connection):
         cursor.execute("drop table if exists tsubakuro_rust_python_test")
         connection.commit()
 
-        try:
+        with pytest.raises(tsurugi.error.TargetNotFoundException):
             metadata = connection.get_table_metadata("tsubakuro_rust_python_test")
-            assert False, "Expected TargetNotFoundException"
-        except tsurugi.error.TargetNotFoundException:
-            pass
 
         metadata = connection.find_table_metadata("tsubakuro_rust_python_test")
         assert metadata is None
