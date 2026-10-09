@@ -67,6 +67,7 @@ pub struct SqlQueryResult {
     pub(crate) value_stream: ResultSetValueStream,
     pub(crate) default_timeout: Duration,
     close_timeout: Duration,
+    error: Option<TgError>,
 }
 
 impl std::fmt::Debug for SqlQueryResult {
@@ -95,6 +96,7 @@ impl SqlQueryResult {
             value_stream,
             default_timeout,
             close_timeout: default_timeout,
+            error: None,
         }
     }
 
@@ -224,8 +226,16 @@ impl SqlQueryResult {
     /// If this operation was succeeded (returns `true`), this cursor points the head of the next row.
     /// After this operation, you need to invoke [`Self::next_column`] to retrieve the first column data of the next row.
     pub async fn next_row_for(&mut self, timeout: Duration) -> Result<bool, TgError> {
+        self.check_response()?;
+
         let timeout = Timeout::new(timeout);
-        self.value_stream.next_row(&timeout).await
+        let has_next = self.value_stream.next_row(&timeout).await?;
+
+        if !has_next {
+            self.pull_and_check_response(&timeout).await?;
+        }
+
+        Ok(has_next)
     }
 
     /// Advances the cursor to the next column in the current row.
@@ -737,15 +747,39 @@ impl SqlQueryResult {
     ///
     /// since 0.3.0
     pub async fn close_for(&mut self, timeout: Duration) -> Result<(), TgError> {
-        const FUNCTION_NAME: &str = "close()";
+        let timeout = Timeout::new(timeout);
+        self.pull_and_check_response(&timeout).await?;
+        Ok(())
+    }
 
+    async fn pull_and_check_response(&mut self, timeout: &Timeout) -> Result<(), TgError> {
         let slot_handle = self.slot_handle.take();
         if let Some(slot_handle) = slot_handle {
-            let timeout = Timeout::new(timeout);
-            let response = self.wire.pull_response(&slot_handle, &timeout).await?;
-            convert_sql_response(FUNCTION_NAME, &response)?;
+            let result = self.pull_response(slot_handle, timeout).await;
+            if let Err(e) = result {
+                self.error = Some(e.clone());
+                return Err(e);
+            }
         }
         Ok(())
+    }
+
+    async fn pull_response(
+        &mut self,
+        slot_handle: Arc<SlotEntryHandle>,
+        timeout: &Timeout,
+    ) -> Result<(), TgError> {
+        let response = self.wire.pull_response(&slot_handle, timeout).await?;
+        convert_sql_response("SqlQueryResult", &response)?;
+        Ok(())
+    }
+
+    fn check_response(&self) -> Result<(), TgError> {
+        if let Some(e) = &self.error {
+            Err(e.clone())
+        } else {
+            Ok(())
+        }
     }
 
     /// Check if this resource is closed.

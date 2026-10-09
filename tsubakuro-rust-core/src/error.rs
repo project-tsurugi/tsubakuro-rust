@@ -1,11 +1,14 @@
+use std::sync::Arc;
+
 /// Error for tsubakuro-rust-core.
+#[derive(Clone)]
 pub enum TgError {
     /// Client error.
     ClientError(
         /// message
         String,
         /// cause
-        Option<Box<dyn std::error::Error + Send + Sync>>,
+        Option<Arc<dyn std::error::Error + Send + Sync>>,
     ),
     /// Timeout error.
     TimeoutError(
@@ -17,7 +20,7 @@ pub enum TgError {
         /// message
         String,
         /// cause
-        Option<Box<dyn std::error::Error + Send + Sync>>,
+        Option<Arc<dyn std::error::Error + Send + Sync>>,
     ),
 
     /// Server error.
@@ -177,7 +180,7 @@ macro_rules! client_error {
         $crate::error::TgError::ClientError(format!("{}", $message), None)
     };
     ($message:expr, $cause:expr) => {
-        $crate::error::TgError::ClientError(format!("{}", $message), Some(Box::new($cause)))
+        $crate::error::TgError::ClientError(format!("{}", $message), Some(std::sync::Arc::new($cause)))
     };
 }
 
@@ -196,7 +199,7 @@ macro_rules! io_error {
         $crate::error::TgError::IoError(format!("{}", $message), None)
     };
     ($message:expr, $cause:expr) => {
-        $crate::error::TgError::IoError(format!("{}", $message), Some(Box::new($cause)))
+        $crate::error::TgError::IoError(format!("{}", $message), Some(std::sync::Arc::new($cause)))
     };
 }
 
@@ -222,7 +225,7 @@ macro_rules! prost_decode_error {
     ($function_name:expr, $data_name:expr, $cause:expr) => {
         $crate::error::TgError::ClientError(
             format!("{}: {} decode error", $function_name, $data_name),
-            Some(Box::new($cause)),
+            Some(std::sync::Arc::new($cause)),
         )
     };
 }
