@@ -68,6 +68,7 @@ pub struct SqlQueryResult {
     pub(crate) default_timeout: Duration,
     close_timeout: Duration,
     error: Option<TgError>,
+    closed: bool,
 }
 
 impl std::fmt::Debug for SqlQueryResult {
@@ -97,6 +98,7 @@ impl SqlQueryResult {
             default_timeout,
             close_timeout: default_timeout,
             error: None,
+            closed: false,
         }
     }
 
@@ -747,6 +749,8 @@ impl SqlQueryResult {
     ///
     /// since 0.3.0
     pub async fn close_for(&mut self, timeout: Duration) -> Result<(), TgError> {
+        self.closed = true;
+
         let timeout = Timeout::new(timeout);
         self.pull_and_check_response(&timeout).await?;
         Ok(())
@@ -786,6 +790,6 @@ impl SqlQueryResult {
     ///
     /// since 0.3.0
     pub fn is_closed(&self) -> bool {
-        self.slot_handle.is_none()
+        self.closed
     }
 }
