@@ -120,7 +120,7 @@ impl Connection {
         Ok(TableMetadata::new(table_metadata))
     }
 
-    pub(super) fn commit_internal(&mut self, option: Option<CommitOption>) -> PyResult<()> {
+    pub(super) fn commit_internal(&self, option: Option<CommitOption>) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.commit()";
         trace!("{FUNCTION_NAME} start. option={:?}", option);
 
@@ -140,7 +140,7 @@ impl Connection {
         result
     }
 
-    pub(super) fn rollback_internal(&mut self) -> PyResult<()> {
+    pub(super) fn rollback_internal(&self) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.rollback()";
         trace!("{FUNCTION_NAME} start");
 
@@ -154,7 +154,7 @@ impl Connection {
         result
     }
 
-    pub(super) fn close_internal(&mut self) -> PyResult<()> {
+    pub(super) fn close_internal(&self) -> PyResult<()> {
         let connection = &self.inner;
         connection.close()
     }

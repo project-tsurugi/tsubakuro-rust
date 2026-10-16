@@ -153,11 +153,11 @@ impl Connection {
 
     /// Transaction option.
     #[setter]
-    pub fn set_transaction_option(&mut self, option: TransactionOption) {
+    pub fn set_transaction_option(&self, option: TransactionOption) {
         const FUNCTION_NAME: &str = "Connection.set_transaction_option()";
         trace!("{FUNCTION_NAME} start. option={:?}", option);
 
-        let connection = &mut self.inner;
+        let connection = &self.inner;
         connection.set_transaction_option(option);
 
         trace!("{FUNCTION_NAME} end");
@@ -165,7 +165,7 @@ impl Connection {
 
     /// Commit option.
     #[setter]
-    pub fn set_commit_option(&mut self, option: CommitOption) {
+    pub fn set_commit_option(&self, option: CommitOption) {
         const FUNCTION_NAME: &str = "Connection.set_commit_option()";
         trace!("{FUNCTION_NAME} start. option={:?}", option);
 
@@ -185,7 +185,7 @@ impl Connection {
     ///     connection.commit()
     ///     ```
     #[pyo3(signature = (option=None))]
-    pub fn commit(&mut self, py: Python, option: Option<CommitOption>) -> PyResult<()> {
+    pub fn commit(&self, py: Python, option: Option<CommitOption>) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.commit()";
         self.check_closed(FUNCTION_NAME)?;
 
@@ -198,7 +198,7 @@ impl Connection {
     ///     ```python
     ///     connection.rollback()
     ///     ```
-    pub fn rollback(&mut self, py: Python) -> PyResult<()> {
+    pub fn rollback(&self, py: Python) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.rollback()";
         self.check_closed(FUNCTION_NAME)?;
 
@@ -213,7 +213,7 @@ impl Connection {
 
     /// Exit the runtime context related to this object.
     pub fn __exit__(
-        &mut self,
+        &self,
         py: Python,
         _exc_type: Option<Bound<PyAny>>,
         exc_value: Option<Bound<PyAny>>,
@@ -242,7 +242,7 @@ impl Connection {
 
     /// Shutdown option.
     #[setter]
-    pub fn set_shutdown_option(&mut self, option: ShutdownOption) {
+    pub fn set_shutdown_option(&self, option: ShutdownOption) {
         const FUNCTION_NAME: &str = "Connection.set_shutdown_option()";
         trace!("{FUNCTION_NAME} start. option={:?}", option);
 
@@ -253,7 +253,7 @@ impl Connection {
     }
 
     /// Close the connection.
-    pub fn close(&mut self, py: Python) -> PyResult<()> {
+    pub fn close(&self, py: Python) -> PyResult<()> {
         const FUNCTION_NAME: &str = "Connection.close()";
         trace!("{FUNCTION_NAME} start");
 
