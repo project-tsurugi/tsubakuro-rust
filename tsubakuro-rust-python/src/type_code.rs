@@ -64,6 +64,7 @@ pub(crate) fn atom_type_to_type_code(atom_type: Option<AtomType>) -> &'static st
 }
 
 pub(crate) struct ParameterContext<'a> {
+    py: Python<'a>,
     runtime: &'a Runtime,
     sql_client: &'a SqlClient,
     lob_upload_timeout: Duration,
@@ -71,15 +72,21 @@ pub(crate) struct ParameterContext<'a> {
 
 impl<'a> ParameterContext<'a> {
     pub(crate) fn new(
+        py: Python<'a>,
         runtime: &'a Runtime,
         sql_client: &'a SqlClient,
         lob_upload_timeout: Duration,
     ) -> Self {
         Self {
+            py,
             runtime,
             sql_client,
             lob_upload_timeout,
         }
+    }
+
+    pub(crate) fn py(&self) -> Python<'a> {
+        self.py
     }
 
     pub(crate) fn runtime(&self) -> &Runtime {

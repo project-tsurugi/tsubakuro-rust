@@ -89,11 +89,13 @@ impl Cursor {
 
     pub(crate) fn convert_parameters<'a>(
         &self,
+        py: Python<'a>,
         sql: &'a str,
         seq_of_parameters: Bound<PyAny>,
     ) -> PyResult<(PsInfo<'a>, Vec<Vec<SqlParameter>>)> {
         let connection = &self.connection;
         let context = ParameterContext::new(
+            py,
             connection.runtime(),
             connection.sql_client(),
             connection.lob_upload_timeout(),

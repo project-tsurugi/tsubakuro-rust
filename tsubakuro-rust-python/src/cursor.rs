@@ -130,7 +130,7 @@ impl Cursor {
             let (info, parameters_list) = {
                 let vec = vec![parameters];
                 let seq_of_parameters = vec.into_pyobject(py)?;
-                self.convert_parameters(operation, seq_of_parameters)?
+                self.convert_parameters(py, operation, seq_of_parameters)?
             };
             py.detach(|| self.execute_with_parameters(info, parameters_list))
         } else {
@@ -182,7 +182,7 @@ impl Cursor {
             let (info, parameters_list) = {
                 let vec = vec![parameters];
                 let seq_of_parameters = vec.into_pyobject(py)?;
-                self.convert_parameters(operation, seq_of_parameters)?
+                self.convert_parameters(py, operation, seq_of_parameters)?
             };
             if parameters_list.is_empty() {
                 py.detach(|| self.explain_direct(operation))
@@ -237,7 +237,8 @@ impl Cursor {
         let connection = &self.connection;
         let runtime = connection.runtime();
         let sql_client = connection.sql_client();
-        let context = ParameterContext::new(runtime, sql_client, connection.lob_upload_timeout());
+        let context =
+            ParameterContext::new(py, runtime, sql_client, connection.lob_upload_timeout());
         let (types, placeholders) = to_placeholders(&context, parameters)?;
 
         let result = py.detach(|| self.prepare_placeholders(operation, types, placeholders));
@@ -363,7 +364,7 @@ impl Cursor {
         self.check_closed(FUNCTION_NAME)?;
         trace!("{FUNCTION_NAME} start. operation={}", operation);
 
-        let (info, parameters_list) = self.convert_parameters(operation, seq_of_parameters)?;
+        let (info, parameters_list) = self.convert_parameters(py, operation, seq_of_parameters)?;
         let result = py.detach(|| self.execute_with_parameters(info, parameters_list));
 
         match &result {
