@@ -79,7 +79,7 @@ tsurugi-dbapiの拡張機能です。
 ```
 
 `find_table_metadata` という拡張メソッドも提供しています。  
-`get_table_metadata` との違いは、指定されたテーブルが存在しないとき、`get_table_metadata`  ではエラーが発生しますが `find_table_metadata` はNoneを返します。
+`get_table_metadata` との違いは、指定されたテーブルが存在しないとき、`get_table_metadata` ではエラーが発生しますが `find_table_metadata` はNoneを返します。
 
 テーブル定義から取得できる情報については [APIドキュメントのTableMetadata](https://tsurugi-dbapi.readthedocs.io/latest/api/#tsurugi_dbapi.TableMetadata) を参照してください。
 
@@ -229,7 +229,7 @@ tsurugi-dbapiでは、パラメーターの値を元にデータ型を推定し�
 ```python
     with connection.cursor() as cursor:
         sql = "select * from example where foo = ?"
-        parameters = (tsurug.type_code.Int32(1),)
+        parameters = (tsurugi.type_code.Int32(1),)
         cursor.execute(sql, parameters)
         row = cursor.fetchone()
         print(row)
@@ -282,7 +282,7 @@ tsurugi-dbapi独自の拡張機能として、SQL実行前にプレースホル�
 ```python
     with connection.cursor() as cursor:
         sql = "select * from example where foo = ?"
-        cursor.prepare(sql, (tsurug.type_code.Int32,))
+        cursor.prepare(sql, (tsurugi.type_code.Int32,))
         parameters = (1,)
         cursor.execute(sql, parameters)
         row = cursor.fetchone()
@@ -313,9 +313,9 @@ tsurugi-dbapi独自の拡張機能として、SQL実行前にプレースホル�
 > tsurugi-dbapiでは、`execute`, `executemany`, `prepare` メソッドが新しいSQL文で呼ばれる度に、TsurugiのPreparedStatementを生成してCursorオブジェクト内部にキャッシュします。
 > 同じSQL文で `execute`, `executemany` メソッドが呼ばれると、キャッシュされていたPreparedStatementを再利用します。
 > 
->このため、ひとつのCursorオブジェクトで様々なSQLを実行していると、PreparedStatementが溜まり続けます。
+> このため、ひとつのCursorオブジェクトで様々なSQLを実行していると、PreparedStatementが溜まり続けます。
 > 
->Cursorの `close` または `clear` メソッドを呼ぶと、キャッシュされていたPreparedStatementは解放されます。
+> Cursorの `close` または `clear` メソッドを呼ぶと、キャッシュされていたPreparedStatementは解放されます。
 
 ## SQLの実行計画の取得方法
 
@@ -326,12 +326,12 @@ tsurugi-dbapiの拡張機能です。
 
 ```python
     with connection.cursor() as cursor:
-        explain_result = corsor.explain("select * from example");
+        explain_result = cursor.explain("select * from example")
         print("explain:", explain_result.contents)
 
         sql = "select * from example where foo = ?"
-        parameters = (tsurug.type_code.Int32(1),)
-        explain_result = corsor.explain(sql, parameters);
+        parameters = (tsurugi.type_code.Int32(1),)
+        explain_result = cursor.explain(sql, parameters)
         print("explain:", explain_result.contents)
 ```
 
@@ -358,7 +358,7 @@ tsurugi-dbapiの例外クラスは、DB API 2.0 (PEP 249)で定義されてい�
 ## ログ出力
 
 tsurugi-dbapi（の中核である内部モジュール `_tsubakuro_rust_python` ）はログを出力しますが、デフォルトではログは無効になっています。  
-初期化用の `logging_init` または  `env_logger_init` 関数を呼ぶことで、実際にログが出力されるようになります。
+初期化用の `logging_init` または `env_logger_init` 関数を呼ぶことで、実際にログが出力されるようになります。
 
 > [!NOTE]
 >
@@ -422,7 +422,7 @@ tsurugi-dbapiでは、以下に挙げたクラスおよび列挙型のオブジ�
 >
 > tsurugi-dbapiではログ出力の初期化関数を呼ばないとログが出力されませんが、マルチプロセッシングにおいては、初期化関数を呼ぶ箇所について注意が必要です。
 >
-> Pythonのmultiprocessingパッケージにはforkとspawnという方式があります。（Windowsはspawnのみ、Linuxのデフォルトはfork）
+> Pythonのmultiprocessingパッケージにはforkとspawnという方式があります。（Windowsはspawnのみ、Linuxのデフォルトはfork（Python 3.14以降はforkserver））
 >
 > forkの場合、生成元プロセスでログ出力初期化関数を呼んでおけば、生成先プロセスでもログが出力されます。
 >
