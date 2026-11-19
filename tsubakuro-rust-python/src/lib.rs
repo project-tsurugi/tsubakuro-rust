@@ -1,5 +1,4 @@
 use pyo3::prelude::*;
-use pyo3_stub_gen::define_stub_info_gatherer;
 
 mod column;
 mod commit_option;
@@ -177,4 +176,16 @@ mod _tsubakuro_rust_python {
     }
 }
 
-define_stub_info_gatherer!(stub_info);
+/// Gather information to generate stub files.
+///
+/// `module-name` in pyproject.toml is `tsurugi_dbapi._tsubakuro_rust_python`,
+/// but the classes are exposed under `tsurugi_dbapi`, so use it as the stub root.
+pub fn stub_info() -> pyo3_stub_gen::Result<pyo3_stub_gen::StubInfo> {
+    let manifest_dir: &std::path::Path = env!("CARGO_MANIFEST_DIR").as_ref();
+    pyo3_stub_gen::StubInfo::from_project_root(
+        "tsurugi_dbapi".to_string(),
+        manifest_dir.join("python"),
+        true, // mixed layout (python-source = "python")
+        pyo3_stub_gen::StubGenConfig::default(),
+    )
+}

@@ -23,7 +23,7 @@ use tsubakuro_rust_core::prelude::{
 ///     LTX: Long transaction (LTX).
 ///     RTX: Read-only transaction (RTX).
 #[gen_stub_pyclass_enum]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum TransactionType {
@@ -111,7 +111,7 @@ impl TransactionType {
 ///     tx_option.scan_parallel = 4
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct TransactionOption {
     /// Transaction type.

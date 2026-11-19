@@ -20,7 +20,7 @@ use tsubakuro_rust_core::prelude::ShutdownType as CoreShutdownType;
 ///     GRACEFUL: Waits for the ongoing requests and safely shutdown the session.
 ///     FORCEFUL: Cancelling the ongoing requests and safely shutdown the session.
 #[gen_stub_pyclass_enum]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum ShutdownType {
@@ -85,7 +85,7 @@ impl ShutdownType {
 ///     shutdown_option = tsurugi.ShutdownOption(tsurugi.ShutdownType.GRACEFUL, 30)
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct ShutdownOption {
     /// Shutdown type.

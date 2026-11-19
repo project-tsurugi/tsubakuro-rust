@@ -16,7 +16,7 @@ use crate::error::InternalError;
 ///
 /// since 0.10.0
 #[gen_stub_pyclass_enum]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
 pub enum LobTransferType {

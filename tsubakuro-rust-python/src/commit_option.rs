@@ -24,7 +24,7 @@ use tsubakuro_rust_core::prelude::{
 ///     STORED: commit data has been saved on the local disk.
 ///     PROPAGATED: commit data has been propagated to the all suitable nodes.
 #[gen_stub_pyclass_enum]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum CommitType {
@@ -98,7 +98,7 @@ impl CommitType {
 ///     commit_option = tsurugi.CommitOption(tsurugi.CommitType.DEFAULT, False, 60)
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CommitOption {
     /// Commit type.

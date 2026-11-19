@@ -64,7 +64,7 @@ use crate::{
 ///     )
 ///     ```
 #[gen_stub_pyclass]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", from_py_object)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Config {
     /// Application name.
