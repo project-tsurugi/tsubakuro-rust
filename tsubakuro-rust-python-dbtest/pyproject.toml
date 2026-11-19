@@ -14,5 +14,10 @@ dev = [
     "pytest>=9.0.3",
 ]
 
+[tool.uv]
+constraint-dependencies = [
+    "Pygments>=2.20.0",
+]
+
 [tool.uv.sources]
 tsurugi-dbapi = { path = "../tsubakuro-rust-python" }
