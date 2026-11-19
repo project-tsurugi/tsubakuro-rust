@@ -34,6 +34,7 @@ sha1 = "0.10.6"
 bytes = "1.11.1"
 tonic = { version = "0.14.5", features = ["tls-native-roots", "tls-ring"] }
 tonic-prost = "0.14.5"
+rustls = { version = "0.23.46", default-features = false }
 
 [build-dependencies]
 prost-build = "0.14"

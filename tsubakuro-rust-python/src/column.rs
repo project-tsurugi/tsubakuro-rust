@@ -18,7 +18,7 @@ use crate::type_code::atom_type_to_type_code;
 ///     scale (Optional[int]): Scale for numeric types. (read only)
 ///     nullable (Optional[bool]): Nullable flag. (read only)
 #[gen_stub_pyclass]
-#[pyclass(module = "tsurugi_dbapi")]
+#[pyclass(module = "tsurugi_dbapi", skip_from_py_object)]
 #[derive(Clone)]
 pub struct Column {
     inner: SqlColumn,

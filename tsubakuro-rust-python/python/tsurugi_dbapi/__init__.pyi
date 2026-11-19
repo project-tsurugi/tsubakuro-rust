@@ -546,7 +546,7 @@ class Connection:
             connection.rollback()
             ```
         """
-    def __enter__(self, slf: Connection) -> Connection:
+    def __enter__(self) -> Connection:
         r"""
         Enter the runtime context related to this object.
         """
@@ -836,7 +836,7 @@ class Cursor:
         r"""
         This method is a no-op in this implementation.
         """
-    def __iter__(self, slf: Cursor) -> Cursor:
+    def __iter__(self) -> Cursor:
         r"""
         Iterator protocol: return the iterator object itself.
         """
@@ -844,7 +844,7 @@ class Cursor:
         r"""
         Iterator protocol: return the next row in the result set.
         """
-    def __enter__(self, slf: Cursor) -> Cursor:
+    def __enter__(self) -> Cursor:
         r"""
         Enter the runtime context related to this object.
         """
@@ -1137,7 +1137,7 @@ class TransactionOption:
         Write preserve.
         """
     @write_preserve.setter
-    def write_preserve(self, value: typing.Optional[builtins.list[builtins.str]]) -> None:
+    def write_preserve(self, value: typing.Optional[typing.Sequence[builtins.str]]) -> None:
         r"""
         Write preserve.
         """
@@ -1147,7 +1147,7 @@ class TransactionOption:
         Inclusive read area.
         """
     @inclusive_read_area.setter
-    def inclusive_read_area(self, value: typing.Optional[builtins.list[builtins.str]]) -> None:
+    def inclusive_read_area(self, value: typing.Optional[typing.Sequence[builtins.str]]) -> None:
         r"""
         Inclusive read area.
         """
@@ -1157,7 +1157,7 @@ class TransactionOption:
         Exclusive read area.
         """
     @exclusive_read_area.setter
-    def exclusive_read_area(self, value: typing.Optional[builtins.list[builtins.str]]) -> None:
+    def exclusive_read_area(self, value: typing.Optional[typing.Sequence[builtins.str]]) -> None:
         r"""
         Exclusive read area.
         """
