@@ -8,7 +8,7 @@ tsubakuro-rust-odbc-dbtest is a project for testing [tsubakuro-rust-odbc](../tsu
 
 ```bash
 cd tsubakuro-rust-odbc-dbtest
-./gradlew test -Pdbtest.odbc.lib.name=odbc32 -Pdbtest.endpoint=tcp://localhost:12345 -Pdbtest.endpoint.java=ipc:tsurugi
+./gradlew test -Pdbtest.odbc.lib.name=odbc32 -Pdbtest.endpoint=tcp://localhost:12345 -Pdbtest.endpoint.java=tcp://localhost:12345
 ```
 
 ```bash

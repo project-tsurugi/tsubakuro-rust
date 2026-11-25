@@ -26,6 +26,7 @@ use crate::{
 #[repr(u16)]
 #[derive(Debug, Clone, Copy)]
 #[allow(non_camel_case_types)]
+#[cfg_attr(not(windows), allow(dead_code))]
 enum DriverCompletion {
     SQL_DRIVER_NOPROMPT = 0,
     SQL_DRIVER_COMPLETE = 1,
@@ -324,7 +325,6 @@ impl DriverConnect {
     #[cfg(not(windows))]
     fn arguments_completion(
         &self,
-        _driver: Option<String>,
         arg: TsurugiOdbcConnectArguments,
     ) -> Result<(TsurugiOdbcConnectArguments, bool), SqlReturn> {
         // To avoid compile warnings
