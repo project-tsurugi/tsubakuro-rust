@@ -2072,7 +2072,7 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "tsubakuro-rust-core"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "async-trait",
  "base64",
@@ -2102,7 +2102,7 @@ dependencies = [
 
 [[package]]
 name = "tsubakuro-rust-dbtest"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "bigdecimal",
  "chrono",
